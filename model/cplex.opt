@@ -1,0 +1,13 @@
+* CPLEX LP solution method
+* see https://www.gams.com/help/topic/gams.doc/solvers/cplex/index.html#CPLEXlpmethod
+* 0     Automatic
+* 1     Primal Simplex
+* 2     Dual Simplex
+* 3     Network Simplex
+* 4     Barrier
+* 5     Sifting
+* 6     Concurrent
+
+lpmethod = 6
+threads = 4
+epopt 1e-6

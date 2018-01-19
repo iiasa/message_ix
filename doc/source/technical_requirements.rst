@@ -1,0 +1,1 @@
+.. include:: ../../ixmp/doc/source/technical_requirements.rst

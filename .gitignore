@@ -1,0 +1,46 @@
+# GAMS, R, Python-specific auxiliary files
+*.~gm
+*.bak
+*.~op
+*.pyc
+*.gdx
+*.lst
+*.log
+*.lxi
+*.gch
+*.gpr
+/model/2*/**
+/model/$gms*
+*.dat
+*.tmp
+*.RData*
+*.pyc
+*~
+#*
+*#
+.
+*.Rproj
+
+# MESSAGEix specifics
+/model/MESSAGE_master.gms
+
+# Apple file system
+.DS_Store
+
+# local version of auto-documentation features
+/doc/build/**
+/doc/source/model/**
+
+# files generated during install
+ixmp/default_paths.py
+build
+
+# credentials
+ixmp/*.properties
+config/*.properties
+
+# testdb
+.cache/**
+tests/testdb/test.properties
+tests/testdb/ixmptest.properties
+tests/testdb/ixmptest.lck
