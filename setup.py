@@ -48,6 +48,7 @@ class Cmd(install):
 
 def main():
     packages = [
+        'message_ix'
     ]
     pack_dir = {
         'message_ix': 'message_ix',

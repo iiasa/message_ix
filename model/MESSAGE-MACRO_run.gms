@@ -23,13 +23,12 @@ please visit http://www.iiasa.ac.at/message_ix/.
 
 Please cite as:
 
-    Daniel Huppmann, Matthew Gidden, Oliver Fricko, Peter Kolp, 
-    Clara Orthofer, Michael Pimmer, Keywan Riahi, and Volker Krey. 
-    The MESSAGEix Integrated Assessment model and the ix modeling platform. 
+    Daniel Huppmann, Matthew Gidden, Oliver Fricko, Peter Kolp,
+    Clara Orthofer, Michael Pimmer, Keywan Riahi, and Volker Krey.
+    The MESSAGEix Integrated Assessment model and the ix modeling platform.
     in preparation.
 
 $OFFTEXT
-$EOLCOM #
 
 ***
 * Run script for |MESSAGEix| and MACRO
@@ -56,6 +55,7 @@ $EOLCOM #
 ***
 
 $SETGLOBAL macromode "linked"
+$EOLCOM #
 $INCLUDE MESSAGE_framework/model_setup.gms
 
 *----------------------------------------------------------------------------------------------------------------------*

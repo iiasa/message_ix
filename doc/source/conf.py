@@ -39,7 +39,6 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinxcontrib.bibtex',
-#    'cloud_sptheme.ext.table_styling',
     'sphinxcontrib.fulltoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon'

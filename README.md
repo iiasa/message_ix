@@ -35,7 +35,8 @@ of the repository [www.github.com/iiasa/message_ix](http://www.github.com/iiasa/
 
 ## Dependency Installation
 
-Please follow the installation instructions of the [ixmp](ixmp/README.md) package,
+Please follow the installation instructions
+of the [ixmp](https://github.com/iiasa/ixmp/blob/master/README.md) package,
 which is included as a submodule to this repository.
 Instead of forking and cloning the GitHub repository [iiasa/ixmp](https://www.github.com/iiasa/ixmp),
 please fork and clone the the repository [iiasa/message_ix](http://www.github.com/iiasa/message_ix).
