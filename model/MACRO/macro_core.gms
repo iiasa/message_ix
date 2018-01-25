@@ -42,7 +42,7 @@
 * :math:`\rho_n`              :math:`\epsilon - 1 / \epsilon` where :math:`\epsilon` is the elasticity of subsitution in region :math:`n`
 * :math:`depr_n`              Annual depreciation rate in region :math:`n`
 * :math:`\alpha_n`            Capital value share parameter in region :math:`n`
-* :math:`a_r`                 Production function coefficient of capital and labor in region :math:`n`
+* :math:`a_n`                 Production function coefficient of capital and labor in region :math:`n`
 * :math:`b_{n,s}`             Production function coefficients of the different end-use sectors in region :math:`n`, sector :math:`s` and period :math:`y`
 * :math:`udf_{n,y}`           Utility discount factor in period year in region :math:`n` and period :math:`y`
 * :math:`newlab_{n,y}`        New vintage of labor force in region :math:`n` and period :math:`y`
@@ -144,7 +144,7 @@ EQUATIONS
 * and :math:`grow` is the potential GDP growth rate. This choice ensures that in the steady state, the optimal growth rate is identical to the potential GDP growth rates :math:`grow`.
 * The values for the utility discount rates are chosen for descriptive rather than normative reasons. The term :math:`\frac{{duration\_period}_{y} + {duration\_period}_{y-1}}{2}` mutliples the
 * discounted logarithm of consumption with the period length. The final period is treated separately to include a correction factor :math:`\frac{1}{{FIN\_TIME}_{n, y}}` reflecting
-* the finite time horizon of the model. Note that the sum over nodes :math:`node\_active` is artificial, because :math:`node_active` only contains one element.
+* the finite time horizon of the model. Note that the sum over nodes :math:`node\_active` is artificial, because :math:`node\_active` only contains one element.
 *
 ***
 

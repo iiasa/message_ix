@@ -39,6 +39,8 @@ $OFFTEXT
 * of the ``ixmp`` ``MESSAGE``-scheme specifications used for exporting data and importing results.
 *
 * This file contains the workflow of a |MESSAGEix|-standalone run. It can be called:
+*  - Via the scientific programming API's using the packages/libraries ``ixmp`` and ``message_ix``,
+*    calling the method ``solve()`` of the ``ixmp``.Scenario class (see the tutorials). 
 *  - using the file ``MESSAGE_master.gms`` with the option ``$SETGLOBAL macromode "none"``,
 *    where the input data file name and other options are stated explicitly, or
 *  - directly from the command line, with the input data file name

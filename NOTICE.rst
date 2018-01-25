@@ -77,9 +77,9 @@ Contributor Guidelines
 ----------------------
 
 We appreciate contributions to the code base and development of new features for the framework.
-Please refer to `CONTRIBUTING.rst`_ for details.
+Please refer to `Contributor Guidelines`_ for details.
 
-.. _`CONTRIBUTING.rst` : CONTRIBUTING.rst
+.. _`Contributor Guidelines` : CONTRIBUTING.rst
 
 
 References

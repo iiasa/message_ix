@@ -76,7 +76,7 @@ An overview of the |MESSAGEix| framework
 Features of the |MESSAGEix| model
 ---------------------------------
 
-The |MESSAGEix| implementation includes... 
+The |MESSAGEix| implementation includes:
  
 - A comprehensive implementation of 'technologies' to represent a *reference energy system*
   (i.e., the fuel supply chain, conversion technologies from primary to secondary energy forms,
@@ -130,7 +130,10 @@ Further information:
 Running the |MESSAGEix| model
 -----------------------------
 
-There are two methods to run the |MESSAGEix| model:
+There are three methods to run the |MESSAGEix| model:
+
+- Via the scientific programming API's using the packages/libraries ``ixmp`` and ``message_ix``,
+  calling the method ``solve()`` of the ``ixmp``.Scenario class (see the tutorials).
 
 - Using the file ``MESSAGE_master.gms``, where the scenario name (i.e., the gdx input file), the optimization horizon 
   (perfect foresight or myopic/rolling-horizon version), and other options can be defined explicitly.
@@ -142,6 +145,7 @@ There are two methods to run the |MESSAGEix| model:
   The scenario name and other options can be passed as command line parameters, 
   e.g. :literal:`gams MESSAGE_run.gms --in="<data-file>" --out="<output-file>"`.
 
+.. _`Scientific Programming APIs` : scientific_programming_api.html
 .. _`auto-doc page`: model/MESSAGE_run.html
    
 Overview of model structure and includes files

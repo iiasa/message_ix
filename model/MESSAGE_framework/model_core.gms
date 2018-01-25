@@ -6,7 +6,7 @@
 *
 * The |MESSAGEix| systems-optimization model minimizes total costs
 * while satisfying given demand levels for commodities/services
-* and a considering a broad range of technical/engineering constraints and societal restrictions
+* and considering a broad range of technical/engineering constraints and societal restrictions
 * (e.g. bounds on greenhouse gas emissions, pollutants).
 * Demand levels are static (i.e. non-elastic), but the demand response can be integrated by linking |MESSAGEix|
 * to the single sector general-economy MACRO model included in this framework.
@@ -73,7 +73,7 @@
 * :math:`ACT_{n,t,y^V,y,m,h} \in \mathbb{R}`    Activity of a technology (by vintage, mode, subannual time)
 * :math:`CAP\_NEW\_UP_{n,t,y} \in \mathbb{R}_+` Relaxation of upper dynamic constraint on new capacity
 * :math:`CAP\_NEW\_LO_{n,t,y} \in \mathbb{R}_+` Relaxation of lower dynamic constraint on new capacity
-* :math:`CAP\_FIRM_{n,t,c,l,y,r}`                   Dispatchable capacity of renewable technologies per grade
+* :math:`CAP\_FIRM_{n,t,c,l,y,q}`                   Dispatchable capacity of renewable technologies per grade
 * :math:`ACT\_UP_{n,t,y,h} \in \mathbb{R}_+`    Relaxation of upper dynamic constraint on activity [#ACT]_
 * :math:`ACT\_LO_{n,t,y,h} \in \mathbb{R}_+`    Relaxation of lower dynamic constraint on activity [#ACT]_
 * :math:`LAND_{n,s,y} \in [0,1]`                Relative share of land-use scenario (for land-use model emulator)
@@ -90,6 +90,9 @@
 * in a period :math:`|y| = duration\_period_{y}` to determine the available capacity in subsequent periods.
 * This formulation gives more flexibility when it comes to using periods of different duration
 * (more intuitive comparison across different periods).
+*
+* The current model framework allows both input or output normalized formulation.
+* This will affect the parametrization, see Section :ref:`efficiency_output` for more details.
 *
 * .. [#ACT] The dynamic activity constraints are implemented as summed over all modes;
 *    therefore, the variables for the relaxation are not indexed over the set ``mode``.
@@ -540,7 +543,8 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 *     - \ demand\_fixed_{n,c,l,y,h}
 *     & \geq 0 \quad \forall \ l \notin L^{RES} \subseteq L
 *
-* The commodity balance constraint at the resource level is included in the `Equation RESOURCE_CONSTRAINT`_.
+* The commodity balance constraint at the resource level is included in the `Equation RESOURCE_CONSTRAINT`_,
+* while at the renewable level, it is included in the `Equation RENEWABLES_EQUIVALENCE`_.
 ***
 COMMODITY_BALANCE(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
                   AND NOT level_resource(level) AND NOT level_renewable(level) )..
@@ -615,7 +619,7 @@ CAPACITY_CONSTRAINT(node,inv_tec,vintage,year,time)$( map_tec_time(node,inv_tec,
 * """"""""""""""""""""""""""""""
 * This constraint deals with fixed costs for operation and maintainance (O&M) of technology capacity_maintainance.
 * Capacity must be maintained over time until decommissioning (no mothballing), and fixed O\&M costs must be paid
-* immediately after commissioning
+* immediately after commissioning.
 *
 *  .. math::
 *     CAP_{n,t,y^V,y} \leq
@@ -761,7 +765,7 @@ RENEWABLES_CAPACITY_REQUIREMENT(node,inv_tec,commodity,year)$(
 * The rating are defined depending on the share the single technology provides to the
 * system. The reliablitiy factor of conventional powerplants is equal to 1. Therefore
 * they provide their nameplate capacity as firm capacity.
-* The reliability factor of wind and solar dependens on the share the have in the
+* The reliability factor of wind and solar dependens on the share they have in the
 * energy system. Therefore their reliability factor depend on the rating.
 *
 * Equation COMMODITY_USE_LEVEL
@@ -775,7 +779,7 @@ RENEWABLES_CAPACITY_REQUIREMENT(node,inv_tec,commodity,year)$(
 *
 * This constraint is only active if :math:`peak\_load\_factor_{n,c,l,y,h}` is defined.
 * The auxiliary variable :math:`COMMODITY\_USE_{n,c,l,y}` is only required
-* for the equations :math:`FIRM_CAPACITY_CONSTRAINT` and :math:`FIRM_CAPACITY_SHARE`.
+* for the equations :math:`FIRM\_CAPACITY\_CONSTRAINT` and :math:`FIRM\_CAPACITY\_SHARE`.
 ***
 
 COMMODITY_USE_LEVEL(node,commodity,level,year,time)$( peak_load_factor(node,commodity,level,year,time) )..
@@ -794,8 +798,8 @@ COMMODITY_USE_LEVEL(node,commodity,level,year,time)$( peak_load_factor(node,comm
 * The formulation is based on Sullivan et al., 2013 :cite:`sullivan_VRE_2013`.
 *
 *   .. math::
-*      \sum_{t, r \substack{t \in T^{INV} \\ y^V \leq y} } reliability\_factor_{n,t,y,c,l,h,r} \cdot
-*                CAP\_FIRM_{n,t,c,l,y,r} \geq \\
+*      \sum_{t, q \substack{t \in T^{INV} \\ y^V \leq y} } reliability\_factor_{n,t,y,c,l,h,q} \cdot
+*                CAP\_FIRM_{n,t,c,l,y,q} \geq \\
 *         peak\_load\_factor_{n,c,l,y,h} \cdot COMMODITY\_USE_{n,c,l,y}
 *
 * This constraint is only active if :math:`peak\_load\_factor_{n,c,l,y,h}` is defined.
@@ -812,9 +816,9 @@ FIRM_CAPACITY_CONSTRAINT(node,commodity,level,year,time)$( peak_load_factor(node
 * Limits the firm capacity per rating to the size of the penetration bin of this rating.
 *
 *   .. math::
-*      CAP\_FIRM_{n,t,c,l,y,r} \leq reliability\_bin_{n,t,y,c,l,h,r} \cdot COMMODITY\_USE_{n,c,l,y}
+*      CAP\_FIRM_{n,t,c,l,y,q} \leq reliability\_bin_{n,t,y,c,l,h,q} \cdot COMMODITY\_USE_{n,c,l,y}
 *
-* This constraint is only active if :math:`reliability\_bin_{n,t,y,c,l,t,r}` is defined.
+* This constraint is only active if :math:`reliability\_bin_{n,t,y,c,l,t,q}` is defined.
 ***
 FIRM_CAPACITY_SHARE(node,inv_tec,commodity,level,year,rating,time)$(
         reliability_bin(node,inv_tec,year,commodity,level,time,rating) ) ..
@@ -828,9 +832,9 @@ FIRM_CAPACITY_SHARE(node,inv_tec,commodity,level,year,rating,time)$(
 * Limits the firm capacity of the renewables technologies to the total installed capacity of each technology.
 *
 *   .. math::
-*      \sum_{r,h} CAP\_FIRM_{n,t,c,l,y,r} \leq \sum_{y^V \leq y} CAP_{n,t,y^Y,y} \quad \forall t \in T^{INV}
+*      \sum_{r,h} CAP\_FIRM_{n,t,c,l,y,q} \leq \sum_{y^V \leq y} CAP_{n,t,y^Y,y} \quad \forall t \in T^{INV}
 *
-* This constraint is only active if :math:`reliability\_bin_{n,t,y,c,l,t,r}` is defined.
+* This constraint is only active if :math:`reliability\_factor_{n,t,y,c,l,h,q}` is defined.
 ***
 FIRM_CAPACITY_PROVISION(node,inv_tec,year,commodity,level)$(
         SUM(rating, map_ren_rating(node,inv_tec,commodity,level,rating,year) ) )..
@@ -1444,6 +1448,8 @@ DYNAMIC_LAND_TYPE_CONSTRAINT_LO(node,year,land_type)$( is_dynamic_land_lo(node,y
 
 *----------------------------------------------------------------------------------------------------------------------*
 ***
+* .. _Section_of_generic_relations:
+*
 * Section of generic relations (linear constraints)
 * -------------------------------------------------
 *

@@ -12,7 +12,7 @@
 * This provides flexibility when changing the resolution of the model horizon (i.e., the set ``year``).
 *
 * Parameters written in *italics* are auxiliary parameters
-* that are either generated automatically when exporting a ``MESSAGE``-scheme ixmp.Scenario to gdx
+* that are either generated automatically when exporting a ``MESSAGE``-scheme ``ixmp``.Scenario to gdx
 * or that are computed during the pre-processing stage in GAMS.
 ***
 
@@ -47,12 +47,12 @@
 *    in the mathematical model documentation for exponents.
 *
 * .. [#year_auto] The values for this parameter are computed automatically when exporting a ``MESSAGE``-scheme 
-*    ixmp.Scenario to gdx. 
+*    ``ixmp``.Scenario to gdx. 
 *    Note that in |MESSAGEix|, the elements of the ``year`` set are understood to be the last year in a period,
 *    see :ref:`this footnote <period_year_footnote>`.
 *
 * .. [#duration_time_year] The element 'year' in the set of subannual time slices ``time`` has the value of 1.
-*    This value is assigned by default when creating a new ixmp.Scenario based on the ``MESSAGE`` scheme.
+*    This value is assigned by default when creating a new ``ixmp``.Scenario based on the ``MESSAGE`` scheme.
 *
 * .. [#df_auto] This parameter is computed during the GAMS execution.
 ***
@@ -125,7 +125,7 @@ Parameter
 *    * - load_flex_factor [#flex]_
 *      - ``node`` | ``commodity`` | ``level`` | ``year``
 *
-* .. [#demand] The parameter ``demand`` in a ``MESSAGE``-scheme ixmp.Scenario is translated
+* .. [#demand] The parameter ``demand`` in a ``MESSAGE``-scheme ``ixmp``.Scenario is translated
 *    to the parameter ``demand_fixed`` in the MESSAGE implementation in GAMS. The variable ``DEMAND`` is introduced
 *    as an auxiliary reporting variable; it equals ``demand_fixed`` in a `MESSAGE`-standalone run and reports
 *    the final demand including the price response in an iterative `MESSAGE-MACRO` solution.
@@ -180,11 +180,9 @@ Parameter
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act``
 *    * - min_utilization_factor [#tecvintage]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act``
-*    * - reliability_factor [#peakload]_
-*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``commodity``
 *    * - flexibility_factor
 *      - ``node`` | ``technology`` | ``vintage`` | ``year`` | ``mode`` | ``commodity`` | ``level`` | ``time``
-*    * - reliability_factor
+*    * - reliability_factor [#peakload]_
 *      - ``node`` | ``technology`` | ``year`` | ``commodity`` | ``level`` | ``time`` | ``rating``
 *    * - reliability_bin
 *      - ``node`` | ``technology`` | ``year`` | ``commodity`` | ``level`` | ``time`` | ``rating``
@@ -443,7 +441,7 @@ Parameters
 *    * - tax_emission
 *      - ``node`` | ``type_emission`` | ``type_tec`` | ``type_year``
 *
-* .. [#em_scaling] The parameters 'emission_scaling' allows to efficiently aggregate different emissions/pollutants
+* .. [#em_scaling] The parameters ``emission_scaling`` allows to efficiently aggregate different emissions/pollutants
 *    and set bounds or taxes on various categories.
 ***
 
@@ -602,7 +600,7 @@ Parameters
 *    * - fixed_land
 *      - ``node`` | ``land_scenario`` | ``year``
 *
-* Note that the variable :math:`STOCK_CHANGE` is determined implicitly by the :math:`STOCK` variable
+* Note that the variable :math:`STOCK\_CHG` is determined implicitly by the :math:`STOCK` variable
 * and therefore does not need to be explicitly fixed.
 ***
 
