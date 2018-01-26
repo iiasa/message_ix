@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/message_ix
+    docker:
+      - image: docker:17.05.0-ce-git
+    steps:
+      - checkout
+      - run: git submodule sync
+      - run: git submodule update --init
+      - setup_remote_docker
+      - run:
+          name: ls
+          command: pwd && ls
+      - run:
+          name: ls-ixmp
+          command: pwd && ls ./ixmp
+      - run:
+          name: Build App Docker Image
+          command: docker build -t message_ix/message_ix:latest .
+      - run:
+          name: Python2 Tests
+          command: docker run message_ix/message_ix:latest python2 -m pytest -v /message_ix/tests
+      - run:
+          name: Python3 Tests
+          command: docker run message_ix/message_ix:latest python3 -m pytest -v /message_ix/tests
+      
