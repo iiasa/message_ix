@@ -63,24 +63,24 @@ $IF NOT SET SLACK_RELATION_BOUND_LO  $SETGLOBAL SLACK_RELATION_BOUND_LO "*"
 
 ** load auxiliary settings from include file (solver options, resource/time limits, prefered solvers) **
 * recommended only for advanced users
-$INCLUDE MESSAGE_framework/auxiliary_settings.gms
+$INCLUDE MESSAGE/auxiliary_settings.gms
 
 * check that the version of MESSAGEix and the ixToolbox used for exporting the data to gdx match
 $INCLUDE version.gms
-$INCLUDE MESSAGE_framework/version_check.gms
+$INCLUDE MESSAGE/version_check.gms
 
 ** initialize sets, mappings, parameters
-$INCLUDE MESSAGE_framework/sets_maps_def.gms
-$INCLUDE MESSAGE_framework/parameter_def.gms
+$INCLUDE MESSAGE/sets_maps_def.gms
+$INCLUDE MESSAGE/parameter_def.gms
 
 ** load data from gdx, run processing scripts of auxiliary parameters
-$INCLUDE MESSAGE_framework/data_load.gms
+$INCLUDE MESSAGE/data_load.gms
 
 ** compute auxiliary parameters for capacity and investment cost accounting
-$INCLUDE MESSAGE_framework/scaling_investment_costs.gms
+$INCLUDE MESSAGE/scaling_investment_costs.gms
 
 *----------------------------------------------------------------------------------------------------------------------*
 * variable and equation definition, model declaration                                                                  *
 *----------------------------------------------------------------------------------------------------------------------*
 
-$INCLUDE MESSAGE_framework/model_core.gms
+$INCLUDE MESSAGE/model_core.gms

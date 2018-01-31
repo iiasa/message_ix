@@ -82,11 +82,11 @@ The |MESSAGEix| implementation includes:
   (i.e., the fuel supply chain, conversion technologies from primary to secondary energy forms,
   transmissions and distribution, and final demand for energy services)
 - Vintaging of capacity and explicit possibility for early retirement/decommissioning of technologies
+- Explicit formulations for the system integration of variable renewable energy sources
+  base on Sullivan et al., 2013 :cite:`sullivan_VRE_2013` and Johnson et al., 2016 :cite:`johnson_VRE_2016`. 
 - A direct implementation of the 'soft' relaxations of dynamic constraints on new capacity and activity 
   (see Keppo and Strubegger, 2010 :cite:`keppo_short_2010`)
 - Implementation of perfect-foresight and dynamic-recursive (myopic) solution approaches
-- A flexible formulation of dynamic constraints (market penetration of new capacity an activity) 
-  allowing for endogenuous learning spillovers across technologies, regions and model periods
 
 Documentation pages
 -------------------
@@ -161,12 +161,12 @@ in the GAMS code.
 
    model/MESSAGE_run
    model/MESSAGE-MACRO_run
-   model/MESSAGE_framework/sets_maps_def
-   model/MESSAGE_framework/parameter_def
-   model/MESSAGE_framework/model_core
-   model/MESSAGE_framework/model_solve
-   model/MESSAGE_framework/reporting
-   model/MESSAGE_framework/scaling_investment_costs
+   model/MESSAGE/sets_maps_def
+   model/MESSAGE/parameter_def
+   model/MESSAGE/model_core
+   model/MESSAGE/model_solve
+   model/MESSAGE/reporting
+   model/MESSAGE/scaling_investment_costs
    model/MACRO/macro_core
    efficiency_methodology
 

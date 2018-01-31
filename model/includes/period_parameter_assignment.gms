@@ -83,7 +83,7 @@ loop(year_all$( ORD(year_all) > 1 ),
             * POWER( 1 / ( 1 + interestrate(year_all) ), duration_period(year_all) ) ) ;
 ) ;
 
-* store the per-year discount factor for later use in the file 'MESSAGE_framework/scaling_investment_costs.gms'
+* store the per-year discount factor for later use in the file 'MESSAGE/scaling_investment_costs.gms'
 discountfactor('last_year') = sum(last_period, discountfactor(last_period) ) ;
 
 * multiply per-year discount factor by discounted period duration

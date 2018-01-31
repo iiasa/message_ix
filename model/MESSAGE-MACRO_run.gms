@@ -40,7 +40,7 @@ $OFFTEXT
 *
 * This file contains the workflow of a |MESSAGEix|-MACRO run. It can be called:
 *  - Via the scientific programming API's using the packages/libraries ``ixmp`` and ``message_ix``,
-*    calling the method ``solve()`` of the ``ixmp``.Scenario class (see the tutorials). 
+*    calling the method ``solve()`` of the ``ixmp``.Scenario class (see the tutorials).
 *  - using the file ``MESSAGE_master.gms`` with the option ``$SETGLOBAL macromode "linked"``,
 *    where the input data file name and other options are stated explicitly, or
 *  - directly from the command line, with the input data file name
@@ -56,7 +56,7 @@ $OFFTEXT
 
 $SETGLOBAL macromode "linked"
 $EOLCOM #
-$INCLUDE MESSAGE_framework/model_setup.gms
+$INCLUDE MESSAGE/model_setup.gms
 
 *----------------------------------------------------------------------------------------------------------------------*
 * load additional equations and parameters for MACRO                                                                   *
@@ -135,7 +135,7 @@ put_utility 'log' /"+++ Starting iteration ", ORD(iteration):0:0, " of MESSAGEix
 * to keep the model in memory between runs, this will speed up computation
 MESSAGE_LP.solvelink = 1 ;
 
-$INCLUDE MESSAGE_framework/model_solve.gms
+$INCLUDE MESSAGE/model_solve.gms
 
 report_iteration(iteration, 'MESSAGEix OBJ') = OBJ.l ;
 
@@ -301,7 +301,7 @@ $INCLUDE includes/aux_computation_time.gms
 * post-processing and export to gdx                                                                                    *
 *----------------------------------------------------------------------------------------------------------------------*
 
-$INCLUDE MESSAGE_framework/reporting.gms
+$INCLUDE MESSAGE/reporting.gms
 
 * dump all input data, processed data and results to a gdx file (with additional comment as name extension if provided)
 execute_unload "%out%"

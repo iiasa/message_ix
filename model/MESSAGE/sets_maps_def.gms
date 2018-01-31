@@ -3,16 +3,15 @@
 *
 * Sets and mappings definition
 * =============================
-* | This page is generated from the auto-documentation
-* | in ``MESSAGE_framework/sets_maps_def.gms``.
+* This page is generated from the auto-documentation in ``MESSAGE/sets_maps_def.gms``.
 *
 * This file contains the definition of all sets and mappings used in |MESSAGEix|.
 ***
 
 * indices to mapping sets will always be in the following order:
 * lvl_spatial, lvl_temporal,
-* node_location, tec, year_actual, year_vintage, mode, commodity, level, grade,
-* node_od, emission, time(actual), time(source/origin)
+* node_location, tec, year_vintage, year_actual, mode, commodity, level, grade,
+* node_origin/destination, emission, time_actual), time_origin/destination, rating
 
 * allows sets to be empty
 $ONEMPTY
@@ -62,7 +61,7 @@ $ONEMPTY
 *      - land-use types (e.g., field, forest, pasture)
 *    * - year [year_all] [#year_all]_ [#period_year]_
 *      - :math:`y \in Y`
-*      - model horizon (including historical periods for vintage structure of installed capacity 
+*      - model horizon (including historical periods for vintage structure of installed capacity
 *        and dynamic constraints)
 *    * - time [#time]_
 *      - :math:`h \in H`
@@ -82,16 +81,16 @@ $ONEMPTY
 *
 * .. [#node] The set ``node`` includes spatial units across all levels of spatial disaggregation
 *    (global, regions, countries, basins, grid cells).
-*    The hierarchical mapping is implemented via the mapping set ``map_spatial_hierarchy``. 
+*    The hierarchical mapping is implemented via the mapping set ``map_spatial_hierarchy``.
 *    This set always includes an element 'World' when initializing a ``MESSAGE``-scheme ``ixmp``.Scenario.
 *
 * .. [#mode] For example, high electricity or high heat production modes of operation for combined heat and power plants.
 *
 * .. [#year_all] In the |MESSAGEix| implementation in GAMS, the set ``year_all`` denotes the "superset"
 *    of the entire horizon (historical and model horizon), and the set ``year`` is a dynamic subset of ``year_all``.
-*    This facilitates an efficient implementation of the historical capacity build-up and 
+*    This facilitates an efficient implementation of the historical capacity build-up and
 *    the (optional) recursive-dynamic solution approach.
-*    When working with a ``MESSAGE``-scheme ``ixmp``.Scenario via the API, the set of all periods is called ``year`` 
+*    When working with a ``MESSAGE``-scheme ``ixmp``.Scenario via the API, the set of all periods is called ``year``
 *    for a more concise notation.
 *    The specification of the model horizon is implemented using the mapping set ``cat_year``
 *    and the type "firstmodelyear".
@@ -103,10 +102,10 @@ $ONEMPTY
 *    the period '2010' comprises the years :math:`[2006, .. ,2010]`.
 *
 * .. [#time] The set ``time`` collects all sub-annual temporal units across all levels of temporal disaggregation.
-*    In a ``MESSAGE``-scheme ``ixmp``.Scenario, this set always includes an element "year", 
+*    In a ``MESSAGE``-scheme ``ixmp``.Scenario, this set always includes an element "year",
 *    and the duration of that element is 1 (:math:`duration\_time_{'year'} = 1`).
 *
-* .. [#relations] A generic formulation of linear constraints is implemented in |MESSAGEix|, see :ref:`section_of_generic_relations`. 
+* .. [#relations] A generic formulation of linear constraints is implemented in |MESSAGEix|, see :ref:`section_of_generic_relations`.
 *    This feature can be used for testing and development, but specific new use cases should be implemented
 *    by specific equations and parameters.
 ***
@@ -216,8 +215,8 @@ Alias(time,time_od);
 *    constraints for all technologies where investment decisions are relevant.
 *    It is added by default when exporting ``MESSAGE``-scheme ``ixmp``.Scenario to gdx.
 *
-* .. [#renewable_tec] The auxiliary set ``renewable_tec`` (subset of ``technology``) is a short-hand notation 
-*    for all technologies with defined parameters relevant for the equations in the "Renewable" section. 
+* .. [#renewable_tec] The auxiliary set ``renewable_tec`` (subset of ``technology``) is a short-hand notation
+*    for all technologies with defined parameters relevant for the equations in the "Renewable" section.
 *    It is added by default when exporting ``MESSAGE``-scheme ``ixmp``.Scenario to gdx.
 *
 * .. [#type_tec_land] The mapping set ``type_tec_land`` is a dynamic subset of ``type_tec`` and specifies whether
@@ -252,7 +251,7 @@ Sets
 *
 * These sets are generated automatically when exporting a ``MESSAGE``-scheme ``ixmp``.Scenario to gdx using the API.
 * They are used in the GAMS model to reduce model size by excluding non-relevant variables and equations
-* (e.g., actitivity of a technology outside of its technical lifetime). 
+* (e.g., actitivity of a technology outside of its technical lifetime).
 *
 * .. list-table::
 *    :widths: 25 15 60
@@ -271,9 +270,9 @@ Sets
     map_time(time,time2)                        mapping of time periods across hierarchy levels (time2 is in time)
 
     map_resource(node,commodity,grade,year_all)  mapping of resources and grades to node over time
-    map_ren_grade(node,commodity,grade,year_all)  mapping of renewables and grades to node over time
-    map_ren_com(node,tec,commodity,year_all)              mapps which technology has which renewable source as input
-    map_ren_rating(node,tec,commodity,level,rating,year_all)         mapps which ratings are available for which technology
+    map_ren_grade(node,commodity,grade,year_all) mapping of renewables and grades to node over time
+    map_ren_com(node,tec,commodity,year_all)     mapping of technologies to renewable energy source as input
+    map_rating(node,tec,commodity,level,rating,year_all) mapping of technologues to ratings bin assignment
 
     map_commodity(node,commodity,level,year_all,time)    mapping of commodity-level to node and time
     map_stocks(node,commodity,level,year_all)    mapping of commodity-level to node and time
@@ -345,7 +344,7 @@ Sets
 * Mapping sets (flags) for fixed variables
 * ----------------------------------------
 *
-* Similar to the mapping sets for bounds, there are mapping sets to indicate whether decision variables 
+* Similar to the mapping sets for bounds, there are mapping sets to indicate whether decision variables
 * are pre-defined to a specific value, usually taken from a solution of another model instance.
 * This can be used to represent imperfect foresight where a policy shift or parameter change is introduced in later years.
 * The names of these sets follow the format ``is_fixed_<variable>``.

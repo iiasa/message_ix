@@ -40,7 +40,7 @@ $OFFTEXT
 *
 * This file contains the workflow of a |MESSAGEix|-standalone run. It can be called:
 *  - Via the scientific programming API's using the packages/libraries ``ixmp`` and ``message_ix``,
-*    calling the method ``solve()`` of the ``ixmp``.Scenario class (see the tutorials). 
+*    calling the method ``solve()`` of the ``ixmp``.Scenario class (see the tutorials).
 *  - using the file ``MESSAGE_master.gms`` with the option ``$SETGLOBAL macromode "none"``,
 *    where the input data file name and other options are stated explicitly, or
 *  - directly from the command line, with the input data file name
@@ -55,13 +55,13 @@ $OFFTEXT
 ***
 
 $EOLCOM #
-$INCLUDE MESSAGE_framework/model_setup.gms
+$INCLUDE MESSAGE/model_setup.gms
 
 *----------------------------------------------------------------------------------------------------------------------*
 * solve statements (including the loop for myopic or rolling-horizon optimization)                                     *
 *----------------------------------------------------------------------------------------------------------------------*
 
-$INCLUDE MESSAGE_framework/model_solve.gms
+$INCLUDE MESSAGE/model_solve.gms
 
 *----------------------------------------------------------------------------------------------------------------------*
 * post-processing and export to gdx                                                                                    *
@@ -101,7 +101,7 @@ COST_NODAL_NET.L(location,year) =
 ;
 
 * include MESSAGE reporting
-$INCLUDE MESSAGE_framework/reporting.gms
+$INCLUDE MESSAGE/reporting.gms
 
 * dump all input data, processed data and results to a gdx file
 execute_unload "%out%"

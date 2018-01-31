@@ -25,10 +25,6 @@ def _notebook_run(path, kernel=None, capsys=None):
     """
     major_version = sys.version_info[0]
     kernel = kernel or 'python{}'.format(major_version)
-    if capsys is not None:
-        with capsys.disabled():
-            print('using py version {} with kernerl {}'.format(
-                major_version, kernel))
     dirname, __ = os.path.split(path)
     os.chdir(dirname)
     fname = os.path.join(here, 'test.ipynb')
@@ -82,6 +78,6 @@ def test_austria_multiple_policies_answers():
 
 @pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
 def test_austria_load():
-    fname = os.path.join(ene_path, 'austria-load_ds_only.ipynb')
+    fname = os.path.join(ene_path, 'austria_load_scenario.ipynb')
     nb, errors = _notebook_run(fname)
     assert errors == []
