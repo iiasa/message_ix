@@ -7,7 +7,7 @@ import pytest
 
 from testing_utils import here
 
-try: 
+try:
     import nbformat
     jupyter_installed = True
 except:
@@ -18,7 +18,7 @@ ene_path = os.path.join(here, '..', 'tutorial', 'Austrian_energy_system')
 # taken from the execellent example here:
 # https://blog.thedataincubator.com/2016/06/testing-jupyter-notebooks/
 
-@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+
 def _notebook_run(path, kernel=None, capsys=None):
     """Execute a notebook via nbconvert and collect output.
     :returns (parsed nb object, execution errors)

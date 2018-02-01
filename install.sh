@@ -1,39 +1,50 @@
 #!/bin/bash
 
-cd ./ixmp
-python setup.py install --user
-if [ "$?" -ne "0" ]; then
+inst_args=$@
+
+
+function error_msg() {
 	echo =====================================================
 	echo  There was an error during the install process!
 	echo =====================================================
 	read -p "Press any key to continue..."
 	exit 1
-fi
-cd ../
-python setup.py install --user
+}
+
+# update ixmp submodule
+git submodule sync
+git submodule update --init
 if [ "$?" -ne "0" ]; then
-	echo =====================================================
-	echo  There was an error during the install process!
-	echo =====================================================
-	read -p "Press any key to continue..."
-	exit 1
+    error_msg
 fi
 
+# install ixmp
+cd ./ixmp
+python setup.py install $inst_args
+if [ "$?" -ne "0" ]; then
+    error_msg
+fi
+py.test tests
+
+# install message_ix
+cd ../
+python setup.py install $inst_args
+if [ "$?" -ne "0" ]; then
+    error_msg
+fi
+py.test tests
+
+# copy some gams files so users dont commit them
 cp ./model/templates/MESSAGE_master_template.gms ./model/MESSAGE_master.gms
 cp ./model/templates/MESSAGE_project_template.gpr ./model/MESSAGE_project.gpr
 
+# make the documentation
 cd ./doc
 make html
 cd ../
 
-py.test ./ixmp/tests
-py.test tests
-
-
 echo 
-echo Please add the MESSAGE_ix directory to your environmental variables by writing:
-echo "	export MESSAGE_IX_PATH=$PWD"
-echo in the command line and in ~/.bashrc
+echo Installation complete
 echo
 read -p "Press any key to continue..."
 echo
