@@ -41,12 +41,12 @@ If (mod(ctr, 2) eq 0,
 * calculate correction factor for labour force growth rate and apply for next iteration of MACRO
     gdp_mer_macro(node_macro,year) = (I.L(node_macro,year) + C.L(node_macro,year) + EC.L(node_macro,year)) * 1000 ;
     gdp_scale(node_macro,year) = gdp_mer_macro(node_macro,year)/gdp_calibrate(node_macro,year) ;
-    growth_correction(node_macro,year) $ (NOT base_period(year)) = SUM(year2 $ seq_period(year2,year), ((gdp_calibrate(node_macro,year)/gdp_calibrate(node_macro,year2))**(1/duration_period(year)))
-                                                                                                     - ((gdp_mer_macro(node_macro,year)/gdp_mer_macro(node_macro,year2))**(1/duration_period(year))) ) ;
+    growth_correction(node_macro,year) $ (NOT macro_base_period(year)) = SUM(year2 $ seq_period(year2,year), ((gdp_calibrate(node_macro,year)/gdp_calibrate(node_macro,year2))**(1/duration_period(year)))
+                                                                                                           - ((gdp_mer_macro(node_macro,year)/gdp_mer_macro(node_macro,year2))**(1/duration_period(year))) ) ;
     grow(node_macro,year) = grow(node_macro,year) + growth_correction(node_macro,year) ;
 Elseif mod(ctr, 2) eq 1,
 * calculate correction factor for aeei and apply for next iteration of MACRO
-    aeei_correction(node_macro,sector,year) $ (NOT base_period(year)) = SUM(year2 $ seq_period(year2,year), ((demand_new(node_macro,sector,year)/demand_MESSAGE(node_macro,sector,year)) / (demand_new(node_macro,sector,year2)/demand_MESSAGE(node_macro,sector,year2)))**(1/duration_period(year)) - 1) ;
+    aeei_correction(node_macro,sector,year) $ (NOT macro_base_period(year)) = SUM(year2 $ seq_period(year2,year), ((demand_new(node_macro,sector,year)/demand_MESSAGE(node_macro,sector,year)) / (demand_new(node_macro,sector,year2)/demand_MESSAGE(node_macro,sector,year2)))**(1/duration_period(year)) - 1) ;
     aeei(node_macro,sector,year) = aeei(node_macro,sector,year) + aeei_correction(node_macro,sector,year);
 ) ;
 DISPLAY demand_scale, aeei_correction ;
@@ -57,26 +57,26 @@ DISPLAY growth_correction, gdp_mer_macro, gdp_scale ;
 * ------------------------------------------------------------------------------
 
 * calculate cumulative growth effect and potential GDP
-growth_factor(node_macro, base_period) = 1;
+growth_factor(node_macro, macro_base_period) = 1;
 
-LOOP(year $ (NOT base_period(year)),
+LOOP(year $ (NOT macro_base_period(year)),
     growth_factor(node_macro, year) = SUM(year2$( seq_period(year2,year) ), growth_factor(node_macro, year2) * (1 + grow(node_macro, year))**(duration_period(year))) ;
 ) ;
 
-potential_gdp(node_macro, year) = sum(base_period, historical_gdp(node_macro,base_period)/1000) * growth_factor(node_macro, year) ;
+potential_gdp(node_macro, year) = sum(macro_base_period, historical_gdp(node_macro, macro_base_period)/1000) * growth_factor(node_macro, year) ;
 
 * calculation of cumulative effect of AEEI over time
-aeei_factor(node_macro, sector, initialize_period) = 1;
+aeei_factor(node_macro, sector, macro_initial_period) = 1;
 
-LOOP(year_all $ ( ORD(year_all) > sum(year_all2$( initialize_period(year_all2) ), ORD(year_all2) ) ),
+LOOP(year_all $ ( ORD(year_all) > sum(year_all2$( macro_initial_period(year_all2) ), ORD(year_all2) ) ),
 aeei_factor(node_macro, sector, year_all) = SUM(year_all2$( seq_period(year_all2,year_all) ), ( (1 - aeei(node_macro, sector, year_all)) ** duration_period(year_all) ) * aeei_factor(node_macro, sector, year_all2))
 );
 
 * recalculate total labor supply, new labor supply and utility discount factor
-udf(node_macro, base_period)   = 1 ;
-labor(node_macro, base_period) = 1 ;
+udf(node_macro, macro_base_period)   = 1 ;
+labor(node_macro, macro_base_period) = 1 ;
 
-LOOP(year_all $( ORD(year_all) > sum(year_all2$( initialize_period(year_all2) ), ORD(year_all2) ) ),
+LOOP(year_all $( ORD(year_all) > sum(year_all2$( macro_initial_period(year_all2) ), ORD(year_all2) ) ),
 * exogenous labor supply growth (including both changes in labor force and labor productivity growth)
    labor(node_macro, year_all)  = SUM(year_all2$( seq_period(year_all2,year_all) ), labor(node_macro, year_all2) * (1 + grow(node_macro, year_all))**duration_period(year_all)) ;
 * new labor supply
