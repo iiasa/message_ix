@@ -1135,11 +1135,11 @@ ACTIVITY_SOFT_CONSTRAINT_UP(node,tec,year,time)$( soft_activity_up(node,tec,year
 ***
 * Equation ACTIVITY_CONSTRAINT_LO
 * """""""""""""""""""""""""""""""
-* This constraint gives dynamic upper bounds on the market penetration of a technology activity.
+* This constraint gives dynamic lower bounds on the market penetration of a technology activity.
 *
 *  .. math::
 *     \sum_{y^V \leq y,m} ACT_{n,t,y^V,y,m,h}
-*         \leq & - initial\_activity\_lo_{n,t,y,h}
+*         \geq & - initial\_activity\_lo_{n,t,y,h}
 *             \cdot \frac{ \Big( 1 + growth\_activity\_lo_{n,t,y,h} \Big)^{|y|} - 1 }
 *                        { growth\_activity\_lo_{n,t,y,h} } \\
 *             & + \bigg( \sum_{y^V \leq y-1,m} ACT_{n,t,y^V,y-1,m,h}
