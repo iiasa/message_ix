@@ -8,13 +8,13 @@ in_file = os.path.join(default_paths.DATA_DIR, 'MsgData_{case}.gdx')
 out_file = os.path.join(default_paths.OUTPUT_DIR, 'MsgOutput_{case}.gdx')
 iter_file = os.path.join(default_paths.OUTPUT_DIR,
                          'MsgIterationReport_{case}.gdx')
-solve_args = '--in={inp} --out={outp} --iter=' + iter_file
+solve_args = ['--in="{inp}"', '--out="{outp}"', '--iter="' + iter_file + '"']
 
 for msg in ['MESSAGE', 'MESSAGE-MACRO']:
     model_settings.register_model(
-            msg,
-            model_settings.ModelConfig(model_file=model_file,
-                                       inp=in_file,
-                                       outp=out_file,
-                                       args=solve_args)
-        )
+        msg,
+        model_settings.ModelConfig(model_file='"{}"'.format(model_file),
+                                   inp=in_file,
+                                   outp=out_file,
+                                   args=solve_args)
+    )
