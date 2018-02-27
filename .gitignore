@@ -36,6 +36,12 @@
 ixmp/default_paths.py
 build
 
+# rixmp build folder and rhistory
+rmessageix/rmessageix*.zip
+rmessageix/source/inst/docum/*.html
+rmessageix/source/.Rhistory
+!rmessageix/source/*.Rproj
+
 # credentials
 ixmp/*.properties
 config/*.properties
@@ -45,3 +51,4 @@ config/*.properties
 tests/testdb/test.properties
 tests/testdb/ixmptest.properties
 tests/testdb/ixmptest.lck
+.Rproj.user

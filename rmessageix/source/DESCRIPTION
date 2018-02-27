@@ -1,0 +1,30 @@
+Package: rmessageix
+Type: Package
+Title: R package for message_ix
+Version: 0.0.0.9000
+Date: 2017-03-29
+Authors@R: c(
+  person("Alessio", "Mastrucci", email = "mastrucc@iiasa.ac.at", role = c("aut", "cre")),
+  person("Adriano", "Vinca", role = "aut"),
+  person("Victor", "Maus", role = "aut"),
+  person("Peter", "Kolp", role = "aut"),
+  person("Daniel", "Huppmann", role = "aut"),
+  person("Volker", "Krey", role = "aut")
+  )
+Description: This package provides 'MESSAGEix' model specifications to the ix modeling platform (ixmp).
+Depends:
+    R (>= 3.3.0),
+    rixmp
+Imports:
+    methods
+Suggests:
+    knitr
+License: Apache License 2.0
+URL: https://github.com/iiasa/ixmp/rixmp/
+BugReports: https://github.com/iiasa/ixmp/issues
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
+Collate: 
+    'init_rmessageix.R'
+VignetteBuilder: knitr

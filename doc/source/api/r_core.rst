@@ -1,0 +1,1 @@
+.. include:: ../../../ixmp/doc/source/api/r_core.rst
