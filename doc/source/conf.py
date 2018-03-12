@@ -60,7 +60,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'MESSAGEix'
-copyright = u'2017, IIASA, Energy Program'
+copyright = u'2018, IIASA, Energy Program'
 author = u'IIASA, Energy Program'
 
 # retrieve MESSAGEix version number from model/version.gms
@@ -98,7 +98,7 @@ language = None
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = []
+exclude_patterns = ['_themes/*']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -131,12 +131,14 @@ todo_include_todos = True
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'cloud'
+sys.path.append(os.path.abspath('_themes'))
+html_theme_path = ['_themes']
+html_theme = 'kr'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-html_theme_options = {"minimal_width": '1200px'}
+html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []

@@ -1,5 +1,5 @@
-Tutorials for the  MESSAGEix framework
-=======================================
+Tutorials for |MESSAGEix|
+=========================
 
 The following tutorials are included in the "message_ix" repository.
 

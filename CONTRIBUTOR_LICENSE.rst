@@ -11,8 +11,7 @@ However, a formal Contributor License Agreements (CLA)
 makes contribution terms explicit and provides the project maintainers 
 a record of your agreement to those terms.
 
-A wide range of terms exist in other CLAs,
-including choice of law provision, waiver of moral rights, 
+A wide range of terms exist in other CLAs, including waiver of moral rights,
 consequential damages waiver, as-is disclaimer, etc.
 For this project, we follow the more bare-boned GitHub CLA,
 which focuses on the three most important clauses:
@@ -46,23 +45,25 @@ The following terms are used throughout this agreement:
 
 Subject to the terms and conditions of this agreement, You grant to
 the Projects’ maintainers, contributors and users a perpetual, worldwide,
-non-exclusive, no-charge, royalty-free, irrevocable copyright license
-to reproduce, prepare derivative works of, publicly display, publicly perform,
-sublicense, and distribute Your contributions and such derivative works. 
-Except for this license, You reserve all rights, title, and interest in 
-your contributions.
+unlimited in scope, non-exclusive, no-charge, royalty-free, irrevocable 
+copyright license to, in particular without being limited to,
+reproduce, prepare derivative works of, publicly display, make available,
+sublicense, and distribute Your contributions and such derivative works
+in whole or in part. Except for this license, You reserve all moral rights,
+title, and interest in your contributions.
 
 2. Grant of Patent License
 --------------------------
 
 Subject to the terms and conditions of this agreement, You grant to
 the Projects’ maintainers, contributors and users a perpetual, worldwide,
-non-exclusive, no-charge, royalty-free, irrevocable (except as stated in 
-this section) patent license to make, have made, use, offer to sell, sell,
-import, and otherwise transfer your contributions, where such license
-applies only to those patent claims licensable by you that are necessarily
-infringed by your contribution or by combination of your contribution
-with the project to which this contribution was submitted.
+unlimited in scope, non-exclusive, no-charge, royalty-free, irrevocable
+(except as stated in this section) patent license to make, have made, use,
+offer to sell, sell, import, and otherwise transfer your contributions, in
+whole or in part, where such license applies only to those patent claims
+licensable by you that are necessarily infringed by your contribution or
+by combination of your contribution with the project
+to which this contribution was submitted.
 
 If any entity institutes patent litigation - including cross-claim or
 counterclaim in a lawsuit - against You alleging that your contribution or
@@ -73,18 +74,28 @@ under this agreement shall terminate as of the date such litigation is filed.
 3. Source of Contribution
 -------------------------
 
-Your contribution is either your original creation, based upon previous work
+Your contribution is either your original creation or based upon previous work
 that, to the best of your knowledge, is covered under an appropriate open
-source license and you have the right under that license to submit that work
-with modifications, whether created in whole or in part by you, or you have
-clearly identified the source of the contribution and any license or other
-restriction (like related patents, trademarks, and license agreements) 
-of which you are personally aware.
+source license. You assure that you are legally entitled to submit your
+contribution and grant the above license, or you have clearly identified the
+source of the contribution and any license or other restriction (like related
+patents, trademarks, and license agreements) of which you are personally aware.
+If your employer(s) or employee(s) have rights to intellectual property that
+you create, you represent that you have received permission to make the
+contributions on behalf of that employer/employee, or that
+your employer/employee has waived such rights for your contributions.
 
-Reference
----------
+Should the licensor be held responsible for any violation of intellectual
+property right in relation to your contribution, you shall be fully liable
+for damages that may arise.
+
+Reference and License
+---------------------
 
 This Contributor License Agreement and the introductory text is adapted from 
-the `GitHub Contributor License Agreement`_, Version 298f3afd updated August 9, 2017
+the `GitHub Contributor License Agreement`_, Version 298f3afd updated August 9, 2017.
+GitHub granted a `CC-BY-4.0 License`_ to IIASA to use and modify the text of the CLA.
 
 .. _`GitHub Contributor License Agreement` : https://cla.github.com/agreement
+
+.. _`CC-BY-4.0 License` : https://creativecommons.org/licenses/by/4.0/

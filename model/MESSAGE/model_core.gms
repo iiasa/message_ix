@@ -1435,7 +1435,7 @@ DYNAMIC_LAND_TYPE_CONSTRAINT_LO(node,year,land_type)$( is_dynamic_land_lo(node,y
 
 *----------------------------------------------------------------------------------------------------------------------*
 ***
-* .. _Section_of_generic_relations:
+* .. _section_of_generic_relations:
 *
 * Section of generic relations (linear constraints)
 * -------------------------------------------------
