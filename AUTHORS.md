@@ -10,3 +10,4 @@ The following persons contributed to the development of the |MESSAGEix| framewor
 - Peter Kolp, [@peterkolp](https://github.com/peterkolp/), [iiasa](http://www.iiasa.ac.at/staff/staff.php?type=auto&visibility=visible&search=true&login=kolp)
 - Clara Orthofer, [@claraluisa](https://github.com/ClaraLuisa)
 - Michael Pimmer, [@fonfon](https://github.com/fonfon), [iiasa](http://www.iiasa.ac.at/staff/staff.php?type=auto&visibility=visible&search=true&login=pimmer)
+- Adriano Vinca, [@adrivinca](https://github.com/adrivinca), [iiasa](http://www.iiasa.ac.at/staff/staff.php?type=auto&visibility=visible&search=true&login=vinca)
