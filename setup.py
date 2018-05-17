@@ -10,7 +10,7 @@ from setuptools import setup, Command, find_packages
 from setuptools.command.install import install
 
 INFO = {
-    'version': '0.1.0',
+    'version': '1.0.0',
 }
 
 
