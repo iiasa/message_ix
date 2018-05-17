@@ -62,27 +62,9 @@ class Cmd(install):
             print('removing {}'.format(d))
             shutil.rmtree(d)
 
-    def _copy_model(self):
-        src = os.path.join(_here, 'model')
-        dst = os.path.join(_local_path, 'model')
-        print('Copying model files to: {}'.format(dst))
-        copy_with_replace(src, dst)
-
-    def _write_default_paths(self):
-        print('Writing default_paths.py')
-        with open(_default_paths_py_path, 'w') as f:
-            f.write(_default_paths_py)
-
-    def _clean_default_paths(self):
-        print('removing default_paths.py')
-        os.remove(_default_paths_py_path)
-
     def run(self):
-        self._write_default_paths()
         install.run(self)
-        self._clean_default_paths()
         self._clean_dirs()
-        self._copy_model()
 
 
 def main():
@@ -99,7 +81,10 @@ def main():
     cmdclass = {
         'install': Cmd,
     }
-    pack_data = {}
+    pack_data = {
+        'message_ix': ['model/*gms'],
+    }
+    print(pack_data)
     setup_kwargs = {
         "name": "message_ix",
         "version": INFO['version'],
