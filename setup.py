@@ -16,7 +16,8 @@ INFO = {
 
 _here = os.path.dirname(os.path.realpath(__file__))
 _local_path = os.path.expanduser(os.path.join('~', '.local', 'message_ix'))
-paths = """
+_default_paths_py_path = os.path.join(_here, 'message_ix', 'default_paths.py')
+_default_paths_py = """
 import os
 
 fullpath = lambda *x: os.path.abspath(os.path.join(*x))
@@ -28,6 +29,20 @@ OUTPUT_DIR = fullpath(ROOT_DIR, 'model', 'output')
 MSG_TEST_DIR = fullpath(r'{here}', 'tests')
 
 """.format(local_path=_local_path, here=_here)
+
+
+def copy_with_replace(src, dst):
+    """Copy src to dst overwriting existing files"""
+    for root, dirs, files in os.walk(src):
+        for f in files:
+            rel_path = root.replace(src, '').lstrip(os.sep)
+            dst_path = os.path.join(dst, rel_path)
+
+            if not os.path.isdir(dst_path):
+                os.makedirs(dst_path)
+
+            shutil.copyfile(os.path.join(root, f),
+                            os.path.join(dst_path, f))
 
 
 class Cmd(install):
@@ -50,10 +65,22 @@ class Cmd(install):
     def _copy_model(self):
         src = os.path.join(_here, 'model')
         dst = os.path.join(_local_path, 'model')
-        shutil.copytree(src, dst)
+        print('Copying model files to: {}'.format(dst))
+        copy_with_replace(src, dst)
+
+    def _write_default_paths(self):
+        print('Writing default_paths.py')
+        with open(_default_paths_py_path, 'w') as f:
+            f.write(_default_paths_py)
+
+    def _clean_default_paths(self):
+        print('removing default_paths.py')
+        os.remove(_default_paths_py_path)
 
     def run(self):
+        self._write_default_paths()
         install.run(self)
+        self._clean_default_paths()
         self._clean_dirs()
         self._copy_model()
 
@@ -87,13 +114,7 @@ def main():
         "entry_points": entry_points,
         "cmdclass": cmdclass,
     }
-    print('Writing default_paths.py')
-    pth = os.path.join('message_ix', 'default_paths.py')
-    with open(pth, 'w') as f:
-        f.write(paths)
     rtn = setup(**setup_kwargs)
-    print('removing default_paths.py')
-    os.remove(pth)
 
 
 if __name__ == "__main__":
