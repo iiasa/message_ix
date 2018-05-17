@@ -13,18 +13,21 @@ INFO = {
     'version': '0.1.0',
 }
 
+
+_here = os.path.dirname(os.path.realpath(__file__))
+_local_path = os.path.expanduser(os.path.join('~', '.local', 'message_ix'))
 paths = """
 import os
 
 fullpath = lambda *x: os.path.abspath(os.path.join(*x))
 
-ROOT_DIR = fullpath(r'{here}')
-MODEL_DIR = fullpath(r'{here}', 'model')
-DATA_DIR = fullpath(r'{here}', 'model', 'data')
-OUTPUT_DIR = fullpath(r'{here}', 'model', 'output')
+ROOT_DIR = fullpath(r'{local_path}')
+MODEL_DIR = fullpath(ROOT_DIR, 'model')
+DATA_DIR = fullpath(ROOT_DIR, 'model', 'data')
+OUTPUT_DIR = fullpath(ROOT_DIR, 'model', 'output')
 MSG_TEST_DIR = fullpath(r'{here}', 'tests')
 
-""".format(here=os.path.dirname(os.path.realpath(__file__)))
+""".format(local_path=_local_path, here=_here)
 
 
 class Cmd(install):
@@ -36,14 +39,23 @@ class Cmd(install):
     def finalize_options(self):
         install.finalize_options(self)
 
-    def run(self):
-        install.run(self)
+    def _clean_dirs(self):
         dirs = [
             'message_ix.egg-info'
         ]
         for d in dirs:
             print('removing {}'.format(d))
             shutil.rmtree(d)
+
+    def _copy_model(self):
+        src = os.path.join(_here, 'model')
+        dst = os.path.join(_local_path, 'model')
+        shutil.copytree(src, dst)
+
+    def run(self):
+        install.run(self)
+        self._clean_dirs()
+        self._copy_model()
 
 
 def main():
@@ -82,6 +94,7 @@ def main():
     rtn = setup(**setup_kwargs)
     print('removing default_paths.py')
     os.remove(pth)
+
 
 if __name__ == "__main__":
     main()
