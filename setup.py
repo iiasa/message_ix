@@ -55,7 +55,7 @@ def main():
     }
     entry_points = {
         'console_scripts': [
-            'messageix-config=message_ix.cli:config',
+            'messageix-config=message_ix.cli:config_cli',
         ],
     }
     cmdclass = {

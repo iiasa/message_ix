@@ -2,6 +2,7 @@ import argparse
 import json
 import logging
 import os
+import shutil
 
 from message_ix.default_paths import CONFIG_PATH, DEFAULT_MODEL_PATH
 from message_ix.utils import logger
@@ -32,7 +33,7 @@ def config(model_path=None, overwrite=False):
     config = {}
 
     if model_path:
-        model_path = os.path.realpath(model_path)
+        model_path = os.path.abspath(os.path.expanduser(model_path))
         if not os.path.exists(model_path):
             logger().info('Creating model directory: {}'.format(model_path))
             os.makedirs(model_path)
