@@ -56,7 +56,8 @@ class Cmd(install):
 
     def _clean_dirs(self):
         dirs = [
-            'message_ix.egg-info'
+            'message_ix.egg-info',
+            'build',
         ]
         for d in dirs:
             print('removing {}'.format(d))
@@ -65,6 +66,16 @@ class Cmd(install):
     def run(self):
         install.run(self)
         self._clean_dirs()
+
+
+def all_files(path, strip=None):
+    paths = [os.path.join(path, '*')]
+    for root, dirnames, filenames in os.walk(path):
+        for dirname in dirnames:
+            paths.append(os.path.join(root, dirname, '*'))
+    if strip:
+        paths = [x[len(strip + os.sep):] for x in paths]
+    return paths
 
 
 def main():
@@ -82,9 +93,8 @@ def main():
         'install': Cmd,
     }
     pack_data = {
-        'message_ix': ['model/*gms'],
+        'message_ix': all_files('message_ix/model', strip='message_ix'),
     }
-    print(pack_data)
     setup_kwargs = {
         "name": "message_ix",
         "version": INFO['version'],
