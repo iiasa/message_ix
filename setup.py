@@ -35,8 +35,8 @@ class Cmd(install):
         self._clean_dirs()
 
 
-def all_files(path, strip=None):
-    paths = [os.path.join(path, '*')]
+def all_subdirs(path, strip=None):
+    paths = []
     for root, dirnames, filenames in os.walk(path):
         for dirname in dirnames:
             paths.append(os.path.join(root, dirname, '*'))
@@ -62,8 +62,10 @@ def main():
         'install': Cmd,
     }
     pack_data = {
-        'message_ix': all_files('message_ix/model', strip='message_ix'),
+        'message_ix': all_subdirs('message_ix/model', strip='message_ix') +
+        ['model/*gms', 'model/*opt'],
     }
+    print(pack_data)
     setup_kwargs = {
         "name": "message_ix",
         "version": INFO['version'],
