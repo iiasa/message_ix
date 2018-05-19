@@ -62,6 +62,9 @@ def main():
         'install': Cmd,
     }
     pack_data = {
+        # for some reason the model/ directory had to be added separately
+        # it worked locally but not on CI:
+        # https://circleci.com/gh/iiasa/message_ix/29
         'message_ix': all_subdirs('message_ix/model', strip='message_ix') +
         ['model/*gms', 'model/*opt'],
     }
