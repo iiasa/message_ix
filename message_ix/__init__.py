@@ -16,5 +16,5 @@ for msg in ['MESSAGE', 'MESSAGE-MACRO']:
         model_settings.ModelConfig(model_file='"{}"'.format(model_file),
                                    inp=in_file,
                                    outp=out_file,
-                                   args=' '.join(solve_args))
+                                   args=solve_args)
     )
