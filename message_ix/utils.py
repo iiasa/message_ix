@@ -1,6 +1,19 @@
-# -*- coding: utf-8 -*-
+import logging
 
 import numpy as np
+
+# globally accessible logger
+_LOGGER = None
+
+
+def logger():
+    """Access global logger"""
+    global _LOGGER
+    if _LOGGER is None:
+        logging.basicConfig()
+        _LOGGER = logging.getLogger()
+        _LOGGER.setLevel('INFO')
+    return _LOGGER
 
 
 def multiply_df(df1, column1, df2, column2):
@@ -32,7 +45,7 @@ def make_ts(df, time_col, value_col, metadata={}):
         'node_loc': 'region',
         time_col: 'year',
         value_col: 'value'
-            }
+    }
     df = df.rename(columns=rename)
     df = df.dropna(axis='index', subset=['value'])
     return df
