@@ -68,7 +68,6 @@ def main():
         'message_ix': all_subdirs('message_ix/model', strip='message_ix') +
         ['model/*gms', 'model/*opt'],
     }
-    print(pack_data)
     setup_kwargs = {
         "name": "message_ix",
         "version": INFO['version'],
