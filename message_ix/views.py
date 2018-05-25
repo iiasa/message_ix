@@ -34,7 +34,7 @@ column_mapping = {
 }
 
 
-def tec_view(scenario, tec=False, sort_by='technology', par=False, xlsx_mapping=False, save=False):
+def tec_view(scenario, tec=False, sort_by='technology', par=False, xlsx_mapping=False):
     """Returns technology parameters for a given sceanrio
 
     Parameter:
@@ -48,18 +48,16 @@ def tec_view(scenario, tec=False, sort_by='technology', par=False, xlsx_mapping=
         single or multiple parameters for technologies
     xlsx_mapping : string
         allows the user to view data either with database column names or in xlsx_import format
-    save : string 
-        path and name including the file type either .csv or .xlsx indicating where the file should be saved
     """
     mapping = xlsx_column_mapping if xlsx_mapping else column_mapping
 
     if sort_by in ['technology', mapping['technology']]:
-        idx_order = [mapping['node_loc'],
-                     mapping['technology'], mapping['par']]
+        idx_order = [mapping['technology'],
+                     mapping['node_loc'], mapping['par']]
         sort_by = mapping['technology']
     elif sort_by in ['par', mapping['par']]:
-        idx_order = [mapping['node_loc'],
-                     mapping['par'], mapping['technology']]
+        idx_order = [mapping['par'],
+                     mapping['node_loc'], mapping['technology']]
         sort_by = mapping['par']
 
     if not tec:
@@ -84,6 +82,7 @@ def tec_view(scenario, tec=False, sort_by='technology', par=False, xlsx_mapping=
             else:
                 tmp = pd.pivot_table(tmp, index=[c for c in tmp.columns if c not in [
                                      'value', 'year_act']], columns='year_act', values='value').reset_index()
+                del tmp.columns.name
             if mapping['year_vtg'] not in tmp.columns:
                 tmp[mapping['year_vtg']] = ''
             tmp = tmp.drop(
@@ -101,15 +100,7 @@ def tec_view(scenario, tec=False, sort_by='technology', par=False, xlsx_mapping=
 
     df = pd.concat(dfs)
     idx = idx_order + [mapping['unit']] + \
-        [i for i in idxs if i not in idx_order + [mapping['unit']]]
+        sorted([i for i in idxs if i not in idx_order + [mapping['unit']]])
     df = df.set_index(idx).sort_index(axis=0, level=sort_by)
-
-    if save:
-        if save.split('.')[-1] == 'csv':
-            df.to_csv(save)
-        elif save.split('.')[-1] == 'xlsx':
-            writer = pd.ExcelWriter(save, engine='xlsxwriter')
-            df.to_excel(writer, index=True)
-            writer.save()
 
     return(df)
