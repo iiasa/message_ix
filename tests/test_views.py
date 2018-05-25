@@ -15,7 +15,7 @@ msg_args = ('canning problem (MESSAGE scheme)', 'standard')
 @pytest.fixture(scope="session")
 def view_df():
     df = pd.read_csv(os.path.join(default_paths.MSG_TEST_DIR,'tec_view_data.csv'), dtype={
-        '2010': np.float32, 'commodity/emission': np.unicode}).fillna('')
+        '2010': np.float32}).fillna('')
     df = df.rename(columns={'2010': int('2010')})
     df.loc[:, 'year_vtg/year_rel'] = df.loc[:,
                                             'year_vtg/year_rel'].apply(lambda x: int(x) if x != '' else x)
@@ -29,8 +29,7 @@ def test_tec_view_canning_all_tecs(test_mp, view_df):
     exp.sort_index(inplace=True)
     obs = views.tec_view(scen)
     obs.sort_index(inplace=True)
-    # , check_index_type=False)#, check_column_type=False)
-    pdt.assert_frame_equal(exp, obs)
+    pdt.assert_frame_equal(exp, obs, check_index_type=False)
 
 
 def test_tec_view_canning_all_tecs_sort_by_par(test_mp, view_df):
@@ -41,7 +40,7 @@ def test_tec_view_canning_all_tecs_sort_by_par(test_mp, view_df):
     exp.sort_index(inplace=True)
     obs = views.tec_view(scen, sort_by='par')
     obs.sort_index(inplace=True)
-    pdt.assert_frame_equal(exp, obs)
+    pdt.assert_frame_equal(exp, obs, check_index_type=False)
 
 
 def test_tec_view_canning_single_tec(test_mp, view_df):
@@ -52,7 +51,7 @@ def test_tec_view_canning_single_tec(test_mp, view_df):
     exp.sort_index(inplace=True)
     obs = views.tec_view(scen, tec=tec)
     obs.sort_index(inplace=True)
-    pdt.assert_frame_equal(exp, obs)
+    pdt.assert_frame_equal(exp, obs, check_index_type=False)
 
 
 def test_tec_view_canning_single_par(test_mp, view_df):
@@ -63,7 +62,7 @@ def test_tec_view_canning_single_par(test_mp, view_df):
     exp.sort_index(inplace=True)
     obs = views.tec_view(scen, par=par)
     obs.sort_index(inplace=True)
-    pdt.assert_frame_equal(exp, obs)
+    pdt.assert_frame_equal(exp, obs, check_index_type=False)
 
 
 def test_tec_view_canning_xlsx_idx(test_mp, view_df):
@@ -84,4 +83,4 @@ def test_tec_view_canning_xlsx_idx(test_mp, view_df):
     exp.sort_index(inplace=True)
     obs = views.tec_view(scen, xlsx_mapping=True)
     obs.sort_index(inplace=True)
-    pdt.assert_frame_equal(exp, obs)
+    pdt.assert_frame_equal(exp, obs, check_index_type=False)
