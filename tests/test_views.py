@@ -14,7 +14,7 @@ msg_args = ('canning problem (MESSAGE scheme)', 'standard')
 
 @pytest.fixture(scope="session")
 def view_df():
-    df = pd.read_csv("{}\\tec_view_data.csv".format(default_paths.MSG_TEST_DIR), dtype={
+    df = pd.read_csv(os.path.join(default_paths.MSG_TEST_DIR,'tec_view_data.csv'), dtype={
                      '2010': np.float32}).fillna('')
     df = df.rename(columns={'2010': int('2010')})
     df.loc[:, 'year_vtg/year_rel'] = df.loc[:,
