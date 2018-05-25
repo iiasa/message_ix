@@ -7,14 +7,14 @@ import pytest
 import numpy as np
 
 from testing_utils import test_mp
-from message_ix import views
+from message_ix import views, default_paths
 
 msg_args = ('canning problem (MESSAGE scheme)', 'standard')
 
 
 @pytest.fixture(scope="session")
 def view_df():
-    df = pd.read_csv("C:\\Repo\\message_ix_dev\\tests\\tec_view_data.csv", dtype={
+    df = pd.read_csv("{}\\tec_view_data.csv".format(default_paths.MSG_TEST_DIR), dtype={
                      '2010': np.float32}).fillna('')
     df = df.rename(columns={'2010': int('2010')})
     df.loc[:, 'year_vtg/year_rel'] = df.loc[:,
