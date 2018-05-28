@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
+from message_ix import utils
 
 # Mapping of database columns to corresponding xlsx_import columns naming
-xlsx_column_mapping = {
+file_mapping = {
     'node_loc': 'Region',
     'node': 'Region',
     'technology': 'Technology',
@@ -19,7 +20,7 @@ xlsx_column_mapping = {
     'rating': 'Rating',
     'par': 'Parameter'
 }
-column_mapping = {
+model_mapping = {
     'node_loc': 'node',
     'technology': 'technology',
     'unit': 'unit',
@@ -34,7 +35,7 @@ column_mapping = {
 }
 
 
-def tec_view(scenario, tec=False, sort_by='technology', par=False, xlsx_mapping=False):
+def tec_view(scenario, tec=None, sort_by='technology', par=None, column_style=False):
     """Returns technology parameters for a given sceanrio
 
     Parameter:
@@ -46,10 +47,10 @@ def tec_view(scenario, tec=False, sort_by='technology', par=False, xlsx_mapping=
         allows the user to sort data by either the 'Technology'/'technology' or 'Parameter'/'par'
     par : string or list
         single or multiple parameters for technologies
-    xlsx_mapping : string
+    column_style : boolean (default is False)
         allows the user to view data either with database column names or in xlsx_import format
     """
-    mapping = xlsx_column_mapping if xlsx_mapping else column_mapping
+    mapping = file_mapping if column_style else model_mapping
 
     if sort_by in ['technology', mapping['technology']]:
         idx_order = [mapping['technology'],
@@ -59,48 +60,57 @@ def tec_view(scenario, tec=False, sort_by='technology', par=False, xlsx_mapping=
         idx_order = [mapping['par'],
                      mapping['node_loc'], mapping['technology']]
         sort_by = mapping['par']
-
-    if not tec:
-        tec = list(scenario.set('technology'))
     else:
-        tec = [tec] if type(tec) != list else tec
+        raise ValueError("{} not supported.".format(sort_by))
 
-    if not par:
-        par = scenario.par_list()
-    else:
-        par = [par] if type(par) != list else par
+    tec = utils.is_iter_not_string(tec) if tec is not None else list(scenario.set('technology'))
+
+    par = utils.is_iter_not_string(par) if par is not None else list(scenario.par_list())
 
     dfs = []
     for parameter in par:
-        if 'technology' in scenario.par(parameter).columns and not scenario.par(parameter, filters={'technology': tec}).empty:
-            tmp = scenario.par(parameter, filters={'technology': tec})
-            tmp = tmp.rename(columns=mapping)
-            tmp[mapping['par']] = parameter
-            if 'year_act' not in tmp.columns:
-                tmp = pd.pivot_table(tmp, index=[c for c in tmp.columns if c not in [
-                                     'value', mapping['year_vtg']]], columns=mapping['year_vtg'], values='value').reset_index()
-            else:
-                tmp = pd.pivot_table(tmp, index=[c for c in tmp.columns if c not in [
-                                     'value', 'year_act']], columns='year_act', values='value').reset_index()
-                del tmp.columns.name
-            if mapping['year_vtg'] not in tmp.columns:
-                tmp[mapping['year_vtg']] = ''
-            tmp = tmp.drop(
-                [c for c in ['time', 'time_dest', 'time_origin'] if c in tmp.columns], axis=1)
-            idx = [c for c in tmp.columns if type(c) not in [float, int]]
-            tmp = tmp.set_index(idx)
-            dfs.append(tmp)
+        # Filters out required parameters
+        if not 'technology' in scenario.par(parameter).columns:
+            continue
+        df = scenario.par(parameter, filters={'technology': tec})
+        if df.empty:
+            continue
+        # Assigns correct naming to columns
+        df = df.rename(columns=mapping)
+        # Adds a column with parameter name
+        df[mapping['par']] = parameter
+        # Applies pivot table
+        if 'year_act' not in df.columns:
+            index=[c for c in df.columns if c not in ['value', mapping['year_vtg']]]
+            columns=mapping['year_vtg']
+        else:
+            index=[c for c in df.columns if c not in ['value', 'year_act']]
+            columns='year_act'
+        df = pd.pivot_table(df, index=index, columns=columns, values='value').reset_index()
+        df.columns.name = None
+        # Adds empty year_vtg
+        if mapping['year_vtg'] not in df.columns:
+            df[mapping['year_vtg']] = ''
+        # Drops non required columns
+        df = df.drop(
+            [c for c in ['time', 'time_dest', 'time_origin'] if c in df.columns], axis=1)
+        # Sets index
+        idx = [i for i in df.columns if i not in utils.numcols(df) or i in set(mapping.values())] 
+        df = df.set_index(idx)
+        dfs.append(df)
 
     idxs = set(np.concatenate([tuple(x.index.names) for x in dfs]))
     for df in dfs:
         df.reset_index(inplace=True)
-        for i in idxs:
-            if i not in df.columns:
-                df[i] = ' '
+        add_empty_cols = set(idxs) - set(df.columns)
+        for col in add_empty_cols:
+            df[col] = ' '
 
     df = pd.concat(dfs)
-    idx = idx_order + [mapping['unit']] + \
-        sorted([i for i in idxs if i not in idx_order + [mapping['unit']]])
-    df = df.set_index(idx).sort_index(axis=0, level=sort_by)
+    idx = idx_order + [mapping['unit']]
+    idx += sorted(list(set(idxs) - set(idx)))
+    df = df.set_index(idx).sort_index(level=sort_by)
 
-    return(df)
+    return df
+
+mapping = {'node_loc': 'Region',     'node': 'Region',    'technology': 'Technology', 'unit': 'Unit', 'year_vtg': 'Vintage/Year Relation', 'node_origin': 'Region I/O', 'node_dest': 'Region I/O', 'node_rel': 'Region I/O', 'commodity': 'Commodity/Species', 'emission': 'Commodity/Species', 'year_rel': 'Vintage/Year Relation', 'mode': 'Mode', 'level': 'Level', 'rating': 'Rating', 'par': 'Parameter' }
