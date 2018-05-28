@@ -7,14 +7,15 @@ import pytest
 import numpy as np
 
 from testing_utils import test_mp
-from message_ix import views, default_paths
+from message_ix import views
 
 msg_args = ('canning problem (MESSAGE scheme)', 'standard')
+here = os.path.dirname(os.path.realpath(__file__))
 
 
 @pytest.fixture(scope="session")
 def view_df():
-    df = pd.read_csv(os.path.join(default_paths.MSG_TEST_DIR,'tec_view_data.csv'), dtype={
+    df = pd.read_csv(os.path.join(here, 'tec_view_data.csv'), dtype={
         '2010': np.float32}).fillna('')
     df = df.rename(columns={'2010': int('2010')})
     df.loc[:, 'year_vtg/year_rel'] = df.loc[:,
@@ -51,6 +52,7 @@ def test_tec_view_canning_single_tec(test_mp, view_df):
     exp.sort_index(inplace=True)
     obs = views.tec_view(scen, tec=tec)
     obs.sort_index(inplace=True)
+    #assert 0
     pdt.assert_frame_equal(exp, obs, check_index_type=False)
 
 
@@ -81,6 +83,6 @@ def test_tec_view_canning_xlsx_idx(test_mp, view_df):
     exp = exp.set_index(['Technology', 'Region', 'Parameter', 'Unit', 'Commodity/Species',
                          'Level', 'Mode', 'Region I/O', 'Vintage/Year Relation']).astype('float32')
     exp.sort_index(inplace=True)
-    obs = views.tec_view(scen, xlsx_mapping=True)
+    obs = views.tec_view(scen, column_style=True)
     obs.sort_index(inplace=True)
     pdt.assert_frame_equal(exp, obs, check_index_type=False)
