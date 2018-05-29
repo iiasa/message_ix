@@ -152,7 +152,7 @@ if (check,
 
 * check for validity of temporal resolution
 loop(lvl_temporal,
-    loop(time2,
+    loop(time2$( sum(time, map_temporal_hierarchy(lvl_temporal,time,time2) ) ),
         check = 1$( sum( time$( map_temporal_hierarchy(lvl_temporal,time,time2) ),
             duration_time(time) ) ne duration_time(time2) ) ;
     ) ;
