@@ -3,7 +3,7 @@ import argparse
 from message_ix.config import config
 
 
-def config_cli():
+def config():
     parser = argparse.ArgumentParser()
     model_path = 'Copy model files to a new path and configure MESSAGEix to use those files.'
     parser.add_argument('--model_path', help=model_path, default=None)
