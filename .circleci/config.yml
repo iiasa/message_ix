@@ -18,5 +18,5 @@ jobs:
           command: docker run message_ix/message_ix:latest python3 -m pytest -v /message_ix/tests
       - run:
           name: Build Docs
-          command: docker run ixmp/ixmp:latest /bin/bash -c 'cd /ixmp/doc && pip install -r requirements.txt && make html'
+          command: docker run message_ix/message_ix:latest /bin/bash -c 'cd /ixmp/doc && pip install -r requirements.txt && make html'
       
