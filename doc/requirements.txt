@@ -1,0 +1,7 @@
+sphinx
+sphinxcontrib-bibtex
+sphinxcontrib-fulltoc
+numpydoc
+cloud_sptheme
+nbformat
+jupyter
