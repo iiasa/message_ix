@@ -106,4 +106,11 @@ opening a command prompt and typing
    messageix-dl --local_path /path/to/tutorials
    ```
 
+## Building Documentation
+
+Navigate to the `doc` folder and in a command prompt type
+
+   ```
+   make doc
+   ```
 
