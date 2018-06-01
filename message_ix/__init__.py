@@ -3,10 +3,10 @@ from message_ix import default_paths
 import ixmp.model_settings as model_settings
 
 
-model_file = os.path.join(default_paths.MODEL_DIR, '{model}_run.gms')
-in_file = os.path.join(default_paths.DATA_DIR, 'MsgData_{case}.gdx')
-out_file = os.path.join(default_paths.OUTPUT_DIR, 'MsgOutput_{case}.gdx')
-iter_file = os.path.join(default_paths.OUTPUT_DIR,
+model_file = os.path.join(default_paths.model_path(), '{model}_run.gms')
+in_file = os.path.join(default_paths.data_path(), 'MsgData_{case}.gdx')
+out_file = os.path.join(default_paths.output_path(), 'MsgOutput_{case}.gdx')
+iter_file = os.path.join(default_paths.output_path(),
                          'MsgIterationReport_{case}.gdx')
 solve_args = ['--in="{inp}"', '--out="{outp}"', '--iter="' + iter_file + '"']
 
