@@ -1,7 +1,7 @@
 import json
 import os
 
-from default_path_constants import CONFIG_PATH, DEFAULT_MODEL_PATH
+from message_ix.default_path_constants import CONFIG_PATH, DEFAULT_MODEL_PATH
 
 
 def model_path():
