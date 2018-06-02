@@ -5,9 +5,6 @@ del .foo
 echo %MESSAGE_IX%
 
 echo Python MESSAGE_IX setup
-chdir ixmp
-python setup.py install
-chdir ../
 python setup.py install
 
 echo R MESSAGE_IX setup
@@ -17,9 +14,6 @@ IF ERRORLEVEL 1 (
     @rem set ERRORLEVEL to 0 -> ignore R setup
     VERIFY
 ) ELSE (
-    chdir ixmp
-    rscript rixmp/build_rixmp.R [--verbose]
-    chdir ../
     rscript rmessageix/build_rmessageix.R [--verbose]
 )
 
@@ -27,14 +21,13 @@ if %errorlevel% neq 0 GOTO InstallError
 
 setx IXMP_PATH "%MESSAGE_IX%"
 
-copy model\\templates\\MESSAGE_master_template.gms model\\MESSAGE_master.gms
-copy model\\templates\\MESSAGE_project_template.gpr model\\MESSAGE_project.gpr
+copy message_ix\\model\\templates\\MESSAGE_master_template.gms model\\MESSAGE_master.gms
+copy message_ix\\model\\templates\\MESSAGE_project_template.gpr model\\MESSAGE_project.gpr
 
 chdir doc/
 call make.bat html
 chdir ../
 
-py.test ixmp\\tests
 py.test tests
 
 pause
