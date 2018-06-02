@@ -64,7 +64,7 @@ copyright = u'2018, IIASA, Energy Program'
 author = u'IIASA, Energy Program'
 
 # retrieve MESSAGEix version number from model/version.gms
-fname = os.path.join('..', '..', 'model', 'version.gms')
+fname = os.path.join('..', '..', 'message_ix', 'model', 'version.gms')
 with open(fname) as f:
     s = str(f.readlines())
 
