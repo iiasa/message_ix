@@ -33,16 +33,27 @@ def create_local_testdb():
 
 @pytest.fixture(scope="session")
 def test_mp():
-    test_props = create_local_testdb()
-
     # start jvm
     ixmp.start_jvm()
 
     # launch Platform and connect to testdb (reconnect if closed)
-    mp = ixmp.Platform(test_props)
+    mp = ixmp.Platform(tempdir(), dbtype='HSQLDB')
     mp.open_db()
 
     yield mp
+
+# @pytest.fixture(scope="session")
+# def test_mp():
+#     test_props = create_local_testdb()
+
+#     # start jvm
+#     ixmp.start_jvm()
+
+#     # launch Platform and connect to testdb (reconnect if closed)
+#     mp = ixmp.Platform(test_props)
+#     mp.open_db()
+
+#     yield mp
 
 
 @pytest.fixture(scope="session")
