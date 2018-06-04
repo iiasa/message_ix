@@ -1,4 +1,6 @@
 import os
+import re
+
 from message_ix import default_paths
 import ixmp.model_settings as model_settings
 
@@ -18,3 +20,18 @@ for msg in ['MESSAGE', 'MESSAGE-MACRO']:
                                    outp=out_file,
                                    args=solve_args)
     )
+
+
+# retrieve MESSAGEix version number from model/version.gms
+fname = os.path.join(default_paths.model_path(), 'version.gms')
+fname = fname if os.path.exists(fname) else \
+    os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                 'model', 'version.gms')  # only exists here on install
+with open(fname) as f:
+    s = str(f.readlines())
+
+__version__ = '{}.{}.{}'.format(
+    re.search('VERSION_MAJOR "(.+?)"', s).group(1),
+    re.search('VERSION_MINOR "(.+?)"', s).group(1),
+    re.search('VERSION_MICRO "(.+?)"', s).group(1),
+)

@@ -7,8 +7,10 @@ import shutil
 from setuptools import setup, find_packages
 from setuptools.command.install import install
 
+import message_ix
+
 INFO = {
-    'version': '1.0.0',
+    'version': message_ix.__version__,
 }
 
 
