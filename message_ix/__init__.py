@@ -25,7 +25,8 @@ for msg in ['MESSAGE', 'MESSAGE-MACRO']:
 # retrieve MESSAGEix version number from model/version.gms
 fname = os.path.join(default_paths.model_path(), 'version.gms')
 fname = fname if os.path.exists(fname) else \
-    os.path.join('model', 'version.gms')  # only exists here on install
+    os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                 'model', 'version.gms')  # only exists here on install
 with open(fname) as f:
     s = str(f.readlines())
 

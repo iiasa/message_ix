@@ -16,4 +16,7 @@ jobs:
       - run:
           name: Python3 Tests
           command: docker run message_ix/message_ix:latest python3 -m pytest -v /message_ix/tests
+      - run:
+          name: Build Docs
+          command: docker run message_ix/message_ix:latest /bin/bash -c 'cd /message_ix/doc && pip3 install -r requirements.txt && make html'
       
