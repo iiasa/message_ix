@@ -5,6 +5,7 @@
 
 $SETGLOBAL VERSION_MAJOR "0"
 $SETGLOBAL VERSION_MINOR "2"
+$SETGLOBAL VERSION_MICRO "0"
 
 * This file is imported by the script that generates the GAMS documentation
 * from rst-markup text, see ``message_ix\doc\grab_gams_doc.py``.
