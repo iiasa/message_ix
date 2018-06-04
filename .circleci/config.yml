@@ -6,15 +6,7 @@ jobs:
       - image: docker:17.05.0-ce-git
     steps:
       - checkout
-      - run: git submodule sync
-      - run: git submodule update --init
       - setup_remote_docker
-      - run:
-          name: ls
-          command: pwd && ls
-      - run:
-          name: ls-ixmp
-          command: pwd && ls ./ixmp
       - run:
           name: Build App Docker Image
           command: docker build -t message_ix/message_ix:latest .

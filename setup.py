@@ -3,28 +3,13 @@ from __future__ import print_function
 
 import os
 import shutil
-import sys
-import glob
 
-from setuptools import setup, Command, find_packages
+from setuptools import setup, find_packages
 from setuptools.command.install import install
 
 INFO = {
-    'version': '0.1.0',
+    'version': '1.0.0',
 }
-
-paths = """
-import os
-
-fullpath = lambda *x: os.path.abspath(os.path.join(*x))
-
-ROOT_DIR = fullpath(r'{here}')
-MODEL_DIR = fullpath(r'{here}', 'model')
-DATA_DIR = fullpath(r'{here}', 'model', 'data')
-OUTPUT_DIR = fullpath(r'{here}', 'model', 'output')
-MSG_TEST_DIR = fullpath(r'{here}', 'tests')
-
-""".format(here=os.path.dirname(os.path.realpath(__file__)))
 
 
 class Cmd(install):
@@ -36,14 +21,29 @@ class Cmd(install):
     def finalize_options(self):
         install.finalize_options(self)
 
-    def run(self):
-        install.run(self)
+    def _clean_dirs(self):
         dirs = [
-            'message_ix.egg-info'
+            'message_ix.egg-info',
+            'build',
         ]
         for d in dirs:
             print('removing {}'.format(d))
             shutil.rmtree(d)
+
+    def run(self):
+        install.run(self)
+        self._clean_dirs()
+
+
+def all_subdirs(path, strip=None):
+    paths = []
+    for root, dirnames, filenames in os.walk(path):
+        for dirname in dirnames:
+            paths.append(os.path.join(root, dirname, '*'))
+    if strip:
+        n = len(strip) if strip.endswith(os.sep) else len(strip + os.sep)
+        paths = [x[n:] for x in paths]
+    return paths
 
 
 def main():
@@ -55,12 +55,20 @@ def main():
     }
     entry_points = {
         'console_scripts': [
+            'messageix-config=message_ix.cli:config',
+            'messageix-dl=message_ix.cli:dl',
         ],
     }
     cmdclass = {
         'install': Cmd,
     }
-    pack_data = {}
+    pack_data = {
+        # for some reason the model/ directory had to be added separately
+        # it worked locally but not on CI:
+        # https://circleci.com/gh/iiasa/message_ix/29
+        'message_ix': all_subdirs('message_ix/model', strip='message_ix') +
+        ['model/*gms', 'model/*opt'],
+    }
     setup_kwargs = {
         "name": "message_ix",
         "version": INFO['version'],
@@ -75,13 +83,8 @@ def main():
         "entry_points": entry_points,
         "cmdclass": cmdclass,
     }
-    print('Writing default_paths.py')
-    pth = os.path.join('message_ix', 'default_paths.py')
-    with open(pth, 'w') as f:
-        f.write(paths)
     rtn = setup(**setup_kwargs)
-    print('removing default_paths.py')
-    os.remove(pth)
+
 
 if __name__ == "__main__":
     main()
