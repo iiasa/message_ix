@@ -68,7 +68,7 @@ the ix modeling platform for scientific publications or technical reports:
 3. Open a command prompt and type
 
     ```
-    conda install message-ix
+    conda install -c conda-forge message-ix
     ```
 
 
