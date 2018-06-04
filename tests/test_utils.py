@@ -73,12 +73,6 @@ def test_add_spatial_heirarchy(test_mp):
     npt.assert_array_equal(obs, exp)
 
 
-def test_add_spatial(test_mp):
-    scen = test_mp.Scenario(*msg_args, version='new', scheme='MESSAGE')
-    data = {'country': 'Austria'}
-    utils.add_spatial_sets(scen, data)
-
-
 def test_add_temporal_raises(test_mp):
     scen = test_mp.Scenario(*msg_args, version='new', scheme='MESSAGE')
     pytest.raises(ValueError, utils.add_temporal_sets,
