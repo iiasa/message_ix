@@ -4,7 +4,7 @@ import itertools
 
 import pandas as pd
 
-from message_ix.utils import isscalar
+from message_ix.utils import isscalar, logger
 
 
 class Scenario(ixmp.Scenario):
@@ -76,18 +76,26 @@ class Scenario(ixmp.Scenario):
         self.add_set("lvl_spatial", levels)
         self.add_set("map_spatial_hierarchy", hierarchy)
 
-    def _add_defaults(self):
-        """Add any default model structure if not already present"""
-        # first model year
-        cyear = self.set('cat_year')
-        if cyear.empty or 'firstmodelyear' not in cyear['type_year']:
-            fyear = self.set('year')[0]
-            self.add_set("cat_year", "firstmodelyear", fyear)
+    def add_horizon(scenario, data):
+        """Add sets related to temporal dimensions of the model
 
-    def to_gdx(self, *args, **kwargs):
-        """See ixmp.Scenario.to_gdx() for documentation"""
-        self._add_defaults()
-        super(Scenario, self).to_gdx(*args, **kwargs)
+        Parameters
+        ----------
+        scenario : ixmp.Scenario
+        data : dict or other
+
+        Examples
+        --------
+        data = {'year': [2010, 2020]}
+        data = {'year': [2010, 2020], 'firstmodelyear': 2020}
+        """
+        if 'year' not in data:
+            raise ValueError('"year" must be in temporal sets')
+        horizon = data['year']
+        scenario.add_set("year", horizon)
+
+        first = data['firstmodelyear'] if 'firstmodelyear' in data else horizon[0]
+        scenario.add_cat("year", "firstmodelyear", first)
 
     def add_temporal_sets(self, data):
         """Add sets related to temporal dimensions of the model
