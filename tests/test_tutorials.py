@@ -5,6 +5,8 @@ import sys
 import tempfile
 import pytest
 
+import numpy as np
+
 from testing_utils import here
 
 try:
@@ -54,8 +56,8 @@ def test_austria(capsys):
     nb, errors = _notebook_run(fname, capsys=capsys)
     assert errors == []
 
-    obs = eval(nb.cells[74]['outputs'][0]['data']['text/plain'])
-    exp = 153.6750030517578
+    obs = eval(nb.cells[-13]['outputs'][0]['data']['text/plain'])
+    exp = 133105106944.0
     assert np.isclose(obs, exp)
 
 
@@ -65,8 +67,8 @@ def test_austria_single_policy():
     nb, errors = _notebook_run(fname)
     assert errors == []
 
-    obs = eval(nb.cells[14]['outputs'][0]['data']['text/plain'])
-    exp = 153.6750030517578
+    obs = eval(nb.cells[-8]['outputs'][0]['data']['text/plain'])
+    exp = 132452155392.0
     assert np.isclose(obs, exp)
 
 
