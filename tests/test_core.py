@@ -71,15 +71,9 @@ def test_add_spatial_hierarchy(test_mp):
     npt.assert_array_equal(obs, exp)
 
 
-def test_add_temporal_raises(test_mp):
-    scen = Scenario(test_mp, *msg_args, version='new')
-    pytest.raises(ValueError, scen.add_temporal_sets,
-                  data={'foo': 'bar'})
-
-
 def test_vintage_and_active_years(test_mp):
     scen = Scenario(test_mp, *msg_args, version='new')
-    scen.add_temporal_sets({'year': ['2010', '2020']})
+    scen.add_horizon({'year': ['2010', '2020']})
     exp = (('2010', '2010', '2020'), ('2010', '2020', '2020'))
     obs = scen.vintage_and_active_years()
     assert obs == exp
