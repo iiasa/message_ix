@@ -77,19 +77,6 @@ def test_add_temporal_raises(test_mp):
                   data={'foo': 'bar'})
 
 
-def test_add_temporal(test_mp):
-    scen = Scenario(test_mp, *msg_args, version='new')
-    exp = ['2010', '2020']
-    scen.add_temporal_sets({'year': exp})
-    obs = scen.set('year')
-    npt.assert_array_equal(obs, exp)
-
-    obs = scen.set('cat_year')
-    exp = pd.DataFrame(
-        {'type_year': 'firstmodelyear', 'year': int(exp[0])}, index=[0])
-    pdt.assert_frame_equal(obs, exp)
-
-
 def test_vintage_and_active_years(test_mp):
     scen = Scenario(test_mp, *msg_args, version='new')
     scen.add_temporal_sets({'year': ['2010', '2020']})

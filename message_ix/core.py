@@ -76,6 +76,19 @@ class Scenario(ixmp.Scenario):
         self.add_set("lvl_spatial", levels)
         self.add_set("map_spatial_hierarchy", hierarchy)
 
+    def _add_defaults(self):
+        """Add any default model structure if not already present"""
+        # first model year
+        cyear = self.set('cat_year')
+        if cyear.empty or 'firstmodelyear' not in cyear['type_year']:
+            fyear = self.set('year')[0]
+            self.add_set("cat_year", "firstmodelyear", fyear)
+
+    def to_gdx(self, *args, **kwargs):
+        """See ixmp.Scenario.to_gdx() for documentation"""
+        self._add_defaults()
+        super(Scenario, self).to_gdx(*args, **kwargs)
+
     def add_temporal_sets(self, data):
         """Add sets related to temporal dimensions of the model
 
