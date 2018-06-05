@@ -12,6 +12,7 @@ class Scenario(ixmp.Scenario):
     def __init__(self, platform, model, scen, version=None, annotation=None, cache=False):
         """Initialize a new message_ix.Scenario (structured input data and solution)
         or get an existing scenario from the ixmp database instance
+
         Parameters
         ----------
         platform : ixmp.Platform
