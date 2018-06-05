@@ -23,7 +23,7 @@
 *.Rproj
 
 # MESSAGEix specifics
-/model/MESSAGE_master.gms
+message_ix/model/MESSAGE_master.gms
 
 # Apple file system
 .DS_Store

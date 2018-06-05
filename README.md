@@ -14,9 +14,9 @@ The MESSAGEix and MACRO models are implemented in [GAMS](http://www.gams.com).
 This repository contains the GAMS code and a number of tutorials and examples
 using stylized national energy system models.
 
-The repository includes, as a git-submodule, the interface to the *ix modeling
-platform* (ixmp), a modeling "data warehouse" for *integrated and cross-cutting*
-scenario analysis.
+The MESSAGEix framework is fully integrated with IIASA's
+[ix modeling platform (ixmp)](https://www.github.com/iiasa/ixmp),
+a data warehouse for high-powered numerical scenario analysis.
 
 
 ## License
