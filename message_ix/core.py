@@ -95,27 +95,7 @@ class Scenario(ixmp.Scenario):
         scenario.add_set("year", horizon)
 
         first = data['firstmodelyear'] if 'firstmodelyear' in data else horizon[0]
-        scenario.add_cat("year", "firstmodelyear", first)
-
-    def add_temporal_sets(self, data):
-        """Add sets related to temporal dimensions of the model
-
-        Parameters
-        ----------
-        data : dict or other
-
-        Examples
-        --------
-        data = {'year': [2010, 2020]}
-        data = {'year': [2010, 2020], 'firstmodelyear': 2020}
-        """
-        if 'year' not in data:
-            raise ValueError('"year" must be in temporal sets')
-        horizon = data['year']
-        self.add_set("year", horizon)
-
-        first = data['firstmodelyear'] if 'firstmodelyear' in data else horizon[0]
-        self.add_set("cat_year", ["firstmodelyear", first])
+        scenario.add_cat("year", "firstmodelyear", first, is_unique=True)
 
     def vintage_and_active_years(self):
         """Return a 2-tuple of valid pairs of vintage years and active years for

@@ -49,7 +49,7 @@ def test_add_spatial_multiple(test_mp):
     npt.assert_array_equal(obs, exp)
 
 
-def test_add_spatial_heirarchy(test_mp):
+def test_add_spatial_hierarchy(test_mp):
     scen = Scenario(test_mp, *msg_args, version='new')
     data = {'country': {'Austria': {'state': ['Vienna', 'Lower Austria']}}}
     scen.add_spatial_sets(data)
