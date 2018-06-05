@@ -48,6 +48,13 @@ and a list of recent publications, please refer to the `MESSAGE-GLOBIOM document
 
 .. _`MESSAGE-GLOBIOM documentation website` : http://data.ene.iiasa.ac.at/message-globiom/
 
+Frequently asked questions
+--------------------------
+
+Please refer to our `FAQ page`_ for more information.
+
+.. _`FAQ page`: faq.html
+
 License and user guidelines
 ---------------------------
 
@@ -68,6 +75,7 @@ and use <message_ix@googlegroups.com> to send an email to the |MESSAGEix| user c
 .. toctree::
    :maxdepth: 1
 
+   faq
    notice
    contributing
    contributor_license
