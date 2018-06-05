@@ -45,7 +45,7 @@ as a discussion forum and community mailing list.
 I have more questions...
 ------------------------
 
-Please have a look at the discussion forum at _`groups.google.com/d/forum/message_ix` - 
+Please have a look at the discussion forum at the |MESSAGEix| `Google group`_ - 
 maybe your issue has been discussed there already! If not, just send an email
 to the community mailing list.
 
@@ -56,4 +56,4 @@ to the community mailing list.
 
 .. _`GitHub` : https://github.com/iiasa/message_ix/
 
-.. _`groups.google.com/d/forum/message_ix` : https://groups.google.com/d/forum/message_ix
+.. _`Google group` : https://groups.google.com/d/forum/message_ix
