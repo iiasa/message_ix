@@ -54,12 +54,20 @@ def test_austria(capsys):
     nb, errors = _notebook_run(fname, capsys=capsys)
     assert errors == []
 
+    obs = eval(nb.cells[74]['outputs'][0]['data']['text/plain'])
+    exp = 153.6750030517578
+    assert np.isclose(obs, exp)
+
 
 @pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
 def test_austria_single_policy():
     fname = os.path.join(ene_path, 'austria_single_policy.ipynb')
     nb, errors = _notebook_run(fname)
     assert errors == []
+
+    obs = eval(nb.cells[14]['outputs'][0]['data']['text/plain'])
+    exp = 153.6750030517578
+    assert np.isclose(obs, exp)
 
 
 @pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
