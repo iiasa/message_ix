@@ -20,12 +20,12 @@ to incorporate feedback between prices and demand levels for energy and commodit
 The equations are implemented in the mathematical programming system `GAMS`_
 for numerical solution of a model instance.
 
-|MESSAGEix| is fully integrated with IIASA's |ixmp| (ixmp),
+The |MESSAGEix| framework is fully integrated with IIASA's |ixmp| (ixmp),
 a data warehouse for high-powered numerical scenario analysis.
-The framework allows an efficient workflow between original input data sources,
+The platform supports an efficient workflow between original input data sources,
 the implementation of the mathematical model formulation, 
 and the analysis of numerical results.
-The platform can be accessed via a web-based user interface 
+The platform can be accessed via a web-based user interface
 and application programming interfaces (API)
 to the scientific programming languages Python and R.
 The platform also includes a generic data exchange API
@@ -33,9 +33,6 @@ to `GAMS`_ for numerical computation.
 
 This documentation provides an introduction and the mathematical formulation 
 of the |MESSAGEix| equations and auxiliary functions.
-It also includes the documentation of the ixmp APIs 
-to the scientific programming languages Python and R.
-
 For the scientific reference of the framework, 
 see Huppmann et al. (submitted) :cite:`huppmann_messageix_2018`.
 The formulation of |MESSAGEix| is a re-implementation and extension of `'MESSAGE V'`
@@ -126,37 +123,48 @@ It is built from the latest master branch at `github.com/iiasa/message_ix`_  upo
 Getting started
 ---------------
 
-Refer to the page on `technical requirements`_ for a list of dependencies,
-installation instructions, and other information on getting started.
+Installation
+^^^^^^^^^^^^
 
-For an introduction to the |ixmp|, look at the tutorials of the ixmp package
-(included as a submodule to this repository) at `ixmp/tutorial/README`_.
+For new users, we recommend to install `Anaconda`_ (Python 3.6 or higher) and
+`GAMS`_. Importantly, when installing GAMS, check the box labeled `Use advanced 
+installation mode` select `Add GAMS directory to PATH environment variable` on
+the Advanced Options page.
+   
+Then, open a command prompt and type
+
+    ```
+    conda install -c conda-forge message-ix
+    ```
+
+For expert users or to install from source, please follow the installation
+instructions in the `README`_.
+
+Tutorials
+^^^^^^^^^
 
 To get started with a stylized energy system model implemented in |MESSAGEix|,
 look at the tutorials included in this repository at `tutorial/README`_.
 
-Further information:
-
 .. toctree::
    :maxdepth: 1
 
-   technical_requirements
    tutorials
 
-.. _`technical requirements`: technical_requirements.html
+.. _`Anaconda`: https://www.continuum.io/downloads
 
-.. _`ixmp/tutorial/README` : https://github.com/iiasa/message_ix/blob/master/ixmp/tutorial/README.md
-
-.. _`tutorial/README` : https://github.com/iiasa/message_ix/blob/master/tutorial/README.md
+.. _`README`: https://github.com/iiasa/message_ix#install-from-source-advanced-users
+   
+.. _`tutorial/README`: https://github.com/iiasa/message_ix/blob/master/tutorial/README.md
 
 
 Running the |MESSAGEix| model
------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 There are three methods to run the |MESSAGEix| model:
 
-- Via the `scientific programming APIs`_ using the packages/libraries ``ixmp`` and ``message_ix``,
-  calling the method ``solve()`` of the ``ixmp``.Scenario class (see the `tutorials`_).
+- Via the scientific programming APIs using the packages/libraries ``ixmp`` and ``message_ix``,
+  calling the method ``solve()`` of the ``ixmp.Scenario`` class (see the `tutorials`_).
 
 - Using the file ``MESSAGE_master.gms``, where the scenario name (i.e., the gdx input file), 
   the optimization horizon (perfect foresight or myopic/rolling-horizon version),
@@ -168,8 +176,6 @@ There are three methods to run the |MESSAGEix| model:
 - Directly from the command line calling the file ``MESSAGE_run.gms`` (see the `auto-doc page`_). 
   The scenario name and other options can be passed as command line parameters, 
   e.g. :literal:`gams MESSAGE_run.gms --in="<data-file>" --out="<output-file>"`.
-
-.. _`scientific programming APIs` : scientific_programming_api.html
 
 .. _`tutorials` : https://github.com/iiasa/message_ix/blob/master/tutorial/README.md
 
@@ -201,13 +207,11 @@ in the GAMS code.
 Scientific programming API documentation
 ----------------------------------------
 
-The documentation of the scientific programming APIs
-are included directly from the ``ixmp`` repository.
+For a comprehensive documentation of the scientific programming APIs,
+please see the documentation of the `ixmp` package at
+`software.ene.iiasa.ac.at/ixmp`_.
 
-.. toctree::
-   :maxdepth: 2
-
-   scientific_programming_api
+.. _`software.ene.iiasa.ac.at/ixmp`: https://software.ene.iiasa.ac.at/ixmp
 
 Bibliography
 ------------
