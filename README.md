@@ -61,9 +61,16 @@ the ix modeling platform for scientific publications or technical reports:
    
 2. Install [GAMS](https://www.gams.com/download/). **Importantly**:
 
-   - Check the box labeled `Use advanced installation mode`
-   - Check the box labeled `Add GAMS directory to PATH environment variable` on
-     the Advanced Options page.
+   - Windows:
+      - Check the box labeled `Use advanced installation mode`
+      - Check the box labeled `Add GAMS directory to PATH environment variable` on
+        the Advanced Options page.
+   - MacOSX/Linux:
+      - Add the following line to you `.bash_profile` (Mac) or `.bashrc` (Linux)
+
+         ```
+         export PATH=$PATH:/path/to/gams-directory-with-gams-binary
+         ```
    
 3. Open a command prompt and type
 
