@@ -109,7 +109,11 @@ def tec_view(scenario, tec=None, sort_by='technology', region=None, par=None, co
         # Adds a column with parameter name
         df[mapping['par']] = parameter
         # Applies pivot table
-        if 'year_act' not in df.columns:
+        if 'year_rel' in df.columns:
+            index = [c for c in df.columns if c not in [
+                'value', mapping['year_rel']]]
+            columns = mapping['year_rel']
+        elif 'year_act' not in df.columns:
             index = [c for c in df.columns if c not in [
                 'value', mapping['year_vtg']]]
             columns = mapping['year_vtg']
