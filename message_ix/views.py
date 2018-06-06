@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from message_ix import utils
+pd.set_option('display.max_rows', 500)
 
 # Mapping of database columns to corresponding xlsx_import columns naming
 mappings = {
@@ -49,7 +50,7 @@ mappings = {
     }}
 
 
-def tec_view(scenario, tec=None, sort_by='technology', par=None, column_style='raw_mapping'):
+def tec_view(scenario, tec=None, sort_by='technology', region=None, par=None, column_style='raw_mapping'):
     """Returns technology parameters for a given sceanrio
 
     Parameter:
@@ -84,12 +85,23 @@ def tec_view(scenario, tec=None, sort_by='technology', par=None, column_style='r
     par = utils.is_iter_not_string(
         par) if par is not None else list(scenario.par_list())
 
+    region = utils.is_iter_not_string(
+        region) if region else None
+
     dfs = []
     for parameter in par:
         # Filters out required parameters
         if not 'technology' in scenario.par(parameter).columns:
             continue
-        df = scenario.par(parameter, filters={'technology': tec})
+        if region and parameter in ['relation_activity', 'relation_new_capacity', 'relation_total_capacity']:
+            filters = filters = {'technology': tec, 'node_rel': region}
+        elif region and parameter in ['resource_volume', 'resource_remaining', 'rating_bin', 'reliability_factor', 'peak_load_factor', 'renewable_potential', 'renewable_capacity_factor']:
+            filters = filters = {'technology': tec, 'node': region}
+        elif region:
+            filters = filters = {'technology': tec, 'node_loc': region}
+        else:
+            filters = filters = {'technology': tec}
+        df = scenario.par(parameter, filters=filters)
         if df.empty:
             continue
         # Assigns correct naming to columns
