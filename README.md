@@ -106,6 +106,32 @@ opening a command prompt and typing
    messageix-dl --local_path /path/to/tutorials
    ```
 
+## Running Tutorials
+
+### Using Anaconda
+
+1. Additionally install the following package:
+
+    ```
+    conda install nb_conda
+    ```
+
+2. Open Jupyter Notebooks from Anaconda's "Home" Tab
+
+3. Open the tutorial notebook file
+
+4. Make sure the Kernel is aligned with your conda environment
+
+  - Change kernels with <Kernel> -> <Change Kernel> -> Python [conda root]
+
+### Using Command Line
+
+Navigate to the tutorial folder and type
+
+   ```
+   jupyter notebook
+   ```
+
 ## Building Documentation
 
 Navigate to the `doc` folder and in a command prompt type
