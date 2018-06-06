@@ -122,7 +122,8 @@ opening a command prompt and typing
 
 4. Make sure the Kernel is aligned with your conda environment
 
-  - Change kernels with <Kernel> -> <Change Kernel> -> Python [conda root]
+   - Change kernels with menu options `Kernel` -> `Change Kernel` -> `Python
+     [conda root]`
 
 ### Using Command Line
 
