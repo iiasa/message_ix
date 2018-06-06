@@ -60,6 +60,8 @@ def tec_view(scenario, tec=None, sort_by='technology', region=None, par=None, co
         single or multiple technologies for which data should be retrieved
     sort_by : string (default is 'technology')
         allows the user to sort data by either the 'Technology'/'technology' or 'Parameter'/'par'
+    region : string or list
+        allows filtering by a specific region/node in the model
     par : string or list
         single or multiple parameters for technologies
     column_style : string
