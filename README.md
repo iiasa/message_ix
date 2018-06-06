@@ -116,14 +116,15 @@ opening a command prompt and typing
     conda install nb_conda
     ```
 
-2. Open Jupyter Notebooks from Anaconda's "Home" Tab
+2. Open Jupyter Notebooks from Anaconda's "Home" Tab (or directly if you have
+   the option)
 
 3. Open the tutorial notebook file
 
 4. Make sure the Kernel is aligned with your conda environment
 
    - Change kernels with menu options `Kernel` -> `Change Kernel` -> `Python
-     [conda root]`
+     [conda root]` (for example)
 
 ### Using Command Line
 
