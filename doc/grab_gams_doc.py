@@ -13,7 +13,7 @@ def files(match='*.gms', ext='rst'):
     """return all input files in ../model matching `match` and their associated
     output files with the given extension
     """
-    pth = os.path.join('..', 'model')
+    pth = os.path.join('..', 'message_ix', 'model')
     ins = [os.path.join(d, f) \
            for d, _, files in os.walk(pth) \
            for f in fnmatch.filter(files, match)]
