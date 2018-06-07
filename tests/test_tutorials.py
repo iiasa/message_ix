@@ -16,6 +16,7 @@ except:
     jupyter_installed = False
 
 ene_path = os.path.join(here, '..', 'tutorial', 'Austrian_energy_system')
+westeros_path = os.path.join(here, '..', 'tutorial', 'westeros')
 
 # taken from the execellent example here:
 # https://blog.thedataincubator.com/2016/06/testing-jupyter-notebooks/
@@ -48,6 +49,17 @@ def _notebook_run(path, kernel=None, capsys=None):
     os.remove(fname)
 
     return nb, errors
+
+
+@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+def test_westeros(capsys):
+    fname = os.path.join(westeros_path, 'westeros.ipynb')
+    nb, errors = _notebook_run(fname, capsys=capsys)
+    assert errors == []
+
+    obs = eval(nb.cells[-11]['outputs'][0]['data']['text/plain'])
+    exp = 3.600316973564438e+23
+    assert np.isclose(obs, exp)
 
 
 @pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')

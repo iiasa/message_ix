@@ -57,6 +57,12 @@ html:
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
+serve: html
+	@echo
+	@echo "Serving html pages on Port 8151."
+	cd build/html && python -m http.server 8151
+
+
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
 	@echo
