@@ -32,7 +32,7 @@ def make_ts(df, time_col, value_col, metadata={}):
         'node_loc': 'region',
         time_col: 'year',
         value_col: 'value'
-            }
+    }
     df = df.rename(columns=rename)
     df = df.dropna(axis='index', subset=['value'])
     return df
@@ -46,3 +46,31 @@ def matching_rows(df, row, match_columns=[]):
     for col in match_columns:
         rows = rows & (df[col] == row[col])
     return df[rows]
+
+
+def is_iter_not_string(x):
+    return x if hasattr(x, '__iter__') and not is_str(x) else [x]
+    #return hasattr(x, '__iter__') and not is_str(x)
+
+
+def is_str(x):
+    """Returns True if x is a string"""
+    try:
+        return isinstance(x, (str, unicode))
+    except NameError:
+        return isinstance(x, str)
+
+
+def is_num(s):
+    """Returns True if s is a number"""
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+
+def numcols(df):
+    dtypes = df.dtypes
+    return [i for i in dtypes.index
+            if dtypes.loc[i].name.startswith(('float', 'int'))]

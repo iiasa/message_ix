@@ -1,0 +1,25 @@
+technology,node,par,unit,level,mode,commodity/emission,year_vtg/year_rel,node I/O,2010
+canning_plant,san-diego,bound_activity_up,cases, ,production, ,, ,600.0
+canning_plant,san-diego,output,%,supply,production,cases,2010,san-diego,1.0
+canning_plant,san-diego,ref_activity,cases, ,production, ,, ,600.0
+canning_plant,seattle,bound_activity_up,cases, ,production, ,, ,350.0
+canning_plant,seattle,output,%,supply,production,cases,2010,seattle,1.0
+canning_plant,seattle,ref_activity,cases, ,production, ,, ,350.0
+transport_from_san-diego,san-diego,input,%,supply,to_chicago,cases,2010,san-diego,1.0
+transport_from_san-diego,san-diego,input,%,supply,to_new-york,cases,2010,san-diego,1.0
+transport_from_san-diego,san-diego,input,%,supply,to_topeka,cases,2010,san-diego,1.0
+transport_from_san-diego,san-diego,output,%,consumption,to_chicago,cases,2010,chicago,1.0
+transport_from_san-diego,san-diego,output,%,consumption,to_new-york,cases,2010,new-york,1.0
+transport_from_san-diego,san-diego,output,%,consumption,to_topeka,cases,2010,topeka,1.0
+transport_from_san-diego,san-diego,var_cost,USD, ,to_chicago, ,2010, ,0.162
+transport_from_san-diego,san-diego,var_cost,USD, ,to_new-york, ,2010, ,0.225
+transport_from_san-diego,san-diego,var_cost,USD, ,to_topeka, ,2010, ,0.126
+transport_from_seattle,seattle,input,%,supply,to_chicago,cases,2010,seattle,1.0
+transport_from_seattle,seattle,input,%,supply,to_new-york,cases,2010,seattle,1.0
+transport_from_seattle,seattle,input,%,supply,to_topeka,cases,2010,seattle,1.0
+transport_from_seattle,seattle,output,%,consumption,to_chicago,cases,2010,chicago,1.0
+transport_from_seattle,seattle,output,%,consumption,to_new-york,cases,2010,new-york,1.0
+transport_from_seattle,seattle,output,%,consumption,to_topeka,cases,2010,topeka,1.0
+transport_from_seattle,seattle,var_cost,USD, ,to_chicago, ,2010, ,0.153
+transport_from_seattle,seattle,var_cost,USD, ,to_new-york, ,2010, ,0.225
+transport_from_seattle,seattle,var_cost,USD, ,to_topeka, ,2010, ,0.162
