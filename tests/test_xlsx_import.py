@@ -202,7 +202,7 @@ def test_add_par_tec_input(create_scen, add_par_tec):
                 2030: [2.5,	2.5,	2.5,	np.nan],
                 2040: [2.5,	2.5,	2.5,	2.5]}
     exp = pd.DataFrame(exp_dict)
-    exp = exp[[*exp_dict]]
+    exp = exp[list(exp.keys())]
     obs = views.tec_view(
         create_scen[0], tec='test_ppl', par='input').reset_index()
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
@@ -225,7 +225,7 @@ def test_add_par_tec_output(create_scen, add_par_tec):
                 2030: [1.0,	1.0,	1.0,	np.nan],
                 2040: [1.0,	1.0,	1.0,	1.0]}
     exp = pd.DataFrame(exp_dict)
-    exp = exp[[*exp_dict]]
+    exp = exp[list(exp_dict.keys())]
     obs = views.tec_view(
         create_scen[0], tec='test_ppl', par='output').reset_index()
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
@@ -242,7 +242,7 @@ def test_add_par_tec_inv_cost(create_scen, add_par_tec):
                 2030: [1600000000],
                 2040: [1600000000]}
     exp = pd.DataFrame(exp_dict)
-    exp = exp[[*exp_dict]]
+    exp = exp[list(exp.keys())]
     obs = views.tec_view(
         create_scen[0], tec='test_ppl', par='inv_cost').reset_index()
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
@@ -259,7 +259,7 @@ def test_add_par_tec_fix_cost(create_scen, add_par_tec):
                 2030: [30000000.0,	30000000.0,	30000000.0,	np.nan],
                 2040: [30000000.0,	30000000.0,	30000000.0,	30000000.0]}
     exp = pd.DataFrame(exp_dict)
-    exp = exp[[*exp_dict]]
+    exp = exp[list(exp.keys())]
     obs = views.tec_view(
         create_scen[0], tec='test_ppl', par='fix_cost').reset_index()
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
@@ -278,7 +278,7 @@ def test_add_par_tec_var_cost(create_scen, add_par_tec):
                 2030: [422232000.0,	422232000.0,	422232000.0,	np.nan],
                 2040: [422232000.0,	422232000.0,	422232000.0,	422232000.0]}
     exp = pd.DataFrame(exp_dict)
-    exp = exp[[*exp_dict]]
+    exp = exp[list(exp.keys())]
     obs = views.tec_view(
         create_scen[0], tec='test_ppl', par='var_cost').reset_index()
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
@@ -295,7 +295,7 @@ def test_add_par_tec_lifetime(create_scen, add_par_tec):
                 2030: [10.0],
                 2040: [10.0]}
     exp = pd.DataFrame(exp_dict)
-    exp = exp[[*exp_dict]]
+    exp = exp[list(exp.keys())]
     obs = views.tec_view(
         create_scen[0], tec='test_ppl', par='technical_lifetime').reset_index()
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
@@ -314,7 +314,7 @@ def test_add_par_tec_bound_activity_lo(create_scen, add_par_tec):
                 2030: [4.0],
                 2040: [4.0]}
     exp = pd.DataFrame(exp_dict)
-    exp = exp[[*exp_dict]]
+    exp = exp[list(exp.keys())]
     obs = views.tec_view(
         create_scen[0], tec='test_ppl', par='bound_activity_lo').reset_index()
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
@@ -330,7 +330,7 @@ def test_add_par_tec_bound_activity_up(create_scen, add_par_tec):
                 'year_vtg': '',
                 2010: [6.0]}
     exp = pd.DataFrame(exp_dict)
-    exp = exp[[*exp_dict]]
+    exp = exp[list(exp.keys())]
     obs = views.tec_view(
         create_scen[0], tec='test_ppl', par='bound_activity_up').reset_index()
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
@@ -344,7 +344,7 @@ def test_add_par_tec_bound_new_capacity_lo(create_scen, add_par_tec):
                 'year_vtg': '',
                 2020: [5.0]}
     exp = pd.DataFrame(exp_dict)
-    exp = exp[[*exp_dict]]
+    exp = exp[list(exp.keys())]
     obs = views.tec_view(
         create_scen[0], tec='test_ppl', par='bound_new_capacity_lo').reset_index()
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
@@ -358,7 +358,7 @@ def test_add_par_tec_bound_new_capacity_up(create_scen, add_par_tec):
                 'year_vtg': '',
                 2010: [1.5]}
     exp = pd.DataFrame(exp_dict)
-    exp = exp[[*exp_dict]]
+    exp = exp[list(exp.keys())]
     obs = views.tec_view(
         create_scen[0], tec='test_ppl', par='bound_new_capacity_up').reset_index()
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
@@ -376,7 +376,7 @@ def test_add_par_tec_capacity_factor(create_scen, add_par_tec):
                 2030: [0.75,	0.75,	0.75,	np.nan],
                 2040: [0.75,	0.75,	0.75,	0.75]}
     exp = pd.DataFrame(exp_dict)
-    exp = exp[[*exp_dict]]
+    exp = exp[list(exp.keys())]
     obs = views.tec_view(
         create_scen[0], tec='test_ppl', par='capacity_factor').reset_index()
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
@@ -395,7 +395,7 @@ def test_add_par_tec_emission_factor(create_scen, add_par_tec):
                 2030: [0.814,	0.814,	0.814,	np.nan],
                 2040: [0.814,	0.814,	0.814,	0.814]}
     exp = pd.DataFrame(exp_dict)
-    exp = exp[[*exp_dict]]
+    exp = exp[list(exp.keys())]
     obs = views.tec_view(
         create_scen[0], tec='test_ppl', par='emission_factor').reset_index()
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
@@ -412,7 +412,7 @@ def test_add_par_tec_growth_activity_lo(create_scen, add_par_tec):
                 2030: [0.03],
                 2040: [0.03]}
     exp = pd.DataFrame(exp_dict)
-    exp = exp[[*exp_dict]]
+    exp = exp[list(exp.keys())]
     obs = views.tec_view(
         create_scen[0], tec='test_ppl', par='growth_activity_lo').reset_index()
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
@@ -429,7 +429,7 @@ def test_add_par_tec_growth_activity_up(create_scen, add_par_tec):
                 2030: [0.05],
                 2040: [0.05]}
     exp = pd.DataFrame(exp_dict)
-    exp = exp[[*exp_dict]]
+    exp = exp[list(exp.keys())]
     obs = views.tec_view(
         create_scen[0], tec='test_ppl', par='growth_activity_up').reset_index()
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
@@ -450,7 +450,7 @@ def test_add_par_tec_reliability_factor(create_scen, add_par_tec):
                 2030: [1.0],
                 2040: [1.0]}
     exp = pd.DataFrame(exp_dict)
-    exp = exp[[*exp_dict]]
+    exp = exp[list(exp.keys())]
     obs = views.tec_view(
         create_scen[0], tec='test_ppl', par='reliability_factor').reset_index()
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
@@ -472,7 +472,7 @@ def test_add_par_tec_flexibility_factor(create_scen, add_par_tec):
                 2030: [0.15,	0.15,	0.15,	np.nan],
                 2040: [0.15,	0.15,	0.15,	0.15]}
     exp = pd.DataFrame(exp_dict)
-    exp = exp[[*exp_dict]]
+    exp = exp[list(exp.keys())]
     obs = views.tec_view(
         create_scen[0], tec='test_ppl', par='flexibility_factor').reset_index()
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
@@ -493,7 +493,7 @@ def test_add_par_tec_rating_bin(create_scen, add_par_tec):
                 2030: [1.0],
                 2040: [1.0]}
     exp = pd.DataFrame(exp_dict)
-    exp = exp[[*exp_dict]]
+    exp = exp[list(exp.keys())]
     obs = views.tec_view(
         create_scen[0], tec='test_ppl', par='rating_bin').reset_index()
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
