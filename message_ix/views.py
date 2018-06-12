@@ -146,6 +146,12 @@ def tec_view(scenario, tec=None, sort_by='technology', region=None, par=None, co
             df[col] = ' '
 
     df = pd.concat(dfs)
+    # When retrieving single parameters which dont have node_loc, then the idx_order needs to be updated.
+    if 'node_loc' not in df.columns:
+        if 'node_rel' in df.columns:
+            idx_order = ['node_rel' if x == 'node_loc' else x for x in idx_order]
+        else:
+            idx_order = ['node' if x == 'node_loc' else x for x in idx_order]
     idx = idx_order + [mapping['unit']]
     idx += sorted(list(set(idxs) - set(idx)))
     df = df.set_index(idx).sort_index(level=sort_by)
