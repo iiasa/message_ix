@@ -158,20 +158,21 @@ class init_model(object):
             + self.resources['Level'].dropna().unique().tolist()
         self.scenario.add_set("level", all_levels)
 
-        if 'renewable' in self.scenario.set("level").tolist():
-            # Assign renewable level
-            self.scenario.add_set("level_renewable", ["renewable"])
-
+        if 'resource' in self.scenario.set("level").tolist():
             # Assign resource level (all non-renewable levels)
             self.scenario.add_set("level_resource", ["resource"])
             print('Scenario levels are:\n', self.scenario.set(
                 'level'), '\n') if self.verbose == True else 0
 
-            # Add penetration bins (ratings)
-            ratings = self.scenario.add_set(
-                'rating', self.tecs['Rating'].dropna().unique().tolist())
-            print('Scenario penetration bins are:\n', self.scenario.set(
-                "rating"), '\n') if self.verbose == True else 0
+        if 'renewable' in self.scenario.set("level").tolist():
+            # Assign renewable level
+            self.scenario.add_set("level_renewable", ["renewable"])
+
+        # Add penetration bins (ratings)
+        ratings = self.scenario.add_set(
+            'rating', self.tecs['Rating'].dropna().unique().tolist())
+        print('Scenario penetration bins are:\n', self.scenario.set(
+            "rating"), '\n') if self.verbose == True else 0
 
         # Adds resource grades
         self.scenario.add_set(
@@ -245,10 +246,10 @@ class init_model(object):
 
         Steps as follows:
         1. Updates 'type_tec' to include all intermittent renewable technologies.
-        2. Adds 'flexibility_factor'
-        3. Adds 'rating_bin' size
-        4. Adds 'reliability_factor' for different bins
-        5. Adds 'peak_load_factor'
+#        2. Adds 'flexibility_factor'
+#        3. Adds 'rating_bin' size
+#        4. Adds 'reliability_factor' for different bins
+#        5. Adds 'peak_load_factor'
         6. Adds 'renewable_potential'
         7. Adds 'renewable_capacity_factor' for the various potentials
         """
@@ -261,29 +262,6 @@ class init_model(object):
         cat_tec = pd.DataFrame.from_dict(cat_tec).stack().reset_index(drop=False).rename(
             columns={'level_1': 'type_tec', 0: 'technology'})[['technology', 'type_tec']]
         self.scenario.add_set('cat_tec', cat_tec)
-
-        # Define the flexibility for various powerplants
-        ap.add_tec_flex(apply_filters(self.tecs, filters={
-                        'Parameter': 'flexibility_factor'}))
-        print(self.scenario.par("flexibility_factor")
-              ) if self.verbose == True else 0
-
-        # Adds the "bin" size for technologies
-        ap.add_bin_size(apply_filters(
-            self.tecs, filters={'Parameter': 'rating_bin'}))
-        print(self.scenario.par("rating_bin")) if self.verbose == True else 0
-
-        # Adds the "bin" reliability factor
-        ap.add_bin_reliability(apply_filters(self.tecs, filters={
-                               'Parameter': 'reliability_factor'}))
-        print(self.scenario.par("reliability_factor")
-              ) if self.verbose == True else 0
-
-        # Adds peak load factor
-        ap.add_peak_load(apply_filters(self.tecs, filters={
-                         'Parameter': 'peak_load_factor'}))
-        print(self.scenario.par('peak_load_factor')
-              ) if self.verbose == True else 0
 
         # Adds potentials for renewables for every timestep in the model
         ren_pot = apply_filters(self.resources, filters={
@@ -461,6 +439,29 @@ class init_model(object):
                            'Parameter': 'emission_factor'}))
         print('Scenario emission factors for technologies are:\n', self.scenario.par(
             'emission_factor'), '\n') if self.verbose == True else 0
+
+        # Define the flexibility for various powerplants
+        ap.add_tec_flex(apply_filters(self.tecs, filters={
+                        'Parameter': 'flexibility_factor'}))
+        print(self.scenario.par("flexibility_factor")
+              ) if self.verbose == True else 0
+
+        # Adds the "bin" size for technologies
+        ap.add_bin_size(apply_filters(
+            self.tecs, filters={'Parameter': 'rating_bin'}))
+        print(self.scenario.par("rating_bin")) if self.verbose == True else 0
+
+        # Adds the "bin" reliability factor
+        ap.add_bin_reliability(apply_filters(self.tecs, filters={
+                               'Parameter': 'reliability_factor'}))
+        print(self.scenario.par("reliability_factor")
+              ) if self.verbose == True else 0
+
+        # Adds peak load factor
+        ap.add_peak_load(apply_filters(self.tecs, filters={
+                         'Parameter': 'peak_load_factor'}))
+        print(self.scenario.par('peak_load_factor')
+              ) if self.verbose == True else 0
 
     def rel_soft_constraints(self, mpalo=None, mpaup=None, mpclo=None, mpcup=None):
         """ Adds relative soft constraints"
@@ -891,7 +892,7 @@ class add_par(object):
                     'unit': row['Units']
                 })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter input containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par("input", par)
@@ -937,7 +938,7 @@ class add_par(object):
                     'unit': row['Units']
                 })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter output containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par("output", par)
@@ -960,7 +961,7 @@ class add_par(object):
                 'unit': row['Units']
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter inv_cost containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par("inv_cost", par)
@@ -986,7 +987,7 @@ class add_par(object):
                 'unit': row['Units']
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter var_cost containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par("var_cost", par)
@@ -1010,7 +1011,7 @@ class add_par(object):
                 'unit': row['Units']
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter fix_cost containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par("fix_cost", par)
@@ -1035,7 +1036,7 @@ class add_par(object):
                 'unit': row['Units']
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter capacity_factor containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('capacity_factor', par)
@@ -1058,7 +1059,7 @@ class add_par(object):
                 'value': row[yr]
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter technical_lifetime containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('technical_lifetime', par)
@@ -1081,7 +1082,7 @@ class add_par(object):
                 'unit': row['Units']
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter initial_new_capacity_up containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('initial_new_capacity_up', par)
@@ -1104,7 +1105,7 @@ class add_par(object):
                 'unit': row['Units']
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter growth_new_capacity_up containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('growth_new_capacity_up', par)
@@ -1127,7 +1128,7 @@ class add_par(object):
                 'value': row[yr]
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter bound_new_capacity_up containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('bound_new_capacity_up', par)
@@ -1150,7 +1151,7 @@ class add_par(object):
                 'value': row[yr]
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter bound_new_capacity_lo containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('bound_new_capacity_lo', par)
@@ -1173,7 +1174,7 @@ class add_par(object):
                 'value': row[yr]
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter bound_total_capacity_up containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('bound_total_capacity_up', par)
@@ -1196,7 +1197,7 @@ class add_par(object):
                 'value': row[yr]
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter bound_total_capacity_lo containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('bound_total_capacity_lo', par)
@@ -1221,7 +1222,7 @@ class add_par(object):
                 'value': row[yr]
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter bound_activity_up containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('bound_activity_up', par)
@@ -1246,7 +1247,7 @@ class add_par(object):
                 'value': row[yr]
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter bound_activity_lo containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('bound_activity_lo', par)
@@ -1270,7 +1271,7 @@ class add_par(object):
                 'unit': row['Units']
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter initial_activity_up containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('initial_activity_up', par)
@@ -1294,7 +1295,7 @@ class add_par(object):
                 'unit': row['Units']
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter growth_activity_up containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('growth_activity_up', par)
@@ -1318,7 +1319,7 @@ class add_par(object):
                 'unit': row['Units']
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter initial_activity_lo containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('initial_activity_lo', par)
@@ -1342,7 +1343,7 @@ class add_par(object):
                 'unit': row['Units']
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter growth_activity_lo containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('growth_activity_lo', par)
@@ -1365,7 +1366,7 @@ class add_par(object):
                 'value': [row[yr]]
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter historical_new_capacity containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('historical_new_capacity', par)
@@ -1394,7 +1395,7 @@ class add_par(object):
                 'value': row[yr]
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter flexibility_factor containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('flexibility_factor', par)
@@ -1421,7 +1422,7 @@ class add_par(object):
                 'value': row[yr]
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter rating_bin containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('rating_bin', par)
@@ -1448,7 +1449,7 @@ class add_par(object):
                 'value': row[yr]
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter reliability_factor containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('reliability_factor', par)
@@ -1473,7 +1474,7 @@ class add_par(object):
                 'value': row[yr]
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter peak_load_factor containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('peak_load_factor', par)
@@ -1498,7 +1499,7 @@ class add_par(object):
                 'value': row['value']
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter renewable_potential containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('renewable_potential', par)
@@ -1523,7 +1524,7 @@ class add_par(object):
                 'value': row['value']
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter renewable_capacity_factor containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('renewable_capacity_factor', par)
@@ -1560,7 +1561,7 @@ class add_par(object):
                         'value': [0.0]
                     })
                     if par.isnull().values.any():
-                        print("Cannot add parameter containing 'NaN'\n",
+                        print("Cannot add parameter relation_upper containing 'NaN'\n",
                               par) if self.disp_error == True else 0
                     else:
                         self.scenario.add_par("relation_upper", par)
@@ -1578,7 +1579,7 @@ class add_par(object):
                         'value': [1.0]
                     })
                     if par.isnull().values.any():
-                        print("Cannot add parameter containing 'NaN'\n",
+                        print("Cannot add parameter relation_activity containing 'NaN'\n",
                               par) if self.disp_error == True else 0
                     else:
                         self.scenario.add_par("relation_activity", par)
@@ -1596,7 +1597,7 @@ class add_par(object):
                         'value': [1.0]
                     })
                     if par.isnull().values.any():
-                        print("Cannot add parameter containing 'NaN'\n",
+                        print("Cannot add parameter relation_activity containing 'NaN'\n",
                               par) if self.disp_error == True else 0
                     else:
                         self.scenario.add_par("relation_activity", par)
@@ -1614,7 +1615,7 @@ class add_par(object):
                         'value': row[yr] * -1
                     })
                     if par.isnull().values.any():
-                        print("Cannot add parameter containing 'NaN'\n",
+                        print("Cannot add parameter relation_activity containing 'NaN'\n",
                               par) if self.disp_error == True else 0
                     else:
                         self.scenario.add_par("relation_activity", par)
@@ -1664,7 +1665,7 @@ class add_par(object):
                 'value': row[yr]
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter emission_factor containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('emission_factor', par)
@@ -1691,7 +1692,7 @@ class add_par(object):
                 'value': row[yr]
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter addon_conversion containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('addon_conversion', par)
@@ -1719,7 +1720,7 @@ class add_par(object):
                 'value': row[yr]
             })
             if par.isnull().values.any():
-                print("Cannot add parameter containing 'NaN'\n",
+                print("Cannot add parameter addon_minimum containing 'NaN'\n",
                       par) if self.disp_error == True else 0
             else:
                 self.scenario.add_par('addon_minimum', par)
