@@ -1,0 +1,12 @@
+config.name = unit_test_DB@local
+
+jdbc.driver.1 = org.hsqldb.jdbcDriver
+jdbc.url.1 = jdbc:hsqldb:file:{here}/ixmptest
+jdbc.user.1 = ixmp
+jdbc.pwd.1 = ixmp
+
+jdbc.driver.2 = org.hsqldb.jdbcDriver
+jdbc.url.2 = jdbc:hsqldb:file:{here}/ixmptest
+jdbc.user.2 = ixmp
+jdbc.pwd.2 = ixmp
+

@@ -107,3 +107,34 @@ class Scenario(ixmp.Scenario):
         year_pairs = [(y_v, y_a) for y_v, y_a in combinations if y_v <= y_a]
         v_years, a_years = zip(*year_pairs)
         return v_years, a_years
+
+    def solve(self, **kwargs):
+        return super(Scenario, self).solve(model='MESSAGE', **kwargs)
+
+    def clone(self, model=None, scen=None, annotation=None, keep_sol=True,
+              first_model_year=None):
+        """clone the current scenario and return the new scenario
+
+        Parameters
+        ----------
+        model : string
+            new model name
+        scen : string
+            new scenario name
+        annotation : string
+            explanatory comment (optional)
+        keep_sol : boolean, default: True
+            indicator whether to include an existing solution
+            in the cloned scenario
+        first_model_year: int, default None
+            new first model year in cloned scenario
+            ('slicing', only available for MESSAGE-scheme scenarios)
+        """
+        first_model_year = first_model_year or 0
+
+        model = self.model if not model else model
+        scen = self.scenario if not scen else scen
+        return Scenario(self.platform, model, scen,
+                        self._jobj.clone(model, scen, annotation,
+                                         keep_sol, first_model_year),
+                        cache=self._cache)
