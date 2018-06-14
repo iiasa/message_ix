@@ -128,7 +128,7 @@ def make_scenario(platform, country, name, base_scen, scen):
     ds.commit(
         "changes committed by 'tutorial/tools.py:scenario_ds()' {} - {}".format(name, scen))
     ds.set_as_default()
-    ds.solve('MESSAGE')
+    ds.solve()
     if close:
         try:
             mp.close_db()
