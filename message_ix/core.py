@@ -109,6 +109,7 @@ class Scenario(ixmp.Scenario):
         return v_years, a_years
 
     def solve(self, **kwargs):
+        """Solve a Message Scenario. See ixmp.Scenario.solve() for arguments"""
         return super(Scenario, self).solve(model='MESSAGE', **kwargs)
 
     def clone(self, model=None, scen=None, annotation=None, keep_sol=True,
@@ -138,3 +139,43 @@ class Scenario(ixmp.Scenario):
                         self._jobj.clone(model, scen, annotation,
                                          keep_sol, first_model_year),
                         cache=self._cache)
+
+    def rename_technology(self, from_tech, to_tech):
+        """Rename a technology in a scenario
+
+        Parameters
+        ----------
+        from_tech : str
+            original technology name
+        to_tech : str
+            new technology name
+        """
+        self.check_out()
+
+        # search for from_tech in sets and replace
+        for item in self.set_list():
+            value = self.set(item)
+            if isinstance(value, pd.DataFrame):
+                if 'technology' in value.columns and not value.empty:
+                    value = value[value['technology'] == from_tech]
+                    if not value.empty:
+                        value['technology'] = to_tech
+                        self.add_set(item, value)
+            elif value.isin([from_tech]).any():  # value is pd.Series
+                self.add_set(item, to_tech)
+
+        # search for from_tech in pars and replace
+        for item in self.par_list():
+            if 'technology' not in self.idx_names(item):
+                continue
+            df = self.par(item, filters={'technology': from_tech})
+            if not df.empty:
+                df['technology'] = to_tech
+                self.add_par(item, df)
+
+        # this removes all instances of from_tech in the model
+        self.remove_set('technology', from_tech)
+
+        # recommit
+        self.commit('Renamed technology from {} to {}'.format(
+            from_tech, to_tech))

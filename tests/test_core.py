@@ -153,3 +153,18 @@ def test_new_timeseries_long_name64plus(test_mp):
     })
     scen.add_timeseries(df)
     scen.commit('importing a testing timeseries')
+
+
+def test_rename_technology(test_mp):
+    scen = Scenario(test_mp, *msg_args)
+    scen.solve()
+    assert scen.par('output')['technology'].isin(['canning_plant']).any()
+    exp_obj = scen.var('OBJ')['lvl']
+
+    clone = scen.clone('foo', 'bar', keep_sol=False)
+    clone.rename_technology('canning_plant', 'foo_bar')
+    assert not clone.par('output')['technology'].isin(['canning_plant']).any()
+    assert clone.par('output')['technology'].isin(['foo_bar']).any()
+    clone.solve()
+    obs_obj = clone.var('OBJ')['lvl']
+    assert obs_obj == exp_obj

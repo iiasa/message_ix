@@ -9,8 +9,6 @@ test_db = os.path.join(db_dir, 'ixmptest')
 
 # %% remove existing database files
 
-lobs = os.path.join(db_dir, 'ixmptest.lobs')
-
 for fname in [
         os.path.join(db_dir, 'ixmptest.lobs'),
         os.path.join(db_dir, 'ixmptest.properties'),
