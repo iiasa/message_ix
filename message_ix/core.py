@@ -9,7 +9,8 @@ from message_ix.utils import isscalar, logger
 
 class Scenario(ixmp.Scenario):
 
-    def __init__(self, platform, model, scen, version=None, annotation=None, cache=False):
+    def __init__(self, platform, model, scen, version=None, annotation=None,
+                 cache=False, clone=None):
         """Initialize a new message_ix.Scenario (structured input data and solution)
         or get an existing scenario from the ixmp database instance
 
@@ -27,9 +28,17 @@ class Scenario(ixmp.Scenario):
             a short annotation/comment (when initializing a new scenario)
         cache : boolean
             keep all dataframes in memory after first query (default: False)
+        clone : Scenario, optional
+            make a clone of an existing scenario
         """
+        if version is not None and clone is not None:
+            raise ValueError(
+                'Can not provide both version and clone as arguments')
         jobj = platform._jobj
-        if version == 'new':
+        if clone is not None:
+            jscen = clone._jobj.clone(model, scen, annotation,
+                                      clone._keep_sol, clone._first_model_year)
+        elif version == 'new':
             scheme = 'MESSAGE'
             jscen = jobj.newScenario(model, scen, scheme, annotation)
         elif isinstance(version, int):
@@ -131,14 +140,12 @@ class Scenario(ixmp.Scenario):
             new first model year in cloned scenario
             ('slicing', only available for MESSAGE-scheme scenarios)
         """
-        first_model_year = first_model_year or 0
-
+        self._keep_sol = keep_sol
+        self._first_model_year = first_model_year or 0
         model = self.model if not model else model
         scen = self.scenario if not scen else scen
-        return Scenario(self.platform, model, scen,
-                        self._jobj.clone(model, scen, annotation,
-                                         keep_sol, first_model_year),
-                        cache=self._cache)
+        return Scenario(self.platform, model, scen, annotation=annotation,
+                        cache=self._cache, clone=self)
 
     def rename_technology(self, from_tech, to_tech):
         """Rename a technology in a scenario
