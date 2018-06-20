@@ -3,28 +3,25 @@
 
 environment:
   matrix:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Miniconda2 4.5.1 x64
-      PYTHON: "C:\\Miniconda-x64"
-      PYTHON_VERSION: "2.7"
-      PYTHON_ARCH: "64"
-      CONDA_PY: "27"
+      - PYTHON_VERSION: 2.7	
+        MINICONDA: C:\Miniconda
+      - PYTHON_VERSION: 3.4
+        MINICONDA: C:\Miniconda3
 
-    - APPVEYOR_BUILD_WORKER_IMAGE: Miniconda3 4.5.1 x64
-      PYTHON: "C:\\Miniconda-x64"
-      PYTHON_VERSION: "3.6"
-      PYTHON_ARCH: "64"
-      CONDA_PY: "36"
+init:
+  - "ECHO %PYTHON_VERSION% %MINICONDA%"
 
 
 install:
   # this installs the appropriate Miniconda (Py2/Py3, 32/64 bit)
   # - powershell .\\ci\\appveyor\\install.ps1
-  - powershell .\\ci\\appveyor\\install-gams.ps1
   # - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 
   # Dependencies and package install
   - conda install --yes ixmp pytest
   - python setup.py install
+
+  - powershell .\\ci\\appveyor\\install-gams.ps1
 
 build: false
 
