@@ -12,9 +12,6 @@ init:
   - "ECHO %PYTHON_VERSION% %MINICONDA%"
   
 install:
-  # this installs the appropriate Miniconda (Py2/Py3, 32/64 bit)
-  # - powershell .\\ci\\appveyor\\install.ps1
-  # - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   # these correspond to folder naming of miniconda installs on appveyor.  See
   # https://www.appveyor.com/docs/installed-software#python
   - if "%PYTHON_VERSION%" == "3.6" set "BASE_PYTHON_VERSION=36"
@@ -22,9 +19,13 @@ install:
   # These are already installed on appveyor.  Update them.
   - set "CONDA_ROOT=C:\Miniconda%BASE_PYTHON_VERSION%%ARCH_LABEL%"
   - set "PATH=%CONDA_ROOT%;%CONDA_ROOT%\Scripts;%CONDA_ROOT%\Library\bin;%PATH%"
+
   # Dependencies and package install
-  - powershell .\\ci\\appveyor\\install-gams.ps1
+  - ps: Start-FileDownload 'https://d37drm4t2jghv5.cloudfront.net/distributions/24.8.5/windows/windows_x64_64.exe'
+  - windows_x64_64.exe /SP- /VERYSILENT /NORESTART /DIR=.\gams /NOICONS
+  - "SET PATH=%cd%\\gams;%PATH%"
   - conda install --yes -c conda-forge ixmp
+  
   - python setup.py install
 
 build: false
