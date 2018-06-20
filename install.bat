@@ -6,6 +6,7 @@ echo %MESSAGE_IX%
 
 echo Python MESSAGE_IX setup
 python setup.py install
+messageix-config --model_path message_ix\\model
 
 echo R MESSAGE_IX setup
 where /q r
