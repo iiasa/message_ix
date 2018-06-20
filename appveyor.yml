@@ -10,8 +10,7 @@ environment:
 
 init:
   - "ECHO %PYTHON_VERSION% %MINICONDA%"
-
-
+  
 install:
   # this installs the appropriate Miniconda (Py2/Py3, 32/64 bit)
   # - powershell .\\ci\\appveyor\\install.ps1
@@ -23,11 +22,9 @@ install:
   # These are already installed on appveyor.  Update them.
   - set "CONDA_ROOT=C:\Miniconda%BASE_PYTHON_VERSION%%ARCH_LABEL%"
   - set "PATH=%CONDA_ROOT%;%CONDA_ROOT%\Scripts;%CONDA_ROOT%\Library\bin;%PATH%"
-	      
   # Dependencies and package install
   - conda install --yes ixmp pytest
   - python setup.py install
-
   - powershell .\\ci\\appveyor\\install-gams.ps1
 
 build: false
