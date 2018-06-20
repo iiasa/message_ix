@@ -27,7 +27,11 @@ install:
   - windows_x64_64.exe /SP- /VERYSILENT /NORESTART /DIR=.\gams /NOICONS
   - "SET PATH=%cd%\\gams;%PATH%"
   - conda install --yes -c conda-forge ixmp
+  - conda remove --force --yes ixmp
   
+  - git clone git@github.com:iiasa/ixmp
+  - cd ixmp && python setup.py install && cd ..
+
   - python setup.py install
 
 build: false
