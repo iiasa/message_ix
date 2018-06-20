@@ -29,7 +29,7 @@ install:
   - conda install --yes -c conda-forge ixmp
   - conda remove --force --yes ixmp
   
-  - git clone git@github.com:iiasa/ixmp
+  - git clone https://github.com/iiasa/ixmp.git
   - cd ixmp && python setup.py install && cd ..
 
   - python setup.py install
