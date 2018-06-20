@@ -16,7 +16,14 @@ install:
   # this installs the appropriate Miniconda (Py2/Py3, 32/64 bit)
   # - powershell .\\ci\\appveyor\\install.ps1
   # - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-
+  # these correspond to folder naming of miniconda installs on appveyor.  See
+  # https://www.appveyor.com/docs/installed-software#python
+  - if "%PYTHON_VERSION%" == "3.6" set "BASE_PYTHON_VERSION=36"
+  - if "%PYTHON_ARCH%" == "64" set "ARCH_LABEL=-x64"
+  # These are already installed on appveyor.  Update them.
+  - set "CONDA_ROOT=C:\Miniconda%BASE_PYTHON_VERSION%%ARCH_LABEL%"
+  - set "PATH=%CONDA_ROOT%;%CONDA_ROOT%\Scripts;%CONDA_ROOT%\Library\bin;%PATH%"
+	      
   # Dependencies and package install
   - conda install --yes ixmp pytest
   - python setup.py install
