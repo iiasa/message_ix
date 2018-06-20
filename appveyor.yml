@@ -4,9 +4,11 @@
 environment:
   matrix:
       - PYTHON_VERSION: 2.7	
-        MINICONDA: C:\Miniconda
+        MINICONDA: C:\Miniconda	
+        ARCH: x64
       - PYTHON_VERSION: 3.4
-        MINICONDA: C:\Miniconda3
+        MINICONDA: C:\Miniconda	
+        ARCH: x64
 
 init:
   - "ECHO %PYTHON_VERSION% %MINICONDA%"
