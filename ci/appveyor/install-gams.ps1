@@ -66,7 +66,8 @@ function InstallMiniconda ($python_version, $architecture, $python_home) {
 
 function main () {
     $filepath = DownloadFile $GAMS_URL $GAMS_FILENAME
-    Start-Process -FilePath $filepath -Wait -Passthru
+    Write-Host "GAMS Download Complete"
+    Start-Process -FilePath $filepath -ArgumentList "/s" -Wait -Passthru
 }
 
 main
