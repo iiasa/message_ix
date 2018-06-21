@@ -96,13 +96,21 @@ the ix modeling platform for scientific publications or technical reports:
 
 ## Configure Model Files
 
-By default, the model files are stored with your installation. If you would like
-to store them some place locally, open a command prompt and type
+By default, the model files (e.g., GAMS files) are installed with `message_ix`
+(in your Python `site-packages` directory). Many users will simply want to run
+MESSAGEix, and will never need to see the these files; however, some users will
+want to edit the files directly to change the mathematical formulation, such as
+adding new types of parameters, constraints, etc. Accordingly, we provide a
+utility to place the model files in a local directory of your choosing:
 
    ```
    messageix-config --model_path /path/to/model
    ```
-   
+
+Please note, if you cloned this repository and installed MESSAGEix with
+`install.bat`, this command has already been run, pointing to
+`message_ix/model`.
+
 ## Getting Tutorial Files
 
 If you installed from source, all tutorial files are in the `tutorial`
