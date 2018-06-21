@@ -39,6 +39,7 @@ build: false
 test_script:
   - conda install --yes -c conda-forge pytest
   - pytest -v tests
+  - messageix-config --model_path=message_ix\\model
 
 on_success:
   - echo Build succesful!

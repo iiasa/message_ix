@@ -35,6 +35,12 @@ def recursive_copy(src, dst, overwrite=False):
 def do_config(model_path=None, overwrite=False):
     config = {}
 
+    # make directory for config if doesn't exist
+    dirname = os.path.dirname(CONFIG_PATH)
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
+
+    # update default path to model directory
     if model_path:
         model_path = os.path.abspath(os.path.expanduser(model_path))
         if not os.path.exists(model_path):
@@ -43,12 +49,14 @@ def do_config(model_path=None, overwrite=False):
         recursive_copy(DEFAULT_MODEL_PATH, model_path, overwrite=overwrite)
         config['MODEL_PATH'] = model_path
 
+    # overwrite config if already exists
     if os.path.exists(CONFIG_PATH):
         with open(CONFIG_PATH, mode='r') as f:
             data = json.load(f)
         data.update(config)
         config = data
 
+    # write new config
     if config:
         with open(CONFIG_PATH, mode='w') as f:
             logger().info('Updating configuration file: {}'.format(CONFIG_PATH))
