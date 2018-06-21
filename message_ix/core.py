@@ -148,14 +148,14 @@ class Scenario(ixmp.Scenario):
                         cache=self._cache, clone=self)
 
     def rename(self, name, mapping):
-        """Rename a technology in a scenario
+        """Rename an element in a set
 
         Parameters
         ----------
         name : str
-            name of the scenario object to change (e.g., 'technology')
+            name of the set to change (e.g., 'technology')
         mapping : str
-            mapping of old (current) to new names
+            mapping of old (current) to new set element names
         """
         self.check_out()
         keys = list(mapping.keys())
