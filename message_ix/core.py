@@ -9,7 +9,8 @@ from message_ix.utils import isscalar, logger
 
 class Scenario(ixmp.Scenario):
 
-    def __init__(self, platform, model, scen, version=None, annotation=None, cache=False):
+    def __init__(self, platform, model, scen, version=None, annotation=None,
+                 cache=False, clone=None):
         """Initialize a new message_ix.Scenario (structured input data and solution)
         or get an existing scenario from the ixmp database instance
 
@@ -27,9 +28,17 @@ class Scenario(ixmp.Scenario):
             a short annotation/comment (when initializing a new scenario)
         cache : boolean
             keep all dataframes in memory after first query (default: False)
+        clone : Scenario, optional
+            make a clone of an existing scenario
         """
+        if version is not None and clone is not None:
+            raise ValueError(
+                'Can not provide both version and clone as arguments')
         jobj = platform._jobj
-        if version == 'new':
+        if clone is not None:
+            jscen = clone._jobj.clone(model, scen, annotation,
+                                      clone._keep_sol, clone._first_model_year)
+        elif version == 'new':
             scheme = 'MESSAGE'
             jscen = jobj.newScenario(model, scen, scheme, annotation)
         elif isinstance(version, int):
@@ -107,3 +116,79 @@ class Scenario(ixmp.Scenario):
         year_pairs = [(y_v, y_a) for y_v, y_a in combinations if y_v <= y_a]
         v_years, a_years = zip(*year_pairs)
         return v_years, a_years
+
+    def solve(self, **kwargs):
+        """Solve a MESSAGE Scenario. See ixmp.Scenario.solve() for arguments"""
+        return super(Scenario, self).solve(model='MESSAGE', **kwargs)
+
+    def clone(self, model=None, scen=None, annotation=None, keep_sol=True,
+              first_model_year=None):
+        """clone the current scenario and return the new scenario
+
+        Parameters
+        ----------
+        model : string
+            new model name
+        scen : string
+            new scenario name
+        annotation : string
+            explanatory comment (optional)
+        keep_sol : boolean, default: True
+            indicator whether to include an existing solution
+            in the cloned scenario
+        first_model_year: int, default None
+            new first model year in cloned scenario
+            ('slicing', only available for MESSAGE-scheme scenarios)
+        """
+        self._keep_sol = keep_sol
+        self._first_model_year = first_model_year or 0
+        model = self.model if not model else model
+        scen = self.scenario if not scen else scen
+        return Scenario(self.platform, model, scen, annotation=annotation,
+                        cache=self._cache, clone=self)
+
+    def rename(self, name, mapping):
+        """Rename an element in a set
+
+        Parameters
+        ----------
+        name : str
+            name of the set to change (e.g., 'technology')
+        mapping : str
+            mapping of old (current) to new set element names
+        """
+        self.check_out()
+        keys = list(mapping.keys())
+        values = list(mapping.values())
+
+        # search for from_tech in sets and replace
+        for item in self.set_list():
+            ix_set = self.set(item)
+            if isinstance(ix_set, pd.DataFrame):
+                if name in ix_set.columns and not ix_set.empty:
+                    for key, value in mapping.items():
+                        df = ix_set[ix_set[name] == key]
+                        if not df.empty:
+                            df[name] = value
+                            self.add_set(item, df)
+            elif ix_set.isin(keys).any():  # ix_set is pd.Series
+                for key, value in mapping.items():
+                    if ix_set.isin([key]).any():
+                        self.add_set(item, value)
+
+        # search for from_tech in pars and replace
+        for item in self.par_list():
+            if name not in self.idx_names(item):
+                continue
+            for key, value in mapping.items():
+                df = self.par(item, filters={name: key})
+                if not df.empty:
+                    df[name] = value
+                    self.add_par(item, df)
+
+        # this removes all instances of from_tech in the model
+        for key in keys:
+            self.remove_set(name, key)
+
+        # commit
+        self.commit('Renamed {} using mapping {}'.format(name, mapping))
