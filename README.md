@@ -96,11 +96,12 @@ Then, open a command prompt in the new `ixmp` directory and type
 
 ## Configure Model Files
 
-By default, the model files are stored with your installation. Many users will
-simply want to run MESSAGEix, and will never need to see the these files;
-however, some users will want to edit the files directly to add new parameters,
-constraints, etc. Accordingly, we provide a utility to place the model files in
-a local directory of your choosing:
+By default, the model files (e.g., GAMS files) are installed with `message_ix`
+(in your Python `site-packages` directory). Many users will simply want to run
+MESSAGEix, and will never need to see the these files; however, some users will
+want to edit the files directly to change the mathematical formulation, such as
+adding new types of parameters, constraints, etc. Accordingly, we provide a
+utility to place the model files in a local directory of your choosing:
 
    ```
    messageix-config --model_path /path/to/model
