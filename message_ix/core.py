@@ -118,7 +118,7 @@ class Scenario(ixmp.Scenario):
         return v_years, a_years
 
     def solve(self, **kwargs):
-        """Solve a Message Scenario. See ixmp.Scenario.solve() for arguments"""
+        """Solve a MESSAGE Scenario. See ixmp.Scenario.solve() for arguments"""
         return super(Scenario, self).solve(model='MESSAGE', **kwargs)
 
     def clone(self, model=None, scen=None, annotation=None, keep_sol=True,
