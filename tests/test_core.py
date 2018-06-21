@@ -162,7 +162,7 @@ def test_rename_technology(test_mp):
     exp_obj = scen.var('OBJ')['lvl']
 
     clone = scen.clone('foo', 'bar', keep_sol=False)
-    clone.rename_technology('canning_plant', 'foo_bar')
+    clone.rename('technology', {'canning_plant': 'foo_bar'})
     assert not clone.par('output')['technology'].isin(['canning_plant']).any()
     assert clone.par('output')['technology'].isin(['foo_bar']).any()
     clone.solve()

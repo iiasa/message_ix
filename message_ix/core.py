@@ -147,42 +147,48 @@ class Scenario(ixmp.Scenario):
         return Scenario(self.platform, model, scen, annotation=annotation,
                         cache=self._cache, clone=self)
 
-    def rename_technology(self, from_tech, to_tech):
+    def rename(self, name, mapping):
         """Rename a technology in a scenario
 
         Parameters
         ----------
-        from_tech : str
-            original technology name
-        to_tech : str
-            new technology name
+        name : str
+            name of the scenario object to change (e.g., 'technology')
+        mapping : str
+            mapping of old (current) to new names
         """
         self.check_out()
+        keys = list(mapping.keys())
+        values = list(mapping.values())
 
         # search for from_tech in sets and replace
         for item in self.set_list():
-            value = self.set(item)
-            if isinstance(value, pd.DataFrame):
-                if 'technology' in value.columns and not value.empty:
-                    value = value[value['technology'] == from_tech]
-                    if not value.empty:
-                        value['technology'] = to_tech
+            ix_set = self.set(item)
+            if isinstance(ix_set, pd.DataFrame):
+                if name in ix_set.columns and not ix_set.empty:
+                    for key, value in mapping.items():
+                        df = ix_set[ix_set[name] == key]
+                        if not df.empty:
+                            df[name] = value
+                            self.add_set(item, df)
+            elif ix_set.isin(keys).any():  # ix_set is pd.Series
+                for key, value in mapping.items():
+                    if ix_set.isin([key]).any():
                         self.add_set(item, value)
-            elif value.isin([from_tech]).any():  # value is pd.Series
-                self.add_set(item, to_tech)
 
         # search for from_tech in pars and replace
         for item in self.par_list():
-            if 'technology' not in self.idx_names(item):
+            if name not in self.idx_names(item):
                 continue
-            df = self.par(item, filters={'technology': from_tech})
-            if not df.empty:
-                df['technology'] = to_tech
-                self.add_par(item, df)
+            for key, value in mapping.items():
+                df = self.par(item, filters={name: key})
+                if not df.empty:
+                    df[name] = value
+                    self.add_par(item, df)
 
         # this removes all instances of from_tech in the model
-        self.remove_set('technology', from_tech)
+        for key in keys:
+            self.remove_set(name, key)
 
-        # recommit
-        self.commit('Renamed technology from {} to {}'.format(
-            from_tech, to_tech))
+        # commit
+        self.commit('Renamed {} using mapping {}'.format(name, mapping))
