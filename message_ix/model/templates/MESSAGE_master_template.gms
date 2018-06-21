@@ -2,7 +2,7 @@ $TITLE The MESSAGEix Integrated Assessment Model
 $ONDOLLAR
 $ONTEXT
 
-   Copyright 2017 IIASA Energy Program
+   Copyright 2018 IIASA Energy Program
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -17,16 +17,20 @@ $ONTEXT
    limitations under the License.
 
 This is the GAMS implementation of the integrated assessment and system optimization model MESSAGEix
-For the most recent version of this code, please visit https://github.com/iiasa/message_ix.
-For a comprehensive documentation of the MESSAGEix framework and the ix modeling platform,
-please visit http://www.iiasa.ac.at/message_ix/.
+For the most recent version of the framework, please visit `github.com/iiasa/message_ix`.
+For a comprehensive documentation of the latest release of the MESSAGEix framework
+and the ix modeling platform, please visit `MESSAGEix.iiasa.ac.at/`.
 
-Please cite as:
+When using the MESSAGEix framework, please cite as:
 
     Daniel Huppmann, Matthew Gidden, Oliver Fricko, Peter Kolp, 
-    Clara Orthofer, Michael Pimmer, Keywan Riahi, and Volker Krey. 
-    The MESSAGEix Integrated Assessment model and the ix modeling platform. 
-    in preparation.
+    Clara Orthofer, Michael Pimmer, Adriano Vinca, Alessio Mastrucci, Keywan Riahi, and Volker Krey.
+    "The MESSAGEix Integrated Assessment Model and the ix modeling platform". 2018, submitted. 
+    Electronic pre-print available at `pure.iiasa.ac.at/15157/`.
+
+Please review the NOTICE at `MESSAGEix.iiasa.ac.at/notice.html`
+and included in the GitHub repository for further user guidelines.
+The community forum and mailing list is hosted at `groups.google.com/d/forum/message_ix`.
 
 $OFFTEXT
 
