@@ -81,18 +81,18 @@ the ix modeling platform for scientific publications or technical reports:
 
 ## Install from Source (Advanced Users)
 
-Please follow the installation instructions of the
-[ixmp](https://github.com/iiasa/ixmp#install-from-source-advanced-users)
-package, which is included as a submodule to this repository.  Instead of
-forking and cloning the GitHub repository
-[iiasa/ixmp](https://www.github.com/iiasa/ixmp), please fork and clone the
-repository [iiasa/message_ix](http://www.github.com/iiasa/message_ix).
+1. Follow the installation instructions of the
+   [ixmp](https://github.com/iiasa/ixmp#install-from-source-advanced-users)
+   package.
 
-Then, open a command prompt in the new `ixmp` directory and type
+2. Fork this repository and clone the forked repository (`<user>/message_ix`)
+   to your machine. Add `iiasa/message_ix` as `upstream` to your clone.
 
-   ```
-   python setup.py install && py.test tests
-   ```
+3. Open a command prompt in the `message_ix` directory and type
+
+      ```
+      python setup.py install && py.test tests
+      ```
 
 ## Configure Model Files
 
