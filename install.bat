@@ -21,6 +21,8 @@ if %errorlevel% neq 0 GOTO InstallError
 
 setx IXMP_PATH "%MESSAGE_IX%"
 
+messageix-config --model_path message_ix\\model
+
 copy message_ix\\model\\templates\\MESSAGE_master_template.gms message_ix\\model\\MESSAGE_master.gms
 copy message_ix\\model\\templates\\MESSAGE_project_template.gpr message_ix\\model\\MESSAGE_project.gpr
 
