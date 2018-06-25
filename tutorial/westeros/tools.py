@@ -7,4 +7,3 @@ path = os.path.join(here, '..', 'utils')
 sys.path.append(path)
 
 from plotting import *
-from run_scenarios import *
