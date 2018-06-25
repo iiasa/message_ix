@@ -1,6 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from __future__ import division
+
 
 class Plots(object):
 
