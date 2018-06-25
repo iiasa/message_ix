@@ -4,10 +4,17 @@ import matplotlib.pyplot as plt
 
 class Plots(object):
 
-    def __init__(self, ds, country, firstyear=2010):
+    def __init__(self, ds, country, firstyear=2010, input_costs='$/GWa'):
         self.ds = ds
         self.country = country
         self.firstyear = firstyear
+
+        if input_costs == '$/MWa':
+            self.cost_unit_conv = 1e3
+        elif input_costs == '$/kWa':
+            self.cost_unit_conv = 1e6
+        else:
+            self.cost_unit_conv = 1
 
     def historic_data(self, par, year_col, subset=None):
         df = self.ds.par(par)
@@ -101,7 +108,7 @@ class Plots(object):
                      values='lvl')
               .rename(columns={'lvl': 'value'})
               )
-        df = df / 8760 / 1e6 * 100
+        df = df / 8760 * 100 / 1e6 * self.cost_unit_conv
         df.plot.bar(stacked=False)
         plt.title('{} Energy System Prices'.format(self.country.title()))
         plt.ylabel('cents/kWhr')
