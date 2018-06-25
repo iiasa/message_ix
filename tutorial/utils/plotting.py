@@ -56,7 +56,8 @@ class Plots(object):
         plt.legend(loc='best')
 
     def plot_activity(self, baseyear=False, subset=None):
-        h = self.historic_data('historical_activity', 'year_act', subset=subset)
+        h = self.historic_data('historical_activity',
+                               'year_act', subset=subset)
         m = self.model_data('ACT', baseyear=baseyear, subset=subset)
         df = pd.concat([h, m]) if not h.empty else m
         df.plot.bar(stacked=True)
@@ -74,9 +75,11 @@ class Plots(object):
         plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
 
     def plot_new_capacity(self, baseyear=False, subset=None):
-        h = self.historic_data('historical_new_capacity', 'year_vtg', subset=subset)
-        m = self.model_data('CAP_NEW', 'year_vtg', baseyear=baseyear, subset=subset)
-        df = pd.concat([h, m], sort=True) if not h.empty else m
+        h = self.historic_data('historical_new_capacity',
+                               'year_vtg', subset=subset)
+        m = self.model_data('CAP_NEW', 'year_vtg',
+                            baseyear=baseyear, subset=subset)
+        df = pd.concat([h, m]) if not h.empty else m
         df.plot.bar(stacked=True)
         plt.title('{} Energy System New Capcity'.format(self.country.title()))
         plt.ylabel('GWa')
@@ -95,9 +98,9 @@ class Plots(object):
               .sum().
               reset_index()
               .pivot(index='year', columns='commodity',
-                      values='lvl')
+                     values='lvl')
               .rename(columns={'lvl': 'value'})
-        )
+              )
         df = df / 8760 / 1e6 * 100
         df.plot.bar(stacked=False)
         plt.title('{} Energy System Prices'.format(self.country.title()))

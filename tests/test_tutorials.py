@@ -59,6 +59,9 @@ def test_westeros(capsys):
 
     obs = eval(nb.cells[-11]['outputs'][0]['data']['text/plain'])
     exp = 3.600316973564438e+23
+    print('FOOO')
+    print(obs)
+    print(exp)
     assert np.isclose(obs, exp)
 
 
