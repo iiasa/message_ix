@@ -1,0 +1,32 @@
+language: generic
+
+os:
+  - osx
+
+before_install:
+  # install gams
+  - curl -O https://d37drm4t2jghv5.cloudfront.net/distributions/25.1.1/macosx/osx_x64_64_sfx.exe;
+  - chmod u+x osx_x64_64_sfx.exe
+  - ./osx_x64_64_sfx.exe > install.out
+  - export PATH=$PATH:$PWD/gams25.1_osx_x64_64_sfx
+  # install conda
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b -p $HOME/miniconda
+  - export PATH=$HOME/miniconda/bin:$PATH
+  - conda update --yes conda
+  # install ixmp deps
+  - conda install --yes -c conda-forge ixmp
+  - conda remove --force --yes ixmp
+
+install:
+  - git clone https://github.com/iiasa/ixmp.git
+  - cd ixmp && python setup.py install && cd ..
+  - python setup.py install
+
+# Run test
+script:
+  - conda install --yes -c conda-forge pytest
+  - pytest -v tests
+  - messageix-config --model_path=message_ix/model
+  - cd doc && pip install -r requirements.txt && make html
