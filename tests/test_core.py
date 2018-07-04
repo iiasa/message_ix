@@ -174,7 +174,7 @@ def test_excel_read_write(test_mp):
     fname = 'test_excel_read_write.xlsx'
 
     scen1 = Scenario(test_mp, *msg_args)
-    scen1.to_excel(fname)
+    scen1.to_excel(fname, solution=False)
 
     scen2 = Scenario(test_mp, model='foo', scen='bar', version='new')
     scen2.read_excel(fname)
