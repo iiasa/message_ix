@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import ixmp as ix
 
-from testing_utils import here
+from conftest import here
 
 db_dir = os.path.join(here, 'testdb')
 test_db = os.path.join(db_dir, 'ixmptest')
