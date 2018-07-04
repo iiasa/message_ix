@@ -4,6 +4,7 @@ import itertools
 
 import pandas as pd
 
+from ixmp.utils import pd_read, pd_write
 from message_ix.utils import isscalar, logger
 
 
@@ -192,3 +193,85 @@ class Scenario(ixmp.Scenario):
 
         # commit
         self.commit('Renamed {} using mapping {}'.format(name, mapping))
+
+    def to_excel(self, fname):
+        """Save a scenario as an Excel file
+
+        Parameters
+        ----------
+        fname : string
+            path to file
+        """
+        funcs = {
+            'set': (self.set_list, self.set),
+            'par': (self.par_list, self.par),
+            'var': (self.var_list, self.var),
+            'equ': (self.equ_list, self.equ),
+        }
+        ix_name_map = {}
+        dfs = {}
+        for ix_type, (list_func, get_func) in funcs.items():
+            for item in list_func():
+                df = get_func(item)
+                if isinstance(df, dict):
+                    df = pd.Series(df)
+                dfs[item] = df
+                ix_name_map[item] = ix_type
+
+        # map names to ix types
+        df = pd.Series(ix_name_map).to_frame(name='ix_type')
+        df.index.name = 'item'
+        df = df.reset_index()
+        dfs['ix_type_mapping'] = df
+
+        pd_write(dfs, fname, index=False)
+
+    def read_excel(self, fname):
+        """Read Excel file data and load into the scenario.
+
+        Parameters
+        ----------
+        fname : string
+            path to file
+        """
+        # only support model generation, can not add var or equ
+        funcs = {
+            'set': self.add_set,
+            'par': self.add_par,
+        }
+
+        # read in all data
+        dfs = pd_read(fname, sheet_name=None)
+
+        # get item-type mapping
+        df = dfs['ix_type_mapping']
+        ix_types = dict(zip(df['item'], df['ix_type']))
+
+        # function for processing both sets and pars
+        def process_df(df):
+            if len(df.columns) == 1 and df.columns == [0]:
+                df = list(df[0])
+            return df
+
+        # fill all sets needed by par indices
+        prefill_sets = [
+            'node',
+            'lvl_spatial',
+            'technology',
+            'commodity',
+            'mode',
+            'year',
+            'level'
+        ]
+        for name in prefill_sets:
+            funcs['set'](name, process_df(dfs[name]))
+
+        # fill all other pars and sets, skipping those already done
+        skip_sheets = ['ix_type_mapping'] + prefill_sets
+        for sheet_name, df in dfs.items():
+            if sheet_name in skip_sheets:
+                continue
+            ix_type = ix_types[sheet_name]
+            if ix_type not in funcs or df.empty:
+                continue
+            funcs[ix_type](sheet_name, process_df(df))

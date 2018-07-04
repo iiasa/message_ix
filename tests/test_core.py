@@ -168,3 +168,24 @@ def test_rename_technology(test_mp):
     clone.solve()
     obs_obj = clone.var('OBJ')['lvl']
     assert obs_obj == exp_obj
+
+
+def test_excel_read_write(test_mp):
+    fname = 'test_excel_read_write.xlsx'
+
+    scen1 = Scenario(test_mp, *msg_args)
+    scen1.to_excel(fname)
+
+    scen2 = Scenario(test_mp, model='foo', scen='bar', version='new')
+    scen2.read_excel(fname)
+
+    exp = scen1.par('input')
+    obs = scen2.par('input')
+    pdt.assert_frame_equal(exp, obs)
+
+    scen1.solve()
+    scen2.commit('foo')  # must be checked in
+    scen2.solve()
+    exp = scen1.var('OBJ')['lvl']
+    obs = scen2.var('OBJ')['lvl']
+    assert exp == obs
