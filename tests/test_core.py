@@ -1,3 +1,4 @@
+import os
 import ixmp
 import message_ix
 import pytest
@@ -174,7 +175,7 @@ def test_excel_read_write(test_mp):
     fname = 'test_excel_read_write.xlsx'
 
     scen1 = Scenario(test_mp, *msg_args)
-    scen1.to_excel(fname, solution=False)
+    scen1.to_excel(fname)
 
     scen2 = Scenario(test_mp, model='foo', scen='bar', version='new')
     scen2.read_excel(fname)
@@ -189,3 +190,5 @@ def test_excel_read_write(test_mp):
     exp = scen1.var('OBJ')['lvl']
     obs = scen2.var('OBJ')['lvl']
     assert exp == obs
+
+    os.remove(fname)

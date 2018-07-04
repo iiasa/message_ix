@@ -194,24 +194,21 @@ class Scenario(ixmp.Scenario):
         # commit
         self.commit('Renamed {} using mapping {}'.format(name, mapping))
 
-    def to_excel(self, fname, solution=True):
-        """Save a scenario as an Excel file
+    def to_excel(self, fname):
+        """Save a scenario as an Excel file. NOTE: Cannot export 
+        solution currently (only model data) due to limitations in excel sheet 
+        names (cannot have multiple sheet names which are identical except for 
+        upper/lower case).
 
         Parameters
         ----------
         fname : string
             path to file
-        solution : bool, optional
-            whether to also store solution. Note: to read this scenario 
-            back in, solution *MUST* be false!!
         """
         funcs = {
             'set': (self.set_list, self.set),
             'par': (self.par_list, self.par),
         }
-        if solution:
-            funcs['var'] = (self.var_list, self.var)
-            funcs['equ'] = (self.equ_list, self.equ)
         ix_name_map = {}
         dfs = {}
         for ix_type, (list_func, get_func) in funcs.items():
@@ -238,20 +235,15 @@ class Scenario(ixmp.Scenario):
         fname : string
             path to file
         """
-        # only support model generation, can not add var or equ
         funcs = {
             'set': self.add_set,
             'par': self.add_par,
         }
 
-        # read in all data
         dfs = pd_read(fname, sheet_name=None)
 
         # get item-type mapping
         df = dfs['ix_type_mapping']
-        if df['ix_type'].isin(['var', 'equ']).any():
-            raise ValueError('Can not have var or equ in ix_types. ' +
-                             'Try `to_excel` with option solution=False')
         ix_types = dict(zip(df['item'], df['ix_type']))
 
         # function for processing both sets and pars
