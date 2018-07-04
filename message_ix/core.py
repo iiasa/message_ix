@@ -195,9 +195,9 @@ class Scenario(ixmp.Scenario):
         self.commit('Renamed {} using mapping {}'.format(name, mapping))
 
     def to_excel(self, fname):
-        """Save a scenario as an Excel file. NOTE: Cannot export 
-        solution currently (only model data) due to limitations in excel sheet 
-        names (cannot have multiple sheet names which are identical except for 
+        """Save a scenario as an Excel file. NOTE: Cannot export
+        solution currently (only model data) due to limitations in excel sheet
+        names (cannot have multiple sheet names which are identical except for
         upper/lower case).
 
         Parameters
