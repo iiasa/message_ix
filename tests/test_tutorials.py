@@ -5,6 +5,8 @@ import sys
 import tempfile
 import pytest
 
+import numpy as np
+
 from testing_utils import here
 
 try:
@@ -14,6 +16,7 @@ except:
     jupyter_installed = False
 
 ene_path = os.path.join(here, '..', 'tutorial', 'Austrian_energy_system')
+westeros_path = os.path.join(here, '..', 'tutorial', 'westeros')
 
 # taken from the execellent example here:
 # https://blog.thedataincubator.com/2016/06/testing-jupyter-notebooks/
@@ -49,10 +52,25 @@ def _notebook_run(path, kernel=None, capsys=None):
 
 
 @pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+def test_westeros(capsys):
+    fname = os.path.join(westeros_path, 'westeros.ipynb')
+    nb, errors = _notebook_run(fname, capsys=capsys)
+    assert errors == []
+
+    obs = eval(nb.cells[-11]['outputs'][0]['data']['text/plain'])
+    exp = 3.600316973564438e+17
+    assert np.isclose(obs, exp)
+
+
+@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
 def test_austria(capsys):
     fname = os.path.join(ene_path, 'austria.ipynb')
     nb, errors = _notebook_run(fname, capsys=capsys)
     assert errors == []
+
+    obs = eval(nb.cells[-13]['outputs'][0]['data']['text/plain'])
+    exp = 133105106944.0
+    assert np.isclose(obs, exp)
 
 
 @pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
@@ -60,6 +78,10 @@ def test_austria_single_policy():
     fname = os.path.join(ene_path, 'austria_single_policy.ipynb')
     nb, errors = _notebook_run(fname)
     assert errors == []
+
+    obs = eval(nb.cells[-8]['outputs'][0]['data']['text/plain'])
+    exp = 132452155392.0
+    assert np.isclose(obs, exp)
 
 
 @pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')

@@ -6,22 +6,21 @@ jobs:
       - image: docker:17.05.0-ce-git
     steps:
       - checkout
-      - run: git submodule sync
-      - run: git submodule update --init
       - setup_remote_docker
       - run:
-          name: ls
-          command: pwd && ls
-      - run:
-          name: ls-ixmp
-          command: pwd && ls ./ixmp
-      - run:
-          name: Build App Docker Image
+          name: Build App Docker Image for Python
           command: docker build -t message_ix/message_ix:latest .
       - run:
           name: Python2 Tests
-          command: docker run message_ix/message_ix:latest python2 -m pytest -v /message_ix/tests
+          command: |
+                docker run message_ix/message_ix:latest python2 -m pytest -v /message_ix/tests
+                docker run message_ix/message_ix:latest messageix-config --model_path=/tmp/
       - run:
           name: Python3 Tests
-          command: docker run message_ix/message_ix:latest python3 -m pytest -v /message_ix/tests
+          command: |
+                docker run message_ix/message_ix:latest python3 -m pytest -v /message_ix/tests
+                docker run message_ix/message_ix:latest messageix-config --model_path=/tmp/
+      - run:
+          name: Build Docs
+          command: docker run message_ix/message_ix:latest /bin/bash -c 'cd /message_ix/doc && pip3 install -r requirements.txt && make html && test -d source/model'
       

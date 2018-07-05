@@ -1,6 +1,51 @@
-# -*- coding: utf-8 -*-
+import collections
+import copy
+import itertools
+import logging
+import six
 
 import numpy as np
+import pandas as pd
+
+# globally accessible logger
+_LOGGER = None
+
+
+def logger():
+    """Access global logger"""
+    global _LOGGER
+    if _LOGGER is None:
+        logging.basicConfig()
+        _LOGGER = logging.getLogger()
+        _LOGGER.setLevel('INFO')
+    return _LOGGER
+
+
+def isstr(x):
+    """Returns True if x is a string"""
+    return isinstance(x, six.string_types)
+
+
+def isscalar(x):
+    """Returns True if x is a scalar"""
+    return not isinstance(x, collections.Iterable) or isstr(x)
+
+
+def make_df(base, **kwargs):
+    """Combine existing data with a series of new data defined in kwargs.
+
+    Parameters
+    ----------
+    base : dict, pd.Series, or pd.DataFrame
+        existing dataset to append to
+    """
+    if not isinstance(base, (collections.Mapping, pd.Series, pd.DataFrame)):
+        raise ValueError('base argument must be a dictionary or Pandas object')
+    base = copy.deepcopy(base)
+    if not isinstance(base, collections.Mapping):
+        base = base.to_dict()
+    base.update(**kwargs)
+    return pd.DataFrame(base)
 
 
 def multiply_df(df1, column1, df2, column2):
@@ -32,7 +77,7 @@ def make_ts(df, time_col, value_col, metadata={}):
         'node_loc': 'region',
         time_col: 'year',
         value_col: 'value'
-            }
+    }
     df = df.rename(columns=rename)
     df = df.dropna(axis='index', subset=['value'])
     return df
