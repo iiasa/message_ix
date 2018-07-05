@@ -216,8 +216,9 @@ class Scenario(ixmp.Scenario):
                 df = get_func(item)
                 if isinstance(df, dict):
                     df = pd.Series(df)
-                dfs[item] = df
-                ix_name_map[item] = ix_type
+                if not df.empty:
+                    dfs[item] = df
+                    ix_name_map[item] = ix_type
 
         # map names to ix types
         df = pd.Series(ix_name_map).to_frame(name='ix_type')
