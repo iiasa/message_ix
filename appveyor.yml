@@ -26,7 +26,7 @@ install:
   - ps: Start-FileDownload 'https://d37drm4t2jghv5.cloudfront.net/distributions/25.1.1/windows/windows_x64_64.exe'
   - windows_x64_64.exe /SP- /VERYSILENT /NORESTART /DIR=.\gams /NOICONS
   - "SET PATH=%cd%\\gams;%PATH%"
-  - conda install --yes -c conda-forge ixmp
+  - conda install --yes -c conda-forge ixmp xlsxwriter xlrd
   - conda remove --force --yes ixmp
   
   - git clone https://github.com/iiasa/ixmp.git
