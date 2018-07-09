@@ -1,9 +1,11 @@
 import argparse
 import json
+import message_ix
 import os
 import shutil
 import tempfile
 import zipfile
+
 
 from six.moves.urllib.request import urlretrieve
 
@@ -82,9 +84,9 @@ def do_dl(tag=None, branch=None, repo_path=None, local_path='.'):
     if tag is not None and branch is not None:
         raise ValueError('Can only provide one of `tag` and `branch`')
     if tag is None and branch is None:
-        branch = 'master'  # change this for default dl behavior
+        tag = '{}'.format(message_ix.__version__)
 
-    zipname = '{}.zip'.format(branch or tag)
+    zipname = '{}.zip'.format(branch or 'v' + tag)
     url = 'https://github.com/iiasa/message_ix/archive/{}'.format(zipname)
 
     tmp = tempdir_name()
