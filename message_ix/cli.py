@@ -107,11 +107,11 @@ def do_dl(tag=None, branch=None, repo_path=None, local_path='.'):
         cpto = '{}/{}'.format(local_path, repo_path)
         logger().info('Copying {} to {}'.format(cpfrom, cpto))
         recursive_copy(cpfrom, cpto, overwrite=True)
+        
+        shutil.rmtree(tmp)
 
-        shutil.rmtree(tmp)
-    except:
-        shutil.rmtree(tmp)
-        raise
+    except WindowsError as e:
+        logger().info("Could not delete {} because {}".format(tmp, e))
 
 
 def dl():
