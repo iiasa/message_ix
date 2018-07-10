@@ -1,6 +1,6 @@
 import subprocess
 
-from testing_utils import tempdir
+from conftest import tempdir
 
 
 def test_dl_default():
