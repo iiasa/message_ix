@@ -7,7 +7,7 @@ import pytest
 
 import numpy as np
 
-from testing_utils import here
+from conftest import here
 
 try:
     import nbformat

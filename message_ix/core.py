@@ -4,6 +4,7 @@ import itertools
 
 import pandas as pd
 
+from ixmp.utils import pd_read, pd_write
 from message_ix.utils import isscalar, logger
 
 
@@ -192,3 +193,75 @@ class Scenario(ixmp.Scenario):
 
         # commit
         self.commit('Renamed {} using mapping {}'.format(name, mapping))
+
+    def to_excel(self, fname):
+        """Save a scenario as an Excel file. NOTE: Cannot export
+        solution currently (only model data) due to limitations in excel sheet
+        names (cannot have multiple sheet names which are identical except for
+        upper/lower case).
+
+        Parameters
+        ----------
+        fname : string
+            path to file
+        """
+        funcs = {
+            'set': (self.set_list, self.set),
+            'par': (self.par_list, self.par),
+        }
+        ix_name_map = {}
+        dfs = {}
+        for ix_type, (list_func, get_func) in funcs.items():
+            for item in list_func():
+                df = get_func(item)
+                df = pd.Series(df) if isinstance(df, dict) else df
+                if not df.empty:
+                    dfs[item] = df
+                    ix_name_map[item] = ix_type
+
+        # map names to ix types
+        df = pd.Series(ix_name_map).to_frame(name='ix_type')
+        df.index.name = 'item'
+        df = df.reset_index()
+        dfs['ix_type_mapping'] = df
+
+        pd_write(dfs, fname, index=False)
+
+    def read_excel(self, fname):
+        """Read Excel file data and load into the scenario.
+
+        Parameters
+        ----------
+        fname : string
+            path to file
+        """
+        funcs = {
+            'set': self.add_set,
+            'par': self.add_par,
+        }
+
+        dfs = pd_read(fname, sheet_name=None)
+
+        # get item-type mapping
+        df = dfs['ix_type_mapping']
+        ix_types = dict(zip(df['item'], df['ix_type']))
+
+        # fill in necessary items first (only sets for now)
+        col = 0  # special case for prefill set Series
+
+        def is_prefill(x):
+            return dfs[x].columns[0] == col and len(dfs[x].columns) == 1
+
+        prefill = [x for x in dfs if is_prefill(x)]
+        for name in prefill:
+            data = list(dfs[name][col])
+            if len(data) > 0:
+                ix_type = ix_types[name]
+                funcs[ix_type](name, data)
+
+        # fill all other pars and sets, skipping those already done
+        skip_sheets = ['ix_type_mapping'] + prefill
+        for sheet_name, df in dfs.items():
+            if sheet_name not in skip_sheets and not df.empty:
+                ix_type = ix_types[sheet_name]
+                funcs[ix_type](sheet_name, df)
