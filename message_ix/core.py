@@ -249,7 +249,8 @@ class Scenario(ixmp.Scenario):
 
         # fill in necessary items first (only sets for now)
         col = 0  # special case for prefill set Series
-        prefill = [x for x in dfs if dfs[x].columns[0] == col]
+        hit = lambda x: dfs[x].columns[0] == col and len(dfs[x]).columns == 1
+        prefill = [x for x in dfs if hit(x)]
         for name in prefill:
             ix_type = ix_types[name]
             data = list(dfs[name][col])
