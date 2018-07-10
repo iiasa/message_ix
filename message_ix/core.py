@@ -247,32 +247,20 @@ class Scenario(ixmp.Scenario):
         df = dfs['ix_type_mapping']
         ix_types = dict(zip(df['item'], df['ix_type']))
 
-        # function for processing both sets and pars
-        def process_df(df):
-            if len(df.columns) == 1 and df.columns == [0]:
-                df = list(df[0])
-            return df
-
-        # fill all sets needed by par indices
-        prefill_sets = [
-            'node',
-            'lvl_spatial',
-            'technology',
-            'commodity',
-            'mode',
-            'year',
-            'level',
-            'type_year',
-        ]
-        for name in prefill_sets:
-            funcs['set'](name, process_df(dfs[name]))
+        # fill in necessary items first (only sets for now)
+        col = 0  # special case for prefill set Series
+        prefill = [x for x in dfs if dfs[x].columns[0] == col]
+        for name in prefill:
+            ix_type = ix_types[name]
+            data = list(dfs[name][col])
+            if data:
+                funcs[ix_type](name, data)
 
         # fill all other pars and sets, skipping those already done
-        skip_sheets = ['ix_type_mapping'] + prefill_sets
+        skip_sheets = ['ix_type_mapping'] + prefill
         for sheet_name, df in dfs.items():
             if sheet_name in skip_sheets:
                 continue
             ix_type = ix_types[sheet_name]
-            if ix_type not in funcs or df.empty:
-                continue
-            funcs[ix_type](sheet_name, process_df(df))
+            if ix_type in funcs and not df.empty:
+                funcs[ix_type](sheet_name, df)
