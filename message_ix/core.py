@@ -248,8 +248,8 @@ class Scenario(ixmp.Scenario):
         ix_types = dict(zip(df['item'], df['ix_type']))
 
         # fill in necessary items first (only sets for now)
+        col = 0  # special case for prefill set Series
         def is_prefill(x):  
-            col = 0  # special case for prefill set Series
             return dfs[x].columns[0] == col and len(dfs[x].columns) == 1
         prefill = [x for x in dfs if is_prefill(x)]
         for name in prefill:
