@@ -214,8 +214,7 @@ class Scenario(ixmp.Scenario):
         for ix_type, (list_func, get_func) in funcs.items():
             for item in list_func():
                 df = get_func(item)
-                if isinstance(df, dict):
-                    df = pd.Series(df)
+                df = pd.Series(df) if isinstance(df, dict) else df
                 if not df.empty:
                     dfs[item] = df
                     ix_name_map[item] = ix_type
@@ -253,16 +252,14 @@ class Scenario(ixmp.Scenario):
             return dfs[x].columns[0] == col and len(dfs[x].columns) == 1
         prefill = [x for x in dfs if is_prefill(x)]
         for name in prefill:
-            ix_type = ix_types[name]
             data = list(dfs[name][col])
-            if data:
+            if len(data) > 0:
+                ix_type = ix_types[name]
                 funcs[ix_type](name, data)
 
         # fill all other pars and sets, skipping those already done
         skip_sheets = ['ix_type_mapping'] + prefill
         for sheet_name, df in dfs.items():
-            if sheet_name in skip_sheets:
-                continue
-            ix_type = ix_types[sheet_name]
-            if ix_type in funcs and not df.empty:
+            if sheet_name not in skip_sheets and not df.empty:
+                ix_type = ix_types[sheet_name]
                 funcs[ix_type](sheet_name, df)
