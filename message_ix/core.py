@@ -250,7 +250,7 @@ class Scenario(ixmp.Scenario):
         # fill in necessary items first (only sets for now)
         def is_prefill(x):  
             col = 0  # special case for prefill set Series
-            return dfs[x].columns[0] == col and len(dfs[x]).columns == 1
+            return dfs[x].columns[0] == col and len(dfs[x].columns) == 1
         prefill = [x for x in dfs if is_prefill(x)]
         for name in prefill:
             ix_type = ix_types[name]
