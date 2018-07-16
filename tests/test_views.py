@@ -1,8 +1,6 @@
 import os
 import pandas as pd
-from numpy import testing as npt
 import pandas.util.testing as pdt
-import ixmp
 import pytest
 import numpy as np
 
@@ -17,15 +15,17 @@ def view_df():
     df = pd.read_csv(os.path.join(here, 'tec_view_data.csv'), dtype={
         '2010': np.float32}).fillna('')
     df = df.rename(columns={'2010': int('2010')})
-    df.loc[:, 'year_vtg/year_rel'] = df.loc[:,
-                                            'year_vtg/year_rel'].apply(lambda x: int(x) if x != '' else x)
+    df.loc[:, 'year_vtg/year_rel'] = df.loc[:, 'year_vtg/year_rel'].apply(
+        lambda x: int(x) if x != '' else x)
     yield df
 
 
 def test_tec_view_canning_all_tecs(test_mp, view_df):
     scen = test_mp.Scenario(*msg_args)
-    exp = view_df.set_index(['technology', 'node', 'par', 'unit', 'commodity/emission',
-                             'level', 'mode', 'node I/O', 'year_vtg/year_rel']).astype('float32')
+    exp = view_df.set_index(['technology', 'node', 'par', 'unit',
+                             'commodity/emission', 'level', 'mode',
+                             'node I/O', 'year_vtg/year_rel'
+                             ]).astype('float32')
     exp.sort_index(inplace=True)
     obs = views.tec_view(scen, column_style='model_mapping')
     obs.sort_index(inplace=True)
@@ -47,19 +47,24 @@ def test_tec_view_canning_single_tec(test_mp, view_df):
     scen = test_mp.Scenario(*msg_args)
     tec = 'transport_from_san-diego'
     exp = view_df[view_df['technology'] == tec].set_index(
-        ['technology', 'node', 'par', 'unit', 'commodity/emission', 'level', 'mode', 'node I/O', 'year_vtg/year_rel'])
+        ['technology', 'node', 'par', 'unit', 'commodity/emission', 'level',
+         'mode', 'node I/O', 'year_vtg/year_rel'])
     exp.sort_index(inplace=True)
     obs = views.tec_view(scen, tec=tec, column_style='model_mapping')
     obs.sort_index(inplace=True)
-    #assert 0
     pdt.assert_frame_equal(exp, obs, check_index_type=False)
 
 
 def test_tec_view_canning_single_par(test_mp, view_df):
     scen = test_mp.Scenario(*msg_args)
     par = 'input'
-    exp = view_df[view_df['par'] == par].set_index(['technology', 'node', 'par', 'unit', 'commodity/emission',
-                                                    'level', 'mode', 'node I/O', 'year_vtg/year_rel']).astype('float32')
+    exp = view_df[view_df['par'] == par].set_index(['technology', 'node',
+                                                    'par', 'unit',
+                                                    'commodity/emission',
+                                                    'level', 'mode',
+                                                    'node I/O',
+                                                    'year_vtg/year_rel'
+                                                    ]).astype('float32')
     exp.sort_index(inplace=True)
     obs = views.tec_view(scen, par=par, column_style='model_mapping')
     obs.sort_index(inplace=True)
