@@ -50,12 +50,13 @@ mappings = {
     }}
 
 
-def tec_view(scenario, tec=None, sort_by='technology', region=None, par=None, column_style='raw_mapping'):
+def tec_view(scenario, tec=None, sort_by='technology', region=None, par=None,
+             column_style='raw_mapping'):
     """Returns technology parameters for a given sceanrio
 
     Parameter:
     ----------
-    scenario : ixmp.Sceanrio 
+    scenario : ixmp.Sceanrio
     tec : string or list
         single or multiple technologies for which data should be retrieved
     sort_by : string (default is 'technology')
@@ -149,7 +150,8 @@ def tec_view(scenario, tec=None, sort_by='technology', region=None, par=None, co
     # When retrieving single parameters which dont have node_loc, then the idx_order needs to be updated.
     if 'node_loc' not in df.columns:
         if 'node_rel' in df.columns:
-            idx_order = ['node_rel' if x == 'node_loc' else x for x in idx_order]
+            idx_order = ['node_rel' if x ==
+                         'node_loc' else x for x in idx_order]
         else:
             idx_order = ['node' if x == 'node_loc' else x for x in idx_order]
     idx = idx_order + [mapping['unit']]
