@@ -97,7 +97,7 @@ def tec_view(scenario, tec=None, sort_by='technology', region=None, par=None,
     dfs = []
     for parameter in par:
         # Filters out required parameters
-        if not 'technology' in scenario.par(parameter).columns:
+        if 'technology' not in scenario.par(parameter).columns:
             continue
         if region and parameter in ['relation_activity',
                                     'relation_new_capacity',
@@ -141,7 +141,8 @@ def tec_view(scenario, tec=None, sort_by='technology', region=None, par=None,
         # Drops non required columns
         if column_style != 'raw_mapping':
             df = df.drop(
-                [c for c in ['time', 'time_dest', 'time_origin'] if c in df.columns], axis=1)
+                [c for c in ['time', 'time_dest', 'time_origin']
+                 if c in df.columns], axis=1)
         # Sets index
         idx = [i for i in df.columns if i not in utils.numcols(
             df) or i in set(mapping.values())]
@@ -156,7 +157,8 @@ def tec_view(scenario, tec=None, sort_by='technology', region=None, par=None,
             df[col] = ' '
 
     df = pd.concat(dfs)
-    # When retrieving single parameters which dont have node_loc, then the idx_order needs to be updated.
+    # When retrieving single parameters which dont have node_loc,
+    # then the idx_order needs to be updated.
     if 'node_loc' not in df.columns:
         if 'node_rel' in df.columns:
             idx_order = ['node_rel' if x ==
