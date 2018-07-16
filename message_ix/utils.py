@@ -20,8 +20,10 @@ def logger():
         _LOGGER.setLevel('INFO')
     return _LOGGER
 
+
 def is_iter_not_string(x):
     return x if hasattr(x, '__iter__') and not is_str(x) else [x]
+
 
 def isstr(x):
     """Returns True if x is a string"""
@@ -93,6 +95,7 @@ def matching_rows(df, row, match_columns=[]):
     for col in match_columns:
         rows = rows & (df[col] == row[col])
     return df[rows]
+
 
 def is_num(s):
     """Returns True if s is a number"""
