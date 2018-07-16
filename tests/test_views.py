@@ -80,8 +80,8 @@ def test_tec_view_canning_xlsx_idx(test_mp, view_df):
         'node I/O': 'Region I/O',
         'year_vtg/year_rel': 'Vintage/Year Relation',
     })
-    exp = exp.set_index(['Technology', 'Region', 'Parameter', 'Unit', 
-                         'Commodity/Species', 'Level', 'Mode', 'Region I/O', 
+    exp = exp.set_index(['Technology', 'Region', 'Parameter', 'Unit',
+                         'Commodity/Species', 'Level', 'Mode', 'Region I/O',
                          'Vintage/Year Relation']).astype('float32')
     exp.sort_index(inplace=True)
     obs = views.tec_view(scen, column_style='file_mapping')
@@ -104,11 +104,11 @@ def test_tec_view_canning_raw_idx(test_mp, view_df):
 
     exp = pd.concat([exp1, exp2, exp3])
     exp = exp.rename(columns={'commodity/emission': 'commodity',
-                              'year_vtg/year_rel': 'year_vtg', 
+                              'year_vtg/year_rel': 'year_vtg',
                               'node': 'node_loc'}).fillna(' ')
     exp['time'] = 'year'
     idx = ['technology', 'node_loc', 'par', 'unit', 'commodity',
-           'level', 'mode', 'node_dest', 'node_origin', 'time', 
+           'level', 'mode', 'node_dest', 'node_origin', 'time',
            'time_dest', 'time_origin', 'year_vtg']
     exp = exp.sort_values(by=idx).set_index(idx).astype('float32')
     obs = views.tec_view(scen)
