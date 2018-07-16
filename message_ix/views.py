@@ -67,7 +67,7 @@ def tec_view(scenario, tec=None, sort_by='technology', region=None, par=None,
     par : string or list
         single or multiple parameters for technologies
     column_style : string
-        allows the user to view data in raw format 
+        allows the user to view data in raw format
             (as data is saved in the database),
         model format (aggregate of raw foramt) or as file format
             (based on xlsx-import column names)
