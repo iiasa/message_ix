@@ -60,14 +60,16 @@ def tec_view(scenario, tec=None, sort_by='technology', region=None, par=None,
     tec : string or list
         single or multiple technologies for which data should be retrieved
     sort_by : string (default is 'technology')
-        allows the user to sort data by either the 'Technology'/'technology' or 'Parameter'/'par'
+        allows the user to sort data by either the 'Technology'/'technology' 
+        or 'Parameter'/'par'
     region : string or list
         allows filtering by a specific region/node in the model
     par : string or list
         single or multiple parameters for technologies
     column_style : string
         allows the user to view data in raw format (as data is saved in the database), 
-        model format (aggregate of raw foramt) or as file format (based on xlsx-import column names)
+        model format (aggregate of raw foramt) or as file format 
+        (based on xlsx-import column names)
     """
     mapping = mappings[column_style]
 
@@ -96,9 +98,12 @@ def tec_view(scenario, tec=None, sort_by='technology', region=None, par=None,
         # Filters out required parameters
         if not 'technology' in scenario.par(parameter).columns:
             continue
-        if region and parameter in ['relation_activity', 'relation_new_capacity', 'relation_total_capacity']:
+        if region and parameter in ['relation_activity', 'relation_new_capacity',
+                                    'relation_total_capacity']:
             filters = filters = {'technology': tec, 'node_rel': region}
-        elif region and parameter in ['resource_volume', 'resource_remaining', 'rating_bin', 'reliability_factor', 'peak_load_factor', 'renewable_potential', 'renewable_capacity_factor']:
+        elif region and parameter in ['resource_volume', 'resource_remaining',
+                                      'rating_bin', 'reliability_factor', 'peak_load_factor',
+                                      'renewable_potential', 'renewable_capacity_factor']:
             filters = filters = {'technology': tec, 'node': region}
         elif region:
             filters = filters = {'technology': tec, 'node_loc': region}
