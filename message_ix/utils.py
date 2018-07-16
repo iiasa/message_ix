@@ -22,7 +22,7 @@ def logger():
 
 
 def is_iter_not_string(x):
-    return x if hasattr(x, '__iter__') and not is_str(x) else [x]
+    return x if hasattr(x, '__iter__') and not isstr(x) else [x]
 
 
 def isstr(x):
