@@ -6,7 +6,6 @@ import ixmp
 import pytest
 import numpy as np
 
-from testing_utils import test_mp
 from message_ix import views
 
 msg_args = ('canning problem (MESSAGE scheme)', 'standard')
