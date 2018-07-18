@@ -72,12 +72,15 @@ the ix modeling platform for scientific publications or technical reports:
          export PATH=$PATH:/path/to/gams-directory-with-gams-binary
          ```
    
-3. Open a command prompt and type
+3. Open a command prompt (e.g. Anaconda prompt)  and type
 
     ```
     conda install -c conda-forge message-ix
     ```
-
+	For all conda-related command prompt commands (both during message_ix and other
+	package installations), we recommend Windows users use **""Anaconda Prompt"**  - as 
+	this can help some user permission issues. Click Start menu and search "Anaconda 
+	Prompt".
 
 ## Install from Source (Advanced Users)
 
@@ -120,6 +123,7 @@ opening a command prompt and typing
    ```
    messageix-dl --local_path /path/to/tutorials
    ```
+N.B. Some Windows users get an error (PermissionError: [WinError 32]:..). Check the tutorials directory - the tutorial files should have downloaded successfully!
 
 ## Running Tutorials
 
@@ -143,11 +147,16 @@ opening a command prompt and typing
 
 ### Using Command Line
 
-Navigate to the tutorial folder and type
+Navigate to the tutorial folder (as above), e.g.
+    ```
+    cd /path/to/tutorials
+    ```
+	
+	and type
 
-   ```
-   jupyter notebook
-   ```
+    ```
+    jupyter notebook
+    ```
 
 ## Building Documentation
 
