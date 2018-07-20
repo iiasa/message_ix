@@ -10,11 +10,11 @@ from message_ix.utils import isscalar, logger
 
 def init_new_scenario(s):
     s.init_par('is_bound_activity_all_modes_up',
-               idx_sets=['node', 'tec', 'year', 'time'])
+               idx_sets=['node', 'technology', 'year', 'time'])
     s.init_par('bound_activity_all_modes_up',
-               idx_sets=['node', 'tec', 'year', 'time'])
+               idx_sets=['node', 'technology', 'year', 'time'])
     s.init_par('bound_activity_all_modes_lo',
-               idx_sets=['node', 'tec', 'year', 'time'])
+               idx_sets=['node', 'technology', 'year', 'time'])
 
 
 class Scenario(ixmp.Scenario):
