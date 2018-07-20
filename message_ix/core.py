@@ -8,6 +8,15 @@ from ixmp.utils import pd_read, pd_write
 from message_ix.utils import isscalar, logger
 
 
+def init_new_scenario(s):
+    s.init_par('is_bound_activity_all_modes_up',
+               idx_sets=['node', 'tec', 'year', 'time'])
+    s.init_par('bound_activity_all_modes_up',
+               idx_sets=['node', 'tec', 'year', 'time'])
+    s.init_par('bound_activity_all_modes_lo',
+               idx_sets=['node', 'tec', 'year', 'time'])
+
+
 class Scenario(ixmp.Scenario):
 
     def __init__(self, platform, model, scen, version=None, annotation=None,
@@ -49,6 +58,9 @@ class Scenario(ixmp.Scenario):
 
         super(Scenario, self).__init__(
             platform, model, scen, jscen, cache=cache)
+
+        if version == 'new':
+            init_new_scenario(self)
 
     def add_spatial_sets(self, data):
         """Add sets related to spatial dimensions of the model
