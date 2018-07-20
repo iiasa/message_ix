@@ -147,6 +147,7 @@ Alias(year,year3);
 Alias(time,time2);
 Alias(time,time_act);
 Alias(time,time_od);
+Alias(mode, mode2);
 
 *----------------------------------------------------------------------------------------------------------------------*
 * Category types and mappings                                                                                                       *
