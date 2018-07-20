@@ -268,6 +268,8 @@ Equations
     NEW_CAPACITY_SOFT_CONSTRAINT_LO bound on soft relaxation of dynamic new capacity constraints (downwards)
     ACTIVITY_BOUND_UP               upper bound on activity summed over all vintages
     ACTIVITY_BOUND_LO               lower bound on activity summed over all vintages
+    ACTIVITY_BOUND_ALL_MODES_UP     upper bound on activity summed over all vintages and modes
+    ACTIVITY_BOUND_ALL_MODES_LO     lower bound on activity summed over all vintages and modes
     ACTIVITY_CONSTRAINT_UP          dynamic constraint on the market penetration of a technology activity (upper bound)
     ACTIVITY_SOFT_CONSTRAINT_UP     bound on relaxation of the dynamic constraint on market penetration (upper bound)
     ACTIVITY_CONSTRAINT_LO          dynamic constraint on the market penetration of a technology activity (lower bound)
@@ -1562,6 +1564,8 @@ Model MESSAGE_LP /
     TOTAL_CAPACITY_BOUND_LO
     ACTIVITY_BOUND_UP
     ACTIVITY_BOUND_LO
+    ACTIVITY_BOUND_ALL_MODES_UP
+    ACTIVITY_BOUND_ALL_MODES_LO
     NEW_CAPACITY_CONSTRAINT_UP
     NEW_CAPACITY_SOFT_CONSTRAINT_UP
     NEW_CAPACITY_CONSTRAINT_LO
