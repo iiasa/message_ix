@@ -3,6 +3,7 @@ import ixmp
 import message_ix
 import pytest
 
+import numpy as np
 import pandas as pd
 import pandas.util.testing as pdt
 
@@ -202,3 +203,50 @@ def test_excel_read_write(test_mp):
     assert exp == obs
 
     os.remove(fname)
+
+
+def test_add_bound_activity_up_modes(test_mp):
+    def calculate(scen):
+        return (
+            scen
+            .var('ACT')
+            .groupby(['technology', 'mode'])['lvl']
+            .sum()
+            .loc['transport_from_seattle']
+        )
+
+    scen = Scenario(test_mp, *msg_args)
+    scen.solve()
+
+    # data for act bound
+    data = pd.DataFrame({
+        'node_loc': 'seattle',
+        'technology': 'transport_from_seattle',
+        'year_act': 2010,
+        'time': 'year',
+        'unit': 'cases',
+    }, index=[0])
+
+    # test limiting one mode
+    clone = scen.clone('foo', 'bar', keep_sol=False)
+    clone.check_out()
+    exp = 0.5 * calculate(scen).sum()
+    data['mode'] = 'to_chicago'
+    data['value'] = exp
+    clone.add_par('bound_activity_up', data)
+    clone.commit('foo')
+    clone.solve()
+    obs = calculate(clone).loc['to_chicago']
+    assert np.isclose(obs, exp)
+
+    # test limiting all modes
+    clone2 = scen.clone('foo', 'baz', keep_sol=False)
+    clone2.check_out()
+    exp = 0.95 * calculate(scen).sum()
+    data['mode'] = 'all'
+    data['value'] = exp
+    clone2.add_par('bound_activity_up', data)
+    clone2.commit('foo')
+    clone2.solve()
+    obs = calculate(clone2).sum()
+    assert np.isclose(obs, exp)
