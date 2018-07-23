@@ -40,7 +40,7 @@ abs_cost_new_capacity_soft_up, abs_cost_new_capacity_soft_lo, level_cost_new_cap
 abs_cost_activity_soft_up, abs_cost_activity_soft_lo, level_cost_activity_soft_up, level_cost_activity_soft_lo,
 soft_new_capacity_up, soft_new_capacity_lo, soft_activity_up, soft_activity_lo,
 * share constraints
-share_factor_up,share_factor_lo,map_shares_commodity_level,
+share_factor_up,share_factor_lo,map_shares_commodity_level,share_mode_up,share_mode_lo,
 * parameters for reliability, flexibility and renewable potential constraints
 rating_bin, reliability_factor, peak_load_factor, flexibility_factor
 renewable_capacity_factor, renewable_potential
