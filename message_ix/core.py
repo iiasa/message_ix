@@ -41,6 +41,22 @@ def _init_scenario(s, commit=False):
                         idx_sets=['shares', 'node', 'year', 'time'],
                         idx_names=['shares', 'node_loc', 'year_act', 'time'])
                 }),
+                (s.init_par, {
+                    'args': ('share_mode_up',),
+                    'kwargs': dict(
+                        idx_sets=['shares', 'node', 'technology',
+                                  'mode', 'year', 'time'],
+                        idx_names=['shares', 'node_loc', 'technology', 'mode',
+                                   'year_act', 'time'])
+                }),
+                (s.init_par, {
+                    'args': ('share_mode_lo',),
+                    'kwargs': dict(
+                        idx_sets=['shares', 'node', 'technology',
+                                  'mode', 'year', 'time'],
+                        idx_names=['shares', 'node_loc', 'technology', 'mode',
+                                   'year_act', 'time'])
+                }),
             ],
         },
     )

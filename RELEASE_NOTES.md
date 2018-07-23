@@ -1,6 +1,7 @@
 
 # Next Release
 
+- [#81](https://github.com/iiasa/message_ix/pull/81): Share constraints by mode added.
 - [#80](https://github.com/iiasa/message_ix/pull/80): Share constraints by commodity/level added.
 - [#78](https://github.com/iiasa/message_ix/pull/78): Bugfix: `message_ix.Scenario.solve()` uses 'MESSAGE' by default, but can be provided other model names
 - [#77](https://github.com/iiasa/message_ix/pull/77): `rename()` function can optionally keep old values in the model (i.e., copy vs. copy-with-replace)
