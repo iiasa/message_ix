@@ -15,7 +15,33 @@ def _init_scenario(s, commit=False):
     inits = (
         {  # required for subset all_modes, see model/data_load.gms
             'test': 'all' not in s.set('mode'),
-            'exec': (s.add_set, {'args': ('mode', 'all')}),
+            'exec': [(s.add_set, {'args': ('mode', 'all')})],
+        },
+        {  # required for share constraints
+            'test': 'shares' not in s.set_list(),
+            'exec': [
+                (s.init_set, {'args': ('shares',)}),
+                (s.init_set, {
+                    'args': ('map_shares_commodity_level',),
+                    'kwargs': dict(
+                        idx_sets=['shares', 'commodity', 'level', 'type_tec',
+                                  'type_tec'],
+                        idx_names=['shares', 'commodity', 'level',
+                                   'type_tec_share', 'type_tec_total'])
+                }),
+                (s.init_par, {
+                    'args': ('share_factor_up',),
+                    'kwargs': dict(
+                        idx_sets=['shares', 'node', 'year', 'time'],
+                        idx_names=['shares', 'node_loc', 'year_act', 'time'])
+                }),
+                (s.init_par, {
+                    'args': ('share_factor_lo',),
+                    'kwargs': dict(
+                        idx_sets=['shares', 'node', 'year', 'time'],
+                        idx_names=['shares', 'node_loc', 'year_act', 'time'])
+                }),
+            ],
         },
     )
 
@@ -26,11 +52,12 @@ def _init_scenario(s, commit=False):
     if commit:
         s.check_out()
     for idx in pass_idx:
-        exec_info = inits[idx]['exec']
-        func = exec_info[0]
-        args = exec_info[1].pop('args', tuple())
-        kwargs = exec_info[1].pop('kwargs', dict())
-        func(*args, **kwargs)
+        for exec_info in inits[idx]['exec']:
+            func = exec_info[0]
+            args = exec_info[1].pop('args', tuple())
+            kwargs = exec_info[1].pop('kwargs', dict())
+            func(*args, **kwargs)
+
     if commit:
         s.commit('Initialized wtih standard sets and params')
 
