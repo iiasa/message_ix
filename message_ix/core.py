@@ -9,12 +9,25 @@ from message_ix.utils import isscalar, logger
 
 
 def init_new_scenario(s):
-    s.init_par('is_bound_activity_all_modes_up',
-               idx_sets=['node', 'technology', 'year', 'time'])
-    s.init_par('bound_activity_all_modes_up',
-               idx_sets=['node', 'technology', 'year', 'time'])
-    s.init_par('bound_activity_all_modes_lo',
-               idx_sets=['node', 'technology', 'year', 'time'])
+    init_pars = {
+        'is_bound_activity_all_modes_up': {
+            'idx_sets': ['node', 'technology', 'year', 'time'],
+            'idx_names': ['node_loc', 'technology', 'year_act', 'time'],
+        },
+        'bound_activity_all_modes_up': {
+            'idx_sets': ['node', 'technology', 'year', 'time'],
+            'idx_names': ['node_loc', 'technology', 'year_act', 'time'],
+        },
+        'bound_activity_all_modes_lo': {
+            'idx_sets': ['node', 'technology', 'year', 'time'],
+            'idx_names': ['node_loc', 'technology', 'year_act', 'time'],
+        },
+    }
+    par_list = s.par_list()
+    for par, idx_info in init_pars.items():
+        if par not in par_list:
+            s.init_par(
+                par, idx_sets=idx_info['idx_sets'], idx_names=idx_info['idx_names'])
 
 
 class Scenario(ixmp.Scenario):
