@@ -521,6 +521,34 @@ Parameters
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
+* Share constraints                                                                                                    *
+*----------------------------------------------------------------------------------------------------------------------*
+
+***
+* Parameters of the `Share Constraints` section
+* ---------------------------------------------
+*
+* Share constraints define the share of a given commodity to be active on a certain level
+*
+* .. list-table::
+*    :widths: 25 75
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index dimensions
+*    * - share_factor_up
+*      - ``shares`` | ``node_loc`` | ``year_act`` | ``time``
+*    * - share_factor_lo
+*      - ``shares`` | ``node_loc`` | ``year_act`` | ``time``
+*
+***
+
+Parameters
+    share_factor_up(shares,node,year_all,time)    upper bound of share constraint
+    share_factor_lo(shares,node,year_all,time)    lower bound of share constraint
+;
+
+*----------------------------------------------------------------------------------------------------------------------*
 * Generic linear relations                                                                                       *
 *----------------------------------------------------------------------------------------------------------------------*
 
