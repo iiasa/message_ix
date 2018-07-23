@@ -69,42 +69,46 @@ def test_add_bound_activity_up_all_modes(test_mp):
 
 
 def test_add_share_output(test_mp):
-    msg_multiyear_args = ('canning problem (MESSAGE scheme)', 'multi-year')
-    scen = Scenario(test_mp, *msg_multiyear_args)
+    scen = Scenario(test_mp, *msg_args)
     scen.solve()
-    print(scen.par('output'))
-    print(scen.var('ACT'))
-    print(scen.set('type_tec'))
 
     # data for share bound
-    print(calculate_activity(scen, city='seattle'))
-    print(calculate_activity(scen, city='san-diego'))
-
-    def calc_share(scen):
-        a = calculate_activity(scen, city='seattle').loc['to_new-york']
-        b = calculate_activity(scen, city='san-diego').loc['to_new-york']
+    def calc_share(s):
+        a = calculate_activity(s, city='seattle').loc['to_new-york']
+        b = calculate_activity(s, city='san-diego').loc['to_new-york']
         return a / (a + b)
 
     exp = 0.95 * calc_share(scen)
-    print(exp)
-    data = pd.DataFrame({
-        'node_loc': 'new-york',
-        'type_tec_numerator': 'transport_from_seattle',
-        'type_tec_denominator': ['transport_from_seattle', 'transport_from_san-diego'],
-        'level': 'consumption',
-        'year_act': 2010,
-        'time': 'year',
-        'unit': 'cases',
-        'value': exp,
-    })  # , index=[0])
 
-    print(data)
-
-    # # test limiting all modes
+    # add share constraints
     clone = scen.clone('foo', 'baz', keep_sol=False)
     clone.check_out()
-    # clone.add_par('bound_activity_up', data)
-    # clone.commit('foo')
-    # clone.solve()
-    # obs = calculate_activity(clone).sum()
-    # assert np.isclose(obs, exp)
+    clone.add_set('type_tec', ['share', 'total'])
+    cat_tec = [
+        ['share', 'transport_from_seattle'],
+        ['total', 'transport_from_seattle'],
+        ['total', 'transport_from_san-diego'],
+    ]
+    clone.add_set('cat_tec', cat_tec)
+    clone.add_set('shares', 'test-share')
+    clone.add_set('map_shares_commodity_level',
+                  pd.DataFrame({
+                      'shares': 'test-share',
+                      'commodity': 'cases',
+                      'level': 'consumption',
+                      'type_tec_share': 'share',
+                      'type_tec_total': 'total',
+                  }, index=[0]))
+    clone.add_par('share_factor_up',
+                  pd.DataFrame({
+                      'shares': 'test-share',
+                      'node_loc': 'new-york',
+                      'year_act': 2010,
+                      'time': 'year',
+                      'unit': 'cases',
+                      'value': exp,
+                  }, index=[0]))
+    clone.commit('foo')
+    clone.solve()
+    obs = calc_share(clone)
+    assert np.isclose(obs, exp)
