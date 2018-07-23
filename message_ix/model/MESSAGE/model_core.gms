@@ -268,6 +268,8 @@ Equations
     NEW_CAPACITY_SOFT_CONSTRAINT_LO bound on soft relaxation of dynamic new capacity constraints (downwards)
     ACTIVITY_BOUND_UP               upper bound on activity summed over all vintages
     ACTIVITY_BOUND_LO               lower bound on activity summed over all vintages
+    ACTIVITY_BOUND_ALL_MODES_UP     upper bound on activity summed over all vintages and modes
+    ACTIVITY_BOUND_ALL_MODES_LO     lower bound on activity summed over all vintages and modes
     ACTIVITY_CONSTRAINT_UP          dynamic constraint on the market penetration of a technology activity (upper bound)
     ACTIVITY_SOFT_CONSTRAINT_UP     bound on relaxation of the dynamic constraint on market penetration (upper bound)
     ACTIVITY_CONSTRAINT_LO          dynamic constraint on the market penetration of a technology activity (lower bound)
@@ -921,7 +923,7 @@ TOTAL_CAPACITY_BOUND_LO(node,inv_tec,year)$( is_bound_total_capacity_lo(node,inv
 ***
 * Equation ACTIVITY_BOUND_UP
 * """"""""""""""""""""""""""
-* This constraint provides lower bounds of a technology activity by mode, summed over all vintages.
+* This constraint provides upper bounds of a technology activity by mode, summed over all vintages.
 *
 *   .. math::
 *      \sum_{y^V \leq y} ACT_{n,t,y^V,y,m,h} \leq bound\_activity\_up_{n,t,m,y,h}
@@ -949,6 +951,38 @@ ACTIVITY_BOUND_LO(node,tec,year,mode,time)$( map_tec_act(node,tec,year,mode,time
     SUM(vintage$( map_tec_lifetime(node,tec,vintage,year) ), ACT(node,tec,vintage,year,mode,time) ) =G=
     bound_activity_lo(node,tec,year,mode,time)
 %SLACK_ACT_BOUND_LO% - SLACK_ACT_BOUND_LO(node,tec,year,mode,time)
+;
+
+***
+* Equation ACTIVITY_BOUND_ALL_MODES_UP
+* """"""""""""""""""""""""""""""""""""
+* This constraint provides upper bounds of a technology activity across all modes and vintages.
+*
+*   .. math::
+*      \sum_{y^V \leq y, m} ACT_{n,t,y^V,y,m,h} \leq bound\_activity\_all\_modes\_up_{n,t,y,h}
+*
+***
+ACTIVITY_BOUND_ALL_MODES_UP(node,tec,year,time)$( is_bound_activity_all_modes_up(node,tec,year,time) )..
+    SUM((vintage,mode)$(
+	map_tec_lifetime(node,tec,vintage,year) AND map_tec_mode(node,tec,year,mode)
+    ), ACT(node,tec,vintage,year,mode,time) )
+    =L=
+    bound_activity_all_modes_up(node,tec,year,time)
+;
+
+***
+* Equation ACTIVITY_BOUND_ALL_MODES_LO
+* """"""""""""""""""""""""""""""""""""
+* This constraint provides lower bounds of a technology activity across all modes and vintages.
+*
+*   .. math::
+*      \sum_{y^V \leq y, m} ACT_{n,t,y^V,y,m,h} \geq bound\_activity\_all\_modes\_lo_{n,t,y,h}
+*
+***
+ACTIVITY_BOUND_ALL_MODES_LO(node,tec,year,time)$( map_tec_time(node,tec,year,time) )..
+    SUM((vintage,mode)$( map_tec_lifetime(node,tec,vintage,year) AND map_tec_mode(node,tec,year,mode) ),
+            ACT(node,tec,vintage,year,mode,time) ) =G=
+    bound_activity_all_modes_up(node,tec,year,time)
 ;
 
 ***
@@ -1531,6 +1565,8 @@ Model MESSAGE_LP /
     TOTAL_CAPACITY_BOUND_LO
     ACTIVITY_BOUND_UP
     ACTIVITY_BOUND_LO
+    ACTIVITY_BOUND_ALL_MODES_UP
+    ACTIVITY_BOUND_ALL_MODES_LO
     NEW_CAPACITY_CONSTRAINT_UP
     NEW_CAPACITY_SOFT_CONSTRAINT_UP
     NEW_CAPACITY_CONSTRAINT_LO

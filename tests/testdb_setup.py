@@ -2,6 +2,8 @@ import os
 import pandas as pd
 import ixmp as ix
 
+import message_ix
+
 from conftest import here
 
 db_dir = os.path.join(here, 'testdb')
@@ -25,8 +27,8 @@ model = "canning problem (MESSAGE scheme)"
 scenario = "standard"
 annot = "Dantzig's canning problem as a MESSAGE-scheme ixmp.Scenario"
 
-scen = mp.Scenario(model, scenario, version='new',
-                   scheme="MESSAGE", annotation=annot)
+scen = message_ix.Scenario(
+    mp, model, scenario, version='new', annotation=annot)
 
 # year set and (sub-annual) time set
 year = [2010]

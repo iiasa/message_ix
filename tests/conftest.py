@@ -10,6 +10,9 @@ from ixmp.default_path_constants import CONFIG_PATH
 
 here = os.path.dirname(os.path.realpath(__file__))
 
+msg_args = ('canning problem (MESSAGE scheme)', 'standard')
+msg_multiyear_args = ('canning problem (MESSAGE scheme)', 'multi-year')
+
 
 def tempdir():
     return os.path.join(tempfile._get_default_tempdir(),

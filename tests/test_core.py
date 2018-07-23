@@ -3,11 +3,13 @@ import ixmp
 import message_ix
 import pytest
 
+import numpy as np
 import pandas as pd
 import pandas.util.testing as pdt
 
 from message_ix import Scenario
 from numpy import testing as npt
+
 
 msg_args = ('canning problem (MESSAGE scheme)', 'standard')
 msg_multiyear_args = ('canning problem (MESSAGE scheme)', 'multi-year')

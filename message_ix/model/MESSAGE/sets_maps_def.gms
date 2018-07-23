@@ -316,9 +316,11 @@ Sets
     is_bound_new_capacity_lo(node,tec,year_all)      flag whether lower bound exists for new capacity
     is_bound_total_capacity_up(node,tec,year_all)    flag whether upper bound exists for total installed capacity
     is_bound_total_capacity_lo(node,tec,year_all)    flag whether lower bound exists for total installed capacity
-    is_bound_activity_up(node,tec,year_all,mode,time) flag whether upper bound exists for a technology activity
+    is_bound_activity_up(node,tec,year_all,mode,time) flag whether upper bound exists for a technology activity for a given mode
+    is_bound_activity_all_modes_up(node,tec,year_all,time) flag whether upper bound exists for a technology activity in all modes
 *   is_bound_activity_lo(node,tec,year_all,mode,time) flag whether lower bound exists for a technology activity
-* this last flag is not required because the lower bound defaults to zero unless explicitly specified otherwise
+*   is_bound_activity_all_modes_lo(node,tec,year_all,time) flag whether lower bound exists for a technology activity in all modes
+* these last flags are not required because the lower bound defaults to zero unless explicitly specified otherwise
 
     is_dynamic_new_capacity_up(node,tec,year_all)    flag whether upper dynamic constraint exists for new capacity (investment)
     is_dynamic_new_capacity_lo(node,tec,year_all)    flag whether lower dynamic constraint exists for new capacity (investment)

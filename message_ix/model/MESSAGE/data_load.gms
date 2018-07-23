@@ -29,6 +29,7 @@ capacity_factor, operation_factor, min_utilization_factor, inv_cost, fix_cost, v
 is_bound_new_capacity_up, is_bound_new_capacity_lo, bound_new_capacity_up, bound_new_capacity_lo,
 is_bound_total_capacity_up, is_bound_total_capacity_lo, bound_total_capacity_up, bound_total_capacity_lo,
 is_bound_activity_up, bound_activity_up, bound_activity_lo,
+is_bound_activity_all_modes_up, bound_activity_all_modes_up, bound_activity_all_modes_lo,
 * dynamic constraints on new capacity investment and activity of technologies
 is_dynamic_new_capacity_up, initial_new_capacity_up, growth_new_capacity_up,
 is_dynamic_new_capacity_lo, initial_new_capacity_lo, growth_new_capacity_lo,

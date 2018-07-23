@@ -249,18 +249,24 @@ Parameters
 *      - ``node_loc`` | ``tec`` | ``year_act`` | ``mode`` | ``time``
 *    * - bound_activity_lo
 *      - ``node_loc`` | ``tec`` | ``year_act`` | ``mode`` | ``time``
+*    * - bound_activity_all_modes_up
+*      - ``node_loc`` | ``tec`` | ``year_act`` | ``time``
+*    * - bound_activity_all_modes_lo
+*      - ``node_loc`` | ``tec`` | ``year_act`` | ``time``
 *
 * The bounds on activity are implemented as the aggregate over all vintages in a specific period
 * (cf. Equation ``ACTIVITY_BOUND_UP`` and ``ACTIVITY_BOUND_LO``).
 ***
 
 Parameters
-    bound_new_capacity_up(node,tec,year_all)         upper bound on new capacity
-    bound_new_capacity_lo(node,tec,year_all)         lower bound on new capacity
-    bound_total_capacity_up(node,tec,year_all)       upper bound on total installed capacity
-    bound_total_capacity_lo(node,tec,year_all)       lower bound on total installed capacity
-    bound_activity_up(node,tec,year_all,mode,time)   upper bound on activity (aggregated over all vintages)
-    bound_activity_lo(node,tec,year_all,mode,time)   lower bound on activity
+    bound_new_capacity_up(node,tec,year_all)              upper bound on new capacity
+    bound_new_capacity_lo(node,tec,year_all)              lower bound on new capacity
+    bound_total_capacity_up(node,tec,year_all)            upper bound on total installed capacity
+    bound_total_capacity_lo(node,tec,year_all)            lower bound on total installed capacity
+    bound_activity_up(node,tec,year_all,mode,time)        upper bound on activity (aggregated over all vintages)
+    bound_activity_lo(node,tec,year_all,mode,time)        lower bound on activity
+    bound_activity_all_modes_up(node,tec,year_all,time)   upper bound on activity (aggregated over all vintages and modes)
+    bound_activity_all_modes_lo(node,tec,year_all,time)   lower bound on activity
 ;
 
 ***
