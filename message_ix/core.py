@@ -21,18 +21,22 @@ def _init_scenario(s, commit=False):
                 (s.init_set, {'args': ('shares',)}),
                 (s.init_set, {
                     'args': ('map_shares_commodity_level',),
-                    'kwargs': dict(idx_sets=['shares', 'commodity', 'level', 'type_tec', 'type_tec'],
-                                   idx_names=['shares', 'commodity', 'level', 'type_tec_share', 'type_tec_total'])
+                    'kwargs': dict(idx_sets=['shares', 'commodity', 'level',
+                                             'type_tec', 'type_tec'],
+                                   idx_names=['shares', 'commodity', 'level',
+                                              'type_tec_share', 'type_tec_total'])
                 }),
                 (s.init_par, {
                     'args': ('share_factor_up',),
                     'kwargs': dict(idx_sets=['shares', 'node', 'year', 'time'],
-                                   idx_names=['shares', 'node_loc', 'year_act', 'time'])
+                                   idx_names=['shares', 'node_loc', 'year_act',
+                                              'time'])
                 }),
                 (s.init_par, {
                     'args': ('share_factor_lo',),
                     'kwargs': dict(idx_sets=['shares', 'node', 'year', 'time'],
-                                   idx_names=['shares', 'node_loc', 'year_act', 'time'])
+                                   idx_names=['shares', 'node_loc', 'year_act',
+                                              'time'])
                 }),
             ],
         },
