@@ -58,6 +58,37 @@ def _init_scenario(s, commit=False):
                 }),
             ],
         },
+        {  # required for addon formulation
+            'test': 'addon' not in s.set_list(),
+            'exec': [
+                (s.init_set, {'args': ('addon',)}),
+                (s.init_set, {'args': ('type_addon',)}),
+                (s.init_set, {'args': ('cat_addon', ['type_addon', 'addon'])}),
+                (s.init_set, {
+                    'args': ('map_tec_addon', ['technology', 'type_addon'])
+                }),
+                (s.init_par, {
+                    'args': (
+                        'addon_conversion',
+                        ['node', 'technology', 'addon',
+                            'year', 'year', 'mode', 'time'],
+                        ['node', 'technology', 'addon',
+                            'year_vtg', 'year_act', 'mode', 'time']
+                    )}),
+                (s.init_par, {
+                    'args': (
+                        'addon_up',
+                        ['node', 'technology', 'year',
+                            'mode', 'time', 'type_addon']
+                    )}),
+                (s.init_par, {
+                    'args': (
+                        'addon_lo',
+                        ['node', 'technology', 'year',
+                            'mode', 'time', 'type_addon']
+                    )}),
+            ],
+        },
     )
 
     pass_idx = [i for i, init in enumerate(inits) if init['test']]
@@ -72,7 +103,6 @@ def _init_scenario(s, commit=False):
             args = exec_info[1].pop('args', tuple())
             kwargs = exec_info[1].pop('kwargs', dict())
             func(*args, **kwargs)
-
     if commit:
         s.commit('Initialized wtih standard sets and params')
 
