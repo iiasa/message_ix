@@ -546,6 +546,8 @@ Parameters
 Parameters
     share_factor_up(shares,node,year_all,time)    upper bound of share constraint
     share_factor_lo(shares,node,year_all,time)    lower bound of share constraint
+    share_mode_up(shares,node,tec,mode,year_all,time)    upper bound of mode share constraint
+    share_mode_lo(shares,node,tec,mode,year_all,time)    lower bound of mode share constraint
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
