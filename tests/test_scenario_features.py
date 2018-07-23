@@ -101,8 +101,8 @@ def test_add_share_output(test_mp):
     print(data)
 
     # # test limiting all modes
-    # clone = scen.clone('foo', 'baz', keep_sol=False)
-    # clone.check_out()
+    clone = scen.clone('foo', 'baz', keep_sol=False)
+    clone.check_out()
     # clone.add_par('bound_activity_up', data)
     # clone.commit('foo')
     # clone.solve()

@@ -124,6 +124,7 @@ Sets
     year_all        years (over entire model horizon)
     year (year_all) years included in a model instance (for myopic or rolling-horizon optimization)
     time            subannual time periods (seasons - days - hours)
+    shares          share constraint relations
     relation        generic linear relations
     lvl_spatial     hierarchical levels of spatial resolution
     lvl_temporal    hierarchical levels of temporal resolution
@@ -242,6 +243,9 @@ Sets
     type_tec_land(type_tec)                 dynamic set whether emissions from land use are included in type_tec
 ;
 
+Alias(type_tec,type_tec_share);
+Alias(type_tec,type_tec_total);
+
 *----------------------------------------------------------------------------------------------------------------------*
 * Mapping sets                                                                                                         *
 *----------------------------------------------------------------------------------------------------------------------*
@@ -286,6 +290,8 @@ Sets
     map_spatial_hierarchy(lvl_spatial,node,node)    mapping of spatial resolution to nodes (last index is 'parent')
     map_temporal_hierarchy(lvl_temporal,time,time)  mapping of temporal resolution to time (last index is 'parent')
 
+    map_shares_commodity_level(shares,commodity,level,type_tec,type_tec)   mapping of commodity and level share constraints
+    
     map_land(node,land_scenario,year_all)            mapping of land-use model emulator scenarios to nodes and years
     map_relation(relation,node,year_all)             mapping of generic (user-defined) relations to nodes and years
 ;

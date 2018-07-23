@@ -270,6 +270,7 @@ Equations
     ACTIVITY_BOUND_LO               lower bound on activity summed over all vintages
     ACTIVITY_BOUND_ALL_MODES_UP     upper bound on activity summed over all vintages and modes
     ACTIVITY_BOUND_ALL_MODES_LO     lower bound on activity summed over all vintages and modes
+    SHARES_COMMODITY_LEVEL_UP       upper bounds on share constraints for commodities and levels
     ACTIVITY_CONSTRAINT_UP          dynamic constraint on the market penetration of a technology activity (upper bound)
     ACTIVITY_SOFT_CONSTRAINT_UP     bound on relaxation of the dynamic constraint on market penetration (upper bound)
     ACTIVITY_CONSTRAINT_LO          dynamic constraint on the market penetration of a technology activity (lower bound)
@@ -1004,6 +1005,34 @@ ACTIVITY_BOUND_ALL_MODES_LO(node,tec,year,time)$( bound_activity_lo(node,tec,yea
 %SLACK_ACT_BOUND_LO% - SLACK_ACT_BOUND_LO(node,tec,year,'all',time)
 ;
 
+SHARES_COMMODITY_LEVEL_UP(shares,node,commodity,level,year,time,type_tec_share,type_tec_total)$(
+    map_shares_commodity_level(shares,commodity,level,type_tec_share,type_tec_total) AND
+    share_factor_up(shares,node,year,time)
+)..
+    SUM( (location,tec,vintage,mode,time2)$(
+	cat_tec(type_tec_share,tec) AND
+	map_tec_act(location,tec,year,mode,time2) AND
+	map_tec_lifetime(location,tec,vintage,year)
+    ),
+* import into node and output by all technologies located at 'location' sending to 'node' and 'time2' sending to 'time'
+        output(location,tec,vintage,year,mode,node,commodity,level,time2,time) *
+        duration_time_rel(time,time2) *
+	ACT(location,tec,vintage,year,mode,time2)
+	)
+    =L=
+    share_factor_up(shares,node,year,time) *
+    SUM( (location,tec,vintage,mode,time2)$(
+	cat_tec(type_tec_total,tec) AND
+	map_tec_act(location,tec,year,mode,time2) AND
+	map_tec_lifetime(location,tec,vintage,year)
+    ),
+* import into node and output by all technologies located at 'location' sending to 'node' and 'time2' sending to 'time'
+        output(location,tec,vintage,year,mode,node,commodity,level,time2,time) *
+        duration_time_rel(time,time2) *
+	ACT(location,tec,vintage,year,mode,time2)
+    )
+;
+
 ***
 * .. _dynamic_constraints:
 *
@@ -1586,6 +1615,7 @@ Model MESSAGE_LP /
     ACTIVITY_BOUND_LO
     ACTIVITY_BOUND_ALL_MODES_UP
     ACTIVITY_BOUND_ALL_MODES_LO
+    SHARES_COMMODITY_LEVEL_UP
     NEW_CAPACITY_CONSTRAINT_UP
     NEW_CAPACITY_SOFT_CONSTRAINT_UP
     NEW_CAPACITY_CONSTRAINT_LO
