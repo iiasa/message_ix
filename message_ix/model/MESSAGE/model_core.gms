@@ -254,6 +254,8 @@ Equations
     RENEWABLES_POTENTIAL_CONSTRAINT constraint on renewable resource potential
     RENEWABLES_CAPACITY_REQUIREMENT lower bound on required overcapacity when using lower grade potentials
     RENEWABLES_EQUIVALENCE          equation to define the renewables extraction
+    ADDON_ACTIVITY_UP               addon-technology activity upper constraint
+    ADDON_ACTIVITY_LO               addon technology activity lower constraint
     COMMODITY_USE_LEVEL             defines the COMMODITY_USE as the amount of a commodity at a level that was consumed
     FIRM_CAPACITY_CONSTRAINT        constraint to maintaint sufficient firm (dispatchable) power generation capacity
     FIRM_CAPACITY_PROVISION         lower bound on CAP as the minimum installed capacity of each technology
@@ -753,6 +755,66 @@ RENEWABLES_CAPACITY_REQUIREMENT(node,inv_tec,commodity,year)$(
     =G= SUM((grade,time,level_renewable)$(renewable_capacity_factor(node,commodity,grade,level_renewable,year) > 0),
             REN(node,inv_tec,commodity,grade,year,time)
                  / renewable_capacity_factor(node,commodity,grade,level_renewable,year))
+;
+
+
+***
+* Constraints for addon technologies
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*
+* Equation ADDON_ACTIVITY_UP
+* """"""""""""""""""""""""""
+* This constraint provides an upper bound on the activity of an addon technology that can only be operated
+* jointly with a parent technology (e.g., abatement option, SO2 scrubber, power plant cooling technology).
+*
+*   .. math::
+*      \sum_{\substack{y^V \\ y^V \leq y}} addon\_conversion_{n,t^a,y^V,y,m,h} \cdot ACT_{n,t^a,y^V,y,m,h}
+*          \leq
+*      \sum_{\substack{t,y^V \\ t \sim t^a \\ y^V \leq y}} ACT_{n,t,y^V,y,m,h}
+*
+***
+
+* addon technology activity constrained to level of parent technology
+ADDON_ACTIVITY_UP(node,type_addon,year,mode,time)..
+* activity of addon technology
+      sum((addon, vintage)$( cat_addon(type_addon, addon) AND map_tec_lifetime(node,addon,vintage,year) AND map_tec_act(node,addon,year,mode,time) ),
+          addon_conversion(node,addon,vintage,year,mode,time) * ACT(node,addon,vintage,year,mode,time) )
+* will need this as both =L= (e.g. mitigation option, scrubber) and =E= (e.g., cooling)
+      =L=
+* activity of corresponding parent-technology
+      sum((tec,vintage)$( map_tec_addon(tec,type_addon) AND map_tec_lifetime(node,tec,vintage,year) AND map_tec_act(node,tec,year,mode,time) ),
+          ACT(node,tec,vintage,year,mode,time) )
+;
+
+***
+* Equation ADDON_ACTIVITY_LO
+* """"""""""""""""""""""""""
+* This constraint provides a lower bound on the activity of an addon technology that has to be operated
+* jointly with a parent technology (e.g., power plant cooling technology). Note that the parameter
+* addon_minimum allows scaling the need to operate an addon technology with the parent technology.
+* addon_minimum = 1 means that it is mandatory to operate the addon technology at the same level as the
+* parent technology.
+*
+*   .. math::
+*      \sum_{\substack{y^V \\ y^V \leq y}} addon\_minimum_{n,t^a,y^V,y,m,h} \cdot addon\_conversion_{n,t^a,y^V,y,m,h} \cdot ACT_{n,t^a,y^V,y,m,h}
+*          \geq
+*      \sum_{\substack{t,y^V \\ t \sim t^a \\ y^V \leq y}} ACT_{n,t,y^V,y,m,h}
+*
+***
+
+* addon technology activity constrained to level of parent technology
+ADDON_ACTIVITY_LO(node,type_addon,year,mode,time)$( sum((tec,vintage)$(
+	map_tec_addon(tec,type_addon) AND map_tec_lifetime(node,tec,vintage,year) AND map_tec_act(node,tec,year,mode,time) ),
+*        	addon_minimum(node,tec,vintage,year,mode,time,type_addon) ) ).. <- should addon_minimum be vintage specific or not? AND should a addon be able to be used past the lifetime of the vintage for which it was built. In that case move vintage from sum((addon, vintage) to ADDON_ACTIVITY_LO(node,type_addon,year,mode,time)
+        	addon_minimum(node,tec,year,mode,time,type_addon) ) )..
+* activity of addon technology
+      sum((addon, vintage)$( cat_addon(type_addon, addon) AND map_tec_lifetime(node,addon,vintage,year) AND map_tec_act(node,addon,year,mode,time) ),
+          addon_conversion(node,addon,vintage,year,mode,time) * ACT(node,addon,vintage,year,mode,time) )
+* will need this as both =L= (e.g. mitigation option, scrubber) and =E= (e.g., cooling)
+      =G=
+* activity of corresponding parent-technology
+      sum((tec,vintage)$( map_tec_addon(tec,type_addon) AND map_tec_lifetime(node,tec,vintage,year) AND map_tec_act(node,tec,year,mode,time) ),
+	  addon_minimum(node,tec,year,mode,time,type_addon) * ACT(node,tec,vintage,year,mode,time) )
 ;
 
 ***

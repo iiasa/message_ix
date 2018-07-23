@@ -325,6 +325,15 @@ Parameters
     soft_activity_lo(node,tec,year_all,time)       soft relaxation of dynamic lower bound on activity (growth rate)
 ;
 
+*----------------------------------------------------------------------------------------------------------------------*
+* Add-on technology parameters                                                                                                *
+*----------------------------------------------------------------------------------------------------------------------*
+
+Parameters
+    addon_conversion(node,addon,vintage,year_all,mode,time)  conversion factor between add-on and parent technology activity
+    addon_minimum(node,tec,year_all,mode,time,type_addon)    minimum deployment fraction of add-on technology relative to parent technology
+;
+
 ***
 * Cost parameters for 'soft' relaxations of dynamic constraints
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
