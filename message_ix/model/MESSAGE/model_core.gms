@@ -777,12 +777,14 @@ RENEWABLES_CAPACITY_REQUIREMENT(node,inv_tec,commodity,year)$(
 * addon technology activity constrained to level of parent technology
 ADDON_ACTIVITY_UP(node,type_addon,year,mode,time)..
 * activity of addon technology
-      sum((addon, vintage)$( cat_addon(type_addon, addon) AND map_tec_lifetime(node,addon,vintage,year) AND map_tec_act(node,addon,year,mode,time) ),
-          addon_conversion(node,addon,vintage,year,mode,time) * ACT(node,addon,vintage,year,mode,time) )
-* will need this as both =L= (e.g. mitigation option, scrubber) and =E= (e.g., cooling)
+      sum((addon, vintage)$( cat_addon(type_addon, addon)
+              AND map_tec_lifetime(node,addon,vintage,year) AND map_tec_act(node,addon,year,mode,time) ),
+          addon_conversion(node,addon,vintage,year,mode,time)
+          * ACT(node,addon,vintage,year,mode,time) )
       =L=
 * activity of corresponding parent-technology
-      sum((tec,vintage)$( map_tec_addon(tec,type_addon) AND map_tec_lifetime(node,tec,vintage,year) AND map_tec_act(node,tec,year,mode,time) ),
+      sum((tec,vintage)$( map_tec_addon(tec,type_addon)
+              AND map_tec_lifetime(node,tec,vintage,year) AND map_tec_act(node,tec,year,mode,time) ),
           ACT(node,tec,vintage,year,mode,time) )
 ;
 
