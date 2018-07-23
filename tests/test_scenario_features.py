@@ -41,6 +41,10 @@ def test_add_bound_activity_up(test_mp):
     obs = calculate_activity(clone).loc['to_chicago']
     assert np.isclose(obs, exp)
 
+    orig_obj = scen.var('OBJ')['lvl']
+    new_obj = clone.var('OBJ')['lvl']
+    assert new_obj >= orig_obj
+
 
 def test_add_bound_activity_up_all_modes(test_mp):
     scen = Scenario(test_mp, *msg_args)
@@ -66,6 +70,10 @@ def test_add_bound_activity_up_all_modes(test_mp):
     clone.solve()
     obs = calculate_activity(clone).sum()
     assert np.isclose(obs, exp)
+
+    orig_obj = scen.var('OBJ')['lvl']
+    new_obj = clone.var('OBJ')['lvl']
+    assert new_obj >= orig_obj
 
 
 def test_add_share_output_up(test_mp):
@@ -113,6 +121,10 @@ def test_add_share_output_up(test_mp):
     obs = calc_share(clone)
     assert np.isclose(obs, exp)
 
+    orig_obj = scen.var('OBJ')['lvl']
+    new_obj = clone.var('OBJ')['lvl']
+    assert new_obj >= orig_obj
+
 
 def test_add_share_output_lo(test_mp):
     scen = Scenario(test_mp, *msg_args)
@@ -158,3 +170,82 @@ def test_add_share_output_lo(test_mp):
     clone.solve()
     obs = calc_share(clone)
     assert np.isclose(obs, exp)
+
+    orig_obj = scen.var('OBJ')['lvl']
+    new_obj = clone.var('OBJ')['lvl']
+    assert new_obj >= orig_obj
+
+
+def test_add_share_mode_up(test_mp):
+    scen = Scenario(test_mp, *msg_args)
+    scen.solve()
+
+    # data for share bound
+    def calc_share(s):
+        a = calculate_activity(s, city='seattle').loc['to_chicago']
+        b = calculate_activity(s, city='seattle').sum()
+        return a / b
+
+    exp = 0.95 * calc_share(scen)
+
+    # add share constraints
+    clone = scen.clone('foo', 'baz', keep_sol=False)
+    clone.check_out()
+    clone.add_set('shares', 'test-share')
+    clone.add_par('share_mode_up',
+                  pd.DataFrame({
+                      'shares': 'test-share',
+                      'node_loc': 'seattle',
+                      'technology': 'transport_from_seattle',
+                      'mode': 'to_chicago',
+                      'year_act': 2010,
+                      'time': 'year',
+                      'unit': 'cases',
+                      'value': exp,
+                  }, index=[0]))
+    clone.commit('foo')
+    clone.solve()
+    obs = calc_share(clone)
+    assert np.isclose(obs, exp)
+
+    orig_obj = scen.var('OBJ')['lvl']
+    new_obj = clone.var('OBJ')['lvl']
+    assert new_obj >= orig_obj
+
+
+def test_add_share_mode_lo(test_mp):
+    scen = Scenario(test_mp, *msg_args)
+    scen.solve()
+
+    # data for share bound
+    def calc_share(s):
+        a = calculate_activity(s, city='san-diego').loc['to_new-york']
+        b = calculate_activity(s, city='san-diego').sum()
+        return a / b
+
+    exp = 1.05 * calc_share(scen)
+
+    # add share constraints
+    clone = scen.clone('foo', 'baz', keep_sol=False)
+    clone.check_out()
+    clone.add_set('shares', 'test-share')
+    clone.add_par('share_mode_lo',
+                  pd.DataFrame({
+                      'shares': 'test-share',
+                      'node_loc': 'san-diego',
+                      'technology': 'transport_from_san-diego',
+                      'mode': 'to_new-york',
+                      'year_act': 2010,
+                      'time': 'year',
+                      'unit': 'cases',
+                      'value': exp,
+                  }, index=[0]))
+    clone.commit('foo')
+    clone.solve()
+
+    obs = calc_share(clone)
+    assert np.isclose(obs, exp)
+
+    orig_obj = scen.var('OBJ')['lvl']
+    new_obj = clone.var('OBJ')['lvl']
+    assert new_obj >= orig_obj
