@@ -962,10 +962,11 @@ ACTIVITY_BOUND_LO(node,tec,year,mode,time)$( map_tec_act(node,tec,year,mode,time
 *      \sum_{y^V \leq y, m} ACT_{n,t,y^V,y,m,h} \leq bound\_activity\_all\_modes\_up_{n,t,y,h}
 *
 ***
-ACTIVITY_BOUND_ALL_MODES_UP(node,tec,year,time)$( map_tec_time(node,tec,year,time)
-        AND is_bound_activity_all_modes_up(node,tec,year,time) )..
-    SUM((vintage,mode)$( map_tec_lifetime(node,tec,vintage,year) AND map_tec_mode(node,tec,year,mode) ),
-            ACT(node,tec,vintage,year,mode,time) ) =L=
+ACTIVITY_BOUND_ALL_MODES_UP(node,tec,year,time)$( is_bound_activity_all_modes_up(node,tec,year,time) )..
+    SUM((vintage,mode)$(
+	map_tec_lifetime(node,tec,vintage,year) AND map_tec_mode(node,tec,year,mode)
+    ), ACT(node,tec,vintage,year,mode,time) )
+    =L=
     bound_activity_all_modes_up(node,tec,year,time)
 ;
 
