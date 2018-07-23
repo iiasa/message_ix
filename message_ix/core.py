@@ -148,7 +148,7 @@ class Scenario(ixmp.Scenario):
         return Scenario(self.platform, model, scen, annotation=annotation,
                         cache=self._cache, clone=self)
 
-    def rename(self, name, mapping):
+    def rename(self, name, mapping, keep=False):
         """Rename an element in a set
 
         Parameters
@@ -157,6 +157,8 @@ class Scenario(ixmp.Scenario):
             name of the set to change (e.g., 'technology')
         mapping : str
             mapping of old (current) to new set element names
+        keep : bool, optional, default: False
+            keep the old values in the model
         """
         self.check_out()
         keys = list(mapping.keys())
@@ -188,8 +190,9 @@ class Scenario(ixmp.Scenario):
                     self.add_par(item, df)
 
         # this removes all instances of from_tech in the model
-        for key in keys:
-            self.remove_set(name, key)
+        if not keep:
+            for key in keys:
+                self.remove_set(name, key)
 
         # commit
         self.commit('Renamed {} using mapping {}'.format(name, mapping))
