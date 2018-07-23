@@ -325,6 +325,41 @@ Parameters
     soft_activity_lo(node,tec,year_all,time)       soft relaxation of dynamic lower bound on activity (growth rate)
 ;
 
+*----------------------------------------------------------------------------------------------------------------------*
+* Add-on technology parameters                                                                                         *
+*----------------------------------------------------------------------------------------------------------------------*
+
+***
+* Parameters for the add-on technologies
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*
+* The implementation of |MESSAGEix| includes the functionality to introduce "add-on technologies" that are specifically
+* linked to parent technologies. This feature can be used to model mitigation options (scrubber, cooling).
+* Note, that no default addon_conversion is set, to avoid default conversion factors of 1 being set for technologies
+* with mutiple modes, of which only a single mode should be linked to the add-on technology.
+*
+* .. list-table::
+*    :widths: 20 80
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index names
+*    * - addon_conversion
+*      - ``node`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``time`` | ``type_addon``
+*    * - addon_up
+*      - ``node`` | ``tec`` | ``vintage`` | ``year`` | ``mode`` | ``time`` | ``type_addon``
+*    * - addon_lo
+*      - ``node`` | ``tec`` | ``vintage`` | ``year`` | ``mode`` | ``time`` | ``type_addon``
+*
+* The upper bound of
+***
+
+Parameters
+    addon_conversion(node,tec,vintage,year_all,mode,time,type_addon)  conversion factor between add-on and parent technology activity
+    addon_up(node,tec,year_all,mode,time,type_addon)    upper bound on deployment of add-on technologies relative to parent technology
+    addon_lo(node,tec,year_all,mode,time,type_addon)    lower bound on deployment of add-on technologies relative to parent technology
+;
+
 ***
 * Cost parameters for 'soft' relaxations of dynamic constraints
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
