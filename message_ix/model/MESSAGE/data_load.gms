@@ -15,6 +15,7 @@ $LOAD map_node, map_time, map_commodity, map_resource, map_stocks, map_tec, map_
 $LOAD map_land, map_relation
 $LOAD type_tec, cat_tec, type_year, cat_year, type_emission, cat_emission, type_tec_land
 $LOAD inv_tec, renewable_tec
+$LOAD shares
 $GDXIN
 
 Execute_load '%in%'
@@ -38,6 +39,8 @@ is_dynamic_activity_lo, initial_activity_lo, growth_activity_lo,
 abs_cost_new_capacity_soft_up, abs_cost_new_capacity_soft_lo, level_cost_new_capacity_soft_up, level_cost_new_capacity_soft_lo,
 abs_cost_activity_soft_up, abs_cost_activity_soft_lo, level_cost_activity_soft_up, level_cost_activity_soft_lo,
 soft_new_capacity_up, soft_new_capacity_lo, soft_activity_up, soft_activity_lo,
+* share constraints
+share_factor_up,share_factor_lo,map_shares_commodity_level,
 * parameters for reliability, flexibility and renewable potential constraints
 rating_bin, reliability_factor, peak_load_factor, flexibility_factor
 renewable_capacity_factor, renewable_potential
