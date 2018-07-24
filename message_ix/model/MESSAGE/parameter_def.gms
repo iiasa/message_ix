@@ -326,8 +326,27 @@ Parameters
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
-* Add-on technology parameters                                                                                                *
+* Add-on technology parameters                                                                                         *
 *----------------------------------------------------------------------------------------------------------------------*
+
+***
+* Parameters for the add-on technologies
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*
+* The implementation of |MESSAGEix| includes the functionality to introduce "add-on technologies" that are specifically
+* linked to parent technologies. This feature can be used to 
+*
+* .. list-table::
+*    :widths: 20 80
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index names
+*    * - addon_conversion
+*      - ``node`` | ``tec`` | ``addon`` | ``year_vtg`` | ``year_vtg`` | ``mode`` | ``time``
+*    * - addon_minimum
+*      - ``node`` | ``tec`` | ``vintage`` | ``year`` | ``mode`` | ``time`` | ``type_addon``
+***
 
 Parameters
     addon_conversion(node,tec,addon,vintage,year_all,mode,time)  conversion factor between add-on and parent technology activity
