@@ -113,6 +113,13 @@ class Scenario(ixmp.Scenario):
         use with data input.
         """
         horizon = self.set('year')
+        filters = {'type_year': ['firstmodelyear']}
+        first = (self
+                 .set("cat_year", filters=filters)['year']
+                 .values[0]
+                 )
+        horizon = horizon[horizon.astype(int) >= int(first)]
+
         combinations = itertools.product(horizon, horizon)
         year_pairs = [(y_v, y_a) for y_v, y_a in combinations if y_v <= y_a]
         v_years, a_years = zip(*year_pairs)
