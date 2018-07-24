@@ -272,6 +272,8 @@ Equations
     ACTIVITY_BOUND_ALL_MODES_LO     lower bound on activity summed over all vintages and modes
     SHARES_COMMODITY_LEVEL_UP       upper bounds on share constraints for commodities and levels
     SHARES_COMMODITY_LEVEL_LO       lower bounds on share constraints for commodities and levels
+    SHARES_MODE_UP                  upper bounds on share constraints for modes of a given technology
+    SHARES_MODE_LO                  lower bounds on share constraints for modes of a given technology
     ACTIVITY_CONSTRAINT_UP          dynamic constraint on the market penetration of a technology activity (upper bound)
     ACTIVITY_SOFT_CONSTRAINT_UP     bound on relaxation of the dynamic constraint on market penetration (upper bound)
     ACTIVITY_CONSTRAINT_LO          dynamic constraint on the market penetration of a technology activity (lower bound)
@@ -1006,6 +1008,44 @@ ACTIVITY_BOUND_ALL_MODES_LO(node,tec,year,time)$( bound_activity_lo(node,tec,yea
 %SLACK_ACT_BOUND_LO% - SLACK_ACT_BOUND_LO(node,tec,year,'all',time)
 ;
 
+
+SHARES_MODE_UP(shares,node,tec,mode,year,time)$(  
+    map_tec_act(node,tec,year,mode,time) AND
+    share_mode_up(shares,node,tec,mode,year,time)
+)..
+* single mode activity generated
+    SUM(
+	vintage$( map_tec_lifetime(node,tec,vintage,year) ),
+	ACT(node,tec,vintage,year,mode,time)
+    )
+    =L=
+    share_mode_up(shares,node,tec,mode,year,time) *
+* all mode activity generated
+    SUM(
+	(vintage,mode2)$( map_tec_lifetime(node,tec,vintage,year) AND map_tec_mode(node,tec,year,mode2) ),
+	ACT(node,tec,vintage,year,mode2,time)
+    )
+;
+
+
+SHARES_MODE_LO(shares,node,tec,mode,year,time)$(  
+    map_tec_act(node,tec,year,mode,time) AND
+    share_mode_lo(shares,node,tec,mode,year,time)
+)..
+* single mode activity generated
+    SUM(
+	vintage$( map_tec_lifetime(node,tec,vintage,year) ),
+	ACT(node,tec,vintage,year,mode,time)
+    )
+    =G=
+    share_mode_lo(shares,node,tec,mode,year,time) *
+* all mode activity generated
+    SUM(
+	(vintage,mode2)$( map_tec_lifetime(node,tec,vintage,year) AND map_tec_mode(node,tec,year,mode2) ),
+	ACT(node,tec,vintage,year,mode2,time)
+    )
+;
+
 ***
 * Equation SHARES_COMMODITY_LEVEL_UP
 * """"""""""""""""""""""""""""""""""
@@ -1678,6 +1718,8 @@ Model MESSAGE_LP /
     ACTIVITY_BOUND_ALL_MODES_LO
     SHARES_COMMODITY_LEVEL_UP
     SHARES_COMMODITY_LEVEL_LO
+    SHARES_MODE_UP
+    SHARES_MODE_LO
     NEW_CAPACITY_CONSTRAINT_UP
     NEW_CAPACITY_SOFT_CONSTRAINT_UP
     NEW_CAPACITY_CONSTRAINT_LO
