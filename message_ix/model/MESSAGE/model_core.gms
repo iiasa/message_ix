@@ -838,6 +838,11 @@ FIRM_CAPACITY_PROVISION(node,inv_tec,year,commodity,level,time)$(
                 * capacity_factor(node,inv_tec,vintage,year,time)
                 * CAP(node,inv_tec,vintage,year) ) ;
 
+
+Set rating_unfirm(rating) ;
+rating_unfirm(rating) = yes ;
+rating_unfirm('firm') = no ;
+
 ***
 * Equation FIRM_CAPACITY_CONSTRAINT
 * """""""""""""""""""""""""""""""""
@@ -855,9 +860,9 @@ FIRM_CAPACITY_CONSTRAINT(node,commodity,level,year,time)$( peak_load_factor(node
     SUM(inv_tec$( reliability_factor(node,inv_tec,year,commodity,level,time,'firm') ),
         reliability_factor(node,inv_tec,year,commodity,level,time,'firm')
         * CAP_FIRM(node,inv_tec,commodity,level,year) )
-    + SUM((tec, mode, rating),
-        reliability_factor(node,tec,year,commodity,level,time,'firm')
-        * ACT_SHARE(node,tec,year,commodity,level,time,rating) )
+    + SUM((tec, mode, rating_unfirm)$( reliability_factor(node,tec,year,commodity,level,time,rating_unfirm) ),
+        reliability_factor(node,tec,year,commodity,level,time,rating_unfirm)
+        * ACT_SHARE(node,tec,year,commodity,level,time,rating_unfirm) )
     =G= peak_load_factor(node,commodity,level,year,time) * COMMODITY_USE(node,commodity,level,year)
 ;
 
