@@ -1,11 +1,5 @@
-import os
-import ixmp
-import message_ix
-import pytest
-
 import numpy as np
 import pandas as pd
-import pandas.util.testing as pdt
 
 from message_ix import Scenario
 
