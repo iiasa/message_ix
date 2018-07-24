@@ -109,12 +109,27 @@ class Scenario(ixmp.Scenario):
         scenario.add_cat("year", "firstmodelyear", first, is_unique=True)
 
     def vintage_and_active_years(self):
-        """Return a 2-tuple of valid pairs of vintage years and active years for
-        use with data input.
+        """Return a 2-tuple of valid pairs of vintage years and active years
+        for use with data input. A valid year-vintage, year-active pair is
+        one in which:
+
+        - year-vintage <= year-active
+        - both within the model's 'year' set
+        - year-active <= the model's first year
         """
         horizon = self.set('year')
-        combinations = itertools.product(horizon, horizon)
-        year_pairs = [(y_v, y_a) for y_v, y_a in combinations if y_v <= y_a]
+        filters = {'type_year': ['firstmodelyear']}
+        first = (self
+                 .set("cat_year", filters=filters)['year']
+                 .values[0]
+                 )
+
+        def valid(y_v, y_a):
+            # casting to int here is probably bad
+            return y_v <= y_a and int(y_a) >= int(first)
+
+        combos = itertools.product(horizon, horizon)
+        year_pairs = [(y_v, y_a) for y_v, y_a in combos if valid(y_v, y_a)]
         v_years, a_years = zip(*year_pairs)
         return v_years, a_years
 

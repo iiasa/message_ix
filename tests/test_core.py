@@ -73,8 +73,10 @@ def test_add_spatial_hierarchy(test_mp):
 
 def test_vintage_and_active_years(test_mp):
     scen = Scenario(test_mp, *msg_args, version='new')
-    scen.add_horizon({'year': ['2010', '2020']})
-    exp = (('2010', '2010', '2020'), ('2010', '2020', '2020'))
+    scen.add_horizon({'year': ['2000', '2010', '2020'],
+                      'firstmodelyear': '2010'})
+    exp = (('2000', '2000', '2010', '2010', '2020'),
+           ('2010', '2020', '2010', '2020', '2020'))
     obs = scen.vintage_and_active_years()
     assert obs == exp
 
