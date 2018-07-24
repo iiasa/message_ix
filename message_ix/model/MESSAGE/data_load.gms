@@ -40,7 +40,7 @@ abs_cost_new_capacity_soft_up, abs_cost_new_capacity_soft_lo, level_cost_new_cap
 abs_cost_activity_soft_up, abs_cost_activity_soft_lo, level_cost_activity_soft_up, level_cost_activity_soft_lo,
 soft_new_capacity_up, soft_new_capacity_lo, soft_activity_up, soft_activity_lo,
 * addon technologies
-addon_conversion, addon_minimum
+addon_conversion, addon_up, addon_lo
 * parameters for reliability, flexibility and renewable potential constraints
 rating_bin, reliability_factor, peak_load_factor, flexibility_factor
 renewable_capacity_factor, renewable_potential
@@ -135,6 +135,12 @@ addon_conversion(node,tec,addon,vintage,year_all,mode,time)$(
     AND map_tec_act(node,tec,year_all,mode,time)
     AND map_tec_lifetime(node,tec,vintage,year_all)
     AND NOT addon_conversion(node,tec,addon,vintage,year_all,mode,time) ) = 1 ;
+
+* set the upper bound on addon-technology activity to 1 by default
+addon_up(node,tec,year_all,mode,time,type_addon)$(
+    sum((type_addon)$( cat_addon(type_addon, addon) AND map_tec_addon(tec,type_addon) ), 1 )
+    AND map_tec_act(node,tec,year_all,mode,time)
+    AND NOT addon_up(node,tec,year_all,mode,time,type_addon) ) = 1 ;
 
 * set the emission scaling parameter to 1 if only one emission is included in a category
 emission_scaling(type_emission,emission)$( cat_emission(type_emission,emission)
