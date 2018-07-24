@@ -21,30 +21,29 @@ def _init_scenario(s, commit=False):
             'exec': [(s.init_set, {'args': ('addon',)}),
                      (s.init_set, {'args': ('type_addon',)}),
                      (s.init_set, {'args': ('cat_addon', ['type_addon', 'addon'])}),
+                     (s.init_set, {'args': ('map_tec_addon', ['technology', 'type_addon'])}),
                      (s.init_par, {'args': ('addon_conversion',
-                                            ['node', 'addon', 'year', 'year', 'mode', 'time'],
-                                            ['node', 'addon', 'year_vtg', 'year_act', 'mode', 'time'])}),
+                                            ['node', 'technology', 'addon', 'year', 'year', 'mode', 'time'],
+                                            ['node', 'technology', 'addon', 'year_vtg', 'year_act', 'mode', 'time'])}),
                      (s.init_par, {'args': ('addon_minimum',
                                             ['node', 'technology', 'year', 'mode', 'time', 'type_addon'])}),
                      ],
-        }, 
-    ) 
- 
-    pass_idx = [i for i, init in enumerate(inits) if init['test']] 
-    if len(pass_idx) == 0: 
-        return  # leave early, all init tests pass 
- 
-    if commit: 
-        s.check_out() 
-    for idx in pass_idx: 
-        for exec_info in inits[idx]['exec']: 
-            func = exec_info[0] 
-            args = exec_info[1].pop('args', tuple()) 
-            kwargs = exec_info[1].pop('kwargs', dict()) 
-            print(func) 
-            print(*args) 
-            func(*args, **kwargs) 
-    if commit: 
+        },
+    )
+
+    pass_idx = [i for i, init in enumerate(inits) if init['test']]
+    if len(pass_idx) == 0:
+        return  # leave early, all init tests pass
+
+    if commit:
+        s.check_out()
+    for idx in pass_idx:
+        for exec_info in inits[idx]['exec']:
+            func = exec_info[0]
+            args = exec_info[1].pop('args', tuple())
+            kwargs = exec_info[1].pop('kwargs', dict())
+            func(*args, **kwargs)
+    if commit:
         s.commit('Initialized wtih standard sets and params')
 
 

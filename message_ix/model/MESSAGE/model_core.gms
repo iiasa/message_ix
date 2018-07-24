@@ -176,7 +176,7 @@ Variables
 ACT.lo(node,tec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,tec,year_all,year_all2)
     AND map_tec_act(node,tec,year_all2,mode,time) AND bound_activity_lo(node,tec,year_all2,mode,time) >= 0 ) = 0 ;
 * previous implementation using upper bounds
-* ACT.lo(node,tec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,tec,year_all,year_all2)
+* ACT.lo(node,addontec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,tec,year_all,year_all2)
 *    AND map_tec_act(node,tec,year_all2,mode,time)
 *    AND ( NOT bound_activity_up(node,tec,year_all2,mode,time)
 *        OR bound_activity_up(node,tec,year_all2,mode,time) >= 0 ) ) = 0 ;
@@ -775,16 +775,16 @@ RENEWABLES_CAPACITY_REQUIREMENT(node,inv_tec,commodity,year)$(
 ***
 
 * addon technology activity constrained to level of parent technology
-ADDON_ACTIVITY_UP(node,type_addon,year,mode,time)..
+ADDON_ACTIVITY_UP(node,tec,type_addon,year,mode,time)$( map_tec_addon(tec,type_addon)
+    AND map_tec_act(node,tec,year,mode,time) ) ..
 * activity of addon technology
       sum((addon, vintage)$( cat_addon(type_addon, addon)
               AND map_tec_lifetime(node,addon,vintage,year) AND map_tec_act(node,addon,year,mode,time) ),
-          addon_conversion(node,addon,vintage,year,mode,time)
+          addon_conversion(node,tec,addon,vintage,year,mode,time)
           * ACT(node,addon,vintage,year,mode,time) )
       =L=
 * activity of corresponding parent-technology
-      sum((tec,vintage)$( map_tec_addon(tec,type_addon)
-              AND map_tec_lifetime(node,tec,vintage,year) AND map_tec_act(node,tec,year,mode,time) ),
+      sum(vintage$( map_tec_lifetime(node,tec,vintage,year) ),
           ACT(node,tec,vintage,year,mode,time) )
 ;
 
@@ -805,18 +805,18 @@ ADDON_ACTIVITY_UP(node,type_addon,year,mode,time)..
 ***
 
 * addon technology activity constrained to level of parent technology
-ADDON_ACTIVITY_LO(node,type_addon,year,mode,time)$( sum((tec,vintage)$(
-	map_tec_addon(tec,type_addon) AND map_tec_lifetime(node,tec,vintage,year) AND map_tec_act(node,tec,year,mode,time) ),
-*        	addon_minimum(node,tec,vintage,year,mode,time,type_addon) ) ).. <- should addon_minimum be vintage specific or not? AND should a addon be able to be used past the lifetime of the vintage for which it was built. In that case move vintage from sum((addon, vintage) to ADDON_ACTIVITY_LO(node,type_addon,year,mode,time)
-        	addon_minimum(node,tec,year,mode,time,type_addon) ) )..
+ADDON_ACTIVITY_LO(node,tec,type_addon,year,mode,time)$( map_tec_addon(tec,type_addon)
+    AND map_tec_act(node,tec,year,mode,time) AND addon_minimum(node,tec,year,mode,time,type_addon) ) ..
 * activity of addon technology
-      sum((addon, vintage)$( cat_addon(type_addon, addon) AND map_tec_lifetime(node,addon,vintage,year) AND map_tec_act(node,addon,year,mode,time) ),
-          addon_conversion(node,addon,vintage,year,mode,time) * ACT(node,addon,vintage,year,mode,time) )
-* will need this as both =L= (e.g. mitigation option, scrubber) and =E= (e.g., cooling)
+      sum((addon, vintage)$( cat_addon(type_addon, addon)
+              AND map_tec_lifetime(node,addon,vintage,year) AND map_tec_act(node,addon,year,mode,time) ),
+          addon_conversion(node,tec,addon,vintage,year,mode,time)
+          * ACT(node,addon,vintage,year,mode,time) )
       =G=
 * activity of corresponding parent-technology
-      sum((tec,vintage)$( map_tec_addon(tec,type_addon) AND map_tec_lifetime(node,tec,vintage,year) AND map_tec_act(node,tec,year,mode,time) ),
-	  addon_minimum(node,tec,year,mode,time,type_addon) * ACT(node,tec,vintage,year,mode,time) )
+      addon_minimum(node,tec,year,mode,time,type_addon)
+      * sum(vintage$( map_tec_lifetime(node,tec,vintage,year) ),
+	  ACT(node,tec,vintage,year,mode,time) )
 ;
 
 ***
@@ -1635,6 +1635,8 @@ Model MESSAGE_LP /
     CAPACITY_MAINTENANCE
     OPERATION_CONSTRAINT
     MIN_UTILIZATION_CONSTRAINT
+    ADDON_ACTIVITY_UP
+    ADDON_ACTIVITY_LO
     RENEWABLES_EQUIVALENCE
     RENEWABLES_POTENTIAL_CONSTRAINT
     RENEWABLES_CAPACITY_REQUIREMENT

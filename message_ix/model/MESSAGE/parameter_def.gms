@@ -330,7 +330,7 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 Parameters
-    addon_conversion(node,addon,vintage,year_all,mode,time)  conversion factor between add-on and parent technology activity
+    addon_conversion(node,tec,addon,vintage,year_all,mode,time)  conversion factor between add-on and parent technology activity
     addon_minimum(node,tec,year_all,mode,time,type_addon)    minimum deployment fraction of add-on technology relative to parent technology
 ;
 
