@@ -112,7 +112,7 @@ Positive Variables
 * investment and capacity variables
     CAP_NEW(node,tec,year_all)       new capacity by year
     CAP(node,tec,vintage,year_all)   total installed capacity by year
-    CAP_FIRM(node,tec,commodity,level,year_all,rating)   renewable firm capacity
+    CAP_FIRM(node,tec,commodity,level,year_all)   firm capacity
 * variables for soft relaxation of dynamic activity constraints
     CAP_NEW_UP(node,tec,year_all)    relaxation variable for dynamic constraints on new capacity (upwards)
     CAP_NEW_LO(node,tec,year_all)    relaxation variable for dynamic constraints on new capacity (downwards)
@@ -258,6 +258,7 @@ Equations
     ACTIVITY_SHARE_BIN
     ACTIVITY_SHARE_TOTAL
     FIRM_CAPACITY_PROVISION         lower bound on CAP as the minimum installed capacity of each technology
+    FIRM_CAPACITY_CONSTRAINT
     NEW_CAPACITY_BOUND_UP           upper bound on technology capacity investment
     NEW_CAPACITY_BOUND_LO           lower bound on technology capacity investment
     TOTAL_CAPACITY_BOUND_UP         upper bound on total installed capacity
@@ -792,22 +793,22 @@ COMMODITY_USE_LEVEL(node,commodity,level,year,time)$(
 ;
 
 Positive Variable
-    ACT_SHARE(node,tec,year,commodity,level,time,rating)
+    ACT_SHARE(node,tec,year_all,commodity,level,time,rating)
 ;
 
-* WENN ENTWEDER PEAK LOAD ODER FLEXIBILITY DEMAND DA IST UND RATING MUSS ÜBER ACT_SHARE DIE BIN SIZE BERECHNET WERDEN
+* WENN ENTWEDER PEAK LOAD ODER FLEXIBILITY DEMAND DA IST UND RATING MUSS ?BER ACT_SHARE DIE BIN SIZE BERECHNET WERDEN
 ACTIVITY_SHARE_BIN(node,tec,year,commodity,level,time,rating)$(
          rating_bin(node,tec,year,commodity,level,time,rating) )..
     ACT_SHARE(node,tec,year,commodity,level,time,rating)
     =L= rating_bin(node,tec,year,commodity,level,time,rating) * COMMODITY_USE(node,commodity,level,year)
 ;
 
-ACTIVITY_SHARE_TOTAL(node,tec,year,mode,commodity,level,time)$(
+ACTIVITY_SHARE_TOTAL(node,tec,year,commodity,level,time)$(
         sum(rating$( rating_bin(node,tec,year,commodity,level,time,rating) ), 1 ) )..
     sum(rating$( rating_bin(node,tec,year,commodity,level,time,rating) ),
-        ACT_SHARE(node,tec,year,commodity,level,time,rating)
+        ACT_SHARE(node,tec,year,commodity,level,time,rating) )
     =E=
-        SUM((location,tec,vintage,mode,time2)$(
+        SUM((location,vintage,mode,time2)$(
               map_tec_act(location,tec,year,mode,time2)
               AND map_tec_lifetime(location,tec,vintage,year) ),
             ( output(location,tec,vintage,year,mode,node,commodity,level,time2,time)
@@ -827,15 +828,15 @@ ACTIVITY_SHARE_TOTAL(node,tec,year,mode,commodity,level,time)$(
 *
 * This constraint is only active if :math:`reliability\_factor_{n,t,y,c,l,h,q}` is defined.
 ***
-FIRM_CAPACITY_PROVISION(node,inv_tec,year,commodity,level)$(
+FIRM_CAPACITY_PROVISION(node,inv_tec,year,commodity,level,time)$(
     reliability_factor(node,inv_tec,year,commodity,level,time,'firm') )..
         CAP_FIRM(node,inv_tec,commodity,level,year) =E=
-        SUM((location,inv_tec,vintage,mode,time2)$(
+        SUM((location,vintage,mode,time2)$(
               map_tec_act(location,inv_tec,year,mode,time2)
               AND map_tec_lifetime(location,inv_tec,vintage,year) ),
-            output(location,inv_tec,vintage,year,mode,node,commodity,level,time2,time))
+            output(location,inv_tec,vintage,year,mode,node,commodity,level,time2,time)
                 * capacity_factor(node,inv_tec,vintage,year,time)
-                * CAP(node,inv_tec,year) ;
+                * CAP(node,inv_tec,vintage,year) ) ;
 
 ***
 * Equation FIRM_CAPACITY_CONSTRAINT
@@ -852,11 +853,11 @@ FIRM_CAPACITY_PROVISION(node,inv_tec,year,commodity,level)$(
 ***
 FIRM_CAPACITY_CONSTRAINT(node,commodity,level,year,time)$( peak_load_factor(node,commodity,level,year,time) )..
     SUM(inv_tec$( reliability_factor(node,inv_tec,year,commodity,level,time,'firm') ),
-        reliability_factor(node,inv_tec,year_all,commodity,level,time,'firm')
-        * CAP_FIRM(node,inv_tec,commodity,level,year)
+        reliability_factor(node,inv_tec,year,commodity,level,time,'firm')
+        * CAP_FIRM(node,inv_tec,commodity,level,year) )
     + SUM((tec, mode, rating),
-        reliability_factor(node,inv_tec,year_all,commodity,level,time,'firm')
-        * ACT_SHARE(node,tec,year,mode,commodity,level,time,rating) )
+        reliability_factor(node,tec,year,commodity,level,time,'firm')
+        * ACT_SHARE(node,tec,year,commodity,level,time,rating) )
     =G= peak_load_factor(node,commodity,level,year,time) * COMMODITY_USE(node,commodity,level,year)
 ;
 
@@ -1521,51 +1522,7 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 * model statements                                                                                                     *
 *----------------------------------------------------------------------------------------------------------------------*
 
-Model MESSAGE_LP /
-    OBJECTIVE
-    COST_ACCOUNTING_NODAL
-    EXTRACTION_EQUIVALENCE
-    EXTRACTION_BOUND_UP
-    RESOURCE_CONSTRAINT
-    RESOURCE_HORIZON
-    COMMODITY_BALANCE
-    STOCKS_BALANCE
-    CAPACITY_CONSTRAINT
-    CAPACITY_MAINTENANCE
-    OPERATION_CONSTRAINT
-    MIN_UTILIZATION_CONSTRAINT
-    RENEWABLES_EQUIVALENCE
-    RENEWABLES_POTENTIAL_CONSTRAINT
-    RENEWABLES_CAPACITY_REQUIREMENT
-    COMMODITY_USE_LEVEL
-    FIRM_CAPACITY_CONSTRAINT
-    FIRM_CAPACITY_PROVISION
-    FIRM_CAPACITY_SHARE
-    NEW_CAPACITY_BOUND_UP
-    NEW_CAPACITY_BOUND_LO
-    TOTAL_CAPACITY_BOUND_UP
-    TOTAL_CAPACITY_BOUND_LO
-    ACTIVITY_BOUND_UP
-    ACTIVITY_BOUND_LO
-    NEW_CAPACITY_CONSTRAINT_UP
-    NEW_CAPACITY_SOFT_CONSTRAINT_UP
-    NEW_CAPACITY_CONSTRAINT_LO
-    NEW_CAPACITY_SOFT_CONSTRAINT_LO
-    ACTIVITY_CONSTRAINT_UP
-    ACTIVITY_SOFT_CONSTRAINT_UP
-    ACTIVITY_CONSTRAINT_LO
-    ACTIVITY_SOFT_CONSTRAINT_LO
-    EMISSION_EQUIVALENCE
-    EMISSION_CONSTRAINT
-    LAND_CONSTRAINT
-    DYNAMIC_LAND_SCEN_CONSTRAINT_UP
-    DYNAMIC_LAND_SCEN_CONSTRAINT_LO
-    DYNAMIC_LAND_TYPE_CONSTRAINT_UP
-    DYNAMIC_LAND_TYPE_CONSTRAINT_LO
-    RELATION_EQUIVALENCE
-    RELATION_CONSTRAINT_UP
-    RELATION_CONSTRAINT_LO
-/ ;
+Model MESSAGE_LP / all / ;
 
 MESSAGE_LP.holdfixed = 1 ;
 MESSAGE_LP.optfile = 1 ;
