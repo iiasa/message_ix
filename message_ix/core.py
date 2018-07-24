@@ -8,6 +8,32 @@ from ixmp.utils import pd_read, pd_write
 from message_ix.utils import isscalar, logger
 
 
+def _init_scenario(s, commit=False):
+    """Initialize a MESSAGEix Scenario object with default values"""
+    inits = (
+        {
+            'test': 'firm' not in s.set('rating'),
+            'exec': [(s.add_set, {'args': ('rating', 'firm')}),
+                     ],
+        },
+    )
+
+    pass_idx = [i for i, init in enumerate(inits) if init['test']]
+    if len(pass_idx) == 0:
+        return  # leave early, all init tests pass
+
+    if commit:
+        s.check_out()
+    for idx in pass_idx:
+        for exec_info in inits[idx]['exec']:
+            func = exec_info[0]
+            args = exec_info[1].pop('args', tuple())
+            kwargs = exec_info[1].pop('kwargs', dict())
+            func(*args, **kwargs)
+    if commit:
+        s.commit('Initialized wtih standard sets and params')
+
+
 class Scenario(ixmp.Scenario):
 
     def __init__(self, platform, model, scen, version=None, annotation=None,
@@ -49,6 +75,19 @@ class Scenario(ixmp.Scenario):
 
         super(Scenario, self).__init__(
             platform, model, scen, jscen, cache=cache)
+
+        if not self.has_solution():
+            _init_scenario(self, commit=version != 'new')
+
+    def has_solution(self):
+        """Returns True if scenario currently has a solution"""
+        try:
+            return not np.isnan(self.var('OBJ')['lvl'])
+        except Exception:
+            return False
+
+        if not self.has_solution():
+            _init_scenario(self, commit=version != 'new')
 
     def add_spatial_sets(self, data):
         """Add sets related to spatial dimensions of the model
