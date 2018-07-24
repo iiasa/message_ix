@@ -783,8 +783,9 @@ ADDON_ACTIVITY_UP(node,tec,type_addon,year,mode,time)$( map_tec_addon(tec,type_a
           addon_conversion(node,tec,addon,vintage,year,mode,time)
           * ACT(node,addon,vintage,year,mode,time) )
       =L=
-* activity of corresponding parent-technology
-      sum(vintage$( map_tec_lifetime(node,tec,vintage,year) ),
+* activity of corresponding parent-technology times upper bound of share
+      addon_up(node,tec,year,mode,time,type_addon)
+      * sum(vintage$( map_tec_lifetime(node,tec,vintage,year) ),
           ACT(node,tec,vintage,year,mode,time) )
 ;
 
@@ -813,8 +814,8 @@ ADDON_ACTIVITY_LO(node,tec,type_addon,year,mode,time)$( map_tec_addon(tec,type_a
           addon_conversion(node,tec,addon,vintage,year,mode,time)
           * ACT(node,addon,vintage,year,mode,time) )
       =G=
-* activity of corresponding parent-technology
-      addon_minimum(node,tec,year,mode,time,type_addon)
+* activity of corresponding parent-technology times lower bound of share
+      addon_lo(node,tec,year,mode,time,type_addon)
       * sum(vintage$( map_tec_lifetime(node,tec,vintage,year) ),
 	  ACT(node,tec,vintage,year,mode,time) )
 ;
