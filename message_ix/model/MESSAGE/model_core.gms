@@ -176,7 +176,7 @@ Variables
 ACT.lo(node,tec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,tec,year_all,year_all2)
     AND map_tec_act(node,tec,year_all2,mode,time) AND bound_activity_lo(node,tec,year_all2,mode,time) >= 0 ) = 0 ;
 * previous implementation using upper bounds
-* ACT.lo(node,addontec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,tec,year_all,year_all2)
+* ACT.lo(node,tec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,tec,year_all,year_all2)
 *    AND map_tec_act(node,tec,year_all2,mode,time)
 *    AND ( NOT bound_activity_up(node,tec,year_all2,mode,time)
 *        OR bound_activity_up(node,tec,year_all2,mode,time) >= 0 ) ) = 0 ;
