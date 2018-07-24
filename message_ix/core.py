@@ -155,15 +155,8 @@ class Scenario(ixmp.Scenario):
     def has_solution(self):
         """Returns True if scenario currently has a solution"""
         try:
-
-
-<< << << < HEAD
-            return len(self.var('ACT')) > 0
-        except:
-=======
             return not np.isnan(self.var('OBJ')['lvl'])
         except Exception:
->>>>>>> addon
             return False
 
     def add_spatial_sets(self, data):
