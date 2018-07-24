@@ -3,6 +3,7 @@ import ixmp
 import itertools
 
 import pandas as pd
+import numpy as np
 
 from ixmp.utils import pd_read, pd_write
 from message_ix.utils import isscalar, logger
@@ -86,8 +87,6 @@ class Scenario(ixmp.Scenario):
         except Exception:
             return False
 
-        if not self.has_solution():
-            _init_scenario(self, commit=version != 'new')
 
     def add_spatial_sets(self, data):
         """Add sets related to spatial dimensions of the model
