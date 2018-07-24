@@ -138,7 +138,8 @@ addon_conversion(node,tec,addon,vintage,year_all,mode,time)$(
 
 * set the upper bound on addon-technology activity to 1 by default
 addon_up(node,tec,year_all,mode,time,type_addon)$(
-    sum((type_addon)$( cat_addon(type_addon, addon) AND map_tec_addon(tec,type_addon) ), 1 )
+    sum(addon$( cat_addon(type_addon, addon) ), 1 )
+    AND map_tec_addon(tec,type_addon)
     AND map_tec_act(node,tec,year_all,mode,time)
     AND NOT addon_up(node,tec,year_all,mode,time,type_addon) ) = 1 ;
 
