@@ -3,6 +3,7 @@ import ixmp
 import itertools
 
 import pandas as pd
+import numpy as np
 
 from ixmp.utils import pd_read, pd_write
 from message_ix.utils import isscalar, logger
@@ -81,8 +82,8 @@ class Scenario(ixmp.Scenario):
     def has_solution(self):
         """Returns True if scenario currently has a solution"""
         try:
-            return len(self.var('ACT')) > 0
-        except:
+            return not np.isnan(self.var('OBJ')['lvl'])
+        except Exception:
             return False
 
     def add_spatial_sets(self, data):
