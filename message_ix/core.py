@@ -3,6 +3,7 @@ import ixmp
 import itertools
 
 import pandas as pd
+import numpy as np
 
 from ixmp.utils import pd_read, pd_write
 from message_ix.utils import isscalar, logger
@@ -13,7 +14,22 @@ def _init_scenario(s, commit=False):
     inits = (
         {  # required for subset all_modes, see model/data_load.gms
             'test': 'all' not in s.set('mode'),
-            'exec': (s.add_set, {'args': ('mode', 'all')}),
+            'exec': [(s.add_set, {'args': ('mode', 'all')})],
+        },
+        {
+            'test': 'addon' not in s.set_list(),
+            'exec': [(s.init_set, {'args': ('addon',)}),
+                     (s.init_set, {'args': ('type_addon',)}),
+                     (s.init_set, {'args': ('cat_addon', ['type_addon', 'addon'])}),
+                     (s.init_set, {'args': ('map_tec_addon', ['technology', 'type_addon'])}),
+                     (s.init_par, {'args': ('addon_conversion',
+                                            ['node', 'technology', 'addon', 'year', 'year', 'mode', 'time'],
+                                            ['node', 'technology', 'addon', 'year_vtg', 'year_act', 'mode', 'time'])}),
+                     (s.init_par, {'args': ('addon_up',
+                                            ['node', 'technology', 'year', 'mode', 'time', 'type_addon'])}),
+                     (s.init_par, {'args': ('addon_lo',
+                                            ['node', 'technology', 'year', 'mode', 'time', 'type_addon'])}),
+                     ],
         },
     )
 
@@ -24,11 +40,11 @@ def _init_scenario(s, commit=False):
     if commit:
         s.check_out()
     for idx in pass_idx:
-        exec_info = inits[idx]['exec']
-        func = exec_info[0]
-        args = exec_info[1].pop('args', tuple())
-        kwargs = exec_info[1].pop('kwargs', dict())
-        func(*args, **kwargs)
+        for exec_info in inits[idx]['exec']:
+            func = exec_info[0]
+            args = exec_info[1].pop('args', tuple())
+            kwargs = exec_info[1].pop('kwargs', dict())
+            func(*args, **kwargs)
     if commit:
         s.commit('Initialized wtih standard sets and params')
 
@@ -81,8 +97,18 @@ class Scenario(ixmp.Scenario):
     def has_solution(self):
         """Returns True if scenario currently has a solution"""
         try:
-            return len(self.var('ACT')) > 0
-        except:
+            return not np.isnan(self.var('OBJ')['lvl'])
+        except Exception:
+            return False
+
+        if not self.has_solution():
+            _init_scenario(self, commit=version != 'new')
+
+    def has_solution(self):
+        """Returns True if scenario currently has a solution"""
+        try:
+            return not np.isnan(self.var('OBJ')['lvl'])
+        except Exception:
             return False
 
     def add_spatial_sets(self, data):

@@ -1,6 +1,7 @@
 
 # Next Release
 
+- [#82](https://github.com/iiasa/message_ix/pull/82): Introducing "add-on technologies" for mitigation options, etc.
 - [#74](https://github.com/iiasa/message_ix/pull/74): Activity upper and lower bounds can now be applied to all modes of a technology
 - [#67](https://github.com/iiasa/message_ix/pull/67): Use of advanced basis in cplex.opt turned off by default to avoid conflicts with barrier method.
 - [#65](https://github.com/iiasa/message_ix/pull/65): Bugfix for downloading tutorials. Now downloads current installed version by default.
