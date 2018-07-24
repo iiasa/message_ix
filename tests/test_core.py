@@ -171,6 +171,17 @@ def test_rename_technology(test_mp):
     assert obs_obj == exp_obj
 
 
+def test_rename_technology_no_rm(test_mp):
+    scen = Scenario(test_mp, *msg_args)
+    scen.solve()
+    assert scen.par('output')['technology'].isin(['canning_plant']).any()
+
+    clone = scen.clone('foo', 'bar', keep_sol=False)
+    clone.rename('technology', {'canning_plant': 'foo_bar'}, keep=True)
+    assert clone.par('output')['technology'].isin(['canning_plant']).any()
+    assert clone.par('output')['technology'].isin(['foo_bar']).any()
+
+
 def test_excel_read_write(test_mp):
     fname = 'test_excel_read_write.xlsx'
 
