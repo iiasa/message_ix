@@ -6,12 +6,46 @@ from message_ix import Scenario
 msg_args = ('canning problem (MESSAGE scheme)', 'standard')
 
 
-def add_addon(s):
+addon_share = pd.DataFrame({
+        'node': 'seattle',
+        'technology': 'canning_plant',
+        'year': 2010,
+        'mode': 'production',
+        'time': 'year',
+        'type_addon': 'better_production',
+        'value': 0.5,
+        'unit': '%'},
+    index=[0])
+
+f = {'technology': 'canning_plant', 'node_loc': 'seattle'}
+g = {'technology': 'canning_addon', 'node_loc': 'seattle'}
+
+
+def add_addon(s, costs=False, zero_output=False):
     s.check_out()
     s.add_set('technology', 'canning_addon')
     s.add_set('addon', 'canning_addon')
     s.add_cat('addon', 'better_production', 'canning_addon')
     s.add_set('map_tec_addon', ['canning_plant', 'better_production'])
+
+    # optionally add negative costs to addon to ensure that upper bound works
+    if costs:
+        var = s.par('var_cost', {'node_loc': "seattle",
+                                 'technology': "transport_from_seattle",
+                                 'mode': "to_new-york"})
+        var['technology'] = 'canning_addon'
+        var['mode'] = 'production'
+        var['value'] = costs
+        s.add_par('var_cost', var)
+
+    # add output (zero explicity to make sure that `map_tec_*` is generated)
+    outp = s.par('output', {'technology': 'canning_plant',
+                            'node_loc': 'seattle'})
+    outp['technology'] = 'canning_addon'
+    if zero_output:
+        outp['value'] = 0
+    s.add_par('output', outp)
+
     s.commit('adding addon technology')
 
 
@@ -19,78 +53,50 @@ def add_addon(s):
 def test_addon_tec(test_mp):
     scen = Scenario(test_mp, *msg_args).clone(scen='addon', keep_sol=False)
 
-    add_addon(scen)
-
-    f = {'technology': 'canning_plant', 'node_loc': 'seattle'}
+    add_addon(scen, costs=-1)
 
     scen.check_out()
-
-    var = scen.par('var_cost', {'node_loc': "seattle",
-                                'technology': "transport_from_seattle",
-                                'mode': "to_new-york"})
-    # add negative csostzs to addon to ensure that upper bound works
-    var['technology'] = 'canning_addon'
-    var['mode'] = 'production'
-    var['value'] = -1
-    scen.add_par('var_cost', var)
-
     bda = scen.par('bound_activity_up', f)
     bda['value'] = bda['value'] / 2
     scen.add_par('bound_activity_up', bda)
-
-    outp = scen.par('output', f)
-    outp['technology'] = 'canning_addon'
-    scen.add_par('output', outp)
-
     scen.commit('changing output and bounds')
+
     scen.solve()
 
     exp = scen.var('ACT', f)['lvl']
-    obs = scen.var('ACT', {'technology': 'canning_addon',
-                           'node_loc': 'seattle'})['lvl']
+    obs = scen.var('ACT', g)['lvl']
+    assert np.isclose(exp, obs)
+
+
+# introduce addon technology with negatove costs, add maximum mitigation
+def test_addon_up(test_mp):
+    scen = Scenario(test_mp, *msg_args).clone(scen='addon_up', keep_sol=False)
+    add_addon(scen, costs=-1, zero_output=True)
+
+    scen.check_out()
+    scen.add_par('addon_up', addon_share)
+    scen.commit('adding upper bound on addon technology')
+
+    scen.solve()
+
+    exp = scen.var('ACT', f)['lvl'] * 0.5
+    obs = scen.var('ACT', g)['lvl']
     assert np.isclose(exp, obs)
 
 
 # introduce addon technology with positive costs, add minimum mitigation
-def test_addon_tec_minimum(test_mp):
-    scen = Scenario(test_mp, *msg_args).clone(scen='addon_min', keep_sol=False)
+def test_addon_lo(test_mp):
+    scen = Scenario(test_mp, *msg_args).clone(scen='addon_lo', keep_sol=False)
 
-    add_addon(scen)
+    add_addon(scen, costs=1, zero_output=True)
 
     scen.check_out()
 
-    var = scen.par('var_cost', {'node_loc': "seattle",
-                                'technology': "transport_from_seattle",
-                                'mode': "to_new-york"})
-    var['technology'] = 'canning_addon'
-    var['mode'] = 'production'
-    var['value'] = 1
-    scen.add_par('var_cost', var)
+    scen.add_par('addon_lo', addon_share)
 
-    # add zero output explicity to make sure that map_tec is generated
-    outp = scen.par('output', {'technology': 'canning_plant',
-                               'node_loc': 'seattle'})
-    outp['technology'] = 'canning_addon'
-    outp['value'] = 0
-    scen.add_par('output', outp)
-
-    addon_min = pd.DataFrame({
-            'node': 'seattle',
-            'technology': 'canning_plant',
-            'year': 2010,
-            'mode': 'production',
-            'time': 'year',
-            'type_addon': 'better_production',
-            'value': 0.5,
-            'unit': '%'},
-            index=[0])
-    scen.add_par('addon_minimum', addon_min)
-
-    scen.commit('changing output and bounds')
+    scen.commit('adding lower bound on addon technology')
     scen.solve()
 
-    exp = scen.var('ACT', {'technology': 'canning_plant',
-                           'node_loc': 'seattle'})['lvl'] * 0.5
-    obs = scen.var('ACT', {'technology': 'canning_addon',
-                           'node_loc': 'seattle'})['lvl']
+    exp = scen.var('ACT', f)['lvl'] * 0.5
+    obs = scen.var('ACT', g)['lvl']
     assert np.isclose(exp, obs)
