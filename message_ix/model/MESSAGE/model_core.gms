@@ -807,7 +807,7 @@ ADDON_ACTIVITY_UP(node,tec,type_addon,year,mode,time)$( map_tec_addon(tec,type_a
 
 * addon technology activity constrained to level of parent technology
 ADDON_ACTIVITY_LO(node,tec,type_addon,year,mode,time)$( map_tec_addon(tec,type_addon)
-    AND map_tec_act(node,tec,year,mode,time) AND addon_minimum(node,tec,year,mode,time,type_addon) ) ..
+    AND map_tec_act(node,tec,year,mode,time) AND addon_lo(node,tec,year,mode,time,type_addon) ) ..
 * activity of addon technology
       sum((addon, vintage)$( cat_addon(type_addon, addon)
               AND map_tec_lifetime(node,addon,vintage,year) AND map_tec_act(node,addon,year,mode,time) ),
