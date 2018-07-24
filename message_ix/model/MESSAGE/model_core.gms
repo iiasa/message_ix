@@ -254,6 +254,8 @@ Equations
     RENEWABLES_POTENTIAL_CONSTRAINT constraint on renewable resource potential
     RENEWABLES_CAPACITY_REQUIREMENT lower bound on required overcapacity when using lower grade potentials
     RENEWABLES_EQUIVALENCE          equation to define the renewables extraction
+    ADDON_ACTIVITY_UP               addon-technology activity upper constraint
+    ADDON_ACTIVITY_LO               addon technology activity lower constraint
     COMMODITY_USE_LEVEL             defines the COMMODITY_USE as the amount of a commodity at a level that was consumed
     FIRM_CAPACITY_CONSTRAINT        constraint to maintaint sufficient firm (dispatchable) power generation capacity
     FIRM_CAPACITY_PROVISION         lower bound on CAP as the minimum installed capacity of each technology
@@ -757,6 +759,69 @@ RENEWABLES_CAPACITY_REQUIREMENT(node,inv_tec,commodity,year)$(
     =G= SUM((grade,time,level_renewable)$(renewable_capacity_factor(node,commodity,grade,level_renewable,year) > 0),
             REN(node,inv_tec,commodity,grade,year,time)
                  / renewable_capacity_factor(node,commodity,grade,level_renewable,year))
+;
+
+
+***
+* Constraints for addon technologies
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*
+* Equation ADDON_ACTIVITY_UP
+* """"""""""""""""""""""""""
+* This constraint provides an upper bound on the activity of an addon technology that can only be operated
+* jointly with a parent technology (e.g., abatement option, SO2 scrubber, power plant cooling technology).
+*
+*   .. math::
+*      \sum_{\substack{t' \sim t^A, y^V \leq y}} addon\_conversion_{n,t',y^V,y,m,h} \cdot ACT_{n,t',y^V,y,m,h}
+*          \leq
+*      addon\_up_{n,t^a,y,m,h,t^A} \cdot \sum_{\substack{t, y^V \leq y}} ACT_{n,t,y^V,y,m,h}
+*
+***
+
+* addon technology activity constrained to level of parent technology
+ADDON_ACTIVITY_UP(node,tec,type_addon,year,mode,time)$( map_tec_addon(tec,type_addon)
+    AND map_tec_act(node,tec,year,mode,time) ) ..
+* activity of addon technology
+      sum((addon, vintage)$( cat_addon(type_addon, addon)
+              AND map_tec_lifetime(node,addon,vintage,year) AND map_tec_act(node,addon,year,mode,time) ),
+          addon_conversion(node,tec,addon,vintage,year,mode,time)
+          * ACT(node,addon,vintage,year,mode,time) )
+      =L=
+* activity of corresponding parent-technology times upper bound of share
+      addon_up(node,tec,year,mode,time,type_addon)
+      * sum(vintage$( map_tec_lifetime(node,tec,vintage,year) ),
+          ACT(node,tec,vintage,year,mode,time) )
+;
+
+***
+* Equation ADDON_ACTIVITY_LO
+* """"""""""""""""""""""""""
+* This constraint provides a lower bound on the activity of an addon technology that has to be operated
+* jointly with a parent technology (e.g., power plant cooling technology). The parameter `addon_lo` allows to define
+* a minimum level of operation of addon technologies relative to the activity of the parent technology.
+* If `addon_minimum = 1`, this means that it is mandatory to operate the addon technology at the same level as the
+* parent technology (i.e., full mitigate).
+*
+*   .. math::
+*      \sum_{\substack{t' \sim t^A, y^V \leq y}} addon\_conversion_{n,t',y^V,y,m,h} \cdot ACT_{n,t',y^V,y,m,h}
+*          \geq
+*      addon\_lo_{n,t^a,y,m,h,t^A} \cdot \sum_{\substack{t, y^V \leq y}} ACT_{n,t,y^V,y,m,h}
+*
+***
+
+* addon technology activity constrained to level of parent technology
+ADDON_ACTIVITY_LO(node,tec,type_addon,year,mode,time)$( map_tec_addon(tec,type_addon)
+    AND map_tec_act(node,tec,year,mode,time) AND addon_lo(node,tec,year,mode,time,type_addon) ) ..
+* activity of addon technology
+      sum((addon, vintage)$( cat_addon(type_addon, addon)
+              AND map_tec_lifetime(node,addon,vintage,year) AND map_tec_act(node,addon,year,mode,time) ),
+          addon_conversion(node,tec,addon,vintage,year,mode,time)
+          * ACT(node,addon,vintage,year,mode,time) )
+      =G=
+* activity of corresponding parent-technology times lower bound of share
+      addon_lo(node,tec,year,mode,time,type_addon)
+      * sum(vintage$( map_tec_lifetime(node,tec,vintage,year) ),
+	  ACT(node,tec,vintage,year,mode,time) )
 ;
 
 ***
@@ -1701,6 +1766,8 @@ Model MESSAGE_LP /
     CAPACITY_MAINTENANCE
     OPERATION_CONSTRAINT
     MIN_UTILIZATION_CONSTRAINT
+    ADDON_ACTIVITY_UP
+    ADDON_ACTIVITY_LO
     RENEWABLES_EQUIVALENCE
     RENEWABLES_POTENTIAL_CONSTRAINT
     RENEWABLES_CAPACITY_REQUIREMENT

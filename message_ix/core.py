@@ -3,6 +3,7 @@ import ixmp
 import itertools
 
 import pandas as pd
+import numpy as np
 
 from ixmp.utils import pd_read, pd_write
 from message_ix.utils import isscalar, logger
@@ -57,6 +58,37 @@ def _init_scenario(s, commit=False):
                 }),
             ],
         },
+        {  # required for addon formulation
+            'test': 'addon' not in s.set_list(),
+            'exec': [
+                (s.init_set, {'args': ('addon',)}),
+                (s.init_set, {'args': ('type_addon',)}),
+                (s.init_set, {'args': ('cat_addon', ['type_addon', 'addon'])}),
+                (s.init_set, {
+                    'args': ('map_tec_addon', ['technology', 'type_addon'])
+                }),
+                (s.init_par, {
+                    'args': (
+                        'addon_conversion',
+                        ['node', 'technology', 'addon',
+                            'year', 'year', 'mode', 'time'],
+                        ['node', 'technology', 'addon',
+                            'year_vtg', 'year_act', 'mode', 'time']
+                    )}),
+                (s.init_par, {
+                    'args': (
+                        'addon_up',
+                        ['node', 'technology', 'year',
+                            'mode', 'time', 'type_addon']
+                    )}),
+                (s.init_par, {
+                    'args': (
+                        'addon_lo',
+                        ['node', 'technology', 'year',
+                            'mode', 'time', 'type_addon']
+                    )}),
+            ],
+        },
     )
 
     pass_idx = [i for i, init in enumerate(inits) if init['test']]
@@ -71,7 +103,6 @@ def _init_scenario(s, commit=False):
             args = exec_info[1].pop('args', tuple())
             kwargs = exec_info[1].pop('kwargs', dict())
             func(*args, **kwargs)
-
     if commit:
         s.commit('Initialized wtih standard sets and params')
 
@@ -124,8 +155,15 @@ class Scenario(ixmp.Scenario):
     def has_solution(self):
         """Returns True if scenario currently has a solution"""
         try:
+
+
+<< << << < HEAD
             return len(self.var('ACT')) > 0
         except:
+=======
+            return not np.isnan(self.var('OBJ')['lvl'])
+        except Exception:
+>>>>>>> addon
             return False
 
     def add_spatial_sets(self, data):
