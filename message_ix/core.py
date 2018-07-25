@@ -280,7 +280,11 @@ class Scenario(ixmp.Scenario):
         keep : bool, optional, default: False
             keep the old values in the model
         """
-        self.check_out()
+        try:
+            self.check_out()
+            commit = True
+        except:
+            commit = False
         keys = list(mapping.keys())
         values = list(mapping.values())
 
@@ -304,7 +308,7 @@ class Scenario(ixmp.Scenario):
             if name not in self.idx_names(item):
                 continue
             for key, value in mapping.items():
-                df = self.par(item, filters={name: key})
+                df = self.par(item, filters={name: [key]})
                 if not df.empty:
                     df[name] = value
                     self.add_par(item, df)
@@ -315,7 +319,8 @@ class Scenario(ixmp.Scenario):
                 self.remove_set(name, key)
 
         # commit
-        self.commit('Renamed {} using mapping {}'.format(name, mapping))
+        if commit:
+            self.commit('Renamed {} using mapping {}'.format(name, mapping))
 
     def to_excel(self, fname):
         """Save a scenario as an Excel file. NOTE: Cannot export
