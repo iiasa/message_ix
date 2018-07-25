@@ -124,6 +124,28 @@ operation_factor(node,tec,year_all2,year_all)$( map_tec(node,tec,year_all)
 emission_scaling(type_emission,emission)$( cat_emission(type_emission,emission)
         and not emission_scaling(type_emission,emission) ) = 1 ;
 
+* set the flexibility factor for the nondefined ratings of a technology (= 'remainin') equal to the min flex factor of the other ratings
+flexibility_factor(node,tec,vintage,year_all,mode,commodity,level,time,'remaining')$(
+    sum( rating,rating_bin(node,tec,year_all,commodity,level,time,rating) ) < 1 ) =
+    smin(rating$( rating_bin(node,tec,year_all,commodity,level,time,rating) ),
+        flexibility_factor(node,tec,vintage,year_all,mode,commodity,level,time,rating) );
+
+* set the flexibility of the 'remaining' rating equal to zero if the flex factor is not smaller than 0
+flexibility_factor(node,tec,vintage,year_all,mode,commodity,level,time,'remaining')$(
+    flexibility_factor(node,tec,vintage,year_all,mode,commodity,level,time,'remaining') > 0) = 0 ;
+
+* total size of the ratings of a technology
+Parameter rating_sum(node,tec,year_all,commodity,level,time) ;
+
+rating_sum(node,tec,year_all,commodity,level,time) =
+    sum( rating, rating_bin(node,tec,year_all,commodity,level,time,rating) ) ;
+
+* set the rating bin size of 'remaining' to 1- the sum of all other ratings 
+rating_bin(node,tec,year_all,commodity,level,time,'remaining')$(
+        rating_sum(node,tec,year_all,commodity,level,time) > 0 AND
+        rating_sum(node,tec,year_all,commodity,level,time) < 1 ) =
+    1 - sum( rating,rating_bin(node,tec,year_all,commodity,level,time,rating) );
+
 *----------------------------------------------------------------------------------------------------------------------*
 * sanity checks on the data set                                                                                        *
 *----------------------------------------------------------------------------------------------------------------------*
@@ -152,7 +174,7 @@ if (check,
 
 * check for validity of temporal resolution
 loop(lvl_temporal,
-    loop(time2$( sum(time, map_temporal_hierarchy(lvl_temporal,time,time2) ) ), 
+    loop(time2$( sum(time, map_temporal_hierarchy(lvl_temporal,time,time2) ) ),
         check = 1$( sum( time$( map_temporal_hierarchy(lvl_temporal,time,time2) ),
             duration_time(time) ) ne duration_time(time2) ) ;
     ) ;

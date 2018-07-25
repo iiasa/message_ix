@@ -14,7 +14,7 @@ def _init_scenario(s, commit=False):
     inits = (
         {
             'test': 'firm' not in s.set('rating'),
-            'exec': [(s.add_set, {'args': ('rating', 'firm')}),
+            'exec': [(s.add_set, {'args': ('rating', ['firm', 'unrated', 'remaining'])}),
                      ],
         },
     )
