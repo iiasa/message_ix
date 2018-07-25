@@ -232,7 +232,7 @@ class Scenario(ixmp.Scenario):
         def valid_years(y_v, y_a):
             # casting to int here is probably bad
             return y_v <= y_a and int(y_a) >= int(first)
-        year_pairs = [(y_v, y_a) for y_v, y_a in combos if valid(y_v, y_a)]
+        year_pairs = [(y_v, y_a) for y_v, y_a in combos if valid_years(y_v, y_a)]
         v_years, a_years = zip(*year_pairs)
         return v_years, a_years
 
