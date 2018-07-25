@@ -53,12 +53,12 @@ def _notebook_run(path, kernel=None, capsys=None):
 
 @pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
 def test_westeros(capsys):
-    fname = os.path.join(westeros_path, 'westeros.ipynb')
+    fname = os.path.join(westeros_path, 'westeros_part1.ipynb')
     nb, errors = _notebook_run(fname, capsys=capsys)
     assert errors == []
 
     obs = eval(nb.cells[-11]['outputs'][0]['data']['text/plain'])
-    exp = 626978193408.0
+    exp = 746530013184.0
     assert np.isclose(obs, exp)
 
 
