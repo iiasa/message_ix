@@ -221,16 +221,18 @@ class Scenario(ixmp.Scenario):
         """Return a 2-tuple of valid pairs of vintage years and active years for
         use with data input.
         """
-        horizon = self.set('year')
+        horizon = self.set('year').tolist()
         filters = {'type_year': ['firstmodelyear']}
         first = (self
                  .set("cat_year", filters=filters)['year']
                  .values[0]
                  )
-        horizon = horizon[horizon.astype(int) >= int(first)]
 
-        combinations = itertools.product(horizon, horizon)
-        year_pairs = [(y_v, y_a) for y_v, y_a in combinations if y_v <= y_a]
+        combos = itertools.product(horizon, horizon)
+        def valid_years(y_v, y_a):
+            # casting to int here is probably bad
+            return y_v <= y_a and int(y_a) >= int(first)
+        year_pairs = [(y_v, y_a) for y_v, y_a in combos if valid(y_v, y_a)]
         v_years, a_years = zip(*year_pairs)
         return v_years, a_years
 
