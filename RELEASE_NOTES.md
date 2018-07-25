@@ -4,6 +4,7 @@
 - [#82](https://github.com/iiasa/message_ix/pull/82): Introducing "add-on technologies" for mitigation options, etc.
 - [#81](https://github.com/iiasa/message_ix/pull/81): Share constraints by mode added.
 - [#80](https://github.com/iiasa/message_ix/pull/80): Share constraints by commodity/level added.
+- [#84](https://github.com/iiasa/message_ix/pull/84): `vintage_and_active_years()` now limited to years only after model's first year
 - [#77](https://github.com/iiasa/message_ix/pull/77): `rename()` function can optionally keep old values in the model (i.e., copy vs. copy-with-replace)
 - [#74](https://github.com/iiasa/message_ix/pull/74): Activity upper and lower bounds can now be applied to all modes of a technology
 - [#67](https://github.com/iiasa/message_ix/pull/67): Use of advanced basis in cplex.opt turned off by default to avoid conflicts with barrier method.
