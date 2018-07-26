@@ -843,16 +843,6 @@ FIRM_CAPACITY_PROVISION(node,inv_tec,year,commodity,level,time)$(
                 * capacity_factor(node,inv_tec,vintage,year,time)
                 * CAP(node,inv_tec,vintage,year) ) ;
 
-
-Set rating_unfirm(rating) ;
-rating_unfirm(rating) = yes ;
-rating_unfirm('firm') = no ;
-
-Set rating_unrated(rating) ;
-rating_unrated(rating) = yes ;
-rating_unrated('unrated') = no ;
-
-
 ***
 * Equation FIRM_CAPACITY_CONSTRAINT
 * """""""""""""""""""""""""""""""""

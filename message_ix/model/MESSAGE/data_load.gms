@@ -63,6 +63,16 @@ is_fixed_extraction, is_fixed_stock, is_fixed_new_capacity, is_fixed_capacity, i
 fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activity, fixed_land
 ;
 
+
+Set rating_unfirm(rating) ;
+rating_unfirm(rating) = yes ;
+rating_unfirm('firm') = no ;
+
+Set rating_unrated(rating) ;
+rating_unrated(rating) = yes ;
+rating_unrated('unrated') = no ;
+
+
 *----------------------------------------------------------------------------------------------------------------------*
 * assignment and computation of MESSAGE-specific auxiliary parameters                                                  *
 *----------------------------------------------------------------------------------------------------------------------*
