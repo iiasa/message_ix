@@ -2,9 +2,11 @@
 
 import pandas as pd
 import numpy as np
+import collections
+import six
+
 import message_ix
 import ixmp
-import pyam
 
 
 IAMC_IDX = ['region', 'variable', 'unit', 'year']
@@ -76,6 +78,16 @@ class PostProcess(object):
 def _apply_filters(data, filters):
     keep = np.array([True] * len(data))
     for col, values in filters.items():
-        values = [values] if pyam.isstr(values) else values
+        values = values if islistable(values) else [values]
         keep &= [i in values for i in data[col]]
     return data[keep].copy()
+
+
+def isstr(x):
+    """Returns True if x is a string"""
+    return isinstance(x, six.string_types)
+
+
+def islistable(x):
+    """Returns True if x is a list but not a string"""
+    return isinstance(x, collections.Iterable) and not isstr(x)
