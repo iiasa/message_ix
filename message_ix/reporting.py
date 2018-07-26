@@ -65,7 +65,7 @@ class PostProcess(object):
         try:
             self.scenario.check_out(timeseries_only=True)
             self.scenario.add_timeseries(self.data.reset_index())
-            self.commit(comment or 'MESSAGEix postprocessing')
+            self.scenario.commit(comment or 'MESSAGEix postprocessing')
         except Exception:
             self.scenario.discard_changes()
             ixmp.logger().error('Error saving timeseries data to the database')
