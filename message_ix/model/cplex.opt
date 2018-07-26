@@ -10,6 +10,6 @@
 
 * advanced basis turned off as default to avoid conflicts wehen using barrier method
 advind = 0
-lpmethod = 6
+lpmethod = 4
 threads = 4
 epopt 1e-6
