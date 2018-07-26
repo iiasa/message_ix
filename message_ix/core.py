@@ -221,16 +221,18 @@ class Scenario(ixmp.Scenario):
         """Return a 2-tuple of valid pairs of vintage years and active years for
         use with data input.
         """
-        horizon = self.set('year')
+        horizon = self.set('year').tolist()
         filters = {'type_year': ['firstmodelyear']}
         first = (self
                  .set("cat_year", filters=filters)['year']
                  .values[0]
                  )
-        horizon = horizon[horizon.astype(int) >= int(first)]
 
-        combinations = itertools.product(horizon, horizon)
-        year_pairs = [(y_v, y_a) for y_v, y_a in combinations if y_v <= y_a]
+        combos = itertools.product(horizon, horizon)
+        def valid_years(y_v, y_a):
+            # casting to int here is probably bad
+            return y_v <= y_a and int(y_a) >= int(first)
+        year_pairs = [(y_v, y_a) for y_v, y_a in combos if valid_years(y_v, y_a)]
         v_years, a_years = zip(*year_pairs)
         return v_years, a_years
 
@@ -280,7 +282,11 @@ class Scenario(ixmp.Scenario):
         keep : bool, optional, default: False
             keep the old values in the model
         """
-        self.check_out()
+        try:
+            self.check_out()
+            commit = True
+        except:
+            commit = False
         keys = list(mapping.keys())
         values = list(mapping.values())
 
@@ -304,7 +310,7 @@ class Scenario(ixmp.Scenario):
             if name not in self.idx_names(item):
                 continue
             for key, value in mapping.items():
-                df = self.par(item, filters={name: key})
+                df = self.par(item, filters={name: [key]})
                 if not df.empty:
                     df[name] = value
                     self.add_par(item, df)
@@ -315,7 +321,8 @@ class Scenario(ixmp.Scenario):
                 self.remove_set(name, key)
 
         # commit
-        self.commit('Renamed {} using mapping {}'.format(name, mapping))
+        if commit:
+            self.commit('Renamed {} using mapping {}'.format(name, mapping))
 
     def to_excel(self, fname):
         """Save a scenario as an Excel file. NOTE: Cannot export

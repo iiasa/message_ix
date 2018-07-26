@@ -779,18 +779,29 @@ RENEWABLES_CAPACITY_REQUIREMENT(node,inv_tec,commodity,year)$(
 ***
 
 * addon technology activity constrained to level of parent technology
-ADDON_ACTIVITY_UP(node,tec,type_addon,year,mode,time)$( map_tec_addon(tec,type_addon)
-    AND map_tec_act(node,tec,year,mode,time) ) ..
+ADDON_ACTIVITY_UP(node,type_addon,year,mode,time)..
 * activity of addon technology
-      sum((addon, vintage)$( cat_addon(type_addon, addon)
-              AND map_tec_lifetime(node,addon,vintage,year) AND map_tec_act(node,addon,year,mode,time) ),
+      sum((addon, tec, vintage)$(
+	  map_tec_addon(tec,type_addon) AND 
+	  map_tec_act(node,tec,year,mode,time) AND
+	  map_tec_lifetime(node,tec,vintage,year) AND
+	  cat_addon(type_addon, addon) AND
+	  map_tec_lifetime(node,addon,vintage,year) AND
+	  map_tec_act(node,addon,year,mode,time)
+      ),
           addon_conversion(node,tec,addon,vintage,year,mode,time)
-          * ACT(node,addon,vintage,year,mode,time) )
+          *
+	  ACT(node,addon,vintage,year,mode,time) )
       =L=
 * activity of corresponding parent-technology times upper bound of share
-      addon_up(node,tec,year,mode,time,type_addon)
-      * sum(vintage$( map_tec_lifetime(node,tec,vintage,year) ),
-          ACT(node,tec,vintage,year,mode,time) )
+      sum((tec, vintage)$(
+	  map_tec_addon(tec,type_addon) AND 
+	  map_tec_act(node,tec,year,mode,time) AND
+	  map_tec_lifetime(node,tec,vintage,year)
+      ),
+	  addon_up(node,tec,year,mode,time,type_addon)
+	  * 
+	  ACT(node,tec,vintage,year,mode,time) )
 ;
 
 ***
