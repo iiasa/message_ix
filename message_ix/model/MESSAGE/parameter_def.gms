@@ -343,17 +343,17 @@ Parameters
 *    * - Parameter name
 *      - Index names
 *    * - addon_conversion
-*      - ``node`` | ``tec`` | ``addon`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``time``
+*      - ``node`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``time`` | ``type_addon``
 *    * - addon_up
 *      - ``node`` | ``tec`` | ``vintage`` | ``year`` | ``mode`` | ``time`` | ``type_addon``
 *    * - addon_lo
 *      - ``node`` | ``tec`` | ``vintage`` | ``year`` | ``mode`` | ``time`` | ``type_addon``
 *
-* The upper bound of 
+* The upper bound of
 ***
 
 Parameters
-    addon_conversion(node,tec,addon,vintage,year_all,mode,time)  conversion factor between add-on and parent technology activity
+    addon_conversion(node,tec,vintage,year_all,mode,time,type_addon)  conversion factor between add-on and parent technology activity
     addon_up(node,tec,year_all,mode,time,type_addon)    upper bound on deployment of add-on technologies relative to parent technology
     addon_lo(node,tec,year_all,mode,time,type_addon)    lower bound on deployment of add-on technologies relative to parent technology
 ;

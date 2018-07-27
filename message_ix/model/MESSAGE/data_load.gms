@@ -133,16 +133,15 @@ operation_factor(node,tec,year_all2,year_all)$( map_tec(node,tec,year_all)
     AND map_tec_lifetime(node,tec,year_all2,year_all) AND NOT operation_factor(node,tec,year_all2,year_all) ) = 1 ;
 
 * set the addon-conversion factor to 1 by default
-addon_conversion(node,tec,addon,vintage,year_all,mode,time)$(
-    sum((type_addon)$( cat_addon(type_addon, addon) AND map_tec_addon(tec,type_addon) ), 1 )
+addon_conversion(node,tec,vintage,year_all,mode,time,type_addon)$(
+    map_tec_addon(tec,type_addon)
     AND map_tec_act(node,tec,year_all,mode,time)
     AND map_tec_lifetime(node,tec,vintage,year_all)
-    AND NOT addon_conversion(node,tec,addon,vintage,year_all,mode,time) ) = 1 ;
+    AND NOT addon_conversion(node,tec,vintage,year_all,mode,time,type_addon) ) = 1 ;
 
 * set the upper bound on addon-technology activity to 1 by default
 addon_up(node,tec,year_all,mode,time,type_addon)$(
-    sum(addon$( cat_addon(type_addon, addon) ), 1 )
-    AND map_tec_addon(tec,type_addon)
+    map_tec_addon(tec,type_addon)
     AND map_tec_act(node,tec,year_all,mode,time)
     AND NOT addon_up(node,tec,year_all,mode,time,type_addon) ) = 1 ;
 
@@ -178,7 +177,7 @@ if (check,
 
 * check for validity of temporal resolution
 loop(lvl_temporal,
-    loop(time2$( sum(time, map_temporal_hierarchy(lvl_temporal,time,time2) ) ), 
+    loop(time2$( sum(time, map_temporal_hierarchy(lvl_temporal,time,time2) ) ),
         check = 1$( sum( time$( map_temporal_hierarchy(lvl_temporal,time,time2) ),
             duration_time(time) ) ne duration_time(time2) ) ;
     ) ;

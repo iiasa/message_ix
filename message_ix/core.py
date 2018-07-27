@@ -70,10 +70,10 @@ def _init_scenario(s, commit=False):
                 (s.init_par, {
                     'args': (
                         'addon_conversion',
-                        ['node', 'technology', 'addon',
-                            'year', 'year', 'mode', 'time'],
-                        ['node', 'technology', 'addon',
-                            'year_vtg', 'year_act', 'mode', 'time']
+                        ['node', 'technology',
+                            'year', 'year', 'mode', 'time', 'type_addon'],
+                        ['node', 'technology',
+                            'year_vtg', 'year_act', 'mode', 'time', 'type_addon']
                     )}),
                 (s.init_par, {
                     'args': (
