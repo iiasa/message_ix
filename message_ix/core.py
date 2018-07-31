@@ -11,7 +11,7 @@ from message_ix.utils import isscalar, logger
 
 class Scenario(ixmp.Scenario):
 
-    def __init__(self, mp, model, scenario, version=None, annotation=None,
+    def __init__(self, mp, model, scenario=None, version=None, annotation=None,
                  cache=False, clone=None, **kwargs):
         """Initialize a new message_ix.Scenario (structured input data and solution)
         or get an existing scenario from the ixmp database instance
