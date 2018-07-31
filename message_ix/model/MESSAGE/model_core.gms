@@ -248,7 +248,9 @@ Equations
     COMMODITY_BALANCE               commodity supply-demand balance constraint
     STOCKS_BALANCE                  commodity inter-temporal balance of stocks
     CAPACITY_CONSTRAINT             capacity constraint for technology (by sub-annual time slice)
-    CAPACITY_MAINTENANCE            constraint for technology capacity maintainance
+    CAPACITY_MAINTENANCE_HIST       constraint for capactiy maintainance  historical installation (built before start of model horizon)
+    CAPACITY_MAINTENANCE_CURR       constraint for capactiy maintainance of new capacity built in the current period (vintage == year)
+    CAPACITY_MAINTENANCE            constraint for capacity maintainance (at the end of previous periode)
     OPERATION_CONSTRAINT            constraint on maximum yearly operation (scheduled down-time for maintainance)
     MIN_UTILIZATION_CONSTRAINT      constraint for minimum yearly operation (aggregated over the course of a year)
     RENEWABLES_POTENTIAL_CONSTRAINT constraint on renewable resource potential
@@ -640,21 +642,32 @@ CAPACITY_CONSTRAINT(node,inv_tec,vintage,year,time)$( map_tec_time(node,inv_tec,
 * The current formulation does not account for construction time in the constraints, but only adds a mark-up
 * to the investment costs in the objective function.
 ***
-CAPACITY_MAINTENANCE(node,inv_tec,vintage,year)$( map_tec_lifetime(node,inv_tec,vintage,year) )..
-    CAP(node,inv_tec,vintage,year) =L=
-* discount the capacity in case the technical lifetime ends within a period
-    remaining_capacity(node,inv_tec,vintage,year) * (
-* historical installation (built before start of model horizon)
-        ( duration_period(vintage) * historical_new_capacity(node,inv_tec,vintage)
-            )$( historical(vintage) AND first_period(year) )
-* new capacity built in the current period (vintage == year)
-        + ( duration_period(vintage) * CAP_NEW(node,inv_tec,vintage)
-            )$( year_order(year) EQ year_order(vintage) AND NOT historical(vintage) )
-* total installed capacity at the end of the previous period
-        + SUM(year2$( seq_period(year2,year) AND map_tec_lifetime(node,inv_tec,vintage,year2) ),
-            CAP(node,inv_tec,vintage,year2) )
-    ) ;
 
+
+* historical installation (built before start of model horizon)
+CAPACITY_MAINTENANCE_HIST(node,inv_tec,vintage,first_period)$( map_tec_lifetime(node,inv_tec,vintage,first_period)
+        AND historical(vintage))..
+    CAP(node,inv_tec,vintage,first_period)
+    =L= remaining_capacity(node,inv_tec,vintage,first_period) *
+        duration_period(vintage) * historical_new_capacity(node,inv_tec,vintage)
+;
+
+* new capacity built in the current period (vintage == year)
+CAPACITY_MAINTENANCE_CURR(node,inv_tec,vintage,vintage)$( map_tec_lifetime(node,inv_tec,vintage,vintage) )..
+    CAP(node,inv_tec,vintage,vintage)
+    =E= remaining_capacity(node,inv_tec,vintage,vintage)
+        * duration_period(vintage) * CAP_NEW(node,inv_tec,vintage)
+;
+
+* total installed capacity at the end of the previous period
+CAPACITY_MAINTENANCE(node,inv_tec,vintage,year)$( map_tec_lifetime(node,inv_tec,vintage,year)
+                                                    AND NOT historical(vintage)
+                                                    AND year_order(vintage) < year_order(year))..
+    CAP(node,inv_tec,vintage,year)
+    =L= remaining_capacity(node,inv_tec,vintage,year) *
+        ( SUM(year2$( seq_period(year2,year) ),
+              CAP(node,inv_tec,vintage,year2) )  )
+;
 ***
 * Equation OPERATION_CONSTRAINT
 * """""""""""""""""""""""""""""
@@ -1797,57 +1810,7 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 *----------------------------------------------------------------------------------------------------------------------*
 
 Model MESSAGE_LP /
-    OBJECTIVE
-    COST_ACCOUNTING_NODAL
-    EXTRACTION_EQUIVALENCE
-    EXTRACTION_BOUND_UP
-    RESOURCE_CONSTRAINT
-    RESOURCE_HORIZON
-    COMMODITY_BALANCE
-    STOCKS_BALANCE
-    CAPACITY_CONSTRAINT
-    CAPACITY_MAINTENANCE
-    OPERATION_CONSTRAINT
-    MIN_UTILIZATION_CONSTRAINT
-    ADDON_ACTIVITY_UP
-    ADDON_ACTIVITY_LO
-    RENEWABLES_EQUIVALENCE
-    RENEWABLES_POTENTIAL_CONSTRAINT
-    RENEWABLES_CAPACITY_REQUIREMENT
-    COMMODITY_USE_LEVEL
-    FIRM_CAPACITY_CONSTRAINT
-    FIRM_CAPACITY_PROVISION
-    FIRM_CAPACITY_SHARE
-    NEW_CAPACITY_BOUND_UP
-    NEW_CAPACITY_BOUND_LO
-    TOTAL_CAPACITY_BOUND_UP
-    TOTAL_CAPACITY_BOUND_LO
-    ACTIVITY_BOUND_UP
-    ACTIVITY_BOUND_LO
-    ACTIVITY_BOUND_ALL_MODES_UP
-    ACTIVITY_BOUND_ALL_MODES_LO
-    SHARES_COMMODITY_LEVEL_UP
-    SHARES_COMMODITY_LEVEL_LO
-    SHARES_MODE_UP
-    SHARES_MODE_LO
-    NEW_CAPACITY_CONSTRAINT_UP
-    NEW_CAPACITY_SOFT_CONSTRAINT_UP
-    NEW_CAPACITY_CONSTRAINT_LO
-    NEW_CAPACITY_SOFT_CONSTRAINT_LO
-    ACTIVITY_CONSTRAINT_UP
-    ACTIVITY_SOFT_CONSTRAINT_UP
-    ACTIVITY_CONSTRAINT_LO
-    ACTIVITY_SOFT_CONSTRAINT_LO
-    EMISSION_EQUIVALENCE
-    EMISSION_CONSTRAINT
-    LAND_CONSTRAINT
-    DYNAMIC_LAND_SCEN_CONSTRAINT_UP
-    DYNAMIC_LAND_SCEN_CONSTRAINT_LO
-    DYNAMIC_LAND_TYPE_CONSTRAINT_UP
-    DYNAMIC_LAND_TYPE_CONSTRAINT_LO
-    RELATION_EQUIVALENCE
-    RELATION_CONSTRAINT_UP
-    RELATION_CONSTRAINT_LO
+all
 / ;
 
 MESSAGE_LP.holdfixed = 1 ;
