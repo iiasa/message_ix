@@ -55,8 +55,7 @@ class Scenario(ixmp.Scenario):
 
         self.is_message_scheme = True
 
-        super(Scenario, self).__init__(
-              mp, model, scenario, jscen, cache=cache)
+        super(Scenario, self).__init__(mp, model, scenario, jscen, cache=cache)
 
     def add_spatial_sets(self, data):
         """Add sets related to spatial dimensions of the model
