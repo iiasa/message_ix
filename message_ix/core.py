@@ -17,6 +17,83 @@ def _init_scenario(s, commit=False):
             'exec': [(s.add_set, {'args': ('rating', ['firm', 'unrated'])}),
                      ],
         },
+        {  # required for subset all_modes, see model/data_load.gms
+            'test': 'all' not in s.set('mode'),
+            'exec': [(s.add_set, {'args': ('mode', 'all')})],
+        },
+        {  # required for share constraints
+            'test': 'shares' not in s.set_list(),
+            'exec': [
+                (s.init_set, {'args': ('shares',)}),
+                (s.init_set, {
+                    'args': ('map_shares_commodity_level',),
+                    'kwargs': dict(
+                        idx_sets=['shares', 'commodity', 'level', 'type_tec',
+                                  'type_tec'],
+                        idx_names=['shares', 'commodity', 'level',
+                                   'type_tec_share', 'type_tec_total'])
+                }),
+                (s.init_par, {
+                    'args': ('share_factor_up',),
+                    'kwargs': dict(
+                        idx_sets=['shares', 'node', 'year', 'time'],
+                        idx_names=['shares', 'node_loc', 'year_act', 'time'])
+                }),
+                (s.init_par, {
+                    'args': ('share_factor_lo',),
+                    'kwargs': dict(
+                        idx_sets=['shares', 'node', 'year', 'time'],
+                        idx_names=['shares', 'node_loc', 'year_act', 'time'])
+                }),
+                (s.init_par, {
+                    'args': ('share_mode_up',),
+                    'kwargs': dict(
+                        idx_sets=['shares', 'node', 'technology',
+                                  'mode', 'year', 'time'],
+                        idx_names=['shares', 'node_loc', 'technology', 'mode',
+                                   'year_act', 'time'])
+                }),
+                (s.init_par, {
+                    'args': ('share_mode_lo',),
+                    'kwargs': dict(
+                        idx_sets=['shares', 'node', 'technology',
+                                  'mode', 'year', 'time'],
+                        idx_names=['shares', 'node_loc', 'technology', 'mode',
+                                   'year_act', 'time'])
+                }),
+            ],
+        },
+        {  # required for addon formulation
+            'test': 'addon' not in s.set_list(),
+            'exec': [
+                (s.init_set, {'args': ('addon',)}),
+                (s.init_set, {'args': ('type_addon',)}),
+                (s.init_set, {'args': ('cat_addon', ['type_addon', 'addon'])}),
+                (s.init_set, {
+                    'args': ('map_tec_addon', ['technology', 'type_addon'])
+                }),
+                (s.init_par, {
+                    'args': (
+                        'addon_conversion',
+                        ['node', 'technology',
+                         'year', 'year', 'mode', 'time', 'type_addon'],
+                        ['node', 'technology',
+                         'year_vtg', 'year_act', 'mode', 'time', 'type_addon']
+                    )}),
+                (s.init_par, {
+                    'args': (
+                        'addon_up',
+                        ['node', 'technology', 'year',
+                         'mode', 'time', 'type_addon']
+                    )}),
+                (s.init_par, {
+                    'args': (
+                        'addon_lo',
+                        ['node', 'technology', 'year',
+                         'mode', 'time', 'type_addon']
+                    )}),
+            ],
+        },
     )
 
     pass_idx = [i for i, init in enumerate(inits) if init['test']]
@@ -86,7 +163,6 @@ class Scenario(ixmp.Scenario):
             return not np.isnan(self.var('OBJ')['lvl'])
         except Exception:
             return False
-
 
     def add_spatial_sets(self, data):
         """Add sets related to spatial dimensions of the model

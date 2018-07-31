@@ -15,6 +15,8 @@ $LOAD map_node, map_time, map_commodity, map_resource, map_stocks, map_tec, map_
 $LOAD map_land, map_relation
 $LOAD type_tec, cat_tec, type_year, cat_year, type_emission, cat_emission, type_tec_land
 $LOAD inv_tec, renewable_tec
+$LOAD shares
+$LOAD addon, type_addon, cat_addon, map_tec_addon
 $GDXIN
 
 Execute_load '%in%'
@@ -38,6 +40,10 @@ is_dynamic_activity_lo, initial_activity_lo, growth_activity_lo,
 abs_cost_new_capacity_soft_up, abs_cost_new_capacity_soft_lo, level_cost_new_capacity_soft_up, level_cost_new_capacity_soft_lo,
 abs_cost_activity_soft_up, abs_cost_activity_soft_lo, level_cost_activity_soft_up, level_cost_activity_soft_lo,
 soft_new_capacity_up, soft_new_capacity_lo, soft_activity_up, soft_activity_lo,
+* share constraints
+share_factor_up,share_factor_lo,map_shares_commodity_level,share_mode_up,share_mode_lo,
+* addon technologies
+addon_conversion, addon_up, addon_lo
 * parameters for reliability, flexibility and renewable potential constraints
 rating_bin, reliability_factor, peak_load_factor, flexibility_factor
 renewable_capacity_factor, renewable_potential
@@ -72,6 +78,12 @@ Set rating_unrated(rating) ;
 rating_unrated(rating) = yes ;
 rating_unrated('unrated') = no ;
 
+
+*----------------------------------------------------------------------------------------------------------------------*
+* Add special sets                                                                                                     *
+*----------------------------------------------------------------------------------------------------------------------*
+
+Set all_modes (mode) / all /;
 
 *----------------------------------------------------------------------------------------------------------------------*
 * assignment and computation of MESSAGE-specific auxiliary parameters                                                  *
@@ -129,6 +141,19 @@ capacity_factor(node,tec,year_all2,year_all,'year') =
 * set the default operation factor for technologies where no parameter value is provided in the input data
 operation_factor(node,tec,year_all2,year_all)$( map_tec(node,tec,year_all)
     AND map_tec_lifetime(node,tec,year_all2,year_all) AND NOT operation_factor(node,tec,year_all2,year_all) ) = 1 ;
+
+* set the addon-conversion factor to 1 by default
+addon_conversion(node,tec,vintage,year_all,mode,time,type_addon)$(
+    map_tec_addon(tec,type_addon)
+    AND map_tec_act(node,tec,year_all,mode,time)
+    AND map_tec_lifetime(node,tec,vintage,year_all)
+    AND NOT addon_conversion(node,tec,vintage,year_all,mode,time,type_addon) ) = 1 ;
+
+* set the upper bound on addon-technology activity to 1 by default
+addon_up(node,tec,year_all,mode,time,type_addon)$(
+    map_tec_addon(tec,type_addon)
+    AND map_tec_act(node,tec,year_all,mode,time)
+    AND NOT addon_up(node,tec,year_all,mode,time,type_addon) ) = 1 ;
 
 * set the emission scaling parameter to 1 if only one emission is included in a category
 emission_scaling(type_emission,emission)$( cat_emission(type_emission,emission)
