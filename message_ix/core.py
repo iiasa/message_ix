@@ -53,6 +53,7 @@ class Scenario(ixmp.Scenario):
         else:
             jscen = mp._jobj.getScenario(model, scenario)
 
+        self.is_message_scheme = True
 
         super(Scenario, self).__init__(
               mp, model, scenario, jscen, cache=cache)
