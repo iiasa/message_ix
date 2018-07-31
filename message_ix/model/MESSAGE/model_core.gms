@@ -254,7 +254,9 @@ Equations
     COMMODITY_BALANCE               commodity supply-demand balance constraint
     STOCKS_BALANCE                  commodity inter-temporal balance of stocks
     CAPACITY_CONSTRAINT             capacity constraint for technology (by sub-annual time slice)
-    CAPACITY_MAINTENANCE            constraint for technology capacity maintainance
+    CAPACITY_MAINTENANCE_HIST       constraint for capactiy maintainance  historical installation (built before start of model horizon)
+    CAPACITY_MAINTENANCE_CURR       constraint for capactiy maintainance of new capacity built in the current period (vintage == year)
+    CAPACITY_MAINTENANCE            constraint for capacity maintainance (at the end of previous periode)
     OPERATION_CONSTRAINT            constraint on maximum yearly operation (scheduled down-time for maintainance)
     MIN_UTILIZATION_CONSTRAINT      constraint for minimum yearly operation (aggregated over the course of a year)
     RENEWABLES_POTENTIAL_CONSTRAINT constraint on renewable resource potential
@@ -646,21 +648,32 @@ CAPACITY_CONSTRAINT(node,inv_tec,vintage,year,time)$( map_tec_time(node,inv_tec,
 * The current formulation does not account for construction time in the constraints, but only adds a mark-up
 * to the investment costs in the objective function.
 ***
-CAPACITY_MAINTENANCE(node,inv_tec,vintage,year)$( map_tec_lifetime(node,inv_tec,vintage,year) )..
-    CAP(node,inv_tec,vintage,year) =L=
-* discount the capacity in case the technical lifetime ends within a period
-    remaining_capacity(node,inv_tec,vintage,year) * (
-* historical installation (built before start of model horizon)
-        ( duration_period(vintage) * historical_new_capacity(node,inv_tec,vintage)
-            )$( historical(vintage) AND first_period(year) )
-* new capacity built in the current period (vintage == year)
-        + ( duration_period(vintage) * CAP_NEW(node,inv_tec,vintage)
-            )$( year_order(year) EQ year_order(vintage) AND NOT historical(vintage) )
-* total installed capacity at the end of the previous period
-        + SUM(year2$( seq_period(year2,year) AND map_tec_lifetime(node,inv_tec,vintage,year2) ),
-            CAP(node,inv_tec,vintage,year2) )
-    ) ;
 
+
+* historical installation (built before start of model horizon)
+CAPACITY_MAINTENANCE_HIST(node,inv_tec,vintage,first_period)$( map_tec_lifetime(node,inv_tec,vintage,first_period)
+        AND historical(vintage))..
+    CAP(node,inv_tec,vintage,first_period)
+    =L= remaining_capacity(node,inv_tec,vintage,first_period) *
+        duration_period(vintage) * historical_new_capacity(node,inv_tec,vintage)
+;
+
+* new capacity built in the current period (vintage == year)
+CAPACITY_MAINTENANCE_CURR(node,inv_tec,vintage,vintage)$( map_tec_lifetime(node,inv_tec,vintage,vintage) )..
+    CAP(node,inv_tec,vintage,vintage)
+    =E= remaining_capacity(node,inv_tec,vintage,vintage)
+        * duration_period(vintage) * CAP_NEW(node,inv_tec,vintage)
+;
+
+* total installed capacity at the end of the previous period
+CAPACITY_MAINTENANCE(node,inv_tec,vintage,year)$( map_tec_lifetime(node,inv_tec,vintage,year)
+                                                    AND NOT historical(vintage)
+                                                    AND year_order(vintage) < year_order(year))..
+    CAP(node,inv_tec,vintage,year)
+    =L= remaining_capacity(node,inv_tec,vintage,year) *
+        ( SUM(year2$( seq_period(year2,year) ),
+              CAP(node,inv_tec,vintage,year2) )  )
+;
 ***
 * Equation OPERATION_CONSTRAINT
 * """""""""""""""""""""""""""""
