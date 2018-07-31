@@ -772,9 +772,9 @@ RENEWABLES_CAPACITY_REQUIREMENT(node,inv_tec,commodity,year)$(
 * jointly with a parent technology (e.g., abatement option, SO2 scrubber, power plant cooling technology).
 *
 *   .. math::
-*      \sum_{\substack{t' \sim t^A, y^V \leq y}} addon\_conversion_{n,t',y^V,y,m,h} \cdot ACT_{n,t',y^V,y,m,h}
+*      \sum_{\substack{t' \sim t^A, y^V \leq y}} ACT_{n,t',y^V,y,m,h}
 *          \leq
-*      addon\_up_{n,t^a,y,m,h,t^A} \cdot \sum_{\substack{t, y^V \leq y}} ACT_{n,t,y^V,y,m,h}
+*      addon\_up_{n,t^a,y,m,h,t^A}  \cdot \sum_{\substack{t, y^V \leq y}} addon\_conversion_{n,t^a,y^V,y,m,h} \cdot ACT_{n,t,y^V,y,m,h}
 *
 ***
 
@@ -841,9 +841,9 @@ ADDON_ACTIVITY_UP(node,type_addon,year,mode,time)..
 * parent technology (i.e., full mitigate).
 *
 *   .. math::
-*      \sum_{\substack{t' \sim t^A, y^V \leq y}} addon\_conversion_{n,t',y^V,y,m,h} \cdot ACT_{n,t',y^V,y,m,h}
+*      \sum_{\substack{t' \sim t^A, y^V \leq y}} ACT_{n,t',y^V,y,m,h}
 *          \geq
-*      addon\_lo_{n,t^a,y,m,h,t^A} \cdot \sum_{\substack{t, y^V \leq y}} ACT_{n,t,y^V,y,m,h}
+*      addon\_lo_{n,t^a,y,m,h,t^A} \cdot \sum_{\substack{t, y^V \leq y}} addon\_conversion_{n,t^a,y^V,y,m,h} \cdot ACT_{n,t,y^V,y,m,h}
 *
 ***
 
