@@ -255,8 +255,8 @@ Equations
     STOCKS_BALANCE                  commodity inter-temporal balance of stocks
     CAPACITY_CONSTRAINT             capacity constraint for technology (by sub-annual time slice)
     CAPACITY_MAINTENANCE_HIST       constraint for capactiy maintainance  historical installation (built before start of model horizon)
-    CAPACITY_MAINTENANCE_CURR       constraint for capactiy maintainance of new capacity built in the current period (vintage == year)
-    CAPACITY_MAINTENANCE            constraint for capacity maintainance (at the end of previous periode)
+    CAPACITY_MAINTENANCE_NEW        constraint for capactiy maintainance of new capacity built in the current period (vintage == year)
+    CAPACITY_MAINTENANCE            constraint for capacity maintainance over the technical lifetime
     OPERATION_CONSTRAINT            constraint on maximum yearly operation (scheduled down-time for maintainance)
     MIN_UTILIZATION_CONSTRAINT      constraint for minimum yearly operation (aggregated over the course of a year)
     RENEWABLES_POTENTIAL_CONSTRAINT constraint on renewable resource potential
@@ -629,21 +629,47 @@ CAPACITY_CONSTRAINT(node,inv_tec,vintage,year,time)$( map_tec_time(node,inv_tec,
         =L= duration_time(time) * capacity_factor(node,inv_tec,vintage,year,time) * CAP(node,inv_tec,vintage,year) ;
 
 ***
-* Equation CAPACITY_MAINTENANCE
-* """"""""""""""""""""""""""""""
-* This constraint deals with fixed costs for operation and maintainance (O&M) of technology capacity_maintainance.
-* Capacity must be maintained over time until decommissioning (no mothballing), and fixed O\&M costs must be paid
-* immediately after commissioning.
+* Equations CAPACITY_MAINTENANCE_HIST, CAPACITY_MAINTENANCE_NEW, CAPACITY_MAINTENANCE
+* """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+* These three constraints deal with technology capacity maintenance. They ensure that capacity is maintained over time until decommissioning, and fixed O\&M costs must be paid immediately after commissioning.
 *
-*  .. math::
-*     CAP_{n,t,y^V,y} \leq
-*     remaining\_capacity_{n,t,y^V,y} \cdot
-*     \left\{ \begin{array}{ll}
-*         duration\_period_{y^V} \cdot historical\_new\_capacity_{n,t,y^V} \quad & \text{if } y \ \text{is first model period} \\
-*         duration\_period_{y^V} \cdot CAP\_NEW_{n,t,y^V} \quad & \text{if } y = y^V \\
-*         CAP_{n,t,y^V,y-1} & \text{if } y > y^V \text{ and }
-*                                  |y| - |y^V| < technical\_lifetime_{n,t,y^V} \end{array} \right\}
-*         \quad \forall \ t \in T^{INV}
+* CAPACITY_MAINTENANCE_HIST ensures that capacity built before the first model year is maintained until decomissioning.
+*
+*   .. math::
+*      CAP_{n,t,y^V,first\_period}
+*      \leq
+*      remaining\_capacity_{n,t,y^V,first\_period} \cdot
+*      duration\_period_{y^V} \cdot
+*      historical\_new\_capacity_{n,t,y^V}
+*
+*      \quad & \text{if } y^V  < first\_period \text{ and } |y| - |y^V| < technical\_lifetime_{n,t,y^V}
+*
+*      \quad \forall \ t \in T^{INV}
+*
+* CAPACITY_MAINTENANCE_NEW ensures that capacity built during a model period is maintained to the end of the model period. Thus, that technologies cannot appear in CAP_NEW and not in CAP for the same model period.
+*
+*   .. math::
+*      CAP_{n,t,y^V,y^V}
+*      \eq
+*      remaining\_capacity_{n,t,y^V,y^V} \cdot
+*      duration\_period_{y^V} \cdot
+*      CAP\_NEW{n,t,y^V}
+*
+*      \quad & \text{if } |y^V| - |y^V| < technical\_lifetime_{n,t,y^V}
+*
+*      \quad \forall \ t \in T^{INV}
+*
+*
+* CAPACITY_MAINTENANCE ensures technology capacity maintainance over time until decommissioning.
+*
+*   .. math::
+*      CAP_{n,t,y^V,y} \leq
+*      remaining\_capacity_{n,t,y^V,y} \cdot
+*      CAP_{n,t,y^V,y-1}
+*      \quad & \text{if } y > y^V \text{ and } y^V  > first\_period \text{ and } |y| - |y^V| < technical\_lifetime_{n,t,y^V}
+*
+*      \quad \forall \ t \in T^{INV}
+*
 *
 * The current formulation does not account for construction time in the constraints, but only adds a mark-up
 * to the investment costs in the objective function.
@@ -659,7 +685,7 @@ CAPACITY_MAINTENANCE_HIST(node,inv_tec,vintage,first_period)$( map_tec_lifetime(
 ;
 
 * new capacity built in the current period (vintage == year)
-CAPACITY_MAINTENANCE_CURR(node,inv_tec,vintage,vintage)$( map_tec_lifetime(node,inv_tec,vintage,vintage) )..
+CAPACITY_MAINTENANCE_NEW(node,inv_tec,vintage,vintage)$( map_tec_lifetime(node,inv_tec,vintage,vintage) )..
     CAP(node,inv_tec,vintage,vintage)
     =E= remaining_capacity(node,inv_tec,vintage,vintage)
         * duration_period(vintage) * CAP_NEW(node,inv_tec,vintage)
