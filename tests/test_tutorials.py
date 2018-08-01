@@ -63,11 +63,13 @@ def test_westeros_baseline(capsys):
     exp = 187445.953125
     assert np.isclose(obs, exp)
 
+
 @pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_westeros_emissions(capsys):
     fname = os.path.join(westeros_path, 'westeros_emissions_tax.ipynb')
     nb, errors = _notebook_run(fname, capsys=capsys)
     assert errors == []
+
 
 @pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_westeros_firm_capacity(capsys):
@@ -75,11 +77,13 @@ def test_westeros_firm_capacity(capsys):
     nb, errors = _notebook_run(fname, capsys=capsys)
     assert errors == []
 
+
 @pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_westeros_flexible_generation(capsys):
     fname = os.path.join(westeros_path, 'westeros_flexible_generation.ipynb')
     nb, errors = _notebook_run(fname, capsys=capsys)
     assert errors == []
+
 
 @pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_austria(capsys):
