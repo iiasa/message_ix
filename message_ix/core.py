@@ -1,6 +1,7 @@
 import collections
 import ixmp
 import itertools
+import warnings
 
 import pandas as pd
 
@@ -10,17 +11,17 @@ from message_ix.utils import isscalar, logger
 
 class Scenario(ixmp.Scenario):
 
-    def __init__(self, platform, model, scen, version=None, annotation=None,
-                 cache=False, clone=None):
+    def __init__(self, mp, model, scenario=None, version=None, annotation=None,
+                 cache=False, clone=None, **kwargs):
         """Initialize a new message_ix.Scenario (structured input data and solution)
         or get an existing scenario from the ixmp database instance
 
         Parameters
         ----------
-        platform : ixmp.Platform
+        mp : ixmp.Platform
         model : string
             model name
-        scen : string
+        scenario : string
             scenario name
         version : string or integer
             initialize a new scenario (if version == 'new'), or
@@ -32,23 +33,29 @@ class Scenario(ixmp.Scenario):
         clone : Scenario, optional
             make a clone of an existing scenario
         """
+        if 'scen' in kwargs:
+            warnings.warn(
+                '`scen` is deprecated and will be removed in the next' +
+                ' release, please use `scenario`')
+            scenario = kwargs.pop('scen')
+
         if version is not None and clone is not None:
             raise ValueError(
                 'Can not provide both version and clone as arguments')
-        jobj = platform._jobj
         if clone is not None:
-            jscen = clone._jobj.clone(model, scen, annotation,
+            jscen = clone._jobj.clone(model, scenario, annotation,
                                       clone._keep_sol, clone._first_model_year)
         elif version == 'new':
             scheme = 'MESSAGE'
-            jscen = jobj.newScenario(model, scen, scheme, annotation)
+            jscen = mp._jobj.newScenario(model, scenario, scheme, annotation)
         elif isinstance(version, int):
-            jscen = jobj.getScenario(model, scen, version)
+            jscen = mp._jobj.getScenario(model, scenario, version)
         else:
-            jscen = jobj.getScenario(model, scen)
+            jscen = mp._jobj.getScenario(model, scenario)
 
-        super(Scenario, self).__init__(
-            platform, model, scen, jscen, cache=cache)
+        self.is_message_scheme = True
+
+        super(Scenario, self).__init__(mp, model, scenario, jscen, cache=cache)
 
     def add_spatial_sets(self, data):
         """Add sets related to spatial dimensions of the model
