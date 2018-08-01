@@ -52,15 +52,32 @@ def _notebook_run(path, kernel=None, capsys=None):
 
 
 @pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
-def test_westeros(capsys):
-    fname = os.path.join(westeros_path, 'westeros_part1.ipynb')
+def test_westeros_baseline(capsys):
+    fname = os.path.join(westeros_path, 'westeros_baseline.ipynb')
     nb, errors = _notebook_run(fname, capsys=capsys)
     assert errors == []
 
-    obs = eval(nb.cells[-11]['outputs'][0]['data']['text/plain'])
-    exp = 746530013184.0
+    obs = eval(nb.cells[-12]['outputs'][0]['data']['text/plain'])
+    exp = 187445.953125
     assert np.isclose(obs, exp)
 
+@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+def test_westeros_emissions(capsys):
+    fname = os.path.join(westeros_path, 'westeros_emissions_tax.ipynb')
+    nb, errors = _notebook_run(fname, capsys=capsys)
+    assert errors == []
+
+@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+def test_westeros_firm_capacity(capsys):
+    fname = os.path.join(westeros_path, 'westeros_firm_capacity.ipynb')
+    nb, errors = _notebook_run(fname, capsys=capsys)
+    assert errors == []
+
+@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+def test_westeros_flexible_generation(capsys):
+    fname = os.path.join(westeros_path, 'westeros_flexible_generation.ipynb')
+    nb, errors = _notebook_run(fname, capsys=capsys)
+    assert errors == []
 
 @pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
 def test_austria(capsys):
