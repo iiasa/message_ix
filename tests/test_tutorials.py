@@ -18,6 +18,8 @@ except:
 ene_path = os.path.join(here, '..', 'tutorial', 'Austrian_energy_system')
 westeros_path = os.path.join(here, '..', 'tutorial', 'westeros')
 
+jupyter_required = 'requires Jupyter Notebook to be installed'
+
 # taken from the execellent example here:
 # https://blog.thedataincubator.com/2016/06/testing-jupyter-notebooks/
 
@@ -51,7 +53,7 @@ def _notebook_run(path, kernel=None, capsys=None):
     return nb, errors
 
 
-@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_westeros_baseline(capsys):
     fname = os.path.join(westeros_path, 'westeros_baseline.ipynb')
     nb, errors = _notebook_run(fname, capsys=capsys)
@@ -61,25 +63,25 @@ def test_westeros_baseline(capsys):
     exp = 187445.953125
     assert np.isclose(obs, exp)
 
-@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_westeros_emissions(capsys):
     fname = os.path.join(westeros_path, 'westeros_emissions_tax.ipynb')
     nb, errors = _notebook_run(fname, capsys=capsys)
     assert errors == []
 
-@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_westeros_firm_capacity(capsys):
     fname = os.path.join(westeros_path, 'westeros_firm_capacity.ipynb')
     nb, errors = _notebook_run(fname, capsys=capsys)
     assert errors == []
 
-@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_westeros_flexible_generation(capsys):
     fname = os.path.join(westeros_path, 'westeros_flexible_generation.ipynb')
     nb, errors = _notebook_run(fname, capsys=capsys)
     assert errors == []
 
-@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_austria(capsys):
     fname = os.path.join(ene_path, 'austria.ipynb')
     nb, errors = _notebook_run(fname, capsys=capsys)
@@ -90,7 +92,7 @@ def test_austria(capsys):
     assert np.isclose(obs, exp)
 
 
-@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_austria_single_policy():
     fname = os.path.join(ene_path, 'austria_single_policy.ipynb')
     nb, errors = _notebook_run(fname)
@@ -101,21 +103,21 @@ def test_austria_single_policy():
     assert np.isclose(obs, exp)
 
 
-@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_austria_multiple_policies():
     fname = os.path.join(ene_path, 'austria_multiple_policies.ipynb')
     nb, errors = _notebook_run(fname)
     assert errors == []
 
 
-@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_austria_multiple_policies_answers():
     fname = os.path.join(ene_path, 'austria_multiple_policies-answers.ipynb')
     nb, errors = _notebook_run(fname)
     assert errors == []
 
 
-@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_austria_load():
     fname = os.path.join(ene_path, 'austria_load_scenario.ipynb')
     nb, errors = _notebook_run(fname)
