@@ -112,7 +112,7 @@ Positive Variables
 * investment and capacity variables
     CAP_NEW(node,tec,year_all)       new capacity by year
     CAP(node,tec,vintage,year_all)   total installed capacity by year
-    CAP_FIRM(node,tec,commodity,level,year_all,rating)   renewable firm capacity
+    CAP_FIRM(node,tec,commodity,level,year_all)   firm capacity
 * variables for soft relaxation of dynamic activity constraints
     CAP_NEW_UP(node,tec,year_all)    relaxation variable for dynamic constraints on new capacity (upwards)
     CAP_NEW_LO(node,tec,year_all)    relaxation variable for dynamic constraints on new capacity (downwards)
@@ -257,9 +257,11 @@ Equations
     ADDON_ACTIVITY_UP               addon-technology activity upper constraint
     ADDON_ACTIVITY_LO               addon technology activity lower constraint
     COMMODITY_USE_LEVEL             defines the COMMODITY_USE as the amount of a commodity at a level that was consumed
-    FIRM_CAPACITY_CONSTRAINT        constraint to maintaint sufficient firm (dispatchable) power generation capacity
+    ACTIVITY_SHARE_BIN
+    ACTIVITY_SHARE_TOTAL
     FIRM_CAPACITY_PROVISION         lower bound on CAP as the minimum installed capacity of each technology
-    FIRM_CAPACITY_SHARE             upper bound of CAP_FIRM per rating to the size of the penetration bin of this rating
+    FIRM_CAPACITY_CONSTRAINT
+    OPERATING_RESERVE_CONSTRAINT
     NEW_CAPACITY_BOUND_UP           upper bound on technology capacity investment
     NEW_CAPACITY_BOUND_LO           lower bound on technology capacity investment
     TOTAL_CAPACITY_BOUND_UP         upper bound on total installed capacity
@@ -892,9 +894,12 @@ ADDON_ACTIVITY_LO(node,type_addon,year,mode,time)..
 * This constraint is only active if :math:`peak\_load\_factor_{n,c,l,y,h}` is defined.
 * The auxiliary variable :math:`COMMODITY\_USE_{n,c,l,y}` is only required
 * for the equations :math:`FIRM\_CAPACITY\_CONSTRAINT` and :math:`FIRM\_CAPACITY\_SHARE`.
+* WENN ENTWEDER PEAK LOAD ODER FLEXIBILITY DEMAND DA IST MUSS DIE COMM_USE BERECHNET WERDEN
 ***
 
-COMMODITY_USE_LEVEL(node,commodity,level,year,time)$( peak_load_factor(node,commodity,level,year,time) )..
+COMMODITY_USE_LEVEL(node,commodity,level,year,time)$(
+         peak_load_factor(node,commodity,level,year,time) OR
+         SUM( (tec,vintage,mode,rating), flexibility_factor(node,tec,vintage,year,mode,commodity,level,time,rating) ) )..
     COMMODITY_USE(node,commodity,level,year)
     =E= SUM( (location,tec,vintage,mode,time2)$( map_tec_act(location,tec,year,mode,time2)
                                                     AND map_tec_lifetime(location,tec,vintage,year) ),
@@ -902,6 +907,55 @@ COMMODITY_USE_LEVEL(node,commodity,level,year,time)$( peak_load_factor(node,comm
                 * duration_time_rel(time,time2)
                 * ACT(location,tec,vintage,year,mode,time2) )
 ;
+
+Positive Variable
+    ACT_SHARE(node,tec,vintage,year_all,commodity,level,time,rating)
+;
+
+* WENN ENTWEDER PEAK LOAD ODER FLEXIBILITY DEMAND DA IST UND RATING MUSS ?BER ACT_SHARE DIE BIN SIZE BERECHNET WERDEN
+ACTIVITY_SHARE_BIN(node,tec,year,commodity,level,time,rating)$(
+         rating_bin(node,tec,year,commodity,level,time,rating) )..
+   sum(vintage$(sum(mode,map_tec_act(node,tec,year,mode,time)) AND map_tec_lifetime(node,tec,vintage,year)),
+            ACT_SHARE(node,tec,vintage,year,commodity,level,time,rating) )
+    =L= rating_bin(node,tec,year,commodity,level,time,rating) * COMMODITY_USE(node,commodity,level,year)
+;
+
+ACTIVITY_SHARE_TOTAL(node,tec,vintage,year,commodity,level,time)$(
+        sum(rating$( rating_bin(node,tec,year,commodity,level,time,rating) ), 1 )
+        AND sum(mode, map_tec_act(node,tec,year,mode,time))
+        AND map_tec_lifetime(node,tec,vintage,year) )..
+    sum((rating)$( rating_bin(node,tec,year,commodity,level,time,rating) ),
+        ACT_SHARE(node,tec,vintage,year,commodity,level,time,rating) )
+    =E=
+        SUM((location,mode,time2)$(
+              map_tec_act(location,tec,year,mode,time2)
+              AND map_tec_lifetime(location,tec,vintage,year) ),
+            ( output(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+              + input(location,tec,vintage,year,mode,node,commodity,level,time2,time) )
+                * duration_time_rel(time,time2)
+                * ACT(location,tec,vintage,year,mode,time2) ) ;
+
+***
+* .. _reliability_constraint:
+*
+* Equation FIRM_CAPACITY_PROVISION
+* """"""""""""""""""""""""""""""""
+* Limits the firm capacity of the renewables technologies to the total installed capacity of each technology.
+*
+*   .. math::
+*      \sum_{q,h} CAP\_FIRM_{n,t,c,l,y,q} \leq \sum_{y^V \leq y} CAP_{n,t,y^Y,y} \quad \forall t \in T^{INV}
+*
+* This constraint is only active if :math:`reliability\_factor_{n,t,y,c,l,h,q}` is defined.
+***
+FIRM_CAPACITY_PROVISION(node,inv_tec,year,commodity,level,time)$(
+    reliability_factor(node,inv_tec,year,commodity,level,time,'firm') )..
+        CAP_FIRM(node,inv_tec,commodity,level,year) =E=
+        SUM((location,vintage,mode,time2)$(
+              map_tec_act(location,inv_tec,year,mode,time2)
+              AND map_tec_lifetime(location,inv_tec,vintage,year) ),
+            output(location,inv_tec,vintage,year,mode,node,commodity,level,time2,time)
+                * capacity_factor(node,inv_tec,vintage,year,time)
+                * CAP(node,inv_tec,vintage,year) ) ;
 
 ***
 * Equation FIRM_CAPACITY_CONSTRAINT
@@ -917,46 +971,18 @@ COMMODITY_USE_LEVEL(node,commodity,level,year,time)$( peak_load_factor(node,comm
 * This constraint is only active if :math:`peak\_load\_factor_{n,c,l,y,h}` is defined.
 ***
 FIRM_CAPACITY_CONSTRAINT(node,commodity,level,year,time)$( peak_load_factor(node,commodity,level,year,time) )..
-    SUM((inv_tec,rating), CAP_FIRM(node,inv_tec,commodity,level,year,rating)
-                        * reliability_factor(node,inv_tec,year,commodity,level,time,rating) )
+    SUM(inv_tec$( reliability_factor(node,inv_tec,year,commodity,level,time,'firm') ),
+        reliability_factor(node,inv_tec,year,commodity,level,time,'firm')
+        * CAP_FIRM(node,inv_tec,commodity,level,year) )
+    + SUM((tec, mode, vintage, rating_unfirm)$(
+        reliability_factor(node,tec,year,commodity,level,time,rating_unfirm)
+            AND map_tec_act(node,tec,year,mode,time)
+            AND map_tec_lifetime(node,tec,vintage,year) ),
+        reliability_factor(node,tec,year,commodity,level,time,rating_unfirm)
+        * ACT_SHARE(node,tec,vintage,year,commodity,level,time,rating_unfirm) )
     =G= peak_load_factor(node,commodity,level,year,time) * COMMODITY_USE(node,commodity,level,year)
 ;
 
-***
-* Equation FIRM_CAPACITY_SHARE
-* """"""""""""""""""""""""""""
-* Limits the firm capacity per rating to the size of the penetration bin of this rating.
-*
-*   .. math::
-*      CAP\_FIRM_{n,t,c,l,y,q} \leq rating\_bin_{n,t,y,c,l,h,q} \cdot COMMODITY\_USE_{n,c,l,y}
-*
-* This constraint is only active if :math:`reliability\_bin_{n,t,y,c,l,t,q}` is defined.
-***
-FIRM_CAPACITY_SHARE(node,inv_tec,commodity,level,year,rating,time)$(
-        rating_bin(node,inv_tec,year,commodity,level,time,rating) ) ..
-    CAP_FIRM(node,inv_tec,commodity,level,year,rating)
-    =L= rating_bin(node,inv_tec,year,commodity,level,time,rating) * COMMODITY_USE(node,commodity,level,year)
-;
-
-***
-* .. _reliability_constraint:
-*
-* Equation FIRM_CAPACITY_PROVISION
-* """"""""""""""""""""""""""""""""
-* Limits the firm capacity of the renewables technologies to the total installed capacity of each technology.
-*
-*   .. math::
-*      \sum_{r,h} CAP\_FIRM_{n,t,c,l,y,q} \leq \sum_{y^V \leq y} CAP_{n,t,y^Y,y} \quad \forall t \in T^{INV}
-*
-* This constraint is only active if :math:`reliability\_factor_{n,t,y,c,l,h,q}` is defined.
-***
-FIRM_CAPACITY_PROVISION(node,inv_tec,year,commodity,level)$(
-        SUM(rating, map_rating(node,inv_tec,commodity,level,rating,year) ) )..
-    SUM( (rating,time)$( map_rating(node,inv_tec,commodity,level,rating,year) AND
-                   reliability_factor(node,inv_tec,year,commodity,level,time,rating) ) ,
-         CAP_FIRM(node,inv_tec,commodity,level,year,rating) )
-    =L= SUM(vintage$( map_tec_lifetime(node,inv_tec,vintage,year) ), CAP(node,inv_tec,vintage,year) )
-;
 
 ***
 * .. _flexibility_constraint:
@@ -966,7 +992,28 @@ FIRM_CAPACITY_PROVISION(node,inv_tec,year,commodity,level)$(
 * This constraint ensures that, in each sub-annual time slice, there is a sufficient share of flexible technologies in
 * the power generation mix. This heading is a placeholder for a new formulation using the extended index set structure.
 ***
+OPERATING_RESERVE_CONSTRAINT(node,commodity,level,year,time)$(
+        sum( (tec, vintage, mode, rating),
+                flexibility_factor(node,tec,vintage,year,mode,commodity,level,time,rating) ) )..
 
+    SUM( (tec, vintage, mode)$( flexibility_factor(node,tec,vintage,year,mode,commodity,level,time,'unrated') ),
+        flexibility_factor(node,tec,vintage,year,mode,commodity,level,time,'unrated')
+        * SUM((location,time2)$(
+              map_tec_act(location,tec,year,mode,time2)
+              AND map_tec_lifetime(location,tec,vintage,year) ),
+            ( output(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+              + input(location,tec,vintage,year,mode,node,commodity,level,time2,time) )
+                * duration_time_rel(time,time2)
+                * ACT(location,tec,vintage,year,mode,time2) ) )
+    + SUM((tec, vintage, mode, rating_unrated)$( flexibility_factor(node,tec,vintage,year,mode,commodity,level,time,rating_unrated)
+            AND map_tec_act(node,tec,year,mode,time)
+            AND map_tec_lifetime(node,tec,vintage,year)),
+        flexibility_factor(node,tec,vintage,year,mode,commodity,level,time,rating_unrated)
+        * ACT_SHARE(node,tec,vintage,year,commodity,level,time,rating_unrated) )
+    =G= 0
+;
+
+ACT.LO(node,tec,vintage,year,mode,time)$sum( ( commodity,level,rating), flexibility_factor(node,tec,vintage,year,mode,commodity,level,time,rating) ) = 0 ;
 
 ***
 * Bounds on capacity and activity
@@ -1834,59 +1881,7 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 * model statements                                                                                                     *
 *----------------------------------------------------------------------------------------------------------------------*
 
-Model MESSAGE_LP /
-    OBJECTIVE
-    COST_ACCOUNTING_NODAL
-    EXTRACTION_EQUIVALENCE
-    EXTRACTION_BOUND_UP
-    RESOURCE_CONSTRAINT
-    RESOURCE_HORIZON
-    COMMODITY_BALANCE
-    STOCKS_BALANCE
-    CAPACITY_CONSTRAINT
-    CAPACITY_MAINTENANCE
-    OPERATION_CONSTRAINT
-    MIN_UTILIZATION_CONSTRAINT
-    ADDON_ACTIVITY_UP
-    ADDON_ACTIVITY_LO
-    RENEWABLES_EQUIVALENCE
-    RENEWABLES_POTENTIAL_CONSTRAINT
-    RENEWABLES_CAPACITY_REQUIREMENT
-    COMMODITY_USE_LEVEL
-    FIRM_CAPACITY_CONSTRAINT
-    FIRM_CAPACITY_PROVISION
-    FIRM_CAPACITY_SHARE
-    NEW_CAPACITY_BOUND_UP
-    NEW_CAPACITY_BOUND_LO
-    TOTAL_CAPACITY_BOUND_UP
-    TOTAL_CAPACITY_BOUND_LO
-    ACTIVITY_BOUND_UP
-    ACTIVITY_BOUND_LO
-    ACTIVITY_BOUND_ALL_MODES_UP
-    ACTIVITY_BOUND_ALL_MODES_LO
-    SHARES_COMMODITY_LEVEL_UP
-    SHARES_COMMODITY_LEVEL_LO
-    SHARES_MODE_UP
-    SHARES_MODE_LO
-    NEW_CAPACITY_CONSTRAINT_UP
-    NEW_CAPACITY_SOFT_CONSTRAINT_UP
-    NEW_CAPACITY_CONSTRAINT_LO
-    NEW_CAPACITY_SOFT_CONSTRAINT_LO
-    ACTIVITY_CONSTRAINT_UP
-    ACTIVITY_SOFT_CONSTRAINT_UP
-    ACTIVITY_CONSTRAINT_LO
-    ACTIVITY_SOFT_CONSTRAINT_LO
-    EMISSION_EQUIVALENCE
-    EMISSION_CONSTRAINT
-    LAND_CONSTRAINT
-    DYNAMIC_LAND_SCEN_CONSTRAINT_UP
-    DYNAMIC_LAND_SCEN_CONSTRAINT_LO
-    DYNAMIC_LAND_TYPE_CONSTRAINT_UP
-    DYNAMIC_LAND_TYPE_CONSTRAINT_LO
-    RELATION_EQUIVALENCE
-    RELATION_CONSTRAINT_UP
-    RELATION_CONSTRAINT_LO
-/ ;
+Model MESSAGE_LP / all / ;
 
 MESSAGE_LP.holdfixed = 1 ;
 MESSAGE_LP.optfile = 1 ;

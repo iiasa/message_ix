@@ -12,6 +12,11 @@ from message_ix.utils import isscalar, logger
 def _init_scenario(s, commit=False):
     """Initialize a MESSAGEix Scenario object with default values"""
     inits = (
+        {
+            'test': 'firm' not in s.set('rating'),
+            'exec': [(s.add_set, {'args': ('rating', ['firm', 'unrated'])}),
+                     ],
+        },
         {  # required for subset all_modes, see model/data_load.gms
             'test': 'all' not in s.set('mode'),
             'exec': [(s.add_set, {'args': ('mode', 'all')})],
