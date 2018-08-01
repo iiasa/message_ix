@@ -176,6 +176,9 @@ def test_rename_technology_no_rm(test_mp):
     assert scen.par('output')['technology'].isin(['canning_plant']).any()
 
     clone = scen.clone('foo', 'bar', keep_sol=False)
+    # also test if already checked out
+    clone.check_out()
+
     clone.rename('technology', {'canning_plant': 'foo_bar'}, keep=True)
     assert clone.par('output')['technology'].isin(['canning_plant']).any()
     assert clone.par('output')['technology'].isin(['foo_bar']).any()
