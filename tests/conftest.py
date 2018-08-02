@@ -16,12 +16,6 @@ def tempdir():
                         next(tempfile._get_candidate_names()))
 
 
-def environ_based_skips():
-    x = os.environ.get('MESSAGEIX_SKIP_TEST_OBJ')
-    x = [] if x is None else x.split(':')
-    return x
-
-
 def create_local_testdb():
     # copy testdb
     dst = tempdir()

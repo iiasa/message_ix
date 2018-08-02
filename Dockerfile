@@ -9,6 +9,3 @@ RUN cd /ixmp && python setup.py install
 COPY . /message_ix
 WORKDIR /
 RUN cd /message_ix && python setup.py install 
-
-# skip specific tests
-ENV MESSAGEIX_SKIP_TEST_OBJ 'test_westeros_baseline'

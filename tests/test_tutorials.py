@@ -7,7 +7,7 @@ import pytest
 
 import numpy as np
 
-from conftest import environ_based_skips, here
+from conftest import here
 
 try:
     import nbformat
@@ -59,13 +59,11 @@ def test_westeros_baseline(capsys):
     nb, errors = _notebook_run(fname, capsys=capsys)
     assert errors == []
 
-    # special case for linux CI, no idea why, but it gives an obj
-    # value of 194351.390625 even off of completely new conda build
-    if 'test_westeros_baseline' in environ_based_skips():
-        return
-
+    # I have no idea why this is different between py2 and 3
     obs = eval(nb.cells[-12]['outputs'][0]['data']['text/plain'])
-    exp = 187445.953125
+    exp_py3 = 187445.953125
+    exp_py2 = 194351.390625
+    exp = exp_py3 if sys.version_info[0] == 3 else exp_py2
     assert np.isclose(obs, exp)
 
 
