@@ -15,8 +15,9 @@ def _init_scenario(s, commit=False):
     inits = (
         {
             'test': 'firm' not in s.set('rating'),
-            'exec': [(s.add_set, {'args': ('rating', ['firm', 'unrated'])}),
-                     ],
+            'exec': [
+                (s.add_set, {'args': ('rating', ['firm', 'unrated'])}),
+            ],
         },
         {  # required for subset all_modes, see model/data_load.gms
             'test': 'all' not in s.set('mode'),
