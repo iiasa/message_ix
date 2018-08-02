@@ -69,6 +69,16 @@ is_fixed_extraction, is_fixed_stock, is_fixed_new_capacity, is_fixed_capacity, i
 fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activity, fixed_land
 ;
 
+
+Set rating_unfirm(rating) ;
+rating_unfirm(rating) = yes ;
+rating_unfirm('firm') = no ;
+
+Set rating_unrated(rating) ;
+rating_unrated(rating) = yes ;
+rating_unrated('unrated') = no ;
+
+
 *----------------------------------------------------------------------------------------------------------------------*
 * Add special sets                                                                                                     *
 *----------------------------------------------------------------------------------------------------------------------*
@@ -198,4 +208,20 @@ loop( (node,commodity,grade,year_all)$( map_resource(node,commodity,grade,year_a
 ) ;
 if (check,
     abort "There is a problem with the parameter 'resources_remaining'!" ;
+) ;
+
+* check that the sum of rating bins (if used for firm-cacpacity or flexibility) is greater than 1
+loop( (node,tec,year_all,commodity,level,time)$(
+    ( sum((vintage,rating_unfirm), reliability_factor(node,tec,year_all,commodity,level,time,rating_unfirm) )
+    OR sum((vintage,mode,rating_unrated)$(
+        flexibility_factor(node,tec,vintage,year_all,mode,commodity,level,time,rating_unrated) ), 1 ) )
+    ),
+    if ( ( sum( rating, rating_bin(node,tec,year_all,commodity,level,time,rating) ) < 1 ),
+        put_utility 'log'/" Error: Insufficient rating bin assignment ' "
+            "for '"node.tl:0"|"tec.tl:0"|"year_all.tl:0 "'" ;
+        check = 1 ;
+    ) ;
+) ;
+if (check,
+    abort "There is a problem with assignment of rating bins!" ;
 ) ;
