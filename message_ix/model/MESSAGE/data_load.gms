@@ -42,6 +42,7 @@ abs_cost_activity_soft_up, abs_cost_activity_soft_lo, level_cost_activity_soft_u
 soft_new_capacity_up, soft_new_capacity_lo, soft_activity_up, soft_activity_lo,
 * share constraints
 share_factor_up,share_factor_lo,map_shares_commodity_level,share_mode_up,share_mode_lo,
+is_input,is_output,share_generic_up
 * addon technologies
 addon_conversion, addon_up, addon_lo
 * parameters for reliability, flexibility and renewable potential constraints
