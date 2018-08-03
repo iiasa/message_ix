@@ -577,6 +577,14 @@ Parameters
 *      - ``shares`` | ``node_loc`` | ``technology`` | ``mode`` | ``year_act`` | ``time``
 *    * - share_mode_lo
 *      - ``shares`` | ``node_loc`` | ``technology`` | ``mode`` | ``year_act`` | ``time``
+*    * - is_input [#tecvintage]_
+*      - ``shares`` | ``type_tec`` | ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` |
+*        ``node_dest`` | ``commodity`` | ``level`` | ``time`` | ``time_dest``
+*    * - is_output [#tecvintage]_
+*      - ``shares`` | ``type_tec`` | ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` |
+*        ``node_dest`` | ``commodity`` | ``level`` | ``time`` | ``time_dest``
+*    * - share_generic_up
+*      - ``shares`` | ``year_act`` | ``time``
 *
 ***
 
@@ -585,6 +593,9 @@ Parameters
     share_factor_lo(shares,node,year_all,time)    lower bound of share constraint
     share_mode_up(shares,node,tec,mode,year_all,time)    upper bound of mode share constraint
     share_mode_lo(shares,node,tec,mode,year_all,time)    lower bound of mode share constraint
+    is_input(shares,type_tec,node,tec,vintage,year_all,mode,node,commodity,level,time,time) whether share is input related
+    is_output(shares,type_tec,node,tec,vintage,year_all,mode,node,commodity,level,time,time) whether share is output related
+    share_generic_up(shares,year_all,time)
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*

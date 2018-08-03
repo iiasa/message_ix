@@ -96,6 +96,48 @@ def _init_scenario(s, commit=False):
                     )}),
             ],
         },
+        {  # required for generic share formulation
+            'test': 'is_input' not in s.par_list(),
+            'exec': [
+                (s.init_par, {
+                    'args': ('is_input',),
+                    'kwargs': dict(
+                        idx_sets=[
+                            'shares', 'type_tec', 'node', 'technology',
+                            'year',
+                            'year', 'mode', 'node', 'commodity', 'level',
+                            'time', 'time'],
+                        idx_names=[
+                            'shares', 'type_tec', 'node_loc', 'technology',
+                            'year_vtg',
+                            'year_act', 'mode', 'node_dest', 'commodity',
+                            'level', 'time', 'time_dest'],
+                    )
+                }),
+                (s.init_par, {
+                    'args': ('is_output',),
+                    'kwargs': dict(
+                        idx_sets=[
+                            'shares', 'type_tec', 'node', 'technology',
+                            'year',
+                            'year', 'mode', 'node', 'commodity', 'level',
+                            'time', 'time'],
+                        idx_names=[
+                            'shares', 'type_tec', 'node_loc', 'technology',
+                            'year_vtg',
+                            'year_act', 'mode', 'node_dest', 'commodity',
+                            'level', 'time', 'time_dest'],
+                    )
+                }),
+                (s.init_par, {
+                    'args': ('share_generic_up',),
+                    'kwargs': dict(
+                        idx_sets=['shares', 'year', 'time'],
+                        idx_names=['shares', 'year_act', 'time'],
+                    )
+                }),
+            ]
+        }
     )
 
     pass_idx = [i for i, init in enumerate(inits) if init['test']]
