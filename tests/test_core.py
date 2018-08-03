@@ -73,10 +73,51 @@ def test_add_spatial_hierarchy(test_mp):
 
 def test_vintage_and_active_years(test_mp):
     scen = Scenario(test_mp, *msg_args, version='new')
-    scen.add_horizon({'year': ['2010', '2020']})
-    exp = (('2010', '2010', '2020'), ('2010', '2020', '2020'))
+    scen.add_horizon({'year': ['2000', '2010', '2020'],
+                      'firstmodelyear': '2010'})
     obs = scen.vintage_and_active_years()
-    assert obs == exp
+    exp = pd.DataFrame({'year_vtg': ('2000', '2000', '2010', '2010', '2020'),
+                        'year_act': ('2010', '2020', '2010', '2020', '2020')})
+    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+
+
+def test_vintage_and_active_years_with_lifetime(test_mp):
+    scen = Scenario(test_mp, *msg_args, version='new')
+    years = ['2000', '2010', '2020']
+    scen.add_horizon({'year': years,
+                      'firstmodelyear': '2010'})
+    scen.add_set('node', 'foo')
+    scen.add_set('technology', 'bar')
+    scen.add_par('duration_period', pd.DataFrame({
+        'unit': '???',
+        'value': 10,
+        'year': years
+    }))
+    scen.add_par('technical_lifetime', pd.DataFrame({
+        'node_loc': 'foo',
+        'technology': 'bar',
+        'unit': '???',
+        'value': 20,
+        'year_vtg': years,
+    }))
+
+    # part is before horizon
+    obs = scen.vintage_and_active_years('foo', 'bar', '2000')
+    exp = pd.DataFrame({'year_vtg': ('2000', '2010'),
+                        'year_act': ('2010', '2010')})
+    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+
+    # fully in horizon
+    obs = scen.vintage_and_active_years('foo', 'bar', '2010')
+    exp = pd.DataFrame({'year_vtg': ('2010', '2010', '2020'),
+                        'year_act': ('2010', '2020', '2020')})
+    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+
+    # part after horizon
+    obs = scen.vintage_and_active_years('foo', 'bar', '2020')
+    exp = pd.DataFrame({'year_vtg': ('2020',),
+                        'year_act': ('2020',)})
+    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
 
 
 def test_cat_all(test_mp):

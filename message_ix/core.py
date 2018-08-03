@@ -115,15 +115,40 @@ class Scenario(ixmp.Scenario):
         first = data['firstmodelyear'] if 'firstmodelyear' in data else horizon[0]
         scenario.add_cat("year", "firstmodelyear", first, is_unique=True)
 
-    def vintage_and_active_years(self):
-        """Return a 2-tuple of valid pairs of vintage years and active years for
-        use with data input.
+    def vintage_and_active_years(self, *args):
+        """Return a 2-tuple of valid pairs of vintage years and active years
+        for use with data input. A valid year-vintage, year-active pair is
+        one in which:
+
+        - year-vintage <= year-active both within the model's 'year' set
+        - year-active >= the model's first year *or* within
+          ixmp.Scenario.years_active() for a given node, technology and vintage
+          (optional)
+
+        Parameters
+        ----------
+        arguments to ixmp.Scenario.years_active(), optional
+
         """
         horizon = self.set('year')
-        combinations = itertools.product(horizon, horizon)
-        year_pairs = [(y_v, y_a) for y_v, y_a in combinations if y_v <= y_a]
+        first = self.cat('year', 'firstmodelyear')[0] or horizon[0]
+
+        if len(args) > 0:
+            # on return values within active years
+            # TODO: casting to int here is probably bad
+            years_active = self.years_active(*args)
+            lb = horizon.astype(int) >= int(min(years_active))
+            ub = horizon.astype(int) <= int(max(years_active))
+            horizon = horizon[lb & ub]
+
+        def valid(y_v, y_a):
+            # TODO: casting to int here is probably bad
+            return y_v <= y_a and int(y_a) >= int(first)
+
+        combos = itertools.product(horizon, horizon)
+        year_pairs = [(y_v, y_a) for y_v, y_a in combos if valid(y_v, y_a)]
         v_years, a_years = zip(*year_pairs)
-        return v_years, a_years
+        return pd.DataFrame({'year_vtg': v_years, 'year_act': a_years})
 
     def solve(self, **kwargs):
         """Solve a MESSAGE Scenario. See ixmp.Scenario.solve() for arguments.
