@@ -230,15 +230,48 @@ class Scenario(ixmp.Scenario):
         first = data['firstmodelyear'] if 'firstmodelyear' in data else horizon[0]
         scenario.add_cat("year", "firstmodelyear", first, is_unique=True)
 
-    def vintage_and_active_years(self):
-        """Return a 2-tuple of valid pairs of vintage years and active years for
-        use with data input.
+    def vintage_and_active_years(self, ya_args=None, in_horizon=True):
+        """Return a 2-tuple of valid pairs of vintage years and active years
+        for use with data input. A valid year-vintage, year-active pair is
+        one in which:
+
+        - year-vintage <= year-active
+        - both within the model's 'year' set
+        - year-active >= the model's first year *or* within
+          ixmp.Scenario.years_active() for a given node, technology and vintage
+          (optional)
+
+        Parameters
+        ----------
+        ya_args : arguments to ixmp.Scenario.years_active(), optional
+        in_horizon : restrict years returned to be within the current model
+                     horizon, optional, default: True
         """
         horizon = self.set('year')
-        combinations = itertools.product(horizon, horizon)
-        year_pairs = [(y_v, y_a) for y_v, y_a in combinations if y_v <= y_a]
+        first = self.cat('year', 'firstmodelyear')[0] or horizon[0]
+
+        if ya_args:
+            if len(ya_args) != 3:
+                raise ValueError('3 arguments are required if using `ya_args`')
+            years_active = self.years_active(*ya_args)
+            combos = itertools.product([ya_args[2]], years_active)
+        else:
+            combos = itertools.product(horizon, horizon)
+
+        # TODO: casting to int here is probably bad, but necessary for now
+        first = int(first)
+        combos = [(int(y1), int(y2)) for y1, y2 in combos]
+
+        def valid(y_v, y_a):
+            # TODO: casting to int here is probably bad
+            ret = y_v <= y_a
+            if in_horizon:
+                ret &= y_a >= first
+            return ret
+
+        year_pairs = [(y_v, y_a) for y_v, y_a in combos if valid(y_v, y_a)]
         v_years, a_years = zip(*year_pairs)
-        return v_years, a_years
+        return pd.DataFrame({'year_vtg': v_years, 'year_act': a_years})
 
     def solve(self, **kwargs):
         """Solve a MESSAGE Scenario. See ixmp.Scenario.solve() for arguments.
