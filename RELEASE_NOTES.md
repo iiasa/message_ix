@@ -2,6 +2,7 @@
 # Next Release
 
 - [#89](https://github.com/iiasa/message_ix/pull/89): Fully implementing system reliability and flexibity considerations (cf. Sullivan)
+- [#84](https://github.com/iiasa/message_ix/pull/84): `message_ix.Scenariovintage_active_years()` now limits active years to those after the first model year or the years of a certain technology vintage
 - [#82](https://github.com/iiasa/message_ix/pull/82): Introducing "add-on technologies" for mitigation options, etc.
 - [#81](https://github.com/iiasa/message_ix/pull/81): Share constraints by mode added.
 - [#80](https://github.com/iiasa/message_ix/pull/80): Share constraints by commodity/level added.
