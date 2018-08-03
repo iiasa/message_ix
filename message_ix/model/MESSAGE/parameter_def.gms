@@ -325,6 +325,39 @@ Parameters
     soft_activity_lo(node,tec,year_all,time)       soft relaxation of dynamic lower bound on activity (growth rate)
 ;
 
+*----------------------------------------------------------------------------------------------------------------------*
+* Add-on technology parameters                                                                                         *
+*----------------------------------------------------------------------------------------------------------------------*
+
+***
+* Parameters for the add-on technologies
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*
+* The implementation of |MESSAGEix| includes the functionality to introduce "add-on technologies" that are specifically
+* linked to parent technologies. This feature can be used to model mitigation options (scrubber, cooling).
+*
+* .. list-table::
+*    :widths: 20 80
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index names
+*    * - addon_conversion
+*      - ``node`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``time`` | ``type_addon``
+*    * - addon_up
+*      - ``node`` | ``tec`` | ``vintage`` | ``year`` | ``mode`` | ``time`` | ``type_addon``
+*    * - addon_lo
+*      - ``node`` | ``tec`` | ``vintage`` | ``year`` | ``mode`` | ``time`` | ``type_addon``
+*
+* The upper bound of
+***
+
+Parameters
+    addon_conversion(node,tec,vintage,year_all,mode,time,type_addon)  conversion factor between add-on and parent technology activity
+    addon_up(node,tec,year_all,mode,time,type_addon)    upper bound on deployment of add-on technologies relative to parent technology
+    addon_lo(node,tec,year_all,mode,time,type_addon)    lower bound on deployment of add-on technologies relative to parent technology
+;
+
 ***
 * Cost parameters for 'soft' relaxations of dynamic constraints
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -518,6 +551,40 @@ Parameters
     initial_land_lo(node,year_all,land_type)                initial bound on land-type use change (downwards)
     dynamic_land_lo(node,land_scenario,year_all,land_type)  absolute bound on land-type use change (upwards)
     growth_land_lo(node,year_all,land_type)                 relative bound on land-type use change (downwards)
+;
+
+*----------------------------------------------------------------------------------------------------------------------*
+* Share constraints                                                                                                    *
+*----------------------------------------------------------------------------------------------------------------------*
+
+***
+* Parameters of the `Share Constraints` section
+* ---------------------------------------------
+*
+* Share constraints define the share of a given commodity to be active on a certain level
+*
+* .. list-table::
+*    :widths: 25 75
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index dimensions
+*    * - share_factor_up
+*      - ``shares`` | ``node_loc`` | ``year_act`` | ``time``
+*    * - share_factor_lo
+*      - ``shares`` | ``node_loc`` | ``year_act`` | ``time``
+*    * - share_mode_up
+*      - ``shares`` | ``node_loc`` | ``technology`` | ``mode`` | ``year_act`` | ``time``
+*    * - share_mode_lo
+*      - ``shares`` | ``node_loc`` | ``technology`` | ``mode`` | ``year_act`` | ``time``
+*
+***
+
+Parameters
+    share_factor_up(shares,node,year_all,time)    upper bound of share constraint
+    share_factor_lo(shares,node,year_all,time)    lower bound of share constraint
+    share_mode_up(shares,node,tec,mode,year_all,time)    upper bound of mode share constraint
+    share_mode_lo(shares,node,tec,mode,year_all,time)    lower bound of mode share constraint
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*

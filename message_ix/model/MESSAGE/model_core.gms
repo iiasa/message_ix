@@ -38,6 +38,7 @@
 * :math:`t \in T`                    technology (a.k.a tec)
 * :math:`h \in H`                    time (subannual time periods)
 * :math:`m \in M`                    mode
+* :math:`q \in Q`                    rating of non-dispatchable technologies relative to aggregate commodity use
 * :math:`e \in E`                    emission, pollutants
 * :math:`s \in S`                    scenarios of land use (for land-use model emulator)
 * :math:`u \in U`                    land-use types
@@ -67,14 +68,15 @@
 * :math:`STOCK_{n,c,l,y} \in \mathbb{R}_+`      Quantity in stock (storage) at start of period :math:`y`
 * :math:`STOCK\_CHG_{n,c,l,y,h} \in \mathbb{R}` Input or output quantity into intertemporal commodity stock (storage)
 * :math:`REN_{n,t,c,g,y,h}`                     Activity of renewable technologies per grade
-* :math:`CAP\_NEW_{n,t,y} \in \mathbb{R}_+`     New installed capacity (yearly average over period duration
+* :math:`CAP\_NEW_{n,t,y} \in \mathbb{R}_+`     Newly installed capacity (yearly average over period duration)
 * :math:`CAP_{n,t,y^V,y} \in \mathbb{R}_+`      Maintained capacity in year :math:`y` of vintage :math:`y^V`
+* :math:`CAP\_FIRM_{n,t,c,l,y,q}`                Capacity counting towards firm (dispatchable)  
 * :math:`ACT_{n,t,y^V,y,m,h} \in \mathbb{R}`    Activity of a technology (by vintage, mode, subannual time)
+* :math:`ACT\_RATING_{n,t,y^V,y,c,l,h,q} \in \mathbb{R}_+` Activity attributed to a particular rating bin [#ACT_RATING]_
 * :math:`CAP\_NEW\_UP_{n,t,y} \in \mathbb{R}_+` Relaxation of upper dynamic constraint on new capacity
 * :math:`CAP\_NEW\_LO_{n,t,y} \in \mathbb{R}_+` Relaxation of lower dynamic constraint on new capacity
-* :math:`CAP\_FIRM_{n,t,c,l,y,q}`                   Dispatchable capacity of renewable technologies per grade
-* :math:`ACT\_UP_{n,t,y,h} \in \mathbb{R}_+`    Relaxation of upper dynamic constraint on activity [#ACT]_
-* :math:`ACT\_LO_{n,t,y,h} \in \mathbb{R}_+`    Relaxation of lower dynamic constraint on activity [#ACT]_
+* :math:`ACT\_UP_{n,t,y,h} \in \mathbb{R}_+`    Relaxation of upper dynamic constraint on activity [#ACT_BD]_
+* :math:`ACT\_LO_{n,t,y,h} \in \mathbb{R}_+`    Relaxation of lower dynamic constraint on activity [#ACT_BD]_
 * :math:`LAND_{n,s,y} \in [0,1]`                Relative share of land-use scenario (for land-use model emulator)
 * :math:`EMISS_{n,e,\widehat{t},y}`             Auxiliary variable for aggregate emissions by technology type
 * :math:`REL_{r,n,y} \in \mathbb{R}`            Auxiliary variable for left-hand side of relations (linear constraints)
@@ -93,7 +95,10 @@
 * The current model framework allows both input or output normalized formulation.
 * This will affect the parametrization, see Section :ref:`efficiency_output` for more details.
 *
-* .. [#ACT] The dynamic activity constraints are implemented as summed over all modes;
+* .. [#ACT_RATING] The auxiliary variable :math:`ACT\_RATING_{n,t,y^V,y,c,l,h,q}` is defined in terms of input or
+*    output of the technology.
+*
+* .. [#ACT_BD] The dynamic activity constraints are implemented as summed over all modes;
 *    therefore, the variables for the relaxation are not indexed over the set ``mode``.
 *
 ***
@@ -112,7 +117,9 @@ Positive Variables
 * investment and capacity variables
     CAP_NEW(node,tec,year_all)       new capacity by year
     CAP(node,tec,vintage,year_all)   total installed capacity by year
-    CAP_FIRM(node,tec,commodity,level,year_all,rating)   renewable firm capacity
+    CAP_FIRM(node,tec,commodity,level,year_all) capacity counting towards system reliability constraints
+* auxiliary variable for distributing total activity of a technology to a number of "rating bins"
+    ACT_RATING(node,tec,vintage,year_all,commodity,level,time,rating)
 * variables for soft relaxation of dynamic activity constraints
     CAP_NEW_UP(node,tec,year_all)    relaxation variable for dynamic constraints on new capacity (upwards)
     CAP_NEW_LO(node,tec,year_all)    relaxation variable for dynamic constraints on new capacity (downwards)
@@ -160,7 +167,6 @@ Variables
     GDP(node,year_all)                         gross domestic product (GDP) in market exchange rates for MACRO reporting
 ;
 
-
 *----------------------------------------------------------------------------------------------------------------------*
 * auxiliary bounds on activity variables (debugging mode, avoid inter-vintage arbitrage, investment technology)                                                        *
 *----------------------------------------------------------------------------------------------------------------------*
@@ -172,7 +178,7 @@ Variables
 %AUX_BOUNDS%    AND map_tec_act(node,tec,year_all2,mode,time) ) = %AUX_BOUND_VALUE% ;
 
 * to avoid "inter-vintage arbitrage" (across different vintages of technologies), all activities that
-* have positive upper bounds are assumed to be non-negative
+* have positive lower bounds are assumed to be non-negative
 ACT.lo(node,tec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,tec,year_all,year_all2)
     AND map_tec_act(node,tec,year_all2,mode,time) AND bound_activity_lo(node,tec,year_all2,mode,time) >= 0 ) = 0 ;
 * previous implementation using upper bounds
@@ -256,10 +262,14 @@ Equations
     RENEWABLES_POTENTIAL_CONSTRAINT constraint on renewable resource potential
     RENEWABLES_CAPACITY_REQUIREMENT lower bound on required overcapacity when using lower grade potentials
     RENEWABLES_EQUIVALENCE          equation to define the renewables extraction
-    COMMODITY_USE_LEVEL             defines the COMMODITY_USE as the amount of a commodity at a level that was consumed
-    FIRM_CAPACITY_CONSTRAINT        constraint to maintaint sufficient firm (dispatchable) power generation capacity
-    FIRM_CAPACITY_PROVISION         lower bound on CAP as the minimum installed capacity of each technology
-    FIRM_CAPACITY_SHARE             upper bound of CAP_FIRM per rating to the size of the penetration bin of this rating
+    ADDON_ACTIVITY_UP               addon-technology activity upper constraint
+    ADDON_ACTIVITY_LO               addon technology activity lower constraint
+    COMMODITY_USE_LEVEL             aggregate use of commodity by level as defined by total input into technologies
+    ACTIVITY_BY_RATING              constraint on auxiliary rating-specific activity variable by rating bin
+    ACTIVITY_RATING_TOTAL           equivalence of auxiliary rating-specific activity variables to actual activity
+    FIRM_CAPACITY_PROVISION         contribution of dispatchable technologies to auxilary firm-capacity variable
+    SYSTEM_RELIABILITY_CONSTRAINT   constraint on total system reliability (firm capacity)
+    SYSTEM_FLEXIBILITY_CONSTRAINT   constraint on total system flexibility
     NEW_CAPACITY_BOUND_UP           upper bound on technology capacity investment
     NEW_CAPACITY_BOUND_LO           lower bound on technology capacity investment
     TOTAL_CAPACITY_BOUND_UP         upper bound on total installed capacity
@@ -270,6 +280,12 @@ Equations
     NEW_CAPACITY_SOFT_CONSTRAINT_LO bound on soft relaxation of dynamic new capacity constraints (downwards)
     ACTIVITY_BOUND_UP               upper bound on activity summed over all vintages
     ACTIVITY_BOUND_LO               lower bound on activity summed over all vintages
+    ACTIVITY_BOUND_ALL_MODES_UP     upper bound on activity summed over all vintages and modes
+    ACTIVITY_BOUND_ALL_MODES_LO     lower bound on activity summed over all vintages and modes
+    SHARES_COMMODITY_LEVEL_UP       upper bounds on share constraints for commodities and levels
+    SHARES_COMMODITY_LEVEL_LO       lower bounds on share constraints for commodities and levels
+    SHARES_MODE_UP                  upper bounds on share constraints for modes of a given technology
+    SHARES_MODE_LO                  lower bounds on share constraints for modes of a given technology
     ACTIVITY_CONSTRAINT_UP          dynamic constraint on the market penetration of a technology activity (upper bound)
     ACTIVITY_SOFT_CONSTRAINT_UP     bound on relaxation of the dynamic constraint on market penetration (upper bound)
     ACTIVITY_CONSTRAINT_LO          dynamic constraint on the market penetration of a technology activity (lower bound)
@@ -307,10 +323,8 @@ Equations
 *    OBJ = \sum_{n,y \in Y^{M}} discountfactor_{y} \cdot COST\_NODAL_{n,y}
 *
 ***
-
 OBJECTIVE..
-    OBJ =E= SUM((node,year), discountfactor(year) * COST_NODAL(node, year))
-;
+    OBJ =E= SUM( (node,year), discountfactor(year) * COST_NODAL(node,year) ) ;
 
 ***
 * Regional system cost accounting function
@@ -792,106 +806,299 @@ RENEWABLES_CAPACITY_REQUIREMENT(node,inv_tec,commodity,year)$(
                  / renewable_capacity_factor(node,commodity,grade,level_renewable,year))
 ;
 
+
 ***
-* Constraints representing the firm capacity requirement
-* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-* The following constraint ensures that there is sufficient firm (dispatchable) capacity in each period.
-* The formulation is based on Sullivan et al., 2013 :cite:`sullivan_VRE_2013`.
+* Constraints for addon technologies
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
-* The firm capacity a technology provides depends on their reliability factor per rating.
-* The rating are defined depending on the share the single technology provides to the
-* system. The reliablitiy factor of conventional powerplants is equal to 1. Therefore
-* they provide their nameplate capacity as firm capacity.
-* The reliability factor of wind and solar dependens on the share they have in the
-* energy system. Therefore their reliability factor depend on the rating.
+* Equation ADDON_ACTIVITY_UP
+* """"""""""""""""""""""""""
+* This constraint provides an upper bound on the activity of an addon technology that can only be operated
+* jointly with a parent technology (e.g., abatement option, SO2 scrubber, power plant cooling technology).
+*
+*   .. math::
+*      \sum_{\substack{t' \sim t^A, y^V \leq y}} addon\_conversion_{n,t',y^V,y,m,h} \cdot ACT_{n,t',y^V,y,m,h}
+*          \leq
+*      addon\_up_{n,t^a,y,m,h,t^A} \cdot \sum_{\substack{t, y^V \leq y}} ACT_{n,t,y^V,y,m,h}
+*
+***
+
+$ONTEXT
+Positive variable
+    ACT_ADDON(node,addon,tec,year_all,mode,time) ;
+
+Equation
+    ADDON_EQUIVALENCE
+    ADDON_PARENT;
+Alias (vintage, vintage_addon);
+
+ADDON_EQUIVALENCE(node,addon,vintage,year,mode,time)$(
+        sum(type_addon$(
+            cat_addon(type_addon, addon, 1 ) ) AND
+            map_tec_act(node,addon,year,mode,time) )..
+    sum(vintage$( map_tec_lifetime(node,addon,vintage,year) ),
+        ACT(node,addon,vintage,year,mode,time) )
+    =E= sum((type_addon,tec)$(
+            map_tec_addon(tec,type_addon) AND cat_addon(type_addon, addon) ),
+        ACT_ADDON(node,addon,tec,year,mode,time) ) ;
+
+ADDON_PARENT(node,addon,tec,year,mode,time)$(
+        sum(type_addon$(
+            cat_addon(type_addon, addon, 1 ) ) AND
+            map_tec_act(node,addon,year,mode,time) )..
+    ACT_ADDON(node,addon,tec,year,mode,time)
+    =L= sum(type_addon,vintage$(
+            map_tec_addon(tec,type_addon) AND cat_addon(type_addon, addon) AND
+            map_tec_act(node,tec,year,mode,time) AND
+            map_tec_lifetime(node,tec,vintage,year) ),
+        addon_conversion(node,tec,type_addon,vintage,year,mode,time)
+        ACT(node,tec,vintage,year,mode,time) ;
+
+$OFFTEXT
+
+* addon technology activity constrained to level of parent technology
+ADDON_ACTIVITY_UP(node,type_addon,year,mode,time)..
+* activity of addon technology
+    sum( (addon,vintage)$(
+            cat_addon(type_addon,addon) AND
+            map_tec_act(node,addon,year,mode,time) AND
+            map_tec_lifetime(node,addon,vintage,year) ),
+        ACT(node,addon,vintage,year,mode,time) )
+    =L=
+* activity of corresponding parent-technology times upper bound of share
+      sum((tec,vintage)$(
+          map_tec_addon(tec,type_addon) AND
+          map_tec_act(node,tec,year,mode,time) AND
+          map_tec_lifetime(node,tec,vintage,year)
+      ),
+          addon_up(node,tec,year,mode,time,type_addon)
+          * addon_conversion(node,tec,vintage,year,mode,time,type_addon)
+          * ACT(node,tec,vintage,year,mode,time) )
+;
+
+***
+* Equation ADDON_ACTIVITY_LO
+* """"""""""""""""""""""""""
+* This constraint provides a lower bound on the activity of an addon technology that has to be operated
+* jointly with a parent technology (e.g., power plant cooling technology). The parameter `addon_lo` allows to define
+* a minimum level of operation of addon technologies relative to the activity of the parent technology.
+* If `addon_minimum = 1`, this means that it is mandatory to operate the addon technology at the same level as the
+* parent technology (i.e., full mitigate).
+*
+*   .. math::
+*      \sum_{\substack{t' \sim t^A, y^V \leq y}} addon\_conversion_{n,t',y^V,y,m,h} \cdot ACT_{n,t',y^V,y,m,h}
+*          \geq
+*      addon\_lo_{n,t^a,y,m,h,t^A} \cdot \sum_{\substack{t, y^V \leq y}} ACT_{n,t,y^V,y,m,h}
+*
+***
+
+* addon technology activity constrained to level of parent technology
+ADDON_ACTIVITY_LO(node,type_addon,year,mode,time)..
+* activity of addon technology
+    sum( (addon,vintage)$(
+            cat_addon(type_addon,addon) AND
+            map_tec_act(node,addon,year,mode,time) AND
+            map_tec_lifetime(node,addon,vintage,year) ),
+        ACT(node,addon,vintage,year,mode,time) )
+    =G=
+* activity of corresponding parent-technology times lower bound of share
+      sum((tec,vintage)$(
+          map_tec_addon(tec,type_addon) AND
+          map_tec_act(node,tec,year,mode,time) AND
+          map_tec_lifetime(node,tec,vintage,year)
+      ),
+          addon_lo(node,tec,year,mode,time,type_addon)
+          * addon_conversion(node,tec,vintage,year,mode,time,type_addon)
+          * ACT(node,tec,vintage,year,mode,time) ) ;
+
+*----------------------------------------------------------------------------------------------------------------------*
+***
+* System reliability and flexibility requirements
+* -----------------------------------------------
+* This section followi allows to include system-wide reliability and flexility considerations.
+* The current formulation is based on Sullivan et al., 2013 :cite:`sullivan_VRE_2013`.
+*
+* Aggregate use of a commodity
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* The reliability and flexibility constraints require the total use of each commodity per level.
 *
 * Equation COMMODITY_USE_LEVEL
 * """"""""""""""""""""""""""""
-* This constraint defines the COMMODITY_USE_LEVEL as summed consumption of a
-* commodity at a certain level during one year.
+* This constraint defines the auxiliary variable :math:`COMMODITY\_USE_{n,c,l,y}`, which is used to define
+* the rating bins and the peak-load that needs to be offset with firm (guaranteed) capacity. 
 *
 *   .. math::
-*      COMMODITY\_USE_{n,c,l,y} = \sum_{n,t,y^V,m,h} input_{n,t,y^V,y,m,n,c,l,h,h} \cdot \\
-*                duration\_time\_rel_{h,h} \cdot ACT_{n,t,y^V,y,m,h}
+*      COMMODITY\_USE_{n,c,l,y}
+*      = \sum_{n,t,y^V,m,h} input_{n,t,y^V,y,m,n,c,l,h,h} \\
+*          \cdot duration\_time\_rel_{h,h} \cdot ACT_{n,t,y^V,y,m,h}
 *
-* This constraint is only active if :math:`peak\_load\_factor_{n,c,l,y,h}` is defined.
-* The auxiliary variable :math:`COMMODITY\_USE_{n,c,l,y}` is only required
-* for the equations :math:`FIRM\_CAPACITY\_CONSTRAINT` and :math:`FIRM\_CAPACITY\_SHARE`.
+* This constraint and the auxiliary variable is only active if :math:`peak\_load\_factor_{n,c,l,y,h}` or
+* :math:`flexibility\_factor_{n,t,y^V,y,m,c,l,h,r}` is defined.
 ***
-
-COMMODITY_USE_LEVEL(node,commodity,level,year,time)$( peak_load_factor(node,commodity,level,year,time) )..
+COMMODITY_USE_LEVEL(node,commodity,level,year,time)$(
+         peak_load_factor(node,commodity,level,year,time) OR
+         SUM( (tec,vintage,mode,rating), flexibility_factor(node,tec,vintage,year,mode,commodity,level,time,rating) ) )..
     COMMODITY_USE(node,commodity,level,year)
-    =E= SUM( (location,tec,vintage,mode,time2)$( map_tec_act(location,tec,year,mode,time2)
-                                                    AND map_tec_lifetime(location,tec,vintage,year) ),
-                input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
-                * duration_time_rel(time,time2)
-                * ACT(location,tec,vintage,year,mode,time2) )
-;
+    =E=
+    SUM( (location,tec,vintage,mode,time2)$( map_tec_act(location,tec,year,mode,time2)
+                                             AND map_tec_lifetime(location,tec,vintage,year) ),
+        input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+        * duration_time_rel(time,time2)
+        * ACT(location,tec,vintage,year,mode,time2) ) ;
 
 ***
-* Equation FIRM_CAPACITY_CONSTRAINT
-* """""""""""""""""""""""""""""""""
-* This constraint ensures that there is sufficient firm (dispatchable) capacity in each period.
-* The formulation is based on Sullivan et al., 2013 :cite:`sullivan_VRE_2013`.
+* .. _rating_bin:
 *
-*   .. math::
-*      \sum_{t, q \substack{t \in T^{INV} \\ y^V \leq y} } reliability\_factor_{n,t,y,c,l,h,q} \cdot
-*                CAP\_FIRM_{n,t,c,l,y,q} \geq \\
-*         peak\_load\_factor_{n,c,l,y,h} \cdot COMMODITY\_USE_{n,c,l,y}
+* Auxilary variables for technology activity by "rating bins"
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* The capacity and activity of certain (usually non-dispatchable) technologies only contributes partially
+* to the system reliability and flexibility requirements.
 *
-* This constraint is only active if :math:`peak\_load\_factor_{n,c,l,y,h}` is defined.
-***
-FIRM_CAPACITY_CONSTRAINT(node,commodity,level,year,time)$( peak_load_factor(node,commodity,level,year,time) )..
-    SUM((inv_tec,rating), CAP_FIRM(node,inv_tec,commodity,level,year,rating)
-                        * reliability_factor(node,inv_tec,year,commodity,level,time,rating) )
-    =G= peak_load_factor(node,commodity,level,year,time) * COMMODITY_USE(node,commodity,level,year)
-;
-
-***
-* Equation FIRM_CAPACITY_SHARE
+* Equation ACTIVITY_RATING_BIN
 * """"""""""""""""""""""""""""
-* Limits the firm capacity per rating to the size of the penetration bin of this rating.
+* The auxiliary variable for rating-specific activity of each technology cannot exceed
+* share of the rating bin in relation to the total commodity use.
+* 
+* .. math::
+*    ACT\_RATING_{n,t,y^V,y,c,l,h,q}
+*    \leq rating\_bin_{n,t,y,c,l,h,q} \cdot COMMODITY\_USE_{n,c,l,y}
 *
-*   .. math::
-*      CAP\_FIRM_{n,t,c,l,y,q} \leq rating\_bin_{n,t,y,c,l,h,q} \cdot COMMODITY\_USE_{n,c,l,y}
-*
-* This constraint is only active if :math:`reliability\_bin_{n,t,y,c,l,t,q}` is defined.
 ***
-FIRM_CAPACITY_SHARE(node,inv_tec,commodity,level,year,rating,time)$(
-        rating_bin(node,inv_tec,year,commodity,level,time,rating) ) ..
-    CAP_FIRM(node,inv_tec,commodity,level,year,rating)
-    =L= rating_bin(node,inv_tec,year,commodity,level,time,rating) * COMMODITY_USE(node,commodity,level,year)
+ACTIVITY_BY_RATING(node,tec,year,commodity,level,time,rating)$(
+         rating_bin(node,tec,year,commodity,level,time,rating) )..
+   sum(vintage$( sum(mode,map_tec_act(node,tec,year,mode,time) ) AND map_tec_lifetime(node,tec,vintage,year) ),
+            ACT_RATING(node,tec,vintage,year,commodity,level,time,rating) )
+    =L= rating_bin(node,tec,year,commodity,level,time,rating) * COMMODITY_USE(node,commodity,level,year)
 ;
+
+***
+* Equation ACTIVITY_SHARE_TOTAL
+* """""""""""""""""""""""""""""
+* The sum of the auxiliary rating-specific activity variables need to equal the total input and/or output
+* of the technology.
+*
+* .. math::
+*    \sum_q ACT\_RATING_{n,t,y^V,y,c,l,h,q}
+*    = \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}}
+*         ( input_{n^L,t,y^V,y,m,n,c,l,h^A,h} + output_{n^L,t,y^V,y,m,n,c,l,h^A,h} )
+*         \cdot duration\_time\_rel_{h,h^A} \cdot & ACT_{n^L,t,y^V,y,m,h^A} \\
+*
+***
+ACTIVITY_RATING_TOTAL(node,tec,vintage,year,commodity,level,time)$(
+        sum(rating$( rating_bin(node,tec,year,commodity,level,time,rating) ), 1 )
+        AND sum(mode, map_tec_act(node,tec,year,mode,time))
+        AND map_tec_lifetime(node,tec,vintage,year) )..
+    sum(rating$( rating_bin(node,tec,year,commodity,level,time,rating) ),
+        ACT_RATING(node,tec,vintage,year,commodity,level,time,rating) )
+    =E=
+        SUM((location,mode,time2)$(
+              map_tec_act(location,tec,year,mode,time2)
+              AND map_tec_lifetime(location,tec,vintage,year) ),
+            ( output(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+              + input(location,tec,vintage,year,mode,node,commodity,level,time2,time) )
+                * duration_time_rel(time,time2)
+                * ACT(location,tec,vintage,year,mode,time2) ) ;
 
 ***
 * .. _reliability_constraint:
 *
+* Reliability of installed capacity
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* The "firm capacity" that a technology can contribute to system reliability depends on their dispatch characteristics.
+* For dispatchable technologies, the total installed capacity counts toward the firm capacity.
+* This is active if the parameter is defined over :math:`reliability\_factor_{n,t,y,c,l,h,'firm'}.
+* For non-dispatchable technologies, or those that do not have explicit investment,
+* the contribution to system reliability is calculated
+* by using the auxiliary variable :math:`ACT\_RATING_{n,t,y^V,y,c,l,h,q}` as a proxy.
+*
 * Equation FIRM_CAPACITY_PROVISION
 * """"""""""""""""""""""""""""""""
-* Limits the firm capacity of the renewables technologies to the total installed capacity of each technology.
+* Technologies where the reliability factor is defined with the rating `firm`
+* have an auxiliary variable :math:`CAP\_FIRM_{n,t,c,l,y,q}`, defined in terms of output.
 *
 *   .. math::
-*      \sum_{r,h} CAP\_FIRM_{n,t,c,l,y,q} \leq \sum_{y^V \leq y} CAP_{n,t,y^Y,y} \quad \forall t \in T^{INV}
+*      \sum_q CAP\_FIRM_{n,t,c,l,y,q}
+*      \leq \sum_{y^V \leq y} output_{n^L,t,y^V,y,m,n,c,l,h^A,h}
+*          \cdot duration\_time_h \cdot capacity\_factor_{n,t,y^V,y,h} \cdot CAP_{n,t,y^Y,y}
+*          \quad \forall t \in T^{INV}
 *
-* This constraint is only active if :math:`reliability\_factor_{n,t,y,c,l,h,q}` is defined.
 ***
-FIRM_CAPACITY_PROVISION(node,inv_tec,year,commodity,level)$(
-        SUM(rating, map_rating(node,inv_tec,commodity,level,rating,year) ) )..
-    SUM( (rating,time)$( map_rating(node,inv_tec,commodity,level,rating,year) AND
-                   reliability_factor(node,inv_tec,year,commodity,level,time,rating) ) ,
-         CAP_FIRM(node,inv_tec,commodity,level,year,rating) )
-    =L= SUM(vintage$( map_tec_lifetime(node,inv_tec,vintage,year) ), CAP(node,inv_tec,vintage,year) )
-;
+FIRM_CAPACITY_PROVISION(node,inv_tec,year,commodity,level,time)$(
+        reliability_factor(node,inv_tec,year,commodity,level,time,'firm') )..
+    CAP_FIRM(node,inv_tec,commodity,level,year) =E=
+    SUM( (location,vintage,mode,time2)$(
+           map_tec_act(location,inv_tec,year,mode,time2)
+           AND map_tec_lifetime(location,inv_tec,vintage,year) ),
+        output(location,inv_tec,vintage,year,mode,node,commodity,level,time2,time)
+        * duration_time(time) 
+        * capacity_factor(node,inv_tec,vintage,year,time)
+        * CAP(node,inv_tec,vintage,year) ) ;
+
+***
+* Equation SYSTEM_RELIABILITY_CONSTRAINT
+* """"""""""""""""""""""""""""""""""""""
+* This constraint ensures that there is sufficient firm (dispatchable) capacity in each period.
+* The formulation is based on Sullivan et al., 2013 :cite:`sullivan_VRE_2013`.
+*
+*   .. math::
+*      \sum_{t, q \substack{t \in T^{INV} \\ y^V \leq y} }
+*          reliability\_factor_{n,t,y,c,l,h,'firm'}
+*          \cdot CAP\_FIRM_{n,t,c,l,y} \\
+*      + \sum_{t,q,y^V \leq y}
+*          reliability\_factor_{n,t,y,c,l,h,q}
+*         * ACT\_SHARE_{n,t,y^V,y,c,l,h,q} \\
+*         \geq peak\_load\_factor_{n,c,l,y,h} \cdot COMMODITY\_USE_{n,c,l,y}
+*
+* This constraint is only active if :math:`peak\_load\_factor_{n,c,l,y,h}` is defined.
+***
+SYSTEM_RELIABILITY_CONSTRAINT(node,commodity,level,year,time)$( peak_load_factor(node,commodity,level,year,time) )..
+    SUM(inv_tec$( reliability_factor(node,inv_tec,year,commodity,level,time,'firm') ),
+        reliability_factor(node,inv_tec,year,commodity,level,time,'firm')
+        * CAP_FIRM(node,inv_tec,commodity,level,year) )
+    + SUM((tec, mode, vintage, rating_unfirm)$(
+        reliability_factor(node,tec,year,commodity,level,time,rating_unfirm)
+            AND map_tec_act(node,tec,year,mode,time)
+            AND map_tec_lifetime(node,tec,vintage,year) ),
+        reliability_factor(node,tec,year,commodity,level,time,rating_unfirm)
+        * ACT_RATING(node,tec,vintage,year,commodity,level,time,rating_unfirm) )
+    =G= peak_load_factor(node,commodity,level,year,time) * COMMODITY_USE(node,commodity,level,year) ;
+
 
 ***
 * .. _flexibility_constraint:
 *
-* Equation OPERATING_RESERVE_CONSTRAINT
+* Equation SYSTEM_FLEXIBILITY_CONSTRAINT
 * """""""""""""""""""""""""""""""""""""
-* This constraint ensures that, in each sub-annual time slice, there is a sufficient share of flexible technologies in
-* the power generation mix. This heading is a placeholder for a new formulation using the extended index set structure.
+* This constraint ensures that, in each sub-annual time slice, there is a sufficient
+* contribution from flexible technologies.
+*
+*   .. math::
+*\sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}}
+*         ( input_{n^L,t,y^V,y,m,n,c,l,h^A,h} + output_{n^L,t,y^V,y,m,n,c,l,h^A,h} )
+*         \cdot duration\_time\_rel_{h,h^A} \cdot & ACT_{n^L,t,y^V,y,m,h^A} \\
 ***
+SYSTEM_FLEXIBILITY_CONSTRAINT(node,commodity,level,year,time)$(
+        sum( (tec, vintage, mode, rating),
+                flexibility_factor(node,tec,vintage,year,mode,commodity,level,time,rating) ) )..
 
+    SUM( (tec, vintage, mode)$( flexibility_factor(node,tec,vintage,year,mode,commodity,level,time,'unrated') ),
+        flexibility_factor(node,tec,vintage,year,mode,commodity,level,time,'unrated')
+        * SUM((location,time2)$(
+              map_tec_act(location,tec,year,mode,time2)
+              AND map_tec_lifetime(location,tec,vintage,year) ),
+            ( output(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+              + input(location,tec,vintage,year,mode,node,commodity,level,time2,time) )
+                * duration_time_rel(time,time2)
+                * ACT(location,tec,vintage,year,mode,time2) ) )
+    + SUM((tec, vintage, mode, rating_unrated)$( flexibility_factor(node,tec,vintage,year,mode,commodity,level,time,rating_unrated)
+            AND map_tec_act(node,tec,year,mode,time)
+            AND map_tec_lifetime(node,tec,vintage,year)),
+        flexibility_factor(node,tec,vintage,year,mode,commodity,level,time,rating_unrated)
+        * ACT_RATING(node,tec,vintage,year,commodity,level,time,rating_unrated) )
+    =G= 0
+;
+
+ACT.LO(node,tec,vintage,year,mode,time)$sum( ( commodity,level,rating), flexibility_factor(node,tec,vintage,year,mode,commodity,level,time,rating) ) = 0 ;
 
 ***
 * Bounds on capacity and activity
@@ -960,23 +1167,49 @@ TOTAL_CAPACITY_BOUND_LO(node,inv_tec,year)$( is_bound_total_capacity_lo(node,inv
 ***
 * Equation ACTIVITY_BOUND_UP
 * """"""""""""""""""""""""""
-* This constraint provides lower bounds of a technology activity by mode, summed over all vintages.
+* This constraint provides upper bounds of a technology activity, summed over
+* all vintages.
 *
 *   .. math::
 *      \sum_{y^V \leq y} ACT_{n,t,y^V,y,m,h} \leq bound\_activity\_up_{n,t,m,y,h}
 *
 ***
-ACTIVITY_BOUND_UP(node,tec,year,mode,time)$( map_tec_act(node,tec,year,mode,time)
-        AND is_bound_activity_up(node,tec,year,mode,time) )..
-    SUM(vintage$( map_tec_lifetime(node,tec,vintage,year) ), ACT(node,tec,vintage,year,mode,time) ) =L=
+ACTIVITY_BOUND_UP(node,tec,year,mode,time)$(
+    is_bound_activity_up(node,tec,year,mode,time) AND map_tec_act(node,tec,year,mode,time)
+)..
+    SUM(
+        vintage$( map_tec_lifetime(node,tec,vintage,year) ),
+        ACT(node,tec,vintage,year,mode,time)
+    )
+    =L=
     bound_activity_up(node,tec,year,mode,time)
 %SLACK_ACT_BOUND_UP% + SLACK_ACT_BOUND_UP(node,tec,year,mode,time)
 ;
 
 ***
+* Equation ACTIVITY_BOUND_ALL_MODES_UP
+* """"""""""""""""""""""""""""""""""""
+* This constraint provides upper bounds of a technology activity across all modes and vintages.
+*
+*   .. math::
+*      \sum_{y^V \leq y, m} ACT_{n,t,y^V,y,m,h} \leq bound\_activity\_up_{n,t,y,'all',h}
+*
+***
+ACTIVITY_BOUND_ALL_MODES_UP(node,tec,year,time)$( is_bound_activity_up(node,tec,year,'all',time) )..
+    SUM(
+        (vintage,mode)$( map_tec_lifetime(node,tec,vintage,year) AND map_tec_mode(node,tec,year,mode) ),
+        ACT(node,tec,vintage,year,mode,time)
+    )
+    =L=
+    bound_activity_up(node,tec,year,'all',time)
+%SLACK_ACT_BOUND_UP% + SLACK_ACT_BOUND_UP(node,tec,year,'all',time)
+;
+
+***
 * Equation ACTIVITY_BOUND_LO
 * """"""""""""""""""""""""""
-* This constraint provides lower bounds of a technology activity by mode summed over all vintages.
+* This constraint provides lower bounds of a technology activity, summed over
+* all vintages.
 *
 *   .. math::
 *      \sum_{y^V \leq y} ACT_{n,t,y^V,y,m,h} \geq bound\_activity\_lo_{n,t,y,m,h}
@@ -985,9 +1218,198 @@ ACTIVITY_BOUND_UP(node,tec,year,mode,time)$( map_tec_act(node,tec,year,mode,time
 * unless explicitly stated otherwise.
 ***
 ACTIVITY_BOUND_LO(node,tec,year,mode,time)$( map_tec_act(node,tec,year,mode,time) )..
-    SUM(vintage$( map_tec_lifetime(node,tec,vintage,year) ), ACT(node,tec,vintage,year,mode,time) ) =G=
+    SUM(
+        vintage$( map_tec_lifetime(node,tec,vintage,year) ),
+        ACT(node,tec,vintage,year,mode,time)
+    )
+    =G=
     bound_activity_lo(node,tec,year,mode,time)
 %SLACK_ACT_BOUND_LO% - SLACK_ACT_BOUND_LO(node,tec,year,mode,time)
+;
+
+***
+* Equation ACTIVITY_BOUND_ALL_MODES_LO
+* """"""""""""""""""""""""""""""""""""
+* This constraint provides lower bounds of a technology activity across all modes and vintages.
+*
+*   .. math::
+*      \sum_{y^V \leq y, m} ACT_{n,t,y^V,y,m,h} \geq bound\_activity\_lo_{n,t,y,'all',h}
+*
+* We assume that :math:`bound\_activity\_lo_{n,t,y,'all',h} = 0`
+* unless explicitly stated otherwise.
+***
+ACTIVITY_BOUND_ALL_MODES_LO(node,tec,year,time)$( bound_activity_lo(node,tec,year,'all',time) )..
+    SUM(
+        (vintage,mode)$( map_tec_lifetime(node,tec,vintage,year) AND map_tec_mode(node,tec,year,mode) ),
+        ACT(node,tec,vintage,year,mode,time)
+    )
+    =G=
+    bound_activity_lo(node,tec,year,'all',time)
+%SLACK_ACT_BOUND_LO% - SLACK_ACT_BOUND_LO(node,tec,year,'all',time)
+;
+
+
+***
+* Equation SHARES_MODE_UP
+* """""""""""""""""""""""
+* This constraint provides upper bounds of the share of the activity of one mode
+* of a technology. For example, it could limit the share
+* of heat that can be produced in a combined heat and electricity power plant.
+*
+*   .. math::
+*     ACT_{n^L,t,y^V,y,m,h^A}
+*     \leq share\_mode\_up_{s,n,y,h} \cdot
+*     \sum_{m\prime} ACT_{n^L,t,y^V,y,m\prime,h^A}
+*
+***
+SHARES_MODE_UP(shares,node,tec,mode,year,time)$(  
+    map_tec_act(node,tec,year,mode,time) AND
+    share_mode_up(shares,node,tec,mode,year,time)
+)..
+* single mode activity generated
+    SUM(
+        vintage$( map_tec_lifetime(node,tec,vintage,year) ),
+        ACT(node,tec,vintage,year,mode,time)
+    )
+    =L=
+    share_mode_up(shares,node,tec,mode,year,time) *
+* all mode activity generated
+    SUM(
+        (vintage,mode2)$( map_tec_lifetime(node,tec,vintage,year) AND map_tec_mode(node,tec,year,mode2) ),
+        ACT(node,tec,vintage,year,mode2,time)
+    )
+;
+
+
+***
+* Equation SHARES_MODE_LO
+* """""""""""""""""""""""
+* This constraint provides lower bounds of the share of the activity of one mode
+* of a technology. For example, it could guarantee the share
+* of heat that can be produced in a combined heat and electricity power plant.
+*
+*   .. math::
+*     ACT_{n^L,t,y^V,y,m,h^A}
+*     \geq share\_mode\_lo_{s,n,y,h} \cdot
+*     \sum_{m\prime} ACT_{n^L,t,y^V,y,m\prime,h^A}
+*
+***
+SHARES_MODE_LO(shares,node,tec,mode,year,time)$(  
+    map_tec_act(node,tec,year,mode,time) AND
+    share_mode_lo(shares,node,tec,mode,year,time)
+)..
+* single mode activity generated
+    SUM(
+        vintage$( map_tec_lifetime(node,tec,vintage,year) ),
+        ACT(node,tec,vintage,year,mode,time)
+    )
+    =G=
+    share_mode_lo(shares,node,tec,mode,year,time) *
+* all mode activity generated
+    SUM(
+        (vintage,mode2)$( map_tec_lifetime(node,tec,vintage,year) AND map_tec_mode(node,tec,year,mode2) ),
+        ACT(node,tec,vintage,year,mode2,time)
+    )
+;
+
+***
+* Equation SHARES_COMMODITY_LEVEL_UP
+* """"""""""""""""""""""""""""""""""
+* This constraint provides upper bounds of the share of the amount of a
+* commodity provided at a certain level. For example, it could limit the share
+* of electricity generated by fossil fuel technologies on the secondary energy
+* level.
+*
+*   .. math::
+*     \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} output_{n^L,t,y^V,y,m,n,c,l,h^A,h} + input_{n^L,t,y^V,y,m,n,c,l,h^A,h}
+*         \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,y^V,y,m,h^A} \\
+*     \leq share\_factor\_up_{s,n,y,h} \cdot
+*     \sum_{\substack{n^L,t\prime,m,h^A \\ y^V \leq y}} output_{n^L,t\prime,y^V,y,m,n,c,l,h^A,h} + input_{n^L,t\prime,y^V,y,m,n,c,l,h^A,h}
+*         \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t\prime,y^V,y,m,h^A}
+*
+***
+SHARES_COMMODITY_LEVEL_UP(shares,node,commodity,level,year,time,type_tec_share,type_tec_total)$(
+    map_shares_commodity_level(shares,commodity,level,type_tec_share,type_tec_total) AND
+    share_factor_up(shares,node,year,time)
+)..
+    SUM( (location,tec,vintage,mode,time2)$(
+        cat_tec(type_tec_share,tec) AND
+        map_tec_act(location,tec,year,mode,time2) AND
+        map_tec_lifetime(location,tec,vintage,year)
+    ),
+* commodity activity generated by type_tec_share technologies
+        (
+	    output(location,tec,vintage,year,mode,node,commodity,level,time2,time) +
+	    input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+	) *
+        duration_time_rel(time,time2) *
+        ACT(location,tec,vintage,year,mode,time2)
+        )
+    =L=
+    share_factor_up(shares,node,year,time) *
+* commodity activity generated by type_tec_total technologies
+    SUM( (location,tec,vintage,mode,time2)$(
+        cat_tec(type_tec_total,tec) AND
+        map_tec_act(location,tec,year,mode,time2) AND
+        map_tec_lifetime(location,tec,vintage,year)
+    ),
+        (
+	    output(location,tec,vintage,year,mode,node,commodity,level,time2,time) +
+	    input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+	) *
+        duration_time_rel(time,time2) *
+        ACT(location,tec,vintage,year,mode,time2)
+    )
+;
+
+***
+* Equation SHARES_COMMODITY_LEVEL_LO
+* """"""""""""""""""""""""""""""""""
+* This constraint provides lower bounds of the share of the amount of a
+* commodity provided at a certain level. For example, it could require the share
+* of electricity generated by renewables technologies on the secondary energy
+* level.
+*
+*   .. math::
+*     \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} output_{n^L,t,y^V,y,m,n,c,l,h^A,h} + input_{n^L,t,y^V,y,m,n,c,l,h^A,h}
+*         \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,y^V,y,m,h^A} \\
+*     \geq share\_factor\_up_{s,n,y,h} \cdot
+*     \sum_{\substack{n^L,t\prime,m,h^A \\ y^V \leq y}} output_{n^L,t\prime,y^V,y,m,n,c,l,h^A,h} + input_{n^L,t\prime,y^V,y,m,n,c,l,h^A,h}
+*         \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t\prime,y^V,y,m,h^A}
+*
+***
+SHARES_COMMODITY_LEVEL_LO(shares,node,commodity,level,year,time,type_tec_share,type_tec_total)$(
+    map_shares_commodity_level(shares,commodity,level,type_tec_share,type_tec_total) AND
+    share_factor_lo(shares,node,year,time)
+)..
+    SUM( (location,tec,vintage,mode,time2)$(
+        cat_tec(type_tec_share,tec) AND
+        map_tec_act(location,tec,year,mode,time2) AND
+        map_tec_lifetime(location,tec,vintage,year)
+    ),
+* commodity activity generated by type_tec_share technologies
+        (
+	    output(location,tec,vintage,year,mode,node,commodity,level,time2,time) +
+	    input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+	) *
+        duration_time_rel(time,time2) *
+        ACT(location,tec,vintage,year,mode,time2)
+        )
+    =G=
+    share_factor_lo(shares,node,year,time) *
+* commodity activity generated by type_tec_total technologies
+    SUM( (location,tec,vintage,mode,time2)$(
+        cat_tec(type_tec_total,tec) AND
+        map_tec_act(location,tec,year,mode,time2) AND
+        map_tec_lifetime(location,tec,vintage,year)
+    ),
+        (
+	    output(location,tec,vintage,year,mode,node,commodity,level,time2,time) +
+	    input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+	) *
+        duration_time_rel(time,time2) *
+        ACT(location,tec,vintage,year,mode,time2)
+    )
 ;
 
 ***
@@ -1544,9 +1966,7 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 * model statements                                                                                                     *
 *----------------------------------------------------------------------------------------------------------------------*
 
-Model MESSAGE_LP /
-all
-/ ;
+Model MESSAGE_LP / all / ;
 
 MESSAGE_LP.holdfixed = 1 ;
 MESSAGE_LP.optfile = 1 ;

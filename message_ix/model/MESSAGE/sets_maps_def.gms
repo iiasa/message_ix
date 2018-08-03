@@ -124,6 +124,7 @@ Sets
     year_all        years (over entire model horizon)
     year (year_all) years included in a model instance (for myopic or rolling-horizon optimization)
     time            subannual time periods (seasons - days - hours)
+    shares          share constraint relations
     relation        generic linear relations
     lvl_spatial     hierarchical levels of spatial resolution
     lvl_temporal    hierarchical levels of temporal resolution
@@ -147,6 +148,7 @@ Alias(year,year3);
 Alias(time,time2);
 Alias(time,time_act);
 Alias(time,time_od);
+Alias(mode, mode2);
 
 *----------------------------------------------------------------------------------------------------------------------*
 * Category types and mappings                                                                                                       *
@@ -234,12 +236,18 @@ Sets
     cat_tec(type_tec,tec)                   mapping of technologies to respective categories
     inv_tec(tec)                            technologies that have explicit investment and capacity decision variables
     renewable_tec(tec)                      technologies that use renewable energy potentials
+    addon(tec)                              technologies that are an add-on to other (parent) technologies
+    type_addon                              types of add-on technologies (that can be applied mutually exclusive)
+    cat_addon(type_addon,addon)             mapping of add-on technologies to respective add-on technology types
     type_year                               types of year aggregations
     cat_year(type_year,year_all)            mapping of years to respective categories
     type_emission                           types of emission aggregations
     cat_emission(type_emission,emission)    mapping of emissions to respective categories
     type_tec_land(type_tec)                 dynamic set whether emissions from land use are included in type_tec
 ;
+
+Alias(type_tec,type_tec_share);
+Alias(type_tec,type_tec_total);
 
 *----------------------------------------------------------------------------------------------------------------------*
 * Mapping sets                                                                                                         *
@@ -281,10 +289,13 @@ Sets
     map_tec_time(node,tec,year_all,time)         mapping of technology to temporal dissagregation (time)
     map_tec_mode(node,tec,year_all,mode)         mapping of technology to modes
     map_tec_act(node,tec,year_all,mode,time)     mapping of technology to modes AND temporal dissagregation
+    map_tec_addon(tec,type_addon)                mapping of types of add-on technologies to the underlying parent technology
 
     map_spatial_hierarchy(lvl_spatial,node,node)    mapping of spatial resolution to nodes (last index is 'parent')
     map_temporal_hierarchy(lvl_temporal,time,time)  mapping of temporal resolution to time (last index is 'parent')
 
+    map_shares_commodity_level(shares,commodity,level,type_tec,type_tec)   mapping of commodity and level share constraints
+    
     map_land(node,land_scenario,year_all)            mapping of land-use model emulator scenarios to nodes and years
     map_relation(relation,node,year_all)             mapping of generic (user-defined) relations to nodes and years
 ;
