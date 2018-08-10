@@ -41,7 +41,8 @@ abs_cost_new_capacity_soft_up, abs_cost_new_capacity_soft_lo, level_cost_new_cap
 abs_cost_activity_soft_up, abs_cost_activity_soft_lo, level_cost_activity_soft_up, level_cost_activity_soft_lo,
 soft_new_capacity_up, soft_new_capacity_lo, soft_activity_up, soft_activity_lo,
 * share constraints
-share_factor_up,share_factor_lo,map_shares_commodity_level,share_mode_up,share_mode_lo,
+map_shares_commodity_share,map_shares_commodity_total,share_commodity_up,share_commodity_lo
+share_mode_up,share_mode_lo,
 * addon technologies
 addon_conversion, addon_up, addon_lo
 * parameters for reliability, flexibility and renewable potential constraints
@@ -68,6 +69,16 @@ demand_fixed=demand
 is_fixed_extraction, is_fixed_stock, is_fixed_new_capacity, is_fixed_capacity, is_fixed_activity, is_fixed_land
 fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activity, fixed_land
 ;
+
+
+Set rating_unfirm(rating) ;
+rating_unfirm(rating) = yes ;
+rating_unfirm('firm') = no ;
+
+Set rating_unrated(rating) ;
+rating_unrated(rating) = yes ;
+rating_unrated('unrated') = no ;
+
 
 *----------------------------------------------------------------------------------------------------------------------*
 * Add special sets                                                                                                     *
@@ -198,4 +209,20 @@ loop( (node,commodity,grade,year_all)$( map_resource(node,commodity,grade,year_a
 ) ;
 if (check,
     abort "There is a problem with the parameter 'resources_remaining'!" ;
+) ;
+
+* check that the sum of rating bins (if used for firm-cacpacity or flexibility) is greater than 1
+loop( (node,tec,year_all,commodity,level,time)$(
+    ( sum((vintage,rating_unfirm), reliability_factor(node,tec,year_all,commodity,level,time,rating_unfirm) )
+    OR sum((vintage,mode,rating_unrated)$(
+        flexibility_factor(node,tec,vintage,year_all,mode,commodity,level,time,rating_unrated) ), 1 ) )
+    ),
+    if ( ( sum( rating, rating_bin(node,tec,year_all,commodity,level,time,rating) ) < 1 ),
+        put_utility 'log'/" Error: Insufficient rating bin assignment ' "
+            "for '"node.tl:0"|"tec.tl:0"|"year_all.tl:0 "'" ;
+        check = 1 ;
+    ) ;
+) ;
+if (check,
+    abort "There is a problem with assignment of rating bins!" ;
 ) ;
