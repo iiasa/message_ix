@@ -133,9 +133,8 @@ Sets
 
 * definition of aliases
 Alias(node,location);
-Alias(node,subnode);
 Alias(node,node2);
-Alias(node,node3);
+Alias(node,node_share);
 Alias(tec,tec2);
 Alias(commodity,commodity2);
 Alias(level,level2);
@@ -294,7 +293,10 @@ Sets
     map_spatial_hierarchy(lvl_spatial,node,node)    mapping of spatial resolution to nodes (last index is 'parent')
     map_temporal_hierarchy(lvl_temporal,time,time)  mapping of temporal resolution to time (last index is 'parent')
 
-    map_shares_commodity_level(shares,commodity,level,type_tec,type_tec)   mapping of commodity and level share constraints
+    map_shares_commodity_share(shares,node,
+        node,type_tec,mode,commodity,level)   mapping for commodity share constraints (numerator)
+    map_shares_commodity_total(shares,node,
+        node,type_tec,mode,commodity,level)   mapping for commodity share constraints (denominator)
     
     map_land(node,land_scenario,year_all)            mapping of land-use model emulator scenarios to nodes and years
     map_relation(relation,node,year_all)             mapping of generic (user-defined) relations to nodes and years
