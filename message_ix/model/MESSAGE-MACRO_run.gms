@@ -44,7 +44,7 @@ $OFFTEXT
 *
 * This file contains the workflow of a |MESSAGEix|-MACRO run. It can be called:
 *  - Via the scientific programming API's using the packages/libraries ``ixmp`` and ``message_ix``,
-*    calling the method ``solve()`` of the ``ixmp``.Scenario class (see the tutorials).
+*    calling the method ``solve()`` of the ``message_ix.Scenario`` class (see the tutorials).
 *  - using the file ``MESSAGE_master.gms`` with the option ``$SETGLOBAL macromode "linked"``,
 *    where the input data file name and other options are stated explicitly, or
 *  - directly from the command line, with the input data file name
