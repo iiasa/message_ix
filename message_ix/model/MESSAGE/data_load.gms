@@ -70,6 +70,11 @@ is_fixed_extraction, is_fixed_stock, is_fixed_new_capacity, is_fixed_capacity, i
 fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activity, fixed_land
 ;
 
+*----------------------------------------------------------------------------------------------------------------------*
+* auxiliary mappings for the implementation of bounds over all modes and system reliability/flexibility constraints    *
+*----------------------------------------------------------------------------------------------------------------------*
+
+Set all_modes (mode) / all /;
 
 Set rating_unfirm(rating) ;
 rating_unfirm(rating) = yes ;
@@ -78,13 +83,6 @@ rating_unfirm('firm') = no ;
 Set rating_unrated(rating) ;
 rating_unrated(rating) = yes ;
 rating_unrated('unrated') = no ;
-
-
-*----------------------------------------------------------------------------------------------------------------------*
-* Add special sets                                                                                                     *
-*----------------------------------------------------------------------------------------------------------------------*
-
-Set all_modes (mode) / all /;
 
 *----------------------------------------------------------------------------------------------------------------------*
 * assignment and computation of MESSAGE-specific auxiliary parameters                                                  *
@@ -95,8 +93,6 @@ $INCLUDE includes/period_parameter_assignment.gms
 
 * compute auxiliary parameters for relative duration of subannual time periods
 duration_time_rel(time,time2)$( map_time(time,time2) ) = duration_time(time2) / duration_time(time) ;
-
-** mapping and other stuff for technologies **
 
 * assign an additional mapping set for technologies to nodes, modes and subannual time slices (for shorter reference)
 map_tec_act(node,tec,year_all,mode,time)$( map_tec_time(node,tec,year_all,time) AND

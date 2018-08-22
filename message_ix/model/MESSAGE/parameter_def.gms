@@ -11,7 +11,7 @@
 * This provides flexibility when changing the resolution of the model horizon (i.e., the set ``year``).
 *
 * Parameters written in *italics* are auxiliary parameters
-* that are either generated automatically when exporting a ``MESSAGE``-scheme ``ixmp``.Scenario to gdx
+* that are either generated automatically when exporting a ``message_ix.Scenario`` to gdx
 * or that are computed during the pre-processing stage in GAMS.
 ***
 
@@ -104,7 +104,7 @@ Parameter
     resource_remaining(node,commodity,grade,year_all)   maximum extraction relative to remaining resources (by year)
     bound_extraction_up(node,commodity,grade,year_all)  upper bound on extraction of resources by grade
     commodity_stock(node,commodity,level,year_all)      exogenous (initial) quantity of commodity in stock
-    historical_extraction(node,commodity,grade,year_all)    historical extraction
+    historical_extraction(node,commodity,grade,year_all) historical extraction
 ;
 
 ***
@@ -133,8 +133,8 @@ Parameter
 ***
 
 Parameter
-    demand_fixed(node,commodity,level,year_all,time) exogenous demand levels
-    peak_load_factor(node,commodity,level,year_all,time)       maximum peak load factor for reliability constraint of firm capacity
+    demand_fixed(node,commodity,level,year_all,time)     exogenous demand levels
+    peak_load_factor(node,commodity,level,year_all,time) maximum peak load factor for reliability constraint of firm capacity
 ;
 
 ***
@@ -353,10 +353,14 @@ Parameters
 ***
 
 Parameters
-    addon_conversion(node,tec,vintage,year_all,mode,time,type_addon)  conversion factor between add-on and parent technology activity
-    addon_up(node,tec,year_all,mode,time,type_addon)    upper bound on deployment of add-on technologies relative to parent technology
-    addon_lo(node,tec,year_all,mode,time,type_addon)    lower bound on deployment of add-on technologies relative to parent technology
+    addon_conversion(node,tec,vintage,year_all,mode,time,type_addon) conversion factor between add-on and parent technology activity
+    addon_up(node,tec,year_all,mode,time,type_addon)    upper bound of add-on technologies relative to parent technology
+    addon_lo(node,tec,year_all,mode,time,type_addon)    lower bound of add-on technologies relative to parent technology
 ;
+
+*----------------------------------------------------------------------------------------------------------------------*
+* Soft relaxations of dynamic constraints                                                                              *
+*----------------------------------------------------------------------------------------------------------------------*
 
 ***
 * Cost parameters for 'soft' relaxations of dynamic constraints
