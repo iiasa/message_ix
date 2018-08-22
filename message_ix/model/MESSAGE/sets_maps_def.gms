@@ -105,9 +105,9 @@ $ONEMPTY
 *    In a ``MESSAGE``-scheme ``ixmp``.Scenario, this set always includes an element "year",
 *    and the duration of that element is 1 (:math:`duration\_time_{'year'} = 1`).
 *
-* .. [#relations] A generic formulation of linear constraints is implemented in |MESSAGEix|, see :ref:`section_of_generic_relations`.
-*    This feature can be used for testing and development, but specific new use cases should be implemented
-*    by specific equations and parameters.
+* .. [#relations] A generic formulation of linear constraints is implemented in |MESSAGEix|,
+*    see :ref:`section_of_generic_relations`. These constraints can be used for testing and development,
+*    but specific new features should be implemented by specific equations and parameters.
 ***
 
 Sets
@@ -359,8 +359,8 @@ Sets
 *
 * Similar to the mapping sets for bounds, there are mapping sets to indicate whether decision variables
 * are pre-defined to a specific value, usually taken from a solution of another model instance.
-* This can be used to represent imperfect foresight where a policy shift or parameter change is introduced in later years.
-* The names of these sets follow the format ``is_fixed_<variable>``.
+* This can be used to represent imperfect foresight where a policy shift or parameter change is introduced in later
+* years. The names of these sets follow the format ``is_fixed_<variable>``.
 ***
 
 Sets
