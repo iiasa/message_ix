@@ -5,15 +5,15 @@ The |MESSAGEix| framework
    :width: 320px
    :align: right
    
-   Key features of the |ixmp| (source: :cite:`huppmann_messageix_2018`)
+   The |ixmp| (source: :cite:`huppmann_messageix_2018`)
 
 Overview and scope
 ------------------
 
-|MESSAGEix| is a versatile, open-source, dynamic systems-optimization model.
+|MESSAGEix| is a versatile, open-source, dynamic systems-optimization modelling framework.
 It was developed for strategic energy planning and integrated assessment of
 energy-engineering-economy-environment systems (E4).
-It can be applied to analyse scenarios of the energy system transformation
+The framework can be applied to analyse scenarios of the energy system transformation
 under technical-engineering constraints and political-societal considerations.
 The optimization model can be linked to the general-economy MACRO model
 to incorporate feedback between prices and demand levels for energy and commodities.
@@ -109,12 +109,12 @@ The |MESSAGEix| implementation includes:
 Documentation
 -------------
 
-The `mathematical model description`_ and other documentation pages are built from the documentation comments 
-in the GAMS code and the Python and R interface bindings. 
-The documentation available on `MESSAGEix.iiasa.ac.at`_ is synchronized with the GitHub repository.
-It is built from the latest master branch at `github.com/iiasa/message_ix`_  upon every update.
+The `mathematical model description`_ and other documentation pages are built
+from the documentation comments in the GAMS code and the Python and R interface bindings. 
+The documentation available on `MESSAGEix.iiasa.ac.at`_ is synchronized with the latest release on the
+public GitHub repository.
 
-.. _`mathematical model description`: model/MESSAGE_framework/model_core.html
+.. _`mathematical model description`: model/MESSAGE/model_core.html
 
 .. _`MESSAGEix.iiasa.ac.at` : http://MESSAGEix.iiasa.ac.at
 
@@ -140,11 +140,13 @@ Then, open a command prompt and type
 For expert users or to install from source, please follow the installation
 instructions in the `README`_.
 
+.. tutorials:
+
 Tutorials
 ^^^^^^^^^
 
 To get started with a stylized energy system model implemented in |MESSAGEix|,
-look at the tutorials included in this repository at `tutorial/README`_.
+look at the tutorials included in this repository:
 
 .. toctree::
    :maxdepth: 1
@@ -154,8 +156,6 @@ look at the tutorials included in this repository at `tutorial/README`_.
 .. _`Anaconda`: https://www.continuum.io/downloads
 
 .. _`README`: https://github.com/iiasa/message_ix#install-from-source-advanced-users
-   
-.. _`tutorial/README`: https://github.com/iiasa/message_ix/blob/master/tutorial/README.md
 
 
 Running the |MESSAGEix| model
@@ -164,7 +164,7 @@ Running the |MESSAGEix| model
 There are three methods to run the |MESSAGEix| model:
 
 - Via the scientific programming APIs using the packages/libraries ``ixmp`` and ``message_ix``,
-  calling the method ``solve()`` of the ``ixmp.Scenario`` class (see the `tutorials`_).
+  calling the method ``solve()`` of the ``message_ix.Scenario`` class (see the `tutorials`_).
 
 - Using the file ``MESSAGE_master.gms``, where the scenario name (i.e., the gdx input file), 
   the optimization horizon (perfect foresight or myopic/rolling-horizon version),
@@ -174,10 +174,8 @@ There are three methods to run the |MESSAGEix| model:
   to set the model specifications.*
    
 - Directly from the command line calling the file ``MESSAGE_run.gms`` (see the `auto-doc page`_). 
-  The scenario name and other options can be passed as command line parameters, 
+  The scenario name and other arguments can be passed as command line parameters, 
   e.g. :literal:`gams MESSAGE_run.gms --in="<data-file>" --out="<output-file>"`.
-
-.. _`tutorials` : https://github.com/iiasa/message_ix/blob/master/tutorial/README.md
 
 .. _`auto-doc page`: model/MESSAGE_run.html
    
