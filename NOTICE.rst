@@ -81,7 +81,7 @@ Contributor Guidelines
 We appreciate contributions to the code base and development of new features for the framework.
 Please refer to `Contributor Guidelines`_ for details.
 
-.. _`Contributor Guidelines` : CONTRIBUTING.rst
+.. _`Contributor Guidelines` : contributing.html
 
 
 References
