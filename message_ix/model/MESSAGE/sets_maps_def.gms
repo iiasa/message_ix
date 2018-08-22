@@ -82,7 +82,7 @@ $ONEMPTY
 * .. [#node] The set ``node`` includes spatial units across all levels of spatial disaggregation
 *    (global, regions, countries, basins, grid cells).
 *    The hierarchical mapping is implemented via the mapping set ``map_spatial_hierarchy``.
-*    This set always includes an element 'World' when initializing a ``MESSAGE``-scheme ``ixmp``.Scenario.
+*    This set always includes an element 'World' when initializing a ``MESSAGE``-scheme ``message_ix.Scenario``.
 *
 * .. [#mode] For example, high electricity or high heat production modes of operation for combined heat and power plants.
 *
@@ -90,8 +90,8 @@ $ONEMPTY
 *    of the entire horizon (historical and model horizon), and the set ``year`` is a dynamic subset of ``year_all``.
 *    This facilitates an efficient implementation of the historical capacity build-up and
 *    the (optional) recursive-dynamic solution approach.
-*    When working with a ``MESSAGE``-scheme ``ixmp``.Scenario via the API, the set of all periods is called ``year``
-*    for a more concise notation.
+*    When working with a ``message_ix.Scenario`` via the scientific programming API, the set of all periods is
+*    called ``year`` for a more concise notation.
 *    The specification of the model horizon is implemented using the mapping set ``cat_year``
 *    and the type "firstmodelyear".
 *
@@ -209,20 +209,20 @@ Alias(mode, mode2);
 * .. [#type_node] The element "economy" is added by default as part of the ``MESSAGE``-scheme ``ixmp``.Scenario.
 *
 * .. [#type_tec] The element "all" in ``type_tec`` and the associated mapping to all technologies in the set ``cat_tec``
-*    are added by default as part of the ``MESSAGE``-scheme ``ixmp``.Scenario.
+*    are added by default as part of the ``MESSAGE``-scheme ``message_ix``.Scenario.
 *
 * .. [#inv_tec] The auxiliary set ``inv_tec`` (subset of ``technology``) is a short-hand notation for all technologies
 *    with defined investment costs. This activates the investment cost part in the objective function and the
 *    constraints for all technologies where investment decisions are relevant.
-*    It is added by default when exporting ``MESSAGE``-scheme ``ixmp``.Scenario to gdx.
+*    It is added by default when exporting ``MESSAGE``-scheme ``message_ix``.Scenario to gdx.
 *
 * .. [#renewable_tec] The auxiliary set ``renewable_tec`` (subset of ``technology``) is a short-hand notation
 *    for all technologies with defined parameters relevant for the equations in the "Renewable" section.
-*    It is added by default when exporting ``MESSAGE``-scheme ``ixmp``.Scenario to gdx.
+*    It is added by default when exporting ``MESSAGE``-scheme ``message_ix``.Scenario to gdx.
 *
 * .. [#type_tec_land] The mapping set ``type_tec_land`` is a dynamic subset of ``type_tec`` and specifies whether
 *    emissions from the land-use model emulator module are included when aggregrating over a specific technology type.
-*    The element "all" is added by default in a ``MESSAGE``-scheme ``ixmp``.Scenario.
+*    The element "all" is added by default in a ``MESSAGE``-scheme ``message_ix``.Scenario.
 ***
 
 * category types and mappings
@@ -315,7 +315,7 @@ Sets
 * Mapping sets (flags) for bounds
 * -------------------------------
 *
-* There are a number of mappings sets generated when exporting a ``MESSAGE``-scheme ``ixmp``.Scenario to gdx.
+* There are a number of mappings sets generated when exporting a ``message_ix.Scenario`` to gdx.
 * They are used as 'flags' to indicate whether a constraint is active.
 * The names of these sets follow the format ``is_<constraint>_<dir>``.
 *

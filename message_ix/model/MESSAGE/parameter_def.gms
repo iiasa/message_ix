@@ -11,7 +11,7 @@
 * This provides flexibility when changing the resolution of the model horizon (i.e., the set ``year``).
 *
 * Parameters written in *italics* are auxiliary parameters
-* that are either generated automatically when exporting a ``MESSAGE``-scheme ``ixmp``.Scenario to gdx
+* that are either generated automatically when exporting a ``message_ix.Scenario`` to gdx
 * or that are computed during the pre-processing stage in GAMS.
 ***
 
