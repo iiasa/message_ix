@@ -238,7 +238,7 @@ def test_excel_read_write(test_mp):
     scen1 = Scenario(test_mp, *msg_args)
     scen1.to_excel(fname)
 
-    scen2 = Scenario(test_mp, model='foo', scen='bar', version='new')
+    scen2 = Scenario(test_mp, model='foo', scenario='bar', version='new')
     scen2.read_excel(fname)
 
     exp = scen1.par('input')
