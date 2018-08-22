@@ -1,14 +1,9 @@
-Scientific Programming API's
-============================
+`ixmp` API Documentation
+------------------------
 
-The |ixmp| has application programming interfaces (API)
-for efficient scientific workflows and data processing.
+.. include:: api/ixmp.rst
 
-Python API
-----------
+`message_ix` API Documentation
+------------------------------
 
-.. toctree::
-   :maxdepth: 2
-
-   api/ixmp
-   api/message_ix
+.. include:: api/message_ix.rst

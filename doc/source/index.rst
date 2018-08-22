@@ -78,6 +78,14 @@ The |MESSAGEix| Model
    
    model
 
+API Documentation
+-----------------
+
+.. toctree::
+   :maxdepth: 1
+   
+   api
+
 Using |MESSAGEix|
 -----------------
 
