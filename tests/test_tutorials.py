@@ -71,6 +71,7 @@ def test_westeros_emissions(capsys):
     nb, errors = _notebook_run(fname, capsys=capsys)
     assert errors == []
 
+
 @pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_westeros_emissions_tax(capsys):
     fname = os.path.join(westeros_path, 'westeros_emissions_taxes.ipynb')
