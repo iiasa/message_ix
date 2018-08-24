@@ -1,7 +1,11 @@
-language: generic
-
-os:
-  - osx
+matrix:
+    include:
+        - os: osx
+          language: generic
+          env: TOXENV=py27
+        - os: osx
+          language: generic
+          env: TOXENV=py36
 
 before_install:
   # install gams
@@ -10,10 +14,15 @@ before_install:
   - ./osx_x64_64_sfx.exe > install.out
   - export PATH=$PATH:$PWD/gams25.1_osx_x64_64_sfx
   # install conda
-  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
+  - export MINICONDA=$HOME/miniconda
+  - export PATH="$MINICONDA/bin:$PATH"
+  - hash -r
+  - if [ $TOXENV == 'py27'];
+    then wget http://repo.continuum.io/miniconda/Miniconda2-latest-MacOSX-x86_64.sh -O miniconda.sh;
+    else wget http://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
+    fi
   - chmod +x miniconda.sh
-  - ./miniconda.sh -b -p $HOME/miniconda
-  - export PATH=$HOME/miniconda/bin:$PATH
+  - ./miniconda.sh -b -f -p $MINICONDA
   - conda update --yes conda
   # install ixmp deps
   - conda install --yes -c conda-forge ixmp xlsxwriter xlrd
@@ -24,7 +33,6 @@ install:
   - cd ixmp && python setup.py install && cd ..
   - python setup.py install
 
-# Run test
 script:
   - conda install --yes -c conda-forge pytest
   - pytest -v tests
