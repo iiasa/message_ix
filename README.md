@@ -56,7 +56,7 @@ the ix modeling platform for scientific publications or technical reports:
 
 ## Install from Conda (New Users)
 
-1. Install Python via [Anaconda](https://www.continuum.io/downloads). We
+1. Install Python via [Anaconda](https://www.anaconda.com/download/). We
    recommend the latest version, e.g., Python 3.6+.
    
 2. Install [GAMS](https://www.gams.com/download/). **Importantly**:
