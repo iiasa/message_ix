@@ -61,9 +61,7 @@ def test_westeros_baseline(capsys):
 
     # I have no idea why this is different between py2 and 3
     obs = eval(nb.cells[-12]['outputs'][0]['data']['text/plain'])
-    exp_py3 = 187445.953125
-    exp_py2 = 194351.390625
-    exp = exp_py3 if sys.version_info[0] == 3 else exp_py2
+    exp = 187445.953125
     assert np.isclose(obs, exp)
 
 
