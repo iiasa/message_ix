@@ -4,9 +4,122 @@ import itertools
 import warnings
 
 import pandas as pd
+import numpy as np
 
 from ixmp.utils import pd_read, pd_write
 from message_ix.utils import isscalar, logger
+
+
+def _init_scenario(s, commit=False):
+    """Initialize a MESSAGEix Scenario object with default values"""
+    inits = (
+        {
+            'test': 'firm' not in s.set('rating'),
+            'exec': [
+                (s.add_set, {'args': ('rating', ['firm', 'unrated'])}),
+            ],
+        },
+        {  # required for subset all_modes, see model/data_load.gms
+            'test': 'all' not in s.set('mode'),
+            'exec': [(s.add_set, {'args': ('mode', 'all')})],
+        },
+        {  # required for share constraints
+            'test': 'shares' not in s.set_list(),
+            'exec': [
+                (s.init_set, {'args': ('shares',)}),
+                (s.init_set, {
+                    'args': ('map_shares_commodity_share',),
+                    'kwargs': dict(
+                        idx_sets=['shares', 'node', 'node', 'type_tec',
+                                  'mode', 'commodity', 'level'],
+                        idx_names=['shares', 'node_share', 'node', 'type_tec',
+                                   'mode', 'commodity', 'level'])
+                }),
+                (s.init_set, {
+                    'args': ('map_shares_commodity_total',),
+                    'kwargs': dict(
+                        idx_sets=['shares', 'node', 'node', 'type_tec',
+                                  'mode', 'commodity', 'level'],
+                        idx_names=['shares', 'node_share', 'node', 'type_tec',
+                                   'mode', 'commodity', 'level'])
+                }),
+                (s.init_par, {
+                    'args': ('share_commodity_up',),
+                    'kwargs': dict(
+                        idx_sets=['shares', 'node', 'year', 'time'],
+                        idx_names=['shares', 'node_share', 'year_act', 'time'])
+                }),
+                (s.init_par, {
+                    'args': ('share_commodity_lo',),
+                    'kwargs': dict(
+                        idx_sets=['shares', 'node', 'year', 'time'],
+                        idx_names=['shares', 'node_share', 'year_act', 'time'])
+                }),
+                (s.init_par, {
+                    'args': ('share_mode_up',),
+                    'kwargs': dict(
+                        idx_sets=['shares', 'node', 'technology',
+                                  'mode', 'year', 'time'],
+                        idx_names=['shares', 'node_loc', 'technology', 'mode',
+                                   'year_act', 'time'])
+                }),
+                (s.init_par, {
+                    'args': ('share_mode_lo',),
+                    'kwargs': dict(
+                        idx_sets=['shares', 'node', 'technology',
+                                  'mode', 'year', 'time'],
+                        idx_names=['shares', 'node_loc', 'technology', 'mode',
+                                   'year_act', 'time'])
+                }),
+            ],
+        },
+        {  # required for addon formulation
+            'test': 'addon' not in s.set_list(),
+            'exec': [
+                (s.init_set, {'args': ('addon',)}),
+                (s.init_set, {'args': ('type_addon',)}),
+                (s.init_set, {'args': ('cat_addon', ['type_addon', 'addon'])}),
+                (s.init_set, {
+                    'args': ('map_tec_addon', ['technology', 'type_addon'])
+                }),
+                (s.init_par, {
+                    'args': (
+                        'addon_conversion',
+                        ['node', 'technology',
+                         'year', 'year', 'mode', 'time', 'type_addon'],
+                        ['node', 'technology',
+                         'year_vtg', 'year_act', 'mode', 'time', 'type_addon']
+                    )}),
+                (s.init_par, {
+                    'args': (
+                        'addon_up',
+                        ['node', 'technology', 'year',
+                         'mode', 'time', 'type_addon']
+                    )}),
+                (s.init_par, {
+                    'args': (
+                        'addon_lo',
+                        ['node', 'technology', 'year',
+                         'mode', 'time', 'type_addon']
+                    )}),
+            ],
+        },
+    )
+
+    pass_idx = [i for i, init in enumerate(inits) if init['test']]
+    if len(pass_idx) == 0:
+        return  # leave early, all init tests pass
+
+    if commit:
+        s.check_out()
+    for idx in pass_idx:
+        for exec_info in inits[idx]['exec']:
+            func = exec_info[0]
+            args = exec_info[1].pop('args', tuple())
+            kwargs = exec_info[1].pop('kwargs', dict())
+            func(*args, **kwargs)
+    if commit:
+        s.commit('Initialized wtih standard sets and params')
 
 
 class Scenario(ixmp.Scenario):
@@ -56,6 +169,16 @@ class Scenario(ixmp.Scenario):
         self.is_message_scheme = True
 
         super(Scenario, self).__init__(mp, model, scenario, jscen, cache=cache)
+
+        if not self.has_solution():
+            _init_scenario(self, commit=version != 'new')
+
+    def has_solution(self):
+        """Returns True if scenario currently has a solution"""
+        try:
+            return not np.isnan(self.var('OBJ')['lvl'])
+        except Exception:
+            return False
 
     def add_spatial_sets(self, data):
         """Add sets related to spatial dimensions of the model
@@ -115,15 +238,41 @@ class Scenario(ixmp.Scenario):
         first = data['firstmodelyear'] if 'firstmodelyear' in data else horizon[0]
         scenario.add_cat("year", "firstmodelyear", first, is_unique=True)
 
-    def vintage_and_active_years(self):
-        """Return a 2-tuple of valid pairs of vintage years and active years for
-        use with data input.
+    def vintage_and_active_years(self, *args):
+        """Return a 2-tuple of valid pairs of vintage years and active years
+        for use with data input. A valid year-vintage, year-active pair is
+        one in which:
+
+        - year-vintage <= year-active
+        - both within the model's 'year' set
+        - year-active >= the model's first year *or* within
+          ixmp.Scenario.years_active() for a given node, technology and vintage
+          (optional)
+
+        Parameters
+        ----------
+        arguments to ixmp.Scenario.years_active(), optional
+
         """
         horizon = self.set('year')
-        combinations = itertools.product(horizon, horizon)
-        year_pairs = [(y_v, y_a) for y_v, y_a in combinations if y_v <= y_a]
+        first = self.cat('year', 'firstmodelyear')[0] or horizon[0]
+
+        if len(args) > 0:
+            # on return values within active years
+            # TODO: casting to int here is probably bad
+            years_active = self.years_active(*args)
+            lb = horizon.astype(int) >= int(min(years_active))
+            ub = horizon.astype(int) <= int(max(years_active))
+            horizon = horizon[lb & ub]
+
+        def valid(y_v, y_a):
+            # TODO: casting to int here is probably bad
+            return y_v <= y_a and int(y_a) >= int(first)
+
+        combos = itertools.product(horizon, horizon)
+        year_pairs = [(y_v, y_a) for y_v, y_a in combos if valid(y_v, y_a)]
         v_years, a_years = zip(*year_pairs)
-        return v_years, a_years
+        return pd.DataFrame({'year_vtg': v_years, 'year_act': a_years})
 
     def solve(self, **kwargs):
         """Solve a MESSAGE Scenario. See ixmp.Scenario.solve() for arguments.

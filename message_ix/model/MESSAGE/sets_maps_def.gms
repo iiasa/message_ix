@@ -82,7 +82,7 @@ $ONEMPTY
 * .. [#node] The set ``node`` includes spatial units across all levels of spatial disaggregation
 *    (global, regions, countries, basins, grid cells).
 *    The hierarchical mapping is implemented via the mapping set ``map_spatial_hierarchy``.
-*    This set always includes an element 'World' when initializing a ``MESSAGE``-scheme ``ixmp``.Scenario.
+*    This set always includes an element 'World' when initializing a ``MESSAGE``-scheme ``message_ix.Scenario``.
 *
 * .. [#mode] For example, high electricity or high heat production modes of operation for combined heat and power plants.
 *
@@ -90,8 +90,8 @@ $ONEMPTY
 *    of the entire horizon (historical and model horizon), and the set ``year`` is a dynamic subset of ``year_all``.
 *    This facilitates an efficient implementation of the historical capacity build-up and
 *    the (optional) recursive-dynamic solution approach.
-*    When working with a ``MESSAGE``-scheme ``ixmp``.Scenario via the API, the set of all periods is called ``year``
-*    for a more concise notation.
+*    When working with a ``message_ix.Scenario`` via the scientific programming API, the set of all periods is
+*    called ``year`` for a more concise notation.
 *    The specification of the model horizon is implemented using the mapping set ``cat_year``
 *    and the type "firstmodelyear".
 *
@@ -105,9 +105,9 @@ $ONEMPTY
 *    In a ``MESSAGE``-scheme ``ixmp``.Scenario, this set always includes an element "year",
 *    and the duration of that element is 1 (:math:`duration\_time_{'year'} = 1`).
 *
-* .. [#relations] A generic formulation of linear constraints is implemented in |MESSAGEix|, see :ref:`section_of_generic_relations`.
-*    This feature can be used for testing and development, but specific new use cases should be implemented
-*    by specific equations and parameters.
+* .. [#relations] A generic formulation of linear constraints is implemented in |MESSAGEix|,
+*    see :ref:`section_of_generic_relations`. These constraints can be used for testing and development,
+*    but specific new features should be implemented by specific equations and parameters.
 ***
 
 Sets
@@ -124,6 +124,7 @@ Sets
     year_all        years (over entire model horizon)
     year (year_all) years included in a model instance (for myopic or rolling-horizon optimization)
     time            subannual time periods (seasons - days - hours)
+    shares          share constraint relations
     relation        generic linear relations
     lvl_spatial     hierarchical levels of spatial resolution
     lvl_temporal    hierarchical levels of temporal resolution
@@ -132,9 +133,8 @@ Sets
 
 * definition of aliases
 Alias(node,location);
-Alias(node,subnode);
 Alias(node,node2);
-Alias(node,node3);
+Alias(node,node_share);
 Alias(tec,tec2);
 Alias(commodity,commodity2);
 Alias(level,level2);
@@ -147,6 +147,7 @@ Alias(year,year3);
 Alias(time,time2);
 Alias(time,time_act);
 Alias(time,time_od);
+Alias(mode, mode2);
 
 *----------------------------------------------------------------------------------------------------------------------*
 * Category types and mappings                                                                                                       *
@@ -208,20 +209,20 @@ Alias(time,time_od);
 * .. [#type_node] The element "economy" is added by default as part of the ``MESSAGE``-scheme ``ixmp``.Scenario.
 *
 * .. [#type_tec] The element "all" in ``type_tec`` and the associated mapping to all technologies in the set ``cat_tec``
-*    are added by default as part of the ``MESSAGE``-scheme ``ixmp``.Scenario.
+*    are added by default as part of the ``MESSAGE``-scheme ``message_ix``.Scenario.
 *
 * .. [#inv_tec] The auxiliary set ``inv_tec`` (subset of ``technology``) is a short-hand notation for all technologies
 *    with defined investment costs. This activates the investment cost part in the objective function and the
 *    constraints for all technologies where investment decisions are relevant.
-*    It is added by default when exporting ``MESSAGE``-scheme ``ixmp``.Scenario to gdx.
+*    It is added by default when exporting ``MESSAGE``-scheme ``message_ix``.Scenario to gdx.
 *
 * .. [#renewable_tec] The auxiliary set ``renewable_tec`` (subset of ``technology``) is a short-hand notation
 *    for all technologies with defined parameters relevant for the equations in the "Renewable" section.
-*    It is added by default when exporting ``MESSAGE``-scheme ``ixmp``.Scenario to gdx.
+*    It is added by default when exporting ``MESSAGE``-scheme ``message_ix``.Scenario to gdx.
 *
 * .. [#type_tec_land] The mapping set ``type_tec_land`` is a dynamic subset of ``type_tec`` and specifies whether
 *    emissions from the land-use model emulator module are included when aggregrating over a specific technology type.
-*    The element "all" is added by default in a ``MESSAGE``-scheme ``ixmp``.Scenario.
+*    The element "all" is added by default in a ``MESSAGE``-scheme ``message_ix``.Scenario.
 ***
 
 * category types and mappings
@@ -234,12 +235,18 @@ Sets
     cat_tec(type_tec,tec)                   mapping of technologies to respective categories
     inv_tec(tec)                            technologies that have explicit investment and capacity decision variables
     renewable_tec(tec)                      technologies that use renewable energy potentials
+    addon(tec)                              technologies that are an add-on to other (parent) technologies
+    type_addon                              types of add-on technologies (that can be applied mutually exclusive)
+    cat_addon(type_addon,addon)             mapping of add-on technologies to respective add-on technology types
     type_year                               types of year aggregations
     cat_year(type_year,year_all)            mapping of years to respective categories
     type_emission                           types of emission aggregations
     cat_emission(type_emission,emission)    mapping of emissions to respective categories
     type_tec_land(type_tec)                 dynamic set whether emissions from land use are included in type_tec
 ;
+
+Alias(type_tec,type_tec_share);
+Alias(type_tec,type_tec_total);
 
 *----------------------------------------------------------------------------------------------------------------------*
 * Mapping sets                                                                                                         *
@@ -281,10 +288,16 @@ Sets
     map_tec_time(node,tec,year_all,time)         mapping of technology to temporal dissagregation (time)
     map_tec_mode(node,tec,year_all,mode)         mapping of technology to modes
     map_tec_act(node,tec,year_all,mode,time)     mapping of technology to modes AND temporal dissagregation
+    map_tec_addon(tec,type_addon)                mapping of types of add-on technologies to the underlying parent technology
 
     map_spatial_hierarchy(lvl_spatial,node,node)    mapping of spatial resolution to nodes (last index is 'parent')
     map_temporal_hierarchy(lvl_temporal,time,time)  mapping of temporal resolution to time (last index is 'parent')
 
+    map_shares_commodity_share(shares,node,
+        node,type_tec,mode,commodity,level)   mapping for commodity share constraints (numerator)
+    map_shares_commodity_total(shares,node,
+        node,type_tec,mode,commodity,level)   mapping for commodity share constraints (denominator)
+    
     map_land(node,land_scenario,year_all)            mapping of land-use model emulator scenarios to nodes and years
     map_relation(relation,node,year_all)             mapping of generic (user-defined) relations to nodes and years
 ;
@@ -302,7 +315,7 @@ Sets
 * Mapping sets (flags) for bounds
 * -------------------------------
 *
-* There are a number of mappings sets generated when exporting a ``MESSAGE``-scheme ``ixmp``.Scenario to gdx.
+* There are a number of mappings sets generated when exporting a ``message_ix.Scenario`` to gdx.
 * They are used as 'flags' to indicate whether a constraint is active.
 * The names of these sets follow the format ``is_<constraint>_<dir>``.
 *
@@ -346,8 +359,8 @@ Sets
 *
 * Similar to the mapping sets for bounds, there are mapping sets to indicate whether decision variables
 * are pre-defined to a specific value, usually taken from a solution of another model instance.
-* This can be used to represent imperfect foresight where a policy shift or parameter change is introduced in later years.
-* The names of these sets follow the format ``is_fixed_<variable>``.
+* This can be used to represent imperfect foresight where a policy shift or parameter change is introduced in later
+* years. The names of these sets follow the format ``is_fixed_<variable>``.
 ***
 
 Sets

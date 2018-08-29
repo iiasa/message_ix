@@ -18,6 +18,8 @@ except:
 ene_path = os.path.join(here, '..', 'tutorial', 'Austrian_energy_system')
 westeros_path = os.path.join(here, '..', 'tutorial', 'westeros')
 
+jupyter_required = 'requires Jupyter Notebook to be installed'
+
 # taken from the execellent example here:
 # https://blog.thedataincubator.com/2016/06/testing-jupyter-notebooks/
 
@@ -51,18 +53,47 @@ def _notebook_run(path, kernel=None, capsys=None):
     return nb, errors
 
 
-@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
-def test_westeros(capsys):
-    fname = os.path.join(westeros_path, 'westeros.ipynb')
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
+def test_westeros_baseline(capsys):
+    fname = os.path.join(westeros_path, 'westeros_baseline.ipynb')
     nb, errors = _notebook_run(fname, capsys=capsys)
     assert errors == []
 
-    obs = eval(nb.cells[-11]['outputs'][0]['data']['text/plain'])
-    exp = 3.600316973564438e+17
+    # I have no idea why this is different between py2 and 3
+    obs = eval(nb.cells[-12]['outputs'][0]['data']['text/plain'])
+    exp = 187445.953125
     assert np.isclose(obs, exp)
 
 
-@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
+def test_westeros_emissions(capsys):
+    fname = os.path.join(westeros_path, 'westeros_emissions_bounds.ipynb')
+    nb, errors = _notebook_run(fname, capsys=capsys)
+    assert errors == []
+
+
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
+def test_westeros_emissions_tax(capsys):
+    fname = os.path.join(westeros_path, 'westeros_emissions_taxes.ipynb')
+    nb, errors = _notebook_run(fname, capsys=capsys)
+    assert errors == []
+
+
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
+def test_westeros_firm_capacity(capsys):
+    fname = os.path.join(westeros_path, 'westeros_firm_capacity.ipynb')
+    nb, errors = _notebook_run(fname, capsys=capsys)
+    assert errors == []
+
+
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
+def test_westeros_flexible_generation(capsys):
+    fname = os.path.join(westeros_path, 'westeros_flexible_generation.ipynb')
+    nb, errors = _notebook_run(fname, capsys=capsys)
+    assert errors == []
+
+
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_austria(capsys):
     fname = os.path.join(ene_path, 'austria.ipynb')
     nb, errors = _notebook_run(fname, capsys=capsys)
@@ -73,7 +104,7 @@ def test_austria(capsys):
     assert np.isclose(obs, exp)
 
 
-@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_austria_single_policy():
     fname = os.path.join(ene_path, 'austria_single_policy.ipynb')
     nb, errors = _notebook_run(fname)
@@ -84,21 +115,21 @@ def test_austria_single_policy():
     assert np.isclose(obs, exp)
 
 
-@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_austria_multiple_policies():
     fname = os.path.join(ene_path, 'austria_multiple_policies.ipynb')
     nb, errors = _notebook_run(fname)
     assert errors == []
 
 
-@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_austria_multiple_policies_answers():
     fname = os.path.join(ene_path, 'austria_multiple_policies-answers.ipynb')
     nb, errors = _notebook_run(fname)
     assert errors == []
 
 
-@pytest.mark.skipif(not jupyter_installed, reason='requires Jupyter Notebook to be installed')
+@pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_austria_load():
     fname = os.path.join(ene_path, 'austria_load_scenario.ipynb')
     nb, errors = _notebook_run(fname)
