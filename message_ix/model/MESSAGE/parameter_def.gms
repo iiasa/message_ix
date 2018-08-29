@@ -335,6 +335,8 @@ Parameters
 *
 * The implementation of |MESSAGEix| includes the functionality to introduce "add-on technologies" that are specifically
 * linked to parent technologies. This feature can be used to model mitigation options (scrubber, cooling).
+* Note, that no default addon_conversion is set, to avoid default conversion factors of 1 being set for technologies
+* with mutiple modes, of which only a single mode should be linked to the add-on technology.
 *
 * .. list-table::
 *    :widths: 20 80

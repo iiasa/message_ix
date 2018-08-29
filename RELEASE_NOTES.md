@@ -1,6 +1,7 @@
 
 # Next Release
 
+- [#106](https://github.com/iiasa/message_ix/pull/106): Revising addon formulation to remove default conversion factor set to 1 to avoid modes of technologies being included that shouldn't be
 - [#99](https://github.com/iiasa/message_ix/pull/99): Fixing an error in the compuation of the auxiliary GAMS reporting variable `PRICE_EMISSION`
 - [#89](https://github.com/iiasa/message_ix/pull/89): Fully implementing system reliability and flexibity considerations (cf. Sullivan)
 - [#88](https://github.com/iiasa/message_ix/pull/88): Reformulated capacity maintainance constraint to ensure that newly installed capacity cannot be decommissioned within the same model period as it is built in
