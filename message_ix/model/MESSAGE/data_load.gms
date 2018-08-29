@@ -139,8 +139,6 @@ capacity_factor(node,tec,year_all2,year_all,'year') =
 operation_factor(node,tec,year_all2,year_all)$( map_tec(node,tec,year_all)
     AND map_tec_lifetime(node,tec,year_all2,year_all) AND NOT operation_factor(node,tec,year_all2,year_all) ) = 1 ;
 
-* addon-conversion factor is not set to 1 by default by default to avoid modes for technologies being set to 1 although they shouldn't
-
 * set the upper bound on addon-technology activity to 1 by default
 addon_up(node,tec,year_all,mode,time,type_addon)$(
     map_tec_addon(tec,type_addon)
