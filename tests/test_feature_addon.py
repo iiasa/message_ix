@@ -27,14 +27,14 @@ def add_addon(s, costs=False, zero_output=False):
     s.add_set('addon', 'canning_addon')
     s.add_cat('addon', 'better_production', 'canning_addon')
     s.add_set('map_tec_addon', ['canning_plant', 'better_production'])
-    conversion_df = pd.DataFrame({'node': 'seattle', 
-                                  'technology': 'canning_plant', 
-                                  'year_vtg': 2010, 
-                                  'year_act': 2010, 
-                                  'mode': 'production', 
-                                  'time': 'year', 
-                                  'type_addon': 'better_production', 
-                                  'unit': 'cases', 
+    conversion_df = pd.DataFrame({'node': 'seattle',
+                                  'technology': 'canning_plant',
+                                  'year_vtg': 2010,
+                                  'year_act': 2010,
+                                  'mode': 'production',
+                                  'time': 'year',
+                                  'type_addon': 'better_production',
+                                  'unit': 'cases',
                                   'value': 1.}, index=[0])
 
     s.add_par('addon_conversion', conversion_df)
