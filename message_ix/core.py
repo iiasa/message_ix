@@ -1,6 +1,7 @@
 import collections
 import ixmp
 import itertools
+import warnings
 
 import pandas as pd
 
@@ -10,17 +11,17 @@ from message_ix.utils import isscalar, logger
 
 class Scenario(ixmp.Scenario):
 
-    def __init__(self, platform, model, scen, version=None, annotation=None,
-                 cache=False, clone=None):
+    def __init__(self, mp, model, scenario=None, version=None, annotation=None,
+                 cache=False, clone=None, **kwargs):
         """Initialize a new message_ix.Scenario (structured input data and solution)
         or get an existing scenario from the ixmp database instance
 
         Parameters
         ----------
-        platform : ixmp.Platform
+        mp : ixmp.Platform
         model : string
             model name
-        scen : string
+        scenario : string
             scenario name
         version : string or integer
             initialize a new scenario (if version == 'new'), or
@@ -32,23 +33,29 @@ class Scenario(ixmp.Scenario):
         clone : Scenario, optional
             make a clone of an existing scenario
         """
+        if 'scen' in kwargs:
+            warnings.warn(
+                '`scen` is deprecated and will be removed in the next' +
+                ' release, please use `scenario`')
+            scenario = kwargs.pop('scen')
+
         if version is not None and clone is not None:
             raise ValueError(
                 'Can not provide both version and clone as arguments')
-        jobj = platform._jobj
         if clone is not None:
-            jscen = clone._jobj.clone(model, scen, annotation,
+            jscen = clone._jobj.clone(model, scenario, annotation,
                                       clone._keep_sol, clone._first_model_year)
         elif version == 'new':
             scheme = 'MESSAGE'
-            jscen = jobj.newScenario(model, scen, scheme, annotation)
+            jscen = mp._jobj.newScenario(model, scenario, scheme, annotation)
         elif isinstance(version, int):
-            jscen = jobj.getScenario(model, scen, version)
+            jscen = mp._jobj.getScenario(model, scenario, version)
         else:
-            jscen = jobj.getScenario(model, scen)
+            jscen = mp._jobj.getScenario(model, scenario)
 
-        super(Scenario, self).__init__(
-            platform, model, scen, jscen, cache=cache)
+        self.is_message_scheme = True
+
+        super(Scenario, self).__init__(mp, model, scenario, jscen, cache=cache)
 
     def add_spatial_sets(self, data):
         """Add sets related to spatial dimensions of the model
@@ -119,8 +126,12 @@ class Scenario(ixmp.Scenario):
         return v_years, a_years
 
     def solve(self, **kwargs):
-        """Solve a MESSAGE Scenario. See ixmp.Scenario.solve() for arguments"""
-        return super(Scenario, self).solve(model='MESSAGE', **kwargs)
+        """Solve a MESSAGE Scenario. See ixmp.Scenario.solve() for arguments.
+        The default model is 'MESSAGE', but can be overwritten with, e.g.,
+        `message_ix.Scenario.solve(model='MESSAGE-MACRO')`.
+        """
+        model = kwargs.pop('model', 'MESSAGE')
+        return super(Scenario, self).solve(model=model, **kwargs)
 
     def clone(self, model=None, scen=None, annotation=None, keep_sol=True,
               first_model_year=None):
@@ -148,7 +159,7 @@ class Scenario(ixmp.Scenario):
         return Scenario(self.platform, model, scen, annotation=annotation,
                         cache=self._cache, clone=self)
 
-    def rename(self, name, mapping):
+    def rename(self, name, mapping, keep=False):
         """Rename an element in a set
 
         Parameters
@@ -157,8 +168,14 @@ class Scenario(ixmp.Scenario):
             name of the set to change (e.g., 'technology')
         mapping : str
             mapping of old (current) to new set element names
+        keep : bool, optional, default: False
+            keep the old values in the model
         """
-        self.check_out()
+        try:
+            self.check_out()
+            commit = True
+        except:
+            commit = False
         keys = list(mapping.keys())
         values = list(mapping.values())
 
@@ -182,17 +199,19 @@ class Scenario(ixmp.Scenario):
             if name not in self.idx_names(item):
                 continue
             for key, value in mapping.items():
-                df = self.par(item, filters={name: key})
+                df = self.par(item, filters={name: [key]})
                 if not df.empty:
                     df[name] = value
                     self.add_par(item, df)
 
         # this removes all instances of from_tech in the model
-        for key in keys:
-            self.remove_set(name, key)
+        if not keep:
+            for key in keys:
+                self.remove_set(name, key)
 
         # commit
-        self.commit('Renamed {} using mapping {}'.format(name, mapping))
+        if commit:
+            self.commit('Renamed {} using mapping {}'.format(name, mapping))
 
     def to_excel(self, fname):
         """Save a scenario as an Excel file. NOTE: Cannot export
