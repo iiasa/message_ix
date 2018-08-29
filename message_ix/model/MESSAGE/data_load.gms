@@ -15,6 +15,8 @@ $LOAD map_node, map_time, map_commodity, map_resource, map_stocks, map_tec, map_
 $LOAD map_land, map_relation
 $LOAD type_tec, cat_tec, type_year, cat_year, type_emission, cat_emission, type_tec_land
 $LOAD inv_tec, renewable_tec
+$LOAD shares
+$LOAD addon, type_addon, cat_addon, map_tec_addon
 $GDXIN
 
 Execute_load '%in%'
@@ -38,6 +40,11 @@ is_dynamic_activity_lo, initial_activity_lo, growth_activity_lo,
 abs_cost_new_capacity_soft_up, abs_cost_new_capacity_soft_lo, level_cost_new_capacity_soft_up, level_cost_new_capacity_soft_lo,
 abs_cost_activity_soft_up, abs_cost_activity_soft_lo, level_cost_activity_soft_up, level_cost_activity_soft_lo,
 soft_new_capacity_up, soft_new_capacity_lo, soft_activity_up, soft_activity_lo,
+* share constraints
+map_shares_commodity_share,map_shares_commodity_total,share_commodity_up,share_commodity_lo
+share_mode_up,share_mode_lo,
+* addon technologies
+addon_conversion, addon_up, addon_lo
 * parameters for reliability, flexibility and renewable potential constraints
 rating_bin, reliability_factor, peak_load_factor, flexibility_factor
 renewable_capacity_factor, renewable_potential
@@ -64,6 +71,20 @@ fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activit
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
+* auxiliary mappings for the implementation of bounds over all modes and system reliability/flexibility constraints    *
+*----------------------------------------------------------------------------------------------------------------------*
+
+Set all_modes (mode) / all /;
+
+Set rating_unfirm(rating) ;
+rating_unfirm(rating) = yes ;
+rating_unfirm('firm') = no ;
+
+Set rating_unrated(rating) ;
+rating_unrated(rating) = yes ;
+rating_unrated('unrated') = no ;
+
+*----------------------------------------------------------------------------------------------------------------------*
 * assignment and computation of MESSAGE-specific auxiliary parameters                                                  *
 *----------------------------------------------------------------------------------------------------------------------*
 
@@ -72,8 +93,6 @@ $INCLUDE includes/period_parameter_assignment.gms
 
 * compute auxiliary parameters for relative duration of subannual time periods
 duration_time_rel(time,time2)$( map_time(time,time2) ) = duration_time(time2) / duration_time(time) ;
-
-** mapping and other stuff for technologies **
 
 * assign an additional mapping set for technologies to nodes, modes and subannual time slices (for shorter reference)
 map_tec_act(node,tec,year_all,mode,time)$( map_tec_time(node,tec,year_all,time) AND
@@ -120,6 +139,19 @@ capacity_factor(node,tec,year_all2,year_all,'year') =
 operation_factor(node,tec,year_all2,year_all)$( map_tec(node,tec,year_all)
     AND map_tec_lifetime(node,tec,year_all2,year_all) AND NOT operation_factor(node,tec,year_all2,year_all) ) = 1 ;
 
+* set the addon-conversion factor to 1 by default
+addon_conversion(node,tec,vintage,year_all,mode,time,type_addon)$(
+    map_tec_addon(tec,type_addon)
+    AND map_tec_act(node,tec,year_all,mode,time)
+    AND map_tec_lifetime(node,tec,vintage,year_all)
+    AND NOT addon_conversion(node,tec,vintage,year_all,mode,time,type_addon) ) = 1 ;
+
+* set the upper bound on addon-technology activity to 1 by default
+addon_up(node,tec,year_all,mode,time,type_addon)$(
+    map_tec_addon(tec,type_addon)
+    AND map_tec_act(node,tec,year_all,mode,time)
+    AND NOT addon_up(node,tec,year_all,mode,time,type_addon) ) = 1 ;
+
 * set the emission scaling parameter to 1 if only one emission is included in a category
 emission_scaling(type_emission,emission)$( cat_emission(type_emission,emission)
         and not emission_scaling(type_emission,emission) ) = 1 ;
@@ -152,7 +184,7 @@ if (check,
 
 * check for validity of temporal resolution
 loop(lvl_temporal,
-    loop(time2$( sum(time, map_temporal_hierarchy(lvl_temporal,time,time2) ) ), 
+    loop(time2$( sum(time, map_temporal_hierarchy(lvl_temporal,time,time2) ) ),
         check = 1$( sum( time$( map_temporal_hierarchy(lvl_temporal,time,time2) ),
             duration_time(time) ) ne duration_time(time2) ) ;
     ) ;
@@ -173,4 +205,20 @@ loop( (node,commodity,grade,year_all)$( map_resource(node,commodity,grade,year_a
 ) ;
 if (check,
     abort "There is a problem with the parameter 'resources_remaining'!" ;
+) ;
+
+* check that the sum of rating bins (if used for firm-cacpacity or flexibility) is greater than 1
+loop( (node,tec,year_all,commodity,level,time)$(
+    ( sum((vintage,rating_unfirm), reliability_factor(node,tec,year_all,commodity,level,time,rating_unfirm) )
+    OR sum((vintage,mode,rating_unrated)$(
+        flexibility_factor(node,tec,vintage,year_all,mode,commodity,level,time,rating_unrated) ), 1 ) )
+    ),
+    if ( ( sum( rating, rating_bin(node,tec,year_all,commodity,level,time,rating) ) < 1 ),
+        put_utility 'log'/" Error: Insufficient rating bin assignment ' "
+            "for '"node.tl:0"|"tec.tl:0"|"year_all.tl:0 "'" ;
+        check = 1 ;
+    ) ;
+) ;
+if (check,
+    abort "There is a problem with assignment of rating bins!" ;
 ) ;

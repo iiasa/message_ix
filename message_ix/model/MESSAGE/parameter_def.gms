@@ -11,7 +11,7 @@
 * This provides flexibility when changing the resolution of the model horizon (i.e., the set ``year``).
 *
 * Parameters written in *italics* are auxiliary parameters
-* that are either generated automatically when exporting a ``MESSAGE``-scheme ``ixmp``.Scenario to gdx
+* that are either generated automatically when exporting a ``message_ix.Scenario`` to gdx
 * or that are computed during the pre-processing stage in GAMS.
 ***
 
@@ -104,7 +104,7 @@ Parameter
     resource_remaining(node,commodity,grade,year_all)   maximum extraction relative to remaining resources (by year)
     bound_extraction_up(node,commodity,grade,year_all)  upper bound on extraction of resources by grade
     commodity_stock(node,commodity,level,year_all)      exogenous (initial) quantity of commodity in stock
-    historical_extraction(node,commodity,grade,year_all)    historical extraction
+    historical_extraction(node,commodity,grade,year_all) historical extraction
 ;
 
 ***
@@ -133,8 +133,8 @@ Parameter
 ***
 
 Parameter
-    demand_fixed(node,commodity,level,year_all,time) exogenous demand levels
-    peak_load_factor(node,commodity,level,year_all,time)       maximum peak load factor for reliability constraint of firm capacity
+    demand_fixed(node,commodity,level,year_all,time)     exogenous demand levels
+    peak_load_factor(node,commodity,level,year_all,time) maximum peak load factor for reliability constraint of firm capacity
 ;
 
 ***
@@ -324,6 +324,43 @@ Parameters
     growth_activity_lo(node,tec,year_all,time)     dynamic lower bound on activity (growth rate)
     soft_activity_lo(node,tec,year_all,time)       soft relaxation of dynamic lower bound on activity (growth rate)
 ;
+
+*----------------------------------------------------------------------------------------------------------------------*
+* Add-on technology parameters                                                                                         *
+*----------------------------------------------------------------------------------------------------------------------*
+
+***
+* Parameters for the add-on technologies
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*
+* The implementation of |MESSAGEix| includes the functionality to introduce "add-on technologies" that are specifically
+* linked to parent technologies. This feature can be used to model mitigation options (scrubber, cooling).
+*
+* .. list-table::
+*    :widths: 20 80
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index names
+*    * - addon_conversion
+*      - ``node`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``time`` | ``type_addon``
+*    * - addon_up
+*      - ``node`` | ``tec`` | ``vintage`` | ``year`` | ``mode`` | ``time`` | ``type_addon``
+*    * - addon_lo
+*      - ``node`` | ``tec`` | ``vintage`` | ``year`` | ``mode`` | ``time`` | ``type_addon``
+*
+* The upper bound of
+***
+
+Parameters
+    addon_conversion(node,tec,vintage,year_all,mode,time,type_addon) conversion factor between add-on and parent technology activity
+    addon_up(node,tec,year_all,mode,time,type_addon)    upper bound of add-on technologies relative to parent technology
+    addon_lo(node,tec,year_all,mode,time,type_addon)    lower bound of add-on technologies relative to parent technology
+;
+
+*----------------------------------------------------------------------------------------------------------------------*
+* Soft relaxations of dynamic constraints                                                                              *
+*----------------------------------------------------------------------------------------------------------------------*
 
 ***
 * Cost parameters for 'soft' relaxations of dynamic constraints
@@ -518,6 +555,40 @@ Parameters
     initial_land_lo(node,year_all,land_type)                initial bound on land-type use change (downwards)
     dynamic_land_lo(node,land_scenario,year_all,land_type)  absolute bound on land-type use change (upwards)
     growth_land_lo(node,year_all,land_type)                 relative bound on land-type use change (downwards)
+;
+
+*----------------------------------------------------------------------------------------------------------------------*
+* Share constraints                                                                                                    *
+*----------------------------------------------------------------------------------------------------------------------*
+
+***
+* Parameters of the `Share Constraints` section
+* ---------------------------------------------
+*
+* Share constraints define the share of a given commodity to be active on a certain level
+*
+* .. list-table::
+*    :widths: 25 75
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index dimensions
+*    * - share_commodity_up
+*      - ``shares`` | ``node_share`` | ``year_act`` | ``time``
+*    * - share_commodity_lo
+*      - ``shares`` | ``node`` | ``year_act`` | ``time``
+*    * - share_mode_up
+*      - ``shares`` | ``node_loc`` | ``technology`` | ``mode`` | ``year_act`` | ``time``
+*    * - share_mode_lo
+*      - ``shares`` | ``node_loc`` | ``technology`` | ``mode`` | ``year_act`` | ``time``
+*
+***
+
+Parameters
+    share_commodity_up(shares,node,year_all,time)    upper bound of commodity share constraint
+    share_commodity_lo(shares,node,year_all,time)    lower bound of commodity share constraint
+    share_mode_up(shares,node,tec,mode,year_all,time)    upper bound of mode share constraint
+    share_mode_lo(shares,node,tec,mode,year_all,time)    lower bound of mode share constraint
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*

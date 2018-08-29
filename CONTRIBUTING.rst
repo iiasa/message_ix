@@ -19,7 +19,7 @@ Code submitted via pull requests must adhere to the following style formats:
  - R: please follow the style of the existing code base
  - other (file names, CLI, etc.): please follow the style of the existing code base
 
-.. _`Contributor License Agreement`: CONTRIBUTOR_LICENSE.rst
+.. _`Contributor License Agreement`: contributor_license.html
 
 .. _`cla-assistant` : https://github.com/cla-assistant/
 
