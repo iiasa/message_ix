@@ -691,7 +691,7 @@ CAPACITY_MAINTENANCE_NEW(node,inv_tec,vintage,vintage)$( map_tec_lifetime(node,i
 *
 ***
 CAPACITY_MAINTENANCE(node,inv_tec,vintage,year)$( map_tec_lifetime(node,inv_tec,vintage,year)
-        AND NOT historical(vintage) AND year_order(vintage) < year_order(year))..
+        AND NOT first_period(year) AND year_order(vintage) < year_order(year))..
     CAP(node,inv_tec,vintage,year)
     =L= remaining_capacity(node,inv_tec,vintage,year) *
         ( SUM(year2$( seq_period(year2,year) ),
