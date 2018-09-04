@@ -1,6 +1,8 @@
 ARG base_image
 FROM ${base_image}
 
+RUN conda install --yes pyyaml
+
 # install ixmp
 RUN git clone https://github.com/iiasa/ixmp.git /ixmp
 RUN cd /ixmp && python setup.py install
