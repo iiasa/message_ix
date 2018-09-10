@@ -7,9 +7,9 @@
 * 4     Barrier
 * 5     Sifting
 * 6     Concurrent
-
-* advanced basis turned off as default to avoid conflicts wehen using barrier method
+* set barrier method as default which generally gives best performance with MESSAGE_ix models
+lpmethod = 4
+* advanced basis turned off as default to avoid conflicts when using barrier method
 advind = 0
-lpmethod = 6
 threads = 4
 epopt 1e-6
