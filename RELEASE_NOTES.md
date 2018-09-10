@@ -1,6 +1,7 @@
 
 # Next Release
 
+- [#110](https://github.com/iiasa/message_ix/pull/110): Default CPLEX solver option changed to barrier method
 - [#99](https://github.com/iiasa/message_ix/pull/99): Fixing an error in the compuation of the auxiliary GAMS reporting variable `PRICE_EMISSION`
 - [#89](https://github.com/iiasa/message_ix/pull/89): Fully implementing system reliability and flexibity considerations (cf. Sullivan)
 - [#88](https://github.com/iiasa/message_ix/pull/88): Reformulated capacity maintainance constraint to ensure that newly installed capacity cannot be decommissioned within the same model period as it is built in
