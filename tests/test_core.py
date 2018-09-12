@@ -122,14 +122,14 @@ def test_vintage_and_active_years_with_lifetime(test_mp):
 
 
 def test_cat_all(test_mp):
-    scen = test_mp.Scenario(*msg_args)
+    scen = message_ix.Scenario(test_mp, *msg_args)
     df = scen.cat('technology', 'all')
     npt.assert_array_equal(df, ['canning_plant', 'transport_from_seattle',
                                 'transport_from_san-diego'])
 
 
 def test_add_cat(test_mp):
-    scen = test_mp.Scenario(*msg_args)
+    scen = message_ix.Scenario(test_mp, *msg_args)
     scen2 = scen.clone(keep_sol=False)
     scen2.check_out()
     scen2.add_cat('technology', 'trade',
@@ -141,7 +141,7 @@ def test_add_cat(test_mp):
 
 
 def test_add_cat_unique(test_mp):
-    scen = test_mp.Scenario(*msg_multiyear_args)
+    scen = message_ix.Scenario(test_mp, *msg_multiyear_args)
     scen2 = scen.clone(keep_sol=False)
     scen2.check_out()
     scen2.add_cat('year', 'firstmodelyear', 2020, True)
