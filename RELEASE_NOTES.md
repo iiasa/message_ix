@@ -1,6 +1,7 @@
 
 # Next Release
 
+- [#113](https://github.com/iiasa/message_ix/pull/113): Upgrading to MESSAGEix 1.1: improved representation of renewables, share constraints, etc.
 - [#109](https://github.com/iiasa/message_ix/pull/109): MACRO module added for initializing models to be solved with MACRO. Added scenario-based CI on circleci.
 - [#99](https://github.com/iiasa/message_ix/pull/99): Fixing an error in the compuation of the auxiliary GAMS reporting variable `PRICE_EMISSION`
 - [#89](https://github.com/iiasa/message_ix/pull/89): Fully implementing system reliability and flexibity considerations (cf. Sullivan)

@@ -74,7 +74,8 @@ fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activit
 * auxiliary mappings for the implementation of bounds over all modes and system reliability/flexibility constraints    *
 *----------------------------------------------------------------------------------------------------------------------*
 
-Set all_modes (mode) / all /;
+Set all_modes (mode) ;
+all_modes('all') = yes ;
 
 Set rating_unfirm(rating) ;
 rating_unfirm(rating) = yes ;
