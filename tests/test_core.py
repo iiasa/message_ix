@@ -130,7 +130,7 @@ def test_cat_all(test_mp):
 
 def test_add_cat(test_mp):
     scen = message_ix.Scenario(test_mp, *msg_args)
-    scen2 = scen.clone(keep_sol=False)
+    scen2 = scen.clone(keep_solution=False)
     scen2.check_out()
     scen2.add_cat('technology', 'trade',
                   ['transport_from_san-diego', 'transport_from_seattle'])
@@ -142,7 +142,7 @@ def test_add_cat(test_mp):
 
 def test_add_cat_unique(test_mp):
     scen = message_ix.Scenario(test_mp, *msg_multiyear_args)
-    scen2 = scen.clone(keep_sol=False)
+    scen2 = scen.clone(keep_solution=False)
     scen2.check_out()
     scen2.add_cat('year', 'firstmodelyear', 2020, True)
     df = scen2.cat('year', 'firstmodelyear')
@@ -159,7 +159,7 @@ def test_years_active(test_mp):
 
 def test_years_active_extend(test_mp):
     scen = test_mp.Scenario(*msg_multiyear_args)
-    scen = scen.clone(keep_sol=False)
+    scen = scen.clone(keep_solution=False)
     scen.check_out()
     scen.add_set('year', ['2040', '2050'])
     scen.add_par('duration_period', '2040', 10, 'y')
@@ -171,7 +171,7 @@ def test_years_active_extend(test_mp):
 
 def test_new_timeseries_long_name64(test_mp):
     scen = test_mp.Scenario(*msg_multiyear_args)
-    scen = scen.clone(keep_sol=False)
+    scen = scen.clone(keep_solution=False)
     scen.check_out(timeseries_only=True)
     df = pd.DataFrame({
         'region': ['India', ],
@@ -185,7 +185,7 @@ def test_new_timeseries_long_name64(test_mp):
 
 def test_new_timeseries_long_name64plus(test_mp):
     scen = test_mp.Scenario(*msg_multiyear_args)
-    scen = scen.clone(keep_sol=False)
+    scen = scen.clone(keep_solution=False)
     scen.check_out(timeseries_only=True)
     df = pd.DataFrame({
         'region': ['India', ],
@@ -203,7 +203,7 @@ def test_rename_technology(test_mp):
     assert scen.par('output')['technology'].isin(['canning_plant']).any()
     exp_obj = scen.var('OBJ')['lvl']
 
-    clone = scen.clone('foo', 'bar', keep_sol=False)
+    clone = scen.clone('foo', 'bar', keep_solution=False)
     clone.rename('technology', {'canning_plant': 'foo_bar'})
     assert not clone.par('output')['technology'].isin(['canning_plant']).any()
     assert clone.par('output')['technology'].isin(['foo_bar']).any()
@@ -217,7 +217,7 @@ def test_rename_technology_no_rm(test_mp):
     scen.solve()
     assert scen.par('output')['technology'].isin(['canning_plant']).any()
 
-    clone = scen.clone('foo', 'bar', keep_sol=False)
+    clone = scen.clone('foo', 'bar', keep_solution=False)
     # also test if already checked out
     clone.check_out()
 
@@ -272,7 +272,7 @@ def test_add_bound_activity_up_modes(test_mp):
     }, index=[0])
 
     # test limiting one mode
-    clone = scen.clone('foo', 'bar', keep_sol=False)
+    clone = scen.clone('foo', 'bar', keep_solution=False)
     clone.check_out()
     exp = 0.5 * calculate(scen).sum()
     data['mode'] = 'to_chicago'
@@ -284,7 +284,7 @@ def test_add_bound_activity_up_modes(test_mp):
     assert np.isclose(obs, exp)
 
     # test limiting all modes
-    clone2 = scen.clone('foo', 'baz', keep_sol=False)
+    clone2 = scen.clone('foo', 'baz', keep_solution=False)
     clone2.check_out()
     exp = 0.95 * calculate(scen).sum()
     data['mode'] = 'all'

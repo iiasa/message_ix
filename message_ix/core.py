@@ -318,8 +318,8 @@ class Scenario(ixmp.Scenario):
         model = kwargs.pop('model', 'MESSAGE')
         return super(Scenario, self).solve(model=model, **kwargs)
 
-    def clone(self, model=None, scen=None, annotation=None, keep_sol=True,
-              first_model_year=None):
+    def clone(self, model=None, scen=None, annotation=None, keep_solution=True,
+              first_model_year=None, **kwargs):
         """clone the current scenario and return the new scenario
 
         Parameters
@@ -330,14 +330,20 @@ class Scenario(ixmp.Scenario):
             new scenario name
         annotation : string
             explanatory comment (optional)
-        keep_sol : boolean, default: True
+        keep_solution : boolean, default, True
             indicator whether to include an existing solution
             in the cloned scenario
         first_model_year: int, default None
             new first model year in cloned scenario
             ('slicing', only available for MESSAGE-scheme scenarios)
         """
-        self._keep_sol = keep_sol
+        if 'keep_sol' in kwargs:
+            warnings.warn(
+                '`keep_sol` is deprecated and will be removed in the next' +
+                ' release, please use `keep_solution`')
+            keep_solution = kwargs.pop('keep_sol')
+
+        self._keep_sol = keep_solution
         self._first_model_year = first_model_year or 0
         model = self.model if not model else model
         scen = self.scenario if not scen else scen
