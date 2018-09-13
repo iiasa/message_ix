@@ -13,10 +13,10 @@ from message_ix.utils import isscalar, logger
 def _init_scenario(s, commit=False):
     """Initialize a MESSAGEix Scenario object with default values"""
     inits = (
-            # {
-            #  'test': False  # some test,
-            #  'exec': [(pass, {'args': ()}), ],
-            # },
+             # {
+             #  'test': False  # some test,
+             #  'exec': [(pass, {'args': ()}), ],
+             # },
     )
 
     pass_idx = [i for i, init in enumerate(inits) if init['test']]
