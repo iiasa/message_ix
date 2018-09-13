@@ -13,97 +13,10 @@ from message_ix.utils import isscalar, logger
 def _init_scenario(s, commit=False):
     """Initialize a MESSAGEix Scenario object with default values"""
     inits = (
-        {
-            'test': 'firm' not in s.set('rating'),
-            'exec': [
-                (s.add_set, {'args': ('rating', ['firm', 'unrated'])}),
-            ],
-        },
-        {  # required for subset all_modes, see model/data_load.gms
-            'test': 'all' not in s.set('mode'),
-            'exec': [(s.add_set, {'args': ('mode', 'all')})],
-        },
-        {  # required for share constraints
-            'test': 'shares' not in s.set_list(),
-            'exec': [
-                (s.init_set, {'args': ('shares',)}),
-                (s.init_set, {
-                    'args': ('map_shares_commodity_share',),
-                    'kwargs': dict(
-                        idx_sets=['shares', 'node', 'node', 'type_tec',
-                                  'mode', 'commodity', 'level'],
-                        idx_names=['shares', 'node_share', 'node', 'type_tec',
-                                   'mode', 'commodity', 'level'])
-                }),
-                (s.init_set, {
-                    'args': ('map_shares_commodity_total',),
-                    'kwargs': dict(
-                        idx_sets=['shares', 'node', 'node', 'type_tec',
-                                  'mode', 'commodity', 'level'],
-                        idx_names=['shares', 'node_share', 'node', 'type_tec',
-                                   'mode', 'commodity', 'level'])
-                }),
-                (s.init_par, {
-                    'args': ('share_commodity_up',),
-                    'kwargs': dict(
-                        idx_sets=['shares', 'node', 'year', 'time'],
-                        idx_names=['shares', 'node_share', 'year_act', 'time'])
-                }),
-                (s.init_par, {
-                    'args': ('share_commodity_lo',),
-                    'kwargs': dict(
-                        idx_sets=['shares', 'node', 'year', 'time'],
-                        idx_names=['shares', 'node_share', 'year_act', 'time'])
-                }),
-                (s.init_par, {
-                    'args': ('share_mode_up',),
-                    'kwargs': dict(
-                        idx_sets=['shares', 'node', 'technology',
-                                  'mode', 'year', 'time'],
-                        idx_names=['shares', 'node_loc', 'technology', 'mode',
-                                   'year_act', 'time'])
-                }),
-                (s.init_par, {
-                    'args': ('share_mode_lo',),
-                    'kwargs': dict(
-                        idx_sets=['shares', 'node', 'technology',
-                                  'mode', 'year', 'time'],
-                        idx_names=['shares', 'node_loc', 'technology', 'mode',
-                                   'year_act', 'time'])
-                }),
-            ],
-        },
-        {  # required for addon formulation
-            'test': 'addon' not in s.set_list(),
-            'exec': [
-                (s.init_set, {'args': ('addon',)}),
-                (s.init_set, {'args': ('type_addon',)}),
-                (s.init_set, {'args': ('cat_addon', ['type_addon', 'addon'])}),
-                (s.init_set, {
-                    'args': ('map_tec_addon', ['technology', 'type_addon'])
-                }),
-                (s.init_par, {
-                    'args': (
-                        'addon_conversion',
-                        ['node', 'technology',
-                         'year', 'year', 'mode', 'time', 'type_addon'],
-                        ['node', 'technology',
-                         'year_vtg', 'year_act', 'mode', 'time', 'type_addon']
-                    )}),
-                (s.init_par, {
-                    'args': (
-                        'addon_up',
-                        ['node', 'technology', 'year',
-                         'mode', 'time', 'type_addon']
-                    )}),
-                (s.init_par, {
-                    'args': (
-                        'addon_lo',
-                        ['node', 'technology', 'year',
-                         'mode', 'time', 'type_addon']
-                    )}),
-            ],
-        },
+            # {
+            #  'test': False  # some test,
+            #  'exec': [(pass, {'args': ()}), ],
+            # },
     )
 
     pass_idx = [i for i, init in enumerate(inits) if init['test']]
