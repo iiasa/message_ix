@@ -109,7 +109,8 @@ def test_vintage_and_active_years_with_lifetime(test_mp):
     pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
 
     # part is before horizon
-    obs = scen.vintage_and_active_years(('foo', 'bar', '2000'), inhorizon=False)
+    obs = scen.vintage_and_active_years(('foo', 'bar', '2000'), 
+                                        inhorizon=False)
     exp = pd.DataFrame({'year_vtg': (2000, 2000),
                         'year_act': (2000, 2010)})
     pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order

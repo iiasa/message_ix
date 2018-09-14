@@ -271,7 +271,8 @@ class Scenario(ixmp.Scenario):
             else:
                 return int(y_v) <= int(y_a)
 
-        year_pairs = [(int(y_v), int(y_a)) for y_v, y_a in combos if valid(y_v, y_a)]
+        year_pairs = [(int(y_v), int(y_a)) for y_v, y_a in combos
+                      if valid(y_v, y_a)]
         v_years, a_years = zip(*year_pairs)
         return pd.DataFrame({'year_vtg': v_years, 'year_act': a_years})
 
