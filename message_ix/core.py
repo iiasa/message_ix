@@ -238,7 +238,7 @@ class Scenario(ixmp.Scenario):
         first = data['firstmodelyear'] if 'firstmodelyear' in data else horizon[0]
         scenario.add_cat("year", "firstmodelyear", first, is_unique=True)
 
-    def vintage_and_active_years(self, *args):
+    def vintage_and_active_years(self, ya_args=None, inhorizon=True):
         """Return a 2-tuple of valid pairs of vintage years and active years
         for use with data input. A valid year-vintage, year-active pair is
         one in which:
@@ -257,20 +257,21 @@ class Scenario(ixmp.Scenario):
         horizon = self.set('year')
         first = self.cat('year', 'firstmodelyear')[0] or horizon[0]
 
-        if len(args) > 0:
+        if ya_args:
             # on return values within active years
             # TODO: casting to int here is probably bad
-            years_active = self.years_active(*args)
-            lb = horizon.astype(int) >= int(min(years_active))
-            ub = horizon.astype(int) <= int(max(years_active))
-            horizon = horizon[lb & ub]
-
+            years_active = self.years_active(*ya_args)
+            combos = itertools.product([ya_args[2]], years_active)
+        else:
+            combos = itertools.product(horizon, horizon)
         def valid(y_v, y_a):
             # TODO: casting to int here is probably bad
-            return y_v <= y_a and int(y_a) >= int(first)
+            if inhorizon:
+                return int(y_v) <= int(y_a) and int(y_a) >= int(first)
+            else:
+                return int(y_v) <= int(y_a)
 
-        combos = itertools.product(horizon, horizon)
-        year_pairs = [(y_v, y_a) for y_v, y_a in combos if valid(y_v, y_a)]
+        year_pairs = [(int(y_v), int(y_a)) for y_v, y_a in combos if valid(y_v, y_a)]
         v_years, a_years = zip(*year_pairs)
         return pd.DataFrame({'year_vtg': v_years, 'year_act': a_years})
 
