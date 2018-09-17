@@ -16,6 +16,14 @@ jobs:
                 docker run message_ix/message_ix:py2 /bin/bash -c 'source activate root && pytest -v /message_ix/tests'
                 docker run message_ix/message_ix:py2 messageix-config --model_path=/tmp/
       - run:
+          name: Python2 Scenario Tests
+          command: |
+                docker run \
+                -e MESSAGE_IX_CI_USER=$MESSAGE_IX_CI_USER \
+                -e MESSAGE_IX_CI_PW=$MESSAGE_IX_CI_PW \
+                message_ix/message_ix:py2 \
+                /bin/bash -c 'source activate root && cd /message_ix/tests/ci && ./run_on_ci.sh'
+      - run:
           name: Build Python3 Image
           command: docker build --build-arg base_image=gidden/ixmp-py3 -t message_ix/message_ix:py3 .
       - run:
@@ -23,6 +31,14 @@ jobs:
           command: |
                 docker run message_ix/message_ix:py3 /bin/bash -c 'source activate root && pytest -v /message_ix/tests'
                 docker run message_ix/message_ix:py3 messageix-config --model_path=/tmp/
+      - run:
+          name: Python3 Scenario Tests
+          command: |
+                docker run \
+                -e MESSAGE_IX_CI_USER=$MESSAGE_IX_CI_USER \
+                -e MESSAGE_IX_CI_PW=$MESSAGE_IX_CI_PW \
+                message_ix/message_ix:py3 \
+                /bin/bash -c 'source activate root && cd /message_ix/tests/ci && ./run_on_ci.sh'
       - run:
           name: Build Docs
           command: docker run message_ix/message_ix:py3 /bin/bash -c 'cd /message_ix/doc && pip install -r requirements.txt && make html && test -d source/model'
