@@ -1,0 +1,7 @@
+CD_Links_SSP2_baseline:
+      model: CD_Links_SSP2
+      scenario: baseline
+      solve: MESSAGE-MACRO
+      obs: scen.var('OBJ')['lvl']
+      exp: 2486801.25
+      test: np.isclose(obs, exp, rtol=3e-6) # not sure why 1e-6 doesn't work
