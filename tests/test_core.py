@@ -77,8 +77,8 @@ def test_vintage_and_active_years(test_mp):
     scen.add_horizon({'year': ['2000', '2010', '2020'],
                       'firstmodelyear': '2010'})
     obs = scen.vintage_and_active_years()
-    exp = pd.DataFrame({'year_vtg': ('2000', '2000', '2010', '2010', '2020'),
-                        'year_act': ('2010', '2020', '2010', '2020', '2020')})
+    exp = pd.DataFrame({'year_vtg': (2000, 2000, 2010, 2010, 2020),
+                        'year_act': (2010, 2020, 2010, 2020, 2020)})
     pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
 
 
@@ -103,21 +103,28 @@ def test_vintage_and_active_years_with_lifetime(test_mp):
     }))
 
     # part is before horizon
-    obs = scen.vintage_and_active_years('foo', 'bar', '2000')
-    exp = pd.DataFrame({'year_vtg': ('2000', '2010'),
-                        'year_act': ('2010', '2010')})
+    obs = scen.vintage_and_active_years(('foo', 'bar', '2000'))
+    exp = pd.DataFrame({'year_vtg': (2000,),
+                        'year_act': (2010,)})
+    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+
+    # part is before horizon
+    obs = scen.vintage_and_active_years(('foo', 'bar', '2000'),
+                                        inhorizon=False)
+    exp = pd.DataFrame({'year_vtg': (2000, 2000),
+                        'year_act': (2000, 2010)})
     pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
 
     # fully in horizon
-    obs = scen.vintage_and_active_years('foo', 'bar', '2010')
-    exp = pd.DataFrame({'year_vtg': ('2010', '2010', '2020'),
-                        'year_act': ('2010', '2020', '2020')})
+    obs = scen.vintage_and_active_years(('foo', 'bar', '2010'))
+    exp = pd.DataFrame({'year_vtg': (2010, 2010),
+                        'year_act': (2010, 2020)})
     pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
 
     # part after horizon
-    obs = scen.vintage_and_active_years('foo', 'bar', '2020')
-    exp = pd.DataFrame({'year_vtg': ('2020',),
-                        'year_act': ('2020',)})
+    obs = scen.vintage_and_active_years(('foo', 'bar', '2020'))
+    exp = pd.DataFrame({'year_vtg': (2020,),
+                        'year_act': (2020,)})
     pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
 
 
