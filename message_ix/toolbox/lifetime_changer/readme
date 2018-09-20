@@ -1,0 +1,7 @@
+This functionality extends or shortens the lifetime of an existing technology in a MESSAGE scenario. The module can be used for adding or removing vintage years as well.
+
+The procedure is as follows:
+- First, parameter "technical_lifetime" is modified based on the new lifetime of technology and for specified vintage years.
+- Second, other relevant parameters are also modified to reflect this hcnage in the lifetime (e.g., "inv_cost", "input" etc.)
+
+The method is based on linear inter/extrapolation of the two adjacent data points from available data in that parameter.
