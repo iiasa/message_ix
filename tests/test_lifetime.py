@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 # Importing required packages
+import os
 import ixmp as ix
 import pandas as pd
 from itertools import product
 from pandas.testing import assert_frame_equal
+from conftest import here
+file_path = os.path.join(here, '..', 'toolbox', 'lifetime_changer')
+os.chdir(file_path)
 from f_lifetimeChanger import change_lifetime
 
 # Building a new scenario and adding two parameters
