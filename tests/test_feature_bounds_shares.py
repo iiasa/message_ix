@@ -274,7 +274,7 @@ def test_add_share_mode_up(test_mp):
     clone.add_par('share_mode_up',
                   pd.DataFrame({
                       'shares': 'test-share',
-                      'node_loc': 'seattle',
+                      'node_share': 'seattle',
                       'technology': 'transport_from_seattle',
                       'mode': 'to_chicago',
                       'year_act': 2010,
@@ -312,7 +312,7 @@ def test_add_share_mode_lo(test_mp):
     clone.add_par('share_mode_lo',
                   pd.DataFrame({
                       'shares': 'test-share',
-                      'node_loc': 'san-diego',
+                      'node_share': 'san-diego',
                       'technology': 'transport_from_san-diego',
                       'mode': 'to_new-york',
                       'year_act': 2010,

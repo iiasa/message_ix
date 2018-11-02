@@ -9,7 +9,7 @@ msg_args = ('canning problem (MESSAGE scheme)', 'standard')
 addon_share = pd.DataFrame({
     'node': 'seattle',
     'technology': 'canning_plant',
-    'year': 2010,
+    'year_act': 2010,
     'mode': 'production',
     'time': 'year',
     'type_addon': 'better_production',
