@@ -128,14 +128,14 @@ def test_vintage_and_active_years_with_lifetime(test_mp):
 
 
 def test_cat_all(test_mp):
-    scen = test_mp.Scenario(*msg_args)
+    scen = Scenario(test_mp, *msg_args)
     df = scen.cat('technology', 'all')
     npt.assert_array_equal(df, ['canning_plant', 'transport_from_seattle',
                                 'transport_from_san-diego'])
 
 
 def test_add_cat(test_mp):
-    scen = test_mp.Scenario(*msg_args)
+    scen = Scenario(test_mp, *msg_args)
     scen2 = scen.clone(keep_sol=False)
     scen2.check_out()
     scen2.add_cat('technology', 'trade',
@@ -147,7 +147,7 @@ def test_add_cat(test_mp):
 
 
 def test_add_cat_unique(test_mp):
-    scen = test_mp.Scenario(*msg_multiyear_args)
+    scen = Scenario(test_mp, *msg_multiyear_args)
     scen2 = scen.clone(keep_sol=False)
     scen2.check_out()
     scen2.add_cat('year', 'firstmodelyear', 2020, True)
@@ -158,13 +158,13 @@ def test_add_cat_unique(test_mp):
 
 
 def test_years_active(test_mp):
-    scen = test_mp.Scenario(*msg_multiyear_args)
+    scen = Scenario(test_mp, *msg_multiyear_args)
     df = scen.years_active('seattle', 'canning_plant', '2020')
     npt.assert_array_equal(df, [2020, 2030])
 
 
 def test_years_active_extend(test_mp):
-    scen = test_mp.Scenario(*msg_multiyear_args)
+    scen = Scenario(test_mp, *msg_multiyear_args)
     scen = scen.clone(keep_sol=False)
     scen.check_out()
     scen.add_set('year', ['2040', '2050'])
@@ -176,7 +176,7 @@ def test_years_active_extend(test_mp):
 
 
 def test_new_timeseries_long_name64(test_mp):
-    scen = test_mp.Scenario(*msg_multiyear_args)
+    scen = Scenario(test_mp, *msg_multiyear_args)
     scen = scen.clone(keep_sol=False)
     scen.check_out(timeseries_only=True)
     df = pd.DataFrame({
@@ -190,7 +190,7 @@ def test_new_timeseries_long_name64(test_mp):
 
 
 def test_new_timeseries_long_name64plus(test_mp):
-    scen = test_mp.Scenario(*msg_multiyear_args)
+    scen = Scenario(test_mp, *msg_multiyear_args)
     scen = scen.clone(keep_sol=False)
     scen.check_out(timeseries_only=True)
     df = pd.DataFrame({
