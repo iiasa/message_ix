@@ -35,5 +35,5 @@ with open(fname) as f:
 __version__ = '{}.{}.{}'.format(
     re.search('VERSION_MAJOR "(.+?)"', s).group(1),
     re.search('VERSION_MINOR "(.+?)"', s).group(1),
-    re.search('VERSION_MICRO "(.+?)"', s).group(1),
+    re.search('VERSION_PATCH "(.+?)"', s).group(1),
 )

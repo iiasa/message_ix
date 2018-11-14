@@ -13,97 +13,10 @@ from message_ix.utils import isscalar, logger
 def _init_scenario(s, commit=False):
     """Initialize a MESSAGEix Scenario object with default values"""
     inits = (
-        {
-            'test': 'firm' not in s.set('rating'),
-            'exec': [
-                (s.add_set, {'args': ('rating', ['firm', 'unrated'])}),
-            ],
-        },
-        {  # required for subset all_modes, see model/data_load.gms
-            'test': 'all' not in s.set('mode'),
-            'exec': [(s.add_set, {'args': ('mode', 'all')})],
-        },
-        {  # required for share constraints
-            'test': 'shares' not in s.set_list(),
-            'exec': [
-                (s.init_set, {'args': ('shares',)}),
-                (s.init_set, {
-                    'args': ('map_shares_commodity_share',),
-                    'kwargs': dict(
-                        idx_sets=['shares', 'node', 'node', 'type_tec',
-                                  'mode', 'commodity', 'level'],
-                        idx_names=['shares', 'node_share', 'node', 'type_tec',
-                                   'mode', 'commodity', 'level'])
-                }),
-                (s.init_set, {
-                    'args': ('map_shares_commodity_total',),
-                    'kwargs': dict(
-                        idx_sets=['shares', 'node', 'node', 'type_tec',
-                                  'mode', 'commodity', 'level'],
-                        idx_names=['shares', 'node_share', 'node', 'type_tec',
-                                   'mode', 'commodity', 'level'])
-                }),
-                (s.init_par, {
-                    'args': ('share_commodity_up',),
-                    'kwargs': dict(
-                        idx_sets=['shares', 'node', 'year', 'time'],
-                        idx_names=['shares', 'node_share', 'year_act', 'time'])
-                }),
-                (s.init_par, {
-                    'args': ('share_commodity_lo',),
-                    'kwargs': dict(
-                        idx_sets=['shares', 'node', 'year', 'time'],
-                        idx_names=['shares', 'node_share', 'year_act', 'time'])
-                }),
-                (s.init_par, {
-                    'args': ('share_mode_up',),
-                    'kwargs': dict(
-                        idx_sets=['shares', 'node', 'technology',
-                                  'mode', 'year', 'time'],
-                        idx_names=['shares', 'node_loc', 'technology', 'mode',
-                                   'year_act', 'time'])
-                }),
-                (s.init_par, {
-                    'args': ('share_mode_lo',),
-                    'kwargs': dict(
-                        idx_sets=['shares', 'node', 'technology',
-                                  'mode', 'year', 'time'],
-                        idx_names=['shares', 'node_loc', 'technology', 'mode',
-                                   'year_act', 'time'])
-                }),
-            ],
-        },
-        {  # required for addon formulation
-            'test': 'addon' not in s.set_list(),
-            'exec': [
-                (s.init_set, {'args': ('addon',)}),
-                (s.init_set, {'args': ('type_addon',)}),
-                (s.init_set, {'args': ('cat_addon', ['type_addon', 'addon'])}),
-                (s.init_set, {
-                    'args': ('map_tec_addon', ['technology', 'type_addon'])
-                }),
-                (s.init_par, {
-                    'args': (
-                        'addon_conversion',
-                        ['node', 'technology',
-                         'year', 'year', 'mode', 'time', 'type_addon'],
-                        ['node', 'technology',
-                         'year_vtg', 'year_act', 'mode', 'time', 'type_addon']
-                    )}),
-                (s.init_par, {
-                    'args': (
-                        'addon_up',
-                        ['node', 'technology', 'year',
-                         'mode', 'time', 'type_addon']
-                    )}),
-                (s.init_par, {
-                    'args': (
-                        'addon_lo',
-                        ['node', 'technology', 'year',
-                         'mode', 'time', 'type_addon']
-                    )}),
-            ],
-        },
+        # {
+        #  'test': False  # some test,
+        #  'exec': [(pass, {'args': ()}), ],
+        # },
     )
 
     pass_idx = [i for i, init in enumerate(inits) if init['test']]
@@ -172,6 +85,42 @@ class Scenario(ixmp.Scenario):
 
         if not self.has_solution():
             _init_scenario(self, commit=version != 'new')
+
+    def cat_list(self, name):
+        """return a list of all categories for a set
+
+        Parameters
+        ----------
+        name : string
+            name of the set
+        """
+        return ixmp.to_pylist(self._jobj.getTypeList(name))
+
+    def add_cat(self, name, cat, keys, is_unique=False):
+        """add a set element key to the respective category mapping
+
+        Parameters
+        ----------
+        name : string
+            name of the set
+        cat : string
+            name of the category
+        keys : list of strings
+            element keys to be added to the category mapping
+        """
+        self._jobj.addCatEle(name, str(cat), ixmp.to_jlist(keys), is_unique)
+
+    def cat(self, name, cat):
+        """return a list of all set elements mapped to a category
+
+        Parameters
+        ----------
+        name : string
+            name of the set
+        cat : string
+            name of the category
+        """
+        return ixmp.to_pylist(self._jobj.getCatEle(name, cat))
 
     def has_solution(self):
         """Returns True if scenario currently has a solution"""
@@ -288,8 +237,8 @@ class Scenario(ixmp.Scenario):
         """
         return super(Scenario, self).solve(model=model, **kwargs)
 
-    def clone(self, model=None, scen=None, annotation=None, keep_sol=True,
-              first_model_year=None):
+    def clone(self, model=None, scen=None, annotation=None, keep_solution=True,
+              first_model_year=None, **kwargs):
         """clone the current scenario and return the new scenario
 
         Parameters
@@ -300,14 +249,20 @@ class Scenario(ixmp.Scenario):
             new scenario name
         annotation : string
             explanatory comment (optional)
-        keep_sol : boolean, default: True
+        keep_solution : boolean, default, True
             indicator whether to include an existing solution
             in the cloned scenario
         first_model_year: int, default None
             new first model year in cloned scenario
             ('slicing', only available for MESSAGE-scheme scenarios)
         """
-        self._keep_sol = keep_sol
+        if 'keep_sol' in kwargs:
+            warnings.warn(
+                '`keep_sol` is deprecated and will be removed in the next' +
+                ' release, please use `keep_solution`')
+            keep_solution = kwargs.pop('keep_sol')
+
+        self._keep_sol = keep_solution
         self._first_model_year = first_model_year or 0
         model = self.model if not model else model
         scen = self.scenario if not scen else scen
