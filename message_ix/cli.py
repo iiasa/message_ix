@@ -110,7 +110,7 @@ def do_dl(tag=None, branch=None, repo_path=None, local_path='.'):
 
         shutil.rmtree(tmp)
 
-    except WindowsError as e:
+    except Exception as e:
         logger().info("Could not delete {} because {}".format(tmp, e))
 
 
