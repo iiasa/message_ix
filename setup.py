@@ -2,15 +2,22 @@
 from __future__ import print_function
 
 import os
+import re
 import shutil
 
 from setuptools import setup, find_packages
 from setuptools.command.install import install
 
+fname = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                     'message_ix', 'model', 'version.gms')
+with open(fname) as f:
+    s = str(f.readlines())
 
-INFO = {
-    'version': '1.1.0',
-}
+VERSION = '{}.{}.{}'.format(
+    re.search('VERSION_MAJOR "(.+?)"', s).group(1),
+    re.search('VERSION_MINOR "(.+?)"', s).group(1),
+    re.search('VERSION_PATCH "(.+?)"', s).group(1),
+)
 
 
 class Cmd(install):
@@ -72,7 +79,7 @@ def main():
     }
     setup_kwargs = {
         "name": "message_ix",
-        "version": INFO['version'],
+        "version": VERSION,
         "description": 'The MESSAGEix Integrated Assessment Model',
         "author": 'Daniel Huppmann, Matthew Gidden, Volker Krey,  '
                   'Oliver Fricko, Peter Kolp',
