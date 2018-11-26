@@ -184,7 +184,8 @@ class Scenario(ixmp.Scenario):
         horizon = data['year']
         scenario.add_set("year", horizon)
 
-        first = data['firstmodelyear'] if 'firstmodelyear' in data else horizon[0]
+        first = data['firstmodelyear'] if 'firstmodelyear'\
+            in data else horizon[0]
         scenario.add_cat("year", "firstmodelyear", first, is_unique=True)
 
     def vintage_and_active_years(self, ya_args=None, in_horizon=True):
@@ -237,15 +238,15 @@ class Scenario(ixmp.Scenario):
         """
         return super(Scenario, self).solve(model=model, **kwargs)
 
-    def clone(self, model=None, scen=None, annotation=None, keep_solution=True,
-              first_model_year=None, **kwargs):
+    def clone(self, model=None, scenario=None, annotation=None,
+              keep_solution=True, first_model_year=None, **kwargs):
         """clone the current scenario and return the new scenario
 
         Parameters
         ----------
         model : string
             new model name
-        scen : string
+        scenario : string
             new scenario name
         annotation : string
             explanatory comment (optional)
@@ -261,12 +262,17 @@ class Scenario(ixmp.Scenario):
                 '`keep_sol` is deprecated and will be removed in the next' +
                 ' release, please use `keep_solution`')
             keep_solution = kwargs.pop('keep_sol')
+        if 'scen' in kwargs:
+            warnings.warn(
+                '`scen` is deprecated and will be removed in the next' +
+                ' release, please use `scenario`')
+            scenario = kwargs.pop('scen')
 
         self._keep_sol = keep_solution
         self._first_model_year = first_model_year or 0
         model = self.model if not model else model
-        scen = self.scenario if not scen else scen
-        return Scenario(self.platform, model, scen, annotation=annotation,
+        scenario = self.scenario if not scenario else scenario
+        return Scenario(self.platform, model, scenario, annotation=annotation,
                         cache=self._cache, clone=self)
 
     def rename(self, name, mapping, keep=False):
