@@ -1,6 +1,8 @@
 
 # Next Release
 
+- [#131](https://github.com/iiasa/message_ix/pull/131): Update clone function syntax scen to scenario
+
 # v1.1.0
 
 ## Warnings
