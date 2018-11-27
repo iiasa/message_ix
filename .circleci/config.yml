@@ -17,7 +17,7 @@ jobs:
                 docker run message_ix/message_ix:py2 messageix-config --model_path=/tmp/
       - run:
           name: test env
-          command: [ -z "$MESSAGE_IX_CI_USER" ] && { echo "MESSAGE_IX_CI_USER empty: $MESSAGE_IX_CI_USER"; exit 1; }
+          command: /bin/bash -c '[ -z "$MESSAGE_IX_CI_USER" ] && { echo "MESSAGE_IX_CI_USER empty: $MESSAGE_IX_CI_USER"; exit 1; }'
       - run:
           name: Python2 Scenario Tests
           command: |
