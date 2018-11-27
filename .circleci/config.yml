@@ -22,8 +22,7 @@ jobs:
           name: Python2 Scenario Tests
           command: |
                 docker run \
-                -e MESSAGE_IX_CI_USER=$MESSAGE_IX_CI_USER \
-                -e MESSAGE_IX_CI_PW=$MESSAGE_IX_CI_PW \
+                -e MESSAGE_IX_CI_USER MESSAGE_IX_CI_PW \
                 message_ix/message_ix:py2 \
                 /bin/bash -c 'source activate root && cd /message_ix/tests/ci && ./run_on_ci.sh'
       - run:
@@ -45,4 +44,3 @@ jobs:
       - run:
           name: Build Docs
           command: docker run message_ix/message_ix:py3 /bin/bash -c 'cd /message_ix/doc && pip install -r requirements.txt && make html && test -d source/model'
-      
