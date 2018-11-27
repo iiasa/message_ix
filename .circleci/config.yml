@@ -8,7 +8,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          name: test env
+          name: Test My Environment
           command: echo "MESSAGE_IX_CI_USER: $MESSAGE_IX_CI_USER"
       - run:
           name: Build Python2 Image
