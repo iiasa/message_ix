@@ -8,6 +8,9 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
+          name:    test env
+          command: [ -z "$MESSAGE_IX_CI_USER" ] && { echo "MESSAGE_IX_CI_USER empty: $MESSAGE_IX_CI_USER"; exit 1; }
+      - run:
           name: Build Python2 Image
           command: docker build --build-arg base_image=gidden/ixmp-py2 -t message_ix/message_ix:py2 .
       - run:
