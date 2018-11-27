@@ -150,7 +150,7 @@ def test_commodity_share_up(test_mp):
         'commodity': 'cases',
         'level': 'supply'
     })
-    clone = scen.clone(scen='share_mode_list', keep_solution=False)
+    clone = scen.clone(scenario='share_mode_list', keep_solution=False)
     clone.check_out()
     add_data(clone, map_df)
     clone.commit('foo')
@@ -175,7 +175,7 @@ def test_commodity_share_up(test_mp):
         'commodity': 'cases',
         'level': 'supply'
     }, index=[0])
-    clone2 = scen.clone(scen='share_all_modes', keep_solution=False)
+    clone2 = scen.clone(scenario='share_all_modes', keep_solution=False)
     clone2.check_out()
     add_data(clone2, map_df2)
     clone2.commit('foo')
@@ -209,7 +209,7 @@ def test_share_commodity_lo(test_mp):
     exp = 1. * calc_share(scen)
 
     # add share constraints
-    clone = scen.clone(scen='share_commodity_lo', keep_solution=False)
+    clone = scen.clone(scenario='share_commodity_lo', keep_solution=False)
     clone.check_out()
     clone.add_cat('technology', 'share', 'transport_from_seattle')
     clone.add_cat('technology', 'total', ['transport_from_seattle',
@@ -268,7 +268,7 @@ def test_add_share_mode_up(test_mp):
     exp = 0.95 * calc_share(scen)
 
     # add share constraints
-    clone = scen.clone(scen='share_mode_up', keep_solution=False)
+    clone = scen.clone(scenario='share_mode_up', keep_solution=False)
     clone.check_out()
     clone.add_set('shares', 'test-share')
     clone.add_par('share_mode_up',

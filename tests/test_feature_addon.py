@@ -62,7 +62,7 @@ def add_addon(s, costs=False, zero_output=False):
 
 # reduce max activity from one canning plant, has to be compensated by addon
 def test_addon_tec(test_mp):
-    scen = Scenario(test_mp, *msg_args).clone(scen='addon',
+    scen = Scenario(test_mp, *msg_args).clone(scenario='addon',
                                               keep_solution=False)
 
     add_addon(scen, costs=-1)
@@ -82,7 +82,7 @@ def test_addon_tec(test_mp):
 
 # introduce addon technology with negatove costs, add maximum mitigation
 def test_addon_up(test_mp):
-    scen = Scenario(test_mp, *msg_args).clone(scen='addon_up',
+    scen = Scenario(test_mp, *msg_args).clone(scenario='addon_up',
                                               keep_solution=False)
     add_addon(scen, costs=-1, zero_output=True)
 
@@ -99,7 +99,7 @@ def test_addon_up(test_mp):
 
 # introduce addon technology with positive costs, add minimum mitigation
 def test_addon_lo(test_mp):
-    scen = Scenario(test_mp, *msg_args).clone(scen='addon_lo',
+    scen = Scenario(test_mp, *msg_args).clone(scenario='addon_lo',
                                               keep_solution=False)
     add_addon(scen, costs=1, zero_output=True)
 

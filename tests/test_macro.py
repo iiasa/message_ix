@@ -9,7 +9,7 @@ def test_init(test_mp):
     scen = Scenario(test_mp, *msg_args)
     obs = scen.var('OBJ')['lvl']
 
-    scen = scen.clone('foo', 'bar', keep_sol=False)
+    scen = scen.clone('foo', 'bar', keep_solution=False)
     scen.check_out()
     macro.init(scen)
     scen.commit('foo')
