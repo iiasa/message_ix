@@ -9,7 +9,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: Test My Environment
-          command: [ -z "$MESSAGE_IX_CI_USER" ] && { echo "MESSAGE_IX_CI_USER empty $MESSAGE_IX_CI_USER"; exit 1; }
+          command: echo "MESSAGE_IX_CI_USER $MESSAGE_IX_CI_USER"
       - run:
           name: Build Python2 Image
           command: docker build --build-arg base_image=gidden/ixmp-py2 -t message_ix/message_ix:py2 .
@@ -45,3 +45,4 @@ jobs:
       - run:
           name: Build Docs
           command: docker run message_ix/message_ix:py3 /bin/bash -c 'cd /message_ix/doc && pip install -r requirements.txt && make html && test -d source/model'
+      
