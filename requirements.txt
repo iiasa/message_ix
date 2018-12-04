@@ -1,0 +1,15 @@
+cython
+numpy
+pandas
+pytest>=3.0.6
+JPype1>=0.6.2
+sphinx
+sphinxcontrib-bibtex
+sphinxcontrib-fulltoc
+numpydoc
+cloud_sptheme
+nbformat
+jupyter
+XlsxWriter
+xlrd
+matplotlib

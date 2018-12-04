@@ -91,7 +91,8 @@ the ix modeling platform for scientific publications or technical reports:
 3. Open a command prompt in the `message_ix` directory and type
 
       ```
-      python setup.py install && py.test tests
+      pip install -r requirements.txt
+      python setup.py install && py.test -x tests
       ```
 
 ## Configure Model Files
