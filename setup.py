@@ -5,7 +5,7 @@ import os
 import re
 import shutil
 
-from setuptools import setup, find_packages
+from setuptools import setup
 from setuptools.command.install import install
 
 fname = os.path.join(os.path.dirname(os.path.realpath(__file__)),
@@ -18,6 +18,22 @@ VERSION = '{}.{}.{}'.format(
     re.search('VERSION_MINOR "(.+?)"', s).group(1),
     re.search('VERSION_PATCH "(.+?)"', s).group(1),
 )
+
+INSTALL_REQUIRES = [
+    'cython',
+    'ixmp>=0.1.3',
+    'JPype1>=0.6.2',
+    'pandas',
+    'xlrd',
+    'XlsxWriter',
+    ]
+
+EXTRAS_REQUIRE = {
+    'tests': ['pytest>=3.0.6'],
+    'docs': ['cloud_sptheme', 'numpydoc', 'sphinx', 'sphinxcontrib-bibtex',
+             'sphinxcontrib-fulldoc'],
+    'tutorial': ['jupyter', 'matplotlib'],
+    }
 
 
 class Cmd(install):
@@ -85,6 +101,8 @@ def main():
                   'Oliver Fricko, Peter Kolp',
         "author_email": 'message_ix@iiasa.ac.at',
         "url": 'http://github.com/iiasa/message_ix',
+        "install_requires": INSTALL_REQUIRES,
+        "extras_require": EXTRAS_REQUIRE,
         "packages": packages,
         "package_dir": pack_dir,
         "package_data": pack_data,
