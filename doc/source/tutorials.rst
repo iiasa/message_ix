@@ -1,1 +1,1 @@
-.. include:: ../../tutorial/README.md
+.. include:: ../../tutorial/README.rst
