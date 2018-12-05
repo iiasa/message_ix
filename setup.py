@@ -24,14 +24,14 @@ INSTALL_REQUIRES = [
     'pandas',
     'xlrd',
     'XlsxWriter',
-    ]
+]
 
 EXTRAS_REQUIRE = {
     'tests': ['pytest>=3.0.6'],
     'docs': ['cloud_sptheme', 'numpydoc', 'sphinx', 'sphinxcontrib-bibtex',
              'sphinxcontrib-fulldoc'],
     'tutorial': ['jupyter', 'matplotlib'],
-    }
+}
 
 
 class Cmd(install):
