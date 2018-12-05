@@ -20,9 +20,7 @@ VERSION = '{}.{}.{}'.format(
 )
 
 INSTALL_REQUIRES = [
-    'cython',
     'ixmp>=0.1.3',
-    'JPype1>=0.6.2',
     'pandas',
     'xlrd',
     'XlsxWriter',
