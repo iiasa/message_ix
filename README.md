@@ -111,43 +111,12 @@ Please note, if you cloned this repository and installed MESSAGEix with
 `install.bat`, this command has already been run, pointing to
 `message_ix/model`.
 
-## Getting Tutorial Files
 
-If you installed from source, all tutorial files are in the `tutorial`
-folder. If you installed from conda, you can download them to your machine by
-opening a command prompt and typing
+## Tutorials
 
-   ```
-   messageix-dl --local_path /path/to/tutorials
-   ```
+The tutorial pages are explained [in the documentation](http://messageix.iiasa.ac.at/getting_started.html#tutorials) or the file
+`tutorial/README.rst`.
 
-## Running Tutorials
-
-### Using Anaconda
-
-1. Additionally install the following package:
-
-    ```
-    conda install nb_conda
-    ```
-
-2. Open Jupyter Notebooks from Anaconda's "Home" Tab (or directly if you have
-   the option)
-
-3. Open the tutorial notebook file
-
-4. Make sure the Kernel is aligned with your conda environment
-
-   - Change kernels with menu options `Kernel` -> `Change Kernel` -> `Python
-     [conda root]` (for example)
-
-### Using Command Line
-
-Navigate to the tutorial folder and type
-
-   ```
-   jupyter notebook
-   ```
 
 ## Building Documentation
 
