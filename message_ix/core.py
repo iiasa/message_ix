@@ -36,6 +36,12 @@ def _init_scenario(s, commit=False):
 
 
 class Scenario(ixmp.Scenario):
+    """|MESSAGEix| Scenario.
+
+    This class extends :class:`ixmp.Scenario` and inherits all its methods. It
+    defines additional methods specific to |MESSAGEix|.
+
+    """
 
     def __init__(self, mp, model, scenario=None, version=None, annotation=None,
                  cache=False, clone=None, **kwargs):
@@ -138,9 +144,12 @@ class Scenario(ixmp.Scenario):
 
         Examples
         --------
-        data = {'country': 'Austria'}
-        data = {'country': ['Austria', 'Germany']}
-        data = {'country': {'Austria': {'state': ['Vienna', 'Lower Austria']}}}
+        >>> s = message_ix.Scenario()
+        >>> s.add_spatial_sets({'country': 'Austria'})
+        >>> s.add_spatial_sets({'country': ['Austria', 'Germany']})
+        >>> s.add_spatial_sets({'country': {
+        ...     'Austria': {'state': ['Vienna', 'Lower Austria']}}})
+
         """
         nodes = []
         levels = []
@@ -166,7 +175,7 @@ class Scenario(ixmp.Scenario):
         self.add_set("lvl_spatial", levels)
         self.add_set("map_spatial_hierarchy", hierarchy)
 
-    def add_horizon(scenario, data):
+    def add_horizon(self, data):
         """Add sets related to temporal dimensions of the model
 
         Parameters
@@ -176,17 +185,19 @@ class Scenario(ixmp.Scenario):
 
         Examples
         --------
-        data = {'year': [2010, 2020]}
-        data = {'year': [2010, 2020], 'firstmodelyear': 2020}
+        >>> s = message_ix.Scenario()
+        >>> s.add_horizon({'year': [2010, 2020]})
+        >>> s.add_horizon({'year': [2010, 2020], 'firstmodelyear': 2020})
+
         """
         if 'year' not in data:
             raise ValueError('"year" must be in temporal sets')
         horizon = data['year']
-        scenario.add_set("year", horizon)
+        self.add_set("year", horizon)
 
         first = data['firstmodelyear'] if 'firstmodelyear'\
             in data else horizon[0]
-        scenario.add_cat("year", "firstmodelyear", first, is_unique=True)
+        self.add_cat("year", "firstmodelyear", first, is_unique=True)
 
     def vintage_and_active_years(self, ya_args=None, in_horizon=True):
         """Return a 2-tuple of valid pairs of vintage years and active years
@@ -232,9 +243,14 @@ class Scenario(ixmp.Scenario):
         return pd.DataFrame({'year_vtg': v_years, 'year_act': a_years})
 
     def solve(self, model='MESSAGE', **kwargs):
-        """Solve a MESSAGE Scenario. See ixmp.Scenario.solve() for arguments.
-        The default model is 'MESSAGE', but can be overwritten with, e.g.,
-        `message_ix.Scenario.solve(model='MESSAGE-MACRO')`.
+        """Solve the Scenario.
+
+        By default, :meth:`ixmp.Scenario.solve` is called with "MESSAGE" as the
+        *model* argument; see the documentation of that method for other
+        arguments. *model* may also be overwritten, e.g.:
+
+        >>> s.solve(model='MESSAGE-MACRO')
+
         """
         return super(Scenario, self).solve(model=model, **kwargs)
 
