@@ -103,16 +103,19 @@ class Scenario(ixmp.Scenario):
         return ixmp.to_pylist(self._jobj.getTypeList(name))
 
     def add_cat(self, name, cat, keys, is_unique=False):
-        """add a set element key to the respective category mapping
+        """Map elements from *keys* to category *cat* within set *name*.
 
         Parameters
         ----------
-        name : string
-            name of the set
-        cat : string
-            name of the category
-        keys : list of strings
-            element keys to be added to the category mapping
+        name : str
+            Name of the set.
+        cat : str
+            Name of the category.
+        keys : str or list of str
+            Element keys to be added to the category mapping.
+        is_unique: bool, optional
+            If `True`, then *cat* must have only one element. An exception is
+            raised if *cat* already has an element, or if ``len(keys) > 1``.
         """
         self._jobj.addCatEle(name, str(cat), ixmp.to_jlist(keys), is_unique)
 
