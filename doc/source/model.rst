@@ -29,8 +29,9 @@ Running the |MESSAGEix| model
 
 There are three methods to run the |MESSAGEix| model:
 
-- Via the scientific programming APIs using the packages/libraries ``ixmp`` and ``message_ix``,
-  calling the method ``solve()`` of the ``message_ix.Scenario`` class (see the `tutorials`_).
+- Via the scientific programming APIs using the packages/libraries
+  :mod:`ixmp` and :mod:`message_ix`, calling :meth:`message_ix.Scenario.solve`.
+  (See the :doc:`tutorials`.)
 
 - Using the file ``MESSAGE_master.gms``, where the scenario name (i.e., the gdx input file),
   the optimization horizon (perfect foresight or myopic/rolling-horizon version),
@@ -40,8 +41,9 @@ There are three methods to run the |MESSAGEix| model:
   to set the model specifications.*
 
 - Directly from the command line calling the file ``MESSAGE_run.gms`` (see the `auto-doc page`_).
-  The scenario name and other arguments can be passed as command line parameters,
-  e.g. :literal:`gams MESSAGE_run.gms --in="<data-file>" --out="<output-file>"`.
+  The scenario name and other arguments can be passed as command line parameters::
+
+      $ gams MESSAGE_run.gms --in="<data-file>" --out="<output-file>"
 
 .. _`auto-doc page`: model/MESSAGE_run.html
 
