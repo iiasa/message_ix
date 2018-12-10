@@ -1,19 +1,15 @@
 .. currentmodule:: ixmp
 
-Class ixmp.Platform
-^^^^^^^^^^^^^^^^^^^
+``ixmp`` package
+================
 
-.. autoclass:: Platform
-   :members:
+|ixmp| provides three classes:
 
-Class ixmp.TimeSeries
-^^^^^^^^^^^^^^^^^^^^^
-   
-.. autoclass:: TimeSeries
-   :members:
+.. autosummary::
 
-Class ixmp.Scenario
-^^^^^^^^^^^^^^^^^^^
-   
-.. autoclass:: Scenario
-   :members:
+   Platform
+   TimeSeries
+   Scenario
+
+.. automodule:: ixmp
+   :members: Platform, TimeSeries, Scenario

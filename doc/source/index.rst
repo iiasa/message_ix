@@ -81,8 +81,12 @@ The |MESSAGEix| Model
 API Documentation
 -----------------
 
+- :doc:`api/ixmp`
+- :doc:`api/message_ix`
+
 .. toctree::
    :maxdepth: 2
+   :hidden:
 
    api
 

@@ -1,12 +1,7 @@
 API documentation
 =================
 
-``ixmp`` module
----------------
+.. toctree::
 
-.. include:: api/ixmp.rst
-
-``message_ix`` module
----------------------
-
-.. include:: api/message_ix.rst
+   api/ixmp.rst
+   api/message_ix.rst

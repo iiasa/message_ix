@@ -1,16 +1,17 @@
 .. currentmodule:: message_ix
 
-Class message_ix.Scenario
-^^^^^^^^^^^^^^^^^^^^^^^^^
+``message_ix`` package
+======================
 
-.. autoclass:: Scenario
-   :noindex:
-   :members:
+|MESSAGEix| models are created using the :py:class:`message_ix.Scenario` class. Several utility methods are also provided in the module :py:mod:`message_ix.utils`.
 
+.. automodule:: message_ix
+   :members: Scenario
+
+.. _utils:
 
 Utility methods
-^^^^^^^^^^^^^^^
+---------------
 
 .. automodule:: message_ix.utils
-   :noindex:
-   :members:
+   :members: make_df, make_ts, matching_rows, multiply_df
