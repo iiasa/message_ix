@@ -20,7 +20,7 @@ to incorporate feedback between prices and demand levels for energy and commodit
 The equations are implemented in the mathematical programming system `GAMS`_
 for numerical solution of a model instance.
 
-The |MESSAGEix| framework is fully integrated with IIASA's |ixmp| (ixmp),
+The |MESSAGEix| framework is fully integrated with |IIASAabbr|'s |ixmp| (ixmp),
 a data warehouse for high-powered numerical scenario analysis.
 The platform supports an efficient workflow between original input data sources,
 the implementation of the mathematical model formulation,
@@ -37,7 +37,7 @@ For the scientific reference of the framework,
 see Huppmann et al. (submitted) :cite:`huppmann_messageix_2018`.
 The formulation of |MESSAGEix| is a re-implementation and extension of `'MESSAGE V'`
 (Messner and Strubegger, 1995 :cite:`messner_users_1995`),
-the Integrated Assessment model developed at IIASA since the 1980s.
+the Integrated Assessment model developed at the International Institute for Applied Systems Analysis (IIASA) since the 1980s.
 For an overview of the |MESSAGEix| model used at the IIASA Energy Program
 and a list of recent publications, please refer to the `MESSAGE-GLOBIOM documentation website`_.
 
@@ -68,7 +68,7 @@ First, check out our FAQ:
 Next, try the community mailing list hosted using Google groups:
 `groups.google.com/d/forum/message_ix`_ .
 
-.. _`groups.google.com/d/forum/message_ix` : https://groups.google.com/d/forum/message_ix
+.. _`groups.google.com/d/forum/message_ix` : https://groups.google.com/d/forum/message_ixHTML
 
 The |MESSAGEix| Model
 ---------------------
@@ -117,3 +117,8 @@ Bibliography
    :maxdepth: 2
 
    bibliography
+
+
+.. |IIASAabbr| raw:: html
+
+   <abbr title="International Institute for Applied Systems Analysis">IIASA</abbr>

@@ -1,5 +1,5 @@
 Tutorials
----------
+=========
 
 To get started with |MESSAGEix|, the following tutorials are provided as
 `Jupyter notebooks <https://jupyter.org/>`_, which combine code, sample output,
@@ -10,7 +10,7 @@ the links below. In order to execute the tutorial code or make modifications,
 read the Preparation_ section, next.
 
 Preparation
-===========
+-----------
 
 Getting tutorial files
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -18,22 +18,22 @@ Getting tutorial files
 If you installed |MESSAGEix| from source, all notebooks are in the ``tutorial``
 directory.
 
-If you installed |MESSAGEix| using Anaconda, download the notebooks by running
-the ``messageix-dl`` utility in a command prompt::
+If you installed |MESSAGEix| using Anaconda, download the notebooks using the
+``messageix-dl`` utility. In a command prompt::
 
     $ messageix-dl --local_path /path/to/tutorials
 
 Running tutorials
 ~~~~~~~~~~~~~~~~~
 
-Using Anaconda, the `nb_conda` package is required. If it was not installed automatically with Anaconda, install it::
+Using Anaconda, the ``nb_conda`` package is required. If it was not installed automatically with Anaconda, install it::
 
     $ conda install nb_conda
 
-1. Open “Jupyter Notebooks” from Anaconda's “Home” Tab (or directly if you have
+1. Open “Jupyter Notebooks” from Anaconda's “Home” tab (or directly if you have
    the option).
 
-2. Open a tutorial notebook.
+2. Choose and open a tutorial notebook.
 
 3. Each notebook requires a *kernel* that executes code interactively. Check
    that the kernel matches your conda environment, and if necessary change
@@ -46,7 +46,7 @@ run::
    $ jupyter notebook
 
 Westeros Electrified
-====================
+--------------------
 
 This tutorial demonstrates how to model a very simple energy system, and then
 uses it to illustrate a range of framework features.
@@ -58,7 +58,7 @@ uses it to illustrate a range of framework features.
 5. Represent coal and wind electricity using a different, `“flexibility requirement” formulation <https://github.com/iiasa/message_ix/blob/v1.1.0/tutorial/westeros/westeros_flexible_generation.ipynb>`_, wherein wind *requires* and coal *supplies* flexibility.
 
 Austrian energy system
-======================
+----------------------
 
 This tutorial demonstrates a stylized representation of a national electricity
 sector model, with several fossil and renewable power plant types.
