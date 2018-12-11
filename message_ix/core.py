@@ -139,11 +139,17 @@ class Scenario(ixmp.Scenario):
             return False
 
     def add_spatial_sets(self, data):
-        """Add sets related to spatial dimensions of the model
+        """Add sets related to spatial dimensions of the model.
 
         Parameters
         ----------
-        data : dict or other
+        data : dict
+            Mapping of `level` → `member`. Each member may be:
+
+            - A single label for elements.
+            - An iterable of labels for elements.
+            - A recursive :class:`dict` following the same convention, defining
+              sub-levels and their members.
 
         Examples
         --------
@@ -154,6 +160,16 @@ class Scenario(ixmp.Scenario):
         ...     'Austria': {'state': ['Vienna', 'Lower Austria']}}})
 
         """
+        # TODO test whether unbalanced data or multiply-defined levels are
+        # handled correctly. How to define 'Germany' as a country *only* but
+        # two states within 'Austria'?
+        # >>> s.add_spatial_sets({'country': {
+        # ...     'Austria': {'country': 'Vienna'}}})
+        # >>> s.add_spatial_sets({'country': {
+        # ...     'Austria': {'state': 'Vienna'},
+        # ...     'Canada': {'province': 'Ontario'},
+        # ...     }})
+
         nodes = []
         levels = []
         hierarchy = []
@@ -169,6 +185,7 @@ class Scenario(ixmp.Scenario):
             for child in children:
                 hierarchy.append([level, child, parent])
                 nodes.append(child)
+
             levels.append(level)
 
         for k, v in data.items():
@@ -179,12 +196,13 @@ class Scenario(ixmp.Scenario):
         self.add_set("map_spatial_hierarchy", hierarchy)
 
     def add_horizon(self, data):
-        """Add sets related to temporal dimensions of the model
+        """Add sets related to temporal dimensions of the model.
 
         Parameters
         ----------
-        scenario : ixmp.Scenario
-        data : dict or other
+        data : dict-like
+            Year sets. "year" is a required key. "firstmodelyear" is optional;
+            if not provided, the first element of "year" is used.
 
         Examples
         --------
@@ -203,21 +221,30 @@ class Scenario(ixmp.Scenario):
         self.add_cat("year", "firstmodelyear", first, is_unique=True)
 
     def vintage_and_active_years(self, ya_args=None, in_horizon=True):
-        """Return a 2-tuple of valid pairs of vintage years and active years
-        for use with data input. A valid year-vintage, year-active pair is
-        one in which:
+        """Return sets of vintage and active years for use in data input.
 
-        - year-vintage <= year-active
-        - both within the model's 'year' set
-        - year-active >= the model's first year *or* within
-          ixmp.Scenario.years_active() for a given node, technology and vintage
-          (optional)
+        For a valid pair `(year_vtg, year_act)`, the following conditions are
+        satisfied:
+
+        1. Both the vintage year (`year_vtg`) and active year (`year_act`) are
+           in the model's ``year`` set.
+        2. `year_vtg` <= `year_act`.
+        3. `year_act` <= the model's first year **or** `year_act` is in the
+           smaller subset :meth:`ixmp.Scenario.years_active` for the given
+           `ya_args`.
 
         Parameters
         ----------
-        ya_args : arguments to ixmp.Scenario.years_active(), optional
-        in_horizon : restrict years returned to be within the current model
-                     horizon, optional, default: True
+        ya_args : tuple of (node, technology, year_vtg), optional
+            Arguments to :meth:`ixmp.Scenario.years_active`.
+        in_horizon : bool, optional
+            Restrict years returned to be within the current model horizon.
+
+        Returns
+        -------
+        pandas.DataFrame
+            with columns, "year_vtg" and "year_act", in which each row is a
+            valid pair.
         """
         horizon = self.set('year')
         first = self.cat('year', 'firstmodelyear')[0] or horizon[0]
