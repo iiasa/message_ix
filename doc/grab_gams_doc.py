@@ -1,79 +1,93 @@
-#!/usr/bin/env python
+"""Sphinx extension for documentation in GAMS code."""
+# TODO move to something like message_ix.util.sphinx_gams
 
-"""Read all gams files in ../model and generate a mirrored tree of rst
-documentation files in ./source. All lines between triple-star comments (***)
-are extracted.
-"""
+from os import PathLike
+from pathlib import Path
 
-import errno
-import fnmatch
-import os
+from sphinx.util import status_iterator
 
-def files(match='*.gms', ext='rst'):
-    """return all input files in ../model matching `match` and their associated
-    output files with the given extension
+
+def files(src_dir, target_dir, match='*.gms', ext='.rst'):
+    """Return files in *src_dir* matching *match*.
+
+    Two lists are returned; the second contains file names in *target_dir* with
+    the replacement *ext*.
+
     """
-    pth = os.path.join('..', 'message_ix', 'model')
-    ins = [os.path.join(d, f) \
-           for d, _, files in os.walk(pth) \
-           for f in fnmatch.filter(files, match)]
-
-    outs = []
-    for inf in ins:
-        p, f = os.path.split(inf)
-        outf = os.path.join('source', 'model', 
-                            p[len(pth) + 1:], 
-                            '{}.{}'.format(os.path.splitext(f)[0], ext))
-        outs.append(outf)
-
+    ins = list(src_dir.glob('**/' + match))
+    outs = [target_dir / Path(inf).relative_to(src_dir).with_suffix(ext)
+            for inf in ins]
     return ins, outs
 
-def read_docs(lines):
-    """Pull out all documentation lines"""
-    ret = []
-    on = False
-    for line in lines:
+
+def transcribe_docs(infp, outfp):
+    """Transcribe documentation lines from *infp* to *outfp*.
+
+    Only lines between matched pairs of triple-star comments ('***') are
+    copied.
+
+    Returns True if any lines were encountered; otherwise False.
+
+    """
+    # State: None = no blocks encountered; True = in a block; False = outside
+    on = None
+    for line in infp:
         if line.lstrip().startswith('***'):
-            if on: # just finished a block, add a new line
-                ret.append('\n')
+            # Located a block divider
+            if on:
+                # Just finished a block, add a new line to the output
+                outfp.write('\n')
+            # Toggle between inside/outside of doc block
             on = not on
         elif on:
+            # Strip leftmost '* ' from the line
             base = "*".join(line.split('*')[1:])[1:]
-            base = base.rstrip() # get rid of windows carriage return
-            ret.append('{}\n'.format(base))
-    return ret
+            # Get rid of windows carriage return
+            base = base.rstrip()
+            outfp.write('{}\n'.format(base))
 
-def mkdir(d):
-    """make a directory if it doesn't already exist"""
-    if not os.path.exists(d):
-        try:
-            os.makedirs(d)
-        except OSError as exc: # Guard against race condition
-            if exc.errno != errno.EEXIST:
-                raise
+    return on is not None
 
-def main():
-    print('Generating GAMS documentation')
-    ins, outs = files()
-    for inf, outf in zip(ins, outs):
-        print('Reading {}'.format(inf))
-        with open(inf, 'r') as f:
-            lines = f.readlines()
-        doc_lines = read_docs(lines)
-        
-        if len(doc_lines) > 0:
-            print('Writing {}'.format(outf))
-            mkdir(os.path.dirname(outf))
-            with open(outf, 'w') as f:
-                f.writelines(doc_lines)
-        else:
-            print('No docs found, moving on')
-    print('Finished Generating GAMS documentation')
+
+def main(app, config):
+    """Generate a mirrored tree of extracted documentation.
+
+    Read all GAMS source files in *gams_source_dir*, and generate a mirrored
+    tree of ReST documentation files in *gams_target_dir* containing any
+    documentation blocks (appearing between triple-quoted comments; see
+    transcribe_docs). Files without such blocks are omitted.
+    """
+    def docname(item):
+        """Helper for status_iterator()."""
+        return str(Path(item[0]).relative_to(app.config.gams_source_dir)
+                                .with_suffix(''))
+
+    # Locate GAMS source files and targets
+    ins, outs = files(app.config.gams_source_dir,
+                      Path(app.srcdir) / app.config.gams_target_dir)
+
+    # Iterator for logging
+    it = status_iterator(zip(ins, outs),
+                         'generating GAMS sources... ',
+                         color='purple', length=len(ins),
+                         stringify_func=docname)
+    for inf, outf in it:
+        # Make any parent directory(ies) of outf
+        outf.parent.mkdir(parents=True, exist_ok=True)
+
+        # Transcribe lines from the source file to the output file
+        with open(inf, 'r') as infp, open(outf, 'w') as outfp:
+            any_docs = transcribe_docs(infp, outfp)
+
+        if not any_docs:
+            # No output was created; delete the file
+            outf.unlink()
+
 
 def test():
-    """Full unit tests are a bit much for the nonce.."""    
+    """Full unit tests are a bit much for the nonce.."""
     lines = [
-        ' ** foo bar\n', 
+        ' ** foo bar\n',
         '  ***\n',
         '   * bz baz2\n',
         '   * bz * baz2\n',
@@ -81,12 +95,13 @@ def test():
         "***fig newton\n",
     ]
 
-    obs = read_docs(lines)
-    exp =  [
+    # FIXME this is outdated; should use StringIO or similar
+    obs = transcribe_docs(lines)
+    exp = [
         'bz baz2\n',
         'bz * baz2\n',
         '\n',
-    ]     
+    ]
 
     try:
         assert(obs == exp)
@@ -94,8 +109,18 @@ def test():
         print('Assert failed')
         print(exp)
         print(obs)
-       
+
+
 if __name__ == "__main__":
     test()
     main()
-    
+
+
+def setup(app):
+    """Sphinx extension configuration."""
+    # Identify a variable to be set in the Sphinx conf.py
+    app.add_config_value('gams_source_dir', Path('.'), 'env', (PathLike, str))
+    app.add_config_value('gams_target_dir', Path('.'), 'env', (PathLike, str))
+
+    # Hook into an early signal in the Sphinx build process
+    app.connect('config-inited', main)
