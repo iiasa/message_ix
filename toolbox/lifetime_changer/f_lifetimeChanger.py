@@ -15,6 +15,7 @@ from colorama import Fore
 # I) Required utility functions for dataframe manupulation
 # I.1) Utility function for interpolation/extrapolation of two numbers,
 # lists or series (x: time steps, y: data points)
+
 def intpol(y1, y2, x1, x2, x):
     if x2 == x1:
         return y1
@@ -26,6 +27,7 @@ def intpol(y1, y2, x1, x2, x):
 # value to a specific level
 # df: dataframe, idx: list, level: string, locator: list, value:
 # integer/string
+
 def f_slice(df, idx, level, locator, value):
     df = df.reset_index().loc[df.reset_index()[level].isin(locator)].copy()
     df[level] = value
@@ -33,6 +35,7 @@ def f_slice(df, idx, level, locator, value):
 
 # I.3) Function for unifroming the "unit" in different years to prevent
 # mistakes in indexing and grouping
+
 def unit_uniform(df):
     column = [x for x in df.columns if x in ['commodity', 'emission']]
     if column:
@@ -151,8 +154,7 @@ def change_lifetime(
                      year_vtg_max]            # New vintage years
         # New last activity years
         act_years = [max([x for x in horizon if x < lifetime + y
-                          and x <= year_act_max])
-                     for y in vtg_years]
+                          and x <= year_act_max]) for y in vtg_years]
         years_all = [x for x in horizon if x >=
                      year_vtg_min and x <= max(max(vtg_years, act_years))]
 
@@ -359,7 +361,8 @@ def change_lifetime(
             # III.3.1) Adding extra active years to existing vintage years, if
             # lifetime extended
             # For checking the index of two dataframes
-            def f_index(df1, df2): return df1.loc[df1.index.isin(df2.index)]
+            def f_index(df1, df2): 
+			return df1.loc[df1.index.isin(df2.index)]
             count = 0
             while count <= n:
                 # The counter of loop (no explicit use of k)
@@ -456,10 +459,9 @@ def change_lifetime(
                             df2[yr_end].loc[pd.isna(df2[yr_end]) & ~pd.isna(
                                 df2[yr_next])] = df2.loc[:, yr_next].copy()
                             # Removing extra values from previous vintage year
-                            if len(df2[yr]) > 1:
-							    df2[yr].loc[pd.isna(df2[yr].shift(+1))] = np.nan
-
-                            if extrapol_neg:
+			    if len(df2[yr]) > 1:
+					df2[yr].loc[pd.isna(df2[yr].shift(+1))] = np.nan
+			    if extrapol_neg:
                                 df2[yr].loc[(df2[yr] < 0) &
                                             (df2[year_next] >= 0)] = \
                                     df2.loc[:, year_next].copy() * extrapol_neg
@@ -541,7 +543,6 @@ def change_lifetime(
                 '" in "' +
                 node +
                 '".')
-
         # print(Fore.RESET + '> Parameters "' + str(par_empty) + '" have no '
         #       'data in node "' + node + '", no update needed!')
     if not test_run:
