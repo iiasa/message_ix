@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-This function extends or shortens the lifetime of an existing technology in an ixmp scenario
-Straightforward version: 'straight' is the linear inter/extrapolation of the two adjacent data points straight from the available model data
+This function extends or shortens the lifetime of an existing technology in an
+ixmp scenario
+Straightforward version: 'straight' is the linear inter/extrapolation of the
+two adjacent data points straight from the available model data
 
 """
 import pandas as pd
@@ -35,18 +37,24 @@ def change_lifetime(
     year_vtg_max: integer
         The last vintage year for new lifetime
     year_act_max: integer (default: None)
-        The last active year for new lifetime (if None, the last active year remain unchanged)
+        The last active year for new lifetime (if None, the last active year
+		remain unchanged)
     nodes: string or a list/series of strings, default all
         Model regions in where the lifetime of technology should be updated
     par_exclude: string or a list of strings, default None
-        Parameters with no need for being updated for new activity or vintage years (e.g., some bounds may not be needed)
+        Parameters with no need for being updated for new activity or vintage
+		years (e.g., some bounds may not be needed)
     remove_old: boolean, default False
-        A flag for permitting the removal of old vintage years (i.e., those not included in new specified vintage years) from scenario
+        A flag for permitting the removal of old vintage years (i.e., those not
+		included in new specified vintage years) from scenario
     test_run: boolean, default False
-        If true, the script is run only for test, and no changes will be commited to MESSAGE scenario
+        If true, the script is run only for test, and no changes will be
+		commited to MESSAGE scenario
     extrapol_neg: integer or None
-        Treatment of negative values from extrapolation of two positive values: None does nothing (negative accepted),
-        and integer acts as a multiplier of the adjacent value (e.g., 0, 0.5 or 1) for replacing the negative value
+        Treatment of negative values from extrapolation of two positive values:
+		None does nothing (negative accepted),
+        and integer acts as a multiplier of the adjacent value (e.g., 0, 0.5 or
+		1) for replacing the negative value
     '''
 # ------------------------------------------------------------------------------
     # I) Required utility functions for dataframe manupulation
@@ -99,10 +107,13 @@ def change_lifetime(
     horizon = sorted([int(i) for i in sc.set('year')])
 
     # Finding MESSAGE parameters with time-related index sets
-    parlist_1d = [x for x in set(sc.par_list()) if len([y for y in sc.idx_names(
-        x) if 'year' in y]) == 1 and 'technology' in sc.idx_names(x)]  # Parameters with one time-related index
-    parlist_2d = [x for x in set(sc.par_list()) if len([y for y in sc.idx_names(
-        x) if 'year' in y]) == 2]  # Parameters with two time-related indexes
+	# Parameters with one time-related index										
+    parlist_1d = [x for x in set(sc.par_list())
+	              if len([y for y in sc.idx_names(x) if 'year' in y]) == 1 and 
+				  'technology' in sc.idx_names(x)]
+	# Parameters with two time-related indexes										  
+    parlist_2d = [x for x in set(sc.par_list())
+	              if len([y for y in sc.idx_names(x) if 'year' in y]) == 2]
 
     if not test_run:
         if sc.has_solution():
@@ -134,8 +145,10 @@ def change_lifetime(
 
         vtg_years = [x for x in horizon if x >= year_vtg_min and x <=
                      year_vtg_max]            # New vintage years
-        act_years = [max([x for x in horizon if x < lifetime + y and x <= year_act_max])
-                     for y in vtg_years]      # New last activity years
+		# New last activity years													   
+        act_years = [max([x for x in horizon if x < lifetime + y
+		                  and x <= year_act_max])
+					 for y in vtg_years]
         years_all = [x for x in horizon if x >=
                      year_vtg_min and x <= max(max(vtg_years, act_years))]
 
@@ -203,7 +216,8 @@ def change_lifetime(
             idx = [x for x in df_old.columns if x not in [year_ref, 'value']]
             # Converting data to pivot table for extrapolation using numeric
             # columns
-            df2 = df_old.copy().pivot_table(index=idx, columns=year_ref, values='value')
+            df2 = df_old.copy().pivot_table(index=idx, columns=year_ref,
+			                                values='value')
 
             # Preparing for backward extrapolation if more than one new years
             # to be added before existing ones
@@ -214,15 +228,18 @@ def change_lifetime(
 
             for yr in [x for x in year_list if yr >= first_modelYear]:
                 if yr < max(df2.columns):
-                   # Finding two adjacent years for extrapolation
+                    # Finding two adjacent years for extrapolation
                     year_next = horizon[horizon.index(yr) + 1]
-                    year_nn = horizon[horizon.index(
-                        yr) + 2] if len([x for x in df2.columns if x > yr]) >= 2 else year_next
+                    year_nn = (horizon[horizon.index(yr) + 2]
+					          if len([x for x in df2.columns if x > yr]) >= 2
+							  else year_next)
 
-                elif yr > max(df2.columns) and horizon[horizon.index(yr) - 1] in df2.columns:
+                elif yr > max(df2.columns) and (horizon[horizon.index(yr) - 1]
+				                               in df2.columns):
                     year_next = horizon[horizon.index(yr) - 1]
-                    year_nn = horizon[horizon.index(
-                        yr) - 2] if len([x for x in df2.columns if x < yr]) >= 2 else year_next
+                    year_nn = (horizon[horizon.index(yr) - 2]
+					                  if len([x for x in df2.columns if x < yr]) >= 2
+						              else year_next)
 
                 else:
                     continue
@@ -242,9 +259,15 @@ def change_lifetime(
                     # adjacent value is positive a multiplier is applied.
                     df2.loc[(df2[yr] < 0) & (df2[year_next] >= 0),
                             yr] = df2.loc[:, year_next] * extrapol_neg
-
-            df_new = pd.melt(df2.reset_index(), id_vars=idx, value_vars=[x for x in df2.columns if x not in idx],     # Reformatting to ixmp parameter table format
-                             var_name=year_ref, value_name='value').dropna(subset=['value']).reset_index(drop=True)
+			# Reformatting to ixmp parameter table format
+            df_new = pd.melt(df2.reset_index(),
+			                 id_vars=idx,
+							 value_vars=[x for x in df2.columns if x not in
+							             idx],
+                             var_name=year_ref,
+							 value_name='value') \
+							 .dropna(subset=['value']) \
+							 .reset_index(drop=True)
             df_new = df_new.sort_values(
                 idx +
                 [year_ref]).reset_index(
@@ -281,7 +304,8 @@ def change_lifetime(
 
             idx = [x for x in df_old.columns if x not in ['year_act', 'value']]
             # Making pivot table for extrapolation
-            df2 = df_old.copy().pivot_table(index=idx, columns='year_act', values='value')
+            df2 = df_old.copy().pivot_table(index=idx, columns='year_act',
+			                                values='value')
             # The second index related to time, to be paired with year_act
             year_ref = [
                 y for y in df_old.columns if y in [
@@ -300,8 +324,11 @@ def change_lifetime(
                         'level',
                         'rating'])]
             if col_nontec:
-                df_count = df2.reset_index().loc[df2.reset_index()[year_ref].isin(
-                    vtg_years), col_nontec].apply(pd.value_counts).fillna(0)
+                df_count = df2.reset_index() \
+				              .loc[df2.reset_index()[year_ref].isin(vtg_years),
+							       col_nontec] \
+								   .apply(pd.value_counts) \
+								   .fillna(0)
                 df_count = df_count.loc[df_count[col_nontec[0]] < int(
                     df_count.mean())]
                 
@@ -309,7 +336,9 @@ def change_lifetime(
                     df_count = df_count.loc[df_count[col_nontec[0]] < int(
                         df_count.mean())]
 
-                if not df_count.empty:    # NOTICE: this is not resolved here and it should be decided by the user
+                if not df_count.empty:
+					# NOTICE: this is not resolved here and it should be
+					# decided by the user
                     print(Fore.RED +
                           '>>> WARNING <<<: In parameter "' +
                           parname +
@@ -319,7 +348,8 @@ def change_lifetime(
                           tec +
                           '" in "' +
                           node +
-                          '" are different from other input entries; Please check the results!!!')
+                          '" are different from other input entries; Please '
+						  'check the results!!!')
 
             # III.3.1) Adding extra active years to existing vintage years, if
             # lifetime extended
@@ -332,8 +362,7 @@ def change_lifetime(
                 for yr in sorted(
                         [x for x in set(df_old[year_ref]) if x in vtg_years]):
                     # The last active year of this vintage year
-                    yr_end = act_years[vtg_years.index(yr)]
-					
+                    yr_end = act_years[vtg_years.index(yr)]					
                     if yr_end > max(
                             df_old['year_act']):
                         df2[yr_end] = np.nan
@@ -345,14 +374,16 @@ def change_lifetime(
                                 max(df_old['year_act'])) - 1]:
                             year_nn = horizon[horizon.index(yr) + 2]
                         else:
-                            year_nn = yr   # This is for the year one but last in the horizon
+							# This is for the year one but last in the horizon
+                            year_nn = yr
 
                         df_yr = df2[df2.index.get_level_values(year_ref).isin(
                             [yr])].reindex(sorted(df2.columns), axis=1)
 
                         # Finding the first active year with a missing value
-                        yr_act = sorted([x for x in df_yr.columns if df_yr[x].isnull(
-                        ).any() and x <= yr_end and x > yr])[:1]
+                        yr_act = (sorted([x for x in df_yr.columns if
+						                  df_yr[x].isnull().any() and x <= yr_end and
+										  x > yr])[:1])
                         if yr_act:
                             yr_act = yr_act[0]
                             # Extrapolation across the activity years of the
@@ -360,7 +391,7 @@ def change_lifetime(
                             df_next = f_slice(
                                 df2, idx, year_ref, [year_next], yr)[yr_act]
                             df_nn = f_slice(
-                                df2, idx, year_ref, [year_nn], yr)[yr_act]							
+                                df2, idx, year_ref, [year_nn], yr)[yr_act]
                             if df_next.empty and df_nn.empty:
                                 df_next = df_yr[horizon[horizon.index(
                                     yr_act) - 1]]
@@ -379,7 +410,8 @@ def change_lifetime(
                         df2.loc[df_yr.index, :] = df_yr
                         df2 = df2.reindex(sorted(df2.columns), axis=1)
 
-            # III.3.2) Adding missing values for extended vintage and active years (before and after existing vintage years)
+            # III.3.2) Adding missing values for extended vintage and active
+			# years (before and after existing vintage years)
             # New vintage years before the first existing vintage year
             # (reversing to extrapolate backwards)
             yr_list = sorted([x for x in vtg_years if x <
@@ -392,8 +424,7 @@ def change_lifetime(
             if yr_list:
                 for yr in yr_list:
                     yr_end = act_years[vtg_years.index(yr)]
-                    df2[yr] = np.nan
-				
+                    df2[yr] = np.nan				
                     # Finding the two adjacent vintage years
                     if yr < min(df_old['year_act']):
                         year_next = horizon[horizon.index(yr) + 1]
@@ -402,15 +433,14 @@ def change_lifetime(
                         else:
                             year_nn = year_next
 
-
                     else:
                         year_next = horizon[horizon.index(yr) - 1]
                         if horizon.index(yr) >= 2:
                             year_nn = horizon[horizon.index(yr) - 2]
                         else:
                             year_nn = year_next
-							
-                        if yr not in df2.columns:     # Adding missing active years for this new vintage year
+						# Adding missing active years for this new vintage year	
+                        if yr not in df2.columns:
                             yr_next = horizon[horizon.index(yr_end) - 1]
                             yr_nn = horizon[horizon.index(yr_end) - 2]
                             df2[yr_end] = intpol(
@@ -418,12 +448,13 @@ def change_lifetime(
                             df2[yr_end].loc[pd.isna(df2[yr_end]) & ~pd.isna(
                                 df2[yr_next])] = df2.loc[:, yr_next].copy()
                             # Removing extra values from previous vintage year
-                        if len(df2[yr]) > 1:
-                            df2[yr].loc[pd.isna(df2[yr].shift(+1))] = np.nan
+							if len(df2[yr]) > 1:
+								df2[yr].loc[pd.isna(df2[yr].shift(+1))] = np.nan
 
                             if extrapol_neg:
-                                df2[yr].loc[(df2[yr] < 0) & (
-                                    df2[year_next] >= 0)] = df2.loc[:, year_next].copy() * extrapol_neg
+                                df2[yr].loc[(df2[yr] < 0) &
+								            (df2[year_next] >= 0)] = \
+									df2.loc[:, year_next].copy() * extrapol_neg
 
                     df_next = f_slice(df2, idx, year_ref, [year_next], yr)
                     df_nn = f_slice(df2, idx, year_ref, [year_nn], yr)
@@ -441,14 +472,20 @@ def change_lifetime(
                     # Excluding parameters with two time index, but not across
                     # all active years
                     if parname not in ['relation_activity']:
-                        df_yr[year_next].loc[pd.isna(df_yr[year_next])] = f_slice(
-                            df2, idx, year_ref, [year_next], yr).loc[:, year_next].copy()
+                        df_yr[year_next].loc[pd.isna(df_yr[year_next])] = (
+						     f_slice(df2, idx, year_ref, [year_next], yr)
+							 .loc[:, year_next].copy())
                         df_yr[yr].loc[pd.isna(df_yr[yr])] = intpol(
-                            df_yr[year_next], df_yr[year_nn], year_next, year_nn, yr)
+                            df_yr[year_next], df_yr[year_nn], year_next,
+							year_nn, yr)
 
                     if not df_yr.loc[pd.isna(df_yr[yr])].empty:
-                        df_yr.loc[:, yr] = intpol(f_slice(df2, idx, year_ref, [year_next], yr).loc[:, year_next], f_slice(
-                            df2, idx, year_ref, [year_nn], yr).loc[:, year_nn], year_next, year_nn, yr)
+						df_yr.loc[:, yr] = intpol(
+							f_slice(df2, idx, year_ref, [year_next], yr)
+							.loc[:, year_next],
+							f_slice(df2, idx, year_ref, [year_nn], yr)
+							.loc[:, year_nn],
+							year_next, year_nn, yr)
 
                     yr_end = act_years[vtg_years.index(yr)]
                     # To make sure no extra active years for new vintage years
@@ -462,10 +499,11 @@ def change_lifetime(
                         df2 = df2.append(df_yr)
                     df2 = df2.reindex(sorted(df2.columns), axis=1)
                     df2 = df2.reset_index().sort_values(idx).set_index(idx)
-
-            for yr in vtg_years:           # The final check in case the liftime is being reduced
-                df2.loc[df2.index.get_level_values(year_ref).isin(
-                    [yr]), df2.columns > act_years[vtg_years.index(yr)]] = np.nan
+					
+			# The final check in case the liftime is being reduced
+            for yr in vtg_years:
+                df2.loc[df2.index.get_level_values(year_ref).isin([yr]),
+				        df2.columns > act_years[vtg_years.index(yr)]] = np.nan
 
             df_new = pd.melt(
                 df2.reset_index(),
@@ -496,7 +534,8 @@ def change_lifetime(
                 node +
                 '".')
 
-        #print(Fore.RESET +'> Parameters "' + str(par_empty) + '" have no data in node "' + node + '", no update needed!')
+        # print(Fore.RESET +'> Parameters "' + str(par_empty) + '" have no '
+		#       'data in node "' + node + '", no update needed!')
     if not test_run:
         sc.commit('Scenario updated for new lifetime.')
     return results
