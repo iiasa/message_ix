@@ -60,11 +60,12 @@ Install |MESSAGEix| from source
 
 6. Open a command prompt in the ``message_ix`` directory and type::
 
-    $ python setup.py install
+    $ pip install .
 
 7. (Optional) Run the built-in test suite to check that |MESSAGEix| functions
    correctly on your system::
 
+    $ pip install .[tests]
     $ py.test tests
 
 
