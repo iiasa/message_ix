@@ -117,27 +117,34 @@ def change_lifetime(
         # III.1) First, changing parameter "technical_lifetime"
         parname = 'technical_lifetime'
         df_old = sc.par(parname, {'node_loc': node, 'technology': tec})
+        df_inp = sc.par('input', {'node_loc': node, 'technology': tec})
 
         if df_old.empty:
             print('There is no technical lifetime for technology "' +
                   tec + '" in node "' + node + '", no change applied!')
             continue
 
-        year_start = min(df_old['year_vtg']) if not year_start else year_start
-        year_end = max(df_old['year_vtg']) if not year_end else year_end
+        year_vtg_min = min(
+            df_old['year_vtg']) if not year_vtg_min else year_vtg_min
+        year_vtg_max = max(
+            df_inp['year_vtg']) if not year_vtg_max else year_vtg_max
+        year_act_max = max(
+            df_inp['year_act']) if not year_act_max else year_act_max
         lifetime = min(df_old['value']) if not lifetime else lifetime
 
-        vtg_years = [x for x in horizon if x >= year_start and x <=
-                     year_end]            # New vintage years
-        act_years = [max([x for x in vtg_years if x < lifetime + y])
-                     for y in vtg_years]   # New last activity years
+        vtg_years = [x for x in horizon if x >= year_vtg_min and x <=
+                     year_vtg_max]            # New vintage years
+        act_years = [max([x for x in horizon if x < lifetime + y and x <= year_act_max])
+                     for y in vtg_years]      # New last activity years
+        years_all = [x for x in horizon if x >=
+                     year_vtg_min and x <= max(max(vtg_years, act_years))]
 
         df_new = df_old.copy()
-        df_new = df_new.loc[df_new['year_vtg'].isin(vtg_years)]
+        df_new = df_new.loc[df_new['year_vtg'].isin(years_all)]
         # For estimating required loop numbers later
         lifetime_old = min(df_new['value'])
 
-        for yr in vtg_years:
+        for yr in years_all:
             if yr in set(df_new['year_vtg']):
                 df_new.loc[df_new['year_vtg'] == yr, 'value'] = lifetime
             else:
@@ -200,10 +207,10 @@ def change_lifetime(
 
             # Preparing for backward extrapolation if more than one new years
             # to be added before existing ones
-            year_list = sorted([x for x in vtg_years if x <
+            year_list = sorted([x for x in years_all if x <
                                 min(df_old[year_ref])], reverse=True)
             year_list = year_list + \
-                sorted([x for x in vtg_years if x > max(df_old[year_ref])])
+                sorted([x for x in years_all if x > max(df_old[year_ref])])
 
             for yr in [x for x in year_list if yr >= first_modelYear]:
                 if yr < max(df2.columns):
@@ -313,7 +320,7 @@ def change_lifetime(
             # III.3.1) Adding extra active years to existing vintage years, if
             # lifetime extended
             # For checking the index of two dataframes
-            def f2(df1, df2): return df1.loc[df1.index.isin(df2.index)]
+            def f_index(df1, df2): return df1.loc[df1.index.isin(df2.index)]
             count = 0
             while count <= n:
                 # The counter of loop (no explicit use of k)
@@ -322,6 +329,10 @@ def change_lifetime(
                         [x for x in set(df_old[year_ref]) if x in vtg_years]):
                     # The last active year of this vintage year
                     yr_end = act_years[vtg_years.index(yr)]
+					
+                    if yr_end > max(
+                            df_old['year_act']):
+                        df2[yr_end] = np.nan
 
                     if yr < max(df_old['year_act']):
                         year_next = horizon[horizon.index(yr) + 1]
@@ -336,30 +347,27 @@ def change_lifetime(
                             [yr])].reindex(sorted(df2.columns), axis=1)
 
                         # Finding the first active year with a missing value
-                        yr_act = sorted([x for x in df_yr.columns if pd.isna(
-                            df_yr[x][0]) and x <= yr_end and x > yr])[:1]
+                        yr_act = sorted([x for x in df_yr.columns if df_yr[x].isnull(
+                        ).any() and x <= yr_end and x > yr])[:1]
                         if yr_act:
                             yr_act = yr_act[0]
                             # Extrapolation across the activity years of the
                             # following two vintage years (column-wise)
-                            df_yr[yr_act] = intpol(f3(df2,
-                                                      idx,
-                                                      year_ref,
-                                                      [year_next],
-                                                      yr)[yr_act],
-                                                   f2(f3(df2,
-                                                         idx,
-                                                         year_ref,
-                                                         [year_nn],
-                                                         yr)[yr_act],
-                                                      f3(df2,
-                                                         idx,
-                                                         year_ref,
-                                                         [year_next],
-                                                         yr)),
-                                                   year_next,
-                                                   year_nn,
-                                                   yr)
+                            df_next = f_slice(
+                                df2, idx, year_ref, [year_next], yr)[yr_act]
+                            df_nn = f_slice(
+                                df2, idx, year_ref, [year_nn], yr)[yr_act]							
+                            if df_next.empty and df_nn.empty:
+                                df_next = df_yr[horizon[horizon.index(
+                                    yr_act) - 1]]
+                                df_nn = df_yr[horizon[horizon.index(
+                                    yr_act) - 2]]
+                            if not df_next.empty and df_nn.empty:
+                                df_nn = df_yr[horizon[horizon.index(
+                                    yr_act) - 1]]
+
+                            df_yr[yr_act] = intpol(df_next, f_index(
+                                df_nn, df_next), year_next, year_nn, yr)
 
                         # To make sure no data in active years bigger than the
                         # end year
