@@ -154,8 +154,8 @@ def change_lifetime(
         vtg_years = [x for x in horizon if x >= year_vtg_min and x <=
                      year_vtg_max]            # New vintage years
         # New last activity years
-        act_years = [max([x for x in horizon if x < lifetime + y
-                          and x <= year_act_max]) for y in vtg_years]
+        act_years = [max([x for x in horizon if x < lifetime + y and
+                          x <= year_act_max]) for y in vtg_years]
         years_all = [x for x in horizon if x >=
                      year_vtg_min and x <= max(max(vtg_years, act_years))]
 
@@ -363,7 +363,8 @@ def change_lifetime(
             # lifetime extended
             # For checking the index of two dataframes
             def f_index(df1, df2): 
-			return df1.loc[df1.index.isin(df2.index)]
+                 return df1.loc[df1.index.isin(df2.index)]
+
             count = 0
             while count <= n:
                 # The counter of loop (no explicit use of k)
@@ -459,10 +460,11 @@ def change_lifetime(
                                 df2[yr_next], df2[yr_nn], yr_next, yr_nn, yr)
                             df2[yr_end].loc[pd.isna(df2[yr_end]) & ~pd.isna(
                                 df2[yr_next])] = df2.loc[:, yr_next].copy()
-                            # Removing extra values from previous vintage year
-			    if len(df2[yr]) > 1:
-					df2[yr].loc[pd.isna(df2[yr].shift(+1))] = np.nan
-			    if extrapol_neg:
+
+                        # Removing extra values from previous vintage year
+                        if len(df2[yr]) > 1:
+                            df2[yr].loc[pd.isna(df2[yr].shift(+1))] = np.nan
+                            if extrapol_neg:
                                 df2[yr].loc[(df2[yr] < 0) &
                                             (df2[year_next] >= 0)] = \
                                     df2.loc[:, year_next].copy() * extrapol_neg
