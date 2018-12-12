@@ -26,7 +26,11 @@ If you installed |MESSAGEix| using Anaconda, download the notebooks using the
 Running tutorials
 ~~~~~~~~~~~~~~~~~
 
-Using Anaconda, the ``nb_conda`` package is required. If it was not installed automatically with Anaconda, install it::
+Using Anaconda
+..............
+
+The ``nb_conda`` package is required. It should be installed by default with
+Anaconda. If it was not, install it::
 
     $ conda install nb_conda
 
@@ -40,10 +44,17 @@ Using Anaconda, the ``nb_conda`` package is required. If it was not installed au
    kernels with the menu, e.g. `Kernel` → `Change Kernel` → `Python
    [conda root]`.
 
-On the command line, or without Anaconda, navigate to the tutorial folder and
-run::
+From the command line
+.....................
 
-   $ jupyter notebook
+1. Navigate to the tutorial folder. For instance, if ``messageix-dl`` was used
+   above::
+
+       $ cd /path/to/tutorials
+
+2. Start the Jupyter notebook::
+
+       $ jupyter notebook
 
 Westeros Electrified
 --------------------

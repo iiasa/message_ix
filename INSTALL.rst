@@ -32,8 +32,11 @@ Install |MESSAGEix| via Anaconda
 3. Install Python via `Anaconda`_. We recommend the latest version, i.e.,
    Python 3.6+.
 
+4. Open a command prompt. We recommend Windows users use the “Anaconda Prompt”
+   to avoid permissions issues when installing and using |MESSAGEix|. This
+   program is available in the Windows Start menu after installing Anaconda.
 
-4. Open a command prompt and type::
+5. Install the ``message-ix`` package::
 
     $ conda install -c conda-forge message-ix
 
