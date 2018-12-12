@@ -89,11 +89,10 @@ def test_lifetime_changer(test_mp):
         df_row['year_act'] = x[1]
         df_test2 = df_test2.append(df_row, ignore_index=True)
 
-    df_new = clone.par('output',
-                       {'node_loc': 'seattle',
-                        'technology': 'canning_plant'}).sort_values(['year_vtg',
-                                                                     'year_act']).reset_index(drop=True)
+    df_new = clone.par('output', {'node_loc': 'seattle',
+                                  'technology': 'canning_plant'}) /
+                       .sort_values(['year_vtg','year_act']) /
+                       .reset_index(drop=True)
 
     assert_frame_equal(df_test2, df_new, check_like=True, check_dtype=False)
     clone.solve()
-
