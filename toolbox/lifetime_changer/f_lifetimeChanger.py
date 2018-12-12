@@ -11,11 +11,11 @@ import pandas as pd
 import numpy as np
 from colorama import Fore
 
+
 # ------------------------------------------------------------------------------
 # I) Required utility functions for dataframe manupulation
 # I.1) Utility function for interpolation/extrapolation of two numbers,
 # lists or series (x: time steps, y: data points)
-
 def intpol(y1, y2, x1, x2, x):
     if x2 == x1:
         return y1
@@ -23,19 +23,19 @@ def intpol(y1, y2, x1, x2, x):
         y = y1 + ((y2 - y1) / (x2 - x1)) * (x - x1)
         return y
 
+
 # I.2) Utility function for slicing a MultiIndex dataframe and setting a
 # value to a specific level
 # df: dataframe, idx: list, level: string, locator: list, value:
 # integer/string
-
 def f_slice(df, idx, level, locator, value):
     df = df.reset_index().loc[df.reset_index()[level].isin(locator)].copy()
     df[level] = value
     return df.set_index(idx)
 
+
 # I.3) Function for unifroming the "unit" in different years to prevent
 # mistakes in indexing and grouping
-
 def unit_uniform(df):
     column = [x for x in df.columns if x in ['commodity', 'emission']]
     if column:
@@ -46,6 +46,7 @@ def unit_uniform(df):
     else:
         df['unit'] = df['unit'].mode()[0]
     return df
+
 
 # -----------------------------------------------------------------------------
 # The main function
