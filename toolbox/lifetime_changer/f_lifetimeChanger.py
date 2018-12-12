@@ -304,8 +304,12 @@ def change_lifetime(
                     vtg_years), col_nontec].apply(pd.value_counts).fillna(0)
                 df_count = df_count.loc[df_count[col_nontec[0]] < int(
                     df_count.mean())]
+                
+                if not df_count.empty:
+                    df_count = df_count.loc[df_count[col_nontec[0]] < int(
+                        df_count.mean())]
 
-                if not df_count.empty:    # NOTICE: this is not solved here and it should be decided by the user
+                if not df_count.empty:    # NOTICE: this is not resolved here and it should be decided by the user
                     print(Fore.RED +
                           '>>> WARNING <<<: In parameter "' +
                           parname +
@@ -375,7 +379,7 @@ def change_lifetime(
                         df2.loc[df_yr.index, :] = df_yr
                         df2 = df2.reindex(sorted(df2.columns), axis=1)
 
-            # III.3.2) Adding missing values for extended vintage and active years (before and fater existing vintage years)
+            # III.3.2) Adding missing values for extended vintage and active years (before and after existing vintage years)
             # New vintage years before the first existing vintage year
             # (reversing to extrapolate backwards)
             yr_list = sorted([x for x in vtg_years if x <
@@ -387,41 +391,63 @@ def change_lifetime(
 
             if yr_list:
                 for yr in yr_list:
+                    yr_end = act_years[vtg_years.index(yr)]
+                    df2[yr] = np.nan
+				
                     # Finding the two adjacent vintage years
                     if yr < min(df_old['year_act']):
                         year_next = horizon[horizon.index(yr) + 1]
-                        year_nn = horizon[horizon.index(yr) + 2]
-                        df2[yr] = np.nan
+                        if horizon[horizon.index(yr) + 2] in df_old[year_ref]:
+                            year_nn = horizon[horizon.index(yr) + 2]
+                        else:
+                            year_nn = year_next
+
 
                     else:
                         year_next = horizon[horizon.index(yr) - 1]
-                        year_nn = horizon[horizon.index(yr) - 2]
-
+                        if horizon.index(yr) >= 2:
+                            year_nn = horizon[horizon.index(yr) - 2]
+                        else:
+                            year_nn = year_next
+							
                         if yr not in df2.columns:     # Adding missing active years for this new vintage year
-                            df2[yr] = intpol(
-                                df2[year_next], df2[year_nn], year_next, year_nn, yr)
-                            df2[yr].loc[pd.isna(df2[yr]) & ~pd.isna(
-                                df2[year_next])] = df2.loc[:, year_next].copy()
+                            yr_next = horizon[horizon.index(yr_end) - 1]
+                            yr_nn = horizon[horizon.index(yr_end) - 2]
+                            df2[yr_end] = intpol(
+                                df2[yr_next], df2[yr_nn], yr_next, yr_nn, yr)
+                            df2[yr_end].loc[pd.isna(df2[yr_end]) & ~pd.isna(
+                                df2[yr_next])] = df2.loc[:, yr_next].copy()
                             # Removing extra values from previous vintage year
+                        if len(df2[yr]) > 1:
                             df2[yr].loc[pd.isna(df2[yr].shift(+1))] = np.nan
 
                             if extrapol_neg:
                                 df2[yr].loc[(df2[yr] < 0) & (
                                     df2[year_next] >= 0)] = df2.loc[:, year_next].copy() * extrapol_neg
 
-                    df_yr = intpol(f3(df2, idx, year_ref, [year_next], yr), f2(f3(df2, idx, year_ref, [year_nn], yr), f3(df2, idx, year_ref, [
-                                   year_next], yr)), year_next, year_nn, yr)  # Configuring the new vintage year to be added to vintage years
+                    df_next = f_slice(df2, idx, year_ref, [year_next], yr)
+                    df_nn = f_slice(df2, idx, year_ref, [year_nn], yr)
+                    # Configuring the new vintage year to be added to vintage
+                    # years
+                    df_yr = intpol(
+                        df_next,
+                        f_index(
+                            df_nn,
+                            df_next),
+                        year_next,
+                        year_nn,
+                        yr)
 
                     # Excluding parameters with two time index, but not across
                     # all active years
                     if parname not in ['relation_activity']:
-                        df_yr[year_next].loc[pd.isna(df_yr[year_next])] = f3(
+                        df_yr[year_next].loc[pd.isna(df_yr[year_next])] = f_slice(
                             df2, idx, year_ref, [year_next], yr).loc[:, year_next].copy()
                         df_yr[yr].loc[pd.isna(df_yr[yr])] = intpol(
                             df_yr[year_next], df_yr[year_nn], year_next, year_nn, yr)
 
                     if not df_yr.loc[pd.isna(df_yr[yr])].empty:
-                        df_yr.loc[:, yr] = intpol(f3(df2, idx, year_ref, [year_next], yr).loc[:, year_next], f3(
+                        df_yr.loc[:, yr] = intpol(f_slice(df2, idx, year_ref, [year_next], yr).loc[:, year_next], f_slice(
                             df2, idx, year_ref, [year_nn], yr).loc[:, year_nn], year_next, year_nn, yr)
 
                     yr_end = act_years[vtg_years.index(yr)]
