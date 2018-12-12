@@ -2,37 +2,40 @@
 """
 This function extends or shortens the lifetime of an existing technology in an ixmp scenario
 Straightforward version: 'straight' is the linear inter/extrapolation of the two adjacent data points straight from the available model data
-@author: zakeri
+
 """
 import pandas as pd
 import numpy as np
-import ixmp as ix
 from colorama import Fore
-mp = ix.Platform()
-
 
 def change_lifetime(
+        mp,
         sc,
         tec,
         lifetime=None,
-        year_start=None,
-        year_end=None,
+        year_vtg_min=None,
+        year_vtg_max=None,
+        year_act_max=None,
         nodes=all,
         par_exclude=None,
         remove_old=False,
         test_run=False,
         extrapol_neg=0.5):
     '''
+    mp: object
+        modeling platform	
     sc: object
         ixmp scenario
     tec: string
         Technology name
     lifetime: integer
         New technical lifetime
-    year_start: integer
-        The first vintage year for this lifetime
-    year_end: integer
-        The last vintage year for this lifetime
+    year_vtg_min: integer
+        The first vintage year for new lifetime
+    year_vtg_max: integer
+        The last vintage year for new lifetime
+    year_act_max: integer (default: None)
+        The last active year for new lifetime (if None, the last active year remain unchanged)
     nodes: string or a list/series of strings, default all
         Model regions in where the lifetime of technology should be updated
     par_exclude: string or a list of strings, default None
