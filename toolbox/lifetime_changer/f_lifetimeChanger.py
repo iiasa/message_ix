@@ -53,12 +53,7 @@ def change_lifetime(
     # I.1) Utility function for interpolation/extrapolation of two numbers,
     # lists or series (x: time steps, y: data points)
     def intpol(y1, y2, x1, x2, x):
-        if x2 == x1 and y2 != y1:
-            print(
-                Fore.RESET +
-                '>>> Warning <<<: No difference between x1 and x2, returned empty!!!')
-            return []
-        elif x2 == x1 and y2 == y1:
+        if x2 == x1:
             return y1
         else:
             y = y1 + ((y2 - y1) / (x2 - x1)) * (x - x1)
@@ -68,7 +63,7 @@ def change_lifetime(
     # value to a specific level
     # df: dataframe, idx: list, level: string, locator: list, value:
     # integer/string
-    def f3(df, idx, level, locator, value):
+    def f_slice(df, idx, level, locator, value):
         df = df.reset_index().loc[df.reset_index()[level].isin(locator)].copy()
         df[level] = value
         return df.set_index(idx)
@@ -110,7 +105,8 @@ def change_lifetime(
         x) if 'year' in y]) == 2]  # Parameters with two time-related indexes
 
     if not test_run:
-        sc.remove_sol()
+        if sc.has_solution():
+            sc.remove_solution()
         sc.check_out()
 # __________________________________________________________________________________
 # % III) Modification of parameters
@@ -152,13 +148,15 @@ def change_lifetime(
 
         df_new = df_new.sort_values('year_vtg').reset_index(drop=True)
 
-        if remove_old:
+        if remove_old and not test_run:
             # Removing extra vintage years if desired
             sc.remove_par(parname, df_old)
+
         if not test_run:
             sc.add_par(parname, df_new)
         results[parname] = df_new
         par_exclude.append(parname)
+
         print(
             Fore.RESET +
             '> Parameter "' +
@@ -244,9 +242,9 @@ def change_lifetime(
                 idx +
                 [year_ref]).reset_index(
                 drop=True)
-            df_new = df_new.loc[df_new[year_ref].isin(vtg_years)]
+            df_new = df_new.loc[df_new[year_ref].isin(years_all)]
 
-            if remove_old:
+            if remove_old and not test_run:
                 # Removing extra vintage/activity years if desired
                 sc.remove_par(parname, df_old)
             if not test_run:
@@ -446,7 +444,7 @@ def change_lifetime(
             df_new = df_new.sort_values(idx).reset_index(drop=True)
             df_new = df_new.loc[df_new[year_ref].isin(vtg_years)]
 
-            if remove_old:
+            if remove_old and not test_run:
                 # Removing extra (old) vintage/activity years if desired
                 sc.remove_par(parname, df_old)
             if not test_run:
