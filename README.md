@@ -58,7 +58,7 @@ the ix modeling platform for scientific publications or technical reports:
 
 1. Install Python via [Anaconda](https://www.anaconda.com/download/). We
    recommend the latest version, e.g., Python 3.6+.
-   
+
 2. Install [GAMS](https://www.gams.com/download/). **Importantly**:
 
    - Windows:
@@ -71,7 +71,7 @@ the ix modeling platform for scientific publications or technical reports:
          ```
          export PATH=$PATH:/path/to/gams-directory-with-gams-binary
          ```
-   
+
 3. Open a command prompt and type
 
     ```
@@ -156,4 +156,3 @@ Navigate to the `doc` folder and in a command prompt type
    ```
    make doc
    ```
-
