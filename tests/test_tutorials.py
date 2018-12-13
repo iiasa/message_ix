@@ -2,7 +2,6 @@ import io
 import os
 import subprocess
 import sys
-import tempfile
 import pytest
 
 import numpy as np
@@ -12,7 +11,7 @@ from conftest import here
 try:
     import nbformat
     jupyter_installed = True
-except:
+except ImportError:
     jupyter_installed = False
 
 ene_path = os.path.join(here, '..', 'tutorial', 'Austrian_energy_system')
@@ -53,14 +52,40 @@ def _notebook_run(path, kernel=None, capsys=None):
     return nb, errors
 
 
+def get_cell_by_name(nb, name):
+    """Retrieve a cell from *nb* according to its metadata *name*:
+
+    The Jupyter notebook format allows specifying a document-wide unique 'name'
+    metadata attribute for each cell:
+
+    https://nbformat.readthedocs.io/en/latest/format_description.html
+                                                                #cell-metadata
+
+    Return the cell matching the name, or raise ValueError.
+    """
+    for i, cell in enumerate(nb.cells):
+        try:
+            cell_name = cell.metadata.jupyter.name
+            if cell_name == name:
+                return cell_name
+        except AttributeError:
+            continue
+
+    raise ValueError("no cell named '{}'".format(name))
+
+
 @pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_westeros_baseline(capsys):
     fname = os.path.join(westeros_path, 'westeros_baseline.ipynb')
     nb, errors = _notebook_run(fname, capsys=capsys)
     assert errors == []
 
-    # I have no idea why this is different between py2 and 3
-    obs = eval(nb.cells[-12]['outputs'][0]['data']['text/plain'])
+    # On Python 2, the returned objective value is different
+    if sys.version_info[0] == 3:
+        return
+
+    cell = get_cell_by_name(nb, 'solve-objective-value')
+    obs = eval(cell['outputs'][0]['data']['text/plain'])
     exp = 187445.953125
     assert np.isclose(obs, exp)
 
@@ -99,6 +124,7 @@ def test_austria(capsys):
     nb, errors = _notebook_run(fname, capsys=capsys)
     assert errors == []
 
+    # FIXME use get_cell_by_name instead of assuming cell count/order is fixed
     obs = eval(nb.cells[-13]['outputs'][0]['data']['text/plain'])
     exp = 133105106944.0
     assert np.isclose(obs, exp)
@@ -110,6 +136,7 @@ def test_austria_single_policy():
     nb, errors = _notebook_run(fname)
     assert errors == []
 
+    # FIXME use get_cell_by_name instead of assuming cell count/order is fixed
     obs = eval(nb.cells[-8]['outputs'][0]['data']['text/plain'])
     exp = 132452155392.0
     assert np.isclose(obs, exp)
