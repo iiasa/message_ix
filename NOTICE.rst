@@ -46,13 +46,13 @@ A) Reference to the scientific publication and online resources
 Please cite the following manuscript when using the |MESSAGEix| framework and/or the ix modeling platform 
 for scientific publications or technical reports:
 
-  Daniel Huppmann, Matthew Gidden, Oliver Fricko, Peter Kolp, Clara Orthofer,
-  Michael Pimmer, Nikolay Kushin, Adriano Vinca, Alessio Mastrucci,
-  Keywan Riahi, and Volker Krey.
-  "The MESSAGEix Integrated Assessment Model and the ix modeling platform".
-  *Environmental Modelling & Software* 112:143-156, 2019. 
-  doi: `10.1016/j.envsoft.2018.11.012`_
-  electronic pre-print available at `pure.iiasa.ac.at/15157/`_.
+  | Daniel Huppmann, Matthew Gidden, Oliver Fricko, Peter Kolp, Clara Orthofer,
+    Michael Pimmer, Nikolay Kushin, Adriano Vinca, Alessio Mastrucci,
+    Keywan Riahi, and Volker Krey.
+  | "The MESSAGEix Integrated Assessment Model and the ix modeling platform".
+  | *Environmental Modelling & Software* 112:143-156, 2019. 
+  | doi: `10.1016/j.envsoft.2018.11.012`_
+  | electronic pre-print available at `pure.iiasa.ac.at/15157/`_.
 
 Also, please include a hyperlink to the online resource `MESSAGEix.iiasa.ac.at`_
 in any publication/report, or on a website describing your model
@@ -92,7 +92,9 @@ Please refer to `Contributor Guidelines`_ for details.
 References
 ----------
 
-[1] Clara Orthofer, Daniel Huppmann, and Volker Krey. "South Africa's shale gas resources - chance or challenge?"
-2018, submitted. Electronic pre-print available at `pure.iiasa.ac.at/15085/`_.
+[1] | Clara Orthofer, Daniel Huppmann, and Volker Krey.
+    | "South Africa's shale gas resources - chance or challenge?"
+    | 2018, submitted. 
+      electronic pre-print available at `pure.iiasa.ac.at/15085/`_
 
 .. _`pure.iiasa.ac.at/15085/` : https://pure.iiasa.ac.at/15085/
