@@ -84,7 +84,8 @@ API Documentation
 .. toctree::
    :maxdepth: 1
    
-   api
+   api/ixmp
+   api/message_ix
 
 Using |MESSAGEix|
 -----------------
