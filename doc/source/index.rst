@@ -68,7 +68,7 @@ First, check out our FAQ:
 Next, try the community mailing list hosted using Google groups:
 `groups.google.com/d/forum/message_ix`_ .
 
-.. _`groups.google.com/d/forum/message_ix` : https://groups.google.com/d/forum/message_ixHTML
+.. _`groups.google.com/d/forum/message_ix` : https://groups.google.com/d/forum/message_ix
 
 The |MESSAGEix| Model
 ---------------------
