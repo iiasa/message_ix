@@ -67,7 +67,7 @@ def get_cell_by_name(nb, name):
         try:
             cell_name = cell.metadata.jupyter.name
             if cell_name == name:
-                return cell_name
+                return cell
         except AttributeError:
             continue
 
