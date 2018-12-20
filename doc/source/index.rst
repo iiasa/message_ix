@@ -34,7 +34,7 @@ to `GAMS`_ for numerical computation.
 This documentation provides an introduction and the mathematical formulation 
 of the |MESSAGEix| equations and auxiliary functions.
 For the scientific reference of the framework, 
-see Huppmann et al. (submitted) :cite:`huppmann_messageix_2018`.
+see Huppmann et al. (2019) :cite:`huppmann_messageix_2018`.
 The formulation of |MESSAGEix| is a re-implementation and extension of `'MESSAGE V'`
 (Messner and Strubegger, 1995 :cite:`messner_users_1995`),
 the Integrated Assessment model developed at IIASA since the 1980s.
@@ -84,7 +84,8 @@ API Documentation
 .. toctree::
    :maxdepth: 1
    
-   api
+   api/ixmp
+   api/message_ix
 
 Using |MESSAGEix|
 -----------------
