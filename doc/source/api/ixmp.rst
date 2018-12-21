@@ -3,7 +3,7 @@
 ``ixmp`` package
 ================
 
-|ixmp| provides three classes:
+``ixmp`` provides three classes:
 
 .. autosummary::
 
@@ -11,5 +11,20 @@
    TimeSeries
    Scenario
 
+as well as some utility methods:
+
+.. autosummary::
+
+   ixmp.model_settings.register_model
+
+Core classes
+------------
+
 .. automodule:: ixmp
-   :members: Platform, TimeSeries, Scenario
+   :members: DEFAULT_LOCAL_DB_PATH, Platform, TimeSeries, Scenario
+
+Utility methods
+---------------
+
+.. automodule:: ixmp.model_settings
+   :members: register_model
