@@ -43,6 +43,8 @@ There are three methods to run the |MESSAGEix| model:
   The scenario name and other arguments can be passed as command line parameters, 
   e.g. :literal:`gams MESSAGE_run.gms --in="<data-file>" --out="<output-file>"`.
 
+.. _`tutorials`: tutorials.html
+
 .. _`auto-doc page`: model/MESSAGE_run.html
    
 Overview of model structure and includes files
