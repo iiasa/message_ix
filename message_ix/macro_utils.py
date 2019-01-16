@@ -1,8 +1,10 @@
 import pandas as pd
 import numpy as np
 
-def prepare_calibration_data(original,level, sector_commodity_mapping, econ_pars,
-                             gdp_calibrate, base_year_demand, aeei, MERtoPPP):
+
+def calibrate_macro(original, level, sector_commodity_mapping,
+                    econ_pars, gdp_calibrate, base_year_demand,
+                    aeei):
     def calc_growth(row):
         val = float(row.values[0] + 1) ** (
                 1 / period_length.loc[int(row.name)].values[0]) - 1
@@ -12,7 +14,7 @@ def prepare_calibration_data(original,level, sector_commodity_mapping, econ_pars
         val = aeei[row.loc['node']][row.loc['year']][row.loc['commodity']]
         return val
 
-    data={}
+    data = {}
 
     commodity_list = list(sector_commodity_mapping.values())
     data['commodity_list'] = commodity_list
@@ -51,7 +53,8 @@ def prepare_calibration_data(original,level, sector_commodity_mapping, econ_pars
 
     # Economic Parameters
     econ_pars = pd.DataFrame.from_dict(econ_pars)
-    # lower bound parameters by region (used to avoid divergences in MACRO solution)
+    # lower bound parameters by region (used to avoid divergences in
+    # MACRO solution)
     data['lotol'] = econ_pars.loc['lotol']
     # initial capital to GDP ration in 1990 (by region)
     data['kgdp'] = econ_pars.loc['kgdp']
@@ -59,7 +62,8 @@ def prepare_calibration_data(original,level, sector_commodity_mapping, econ_pars
     data['depr'] = econ_pars.loc['depr']
     # capital value share (by region)
     data['kpvs'] = econ_pars.loc['kpvs']
-    # VK, 10 April 2008: DRATE (social discount rate from MESSAGE) introduced as a new parameter as in MERGE 5
+    # VK, 10 April 2008: DRATE (social discount rate from MESSAGE)
+    # introduced as a new parameter as in MERGE 5
     data['drate'] = econ_pars.loc['drate']
     # subsitution elasticity between x and y  (by region)
     data['esub'] = econ_pars.loc['esub']
@@ -83,9 +87,9 @@ def prepare_calibration_data(original,level, sector_commodity_mapping, econ_pars
     for node in base_year_demand.columns:
         _demand_ref = pd.DataFrame(columns=['node', 'commodity', 'level',
                                             'year', 'lvl'],
-                                   index = base_year_demand.index)
+                                   index=base_year_demand.index)
         _demand_ref['node'] = node
-        _demand_ref['commodity'] =_demand_ref.index
+        _demand_ref['commodity'] = _demand_ref.index
         _demand_ref['level'] = level
         _demand_ref['year'] = baseyearmacro
         _demand_ref['lvl'] = base_year_demand
@@ -96,7 +100,7 @@ def prepare_calibration_data(original,level, sector_commodity_mapping, econ_pars
     # reference energy system costs in base year [billion US$2005]
     # ?: hier COST_NODAL aus 2020 ok?
     cost_ref = original.var("COST_NODAL_NET")
-    cost_ref = cost_ref[cost_ref.year==firstmodelyear]
+    cost_ref = cost_ref[cost_ref.year == firstmodelyear]
     cost_ref['year'] = baseyearmacro
     data['cost_ref'] = cost_ref
 
@@ -116,17 +120,5 @@ def prepare_calibration_data(original,level, sector_commodity_mapping, econ_pars
     df['value'] = df.apply(find_aeei, axis=1)
     aeei = df.copy()
     data['aeei'] = aeei
-
-    # MER to PPP conversion ratio
-    # ?: hier LAM werte  ok?
-    MERtoPPP = pd.DataFrame.from_dict(MERtoPPP)
-
-    #########################################################################
-    # NEVER USED PARAMETERS - was sollen wir mit denen machen?
-    #########################################################################
-    # read correction coefficients (MESSAGE vs MACRO energy units)
-    correction = [1e-3] * 6
-    # read scaling factors for production function
-    scaling = [1] * 6
 
     return data

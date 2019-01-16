@@ -53,3 +53,11 @@ tests/testdb/test.properties
 tests/testdb/ixmptest.properties
 tests/testdb/ixmptest.lck
 .Rproj.user
+
+*.lck
+
+*.lobs
+
+*.properties
+
+*.script
