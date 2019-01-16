@@ -24,6 +24,11 @@ econ_pars = {
 gdp_calibrate = {
     'South Africa': {2010: 372, 2020: 543, 2030: 764, 2040: 1074,
                      2050: 1412}}
+
+base_year_demand = {'South Africa': {"i_spec": 9.8, "i_therm": 8.7, "i_feed": 5.3,
+                    "rc_spec": 3.8, "rc_therm": 4.2, "transport": 19.46}}
+base_year_demand = pd.DataFrame(base_year_demand)
+
 gdp_calibrate = pd.DataFrame(gdp_calibrate)
 
 aeei = {'South Africa': {
@@ -41,10 +46,11 @@ MERtoPPP = {'South Africa': {'2010': 1.761, '2020': 1.584, '2030': 1.438,
 MERtoPPP = pd.DataFrame(MERtoPPP)
 
 
-def init_macro(original, sector_commodity_mapping, econ_pars, gdp_calibrate,
-               aeei, MERtoPPP):
-    dict = prepare_calibration_data(original, sector_commodity_mapping,
-                                    econ_pars, gdp_calibrate, aeei, MERtoPPP)
+def init_macro(original, level, sector_commodity_mapping, econ_pars,gdp_calibrate,
+               base_year_demand, aeei, MERtoPPP):
+    data = prepare_calibration_data(original, level, sector_commodity_mapping,
+                                    econ_pars, gdp_calibrate, base_year_demand,
+                                    aeei, MERtoPPP)
 
     modelpath = 'C:\\Users\\ga46gup\\Modelle\\message_ix\\message_ix\\model'
     newscenario = scenario + '_MACRO'
@@ -57,24 +63,24 @@ def init_macro(original, sector_commodity_mapping, econ_pars, gdp_calibrate,
     os.chdir(path)
 
     # useful demand levels by region and year
-    demand_new = original.var("DEMAND", {'node': dict['region_list'],
-                                         'year': dict['year_message'],
-                                         'commodity': dict['commodity_list']})
-    demand = dict['demand_ref'].append(demand_new)
+    demand_new = original.var("DEMAND", {'node': data['region_list'],
+                                         'year': data['year_message'],
+                                         'commodity': data['commodity_list']})
+    demand = data['demand_ref'].append(demand_new)
 
     # useful energy demand prices by region and year
     price_new = original.var("PRICE_COMMODITY",
-                             {'node': dict['region_list'],
-                              'year': dict['year_message'],
-                              'commodity': dict['commodity_list']})
-    price = dict['p_ref'].append(price_new)
+                             {'node': data['region_list'],
+                              'year': data['year_message'],
+                              'commodity': data['commodity_list']})
+    price = data['p_ref'].append(price_new)
 
     # regional energy system costs
     total_cost_new = original.var("COST_NODAL_NET",
-                                  {'node': dict['region_list'],
-                                   'year': dict['year_message']})
+                                  {'node': data['region_list'],
+                                   'year': data['year_message']})
     # reference energy system costs (convert from US. million to US. billion)
-    total_cost = dict['cost_ref'].append(total_cost_new)
+    total_cost = data['cost_ref'].append(total_cost_new)
     total_cost = total_cost.pivot_table(columns='node', index='year',
                                         values='lvl')
     total_cost = total_cost / 1e3
@@ -86,15 +92,15 @@ def init_macro(original, sector_commodity_mapping, econ_pars, gdp_calibrate,
     # production function
     # exponent rho (esub is elasticity of substitution  between energy and the
     # value added aggregates, i.e. capital and labor)
-    rho = (dict['esub'] - 1) / dict['esub']
+    rho = (data['esub'] - 1) / data['esub']
     # production Y in base year
-    gdp0 = gdp_calibrate.loc[dict['baseyearmacro']]
+    gdp0 = gdp_calibrate.loc[data['baseyearmacro']]
     # capital K in base year
-    k0 = dict['kgdp'] * gdp0
+    k0 = data['kgdp'] * gdp0
     # investments I in base year
-    i0 = k0 * (dict['growth'].loc[dict['firstmodelyear']] + dict['depr'])
+    i0 = k0 * (data['growth'].loc[data['firstmodelyear']] + data['depr'])
     # consumption C in base year
-    c0 = gdp0 - i0 - total_cost.loc[dict['baseyearmacro']]
+    c0 = gdp0 - i0 - total_cost.loc[data['baseyearmacro']]
 
     # production function coefficients for capital, labor (aconst) and
     # energy (bconst) are calibrated from the first-order optimality
@@ -105,20 +111,20 @@ def init_macro(original, sector_commodity_mapping, econ_pars, gdp_calibrate,
 
     # production function coefficients of the different energy sectors
     # (factor of 1000 needed for billion US. to trillion US. conversion)
-    dict['demand_ref'] = dict['demand_ref'].pivot_table(columns='commodity',
+    data['demand_ref'] = data['demand_ref'].pivot_table(columns='commodity',
                                                         index='node',
                                                         values='lvl')
-    dict['p_ref'] = dict['p_ref'].pivot_table(columns='commodity',
+    data['p_ref'] = data['p_ref'].pivot_table(columns='commodity',
                                               index='node',
                                               values='lvl')
 
     def calc_bconst(row):
-        val = (dict['p_ref'].loc[row.name] / 1e3 * (
+        val = (data['p_ref'].loc[row.name] / 1e3 * (
                 float(1 / gdp0.loc[row.name]) * row) ** float(
             rho.loc[row.name] - 1))
         return val
 
-    bconst = dict['demand_ref'].apply(calc_bconst, axis=1)
+    bconst = data['demand_ref'].apply(calc_bconst, axis=1)
 
     # production function coefficient of capital and labor
     # (factor of 1000 needed for billion US. to trillion US. conversion)
@@ -126,14 +132,14 @@ def init_macro(original, sector_commodity_mapping, econ_pars, gdp_calibrate,
         val = bconst.loc[row.name] * row ** rho.loc[row.name]
         return val
 
-    partmp = dict['demand_ref'].apply(calc_partmp, axis=1)
+    partmp = data['demand_ref'].apply(calc_partmp, axis=1)
 
     def calc_aconst(row):
-        val = ((gdp_calibrate.loc[dict['baseyearmacro'], row.name] / 1000) **
+        val = ((gdp_calibrate.loc[data['baseyearmacro'], row.name] / 1000) **
                rho.loc[
                    row.name] - partmp.sum(axis=0) / (
                            (k0.loc[row.name] / 1000) ** (
-                           rho.loc[row.name] * dict['kgdp'].loc[row.name])))
+                           rho.loc[row.name] * data['kgdp'].loc[row.name])))
         return val
 
     aconst = partmp.apply(calc_aconst, axis=1)
@@ -145,7 +151,7 @@ def init_macro(original, sector_commodity_mapping, econ_pars, gdp_calibrate,
     # running MACRO standalone
     if not new.has_set("node"):
         new.init_set("node")
-    for node in dict['region_list']:
+    for node in data['region_list']:
         new.add_set("node", node)
 
     if not new.has_set("type_node"):
@@ -154,17 +160,17 @@ def init_macro(original, sector_commodity_mapping, econ_pars, gdp_calibrate,
 
     if not new.has_set("cat_node"):
         new.init_set("cat_node", ["type_node", "node"])
-    for node in dict['region_list']:
+    for node in data['region_list']:
         new.add_set("cat_node", f"economy.{node}")
 
     if not new.has_set("year"):
         new.init_set("year")
-    for year in dict['period_list']:
+    for year in data['period_list']:
         new.add_set("year", str(year))
 
     if not new.has_set("commodity"):
         new.init_set("commodity")
-    for commodity in dict['commodity_list']:
+    for commodity in data['commodity_list']:
         new.add_set("commodity", commodity)
 
     if not new.has_set("level"):
@@ -179,13 +185,13 @@ def init_macro(original, sector_commodity_mapping, econ_pars, gdp_calibrate,
 
     if not new.has_set("cat_year"):
         new.init_set("cat_year", ["type_year", "year"])
-    new.add_set("cat_year", f"baseyear_macro.{dict['baseyearmacro']}")
-    new.add_set("cat_year", f"initializeyear_macro.{dict['baseyearmacro']}")
+    new.add_set("cat_year", f"baseyear_macro.{data['baseyearmacro']}")
+    new.add_set("cat_year", f"initializeyear_macro.{data['baseyearmacro']}")
 
     # set of MACRO sectors
     if not new.has_set("sector"):
         new.init_set("sector")
-    for sector in dict['sector_list']:
+    for sector in data['sector_list']:
         new.add_set("sector", sector)
 
     # mapping of MACRO sectors to MESSAGE commodity/level combinations
@@ -203,12 +209,16 @@ def init_macro(original, sector_commodity_mapping, econ_pars, gdp_calibrate,
     # storage of MESSAGE results in GDX for standalone use of MACRO
     # (including calibration process)
 
+    for unit in ['GWa', "USD/kWa","G.", "T.", '-']:
+        if not unit in mp.units().tolist():
+            mp.add_unit(unit)
+
     # demand
     if not new.has_par("demand_MESSAGE"):
         new.init_par("demand_MESSAGE", ["node", "sector", "year"])
-    for node in dict['region_list']:
-        for sector in dict['sector_list']:
-            for year in dict['period_list']:
+    for node in data['region_list']:
+        for sector in data['sector_list']:
+            for year in data['period_list']:
                 new.add_par("demand_MESSAGE", f"{node}.{sector}.{year}",
                             float(demand.loc[(demand.node == node) &
                                        (demand.year == year) &
@@ -219,30 +229,28 @@ def init_macro(original, sector_commodity_mapping, econ_pars, gdp_calibrate,
     # prices
     if not new.has_par("price_MESSAGE"):
         new.init_par("price_MESSAGE", ["node", "sector", "year"])
-    for node in dict['region_list']:
-        for sector in dict['sector_list']:
-            for year in dict['period_list']:
+    for node in data['region_list']:
+        for sector in data['sector_list']:
+            for year in data['period_list']:
                 new.add_par("price_MESSAGE", f"{node}.{sector}.{year}",
                             price.loc[(price.node == node) &
-                                      (price.year == year) & (
-                                                  price.commodity ==
-                                                  sector_commodity_mapping[
-                                                      sector])]['lvl'],
+                                      (price.year == year) &
+                                      (price.commodity == sector_commodity_mapping[sector])]['lvl'],
                             "USD/kWa")
 
     # system costs
     if not new.has_par("cost_MESSAGE"):
         new.init_par("cost_MESSAGE", ["node", "year"])
-    for node in dict['region_list']:
-        for year in dict['period_list']:
+    for node in data['region_list']:
+        for year in data['period_list']:
             new.add_par("cost_MESSAGE", f"{node}.{year}",
                         total_cost.loc[year, node], "G.")
 
     # GDP values to calibrate to (incl. base year data)
     if not new.has_par("gdp_calibrate"):
         new.init_par("gdp_calibrate", ["node", "year"])
-    for node in dict['region_list']:
-        for year in dict['period_list']:
+    for node in data['region_list']:
+        for year in data['period_list']:
             new.add_par("gdp_calibrate", f"{node}.{year}",
                         gdp_calibrate.loc[year, node], "T.")
 
@@ -250,94 +258,95 @@ def init_macro(original, sector_commodity_mapping, econ_pars, gdp_calibrate,
     # ? passt hier baseyearmacro?
     if not new.has_par("historical_gdp"):
         new.init_par("historical_gdp", ["node", "year"])
-    for node in dict['region_list']:
-        for year in dict['baseyearmacro']:
-            new.add_par("historical_gdp", f"{node}.{year}",
-                        gdp_calibrate.loc[year, node], "T.")
+    for node in data['region_list']:
+        new.add_par("historical_gdp", f"{node}.{data['baseyearmacro']}",
+                    gdp_calibrate.loc[data['baseyearmacro'], node], "T.")
 
     # MER to PPP conversion factor
     if not new.has_par("MERtoPPP"):
         new.init_par("MERtoPPP", ["node", "year"])
-    for node in dict['region_list']:
-        for year in dict['period_list']:
-            new.add_par("MERtoPPP", f"{node}.{year}", MERtoPPP.loc[year, node],
+    for node in data['region_list']:
+        for year in data['period_list']:
+            new.add_par("MERtoPPP", f"{node}.{year}", MERtoPPP.loc[str(year), node],
                         "-")
 
     # capital to GDP ratio
     if not new.has_par("kgdp"):
         new.init_par("kgdp", ["node"])
-    for node in dict['region_list']:
-        new.add_par("kgdp", node, dict["kgdp"].loc[node], "-")
+    for node in data['region_list']:
+        new.add_par("kgdp", node, data["kgdp"].loc[node], "-")
 
     # capital value share
     if not new.has_par("kpvs"):
         new.init_par("kpvs", ["node"])
-    for node in dict['region_list']:
-        new.add_par("kpvs", node, dict["kpvs"].loc[node], "-")
+    for node in data['region_list']:
+        new.add_par("kpvs", node, data["kpvs"].loc[node], "-")
 
     # capital depreciation rate
     if not new.has_par("depr"):
         new.init_par("depr", ["node"])
-    for node in dict['region_list']:
-        new.add_par("depr", node, dict["depr"].loc[node], "-")
+    for node in data['region_list']:
+        new.add_par("depr", node, data["depr"].loc[node], "-")
 
     # discount rate
     if not new.has_par("drate"):
         new.init_par("drate", ["node"])
-    for node in dict['region_list']:
-        new.add_par("drate", node, dict["drate"].loc[node], "-")
+    for node in data['region_list']:
+        new.add_par("drate", node, data["drate"].loc[node], "-")
 
     # elasticity of substitution between capital-labor and total energy
     if not new.has_par("esub"):
         new.init_par("esub", ["node"])
-    for node in dict['region_list']:
-        new.add_par("esub", node, dict["esub"].loc[node], "-")
+    for node in data['region_list']:
+        new.add_par("esub", node, data["esub"].loc[node], "-")
 
     # tolerance parameter
     if not new.has_par("lotol"):
         new.init_par("lotol", ["node"])
-    for node in dict['region_list']:
-        new.add_par("lotol", node, dict["lotol"].loc[node], "-")
+    for node in data['region_list']:
+        new.add_par("lotol", node, data["lotol"].loc[node], "-")
 
     # base year reference prices
     if not new.has_par("p_ref"):
         new.init_par("p_ref", ["node", "sector"])
-    for node in dict['region_list']:
-        for sector in dict['sector_list']:
+    for node in data['region_list']:
+        for sector in data['sector_list']:
             new.add_par("p_ref", f"{node}.{sector}",
-                        dict['p_ref'].loc[node, sector], "USD/kWa")
+                        data['p_ref'].loc[node, sector], "USD/kWa")
 
-    # production function coefficient of capital and labor
-    if not new.has_par("lakl"):
-        new.init_par("lakl", ["node"])
-    for node in dict['region_list']:
-        new.add_par("lakl", node, aconst.loc[node], "-")
+    # production function coefficient of capital and labor - ??? welches vormat soll ads haben???
+    # if not new.has_par("lakl"):
+    #     new.init_par("lakl", ["node"])
+    # for node in data['region_list']:
+    #     new.add_par("lakl", node, aconst.loc[node], "-")
 
     # production function coefficients of the different energy sectors
     if not new.has_par("prfconst"):
         new.init_par("prfconst", ["node", "sector"])
-    for node in dict['region_list']:
-        for sector in dict['sector_list']:
+    for node in data['region_list']:
+        for sector in data['sector_list']:
             new.add_par("prfconst", f"{node}.{sector}",
                         bconst.loc[node, sector], "-")
 
     # labor supply growth rate
     if not new.has_par("grow"):
         new.init_par("grow", ["node", "year"])
-    for node in dict['region_list']:
-        for year in dict['period_list']:
+    for node in data['region_list']:
+        for year in data['period_list']:
             new.add_par("grow", f"{node}.{year}",
-                        dict['growth'].loc[year, node],
+                        data['growth'].loc[year],
                         "-")
 
     # autonomous energy efficiency improvement (aeei) coefficients
     if not new.has_par("aeei"):
         new.init_par("aeei", ["node", "sector", "year"])
-    for node in dict['region_list']:
-        for sector in dict['sector_list']:
-            for year in dict['period_list']:
-                new.add_par("aeei", f"{node}.{year}.{sector}",
-                            dict['aeei'].loc[node, sector, year], "-")
+    for node in data['region_list']:
+        for sector in data['sector_list']:
+            for year in data['period_list']:
+                new.add_par("aeei", f"{node}.{sector}.{year}",
+                            data['aeei'].loc[(data['aeei'].node==node) &
+                                             (data['aeei'].year == str(year)) &
+                                             (data['aeei'].commodity == sector_commodity_mapping[sector])]['value'], "-")
 
     # ------------------------------------------------------------------------
     # initialize cost accounting variables/equations if they don't exist

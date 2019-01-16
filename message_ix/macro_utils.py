@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 
-def prepare_calibration_data(original, sector_commodity_mapping, econ_pars,
-                             gdp_calibrate, aeei, MERtoPPP):
+def prepare_calibration_data(original,level, sector_commodity_mapping, econ_pars,
+                             gdp_calibrate, base_year_demand, aeei, MERtoPPP):
     def calc_growth(row):
         val = float(row.values[0] + 1) ** (
                 1 / period_length.loc[int(row.name)].values[0]) - 1
@@ -12,34 +12,34 @@ def prepare_calibration_data(original, sector_commodity_mapping, econ_pars,
         val = aeei[row.loc['node']][row.loc['year']][row.loc['commodity']]
         return val
 
-    dict={}
+    data={}
 
     commodity_list = list(sector_commodity_mapping.values())
-    dict['commodity_list'] = commodity_list
+    data['commodity_list'] = commodity_list
     sector_list = list(sector_commodity_mapping.keys())
-    dict['sector_list'] = sector_list
+    data['sector_list'] = sector_list
 
     # temporal structure
     year = [int(i) for i in original.set("year").tolist()]
     firstmodelyear = int(
         original.set("cat_year", {'type_year': "firstmodelyear"})[
             ["year"]].values)
-    dict['firstmodelyear'] = firstmodelyear
+    data['firstmodelyear'] = firstmodelyear
     year_message = [i for i in year if i >= firstmodelyear]
-    dict['year_message'] = year_message
+    data['year_message'] = year_message
 
     try:
         baseyearmacro = [i for i in year if i < firstmodelyear][-1]
     except ValueError:
         print('Scenario has no MACRO base year - '
               'add at least one year before first model year')
-    dict['baseyearmacro'] = baseyearmacro
+    data['baseyearmacro'] = baseyearmacro
     year_macro = [i for i in year if i >= baseyearmacro]
-    dict['year_macro'] = year_macro
+    data['year_macro'] = year_macro
 
     # periods
     period_list = year_message
-    dict['period_list'] = period_list
+    data['period_list'] = period_list
 
     # period length
     period_length = pd.DataFrame(index=year_macro[1:],
@@ -47,47 +47,64 @@ def prepare_calibration_data(original, sector_commodity_mapping, econ_pars,
 
     # list of regions in the model
     region_list = [i for i in original.set("node").tolist() if i != 'World']
-    dict['region_list'] = region_list
+    data['region_list'] = region_list
 
     # Economic Parameters
     econ_pars = pd.DataFrame.from_dict(econ_pars)
     # lower bound parameters by region (used to avoid divergences in MACRO solution)
-    dict['lotol'] = econ_pars.loc['lotol']
+    data['lotol'] = econ_pars.loc['lotol']
     # initial capital to GDP ration in 1990 (by region)
-    dict['kgdp'] = econ_pars.loc['kgdp']
+    data['kgdp'] = econ_pars.loc['kgdp']
     # depreciation rate (by region)
-    dict['depr'] = econ_pars.loc['depr']
+    data['depr'] = econ_pars.loc['depr']
     # capital value share (by region)
-    dict['kpvs'] = econ_pars.loc['kpvs']
+    data['kpvs'] = econ_pars.loc['kpvs']
     # VK, 10 April 2008: DRATE (social discount rate from MESSAGE) introduced as a new parameter as in MERGE 5
-    dict['drate'] = econ_pars.loc['drate']
+    data['drate'] = econ_pars.loc['drate']
     # subsitution elasticity between x and y  (by region)
-    dict['esub'] = econ_pars.loc['esub']
+    data['esub'] = econ_pars.loc['esub']
 
     # reference price of energy service demands in [US$2005/kWyr]
     # ?: hier PRICE_COMMODITY aus 2020 ok?
     p_ref = original.var("PRICE_COMMODITY", {'year': firstmodelyear,
-                                                 'commodity': commodity_list})
+                                             'commodity': commodity_list})
+    # Todo: write more explicit error message
+    if len(p_ref) < len(commodity_list):
+        raise ValueError
+        print('The Scenario has one or more PRICE_COMMODITY = 0. '
+              'MACRO cannot handle Prices equal to zero. '
+              'Your model mightbe overconstraint')
+
     p_ref['year'] = baseyearmacro
-    dict['p_ref'] = p_ref
+    data['p_ref'] = p_ref
 
     # reference demand in base year [GWyr]
-    demand_ref = original.var("DEMAND", {'year': firstmodelyear,
-                                             'commodity': commodity_list})
-    demand_ref['year'] = baseyearmacro
-    dict['demand_ref'] = demand_ref
+    demand_ref = pd.DataFrame(columns=original.var("DEMAND").columns)
+    for node in base_year_demand.columns:
+        _demand_ref = pd.DataFrame(columns=['node', 'commodity', 'level',
+                                            'year', 'lvl'],
+                                   index = base_year_demand.index)
+        _demand_ref['node'] = node
+        _demand_ref['commodity'] =_demand_ref.index
+        _demand_ref['level'] = level
+        _demand_ref['year'] = baseyearmacro
+        _demand_ref['lvl'] = base_year_demand
+        demand_ref = demand_ref.append(_demand_ref)
+
+    data['demand_ref'] = demand_ref
 
     # reference energy system costs in base year [billion US$2005]
     # ?: hier COST_NODAL aus 2020 ok?
     cost_ref = original.var("COST_NODAL_NET")
     cost_ref = cost_ref[cost_ref.year==firstmodelyear]
     cost_ref['year'] = baseyearmacro
-    dict['cost_ref'] = cost_ref
+    data['cost_ref'] = cost_ref
 
     # calculate growth rates based on calibrated GDP
+    # Todo: Check for compatibility with multiple nodes
     change = gdp_calibrate.pct_change().dropna()
     growth = change.apply(calc_growth, axis=1)
-    dict['growth'] = growth
+    data['growth'] = growth
 
     # uncalibrated AEEI (autonomous energy efficiency improvement)
     reform = {(l1_k, l2_k, l3_k): values for l1_k, l2_d in aeei.items() for
@@ -98,6 +115,7 @@ def prepare_calibration_data(original, sector_commodity_mapping, econ_pars,
 
     df['value'] = df.apply(find_aeei, axis=1)
     aeei = df.copy()
+    data['aeei'] = aeei
 
     # MER to PPP conversion ratio
     # ?: hier LAM werte  ok?
@@ -111,4 +129,4 @@ def prepare_calibration_data(original, sector_commodity_mapping, econ_pars,
     # read scaling factors for production function
     scaling = [1] * 6
 
-    return dict
+    return data
