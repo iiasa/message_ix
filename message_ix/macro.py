@@ -23,6 +23,8 @@ macro_regions = ['South Africa']
 econ_pars = {
     'South Africa': {'lotol': 0.05, 'kgdp': 3, 'depr': 0.05, 'kpvs': 0.3,
                      'drate': 0.5, 'esub': 0.2}}
+econ_pars = pd.DataFrame.from_dict(econ_pars)
+
 gdp_calibrate = {
     'South Africa': {2010: 372, 2020: 543, 2030: 764, 2040: 1074,
                      2050: 1412}}
@@ -50,10 +52,10 @@ mer_to_ppp = pd.DataFrame(mer_to_ppp)
 
 
 def init_macro(original, level, sector_commodity_mapping, econ_pars,
-               gdp_calibrate, base_year_demand, aeei, mer_to_ppp):
+               gdp_calibrate, base_year_demand, aeei, mer_to_ppp, macro_regions):
     data = calibrate_macro(original, level, sector_commodity_mapping,
                            econ_pars, gdp_calibrate, base_year_demand,
-                           aeei)
+                           aeei, macro_regions)
 
     modelpath = 'C:\\Users\\ga46gup\\Modelle\\message_ix\\message_ix\\model'
     newscenario = scenario + '_MACRO'
@@ -139,10 +141,10 @@ def init_macro(original, level, sector_commodity_mapping, econ_pars,
 
     def calc_aconst(row):
         val = ((gdp_calibrate.loc[data['baseyearmacro'], row.name] / 1000) **
-               rho.loc[
-                   row.name] - partmp.sum(axis=0) / (
-                       (k0.loc[row.name] / 1000) ** (
-                       rho.loc[row.name] * data['kgdp'].loc[row.name])))
+               rho.loc[row.name] - partmp.sum(axis=0) / (
+                           (k0.loc[row.name] / 1000) ** (
+                               rho.loc[row.name] * data['kgdp'].loc[row.name]))
+               )
         return val
 
     aconst = partmp.apply(calc_aconst, axis=1)
@@ -153,14 +155,14 @@ def init_macro(original, level, sector_commodity_mapping, econ_pars,
     # sets that are standard part of a MESSAGE scenario, but needed for
     # running MACRO standalone
     MACRO_SPECS = {'sets': [
-        ['node', ], ["type_node", ],
-        ["cat_node", ["type_node", "node", ], ],
-        ["year", ], ["type_year", ],
-        ["cat_year", ["type_year", "year", ], ],
-        ["commodity", ], ['level', ], ["sector", ],
-        ["mapping_macro_sector",
-         ["sector", "commodity", "level", ], ],
-    ],
+                            ['node', ], ["type_node", ],
+                            ["cat_node", ["type_node", "node", ], ],
+                            ["year", ], ["type_year", ],
+                            ["cat_year", ["type_year", "year", ], ],
+                            ["commodity", ], ['level', ], ["sector", ],
+                            ["mapping_macro_sector",
+                            ["sector", "commodity", "level", ], ],
+                           ],
         'pars': [
             ['demand_MESSAGE', ['node', 'sector', 'year', ], ],
             ['price_MESSAGE', ['node', 'sector', 'year', ], ],
@@ -180,7 +182,6 @@ def init_macro(original, level, sector_commodity_mapping, econ_pars,
             ['grow', ['node', 'year', ], ],
             ['aeei', ['node', 'sector', 'year', ], ],
         ],
-
         'vars': [
             ['DEMAND', ['node', 'commodity', 'level', 'year', 'time', ], ],
             ['PRICE', ['node', 'commodity', 'level', 'year', 'time', ], ],
@@ -327,8 +328,8 @@ def init_macro(original, level, sector_commodity_mapping, econ_pars,
                         data['p_ref'].loc[node, sector], "USD/kWa")
 
     # production function coefficient of capital and labor
-    # for node in data['region_list']:
-    #     new.add_par("lakl", aconst.loc[node], "-")
+    for node in data['region_list']:
+        new.add_par("lakl", aconst.loc[node], "-")
 
     # production function coefficients of the different energy sectors
     for node in data['region_list']:

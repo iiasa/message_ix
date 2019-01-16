@@ -4,7 +4,7 @@ import numpy as np
 
 def calibrate_macro(original, level, sector_commodity_mapping,
                     econ_pars, gdp_calibrate, base_year_demand,
-                    aeei):
+                    aeei, macro_regions):
     def calc_growth(row):
         val = float(row.values[0] + 1) ** (
                 1 / period_length.loc[int(row.name)].values[0]) - 1
@@ -16,10 +16,8 @@ def calibrate_macro(original, level, sector_commodity_mapping,
 
     data = {}
 
-    commodity_list = list(sector_commodity_mapping.values())
-    data['commodity_list'] = commodity_list
-    sector_list = list(sector_commodity_mapping.keys())
-    data['sector_list'] = sector_list
+    data['commodity_list'] = list(sector_commodity_mapping.values())
+    data['sector_list'] = list(sector_commodity_mapping.keys())
 
     # temporal structure
     year = [int(i) for i in original.set("year").tolist()]
@@ -40,19 +38,16 @@ def calibrate_macro(original, level, sector_commodity_mapping,
     data['year_macro'] = year_macro
 
     # periods
-    period_list = year_message
-    data['period_list'] = period_list
+    data['period_list'] = year_message
 
     # period length
     period_length = pd.DataFrame(index=year_macro[1:],
                                  data=np.diff(year_macro))
 
     # list of regions in the model
-    region_list = [i for i in original.set("node").tolist() if i != 'World']
-    data['region_list'] = region_list
+    data['region_list'] = macro_regions
 
     # Economic Parameters
-    econ_pars = pd.DataFrame.from_dict(econ_pars)
     # lower bound parameters by region (used to avoid divergences in
     # MACRO solution)
     data['lotol'] = econ_pars.loc['lotol']
@@ -71,9 +66,10 @@ def calibrate_macro(original, level, sector_commodity_mapping,
     # reference price of energy service demands in [US$2005/kWyr]
     # ?: hier PRICE_COMMODITY aus 2020 ok?
     p_ref = original.var("PRICE_COMMODITY", {'year': firstmodelyear,
-                                             'commodity': commodity_list})
+                                             'commodity': data[
+                                                 'commodity_list']})
     # Todo: write more explicit error message
-    if len(p_ref) < len(commodity_list):
+    if len(p_ref) < len(data['commodity_list']):
         raise ValueError
         print('The Scenario has one or more PRICE_COMMODITY = 0. '
               'MACRO cannot handle Prices equal to zero. '
@@ -98,7 +94,7 @@ def calibrate_macro(original, level, sector_commodity_mapping,
     data['demand_ref'] = demand_ref
 
     # reference energy system costs in base year [billion US$2005]
-    # ?: hier COST_NODAL aus 2020 ok?
+    # ?: here COST_NODAL from 2020 ok?
     cost_ref = original.var("COST_NODAL_NET")
     cost_ref = cost_ref[cost_ref.year == firstmodelyear]
     cost_ref['year'] = baseyearmacro
