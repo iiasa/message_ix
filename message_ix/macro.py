@@ -52,7 +52,9 @@ mer_to_ppp = pd.DataFrame(mer_to_ppp)
 
 
 def init_macro(original, level, sector_commodity_mapping, econ_pars,
-               gdp_calibrate, base_year_demand, aeei, mer_to_ppp, macro_regions):
+               gdp_calibrate, base_year_demand, aeei, mer_to_ppp,
+               macro_regions):
+    
     data = calibrate_macro(original, level, sector_commodity_mapping,
                            econ_pars, gdp_calibrate, base_year_demand,
                            aeei, macro_regions)
@@ -64,7 +66,8 @@ def init_macro(original, level, sector_commodity_mapping, econ_pars,
                          keep_solution=False)
     new.check_out()
 
-    path = 'C:\\Users\\ga46gup\\Modelle\\message_ix\\message_ix\\MACRO_py\MACRO_py'
+    path = 'C:\\Users\\ga46gup\\Modelle\\message_ix' \
+           '\\message_ix\\MACRO_py\MACRO_py'
     os.chdir(path)
 
     # useful demand levels by region and year
@@ -104,8 +107,7 @@ def init_macro(original, level, sector_commodity_mapping, econ_pars,
     k0 = data['kgdp'] * gdp0
     # investments I in base year
     i0 = k0 * (data['growth'].loc[data['firstmodelyear']] + data['depr'])
-    # consumption C in base year
-    c0 = gdp0 - i0 - total_cost.loc[data['baseyearmacro']]
+
 
     # production function coefficients for capital, labor (aconst) and
     # energy (bconst) are calibrated from the first-order optimality
@@ -147,7 +149,10 @@ def init_macro(original, level, sector_commodity_mapping, econ_pars,
                )
         return val
 
-    aconst = partmp.apply(calc_aconst, axis=1)
+    _aconst = partmp.apply(calc_aconst, axis=1)
+    aconst = _aconst.reset_index(drop=False).melt(id_vars='node')
+    aconst['unit'] = '-'
+
 
     # ------------------------------------------------------------------------
     # add sets needed for MACRO (if they don't exist)
@@ -329,7 +334,7 @@ def init_macro(original, level, sector_commodity_mapping, econ_pars,
 
     # production function coefficient of capital and labor
     for node in data['region_list']:
-        new.add_par("lakl", aconst.loc[node], "-")
+        new.add_par("lakl", aconst.loc[aconst.node==node], "-")
 
     # production function coefficients of the different energy sectors
     for node in data['region_list']:
