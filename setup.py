@@ -2,14 +2,35 @@
 from __future__ import print_function
 
 import os
+import re
 import shutil
 
-from setuptools import setup, find_packages
+from setuptools import setup
 from setuptools.command.install import install
 
+fname = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                     'message_ix', 'model', 'version.gms')
+with open(fname) as f:
+    s = str(f.readlines())
 
-INFO = {
-    'version': '1.0.0',
+VERSION = '{}.{}.{}'.format(
+    re.search('VERSION_MAJOR "(.+?)"', s).group(1),
+    re.search('VERSION_MINOR "(.+?)"', s).group(1),
+    re.search('VERSION_PATCH "(.+?)"', s).group(1),
+)
+
+INSTALL_REQUIRES = [
+    'ixmp>=0.1.3',
+    'pandas',
+    'xlrd',
+    'XlsxWriter',
+]
+
+EXTRAS_REQUIRE = {
+    'tests': ['pytest>=3.0.6'],
+    'docs': ['cloud_sptheme', 'numpydoc', 'sphinx', 'sphinxcontrib-bibtex',
+             'sphinxcontrib-fulldoc'],
+    'tutorial': ['jupyter', 'matplotlib'],
 }
 
 
@@ -72,12 +93,14 @@ def main():
     }
     setup_kwargs = {
         "name": "message_ix",
-        "version": INFO['version'],
+        "version": VERSION,
         "description": 'The MESSAGEix Integrated Assessment Model',
         "author": 'Daniel Huppmann, Matthew Gidden, Volker Krey,  '
                   'Oliver Fricko, Peter Kolp',
         "author_email": 'message_ix@iiasa.ac.at',
         "url": 'http://github.com/iiasa/message_ix',
+        "install_requires": INSTALL_REQUIRES,
+        "extras_require": EXTRAS_REQUIRE,
         "packages": packages,
         "package_dir": pack_dir,
         "package_data": pack_data,

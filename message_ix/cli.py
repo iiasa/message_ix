@@ -1,9 +1,11 @@
 import argparse
 import json
+import message_ix
 import os
 import shutil
 import tempfile
 import zipfile
+
 
 from six.moves.urllib.request import urlretrieve
 
@@ -82,9 +84,9 @@ def do_dl(tag=None, branch=None, repo_path=None, local_path='.'):
     if tag is not None and branch is not None:
         raise ValueError('Can only provide one of `tag` and `branch`')
     if tag is None and branch is None:
-        branch = 'master'  # change this for default dl behavior
+        tag = '{}'.format(message_ix.__version__)
 
-    zipname = '{}.zip'.format(branch or tag)
+    zipname = '{}.zip'.format(branch or 'v' + tag)
     url = 'https://github.com/iiasa/message_ix/archive/{}'.format(zipname)
 
     tmp = tempdir_name()
@@ -107,18 +109,18 @@ def do_dl(tag=None, branch=None, repo_path=None, local_path='.'):
         recursive_copy(cpfrom, cpto, overwrite=True)
 
         shutil.rmtree(tmp)
-    except:
-        shutil.rmtree(tmp)
-        raise
+
+    except Exception as e:
+        logger().info("Could not delete {} because {}".format(tmp, e))
 
 
 def dl():
     parser = argparse.ArgumentParser()
-    repo_path = 'Path to files to download from repository.'
+    repo_path = 'Path to files to download from repository (e.g., tutorial).'
     parser.add_argument('--repo_path', help=repo_path, default='tutorial')
     local_path = 'Path on place files on local machine.'
     parser.add_argument('--local_path', help=local_path, default='.')
-    tag = 'Repository tag to download from (e.g., latest).'
+    tag = 'Repository tag to download from (e.g., 1.0.0).'
     parser.add_argument('--tag', help=tag, default=None)
     branch = 'Repository branch to download from (e.g., master).'
     parser.add_argument('--branch', help=branch, default=None)

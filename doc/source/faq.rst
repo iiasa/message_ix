@@ -4,12 +4,12 @@ Frequently asked questions
 What's included in a 'typical' |MESSAGEix| model?
 -------------------------------------------------
 
-A typical |MESSAGEix| model is based on a suite of technologies such as power
-plants, which represent a reference energy system (RES). Each technology is
-characterised by its input and output commodities, costs (investment, fixed
-and variable components), and other technical/engineering parameters.
-The model minimizes the total system cost while meeting a given demand for
-energy services or commodities.
+A typical |MESSAGEix| model instance is based on a suite of technologies such
+as power plants, which represent a reference energy system (RES). Each
+technology is characterised by its input and output commodities, costs
+(investment, fixed and variable components), and other technical/engineering
+parameters. The model minimizes the total system cost while meeting a given
+demand for energy services or commodities.
 
 Which policies and regulatory measures can be included?
 -------------------------------------------------------
@@ -39,8 +39,8 @@ How can I contribute to the development of the |MESSAGEix| framework?
 ---------------------------------------------------------------------
 
 We use `GitHub`_ for code development and management of issues and bug reports.
-In addition, we use a Google-group (_`groups.google.com/d/forum/message_ix`)
-as a discussion forum and community mailing list.
+In addition, we use a `Google group`_ as a discussion forum and
+community mailing list.
 
 I have more questions...
 ------------------------

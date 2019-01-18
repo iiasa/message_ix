@@ -1,6 +1,7 @@
 # GAMS, R, Python-specific auxiliary files
 *.~gm
 *.bak
+*.egg-info
 *.~op
 *.pyc
 *.gdx
