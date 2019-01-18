@@ -28,7 +28,7 @@ install:
 
 script:
   - python -c "import os, sys; assert os.environ['PYVERSION'] == sys.version[0]"
-  - py.test tests --verbose --cov --cov-config ci/.coveragerc --cov-report term-missing
+  - cd tests && py.test --verbose --cov=message_ix --cov-config ci/.coveragerc --cov-report term-missing && cd ..
   - if [[ ! -z "${MESSAGE_IX_CI_USER}" ]]; then cd tests/ci && ./run_on_ci.sh && cd ../..; fi
   - messageix-config --model_path=message_ix/model
   - cd doc && pip install -r requirements.txt && make html
