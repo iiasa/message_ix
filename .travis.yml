@@ -1,32 +1,25 @@
+language: minimal
+
 matrix:
     include:
+        - os: linux
+          env: PYENV=py37
+        - os: linux
+          env: PYENV=py27
         - os: osx
-          language: generic
-          env: TOXENV=py27
+          env: PYENV=py37
         - os: osx
-          language: generic
-          env: TOXENV=py36
+          env: PYENV=py27
+# turn these on once travis support gets a little better
+#        - os: windows
+#          env: PYENV=py37
+#        - os: windows
+#          env: PYENV=py27
 
 before_install:
-  # install gams
-  - curl -O https://d37drm4t2jghv5.cloudfront.net/distributions/25.1.1/macosx/osx_x64_64_sfx.exe;
-  - chmod u+x osx_x64_64_sfx.exe
-  - ./osx_x64_64_sfx.exe > install.out
-  - export PATH=$PATH:$PWD/gams25.1_osx_x64_64_sfx
-  # install conda
-  - export MINICONDA=$HOME/miniconda
-  - export PATH="$MINICONDA/bin:$PATH"
-  - hash -r
-  - if [ $TOXENV == 'py27'];
-    then wget http://repo.continuum.io/miniconda/Miniconda2-latest-MacOSX-x86_64.sh -O miniconda.sh;
-    else wget http://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
-    fi
-  - chmod +x miniconda.sh
-  - ./miniconda.sh -b -f -p $MINICONDA
-  - conda update --yes conda
-  # install ixmp deps
-  - conda install --yes -c conda-forge ixmp xlsxwriter xlrd
-  - conda remove --force --yes ixmp
+  - source ./ci/env.sh
+  - bash ./ci/travis-install.sh
+  - source activate testing
 
 install:
   - git clone https://github.com/iiasa/ixmp.git
@@ -34,7 +27,11 @@ install:
   - python setup.py install
 
 script:
-  - conda install --yes -c conda-forge pytest
-  - pytest -v tests
+  - python -c "import os, sys; assert os.environ['PYVERSION'] == sys.version[0]"
+  - py.test tests --verbose --cov=message_ix --cov-report term-missing
+  - if [[ ! -z "${MESSAGE_IX_CI_USER}" ]]; then cd tests/ci && ./run_on_ci.sh && cd ../..; fi
   - messageix-config --model_path=message_ix/model
   - cd doc && pip install -r requirements.txt && make html
+
+after_success:
+  - coveralls
