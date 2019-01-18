@@ -23,10 +23,13 @@ and the ix modeling platform, please visit `MESSAGEix.iiasa.ac.at/`.
 
 When using the MESSAGEix framework, please cite as:
 
-    Daniel Huppmann, Matthew Gidden, Oliver Fricko, Peter Kolp, 
-    Clara Orthofer, Michael Pimmer, Adriano Vinca, Alessio Mastrucci, Keywan Riahi, and Volker Krey.
-    "The MESSAGEix Integrated Assessment Model and the ix modeling platform". 2018, submitted. 
-    Electronic pre-print available at `pure.iiasa.ac.at/15157/`.
+   Daniel Huppmann, Matthew Gidden, Oliver Fricko, Peter Kolp, Clara Orthofer,
+   Michael Pimmer, Nikolay Kushin, Adriano Vinca, Alessio Mastrucci,
+   Keywan Riahi, and Volker Krey.
+   "The |MESSAGEix| Integrated Assessment Model and the ix modeling platform".
+   Environmental Modelling & Software 112:143-156, 2019.
+   doi: 10.1016/j.envsoft.2018.11.012
+   electronic pre-print available at pure.iiasa.ac.at/15157/
 
 Please review the NOTICE at `MESSAGEix.iiasa.ac.at/notice.html`
 and included in the GitHub repository for further user guidelines.

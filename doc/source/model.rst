@@ -45,6 +45,8 @@ There are three methods to run the |MESSAGEix| model:
 
       $ gams MESSAGE_run.gms --in="<data-file>" --out="<output-file>"
 
+.. _`tutorials`: tutorials.html
+
 .. _`auto-doc page`: model/MESSAGE_run.html
 
 Overview of model structure and includes files
