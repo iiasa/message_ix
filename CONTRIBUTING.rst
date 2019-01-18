@@ -11,9 +11,12 @@ from your contribution, and that your contributions do not infringe on anyone el
 The electronic signature is collected via the `cla-assistant`_ when issuing the pull request.
 
 Code submitted via pull requests must adhere to the following style formats:
- - Python: `pep8`_
- - R: please follow the style of the existing code base
- - other (file names, CLI, etc.): please follow the style of the existing code base
+- Python: `pep8`_
+- R: please follow the style of the existing code base
+- Jupyter notebooks: commit 'bare' notebooks, with no cell output. Notebooks
+  will be run and rendered when the documentation is generated.
+- other (file names, CLI, etc.): please follow the style of the existing code
+  base
 
 .. _`Contributor License Agreement`: contributor_license.html
 
