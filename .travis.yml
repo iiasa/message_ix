@@ -29,7 +29,7 @@ install:
 script:
   - python -c "import os, sys; assert os.environ['PYVERSION'] == sys.version[0]"
   - cd tests
-  - py.test --verbose --cov=message_ix --cov-config ci/.coveragerc --cov-report term-missing
+  - py.test --verbose --cov=message_ix --cov-config ../ci/.coveragerc --cov-report term-missing
   - cd ..
   - cd tests/ci
   - if [[ ! -z "${MESSAGE_IX_CI_USER}" ]]; then ./run_on_ci.sh; fi
