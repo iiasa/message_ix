@@ -14,7 +14,12 @@
 
 import sys
 import os
-from pathlib import Path
+
+try:
+    from pathlib import Path
+except ImportError:
+    def Path(*args):
+        return os.path.join(*args)
 
 import message_ix
 
