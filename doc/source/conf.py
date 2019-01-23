@@ -18,8 +18,7 @@ import os
 try:
     from pathlib import Path
 except ImportError:
-    def Path(*args):
-        return os.path.join(*args)
+    pass
 
 import message_ix
 
@@ -48,8 +47,12 @@ extensions = [
     'sphinxcontrib.fulltoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon',
-    'grab_gams_doc'
 ]
+
+# Extension only works for Python 3
+if sys.version_info[0] == 3:
+    extensions.append('grab_gams_doc')
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -326,5 +329,6 @@ rst_prolog = """
 """.format(version)
 
 # Configuration for grab_gams_doc extension
-gams_source_dir = Path('..', 'message_ix', 'model')
-gams_target_dir = 'model'
+if sys.version_info[0] == 3:
+    gams_source_dir = Path('..', 'message_ix', 'model')
+    gams_target_dir = 'model'
