@@ -5,3 +5,4 @@ numpydoc
 cloud_sptheme
 nbformat
 jupyter
+-e git://github.com/iiasa/ixmp.git#egg=ixmp
