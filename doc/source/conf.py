@@ -22,11 +22,6 @@ except ImportError:
 
 import message_ix
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
-
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -51,6 +46,7 @@ extensions = [
 
 # Extension only works for Python 3
 if sys.version_info[0] == 3:
+    sys.path.insert(0, os.path.abspath('..'))
     extensions.append('grab_gams_doc')
 
 
@@ -309,7 +305,7 @@ texinfo_documents = [
 
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/', None),
+    'python': ('https://docs.python.org/3/', None),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
 }
 
