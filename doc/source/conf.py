@@ -326,5 +326,5 @@ rst_prolog = """
 
 # Configuration for grab_gams_doc extension
 if sys.version_info[0] == 3:
-    gams_source_dir = Path('..', 'message_ix', 'model')
+    gams_source_dir = Path(__file__).parents[2] / 'message_ix' / 'model'
     gams_target_dir = 'model'
