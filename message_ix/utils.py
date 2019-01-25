@@ -32,12 +32,33 @@ def isscalar(x):
 
 
 def make_df(base, **kwargs):
-    """Combine existing data with a series of new data defined in kwargs.
+    """Extend or overwrite *base* with new values from *kwargs*.
 
     Parameters
     ----------
-    base : dict, pd.Series, or pd.DataFrame
-        existing dataset to append to
+    base : dict, :class:`pandas.Series`, or :class:`pandas.DataFrame`
+        Existing dataset to append to.
+    **kwargs:
+        Additional values to append to *base*.
+
+    Returns
+    -------
+    :class:`pandas.DataFrame`
+        *base* modified with *kwargs*.
+
+    Examples
+    --------
+    Scalar values in *base* or *kwargs* are broadcast. The number of rows in
+    the returned :class:`pandas.DataFrame` equals the length of the longest
+    item in either argument.
+
+    >>> base = {'foo': 'bar'}
+    >>> make_df(base, baz=[42, 43, 44])
+        foo	baz
+    0	bar	42
+    1	bar	43
+    2	bar	44
+
     """
     if not isinstance(base, (collections.Mapping, pd.Series, pd.DataFrame)):
         raise ValueError('base argument must be a dictionary or Pandas object')

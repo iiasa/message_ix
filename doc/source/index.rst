@@ -1,10 +1,10 @@
-The |MESSAGEix| framework 
+The |MESSAGEix| framework
 =========================
 
 .. figure:: _static/ix_features.png
    :width: 320px
    :align: right
-   
+
    The |ixmp| (source: :cite:`huppmann_messageix_2018`)
 
 Overview and scope
@@ -20,10 +20,10 @@ to incorporate feedback between prices and demand levels for energy and commodit
 The equations are implemented in the mathematical programming system `GAMS`_
 for numerical solution of a model instance.
 
-The |MESSAGEix| framework is fully integrated with IIASA's |ixmp| (ixmp),
+The |MESSAGEix| framework is fully integrated with |IIASAabbr|'s |ixmp| (ixmp),
 a data warehouse for high-powered numerical scenario analysis.
 The platform supports an efficient workflow between original input data sources,
-the implementation of the mathematical model formulation, 
+the implementation of the mathematical model formulation,
 and the analysis of numerical results.
 The platform can be accessed via a web-based user interface
 and application programming interfaces (API)
@@ -31,13 +31,13 @@ to the scientific programming languages Python and R.
 The platform also includes a generic data exchange API
 to `GAMS`_ for numerical computation.
 
-This documentation provides an introduction and the mathematical formulation 
+This documentation provides an introduction and the mathematical formulation
 of the |MESSAGEix| equations and auxiliary functions.
-For the scientific reference of the framework, 
+For the scientific reference of the framework,
 see Huppmann et al. (2019) :cite:`huppmann_messageix_2018`.
 The formulation of |MESSAGEix| is a re-implementation and extension of `'MESSAGE V'`
 (Messner and Strubegger, 1995 :cite:`messner_users_1995`),
-the Integrated Assessment model developed at IIASA since the 1980s.
+the Integrated Assessment model developed at the International Institute for Applied Systems Analysis (IIASA) since the 1980s.
 For an overview of the |MESSAGEix| model used at the IIASA Energy Program
 and a list of recent publications, please refer to the `MESSAGE-GLOBIOM documentation website`_.
 
@@ -49,7 +49,7 @@ Getting Started
 ---------------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    getting_started
 
@@ -61,7 +61,7 @@ First, check out our FAQ:
 
 .. toctree::
    :maxdepth: 1
-   
+
    faq
 
 
@@ -74,23 +74,26 @@ The |MESSAGEix| Model
 ---------------------
 
 .. toctree::
-   :maxdepth: 1
-   
+   :maxdepth: 3
+
    model
 
 API Documentation
 -----------------
 
+- :doc:`api/ixmp`
+- :doc:`api/message_ix`
+
 .. toctree::
-   :maxdepth: 1
-   
-   api/ixmp
-   api/message_ix
+   :maxdepth: 2
+   :hidden:
+
+   api
 
 Using |MESSAGEix|
 -----------------
 
-|MESSAGEix| and the |ixmp| are licensed under an `APACHE 2.0 open-source license`_. 
+|MESSAGEix| and the |ixmp| are licensed under an `APACHE 2.0 open-source license`_.
 See the `LICENSE`_ file for the full text.
 
 .. _`APACHE 2.0 open-source license`: http://www.apache.org/licenses/LICENSE-2.0
@@ -116,5 +119,10 @@ Bibliography
 
 .. toctree::
    :maxdepth: 2
-   
-   bibliography   
+
+   bibliography
+
+
+.. |IIASAabbr| raw:: html
+
+   <abbr title="International Institute for Applied Systems Analysis">IIASA</abbr>
