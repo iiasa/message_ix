@@ -3,13 +3,29 @@ This functionality adds new time steps to an existing scenario (hereafter "refer
 - Copying all sets from reference scenario and adding new time steps to relevant sets (e.g., adding 2025 between 2020 and 2030 in the set "year")
 - Copying all parameters from reference scenario, adding new time steps to relevant parameters, and calculating missing values for the added time steps.
 
+# Main features
+- It can be used for any MESSAGE scenario, from tutorials, country-level, and global models.
+- The new years can be consecutive, between existing years, and after the model horizon.
+- The user can define for what regions and parameters the new years should be added. This saves time when adding the new years to only one parameter for modifications.
+
 # Main steps
-1. An existing scenario is loaded and the desired new years is specified. The new years can be in between existing years or beyond the existing model horizon.
+1. An existing scenario is loaded and the desired new years is specified.
 2. A new (empty) scenario is created for adding the new time steps.
-3. The new years added to the relevant sets. This include:
-- adding new years to the set "year"
-- adding new years to the set "cat_year"
-- changing "first_modelyear" and "last_modelyear" if needed.
+3. The new years are added to the relevant sets:
+- adding new years to the set "year" and "type_year"
+- changing "firstmodelyear", "lastmodelyear", "baseyear_macro", and "initializeyear_macro" if needed.
+- modifying the set "cat_year" for the new years.
+4. The new years are added to the index sets of relevant parameters, and the missing data for the new years are calculated based on interpolation of adjacent data points. The following steps are applied:
+- each non-empty parameter is loaded from the reference scenario
+- the year-related indexes of the parameter are identified (either 0, 1, and 2 index under MESSAGE scheme)
+- the new years are added to the parameter, and the missing data is calculated based on the number of year-related indexes. For example, the new years are added to index "year_vtg" in parameter "inv_cost", while these new years are added both to "year_vtg" and "year_act" in parameter "output".
+- the missing data is calculated by interpolation.
+- for the parameters with 2 year-related index (such as "output"), a final check is applied so ensure that the vintaging is correct. This step is done based on lifetime of each technology.
+5. The changes are commited and saved to the new scenario.
+
+# Notice:
+I. This functionality in the current format does not ensure that the new scenario will solve after adding the new years. The user needs to load the new scenario, check some key parameters (like bounds) and solve the new scenario.
+
 
 Usage:
     This script can be used either:
