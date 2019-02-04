@@ -32,5 +32,5 @@ A) By running directly from the command line, example:
     ```
     python f_addNewYear.py --model_ref "MESSAGE_Model" --scen_ref "baseline" --years_new "[2015,2025,2035,2045]"
     ```
-(For the full list of input arguments see the explanation in the code.
+For the full list of input arguments see the explanation in the code.
 B) By calling the class "addNewYear" from another python script.
