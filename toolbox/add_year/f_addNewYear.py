@@ -880,8 +880,8 @@ class addNewYear(object):
                         horizon_new.index(yr) - 1] - horizon_new[
                                 horizon_new.index(yr) - 2]:
 
-                    df2[yr].loc[pd.isna(df2[year_pre].shift(+1))
-                                & ~pd.isna(df2[year_pp].shift(+1))] = np.nan
+                    df2[yr].loc[(pd.isna(df2[year_pre].shift(+1))) & (
+                        ~pd.isna(df2[year_pp].shift(+1)))] = np.nan
                 if extrapol_neg and not df2[yr].loc[(df2[yr] < 0) & (
                         df2[year_pre].shift(+1) >= 0)].empty:
                     df2.loc[(df2[yr] < 0) & (df2[year_pre].shift(+1) >= 0),
