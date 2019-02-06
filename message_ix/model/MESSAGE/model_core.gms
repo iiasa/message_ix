@@ -222,6 +222,8 @@ Set
 Positive variables
     SLACK_COMMODITY_BALANCE_UP(node,commodity,level,year_all,time) slack variable for commodity balance (upwards)
     SLACK_COMMODITY_BALANCE_LO(node,commodity,level,year_all,time) slack variable for commodity balance (downwards)
+    SLACK_COMMODITY_BALANCE_FULL_UP(node,commodity,level,year_all,time) slack variable for full commodity balance (upwards)
+    SLACK_COMMODITY_BALANCE_FULL_LO(node,commodity,level,year_all,time) slack variable for full commodity balance (downwards)
     SLACK_CAP_NEW_BOUND_UP (node,tec,year_all)        slack variable for bound on new capacity (upwards)
     SLACK_CAP_NEW_BOUND_LO (node,tec,year_all)        slack variable for bound on new capacity (downwards)
     SLACK_CAP_TOTAL_BOUND_UP (node,tec,year_all)      slack variable for upper bound on total installed capacity
@@ -251,7 +253,8 @@ Equations
     EXTRACTION_BOUND_UP             upper bound on extraction (by grade)
     RESOURCE_CONSTRAINT             constraint on resources remaining in each period (maximum extraction per period)
     RESOURCE_HORIZON                constraint on extraction over entire model horizon (resource volume in place)
-    COMMODITY_BALANCE               commodity supply-demand balance constraint
+    COMMODITY_BALANCE               commodity supply-demand lower balance constraint
+    COMMODITY_BALANCE_FULL          commodity supply-demand upper balance constraint
     STOCKS_BALANCE                  commodity inter-temporal balance of stocks
     CAPACITY_CONSTRAINT             capacity constraint for technology (by sub-annual time slice)
     CAPACITY_MAINTENANCE_HIST       constraint for capactiy maintainance  historical installation (built before start of model horizon)
@@ -422,6 +425,8 @@ COST_ACCOUNTING_NODAL(node, year)..
     + SUM((commodity,level,time)$( map_commodity(node,commodity,level,year,time) ), ( 0
 %SLACK_COMMODITY_BALANCE%   + SLACK_COMMODITY_BALANCE_UP(node,commodity,level,year,time)
 %SLACK_COMMODITY_BALANCE%   + SLACK_COMMODITY_BALANCE_LO(node,commodity,level,year,time)
+%SLACK_COMMODITY_BALANCE_FULL%   + SLACK_COMMODITY_BALANCE_FULL_UP(node,commodity,level,year,time)
+%SLACK_COMMODITY_BALANCE_FULL%   + SLACK_COMMODITY_BALANCE_FULL_LO(node,commodity,level,year,time)
         ) * 1e6 )
     + SUM((tec)$( map_tec(node,tec,year) ), ( 0
 %SLACK_CAP_NEW_BOUND_UP%    + 10 * SLACK_CAP_NEW_BOUND_UP(node,tec,year)
@@ -582,6 +587,47 @@ COMMODITY_BALANCE(node,commodity,level,year,time)$( map_commodity(node,commodity
 %SLACK_COMMODITY_BALANCE%   + SLACK_COMMODITY_BALANCE_UP(node,commodity,level,year,time)
 %SLACK_COMMODITY_BALANCE%   - SLACK_COMMODITY_BALANCE_LO(node,commodity,level,year,time)
     =G= 0 ;
+
+* Equation COMMODITY_BALANCE_FULL
+* """"""""""""""""""""""""""
+* This constraint ensures the nodal and temporal balance of outputs/imports and inputs/exports for some commodities
+* with a lower than inequality
+*
+*  .. math::
+*     \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} output_{n^L,t,y^V,y,m,n,c,l,h^A,h}
+*         \cdot duration\_time\_rel_{h,h^A} \cdot & ACT_{n^L,t,y^V,y,m,h^A} \\
+*     - \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} input_{n^L,t,y^V,y,m,n,c,l,h^A,h}
+*         \cdot duration\_time\_rel_{h,h^A} \cdot & ACT_{n^L,t,m,y,h^A} \\
+*     + \ STOCK\_CHG_{n,c,l,y,h} & \\[4pt]
+*     + \ \sum_s \Big( land\_output_{n,s,y,c,l,h} - land\_input_{n,s,y,c,l,h} \Big) \cdot & LAND_{n,s,y} \\[4pt]
+*     - \ demand\_fixed_{n,c,l,y,h}
+*     & \leq 0 \quad \forall \ l \notin L^{RES} \subseteq L
+*
+* The commodity balance constraint at the resource level is included in the `Equation RESOURCE_CONSTRAINT`_,
+* while at the renewable level, it is included in the `Equation RENEWABLES_EQUIVALENCE`_.
+***
+COMMODITY_BALANCE_FULL(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
+                  AND NOT level_resource(level) AND NOT level_renewable(level) AND full_balance(commodity) )..
+    SUM( (location,tec,vintage,mode,time2)$( map_tec_act(location,tec,year,mode,time2)
+            AND map_tec_lifetime(location,tec,vintage,year) ),
+* import into node and output by all technologies located at 'location' sending to 'node' and 'time2' sending to 'time'
+        output(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+        * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2)
+* export from node and input into technologies located at 'location' taking from 'node' and 'time2' taking from 'time'
+        - input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+        * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2) )
+* quantity taken out from ( >0 ) or put into ( <0 ) inter-period stock (storage)
+    + STOCK_CHG(node,commodity,level,year,time)$( map_stocks(node,commodity,level,year) )
+* yield from land-use model emulator
+    + SUM(land_scenario,
+        ( land_output(node,land_scenario,year,commodity,level,time)
+          - land_input(node,land_scenario,year,commodity,level,time) ) * LAND(node,land_scenario,year) )
+* final consumption (exogenous parameter to be satisfied by the energy+water+xxx system)
+    - demand_fixed(node,commodity,level,year,time)
+* relaxation of constraints for debugging
+%SLACK_COMMODITY_BALANCE_FULL%   + SLACK_COMMODITY_BALANCE_FULL_UP(node,commodity,level,year,time)
+%SLACK_COMMODITY_BALANCE_FULL%   - SLACK_COMMODITY_BALANCE_FULL_LO(node,commodity,level,year,time)
+    =L= 0 ;
 
 ***
 * Equation STOCKS_BALANCE
