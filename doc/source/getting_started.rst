@@ -2,7 +2,7 @@
 
 
 Configure model files
-=====================
+---------------------
 
 By default, the GAMS files containing the mathematical model core are installed
 with ``message_ix`` (e.g., in your Python ``site-packages`` directory). Many
@@ -20,6 +20,3 @@ utility to place the model files in a directory of your choice::
 
    If you installed from source on Windows using ``install.bat``, this
    command was run automatically, pointing to ``message_ix/model``.
-
-
-.. include:: ../../tutorial/README.rst

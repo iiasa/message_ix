@@ -1,19 +1,16 @@
 Auto-documentation of the MESSAGEix framework
 =============================================
 
-The documentation of the MESSAGEix framework is generated from rst files
-included in ``doc\source`` and from mark-up comments in the GAMS code written
-in restructured text.
+The documentation of the MESSAGEix framework is generated from rst files included in ``doc\source`` and from mark-up comments in the GAMS code written in restructured text.
 
 
 Dependencies
 ------------
 
-1. Sphinx_ v1.1.2 or higher
-2. `sphinxcontrib.bibtex`
-3. `sphinxcontrib-fulltoc`
+1. Sphinx_ v1.8 or higher
+2. `sphinx_rtd_theme`
+3. `sphinxcontrib.bibtex`
 4. `numpydoc`
-5. `cloud_sptheme`
 
 
 Writing in Restructured Text
