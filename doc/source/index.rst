@@ -40,7 +40,7 @@ Getting Started
 
 Have a question? First, check the :doc:`faq`, then try the community Google group:
 
-- at `groups.google.com/d/forum/message_ix`_, or
+- on the Web at https://groups.google.com/d/forum/message_ix, or
 - via e-mail at <message_ix@googlegroups.com>.
 
 Detailed documentation
@@ -60,7 +60,7 @@ Using and contributing to |MESSAGEix|
 
 |MESSAGEix| and the |ixmp| are licensed under the `APACHE 2.0 open-source license`_.
 
-Anyone is encouraged to use the framework to develop energy system and integrated assessment models! Please see the :doc:`notice` for using the framework in scientific research. Contributions to the framework itself, to enable new features across all models, are also welcome.
+Anyone is encouraged to use the framework to develop energy system and integrated assessment models! Please see the :doc:`notice` for using the framework in scientific research. Contributions to the framework itself, which enable new features across all models, are also welcome.
 
 .. toctree::
    :maxdepth: 1
@@ -80,7 +80,6 @@ Anyone is encouraged to use the framework to develop energy system and integrate
 
 .. _`GAMS`: http://www.gams.com
 .. _`MESSAGE-GLOBIOM documentation website`: http://data.ene.iiasa.ac.at/message-globiom/
-.. _`groups.google.com/d/forum/message_ix`: https://groups.google.com/d/forum/message_ix
 .. _`APACHE 2.0 open-source license`: https://github.com/iiasa/message_ix/blob/master/LICENSE
 .. |IIASAabbr| raw:: html
 
