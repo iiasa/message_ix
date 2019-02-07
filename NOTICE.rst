@@ -1,10 +1,10 @@
 User guidelines and notice
 ==========================
 
-We ask that you take the following four actions:
+We ask that you take the following four actions whenever you:
 
-- when you use the |MESSAGEix| framework, |ixmp|, or any model(s) you have built using these tools
-- to produce any scientific publication, technical report, website, or other publicly-available material.
+- **use** the |MESSAGEix| framework, |ixmp|, or any model(s) you have built using these tools
+- to **produce** any scientific publication, technical report, website, or other **publicly-available material**.
 
 The aim of this request is to ensure good scientific practice and collaborative development of the platform.
 
