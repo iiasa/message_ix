@@ -20,7 +20,7 @@ def files(src_dir, target_dir, match='*.gms', ext='.rst'):
     return ins, outs
 
 
-def transcribe_docs(infp, outfp):
+def transcribe_docs(infp, outfp, source_filename):
     """Transcribe documentation lines from *infp* to *outfp*.
 
     Only lines between matched pairs of triple-star comments ('***') are
@@ -45,6 +45,10 @@ def transcribe_docs(infp, outfp):
             # Get rid of windows carriage return
             base = base.rstrip()
             outfp.write('{}\n'.format(base))
+
+    if on is not None:
+        outfp.write(('.. note:: This page is generated from inline '
+                     'documentation in ``{}``.').format(source_filename))
 
     return on is not None
 
@@ -77,7 +81,8 @@ def main(app, config):
 
         # Transcribe lines from the source file to the output file
         with open(inf, 'r') as infp, open(outf, 'w') as outfp:
-            any_docs = transcribe_docs(infp, outfp)
+            any_docs = transcribe_docs(
+                infp, outfp, inf.relative_to(app.config.gams_source_dir))
 
         if not any_docs:
             # No output was created; delete the file
