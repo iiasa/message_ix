@@ -3,7 +3,6 @@
 *
 * Parameter definition
 * ====================
-* This page is generated from the auto-documentation in ``MESSAGE/parameter_def.gms``.
 *
 * This file contains the definition of all parameters used in |MESSAGEix|.
 *

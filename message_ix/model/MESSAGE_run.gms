@@ -40,7 +40,6 @@ $OFFTEXT
 ***
 * Run script for |MESSAGEix| (stand-alone)
 * ========================================
-* This page is generated from the auto-documentation in ``model/MESSAGE_run.gms``.
 *
 * This is |MESSAGEix| version |version|. The version number must match the version number
 * of the ``ixmp`` ``MESSAGE``-scheme specifications used for exporting data and importing results.
@@ -118,4 +117,3 @@ put_utility 'log' / /"+++ End of MESSAGEix (stand-alone) run - have a nice day! 
 *----------------------------------------------------------------------------------------------------------------------*
 * end of file - have a nice day!                                                                                       *
 *----------------------------------------------------------------------------------------------------------------------*
-

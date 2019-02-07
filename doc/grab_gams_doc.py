@@ -31,6 +31,10 @@ def transcribe_docs(infp, outfp, source_filename):
     """
     # State: None = no blocks encountered; True = in a block; False = outside
     on = None
+
+    note = ('.. note:: This page is generated from inline documentation in '
+            '``{}``.\n\n').format(source_filename)
+
     for line in infp:
         if line.lstrip().startswith('***'):
             # Located a block divider
@@ -39,16 +43,16 @@ def transcribe_docs(infp, outfp, source_filename):
                 outfp.write('\n')
             # Toggle between inside/outside of doc block
             on = not on
+            # Write the header notice
+            if note:
+                outfp.write(note)
+                note = None
         elif on:
             # Strip leftmost '* ' from the line
             base = "*".join(line.split('*')[1:])[1:]
             # Get rid of windows carriage return
             base = base.rstrip()
             outfp.write('{}\n'.format(base))
-
-    if on is not None:
-        outfp.write(('.. note:: This page is generated from inline '
-                     'documentation in ``{}``.').format(source_filename))
 
     return on is not None
 

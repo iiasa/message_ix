@@ -40,7 +40,6 @@ $OFFTEXT
 ***
 * Run script for |MESSAGEix| and MACRO
 * ====================================
-* This page is generated from the auto-documentation in ``model/MESSAGE-MACRO_run.gms``.
 *
 * This is |MESSAGEix|-MACRO version |version|. The version number must match the version number
 * of the ``ixmp`` ``MESSAGE``-scheme specifications used for exporting data and importing results.
@@ -324,4 +323,3 @@ put_utility 'log' /"+++ End of MESSAGEix-MACRO run - have a nice day! +++ " ;
 *----------------------------------------------------------------------------------------------------------------------*
 * end of file - have a nice day!                                                                                       *
 *----------------------------------------------------------------------------------------------------------------------*
-
