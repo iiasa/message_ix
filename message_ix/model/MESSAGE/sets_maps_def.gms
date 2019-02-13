@@ -201,11 +201,9 @@ Alias(mode, mode2);
 *    * - type_tec_land (type_tec) [#type_tec_land]_
 *      - :math:`\widehat{t} \in \widehat{T}^{LAND} \subseteq \widehat{T}`
 *      - Mapping set of technology types and land use
-*    * - commodity_surplus (commodity)
+*    * - balance_equality (commodity,level)
 *      - :math:`c \in C^{FULL} \subseteq C`
-*      - Commodities related to `Equation COMMODITY_BALANCE_GT`_
-*    * - commodity_shortage (commodity)
-*      - :math:`c \in C^{FULL} \subseteq C`
+*      - :math:`l \in L^{FULL} \subseteq L`
 *      - Commodities related to `Equation COMMODITY_BALANCE_LT`_
 *
 * .. [#level_res] The constraint ``EXTRACTION_EQUIVALENCE`` is active only for the levels included in this set,
@@ -248,8 +246,7 @@ Sets
     type_emission                           types of emission aggregations
     cat_emission(type_emission,emission)    mapping of emissions to respective categories
     type_tec_land(type_tec)                 dynamic set whether emissions from land use are included in type_tec
-    commodity_surplus(commodity)            subset of 'commodity' to mark all commodities in Equation COMMODITY_BALANCE_GT
-    commodity_shortage(commodity)           subset of 'commodity' to mark all commodities in Equation COMMODITY_BALANCE_LT
+    balance_equality(commodity,level)       subset of 'commodity' and 'level' to mark all commodities in Equation COMMODITY_BALANCE_LT
 ;
 
 Alias(type_tec,type_tec_share);
