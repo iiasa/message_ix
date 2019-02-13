@@ -14,8 +14,11 @@
 
 import sys
 import os
-import shlex
-import re
+
+try:
+    from pathlib import Path
+except ImportError:
+    pass
 
 import message_ix
 
@@ -32,7 +35,7 @@ import message_ix
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-sys.path.append(os.path.abspath('exts'))
+sys.path.append('.')
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
@@ -43,8 +46,13 @@ extensions = [
     'sphinxcontrib.bibtex',
     'sphinxcontrib.fulltoc',
     'sphinx.ext.autosummary',
-    'sphinx.ext.napoleon'
+    'sphinx.ext.napoleon',
 ]
+
+# Extension only works for Python 3
+if sys.version_info[0] == 3:
+    extensions.append('grab_gams_doc')
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -300,8 +308,11 @@ texinfo_documents = [
 #texinfo_no_detailmenu = False
 
 
-# Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/', None),
+    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+}
+
 
 # prolog for all rst files
 rst_prolog = """
@@ -316,3 +327,8 @@ rst_prolog = """
 .. role:: underline
 
 """.format(version)
+
+# Configuration for grab_gams_doc extension
+if sys.version_info[0] == 3:
+    gams_source_dir = Path('..', 'message_ix', 'model')
+    gams_target_dir = 'model'

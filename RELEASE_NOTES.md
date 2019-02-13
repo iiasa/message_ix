@@ -1,6 +1,7 @@
 
 # Next Release
 
+- [#138](https://github.com/iiasa/message_ix/pull/138): Update documentation and tutorials.
 - [#131](https://github.com/iiasa/message_ix/pull/131): Update clone function syntax scen to scenario
 
 # v1.1.0
@@ -15,17 +16,17 @@ management.
 If you see an error message like:
 
 ```
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 usr/local/lib/python2.7/site-packages/ixmp/core.py:81: in __init__
     self._jobj = java.ixmp.Platform("Python", dbprops)
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = <jpype._jclass.at.ac.iiasa.ixmp.Platform object at 0x7ff1a8e98410>
 args = ('Python', '/tmp/kH07wz/test.properties')
 
     def _javaInit(self, *args):
         object.__init__(self)
-    
+
         if len(args) == 1 and isinstance(args[0], tuple) \
            and args[0][0] is _SPECIAL_CONSTRUCTOR_KEY:
             self.__javaobject__ = args[0][1]
@@ -45,7 +46,7 @@ Then you need to update your local database. There are two methods to do so:
    allows you to save all your data. If you want help, feel free to get in
    contact on the
    [listserv](https://groups.google.com/forum/#!forum/message_ix).
-   
+
 
 ### New Property File Layout
 
@@ -65,10 +66,10 @@ _________________ ERROR at setup of test_add_spatial_multiple __________________
     @pytest.fixture(scope="session")
     def test_mp():
         test_props = create_local_testdb()
-    
+
         # start jvm
         ixmp.start_jvm()
-    
+
         # launch Platform and connect to testdb (reconnect if closed)
 >       mp = ixmp.Platform(test_props)
 ```

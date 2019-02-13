@@ -1,19 +1,30 @@
 .. currentmodule:: ixmp
 
-Class ixmp.Platform
-^^^^^^^^^^^^^^^^^^^
+``ixmp`` package
+================
 
-.. autoclass:: Platform
-   :members:
+``ixmp`` provides three classes:
 
-Class ixmp.TimeSeries
-^^^^^^^^^^^^^^^^^^^^^
-   
-.. autoclass:: TimeSeries
-   :members:
+.. autosummary::
 
-Class ixmp.Scenario
-^^^^^^^^^^^^^^^^^^^
-   
-.. autoclass:: Scenario
-   :members:
+   Platform
+   TimeSeries
+   Scenario
+
+as well as some utility methods:
+
+.. autosummary::
+
+   ixmp.model_settings.register_model
+
+Core classes
+------------
+
+.. automodule:: ixmp
+   :members: DEFAULT_LOCAL_DB_PATH, Platform, TimeSeries, Scenario
+
+Utility methods
+---------------
+
+.. automodule:: ixmp.model_settings
+   :members: register_model
