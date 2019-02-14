@@ -1,3 +1,11 @@
-.wy-side-nav-search, .wy-nav-top {
+.wy-nav-side {
   background-color: #00589d;
+}
+
+.wy-nav-top {
+  background-color: #00589d;
+}
+
+.wy-menu-vertical a {
+  color: #ffffff;
 }
