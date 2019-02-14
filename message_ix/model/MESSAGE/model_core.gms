@@ -548,7 +548,7 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
 * Equation COMMODITY_EQUIVALENCE
-* """"""""""""""""""""""""""
+* """"""""""""""""""""""""""""""
 * This constraint accounts for the nodal and temporal balance of outputs/imports and inputs/exports for all commodities.
 *
 *  .. math::
@@ -589,7 +589,7 @@ COMMODITY_EQUIVALENCE(node,commodity,level,year,time)$( map_commodity(node,commo
     =E= COMM(node,commodity,level,year,time) ;
 
 * Equation COMMODITY_BALANCE_GT
-* """"""""""""""""""""""""""
+* """""""""""""""""""""""""""""
 * This constraint ensures the supply to be lower than or equal to the demand for every commodity and level
 * considered in Equation COMMODITY_EQUIVALENCE
 
@@ -601,7 +601,7 @@ COMMODITY_BALANCE_GT(node,commodity,level,year,time)..
         COMM(node,commodity,level,year,time) =G= 0;
 
 * Equation COMMODITY_BALANCE_LT
-* """"""""""""""""""""""""""
+* """""""""""""""""""""""""""""
 * This constraint ensures the supply to be greater than or equal to the demand for specific commodities and levels
 * defined with `balance_equality` at the nodal and temporal level
 *

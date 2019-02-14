@@ -81,9 +81,9 @@ import_cost(node2, commodity, year) =
 * import into node2 from other nodes
           input(node2,tec,vintage,year,mode,node,commodity,level,time2,time)
         * duration_time_rel(time,time2) * ACT.L(node2,tec,vintage,year,mode,time2)
-        * (COMMODITY_EQUIVALENCE.m(node,commodity,level,year,time) + 
-        COMMODITY_BALANCE_GT.m(node,commodity,level,year,time) - COMMODITY_BALANCE_LT.m(node,commodity,level,year,time))
-         / discountfactor(year) )
+        * ( COMMODITY_EQUIVALENCE.m(node,commodity,level,year,time) + 
+          COMMODITY_BALANCE_GT.m(node,commodity,level,year,time) - COMMODITY_BALANCE_LT.m(node,commodity,level,year,time) )
+          / discountfactor(year) )
 ;
 
 * calculation of commodity export costs by node, commodity and year
@@ -93,9 +93,9 @@ export_cost(node2, commodity, year) =
 * export from node2 to other market
           output(node2,tec,vintage,year,mode,node,commodity,level,time2,time)
         * duration_time_rel(time,time2) * ACT.L(node2,tec,vintage,year,mode,time2)
-        * (COMMODITY_EQUIVALENCE.m(node,commodity,level,year,time) + 
-        COMMODITY_BALANCE_GT.m(node,commodity,level,year,time) - COMMODITY_BALANCE_LT.m(node,commodity,level,year,time))
-         / discountfactor(year) )
+        * ( COMMODITY_EQUIVALENCE.m(node,commodity,level,year,time) + 
+          COMMODITY_BALANCE_GT.m(node,commodity,level,year,time) - COMMODITY_BALANCE_LT.m(node,commodity,level,year,time) )
+          / discountfactor(year) )
 ;
 
 * net commodity trade costs by node and year
