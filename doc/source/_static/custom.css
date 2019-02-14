@@ -1,11 +1,65 @@
-.wy-nav-side {
-  background-color: #00589d;
+/*
+
+IIASA secondary colours:
+- #62c5c0
+- #247f6e
+- #fdbb40
+- #ee6a6b
+- #6a4c93
+
+*/
+
+
+.wy-nav-side, .wy-side-nav-search, .wy-nav-top {
+  background: #00589d;
 }
 
-.wy-nav-top {
-  background-color: #00589d;
+.wy-side-nav-search {
+  border-bottom: 1px solid #ffffff;
 }
 
 .wy-menu-vertical a {
   color: #ffffff;
+}
+
+.wy-menu-vertical li.current a {
+  border-right: 1px solid #00589d;
+}
+
+.wy-menu-vertical li.on a,
+.wy-menu-vertical li.current > a {
+  color: #00589d;
+}
+
+.wy-menu-vertical li > a:hover,
+.wy-menu-vertical li.current > a:hover,
+.wy-menu-vertical li.toctree-l2 > a:hover,
+.wy-menu-vertical li.toctree-l2.current li.toctree-l3 > a:hover,
+.wy-menu-vertical li.toctree-l2.current li.toctree-l3 > a:hover span.toctree-expand,
+.wy-menu-vertical li.toctree-l3 > a:hover,
+.wy-menu-vertical li.toctree-l3.current li.toctree-l4 > a:hover,
+.wy-menu-vertical li.toctree-l4 > a:hover {
+  background: #fdbb40;
+  color: #00589d;
+}
+
+
+.wy-menu-vertical li.toctree-l1.current > a {
+  border-bottom: 1px solid #00589d;
+  border-right: none;
+}
+
+
+.wy-menu-vertical li.current,
+.wy-menu-vertical li.toctree-l2.current > a {
+  background: #caebea;
+}
+
+
+.wy-menu-vertical li.toctree-l2.current li.toctree-l3 > a {
+  background: #96d8d5;
+}
+
+.wy-menu-vertical li.toctree-l3.current li.toctree-l4 > a {
+  background: #62c5c0;
 }
