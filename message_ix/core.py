@@ -469,3 +469,42 @@ class Scenario(ixmp.Scenario):
                 if commit_steps:
                     self.commit('Loaded {} from {}'.format(sheet_name, fname))
                     self.check_out()
+
+    def get_firstmodelyear(self):
+        """Retrieves firstmodelyear.
+
+        Returns
+        -------
+        year : int or empty series
+            if firstmodelyear is not defined, an empty series is returned
+        """
+
+        year = self.set("cat_year",
+                        filters={"type_year": ["firstmodelyear"]}
+                        )["year"]
+        return(int(year) if not year.empty else year)
+
+    def get_all_years(self):
+        """Retrieves all model years
+
+        Retruns
+        -------
+        years : list of integers
+
+        """
+        return(self.set("cat_year")["year"].unique().tolist())
+
+    def get_model_horizon(self):
+        """Retrieves modeling horizon
+
+        Returns
+        -------
+        years : list of integers
+            model years; if firsmodelyear is defined,
+            then all previous years are not included
+        """
+        if not self.get_firstmodelyear().empty:
+            return([int(y) for y in self.get_all_years()
+                   if int(y) >= self.get_all_years()])
+        else:
+            return(self.get_all_years())
