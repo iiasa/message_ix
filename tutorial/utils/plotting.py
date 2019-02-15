@@ -28,7 +28,8 @@ class Plots(object):
                       values='value')
         return df
 
-    def model_data(self, var, year_col='year_act', baseyear=False, subset=None):
+    def model_data(self, var, year_col='year_act',
+                   baseyear=False, subset=None):
         df = self.ds.var(var)
         if subset is not None:
             df = df[df['technology'].isin(subset)]
@@ -114,5 +115,28 @@ class Plots(object):
         df.plot.bar(stacked=False)
         plt.title('{} Energy System Prices'.format(self.country.title()))
         plt.ylabel('cents/kWhr')
+        plt.xlabel('Year')
+        plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+
+    def plot_extraction(self, baseyear=False, subset=None, bygrade=True):
+        df = self.ds.var('EXT')
+        if not baseyear:
+            df = df[df['year'] > self.firstyear]
+        if subset is not None:
+            df = df[df['commodity'].isin(subset)]
+        if bygrade:
+            df['commodity'] = df['commodity'] + '_grade-' + df['grade']
+        idx = ['year', 'commodity']
+        df = (df[idx + ['lvl']]
+              .groupby(idx)
+              .sum().
+              reset_index()
+              .pivot(index='year', columns='commodity',
+                     values='lvl')
+              .rename(columns={'lvl': 'value'})
+              )
+        df.plot.bar(stacked=True)
+        plt.title('{} Energy System Extraction'.format(self.country.title()))
+        plt.ylabel('GWa')
         plt.xlabel('Year')
         plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
