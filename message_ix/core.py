@@ -29,9 +29,9 @@ def _init_scenario(s, commit=False):
         #  'exec': [(pass, {'args': ()}), ],
         # },
         {
-         'test': 'balance_equality' not in s.set_list(),
-         'exec': [(s.init_set, {'args': ('balance_equality',
-                                         ['commodity', 'level'])})],
+            'test': 'balance_equality' not in s.set_list(),
+            'exec': [(s.init_set, {'args': ('balance_equality',
+                                            ['commodity', 'level'])})],
         },
     )
 
