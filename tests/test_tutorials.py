@@ -1,12 +1,12 @@
 import io
 import os
-import shutil
 import subprocess
 import sys
 import pytest
 
 import numpy as np
 
+from distutils.spawn import find_executable
 from conftest import here
 
 try:
@@ -22,7 +22,7 @@ jupyter_required = 'requires Jupyter Notebook to be installed'
 
 # look for gamslice.txt wherever gams is installed
 has_gamslice = os.path.exists(
-    os.path.join(os.path.dirname(shutil.which('gams')), 'gamslice.txt')
+    os.path.join(os.path.dirname(find_executable('gams')), 'gamslice.txt')
 )
 gamslice_required = 'Requires GAMS license file'
 
