@@ -46,8 +46,8 @@ EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
 
 * assign auxiliary variables DEMAND, PRICE_COMMODITY and PRICE_EMISSION for integration with MACRO and reporting
     DEMAND.l(node,commodity,level,year,time) = demand_fixed(node,commodity,level,year,time) ;
-    PRICE_COMMODITY.l(node,commodity,level,year,time) = ( COMMODITY_EQUIVALENCE.m(node,commodity,level,year,time) + 
-        COMMODITY_BALANCE_GT.m(node,commodity,level,year,time) - COMMODITY_BALANCE_LT.m(node,commodity,level,year,time) )
+    PRICE_COMMODITY.l(node,commodity,level,year,time) =
+        ( COMMODITY_BALANCE_GT.m(node,commodity,level,year,time) + COMMODITY_BALANCE_LT.m(node,commodity,level,year,time) )
             / discountfactor(year) ;
     PRICE_EMISSION.l(node,type_emission,type_tec,year)$( SUM(type_year$( cat_year(type_year,year) ), 1 ) ) =
             SMAX(type_year$( cat_year(type_year,year) ),

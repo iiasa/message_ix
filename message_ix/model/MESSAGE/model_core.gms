@@ -589,15 +589,13 @@ COMMODITY_EQUIVALENCE(node,commodity,level,year,time)$( map_commodity(node,commo
 
 * Equation COMMODITY_BALANCE_GT
 * """""""""""""""""""""""""""""
-* This constraint ensures the supply to be lower than or equal to the demand for every commodity and level
-* considered in Equation COMMODITY_EQUIVALENCE
-
+* This constraint ensures that supply is greater than demand for every commodity-level combination.
 *
 *
 ***
-
-COMMODITY_BALANCE_GT(node,commodity,level,year,time)..
-        COMM(node,commodity,level,year,time) =G= 0;
+COMMODITY_BALANCE_GT(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
+        AND NOT level_resource(level) AND NOT level_renewable(level) )..
+    COMM(node,commodity,level,year,time) =G= 0 ;
 
 * Equation COMMODITY_BALANCE_LT
 * """""""""""""""""""""""""""""
@@ -606,9 +604,10 @@ COMMODITY_BALANCE_GT(node,commodity,level,year,time)..
 *
 *
 ***
-
-COMMODITY_BALANCE_LT(node,commodity,level,year,time)$( balance_equality(commodity,level) )..
-        COMM(node,commodity,level,year,time) =L= 0;
+COMMODITY_BALANCE_LT(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
+        AND NOT level_resource(level) AND NOT level_renewable(level)
+        AND balance_equality(commodity,level) )..
+    COMM(node,commodity,level,year,time) =L= 0 ;
 
 ***
 * Equation STOCKS_BALANCE
