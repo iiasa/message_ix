@@ -151,7 +151,7 @@ Variables
 * Variable                                      Explanatory text
 * ============================================= ========================================================================
 * :math:`DEMAND_{n,c,l,y,h} \in \mathbb{R}`     Demand level (in equilibrium with MACRO integration)
-* :math:`PRICE\_COMMODITY_{n,c,l,y,h}`          Commodity price (undiscounted marginals of COMMODITY_BALANCE constraint)
+* :math:`PRICE\_COMMODITY_{n,c,l,y,h}`          Commodity price (undiscounted marginals of the commodity balances)
 * :math:`PRICE\_EMISSION_{n,e,\widehat{t},y}`   Emission price (undiscounted marginals of EMISSION_BOUND constraint)
 * :math:`COST\_NODAL\_NET_{n,y} \in \mathbb{R}` System costs at the node level net of energy trade revenues/cost
 * :math:`GDP_{n,y} \in \mathbb{R}`              gross domestic product (GDP) in market exchange rates for MACRO reporting
@@ -252,7 +252,6 @@ Equations
     EXTRACTION_BOUND_UP             upper bound on extraction (by grade)
     RESOURCE_CONSTRAINT             constraint on resources remaining in each period (maximum extraction per period)
     RESOURCE_HORIZON                constraint on extraction over entire model horizon (resource volume in place)
-    COMMODITY_EQUIVALENCE           commodity supply-demand lower balance constraint
     COMMODITY_BALANCE_GT            commodity supply greater than or equal demand
     COMMODITY_BALANCE_LT            commodity supply lower than or equal demand
     STOCKS_BALANCE                  commodity inter-temporal balance of stocks
@@ -546,9 +545,10 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 * Constraints on commodities and stocks
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
-* Equation COMMODITY_EQUIVALENCE
-* """"""""""""""""""""""""""""""
-* This constraint accounts for the nodal and temporal balance of outputs/imports and inputs/exports for all commodities.
+* Auxiliary COMMODITY_BALANCE
+* """""""""""""""""""""""""""
+* For the commodity balance constraints below, we introduce an auxiliary `COMMODITY_BALANCE`. This is implemented
+* as a GAMS `$macro` function. 
 *
 *  .. math::
 *     \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} output_{n^L,t,y^V,y,m,n,c,l,h^A,h}
@@ -558,56 +558,63 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 *     + \ STOCK\_CHG_{n,c,l,y,h} & \\[4pt]
 *     + \ \sum_s \Big( land\_output_{n,s,y,c,l,h} - land\_input_{n,s,y,c,l,h} \Big) \cdot & LAND_{n,s,y} \\[4pt]
 *     - \ demand\_fixed_{n,c,l,y,h}
-*     & \eq COMM_{n,c,l,y,h} \quad \forall \ l \notin L^{RES} \subseteq L
+*     & = COMMODITY\_BALANCE{n,c,l,y,h} \quad \forall \ l \notin (L^{RES}, l^{REN} \subseteq L
 *
 * The commodity balance constraint at the resource level is included in the `Equation RESOURCE_CONSTRAINT`_,
 * while at the renewable level, it is included in the `Equation RENEWABLES_EQUIVALENCE`_.
 ***
-COMMODITY_EQUIVALENCE(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
-                  AND NOT level_resource(level) AND NOT level_renewable(level) )..
-    SUM( (location,tec,vintage,mode,time2)$( map_tec_act(location,tec,year,mode,time2)
-            AND map_tec_lifetime(location,tec,vintage,year) ),
+$macro COMMODITY_BALANCE(node,commodity,level,year,time) (                                                             \
+    SUM( (location,tec,vintage,mode,time2)$( map_tec_act(location,tec,year,mode,time2)                                 \
+            AND map_tec_lifetime(location,tec,vintage,year) ),                                                         \
 * import into node and output by all technologies located at 'location' sending to 'node' and 'time2' sending to 'time'
-        output(location,tec,vintage,year,mode,node,commodity,level,time2,time)
-        * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2)
+        output(location,tec,vintage,year,mode,node,commodity,level,time2,time)                                         \                    
+        * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2)                                    \
 * export from node and input into technologies located at 'location' taking from 'node' and 'time2' taking from 'time'
-        - input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
-        * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2) )
+        - input(location,tec,vintage,year,mode,node,commodity,level,time2,time)                                        \
+        * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2) )                                  \
 * quantity taken out from ( >0 ) or put into ( <0 ) inter-period stock (storage)
-    + STOCK_CHG(node,commodity,level,year,time)$( map_stocks(node,commodity,level,year) )
+    + STOCK_CHG(node,commodity,level,year,time)$( map_stocks(node,commodity,level,year) )                              \
 * yield from land-use model emulator
-    + SUM(land_scenario,
-        ( land_output(node,land_scenario,year,commodity,level,time)
-          - land_input(node,land_scenario,year,commodity,level,time) ) * LAND(node,land_scenario,year) )
-* final consumption (exogenous parameter to be satisfied by the energy+water+xxx system)
-    - demand_fixed(node,commodity,level,year,time)
-* relaxation of constraints for debugging
-%SLACK_COMMODITY_EQUIVALENCE%   + SLACK_COMMODITY_EQUIVALENCE_UP(node,commodity,level,year,time)
-%SLACK_COMMODITY_EQUIVALENCE%   - SLACK_COMMODITY_EQUIVALENCE_LO(node,commodity,level,year,time)
-* equality to auxiliary variable COMM
-    =E= COMM(node,commodity,level,year,time) ;
+    + SUM(land_scenario,                                                                                               \
+        ( land_output(node,land_scenario,year,commodity,level,time)                                                    \
+          - land_input(node,land_scenario,year,commodity,level,time) ) * LAND(node,land_scenario,year) )               \
+* final demand (exogenous parameter to be satisfied by the commodity system)                              
+    - demand_fixed(node,commodity,level,year,time)                                                                     \
+    )$( map_commodity(node,commodity,level,year,time) AND NOT level_resource(level) AND NOT level_renewable(level) )
+
 
 * Equation COMMODITY_BALANCE_GT
 * """""""""""""""""""""""""""""
-* This constraint ensures that supply is greater than demand for every commodity-level combination.
+* This constraint ensures that supply is greater or equal than demand for every commodity-level combination.
 *
+*  .. math::
+*     COMMODITY\_BALANCE{n,c,l,y,h} \geq 0
 *
 ***
 COMMODITY_BALANCE_GT(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
         AND NOT level_resource(level) AND NOT level_renewable(level) )..
-    COMM(node,commodity,level,year,time) =G= 0 ;
+    COMMODITY_BALANCE(node,commodity,level,year,time)
+* relaxation of constraints for debugging
+%SLACK_COMMODITY_EQUIVALENCE% + SLACK_COMMODITY_EQUIVALENCE_UP(node,commodity,level,year,time)
+     =G= 0 ;
 
 * Equation COMMODITY_BALANCE_LT
 * """""""""""""""""""""""""""""
-* This constraint ensures the supply to be greater than or equal to the demand for specific commodities and levels
-* defined with `balance_equality` at the nodal and temporal level
+* This constraint ensures the supply is smaller than or equal to the demand for all commodity-level combinatio
+* given in the :math:`balance\_equality_{c,l}`. In combination withe constraint above, it ensures that supply
+* is (exactly) equal to demand.
 *
+*  .. math::
+*     COMMODITY\_BALANCE{n,c,l,y,h} \leq 0
 *
 ***
 COMMODITY_BALANCE_LT(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
         AND NOT level_resource(level) AND NOT level_renewable(level)
         AND balance_equality(commodity,level) )..
-    COMM(node,commodity,level,year,time) =L= 0 ;
+    COMMODITY_BALANCE(node,commodity,level,year,time)
+* relaxation of constraints for debugging
+%SLACK_COMMODITY_EQUIVALENCE% - SLACK_COMMODITY_EQUIVALENCE_LO(node,commodity,level,year,time)
+    =L= 0 ;
 
 ***
 * Equation STOCKS_BALANCE
