@@ -34,29 +34,6 @@ EXTRAS_REQUIRE = {
 }
 
 
-class Cmd(install):
-    """Custom clean command to tidy up the project root."""
-
-    def initialize_options(self):
-        install.initialize_options(self)
-
-    def finalize_options(self):
-        install.finalize_options(self)
-
-    def _clean_dirs(self):
-        dirs = [
-            'message_ix.egg-info',
-            'build',
-        ]
-        for d in dirs:
-            print('removing {}'.format(d))
-            shutil.rmtree(d)
-
-    def run(self):
-        install.run(self)
-        self._clean_dirs()
-
-
 def all_subdirs(path, strip=None):
     paths = []
     for root, dirnames, filenames in os.walk(path):
@@ -82,7 +59,6 @@ def main():
         ],
     }
     cmdclass = {
-        'install': Cmd,
     }
     pack_data = {
         # for some reason the model/ directory had to be added separately
