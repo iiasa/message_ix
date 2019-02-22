@@ -1,7 +1,6 @@
 ***
 * Mathematical formulation (core model)
 * =====================================
-* This page is generated from the auto-documentation mark-up in ``MESSAGE/model_core.gms``.
 *
 * The |MESSAGEix| systems-optimization model minimizes total costs
 * while satisfying given demand levels for commodities/services
@@ -70,7 +69,7 @@
 * :math:`REN_{n,t,c,g,y,h}`                     Activity of renewable technologies per grade
 * :math:`CAP\_NEW_{n,t,y} \in \mathbb{R}_+`     Newly installed capacity (yearly average over period duration)
 * :math:`CAP_{n,t,y^V,y} \in \mathbb{R}_+`      Maintained capacity in year :math:`y` of vintage :math:`y^V`
-* :math:`CAP\_FIRM_{n,t,c,l,y,q}`               Capacity counting towards firm (dispatchable)  
+* :math:`CAP\_FIRM_{n,t,c,l,y,q}`               Capacity counting towards firm (dispatchable)
 * :math:`ACT_{n,t,y^V,y,m,h} \in \mathbb{R}`    Activity of a technology (by vintage, mode, subannual time)
 * :math:`ACT\_RATING_{n,t,y^V,y,c,l,h,q}`       Activity attributed to a particular rating bin [#ACT_RATING]_
 * :math:`CAP\_NEW\_UP_{n,t,y} \in \mathbb{R}_+` Relaxation of upper dynamic constraint on new capacity
@@ -613,7 +612,7 @@ STOCKS_BALANCE(node,commodity,level,year)$( map_stocks(node,commodity,level,year
 * and where installed/maintained capacity is relevant for operational decisions.
 * The set where :math:`T^{INV} \subseteq T` is the set of all these technologies.
 
-* 
+*
 * Equation CAPACITY_CONSTRAINT
 * """"""""""""""""""""""""""""
 * This constraint ensures that the actual activity of a technology at a node cannot exceed available (maintained)
@@ -631,7 +630,7 @@ CAPACITY_CONSTRAINT(node,inv_tec,vintage,year,time)$( map_tec_time(node,inv_tec,
         =L= duration_time(time) * capacity_factor(node,inv_tec,vintage,year,time) * CAP(node,inv_tec,vintage,year) ;
 
 ***
-* Equation CAPACITY_MAINTENANCE_HIST 
+* Equation CAPACITY_MAINTENANCE_HIST
 * """"""""""""""""""""""""""""""""""
 * The following three constraints implement technology capacity maintenance over time to allow early retirment.
 * The optimization problem determines the optimal timing of retirement, when fixed operation-and-maintenance costs
@@ -785,7 +784,7 @@ RENEWABLES_POTENTIAL_CONSTRAINT(node,commodity,grade,year)$( map_ren_grade(node,
 *
 *  .. math::
 *     \sum_{y^V, h} & CAP_{n,t,y^V,y} \cdot operation\_factor_{n,t,y^V,y} \cdot capacity\_factor_{n,t,y^V,y,h} \\
-*        & \quad \geq \sum_{g,h,l} \frac{1}{renewable\_capacity\_factor_{n,c,g,l,y}} \cdot REN_{n,t,c,g,y,h}        
+*        & \quad \geq \sum_{g,h,l} \frac{1}{renewable\_capacity\_factor_{n,c,g,l,y}} \cdot REN_{n,t,c,g,y,h}
 *
 * This constraint is only active if :math:`renewable\_capacity\_factor_{n,c,g,l,y}` is defined.
 ***
@@ -815,7 +814,7 @@ RENEWABLES_CAPACITY_REQUIREMENT(node,inv_tec,commodity,year)$(
 *   .. math::
 *      \sum_{\substack{t' \sim t^A, y^V \leq y}} ACT_{n,t',y^V,y,m,h}
 *      \leq
-*      \sum_{\substack{t, y^V \leq y}} 
+*      \sum_{\substack{t, y^V \leq y}}
 *          addon\_up_{n,t^a,y,m,h,t^A} \cdot
 *          addon\_conversion_{n,t',y^V,y,m,h} \cdot
 *          ACT_{n,t,y^V,y,m,h}
@@ -852,7 +851,7 @@ ADDON_ACTIVITY_UP(node,type_addon,year,mode,time)..
 *   .. math::
 *      \sum_{\substack{t' \sim t^A, y^V \leq y}} ACT_{n,t',y^V,y,m,h}
 *      \geq
-*      \sum_{\substack{t, y^V \leq y}} 
+*      \sum_{\substack{t, y^V \leq y}}
 *          addon\_lo_{n,t^a,y,m,h,t^A} \cdot
 *          addon\_conversion_{n,t',y^V,y,m,h} \cdot
 *          ACT_{n,t,y^V,y,m,h}
@@ -891,7 +890,7 @@ ADDON_ACTIVITY_LO(node,type_addon,year,mode,time)..
 * Equation COMMODITY_USE_LEVEL
 * """"""""""""""""""""""""""""
 * This constraint defines the auxiliary variable :math:`COMMODITY\_USE_{n,c,l,y}`, which is used to define
-* the rating bins and the peak-load that needs to be offset with firm (dispatchable) capacity. 
+* the rating bins and the peak-load that needs to be offset with firm (dispatchable) capacity.
 *
 *   .. math::
 *      COMMODITY\_USE_{n,c,l,y}
@@ -924,7 +923,7 @@ COMMODITY_USE_LEVEL(node,commodity,level,year,time)$(
 * """"""""""""""""""""""""""""
 * The auxiliary variable for rating-specific activity of each technology cannot exceed
 * the share of the rating bin in relation to the total commodity use.
-* 
+*
 * .. math::
 *    ACT\_RATING_{n,t,y^V,y,c,l,h,q}
 *    \leq rating\_bin_{n,t,y,c,l,h,q} \cdot COMMODITY\_USE_{n,c,l,y}
@@ -997,7 +996,7 @@ FIRM_CAPACITY_PROVISION(node,inv_tec,year,commodity,level,time)$(
            map_tec_act(location,inv_tec,year,mode,time2)
            AND map_tec_lifetime(location,inv_tec,vintage,year) ),
         output(location,inv_tec,vintage,year,mode,node,commodity,level,time2,time)
-        * duration_time(time) 
+        * duration_time(time)
         * capacity_factor(node,inv_tec,vintage,year,time)
         * CAP(node,inv_tec,vintage,year) ) ;
 
@@ -1042,7 +1041,7 @@ SYSTEM_RELIABILITY_CONSTRAINT(node,commodity,level,year,time)$( peak_load_factor
 *      \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} &
 *          flexibility\_factor_{n^L,t,y^V,y,m,c,l,h,'unrated'} \\
 *      & \quad   \cdot ( output_{n^L,t,y^V,y,m,n,c,l,h^A,h} + input_{n^L,t,y^V,y,m,n,c,l,h^A,h} ) \\
-*      & \quad   \cdot duration\_time\_rel_{h,h^A} 
+*      & \quad   \cdot duration\_time\_rel_{h,h^A}
 *                \cdot ACT_{n,t,y^V,y,m,h} \\
 *      + \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} &
 *         flexibility\_factor_{n^L,t,y^V,y,m,c,l,h,1} \\
@@ -1243,7 +1242,7 @@ ACTIVITY_BOUND_ALL_MODES_LO(node,tec,year,time)$( bound_activity_lo(node,tec,yea
 *     \sum_{m\prime} ACT_{n^L,t,y^V,y,m\prime,h^A}
 *
 ***
-SHARE_CONSTRAINT_MODE_UP(shares,node,tec,mode,year,time)$(  
+SHARE_CONSTRAINT_MODE_UP(shares,node,tec,mode,year,time)$(
     map_tec_act(node,tec,year,mode,time) AND
     share_mode_up(shares,node,tec,mode,year,time)
 )..
@@ -1271,7 +1270,7 @@ SHARE_CONSTRAINT_MODE_UP(shares,node,tec,mode,year,time)$(
 *     \sum_{m\prime} ACT_{n^L,t,y^V,y,m\prime,h^A}
 *
 ***
-SHARE_CONSTRAINT_MODE_LO(shares,node,tec,mode,year,time)$(  
+SHARE_CONSTRAINT_MODE_LO(shares,node,tec,mode,year,time)$(
     map_tec_act(node,tec,year,mode,time) AND
     share_mode_lo(shares,node,tec,mode,year,time)
 )..
@@ -1956,6 +1955,3 @@ Model MESSAGE_LP / all / ;
 MESSAGE_LP.holdfixed = 1 ;
 MESSAGE_LP.optfile = 1 ;
 MESSAGE_LP.optcr = 0 ;
-
-
-

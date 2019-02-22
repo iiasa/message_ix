@@ -20,7 +20,7 @@ def files(src_dir, target_dir, match='*.gms', ext='.rst'):
     return ins, outs
 
 
-def transcribe_docs(infp, outfp):
+def transcribe_docs(infp, outfp, source_filename):
     """Transcribe documentation lines from *infp* to *outfp*.
 
     Only lines between matched pairs of triple-star comments ('***') are
@@ -31,6 +31,10 @@ def transcribe_docs(infp, outfp):
     """
     # State: None = no blocks encountered; True = in a block; False = outside
     on = None
+
+    note = ('.. note:: This page is generated from inline documentation in '
+            '``{}``.\n\n').format(source_filename)
+
     for line in infp:
         if line.lstrip().startswith('***'):
             # Located a block divider
@@ -39,6 +43,10 @@ def transcribe_docs(infp, outfp):
                 outfp.write('\n')
             # Toggle between inside/outside of doc block
             on = not on
+            # Write the header notice
+            if note:
+                outfp.write(note)
+                note = None
         elif on:
             # Strip leftmost '* ' from the line
             base = "*".join(line.split('*')[1:])[1:]
@@ -77,7 +85,8 @@ def main(app, config):
 
         # Transcribe lines from the source file to the output file
         with open(inf, 'r') as infp, open(outf, 'w') as outfp:
-            any_docs = transcribe_docs(infp, outfp)
+            any_docs = transcribe_docs(
+                infp, outfp, inf.relative_to(app.config.gams_source_dir))
 
         if not any_docs:
             # No output was created; delete the file

@@ -1,12 +1,10 @@
 Installation
 ============
 
-|MESSAGEix| requires `GAMS`_. After installing GAMS, we recommend that new
-users install Anaconda, and then use it to install |MESSAGEix|. Advanced users
-may choose to install |MESSAGEix| from source code.
+Install GAMS
+------------
 
-Installing GAMS
----------------
+|MESSAGEix| requires `GAMS`_.
 
 1. Download the latest version of `GAMS`_ for your operating system; run the
    installer.
@@ -14,20 +12,20 @@ Installing GAMS
 2. Add GAMS to the ``PATH`` environment variable. This is **required** in order
    for |MESSAGEix| to run the mathematical model core:
 
-   - on Windows, in the GAMS installer:
+   - on Windows, in the GAMS installer…
       - Check the box labeled “Use advanced installation mode.”
       - Check the box labeled “Add GAMS directory to PATH environment variable”
         on the Advanced Options page.
-   - on macOS or Linux:
-      - Add the following line to your ``.bash_profile`` (Mac) or ``.bashrc`` (Linux)
+   - on macOS or Linux, add the following line to your ``.bash_profile`` (Mac) or ``.bashrc`` (Linux)::
 
-         ```
-         export PATH=$PATH:/path/to/gams-directory-with-gams-binary
-         ```
-
+          export PATH=$PATH:/path/to/gams-directory-with-gams-binary
 
 Install |MESSAGEix| via Anaconda
 --------------------------------
+
+After installing GAMS, we recommend that new users install Anaconda, and then
+use it to install |MESSAGEix|. Advanced users may choose to install |MESSAGEix|
+from source code (next section).
 
 3. Install Python via `Anaconda`_. We recommend the latest version, i.e.,
    Python 3.6+.

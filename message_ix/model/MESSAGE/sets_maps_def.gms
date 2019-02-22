@@ -3,7 +3,6 @@
 *
 * Sets and mappings definition
 * =============================
-* This page is generated from the auto-documentation in ``MESSAGE/sets_maps_def.gms``.
 *
 * This file contains the definition of all sets and mappings used in |MESSAGEix|.
 ***
@@ -297,7 +296,7 @@ Sets
         node,type_tec,mode,commodity,level)   mapping for commodity share constraints (numerator)
     map_shares_commodity_total(shares,node,
         node,type_tec,mode,commodity,level)   mapping for commodity share constraints (denominator)
-    
+
     map_land(node,land_scenario,year_all)            mapping of land-use model emulator scenarios to nodes and years
     map_relation(relation,node,year_all)             mapping of generic (user-defined) relations to nodes and years
 ;

@@ -1,11 +1,10 @@
-cloud_sptheme
 jupyter
 matplotlib
 numpydoc
 pandas
 pytest>=3.0.6
-sphinx
+sphinx>=1.8
+sphinx_rtd_theme
 sphinxcontrib-bibtex
-sphinxcontrib-fulltoc
 xlrd
 XlsxWriter

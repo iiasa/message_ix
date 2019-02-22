@@ -21,12 +21,14 @@ a data warehouse for high-powered numerical scenario analysis.
 
 ## License
 
-Copyright © 2018 IIASA Energy Program
+Copyright © 2018–2019 IIASA Energy Program
 
 The MESSAGEix framework is licensed under the Apache License, Version 2.0 (the
 "License"); you may not use the files in this repository except in compliance
-with the License.  You may obtain a copy of the License at
+with the License. You may obtain a copy of the License at
 <http://www.apache.org/licenses/LICENSE-2.0>.
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
 Please refer to the [NOTICE](NOTICE.rst) for details and user guidelines.
 
@@ -41,11 +43,7 @@ automatically created from mark-up comments in the GAMS, Python, and R code.
 The online documentation is synchronized with the contents of the master branch
 of the [message_ix Github repository](http://www.github.com/iiasa/message_ix).
 
-For offline use, the documentation can be built from the source code. Navigate
-to the `doc` folder and in a command prompt type:
-
-    $ make doc
-
+For offline use, the documentation can be built from the source code.
 See `doc/README.md` for further details.
 
 

@@ -1,6 +1,6 @@
 References
-================
+==========
 
 .. bibliography:: /bibs/main.bib
-   :style: plain 
+   :style: plain
    :all:
