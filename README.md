@@ -51,13 +51,13 @@ See `doc/README.md` for further details.
 
 ### Installation
 
-See [‘Installation’ in the documentation](http://MESSAGEix.iiasa.ac.at/getting_started.html#installation) or the file `INSTALL.rst`.
+See [‘Installation’ in the documentation](http://MESSAGEix.iiasa.ac.at#installation) or the file `INSTALL.rst`.
 
 
 ### Tutorials
 
 Several introductory tutorials are provided.
-See [‘Tutorials’ in the documentation](http://messageix.iiasa.ac.at/getting_started.html#tutorials) or the file
+See [‘Tutorials’ in the documentation](http://messageix.iiasa.ac.at#tutorials) or the file
 `tutorial/README.rst`.
 
 
