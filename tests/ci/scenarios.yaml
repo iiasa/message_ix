@@ -2,6 +2,19 @@ CD_Links_SSP2_baseline:
       model: CD_Links_SSP2
       scenario: baseline
       solve: MESSAGE-MACRO
-      obs: scen.var('OBJ')['lvl']
-      exp: 2486801.25
-      test: np.isclose(obs, exp, rtol=3e-6) # not sure why 1e-6 doesn't work
+      solve_options:
+        lpmethod: 4
+      cases:
+        - obs: scen.var('OBJ')['lvl']
+          exp: 2486801.25
+          test: np.isclose(obs, exp, rtol=3e-6) # not sure why 1e-6 doesn't work
+CD_Links_SSP2_v2_1000:
+      model: CD_Links_SSP2_v2
+      scenario: NPi2020_1000-con-prim-dir-ncr
+      solve: MESSAGE-MACRO
+      solve_options:
+        lpmethod: 4
+      cases:
+        - obs: scen.var('OBJ')['lvl']
+          exp: 2175644.25
+          test: np.isclose(obs, exp, rtol=3e-6) # not sure why 1e-6 doesn't work
