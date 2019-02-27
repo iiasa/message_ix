@@ -10,7 +10,7 @@ def model_setup(scen, var_cost=1):
     scen.add_set('level', 'level')
     scen.add_set('year', 2020)
 
-    scen.add_par('demand', ['node', 'comm', 'level', 2020, 'year'],  1, 'GWa')
+    scen.add_par('demand', ['node', 'comm', 'level', 2020, 'year'], 1, 'GWa')
 
     scen.add_set('technology', 'tec')
     scen.add_set('mode', 'mode')
