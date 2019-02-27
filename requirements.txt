@@ -8,3 +8,5 @@ sphinx_rtd_theme
 sphinxcontrib-bibtex
 xlrd
 XlsxWriter
+ixmp
+pyam
