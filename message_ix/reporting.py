@@ -47,7 +47,7 @@ class Reporting(object):
         act = _apply_filters(self.scenario.var('ACT'), kwargs)\
             .groupby([region, year]).sum()['lvl'].reset_index()
         self.report.append(act, value='lvl', region=region, variable=variable,
-                           unit=unit, year=year**self.args)
+                           unit=unit, year=year, **self.args)
 
     def aggregate(self, variable, components=None, units=None):
         """Compute the aggregate of timeseries components or sub-categories
