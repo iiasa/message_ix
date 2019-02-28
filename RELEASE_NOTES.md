@@ -2,6 +2,7 @@
 # Next Release
 
 - [#154](https://github.com/iiasa/message_ix/pull/154): Enable documentation build on ReadTheDocs.
+- [#142](https://github.com/iiasa/message_ix/pull/142): Introduce a generic MESSAGEix Reporting class.
 - [#138](https://github.com/iiasa/message_ix/pull/138): Update documentation and tutorials.
 - [#131](https://github.com/iiasa/message_ix/pull/131): Update clone function syntax scen to scenario
 
