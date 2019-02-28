@@ -22,7 +22,7 @@ class Reporting(object):
         if np.isnan(scenario.var('OBJ')['lvl']):
             raise ValueError('this scenario has not been solved!')
         self.scenario = scenario
-        self.reporting = pyam.IamDataFrame(scenario)
+        self.report = pyam.IamDataFrame(scenario)
         self.args = dict(model=self.scenario.model,
                          scenario=self.scenario.scenario, inplace=True)
 
@@ -44,10 +44,10 @@ class Reporting(object):
         **kwargs
             filters for variable columns
         """
-        _data = _apply_filters(self.scenario.var('ACT'), kwargs)\
+        act = _apply_filters(self.scenario.var('ACT'), kwargs)\
             .groupby([region, year]).sum()['lvl'].reset_index()
-        self.reporting.append(_data, value='lvl', **self.args, region=region,
-                              variable=variable, unit=unit, year=year)
+        self.report.append(act, value='lvl', region=region, variable=variable,
+                           unit=unit, year=year**self.args)
 
     def aggregate(self, variable, components=None, units=None):
         """Compute the aggregate of timeseries components or sub-categories
@@ -61,7 +61,7 @@ class Reporting(object):
         units: str or list of str, default None
             filter variable and components for given unit(s)
         """
-        self.reporting.aggregate(variable, components, units, append=True)
+        self.report.aggregate(variable, components, units, append=True)
 
     def finalize(self, comment=None):
         """Finalizes the reporting by committing to the modeling platform
@@ -73,7 +73,7 @@ class Reporting(object):
         """
         try:
             self.scenario.check_out(timeseries_only=True)
-            self.scenario.add_timeseries(self.reporting.data)
+            self.scenario.add_timeseries(self.report.data)
             self.scenario.commit(comment or 'MESSAGEix postprocessing')
         except Exception:
             self.scenario.discard_changes()
