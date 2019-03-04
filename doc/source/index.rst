@@ -53,6 +53,7 @@ Detailed documentation
    api
    core
    guide
+   reporting
 
 
 Using and contributing to |MESSAGEix|

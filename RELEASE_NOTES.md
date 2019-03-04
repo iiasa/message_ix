@@ -1,6 +1,7 @@
 
 # Next Release
 
+- [#176](https://github.com/iiasa/message_ix/pull/176): Improve reporting, phase 2.
 - [#196](https://github.com/iiasa/message_ix/pull/196): Improve testing by re-using :mod:`ixmp` apparatus.
 - [#187](https://github.com/iiasa/message_ix/pull/187): Test for cumulative bound on emissions.
 - [#182](https://github.com/iiasa/message_ix/pull/182): Fix cross-platform cloning.
