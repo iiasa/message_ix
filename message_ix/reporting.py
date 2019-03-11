@@ -83,6 +83,7 @@ class Reporting(object):
 # %%  auxiliary functions
 
 def _apply_filters(data, filters):
+    """Downselect `data` using a `filters` dictionary like `col: values`"""
     keep = np.array([True] * len(data))
     for col, values in filters.items():
         values = [values] if pyam.isstr(values) else values
