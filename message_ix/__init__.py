@@ -5,7 +5,7 @@ import ixmp.model_settings as model_settings
 
 from message_ix import default_paths
 from message_ix.core import *
-from message_ix.reporting import *
+from message_ix.reporting import Reporting  # noqa:F401
 
 
 model_file = os.path.join(default_paths.model_path(), '{model}_run.gms')
