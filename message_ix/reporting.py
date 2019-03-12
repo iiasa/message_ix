@@ -3,6 +3,7 @@
 import numpy as np
 import message_ix
 import ixmp
+from ixmp import logger
 import pyam
 
 GROUP_IDX = pyam.IAMC_IDX + ['year']
@@ -17,10 +18,10 @@ class Reporting(object):
     """
     def __init__(self, scenario):
         if not isinstance(scenario, message_ix.Scenario):
-            msg = 'Postprocess can only be used with a `message_ix.Scenario`'
+            msg = '`Reporting` can only be used with a `message_ix.Scenario`!'
             raise ValueError(msg)
         if np.isnan(scenario.var('OBJ')['lvl']):
-            raise ValueError('this scenario has not been solved!')
+            raise ValueError('This scenario has not been solved!')
 
         self.platform = scenario.platform
         self.scenario = scenario
@@ -47,7 +48,7 @@ class Reporting(object):
 
     def activity(self, variable, unit='', region='node_loc', year='year_act',
                  **kwargs):
-        """Aggregates the activity level :math:`ACT` across technologies.
+        """Report the activity :math:`ACT` by technology, vintage, mode, etc.
 
         Parameters
         ----------
