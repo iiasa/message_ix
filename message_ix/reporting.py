@@ -21,10 +21,29 @@ class Reporting(object):
             raise ValueError(msg)
         if np.isnan(scenario.var('OBJ')['lvl']):
             raise ValueError('this scenario has not been solved!')
+
+        self.platform = scenario.platform
         self.scenario = scenario
         self.report = pyam.IamDataFrame(scenario)
         self.args = dict(model=self.scenario.model,
                          scenario=self.scenario.scenario, inplace=True)
+
+        # check that scenario nodes are defined as regions in the database,
+        # add if necessary
+        regions = self.platform.regions()
+        for i, (level, node, parent) \
+                in self.scenario.set('map_spatial_hierarchy').iterrows():
+            if node not in list(regions.region):
+                self.platform.add_region(node, level, parent)
+                logger().info('Added `{}` as a timeseries region'.format(node))
+            else:
+                rows = regions[regions.region == node][['hierarchy', 'parent']]
+                _rows = list(map(tuple, rows.values))
+                if (level, parent) not in _rows:
+                    msg = 'The regional hierarchy of node `{}` differs '\
+                          'from the defined region mapping in the platform!\n'\
+                          'scenario: ({}, {}), database: {}'
+                    logger().warning(msg.format(node, level, parent, _rows))
 
     def activity(self, variable, unit='', region='node_loc', year='year_act',
                  **kwargs):
