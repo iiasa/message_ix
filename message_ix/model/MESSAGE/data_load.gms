@@ -15,6 +15,7 @@ $LOAD map_node, map_time, map_commodity, map_resource, map_stocks, map_tec, map_
 $LOAD map_land, map_relation
 $LOAD type_tec, cat_tec, type_year, cat_year, type_emission, cat_emission, type_tec_land
 $LOAD inv_tec, renewable_tec
+$LOAD balance_equality
 $LOAD shares
 $LOAD addon, type_addon, cat_addon, map_tec_addon
 $GDXIN

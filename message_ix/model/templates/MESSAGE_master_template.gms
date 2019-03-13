@@ -76,7 +76,7 @@ $SETGLOBAL AUX_BOUND_VALUE "1e9"
 
 * include relaxations for specific constraint blocks to identify infeasibilities during model development/calibration
 * by adding 'slack' variables in the constraints and associated penalty factors in the objective function
-$SETGLOBAL SLACK_COMMODITY_BALANCE "*"
+$SETGLOBAL SLACK_COMMODITY_EQUIVALENCE "*"
 
 $SETGLOBAL SLACK_CAP_NEW_BOUND_UP "*"
 $SETGLOBAL SLACK_CAP_NEW_BOUND_LO "*"

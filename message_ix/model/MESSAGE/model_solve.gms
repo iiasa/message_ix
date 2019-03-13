@@ -46,8 +46,9 @@ EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
 
 * assign auxiliary variables DEMAND, PRICE_COMMODITY and PRICE_EMISSION for integration with MACRO and reporting
     DEMAND.l(node,commodity,level,year,time) = demand_fixed(node,commodity,level,year,time) ;
-    PRICE_COMMODITY.l(node,commodity,level,year,time) = COMMODITY_BALANCE.m(node,commodity,level,year,time)
-        / discountfactor(year) ;
+    PRICE_COMMODITY.l(node,commodity,level,year,time) =
+        ( COMMODITY_BALANCE_GT.m(node,commodity,level,year,time) + COMMODITY_BALANCE_LT.m(node,commodity,level,year,time) )
+            / discountfactor(year) ;
     PRICE_EMISSION.l(node,type_emission,type_tec,year)$( SUM(type_year$( cat_year(type_year,year) ), 1 ) ) =
             SMAX(type_year$( cat_year(type_year,year) ),
                 - EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year) / discountfactor(year) ) ;
@@ -126,3 +127,40 @@ else
     ) ; # end of the recursive-dynamic loop
 
 ) ; # end of if statement for the selection betwen perfect-foresight or recursive-dynamic model
+
+*----------------------------------------------------------------------------------------------------------------------*
+* post-processing of trade costs and total costs                                                                       *
+*----------------------------------------------------------------------------------------------------------------------*
+
+* calculation of commodity import costs by node, commodity and year
+import_cost(node2, commodity, year) =
+          SUM( (node,tec,vintage,mode,level,time,time2)$( (NOT sameas(node,node2)) AND map_tec_act(node2,tec,year,mode,time2)
+            AND map_tec_lifetime(node2,tec,vintage,year) AND map_commodity(node,commodity,level,year,time) ),
+* import into node2 from other nodes
+    input(node2,tec,vintage,year,mode,node,commodity,level,time2,time)
+    * duration_time_rel(time,time2) * ACT.L(node2,tec,vintage,year,mode,time2)
+    * PRICE_COMMODITY.l(node,commodity,level,year,time) )
+;
+
+* calculation of commodity export costs by node, commodity and year
+export_cost(node2, commodity, year) =
+          SUM( (node,tec,vintage,mode,level,time,time2)$( (NOT sameas(node,node2)) AND map_tec_act(node2,tec,year,mode,time2)
+            AND map_tec_lifetime(node2,tec,vintage,year) AND map_commodity(node,commodity,level,year,time) ),
+* export from node2 to other market
+    output(node2,tec,vintage,year,mode,node,commodity,level,time2,time)
+    * duration_time_rel(time,time2) * ACT.L(node2,tec,vintage,year,mode,time2)
+    * PRICE_COMMODITY.l(node,commodity,level,year,time) )
+;
+
+* net commodity trade costs by node and year
+trade_cost(node2, year) = SUM(commodity, import_cost(node2, commodity, year) - export_cost(node2, commodity, year)) ;
+
+* total energy system costs excluding taxes by node and time (CAVEAT: lacking regional corrections due to emission trading)
+total_cost(node, year)$(NOT macro_base_period(year)) = (
+    COST_NODAL.L(node, year) + trade_cost(node, year)
+* subtract emission taxes applied at any higher nodal level (via map_node set)
+    - sum((type_emission,emission,type_tec,type_year,node2)$( emission_scaling(type_emission,emission)
+            AND map_node(node2,node) AND cat_year(type_year,year) ),
+        emission_scaling(type_emission,emission) * tax_emission(node2,type_emission,type_tec,type_year)
+        * EMISS.L(node,emission,type_tec,year) )
+) / 1000 ;
