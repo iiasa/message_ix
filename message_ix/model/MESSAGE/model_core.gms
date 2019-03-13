@@ -140,6 +140,8 @@ Variables
     EMISS(node,emission,type_tec,year_all)       aggregate emissions by technology type and land-use model emulator
 * auxiliary variable for left-hand side of relations (linear constraints)
     REL(relation,node,year_all)                  auxiliary variable for left-hand side of user-defined relations
+* auxiliary variable for left-hand side of commodity balance
+    COMM(node,commodity,level,year_all,time)         auxiliary variable for left-hand side of commodity balance
 ;
 
 ***
@@ -149,7 +151,7 @@ Variables
 * Variable                                      Explanatory text
 * ============================================= ========================================================================
 * :math:`DEMAND_{n,c,l,y,h} \in \mathbb{R}`     Demand level (in equilibrium with MACRO integration)
-* :math:`PRICE\_COMMODITY_{n,c,l,y,h}`          Commodity price (undiscounted marginals of COMMODITY_BALANCE constraint)
+* :math:`PRICE\_COMMODITY_{n,c,l,y,h}`          Commodity price (undiscounted marginals of the commodity balances)
 * :math:`PRICE\_EMISSION_{n,e,\widehat{t},y}`   Emission price (undiscounted marginals of EMISSION_BOUND constraint)
 * :math:`COST\_NODAL\_NET_{n,y} \in \mathbb{R}` System costs at the node level net of energy trade revenues/cost
 * :math:`GDP_{n,y} \in \mathbb{R}`              gross domestic product (GDP) in market exchange rates for MACRO reporting
@@ -219,8 +221,8 @@ Set
 
 * slack variables for debugging
 Positive variables
-    SLACK_COMMODITY_BALANCE_UP(node,commodity,level,year_all,time) slack variable for commodity balance (upwards)
-    SLACK_COMMODITY_BALANCE_LO(node,commodity,level,year_all,time) slack variable for commodity balance (downwards)
+    SLACK_COMMODITY_EQUIVALENCE_UP(node,commodity,level,year_all,time) slack variable for commodity balance (upwards)
+    SLACK_COMMODITY_EQUIVALENCE_LO(node,commodity,level,year_all,time) slack variable for commodity balance (downwards)
     SLACK_CAP_NEW_BOUND_UP (node,tec,year_all)        slack variable for bound on new capacity (upwards)
     SLACK_CAP_NEW_BOUND_LO (node,tec,year_all)        slack variable for bound on new capacity (downwards)
     SLACK_CAP_TOTAL_BOUND_UP (node,tec,year_all)      slack variable for upper bound on total installed capacity
@@ -250,7 +252,8 @@ Equations
     EXTRACTION_BOUND_UP             upper bound on extraction (by grade)
     RESOURCE_CONSTRAINT             constraint on resources remaining in each period (maximum extraction per period)
     RESOURCE_HORIZON                constraint on extraction over entire model horizon (resource volume in place)
-    COMMODITY_BALANCE               commodity supply-demand balance constraint
+    COMMODITY_BALANCE_GT            commodity supply greater than or equal demand
+    COMMODITY_BALANCE_LT            commodity supply lower than or equal demand
     STOCKS_BALANCE                  commodity inter-temporal balance of stocks
     CAPACITY_CONSTRAINT             capacity constraint for technology (by sub-annual time slice)
     CAPACITY_MAINTENANCE_HIST       constraint for capactiy maintainance  historical installation (built before start of model horizon)
@@ -419,8 +422,8 @@ COST_ACCOUNTING_NODAL(node, year)..
         relation_cost(relation,node,year) * REL(relation,node,year) )
 * implementation of slack variables for constraints to aid in debugging
     + SUM((commodity,level,time)$( map_commodity(node,commodity,level,year,time) ), ( 0
-%SLACK_COMMODITY_BALANCE%   + SLACK_COMMODITY_BALANCE_UP(node,commodity,level,year,time)
-%SLACK_COMMODITY_BALANCE%   + SLACK_COMMODITY_BALANCE_LO(node,commodity,level,year,time)
+%SLACK_COMMODITY_EQUIVALENCE%   + SLACK_COMMODITY_EQUIVALENCE_UP(node,commodity,level,year,time)
+%SLACK_COMMODITY_EQUIVALENCE%   + SLACK_COMMODITY_EQUIVALENCE_LO(node,commodity,level,year,time)
         ) * 1e6 )
     + SUM((tec)$( map_tec(node,tec,year) ), ( 0
 %SLACK_CAP_NEW_BOUND_UP%    + 10 * SLACK_CAP_NEW_BOUND_UP(node,tec,year)
@@ -542,9 +545,10 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 * Constraints on commodities and stocks
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
-* Equation COMMODITY_BALANCE
-* """"""""""""""""""""""""""
-* This constraint ensures the nodal and temporal balance of outputs/imports and inputs/exports for all commodities.
+* Auxiliary COMMODITY_BALANCE
+* """""""""""""""""""""""""""
+* For the commodity balance constraints below, we introduce an auxiliary `COMMODITY_BALANCE`. This is implemented
+* as a GAMS `$macro` function. 
 *
 *  .. math::
 *     \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} output_{n^L,t,y^V,y,m,n,c,l,h^A,h}
@@ -554,33 +558,63 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 *     + \ STOCK\_CHG_{n,c,l,y,h} & \\[4pt]
 *     + \ \sum_s \Big( land\_output_{n,s,y,c,l,h} - land\_input_{n,s,y,c,l,h} \Big) \cdot & LAND_{n,s,y} \\[4pt]
 *     - \ demand\_fixed_{n,c,l,y,h}
-*     & \geq 0 \quad \forall \ l \notin L^{RES} \subseteq L
+*     & = COMMODITY\_BALANCE{n,c,l,y,h} \quad \forall \ l \notin (L^{RES}, l^{REN} \subseteq L
 *
 * The commodity balance constraint at the resource level is included in the `Equation RESOURCE_CONSTRAINT`_,
 * while at the renewable level, it is included in the `Equation RENEWABLES_EQUIVALENCE`_.
 ***
-COMMODITY_BALANCE(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
-                  AND NOT level_resource(level) AND NOT level_renewable(level) )..
-    SUM( (location,tec,vintage,mode,time2)$( map_tec_act(location,tec,year,mode,time2)
-            AND map_tec_lifetime(location,tec,vintage,year) ),
+$macro COMMODITY_BALANCE(node,commodity,level,year,time) (                                                             \
+    SUM( (location,tec,vintage,mode,time2)$( map_tec_act(location,tec,year,mode,time2)                                 \
+            AND map_tec_lifetime(location,tec,vintage,year) ),                                                         \
 * import into node and output by all technologies located at 'location' sending to 'node' and 'time2' sending to 'time'
-        output(location,tec,vintage,year,mode,node,commodity,level,time2,time)
-        * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2)
+        output(location,tec,vintage,year,mode,node,commodity,level,time2,time)                                         \                    
+        * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2)                                    \
 * export from node and input into technologies located at 'location' taking from 'node' and 'time2' taking from 'time'
-        - input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
-        * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2) )
+        - input(location,tec,vintage,year,mode,node,commodity,level,time2,time)                                        \
+        * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2) )                                  \
 * quantity taken out from ( >0 ) or put into ( <0 ) inter-period stock (storage)
-    + STOCK_CHG(node,commodity,level,year,time)$( map_stocks(node,commodity,level,year) )
+    + STOCK_CHG(node,commodity,level,year,time)$( map_stocks(node,commodity,level,year) )                              \
 * yield from land-use model emulator
-    + SUM(land_scenario,
-        ( land_output(node,land_scenario,year,commodity,level,time)
-          - land_input(node,land_scenario,year,commodity,level,time) ) * LAND(node,land_scenario,year) )
-* final consumption (exogenous parameter to be satisfied by the energy+water+xxx system)
-    - demand_fixed(node,commodity,level,year,time)
+    + SUM(land_scenario,                                                                                               \
+        ( land_output(node,land_scenario,year,commodity,level,time)                                                    \
+          - land_input(node,land_scenario,year,commodity,level,time) ) * LAND(node,land_scenario,year) )               \
+* final demand (exogenous parameter to be satisfied by the commodity system)                              
+    - demand_fixed(node,commodity,level,year,time)                                                                     \
+    )$( map_commodity(node,commodity,level,year,time) AND NOT level_resource(level) AND NOT level_renewable(level) )
+
+
+* Equation COMMODITY_BALANCE_GT
+* """""""""""""""""""""""""""""
+* This constraint ensures that supply is greater or equal than demand for every commodity-level combination.
+*
+*  .. math::
+*     COMMODITY\_BALANCE{n,c,l,y,h} \geq 0
+*
+***
+COMMODITY_BALANCE_GT(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
+        AND NOT level_resource(level) AND NOT level_renewable(level) )..
+    COMMODITY_BALANCE(node,commodity,level,year,time)
 * relaxation of constraints for debugging
-%SLACK_COMMODITY_BALANCE%   + SLACK_COMMODITY_BALANCE_UP(node,commodity,level,year,time)
-%SLACK_COMMODITY_BALANCE%   - SLACK_COMMODITY_BALANCE_LO(node,commodity,level,year,time)
-    =G= 0 ;
+%SLACK_COMMODITY_EQUIVALENCE% + SLACK_COMMODITY_EQUIVALENCE_UP(node,commodity,level,year,time)
+     =G= 0 ;
+
+* Equation COMMODITY_BALANCE_LT
+* """""""""""""""""""""""""""""
+* This constraint ensures the supply is smaller than or equal to the demand for all commodity-level combinatio
+* given in the :math:`balance\_equality_{c,l}`. In combination withe constraint above, it ensures that supply
+* is (exactly) equal to demand.
+*
+*  .. math::
+*     COMMODITY\_BALANCE{n,c,l,y,h} \leq 0
+*
+***
+COMMODITY_BALANCE_LT(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
+        AND NOT level_resource(level) AND NOT level_renewable(level)
+        AND balance_equality(commodity,level) )..
+    COMMODITY_BALANCE(node,commodity,level,year,time)
+* relaxation of constraints for debugging
+%SLACK_COMMODITY_EQUIVALENCE% - SLACK_COMMODITY_EQUIVALENCE_LO(node,commodity,level,year,time)
+    =L= 0 ;
 
 ***
 * Equation STOCKS_BALANCE
@@ -1317,16 +1351,16 @@ SHARE_CONSTRAINT_MODE_LO(shares,node,tec,mode,year,time)$(
 SHARE_CONSTRAINT_COMMODITY_UP(shares,node_share,year,time)$( share_commodity_up(shares,node_share,year,time) )..
 * activity by type_tec_share technologies with map_shares_generic_share entries and a specific mode
     SUM( (node,location,type_tec_share,tec,vintage,mode,commodity,level,time2)$(
-	( map_shares_commodity_share(shares,node_share,node,type_tec_share,mode,commodity,level) OR
-	   map_shares_commodity_share(shares,node_share,node,type_tec_share,'all',commodity,level) ) AND
+        ( map_shares_commodity_share(shares,node_share,node,type_tec_share,mode,commodity,level) OR
+           map_shares_commodity_share(shares,node_share,node,type_tec_share,'all',commodity,level) ) AND
         cat_tec(type_tec_share,tec) AND
         map_tec_act(location,tec,year,mode,time2) AND
         map_tec_lifetime(location,tec,vintage,year)
     ),
         (
-	    output(location,tec,vintage,year,mode,node,commodity,level,time2,time) +
-	    input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
-	) *
+            output(location,tec,vintage,year,mode,node,commodity,level,time2,time) +
+            input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+        ) *
         duration_time_rel(time,time2) *
         ACT(location,tec,vintage,year,mode,time2)
     )
@@ -1334,16 +1368,16 @@ SHARE_CONSTRAINT_COMMODITY_UP(shares,node_share,year,time)$( share_commodity_up(
     share_commodity_up(shares,node_share,year,time) * (
 * total input and output by `type_tec_total` technologies mapped to respective commodity, level and node
     SUM( (node,location,type_tec_total,tec,vintage,mode,commodity,level,time2)$(
-	( map_shares_commodity_total(shares,node_share,node,type_tec_total,mode,commodity,level) OR
-	   map_shares_commodity_total(shares,node_share,node,type_tec_total,'all',commodity,level) ) AND
+        ( map_shares_commodity_total(shares,node_share,node,type_tec_total,mode,commodity,level) OR
+           map_shares_commodity_total(shares,node_share,node,type_tec_total,'all',commodity,level) ) AND
         cat_tec(type_tec_total,tec) AND
         map_tec_act(location,tec,year,mode,time2) AND
         map_tec_lifetime(location,tec,vintage,year)
     ),
         (
-	    output(location,tec,vintage,year,mode,node,commodity,level,time2,time) +
-	    input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
-	) *
+            output(location,tec,vintage,year,mode,node,commodity,level,time2,time) +
+            input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+        ) *
         duration_time_rel(time,time2) *
         ACT(location,tec,vintage,year,mode,time2)
     ) ) ;
@@ -1366,16 +1400,16 @@ SHARE_CONSTRAINT_COMMODITY_UP(shares,node_share,year,time)$( share_commodity_up(
 SHARE_CONSTRAINT_COMMODITY_LO(shares,node_share,year,time)$( share_commodity_lo(shares,node_share,year,time) )..
 * total input and output by `type_tec_share` technologies mapped to respective commodity, level and node
     SUM( (node,location,type_tec_share,tec,vintage,mode,commodity,level,time2)$(
-	( map_shares_commodity_share(shares,node_share,node,type_tec_share,mode,commodity,level) OR
-	   map_shares_commodity_share(shares,node_share,node,type_tec_share,'all',commodity,level) ) AND
+        ( map_shares_commodity_share(shares,node_share,node,type_tec_share,mode,commodity,level) OR
+           map_shares_commodity_share(shares,node_share,node,type_tec_share,'all',commodity,level) ) AND
         cat_tec(type_tec_share,tec) AND
         map_tec_act(location,tec,year,mode,time2) AND
         map_tec_lifetime(location,tec,vintage,year)
     ),
         (
-	    output(location,tec,vintage,year,mode,node,commodity,level,time2,time) +
-	    input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
-	) *
+            output(location,tec,vintage,year,mode,node,commodity,level,time2,time) +
+            input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+        ) *
         duration_time_rel(time,time2) *
         ACT(location,tec,vintage,year,mode,time2)
     )
@@ -1383,16 +1417,16 @@ SHARE_CONSTRAINT_COMMODITY_LO(shares,node_share,year,time)$( share_commodity_lo(
     share_commodity_lo(shares,node_share,year,time) * (
 * total input and output by `type_tec_total` technologies mapped to respective commodity, level and node
     SUM( (node,location,type_tec_total,tec,vintage,mode,commodity,level,time2)$(
-	( map_shares_commodity_total(shares,node_share,node,type_tec_total,mode,commodity,level) OR
-	   map_shares_commodity_total(shares,node_share,node,type_tec_total,'all',commodity,level) ) AND
+        ( map_shares_commodity_total(shares,node_share,node,type_tec_total,mode,commodity,level) OR
+           map_shares_commodity_total(shares,node_share,node,type_tec_total,'all',commodity,level) ) AND
         cat_tec(type_tec_total,tec) AND
         map_tec_act(location,tec,year,mode,time2) AND
         map_tec_lifetime(location,tec,vintage,year)
     ),
         (
-	    output(location,tec,vintage,year,mode,node,commodity,level,time2,time) +
-	    input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
-	) *
+            output(location,tec,vintage,year,mode,node,commodity,level,time2,time) +
+            input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+        ) *
         duration_time_rel(time,time2) *
         ACT(location,tec,vintage,year,mode,time2)
     ) ) ;

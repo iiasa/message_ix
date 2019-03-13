@@ -28,6 +28,11 @@ def _init_scenario(s, commit=False):
         #  'test': False  # some test,
         #  'exec': [(pass, {'args': ()}), ],
         # },
+        {
+            'test': 'balance_equality' not in s.set_list(),
+            'exec': [(s.init_set, {'args': ('balance_equality',
+                                            ['commodity', 'level'])})],
+        },
     )
 
     pass_idx = [i for i, init in enumerate(inits) if init['test']]
