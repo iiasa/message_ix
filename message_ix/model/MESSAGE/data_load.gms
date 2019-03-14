@@ -71,6 +71,13 @@ is_fixed_extraction, is_fixed_stock, is_fixed_new_capacity, is_fixed_capacity, i
 fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activity, fixed_land
 ;
 
+
+*----------------------------------------------------------------------------------------------------------------------*
+* ensure that each node is mapped to itself                                                                            *
+*----------------------------------------------------------------------------------------------------------------------*
+
+map_node(node,node) = yes ;
+
 *----------------------------------------------------------------------------------------------------------------------*
 * auxiliary mappings for the implementation of bounds over all modes and system reliability/flexibility constraints    *
 *----------------------------------------------------------------------------------------------------------------------*
