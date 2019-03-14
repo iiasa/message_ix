@@ -97,12 +97,31 @@ def test_per_period_variable_periodlength(test_mp):
     years = [2020, 2025, 2030, 2040]
 
     model_setup(scen, years)
-    scen.add_cat('year', 'cumulative', years)
-    scen.add_par('bound_emission',
-                 ['World', 'ghg', 'all', 'cumulative'], 0, 'tCO2')
+    for y in years:
+        scen.add_cat('year', y, y)
+        scen.add_par('bound_emission',
+                     ['World', 'ghg', 'all', y], 0, 'tCO2')
     scen.commit('initialize test scenario')
     scen.solve()
 
     assert scen.var('OBJ')['lvl'] > 0
     obs = scen.var('PRICE_EMISSION')['lvl'].values
     npt.assert_allclose(obs, [1] * 4)
+
+
+def test_custom_type_variable_periodlength(test_mp):
+    scen = Scenario(test_mp, MODEL, 'cum_equidistant', version='new')
+    years = [2020, 2025, 2030, 2040, 2050]
+    custom = [2025, 2030, 2040]
+
+    model_setup(scen, years)
+    scen.add_cat('year', 'custom', custom)
+    scen.add_par('bound_emission',
+                 ['World', 'ghg', 'all', 'custom'], 0, 'tCO2')
+
+    scen.commit('initialize test scenario')
+    scen.solve()
+
+    assert scen.var('OBJ')['lvl'] > 0
+    obs = scen.var('PRICE_EMISSION')['lvl'].values
+    npt.assert_allclose(obs, [1.05**(y - custom[0]) for y in custom])
