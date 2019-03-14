@@ -1,5 +1,4 @@
 from message_ix import Scenario
-import pandas as pd
 import numpy.testing as npt
 
 MODEL = 'test_emissions_price'
