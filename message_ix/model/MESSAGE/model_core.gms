@@ -326,7 +326,7 @@ Equations
 *
 ***
 OBJECTIVE..
-    OBJ =E= SUM( (node,year), discountfactor(year) * COST_NODAL(node,year) ) ;
+    OBJ =E= SUM( (node,year), df_period(year) * COST_NODAL(node,year) ) ;
 
 ***
 * Regional system cost accounting function

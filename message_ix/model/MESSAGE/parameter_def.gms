@@ -37,9 +37,12 @@
 *    * - interestrate
 *      - ``year``
 *      - economy-wide interest rate or social discount rate
-*    * - *discountfactor*
+*    * - *df_period*
 *      - ``year``
 *      -  cumulative discount factor over period duration [#df_auto]_
+*    * - *df_year*
+*      - ``year``
+*      -  discount factor of the last year in the period [#df_auto]_
 *
 * .. [#short_dur] The short-hand notation :math:`|y|` is used for the parameters :math:`duration\_period_y`
 *    in the mathematical model documentation for exponents.
@@ -52,7 +55,7 @@
 * .. [#duration_time_year] The element 'year' in the set of subannual time slices ``time`` has the value of 1.
 *    This value is assigned by default when creating a new ``ixmp``.Scenario based on the ``MESSAGE`` scheme.
 *
-* .. [#df_auto] This parameter is computed during the GAMS execution.
+* .. [#df_auto] These parameters are computed during the GAMS execution.
 ***
 
 Parameters
@@ -62,7 +65,8 @@ Parameters
     duration_period_sum(year_all,year_all2)  number of years between two periods ('year_all' must precede 'year_all2')
     duration_time_rel(time,time2)  relative duration of subannual time period ('time2' relative to parent 'time')
     interestrate(year_all)         interest rate (to compute discount factor)
-    discountfactor(*)              cumulative discount facor
+    df_period(year_all)            cumulative discount factor
+    df_year(year_all)              cumulative discount factor
 ;
 
 ***

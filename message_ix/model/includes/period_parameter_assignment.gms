@@ -9,6 +9,7 @@ Sets
     macro_horizon(year_all)          set of periods included in the MACRO model horizon
     seq_period(year_all,year_all2)    mapping of one period ('year_all') to the next ('year_all2')
     map_period(year_all,year_all2)    mapping of one period ('year_all') to itself and all subsequent periods ('year_all2')
+    map_first_period(type_year, year_all) mapping of a 'type_year' to the first 'year'
     first_period(year_all)           flag for first period in model horizon
     last_period(year_all)            flag for last period in model horizon
     macro_initial_period(year_all)   flag for period in model horizon in which to initialize model parameters in (period prior to first model period) - used in MACRO
@@ -74,34 +75,38 @@ macro_horizon(year_all)$model_horizon(year_all) = yes;
 *    duration_period(year_all2) ) ) ;
 
 * compute per-year discount factor (using a recursive method) - set to 1 by default (interest rate = 0)
-discountfactor(year_all) = 1 ;
+df_year(year_all) = 1 ;
 
 * recursively compute the per-year discount factor
 loop(year_all$( ORD(year_all) > 1 ),
-    discountfactor(year_all) =
-        sum(year_all2$( seq_period(year_all2,year_all) ), discountfactor(year_all2)
+    df_year(year_all) =
+        sum(year_all2$( seq_period(year_all2,year_all) ), df_year(year_all2)
             * POWER( 1 / ( 1 + interestrate(year_all) ), duration_period(year_all) ) ) ;
 ) ;
 
 * store the per-year discount factor for later use in the file 'MESSAGE/scaling_investment_costs.gms'
-discountfactor('last_year') = sum(last_period, discountfactor(last_period) ) ;
+*discountfactor('last_year') = sum(last_period, df_year(last_period) ) ;
 
 * multiply per-year discount factor by discounted period duration
-discountfactor(year_all) =
-    discountfactor(year_all) * (
+df_period(year_all) =
+    df_year(year_all) * (
 * multiply the per-year discount factor by the geometric series of over the duration of the period
-        ( ( 1 - POWER( 1 / ( 1 + interestrate(year_all) ), duration_period(year_all) ) )
-            / ( 1 - 1 / ( 1 + interestrate(year_all) ) ) )$( interestrate(year_all) )
+        ( ( POWER( 1 + interestrate(year_all) , duration_period(year_all) ) - 1 )
+            / interestrate(year_all) )$( interestrate(year_all) )
 * if interest rate = 0, multiply by the number of years in that period
         + ( duration_period(year_all) )$( interestrate(year_all) eq 0 ) )
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
-* assignment of auxiliary parameters for duration of periods                                                           *
+* assignment of auxiliary first-period-per-category mapping and parameters for duration of periods                     *
 *----------------------------------------------------------------------------------------------------------------------*
 
 * define order of set 'year_all' (to use as equivalent of ORD operator on the dynamic set year (subset of 'year_all') )
 year_order(year_all) = ORD(year_all) ;
+
+* assign the first year of each category to a specific mapping set for use in computing emissions prices
+map_first_period(type_year,year_all)$( cat_year(type_year,year_all)
+    AND year_order(year_all) = SMIN(year_all2$( cat_year(type_year,year_all2) ), year_order(year_all2) ) ) = yes ;
 
 * auxiliary parameters for duration between periods (years) - not including the final period 'year_all2'
 duration_period_sum(year_all,year_all2) =

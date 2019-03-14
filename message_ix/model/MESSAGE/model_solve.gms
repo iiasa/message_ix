@@ -42,16 +42,20 @@ if (%foresight% = 0,
 * rescale the dual of the emission constraint to account that the constraint is defined on the average year, not total
 EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
         EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year) ) =
-    EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year) / sum(year$( cat_year(type_year,year) ), 1 ) ;
+    EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)
+        / SUM(year$( cat_year(type_year,year) ), duration_period(year) )
+        * SUM(year$( map_first_period(type_year,year) ), duration_period(year) / df_period(year) * df_year(year) );
+
 
 * assign auxiliary variables DEMAND, PRICE_COMMODITY and PRICE_EMISSION for integration with MACRO and reporting
     DEMAND.l(node,commodity,level,year,time) = demand_fixed(node,commodity,level,year,time) ;
     PRICE_COMMODITY.l(node,commodity,level,year,time) =
         ( COMMODITY_BALANCE_GT.m(node,commodity,level,year,time) + COMMODITY_BALANCE_LT.m(node,commodity,level,year,time) )
-            / discountfactor(year) ;
+            / df_period(year) ;
     PRICE_EMISSION.l(node,type_emission,type_tec,year)$( SUM(type_year$( cat_year(type_year,year) ), 1 ) ) =
-            SMAX(type_year$( cat_year(type_year,year) ),
-                - EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year) / discountfactor(year) ) ;
+        SMAX(type_year$( cat_year(type_year,year) ),
+               - EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year) )
+            / df_year(year) ;
     PRICE_EMISSION.l(node,type_emission,type_tec,year)$(
         PRICE_EMISSION.l(node,type_emission,type_tec,year) = - inf ) = 0 ;
 
