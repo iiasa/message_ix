@@ -29,9 +29,10 @@ def model_setup(scen, years, simple_tecs=True):
 def add_two_tecs(scen, years):
     """add two technologies to the scenario"""
     scen.add_set('technology', ['dirty_tec', 'clean_tec'])
+    output_specs = ['node', 'comm', 'level', 'year', 'year']
+
     for y in years:
         # the dirty technology is free (no costs) but has emissions
-        output_specs = ['node', 'comm', 'level', 'year', 'year']
         tec_specs = ['node', 'dirty_tec', y, y, 'mode']
         scen.add_par('output', tec_specs + output_specs, 1, 'GWa')
         scen.add_par('emission_factor', tec_specs + ['co2'], 1, 'tCO2')
@@ -107,8 +108,7 @@ def test_per_period_equidistant(test_mp):
     assert scen.var('OBJ')['lvl'] > 0
     # under per-year emissions constraints, the emission price must be equal to
     # the marginal relaxation, ie. the difference in costs between technologies
-    obs = scen.var('PRICE_EMISSION')['lvl']
-    npt.assert_allclose(obs, [1] * 3)
+    npt.assert_allclose(scen.var('PRICE_EMISSION')['lvl'], [1] * 3)
 
 
 def test_cumulative_variable_periodlength(test_mp):
@@ -146,8 +146,7 @@ def test_per_period_variable_periodlength(test_mp):
     assert scen.var('OBJ')['lvl'] > 0
     # under per-year emissions constraints, the emission price must be equal to
     # the marginal relaxation, ie. the difference in costs between technologies
-    obs = scen.var('PRICE_EMISSION')['lvl'].values
-    npt.assert_allclose(obs, [1] * 4)
+    npt.assert_allclose(scen.var('PRICE_EMISSION')['lvl'].values, [1] * 4)
 
 
 def test_custom_type_variable_periodlength(test_mp):
