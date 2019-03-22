@@ -4,6 +4,7 @@
 - [#196](https://github.com/iiasa/message_ix/pull/196): Improve testing by re-using :mod:`ixmp` apparatus.
 - [#187](https://github.com/iiasa/message_ix/pull/187): Test for cumulative bound on emissions.
 - [#182](https://github.com/iiasa/message_ix/pull/182): Fix cross-platform cloning.
+- [#178](https://github.com/iiasa/message_ix/pull/178): Bugfix of the `PRICE_EMISSION` variable in models with non-equidistant period durations (#167)._
 - [#173](https://github.com/iiasa/message_ix/pull/173): The `solve` command now takes additional arguments when solving with CPLEX. The `cplex.opt` file is now generated on the fly during the solve command and removed after successfully solving.
 - [#154](https://github.com/iiasa/message_ix/pull/154): Enable documentation build on ReadTheDocs.
 - [#138](https://github.com/iiasa/message_ix/pull/138): Update documentation and tutorials.
