@@ -2,6 +2,7 @@ import argparse
 import json
 import message_ix
 import os
+from os.path import splitext
 import shutil
 import tempfile
 import zipfile
@@ -12,11 +13,13 @@ from six.moves.urllib.request import urlretrieve
 from message_ix.default_path_constants import CONFIG_PATH, DEFAULT_MODEL_PATH
 from message_ix.utils import logger
 
+GMS_EXT = ['.gms', '.opt', '.md']
+
 
 def recursive_copy(src, dst, overwrite=False):
     """Copy src to dst recursively"""
     for root, dirs, files in os.walk(src):
-        for f in files:
+        for f in [_f for _f in files if splitext(_f)[1] in GMS_EXT]:
             rel_path = root.replace(src, '').lstrip(os.sep)
             dst_path = os.path.join(dst, rel_path)
 
