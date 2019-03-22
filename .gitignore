@@ -37,6 +37,7 @@ doc/source/model
 # files generated during install
 ixmp/default_paths.py
 build
+dist
 
 # rixmp build folder and rhistory
 rmessageix/rmessageix*.zip
