@@ -300,3 +300,43 @@ def test_add_bound_activity_up_modes(test_mp):
     clone2.solve()
     obs = calculate(clone2).sum()
     assert np.isclose(obs, exp)
+
+
+def test_clone(tmpdir):
+    # Two local platforms
+    mp1 = ixmp.Platform(tmpdir / 'mp1', dbtype='HSQLDB')
+    mp2 = ixmp.Platform(tmpdir / 'mp2', dbtype='HSQLDB')
+
+    # A minimal scenario
+    scen1 = Scenario(mp1, model='model', scenario='scenario', version='new')
+    scen1.add_spatial_sets({'country': 'Austria'})
+    scen1.add_set('technology', 'bar')
+    scen1.add_horizon({'year': [2010, 2020]})
+    scen1.commit('add minimal sets for testing')
+
+    assert len(mp1.scenario_list(default=False)) == 1
+
+    # Clone
+    scen2 = scen1.clone(platform=mp2)
+
+    # Return type of ixmp.Scenario.clone is message_ix.Scenario
+    assert isinstance(scen2, Scenario)
+
+    # Close and re-open both databases
+    mp1.close_db()  # TODO this should be done automatically on del
+    mp2.close_db()  # TODO this should be done automatically on del
+    del mp1, mp2
+    mp1 = ixmp.Platform(tmpdir / 'mp1', dbtype='HSQLDB')
+    mp2 = ixmp.Platform(tmpdir / 'mp2', dbtype='HSQLDB')
+
+    # Same scenarios present in each database
+    assert all(mp1.scenario_list(default=False) ==
+               mp2.scenario_list(default=False))
+
+    # Load both scenarios
+    scen1 = Scenario(mp1, 'model', 'scenario')
+    scen2 = Scenario(mp2, 'model', 'scenario')
+
+    # Contents are identical
+    assert all(scen1.set('node') == scen2.set('node'))
+    assert all(scen1.set('year') == scen2.set('year'))
