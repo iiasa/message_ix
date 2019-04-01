@@ -11,20 +11,28 @@
    TimeSeries
    Scenario
 
-as well as some utility methods:
+as well as some utility classes and methods:
 
 .. autosummary::
 
+   ixmp.config.Config
    ixmp.model_settings.register_model
+   ixmp.testing.dantzig_transport
 
 Core classes
 ------------
 
 .. automodule:: ixmp
-   :members: DEFAULT_LOCAL_DB_PATH, Platform, TimeSeries, Scenario
+   :members: Platform, TimeSeries, Scenario
 
 Utility methods
 ---------------
 
+.. automodule:: ixmp.config
+   :members: Config
+
 .. automodule:: ixmp.model_settings
    :members: register_model
+
+.. automodule:: ixmp.testing
+   :members: dantzig_transport

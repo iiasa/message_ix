@@ -1,10 +1,11 @@
 
 # Next Release
 
+- [#182](https://github.com/iiasa/message_ix/pull/182): Fix cross-platform cloning.
 - [#173](https://github.com/iiasa/message_ix/pull/173): The `solve` command now takes additional arguments when solving with CPLEX. The `cplex.opt` file is now generated on the fly during the solve command and removed after successfully solving.
 - [#154](https://github.com/iiasa/message_ix/pull/154): Enable documentation build on ReadTheDocs.
 - [#138](https://github.com/iiasa/message_ix/pull/138): Update documentation and tutorials.
-- [#131](https://github.com/iiasa/message_ix/pull/131): Update clone function syntax scen to scenario
+- [#131](https://github.com/iiasa/message_ix/pull/131): Update clone function argument `scen` to `scenario` with planned deprecation of the former.
 
 # v1.1.0
 
