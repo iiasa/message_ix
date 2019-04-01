@@ -319,43 +319,6 @@ class Scenario(ixmp.Scenario):
         os.remove(fname)
         return ret
 
-    def clone(self, model=None, scenario=None, annotation=None,
-              keep_solution=True, first_model_year=None, **kwargs):
-        """clone the current scenario and return the new scenario
-
-        Parameters
-        ----------
-        model : string
-            new model name
-        scenario : string
-            new scenario name
-        annotation : string
-            explanatory comment (optional)
-        keep_solution : boolean, default, True
-            indicator whether to include an existing solution
-            in the cloned scenario
-        first_model_year: int, default None
-            new first model year in cloned scenario
-            ('slicing', only available for MESSAGE-scheme scenarios)
-        """
-        if 'keep_sol' in kwargs:
-            warnings.warn(
-                '`keep_sol` is deprecated and will be removed in the next' +
-                ' release, please use `keep_solution`')
-            keep_solution = kwargs.pop('keep_sol')
-        if 'scen' in kwargs:
-            warnings.warn(
-                '`scen` is deprecated and will be removed in the next' +
-                ' release, please use `scenario`')
-            scenario = kwargs.pop('scen')
-
-        self._keep_sol = keep_solution
-        self._first_model_year = first_model_year or 0
-        model = self.model if not model else model
-        scenario = self.scenario if not scenario else scenario
-        return Scenario(self.platform, model, scenario, annotation=annotation,
-                        cache=self._cache, clone=self)
-
     def rename(self, name, mapping, keep=False):
         """Rename an element in a set
 
