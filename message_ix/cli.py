@@ -2,7 +2,7 @@ import argparse
 import json
 import message_ix
 import os
-from os.path import splitext
+import pathlib
 import shutil
 import tempfile
 import zipfile
@@ -16,10 +16,10 @@ from message_ix.utils import logger
 GMS_EXT = ['.gms', '.opt', '.md']
 
 
-def recursive_copy(src, dst, overwrite=False):
+def recursive_copy(src, dst, overwrite=False, valid_ext=GMS_EXT):
     """Copy src to dst recursively"""
     for root, dirs, files in os.walk(src):
-        for f in [_f for _f in files if splitext(_f)[1] in GMS_EXT]:
+        for f in [_f for _f in files if pathlib.Path(_f).suffix in valid_ext]:
             rel_path = root.replace(src, '').lstrip(os.sep)
             dst_path = os.path.join(dst, rel_path)
 
