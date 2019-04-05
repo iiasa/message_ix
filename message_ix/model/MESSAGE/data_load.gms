@@ -71,8 +71,6 @@ demand_fixed=demand
 * fixing variables to pre-specified values
 is_fixed_extraction, is_fixed_stock, is_fixed_new_capacity, is_fixed_capacity, is_fixed_activity, is_fixed_land
 fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activity, fixed_land
-* BZ added
-investment_upper
 * BZ added for storage
 bound_storage_lo,bound_storage_up,storage_loss,time_seq
 ;
