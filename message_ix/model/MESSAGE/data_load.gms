@@ -18,6 +18,8 @@ $LOAD inv_tec, renewable_tec
 $LOAD balance_equality
 $LOAD shares
 $LOAD addon, type_addon, cat_addon, map_tec_addon
+* BZ added for storage
+$LOAD storage_tec, level_storage, map_tec_storage
 $GDXIN
 
 Execute_load '%in%'
@@ -69,6 +71,10 @@ demand_fixed=demand
 * fixing variables to pre-specified values
 is_fixed_extraction, is_fixed_stock, is_fixed_new_capacity, is_fixed_capacity, is_fixed_activity, is_fixed_land
 fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activity, fixed_land
+* BZ added
+investment_upper
+* BZ added for storage
+bound_storage_lo,bound_storage_up,storage_loss,time_seq
 ;
 
 
@@ -157,6 +163,34 @@ addon_up(node,tec,year_all,mode,time,type_addon)$(
 * set the emission scaling parameter to 1 if only one emission is included in a category
 emission_scaling(type_emission,emission)$( cat_emission(type_emission,emission)
         and not emission_scaling(type_emission,emission) ) = 1 ;
+
+* BZ added for storage
+* mapping of storage technologies for charging to their commodities
+$ontext
+map_tec_charge(node,tec,mode,commodity,year_all,time)$(
+    SUM((node2,year_all2,time_act)$( SUM(storage_tec,map_tec_storage(tec,storage_tec) ) ),
+        output(node2,tec,year_all,year_all2,mode,node,commodity,level,time_act,time) ) OR
+    SUM((node2,year_all2,time_act)$( SUM(storage_tec,map_tec_storage(tec,storage_tec) ) ),
+        input(node2,tec,year_all,year_all2,mode,node,commodity,level,time_act,time) ) ) = yes;
+$offtext
+map_tec_charge(node,tec,mode,commodity,level_storage,year_all,time)$( Not storage_tec(tec) AND
+    SUM((node2,year_all2,time_act),
+        output(node2,tec,year_all,year_all2,mode,node,commodity,level_storage,time_act,time) ) ) = yes;
+
+charge_tec(tec)$(
+     SUM((node,mode,commodity,level_storage,year_all,time), map_tec_charge(node,tec,mode,commodity,level_storage,year_all,time) ) ) = yes;
+
+* mapping of storage technologies for discharging to their commodities
+map_tec_discharge(node,tec,mode,commodity,level_storage,year_all,time)$( Not storage_tec(tec) AND
+    SUM((node2,year_all2,time_act),
+        input(node2,tec,year_all,year_all2,mode,node,commodity,level_storage,time_act,time) ) ) = yes;
+discharge_tec(tec)$(
+     SUM((node,mode,commodity,level_storage,year_all,time), map_tec_discharge(node,tec,mode,commodity,level_storage,year_all,time) ) ) = yes;
+
+* mapping of storage reservoir technologies
+map_tec_storage_level(node,tec,storage_tec,level_storage,year_all,time)$(
+    SUM(commodity, storage_loss(node,storage_tec,commodity,level_storage,year_all,time) ) AND
+    map_tec_storage(tec,storage_tec) ) = yes;
 
 *----------------------------------------------------------------------------------------------------------------------*
 * sanity checks on the data set                                                                                        *
