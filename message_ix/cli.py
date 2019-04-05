@@ -2,7 +2,6 @@ import argparse
 import json
 import message_ix
 import os
-import pathlib
 import shutil
 import tempfile
 import zipfile
@@ -19,7 +18,7 @@ GMS_EXT = ['.gms', '.opt', '.md']
 def recursive_copy(src, dst, overwrite=False, valid_ext=GMS_EXT):
     """Copy src to dst recursively"""
     for root, dirs, files in os.walk(src):
-        for f in [_f for _f in files if pathlib.Path(_f).suffix in valid_ext]:
+        for f in [_f for _f in files if os.path.splitext(_f)[1] in valid_ext]:
             rel_path = root.replace(src, '').lstrip(os.sep)
             dst_path = os.path.join(dst, rel_path)
 
