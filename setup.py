@@ -33,13 +33,12 @@ EXTRAS_REQUIRE = {
     'tutorial': ['jupyter', 'matplotlib'],
 }
 
-GMS_EXT = ['.gms', '.opt', '.md']
 
-
-def all_subdirs(path, strip=None):
+def all_gams_files(path, strip=None):
     paths = []
     for root, dirnames, files in os.walk(path):
-        for f in [_f for _f in files if os.path.splitext(_f)[1] in GMS_EXT]:
+        for f in [_f for _f in files
+                  if os.path.splitext(_f)[1] in ['.gms', '.opt', '.md']]:
             paths.append(os.path.join(root, f))
     if strip:
         n = len(strip) if strip.endswith(os.sep) else len(strip + os.sep)
@@ -63,10 +62,7 @@ def main():
     cmdclass = {
     }
     pack_data = {
-        # for some reason the model/ directory had to be added separately
-        # it worked locally but not on CI:
-        # https://circleci.com/gh/iiasa/message_ix/29
-        'message_ix': all_subdirs('message_ix/model', strip='message_ix')
+        'message_ix': all_gams_files('message_ix/model', strip='message_ix')
     }
     setup_kwargs = {
         "name": "message_ix",
