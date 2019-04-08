@@ -12,13 +12,11 @@ from six.moves.urllib.request import urlretrieve
 from message_ix.default_path_constants import CONFIG_PATH, DEFAULT_MODEL_PATH
 from message_ix.utils import logger
 
-GMS_EXT = ['.gms', '.opt', '.md']
 
-
-def recursive_copy(src, dst, overwrite=False, valid_ext=GMS_EXT):
+def recursive_copy(src, dst, overwrite=False, skip_ext=[]):
     """Copy src to dst recursively"""
     for root, dirs, files in os.walk(src):
-        for f in [_f for _f in files if os.path.splitext(_f)[1] in valid_ext]:
+        for f in [f for f in files if os.path.splitext(f)[1] not in skip_ext]:
             rel_path = root.replace(src, '').lstrip(os.sep)
             dst_path = os.path.join(dst, rel_path)
 
@@ -50,7 +48,8 @@ def do_config(model_path=None, overwrite=False):
         if not os.path.exists(model_path):
             logger().info('Creating model directory: {}'.format(model_path))
             os.makedirs(model_path)
-        recursive_copy(DEFAULT_MODEL_PATH, model_path, overwrite=overwrite)
+        recursive_copy(DEFAULT_MODEL_PATH, model_path, overwrite=overwrite,
+                       skip_ext=['gdx'])
         config['MODEL_PATH'] = model_path
 
     # overwrite config if already exists
