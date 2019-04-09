@@ -1,5 +1,5 @@
 ## Description
-This functionality adds new time steps to an existing scenario (hereafter "reference scenario"). This will be done by creating a new empty scenario (hereafter "new scenario") and:
+This functionality adds new modeling years to an existing scenario (hereafter "reference scenario"). This will be done by creating a new empty scenario (hereafter "new scenario") and:
 - Copying all sets from reference scenario and adding new time steps to relevant sets (e.g., adding 2025 between 2020 and 2030 in the set "year")
 - Copying all parameters from reference scenario, adding new time steps to relevant parameters, and calculating missing values for the added time steps.
 
