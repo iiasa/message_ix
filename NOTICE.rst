@@ -60,12 +60,11 @@ E-mail <message_ix@iiasa.ac.at> with notice of notice of any new or pending publ
 References
 ----------
 
-[1] | Clara Orthofer, Daniel Huppmann, and Volker Krey.
-    | "South Africa's shale gas resources - chance or challenge?"
-    | 2018, submitted.
-      electronic pre-print available at `pure.iiasa.ac.at/15085/`_
+  | [1] Clara Orthofer, Daniel Huppmann, and Volker Krey (2019).
+  |     "South Africa's shale gas resources - chance or challenge?"
+  |     Frontiers in Energy Research 7:20. doi: `10.3389/fenrg.2019.00020`_
 
 ..  _`10.1016/j.envsoft.2018.11.012`: https://doi.org/10.1016/j.envsoft.2018.11.012
 .. _`pure.iiasa.ac.at/15157/`: https://pure.iiasa.ac.at/15157/
 .. _`MESSAGEix.iiasa.ac.at`: https://MESSAGEix.iiasa.ac.at/
-.. _`pure.iiasa.ac.at/15085/`: https://pure.iiasa.ac.at/15085/
+.. _`10.3389/fenrg.2019.00020`: https://doi.org/10.3389/fenrg.2019.00020
