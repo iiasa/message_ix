@@ -8,7 +8,7 @@ import numpy as np
 
 from conftest import here
 
-skip_py2 = True if sys.version_info[0] == 2 else False
+is_py2 = sys.version_info[0] == 2
 
 try:
     import nbformat
@@ -77,7 +77,7 @@ def get_cell_by_name(nb, name):
     raise ValueError("no cell named '{}'".format(name))
 
 
-@pytest.mark.skipif(skip_py2, reason=py2_deprecated)
+@pytest.mark.skipif(is_py2, reason=py2_deprecated)
 @pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_westeros_baseline(capsys):
     fname = os.path.join(westeros_path, 'westeros_baseline.ipynb')
@@ -94,7 +94,7 @@ def test_westeros_baseline(capsys):
     assert np.isclose(obs, exp)
 
 
-@pytest.mark.skipif(skip_py2, reason=py2_deprecated)
+@pytest.mark.skipif(is_py2, reason=py2_deprecated)
 @pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_westeros_emissions(capsys):
     fname = os.path.join(westeros_path, 'westeros_emissions_bounds.ipynb')
@@ -102,7 +102,7 @@ def test_westeros_emissions(capsys):
     assert errors == []
 
 
-@pytest.mark.skipif(skip_py2, reason=py2_deprecated)
+@pytest.mark.skipif(is_py2, reason=py2_deprecated)
 @pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_westeros_emissions_tax(capsys):
     fname = os.path.join(westeros_path, 'westeros_emissions_taxes.ipynb')
@@ -110,7 +110,7 @@ def test_westeros_emissions_tax(capsys):
     assert errors == []
 
 
-@pytest.mark.skipif(skip_py2, reason=py2_deprecated)
+@pytest.mark.skipif(is_py2, reason=py2_deprecated)
 @pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_westeros_firm_capacity(capsys):
     fname = os.path.join(westeros_path, 'westeros_firm_capacity.ipynb')
@@ -118,7 +118,7 @@ def test_westeros_firm_capacity(capsys):
     assert errors == []
 
 
-@pytest.mark.skipif(skip_py2, reason=py2_deprecated)
+@pytest.mark.skipif(is_py2, reason=py2_deprecated)
 @pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_westeros_flexible_generation(capsys):
     fname = os.path.join(westeros_path, 'westeros_flexible_generation.ipynb')
@@ -126,7 +126,7 @@ def test_westeros_flexible_generation(capsys):
     assert errors == []
 
 
-@pytest.mark.skipif(skip_py2, reason=py2_deprecated)
+@pytest.mark.skipif(is_py2, reason=py2_deprecated)
 @pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_austria(capsys):
     fname = os.path.join(ene_path, 'austria.ipynb')
@@ -139,7 +139,7 @@ def test_austria(capsys):
     assert np.isclose(obs, exp)
 
 
-@pytest.mark.skipif(skip_py2, reason=py2_deprecated)
+@pytest.mark.skipif(is_py2, reason=py2_deprecated)
 @pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_austria_single_policy():
     fname = os.path.join(ene_path, 'austria_single_policy.ipynb')
@@ -152,7 +152,7 @@ def test_austria_single_policy():
     assert np.isclose(obs, exp)
 
 
-@pytest.mark.skipif(skip_py2, reason=py2_deprecated)
+@pytest.mark.skipif(is_py2, reason=py2_deprecated)
 @pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_austria_multiple_policies():
     fname = os.path.join(ene_path, 'austria_multiple_policies.ipynb')
@@ -160,7 +160,7 @@ def test_austria_multiple_policies():
     assert errors == []
 
 
-@pytest.mark.skipif(skip_py2, reason=py2_deprecated)
+@pytest.mark.skipif(is_py2, reason=py2_deprecated)
 @pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_austria_multiple_policies_answers():
     fname = os.path.join(ene_path, 'austria_multiple_policies-answers.ipynb')
@@ -168,7 +168,7 @@ def test_austria_multiple_policies_answers():
     assert errors == []
 
 
-@pytest.mark.skipif(skip_py2, reason=py2_deprecated)
+@pytest.mark.skipif(is_py2, reason=py2_deprecated)
 @pytest.mark.skipif(not jupyter_installed, reason=jupyter_required)
 def test_austria_load():
     fname = os.path.join(ene_path, 'austria_load_scenario.ipynb')
