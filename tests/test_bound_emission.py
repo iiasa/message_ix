@@ -47,8 +47,8 @@ def test_bound_emission_10y(test_mp):
     add_bound_emission(scen, bound=1.250)
     scen.solve(case='bound_emission_10y')
 
-    assert scen.var('EMISS')['lvl'].mean() <= float(
-            scen.par('bound_emission')['value'])
+    assert scen.var('EMISS')['lvl'].mean() <= float(scen.par('bound_emission'
+                                                             )['value'])
 
 
 def test_bound_emission_5y(test_mp):
@@ -58,5 +58,5 @@ def test_bound_emission_5y(test_mp):
     add_bound_emission(scen, bound=1.250)
     scen.solve(case='bound_emission_5y')
 
-    assert scen.var('EMISS')['lvl'].mean() <= float(
-            scen.par('bound_emission')['value'])
+    assert scen.var('EMISS')['lvl'].mean() <= float(scen.par('bound_emission'
+                                                             )['value'])
