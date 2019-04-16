@@ -42,13 +42,16 @@ def add_bound_emission(scen, bound, year='cumulative'):
 
 def test_bound_emission_10y(test_mp):
     scen = Scenario(test_mp, 'test_bound_emission', 'standard', version='new')
-    model_setup(scen, [2020, 2030, 2040])
+    model_setup(scen, [2020, 2030, 2040, 2050])
     scen.commit('initialize test model')
     add_bound_emission(scen, bound=1.250)
     scen.solve(case='bound_emission_10y')
 
-    assert scen.var('EMISS')['lvl'].mean() <= float(scen.par('bound_emission'
-                                                             )['value'])
+    var_em = scen.var('EMISS', {'node': 'node'}).set_index(['year'])['lvl']
+    duration = scen.par('duration_period').set_index('year')['value']
+    bound_em = float(scen.par('bound_emission')['value'])
+
+    assert sum(var_em * duration) / sum(duration) <= bound_em
 
 
 def test_bound_emission_5y(test_mp):
@@ -58,5 +61,8 @@ def test_bound_emission_5y(test_mp):
     add_bound_emission(scen, bound=1.250)
     scen.solve(case='bound_emission_5y')
 
-    assert scen.var('EMISS')['lvl'].mean() <= float(scen.par('bound_emission'
-                                                             )['value'])
+    var_em = scen.var('EMISS', {'node': 'node'}).set_index(['year'])['lvl']
+    duration = scen.par('duration_period').set_index('year')['value']
+    bound_em = float(scen.par('bound_emission')['value'])
+
+    assert sum(var_em * duration) / sum(duration) <= bound_em
