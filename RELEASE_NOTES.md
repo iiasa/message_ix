@@ -120,3 +120,4 @@ jdbc.pwd = ixmp
 - [#60](https://github.com/iiasa/message_ix/pull/60): Add basic ability to write and read model input to/from Excel
 - [#59](https://github.com/iiasa/message_ix/pull/59): Added MacOSX CI support
 - [#187](https://github.com/iiasa/message_ix/pull/187): Test for cumulative bound on emissions
+- [#189](https://github.com/iiasa/message_ix/pull/189): Adding a Westeros tutorial for modelling seasonality
