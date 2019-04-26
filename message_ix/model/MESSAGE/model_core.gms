@@ -1975,30 +1975,29 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 %SLACK_RELATION_BOUND_LO% + SLACK_RELATION_BOUND_LO(relation,node,year)
     =G= relation_lower(relation,node,year) ;
 
-***  BZ added
-* Equation STORAGE_BALANCE
-***********************ADRIANO's WORK**********************************
-$ontext
-STORAGE_BALANCE(node,commodity,level,year,time)$( map_storage(node,commodity,level,year,time) AND bound_storage_up(node,commodity,level,year,time) )..
-    STORAGE(node,commodity,level,year,time)
-* fixed level of storage (i.e. in first period)
-    - commodity_storage(node,commodity,level,year,time) =E= ( storage_to_activity(time)*STORAGE_CHG(node,commodity,level,year,time) )
-* the next line is just saying STORAGE(t-1)
-   + SUM((time2,year2)$seq_year_time(year2,year,time2,time), STORAGE(node,commodity,level,year2,time2) *
-   (1 - storage_loss(node,commodity,level,year2,time2)) ) ;
-$offtext
-***********************************************************************
+***
+* Equation STORAGE_CHANGE
+* """""""""""""""""""""""""""""""
+*   .. math::
+*      STORAGE\_CHG_{n,t,l,y,h} \eq ... (math notation to be added)
+***
 STORAGE_CHANGE(node,storage_tec,level,year,time)$( SUM( (mode,tec,commodity), map_tec_storage_level(node,tec,storage_tec,level,year,time) AND
     (map_tec_charge(node,tec,mode,commodity,level,year,time) OR map_tec_discharge(node,tec,mode,commodity,level,year,time) ) ) )..
 * change in the content of storage in the examined timestep
     STORAGE_CHG(node,storage_tec,level,year,time) =E=
-* increase in the content of storage due to the activity of charging technologies located at 'location' sending to 'node', and 'time2' sending to 'time'
+* increase in the content of storage due to the activity of charging technologies
         SUM((location,vintage,mode,tec,commodity,time2)$(map_tec_lifetime(node,tec,vintage,year) AND charge_tec(tec) AND map_tec_storage_level(node,tec,storage_tec,level,year,time) ),
         output(location,tec,vintage,year,mode,node,commodity,level,time2,time) * ACT(location,tec,vintage,year,mode,time) )
-* decrease in the content of storage due to the activity of discharging technologies located at 'location' sending to 'node', and 'time2' sending to 'time'
+* decrease in the content of storage due to the activity of discharging technologies
         - SUM((location,vintage,mode,tec,commodity,time2)$(map_tec_lifetime(node,tec,vintage,year) AND discharge_tec(tec) AND map_tec_storage_level(node,tec,storage_tec,level,year,time) ),
         input(location,tec,vintage,year,mode,node,commodity,level,time2,time) * ACT(location,tec,vintage,year,mode,time) );
 
+***
+* Equation STORAGE_BALANCE
+* """""""""""""""""""""""""""""""
+*   .. math::
+*      STORAGE_{n,t,l,y,h} \eq ... (math notation to be added)
+***
 STORAGE_BALANCE(node,storage_tec,level,year,time2)$ ( SUM(commodity, storage_loss(node,storage_tec,commodity,level,year,time2) )  )..
 * Showing the content level of storage at each timestep
        STORAGE(node,storage_tec,level,year,time2)
@@ -2012,14 +2011,32 @@ STORAGE_BALANCE(node,storage_tec,level,year,time2)$ ( SUM(commodity, storage_los
 * considering storage losses due to keeping the storage media between two subannual timesteps
     (1 - SUM(commodity, storage_loss(node,storage_tec,commodity,level,year,time) ) ) ) ;
 
-* Later I should put a test to check if the bounds defined by the user in first and last time period doesn't violate this equation (they can lead to equal results for STOARGE)
+***
+* Equation STORAGE_EQUALITY
+* """""""""""""""""""""""""""""""
+*   .. math::
+*      STORAGE_{n,t,l,y,h} \eq ... (math notation to be added)
+***
+* We can add a test to check if the storage bounds defined by the user in first and last time period doesn't violate this equation
 STORAGE_EQUALITY(node,storage_tec,level_storage,year,time)$ ( SUM(commodity, storage_loss(node,storage_tec,commodity,level_storage,year,time) ) AND SUM(year2,map_time_first_last(year,year2,time) ) )..
        STORAGE(node,storage_tec,level_storage,year,time) =E= STORAGE(node,storage_tec,level_storage,year,time);
 
+***
+* Equation STORAGE_BOUND_UP
+* """""""""""""""""""""""""""""""
+*   .. math::
+*      STORAGE_{n,t,l,y,h} \leq ... (math notation to be added)
+***
 STORAGE_BOUND_UP(node,storage_tec,level,year,time)$(sum(commodity, bound_storage_up(node,storage_tec,commodity,level,year,time) ) )..
     STORAGE(node,storage_tec,level,year,time) =L= sum( commodity, bound_storage_up(node,storage_tec,commodity,level,year,time)*
     SUM(vintage, capacity_factor(node,storage_tec,vintage,year,time) * CAP(node,storage_tec,vintage,year) ) ) ;
 
+***
+* Equation STORAGE_BOUND_LO
+* """""""""""""""""""""""""""""""
+*   .. math::
+*      STORAGE_{n,t,l,y,h} \geq ... (math notation to be added)
+***
 STORAGE_BOUND_LO(node,storage_tec,level,year,time)$(sum(commodity, bound_storage_lo(node,storage_tec,commodity,level,year,time) ) )..
     STORAGE(node,storage_tec,level,year,time) =G= sum( commodity, bound_storage_lo(node,storage_tec,commodity,level,year,time)*
     SUM(vintage, capacity_factor(node,storage_tec,vintage,year,time) * CAP(node,storage_tec,vintage,year) ) ) ;
