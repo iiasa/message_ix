@@ -210,7 +210,7 @@ Positive variables
     SLACK_RELATION_BOUND_UP(relation,node,year_all)   slack variable for upper bound of generic relation
     SLACK_RELATION_BOUND_LO(relation,node,year_all)   slack variable for lower bound of generic relation
 
-* BZ added for storage
+* Added for storage
     STORAGE(node,tec,level,year_all,time)       content of storage (positive)
 ;
 
@@ -276,7 +276,7 @@ Equations
     RELATION_CONSTRAINT_UP          upper bound of relations (linear constraints)
     RELATION_CONSTRAINT_LO          lower bound of relations (linear constraints)
 
-* BZ added for storage
+* Added for storage
     STORAGE_CHANGE                  change in the content of storage
     STORAGE_BALANCE                 storage commodity (content) balance
     STORAGE_EQUALITY                equality in the content of storage in two different time steps (like first and last timesteps)
@@ -2000,10 +2000,7 @@ STORAGE_CHANGE(node,storage_tec,level,year,time)$( SUM( (mode,tec,commodity), ma
 ***
 STORAGE_BALANCE(node,storage_tec,level,year,time2)$ ( SUM(commodity, storage_loss(node,storage_tec,commodity,level,year,time2) )  )..
 * Showing the content level of storage at each timestep
-       STORAGE(node,storage_tec,level,year,time2)
-* ignoring the the fixed amount of storage in that time (e.g., the storage content in the first subannual period)
-*    - commodity_storage(node,commodity,level,year,time)
-    =E=
+       STORAGE(node,storage_tec,level,year,time2) =E=
 * change in the content of storage in the examined timestep
     STORAGE_CHG(node,storage_tec,level,year,time2)
 * storage content in the previous subannual timestep
@@ -2018,8 +2015,9 @@ STORAGE_BALANCE(node,storage_tec,level,year,time2)$ ( SUM(commodity, storage_los
 *      STORAGE_{n,t,l,y,h} \eq ... (math notation to be added)
 ***
 * We can add a test to check if the storage bounds defined by the user in first and last time period doesn't violate this equation
-STORAGE_EQUALITY(node,storage_tec,level_storage,year,time)$ ( SUM(commodity, storage_loss(node,storage_tec,commodity,level_storage,year,time) ) AND SUM(year2,map_time_first_last(year,year2,time) ) )..
-       STORAGE(node,storage_tec,level_storage,year,time) =E= STORAGE(node,storage_tec,level_storage,year,time);
+STORAGE_EQUALITY(node,storage_tec,level_storage,year,time)$(SUM(commodity, storage_loss(node,storage_tec,commodity,level_storage,year,time) ) AND
+    SUM((time2,year2), map_time_first_last(year,year2,time,time2) ) )..
+       STORAGE(node,storage_tec,level_storage,year,time) =E= SUM( (time2,year2)$map_time_first_last(year,year2,time,time2), STORAGE(node,storage_tec,level_storage,year,time2) );
 
 ***
 * Equation STORAGE_BOUND_UP
