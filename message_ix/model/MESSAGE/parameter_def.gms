@@ -781,10 +781,10 @@ Parameters
 
 *----------------------------------------------------------------------------------------------------------------------*
 
-* BZ added for storage
+* Added for storage
 Parameters
-    bound_storage_lo(node,tec,commodity,level,year_all,time)            lower bound of storage section (percentage)
-    bound_storage_up(node,tec,commodity,level,year_all,time)            upper bound of storage section (percentage)
-    storage_loss(node,tec,commodity,level,year_all,time)                storage losses per timestep (percentage)
+    bound_storage_lo(node,tec,commodity,level,year_all,time)            lower bound of storage content (percentage of capacity)
+    bound_storage_up(node,tec,commodity,level,year_all,time)            upper bound of storage content (percentage of capacity)
+    storage_loss(node,tec,commodity,level,year_all,time)                storage loss per timestep (percentage of capacity)
     time_seq(time)                                                      sequence of subannual timesteps
 ;
