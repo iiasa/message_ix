@@ -87,7 +87,7 @@ def init_storage(scen):
                                          'level', 'year', 'time'])
     # Initiating a parameter for specifying storage losses (percentage)
     scen.init_par('storage_loss', idx_sets=['node', 'technology', 'commodity',
-                                         'level', 'year', 'time'])
+                                            'level', 'year', 'time'])
 
 
 # A function for adding storage technologies and parameterization
@@ -119,22 +119,22 @@ def add_storage_data(scen, time_order):
     for y in set(scen.set('year')):
         for h in time_order.keys():
             scen.add_par('bound_storage_lo', ['node', 'dam', 'electr',
-                                 'storage', y, h], 0.0, '%')
+                                              'storage', y, h], 0.0, '%')
 
             scen.add_par('bound_storage_up', ['node', 'dam', 'electr',
-                                 'storage', y, h], 1.0, '%')
+                                              'storage', y, h], 1.0, '%')
 
             scen.add_par('storage_loss', ['node', 'dam', 'electr',
-                                 'storage', y, h], 0.05, '%')
+                                          'storage', y, h], 0.05, '%')
 
     # input, output, and capacity factor for storage technologies
     output = {'dam': ['node', 'stored_com', 'storage'],
-                    'pump': ['node', 'stored_com', 'storage'],
-                    'turbine': ['node', 'electr', 'level']}
+              'pump': ['node', 'stored_com', 'storage'],
+              'turbine': ['node', 'electr', 'level']}
 
     inp = {'dam': ['node', 'stored_com', 'storage'],
-                    'pump': ['node', 'electr', 'level'],
-                    'turbine': ['node', 'stored_com', 'storage']}
+           'pump': ['node', 'electr', 'level'],
+           'turbine': ['node', 'stored_com', 'storage']}
 
     var_cost = {'dam': 0, 'pump': 0.2, 'turbine': 0.3}
 
@@ -217,8 +217,9 @@ def test_storage(test_mp):
     # II. Testing equations of storage (when added to ixmp variables)
     if storage_in_java:
         # II.1. Equality: storage content in the beginning and end is equal
-        assert scen.var('STORAGE', {'time': 'a'})['lvl'] == scen.var('STORAGE',
-                {'time': 'd'})['lvl']
+        storage_first = scen.var('STORAGE', {'time': 'a'})['lvl']
+        storage_last = scen.var('STORAGE', {'time': 'd'})['lvl']
+        assert storage_first == storage_last
 
         # II.2. Storage content should never exceed storage capacity
         assert max(scen.var('STORAGE')['lvl']) <= cap_storage
