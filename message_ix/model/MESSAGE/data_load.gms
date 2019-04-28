@@ -71,8 +71,8 @@ demand_fixed=demand
 * fixing variables to pre-specified values
 is_fixed_extraction, is_fixed_stock, is_fixed_new_capacity, is_fixed_capacity, is_fixed_activity, is_fixed_land
 fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activity, fixed_land
-* BZ added for storage
-bound_storage_lo,bound_storage_up,storage_loss,time_seq
+* Added for storage
+bound_storage_lo, bound_storage_up, storage_loss, time_seq
 ;
 
 
@@ -178,7 +178,7 @@ map_tec_discharge(node,tec,mode,commodity,level_storage,year_all,time)$( Not sto
 discharge_tec(tec)$(
      SUM((node,mode,commodity,level_storage,year_all,time), map_tec_discharge(node,tec,mode,commodity,level_storage,year_all,time) ) ) = yes;
 
-* mapping of storage reservoir technologies to their levels
+* mapping of storage reservoir technologies to their levels and charge/discharge technologies
 map_tec_storage_level(node,tec,storage_tec,level_storage,year_all,time)$(
     SUM(commodity, storage_loss(node,storage_tec,commodity,level_storage,year_all,time) ) AND
     map_tec_storage(tec,storage_tec) ) = yes;

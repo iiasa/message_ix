@@ -202,7 +202,7 @@ def test_storage(test_mp):
     # I.2. Activity of discharger should be always =< activity of charger
     act_pump = scen.var('ACT', {'technology': 'pump'})['lvl']
     act_turb = scen.var('ACT', {'technology': 'turbine'})['lvl']
-    assert act_turb.sum() < act_pump.sum()
+    assert act_turb.sum() <= act_pump.sum()
 
     # I.3. Max activity of charger is lower than storage capacity
     max_pump = max(act_pump)

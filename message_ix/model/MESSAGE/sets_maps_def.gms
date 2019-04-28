@@ -443,7 +443,7 @@ Sets
     map_tec_discharge(node,tec,mode,commodity,level,year_all,time)     mapping of discharging technologies (for storage) to their commodities
     map_tec_storage(tec,tec2)                                          mapping of charge and discharging technologies (for storage) to their respective storage container
     map_tec_storage_level(node,tec,tec2,level,year_all,time)           mapping of storage container to its level and charge-discharge technologies
-    storage_tec(tec)                                                   set of storage container technologies
+    storage_tec(tec)                                                   storage container technologies
     charge_tec(tec)                                                    charging technologies (for storage)
     discharge_tec(tec)                                                 discharging technologies (for storage)
 
