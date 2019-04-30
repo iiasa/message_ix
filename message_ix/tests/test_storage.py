@@ -62,34 +62,6 @@ def year_to_time(scen, parname, dict_par, filters=None):
         scen.add_par(parname, new)
 
 
-# A function for initiating sets/parameters required for storage equations
-# NOTICE: this function can be deleted when storage parameters/sets are added
-# to ixmp java backend
-def init_storage(scen):
-
-    # Initiating a set to specifiy storage level (no commodity balance needed)
-    scen.init_set('level_storage')
-
-    # Initiating a set to specifiy storage reservoir technology
-    scen.init_set('storage_tec')
-
-    # Initiating a set to map storage reservoir to its charger/discharger
-    scen.init_set('map_tec_storage', idx_sets=['technology', 'storage_tec'])
-
-    # Initiating a parameter to specify the order of sub-annual time steps
-    scen.init_par('time_seq', idx_sets=['time'])
-
-    # Initiating two parameters for specifying lower and upper bounds of
-    # storage reservoir as percentage of installed reservoir capacity
-    par_list_stor = ['bound_storage_lo', 'bound_storage_up']
-    for parname in par_list_stor:
-        scen.init_par(parname, idx_sets=['node', 'technology', 'commodity',
-                                         'level', 'year', 'time'])
-    # Initiating a parameter for specifying storage losses (percentage)
-    scen.init_par('storage_loss', idx_sets=['node', 'technology', 'commodity',
-                                            'level', 'year', 'time'])
-
-
 # A function for adding storage technologies and parameterization
 def add_storage_data(scen, time_order):
     # Adding level of storage
@@ -152,10 +124,6 @@ def test_storage(test_mp):
     # First building a simple model
     scen = Scenario(test_mp, 'no_storage', 'standard', version='new')
     model_setup(scen, [2020])
-
-    # Initiating missing sets/parameters if not yet in ixmp backend
-    if not storage_in_java:
-        init_storage(scen)
     scen.commit('initialized test model')
     scen.solve(case='no_seasonality')
 
