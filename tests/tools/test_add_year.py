@@ -6,14 +6,11 @@ import ixmp as ix
 import message_ix
 from conftest import here
 
+from message_ix.tools.add_year import addNewYear
+
 db_dir = os.path.join(here, 'testdb')
 test_db = os.path.join(db_dir, 'ixmptest')
 test_mp = ix.Platform(dbprops=test_db, dbtype='HSQLDB')
-
-# the path to where the main script is (based on message_ix folder hirerarchy)
-file_path = os.path.join(here, '..', 'toolbox', 'add_year')
-os.chdir(file_path)
-from f_addNewYear import addNewYear
 
 
 def test_addNewYear(test_mp):
