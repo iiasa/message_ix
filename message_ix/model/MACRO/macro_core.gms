@@ -1,7 +1,6 @@
 ***
 * MACRO - Mathematical formulation
 * ================================
-* This page is generated from the auto-documentation in ``MACRO/model_core.gms``.
 *
 * MACRO is a macroeconomic model maximizing the intertemporal utility function of a single representative producer-consumer
 * in each node (or macro-economic region). The optimization result is a sequence of optimal savings, investment, and consumption decisions.
@@ -259,7 +258,7 @@ SUM(year2$( seq_period(year2,year) ), PRODENE(node_active, sector, year2)) * (1 
 *
 * .. math:: {PHYSENE}_{n, s, y} \geq {PRODENE}_{n, s, y} \cdot {aeei\_factor}_{n, s, y} \qquad \forall{ n, s, y > 1}
 *
-* The cumulative effect of autonomous energy efficiency improvements (AEEI) is captured in 
+* The cumulative effect of autonomous energy efficiency improvements (AEEI) is captured in
 * :math:`{aeei\_factor}_{n,s,y} = {aeei\_factor}_{n, s, y-1} \cdot (1 - {aeei}_{n,s,y})^{duration\_period}_{y}`
 * with :math:`{aeei\_factor}_{n,s,y=1} = 1`. Therefore, choosing the :math:`{aeei}_{n,s,y}` coefficients appropriately offers the possibility to calibrate MACRO to a certain energy demand trajectory
 * from MESSAGE.

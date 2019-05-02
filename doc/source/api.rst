@@ -1,9 +1,17 @@
-`ixmp` API Documentation
-------------------------
+Python & R API
+==============
 
-.. include:: api/ixmp.rst
+The application programming interface (API) for |MESSAGEix| model developers
+is implemented in Python. Support for R usage of the core classes is provided
+through the `reticulate`_ package. For instance::
 
-`message_ix` API Documentation
-------------------------------
+    > library(reticulate)
+    > message <- library("message_ix")
+    > s <- messageix$Scenario(…)
 
-.. include:: api/message_ix.rst
+.. _`reticulate`: https://rstudio.github.io/reticulate/
+
+.. toctree::
+
+   api/ixmp.rst
+   api/message_ix.rst

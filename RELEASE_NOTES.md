@@ -1,7 +1,12 @@
 
 # Next Release
 
-- [#131](https://github.com/iiasa/message_ix/pull/131): Update clone function syntax scen to scenario
+- [#161](https://github.com/iiasa/message_ix/pull/161): A feature for adding new time steps to a scenario
+- [#182](https://github.com/iiasa/message_ix/pull/182): Fix cross-platform cloning.
+- [#173](https://github.com/iiasa/message_ix/pull/173): The `solve` command now takes additional arguments when solving with CPLEX. The `cplex.opt` file is now generated on the fly during the solve command and removed after successfully solving.
+- [#154](https://github.com/iiasa/message_ix/pull/154): Enable documentation build on ReadTheDocs.
+- [#138](https://github.com/iiasa/message_ix/pull/138): Update documentation and tutorials.
+- [#131](https://github.com/iiasa/message_ix/pull/131): Update clone function argument `scen` to `scenario` with planned deprecation of the former.
 
 # v1.1.0
 
@@ -15,17 +20,17 @@ management.
 If you see an error message like:
 
 ```
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 usr/local/lib/python2.7/site-packages/ixmp/core.py:81: in __init__
     self._jobj = java.ixmp.Platform("Python", dbprops)
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = <jpype._jclass.at.ac.iiasa.ixmp.Platform object at 0x7ff1a8e98410>
 args = ('Python', '/tmp/kH07wz/test.properties')
 
     def _javaInit(self, *args):
         object.__init__(self)
-    
+
         if len(args) == 1 and isinstance(args[0], tuple) \
            and args[0][0] is _SPECIAL_CONSTRUCTOR_KEY:
             self.__javaobject__ = args[0][1]
@@ -45,7 +50,7 @@ Then you need to update your local database. There are two methods to do so:
    allows you to save all your data. If you want help, feel free to get in
    contact on the
    [listserv](https://groups.google.com/forum/#!forum/message_ix).
-   
+
 
 ### New Property File Layout
 
@@ -65,10 +70,10 @@ _________________ ERROR at setup of test_add_spatial_multiple __________________
     @pytest.fixture(scope="session")
     def test_mp():
         test_props = create_local_testdb()
-    
+
         # start jvm
         ixmp.start_jvm()
-    
+
         # launch Platform and connect to testdb (reconnect if closed)
 >       mp = ixmp.Platform(test_props)
 ```
@@ -115,4 +120,4 @@ jdbc.pwd = ixmp
 - [#65](https://github.com/iiasa/message_ix/pull/65): Bugfix for downloading tutorials. Now downloads current installed version by default.
 - [#60](https://github.com/iiasa/message_ix/pull/60): Add basic ability to write and read model input to/from Excel
 - [#59](https://github.com/iiasa/message_ix/pull/59): Added MacOSX CI support
-- [#161](https://github.com/iiasa/message_ix/pull/161): A feature for adding new time steps to a scenario
+- [#187](https://github.com/iiasa/message_ix/pull/187): Test for cumulative bound on emissions

@@ -1,7 +1,7 @@
-sphinx
-sphinxcontrib-bibtex
-sphinxcontrib-fulltoc
-numpydoc
-cloud_sptheme
-nbformat
+-e git://github.com/iiasa/ixmp.git#egg=ixmp
 jupyter
+nbformat
+numpydoc
+sphinx>=1.8
+sphinx_rtd_theme
+sphinxcontrib-bibtex

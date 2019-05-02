@@ -1,6 +1,7 @@
 # GAMS, R, Python-specific auxiliary files
 *.~gm
 *.bak
+*.egg-info
 *.~op
 *.pyc
 *.gdx
@@ -29,8 +30,9 @@ message_ix/model/MESSAGE_master.gms
 .DS_Store
 
 # local version of auto-documentation features
-/doc/build/**
-/doc/source/model/**
+doc/build
+doc/source/_build
+doc/source/model
 
 # files generated during install
 ixmp/default_paths.py

@@ -7,8 +7,9 @@ aspects:
 - `MESSAGE_IX_CI_USER`
 - `MESSAGE_IX_CI_PW`
 
-For posterity, ask Oliver Fricko, Matthew Gidden, or Peter Kolp for the correct
-values.
+
+The values for these variables can be found in the internal IIASA document
+[here](https://iiasahub.sharepoint.com/:x:/s/ene/MESSAGEix/EQSb7ohzU2xCjltYjJs68SoBXOmIoovhezqfpFol1JOzGw?e=gvlXg2).
 
 # Generate the Database
 

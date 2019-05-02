@@ -14,15 +14,13 @@
 
 import sys
 import os
-import shlex
-import re
+
+try:
+    from pathlib import Path
+except ImportError:
+    pass
 
 import message_ix
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
 
 # -- General configuration ------------------------------------------------
 
@@ -32,7 +30,7 @@ import message_ix
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-sys.path.append(os.path.abspath('exts'))
+sys.path.append('.')
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
@@ -41,10 +39,15 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinxcontrib.bibtex',
-    'sphinxcontrib.fulltoc',
     'sphinx.ext.autosummary',
-    'sphinx.ext.napoleon'
+    'sphinx.ext.napoleon',
 ]
+
+# Extension only works for Python 3
+if sys.version_info[0] == 3:
+    sys.path.insert(0, os.path.abspath('..'))
+    extensions.append('grab_gams_doc')
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -123,9 +126,7 @@ todo_include_todos = True
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-sys.path.append(os.path.abspath('_themes'))
-html_theme_path = ['_themes']
-html_theme = 'kr'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -144,7 +145,7 @@ html_theme_options = {}
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = '_static/IIASA_logo.png'
+html_logo = '_static/logo_white.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -154,7 +155,11 @@ html_logo = '_static/IIASA_logo.png'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['css']
+html_static_path = ['_static']
+
+
+def setup(app):
+    app.add_stylesheet('custom.css')
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -300,8 +305,11 @@ texinfo_documents = [
 #texinfo_no_detailmenu = False
 
 
-# Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3/', None),
+    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+}
+
 
 # prolog for all rst files
 rst_prolog = """
@@ -316,3 +324,8 @@ rst_prolog = """
 .. role:: underline
 
 """.format(version)
+
+# Configuration for grab_gams_doc extension
+if sys.version_info[0] == 3:
+    gams_source_dir = Path(__file__).parents[2] / 'message_ix' / 'model'
+    gams_target_dir = 'model'

@@ -1,7 +1,6 @@
 ***
 * Solve statement workflow
 * ========================
-* This page is generated from the auto-documentation in ``MESSAGE/model_solve.gms``.
 *
 * This part of the code includes the perfect-foresight, myopic and rolling-horizon model solve statements
 * including the required accounting of investment costs beyond the model horizon.

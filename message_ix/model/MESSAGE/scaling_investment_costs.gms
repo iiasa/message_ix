@@ -1,7 +1,6 @@
 ***
 * Auxiliary investment parameters
 * ===============================
-* This page is generated from the auto-documentation mark-up in ``MESSAGE/scaling_investment_costs.gms``.
 *
 ***
 

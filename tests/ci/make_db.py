@@ -7,12 +7,12 @@ import message_ix
 
 from message_ix import macro
 
-from paths import dbpath
+from paths import dbpath, dbfolder
 
 
 def main():
-    if os.path.exists(dbpath):
-        shutil.rmtree(dbpath)
+    if os.path.exists(dbfolder):
+        shutil.rmtree(dbfolder)
 
     mp = ixmp.Platform(dbpath, dbtype='HSQLDB')
     with open('scenarios.yaml', 'r') as f:

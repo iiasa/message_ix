@@ -1,13 +1,24 @@
 import collections
+import copy
 import ixmp
 import itertools
+import os
 import warnings
 
 import pandas as pd
 import numpy as np
 
+from message_ix import default_paths
+
 from ixmp.utils import pd_read, pd_write
 from message_ix.utils import isscalar, logger
+
+DEFAULT_SOLVE_OPTIONS = {
+    'advind': 0,
+    'lpmethod': 2,
+    'threads': 4,
+    'epopt': 1e-6,
+}
 
 
 def _init_scenario(s, commit=False):
@@ -36,6 +47,12 @@ def _init_scenario(s, commit=False):
 
 
 class Scenario(ixmp.Scenario):
+    """|MESSAGEix| Scenario.
+
+    This class extends :class:`ixmp.Scenario` and inherits all its methods. It
+    defines additional methods specific to |MESSAGEix|.
+
+    """
 
     def __init__(self, mp, model, scenario=None, version=None, annotation=None,
                  cache=False, clone=None, **kwargs):
@@ -97,16 +114,19 @@ class Scenario(ixmp.Scenario):
         return ixmp.to_pylist(self._jobj.getTypeList(name))
 
     def add_cat(self, name, cat, keys, is_unique=False):
-        """add a set element key to the respective category mapping
+        """Map elements from *keys* to category *cat* within set *name*.
 
         Parameters
         ----------
-        name : string
-            name of the set
-        cat : string
-            name of the category
-        keys : list of strings
-            element keys to be added to the category mapping
+        name : str
+            Name of the set.
+        cat : str
+            Name of the category.
+        keys : str or list of str
+            Element keys to be added to the category mapping.
+        is_unique: bool, optional
+            If `True`, then *cat* must have only one element. An exception is
+            raised if *cat* already has an element, or if ``len(keys) > 1``.
         """
         self._jobj.addCatEle(name, str(cat), ixmp.to_jlist(keys), is_unique)
 
@@ -130,18 +150,37 @@ class Scenario(ixmp.Scenario):
             return False
 
     def add_spatial_sets(self, data):
-        """Add sets related to spatial dimensions of the model
+        """Add sets related to spatial dimensions of the model.
 
         Parameters
         ----------
-        data : dict or other
+        data : dict
+            Mapping of `level` → `member`. Each member may be:
+
+            - A single label for elements.
+            - An iterable of labels for elements.
+            - A recursive :class:`dict` following the same convention, defining
+              sub-levels and their members.
 
         Examples
         --------
-        data = {'country': 'Austria'}
-        data = {'country': ['Austria', 'Germany']}
-        data = {'country': {'Austria': {'state': ['Vienna', 'Lower Austria']}}}
+        >>> s = message_ix.Scenario()
+        >>> s.add_spatial_sets({'country': 'Austria'})
+        >>> s.add_spatial_sets({'country': ['Austria', 'Germany']})
+        >>> s.add_spatial_sets({'country': {
+        ...     'Austria': {'state': ['Vienna', 'Lower Austria']}}})
+
         """
+        # TODO test whether unbalanced data or multiply-defined levels are
+        # handled correctly. How to define 'Germany' as a country *only* but
+        # two states within 'Austria'?
+        # >>> s.add_spatial_sets({'country': {
+        # ...     'Austria': {'country': 'Vienna'}}})
+        # >>> s.add_spatial_sets({'country': {
+        # ...     'Austria': {'state': 'Vienna'},
+        # ...     'Canada': {'province': 'Ontario'},
+        # ...     }})
+
         nodes = []
         levels = []
         hierarchy = []
@@ -157,6 +196,7 @@ class Scenario(ixmp.Scenario):
             for child in children:
                 hierarchy.append([level, child, parent])
                 nodes.append(child)
+
             levels.append(level)
 
         for k, v in data.items():
@@ -166,44 +206,56 @@ class Scenario(ixmp.Scenario):
         self.add_set("lvl_spatial", levels)
         self.add_set("map_spatial_hierarchy", hierarchy)
 
-    def add_horizon(scenario, data):
-        """Add sets related to temporal dimensions of the model
+    def add_horizon(self, data):
+        """Add sets related to temporal dimensions of the model.
 
         Parameters
         ----------
-        scenario : ixmp.Scenario
-        data : dict or other
+        data : dict-like
+            Year sets. "year" is a required key. "firstmodelyear" is optional;
+            if not provided, the first element of "year" is used.
 
         Examples
         --------
-        data = {'year': [2010, 2020]}
-        data = {'year': [2010, 2020], 'firstmodelyear': 2020}
+        >>> s = message_ix.Scenario()
+        >>> s.add_horizon({'year': [2010, 2020]})
+        >>> s.add_horizon({'year': [2010, 2020], 'firstmodelyear': 2020})
+
         """
         if 'year' not in data:
             raise ValueError('"year" must be in temporal sets')
         horizon = data['year']
-        scenario.add_set("year", horizon)
+        self.add_set("year", horizon)
 
         first = data['firstmodelyear'] if 'firstmodelyear'\
             in data else horizon[0]
-        scenario.add_cat("year", "firstmodelyear", first, is_unique=True)
+        self.add_cat("year", "firstmodelyear", first, is_unique=True)
 
     def vintage_and_active_years(self, ya_args=None, in_horizon=True):
-        """Return a 2-tuple of valid pairs of vintage years and active years
-        for use with data input. A valid year-vintage, year-active pair is
-        one in which:
+        """Return sets of vintage and active years for use in data input.
 
-        - year-vintage <= year-active
-        - both within the model's 'year' set
-        - year-active >= the model's first year *or* within
-          ixmp.Scenario.years_active() for a given node, technology and vintage
-          (optional)
+        For a valid pair `(year_vtg, year_act)`, the following conditions are
+        satisfied:
+
+        1. Both the vintage year (`year_vtg`) and active year (`year_act`) are
+           in the model's ``year`` set.
+        2. `year_vtg` <= `year_act`.
+        3. `year_act` <= the model's first year **or** `year_act` is in the
+           smaller subset :meth:`ixmp.Scenario.years_active` for the given
+           `ya_args`.
 
         Parameters
         ----------
-        ya_args : arguments to ixmp.Scenario.years_active(), optional
-        in_horizon : restrict years returned to be within the current model
-                     horizon, optional, default: True
+        ya_args : tuple of (node, technology, year_vtg), optional
+            Arguments to :meth:`ixmp.Scenario.years_active`.
+        in_horizon : bool, optional
+            Restrict years returned to be within the current model horizon.
+
+        Returns
+        -------
+        pandas.DataFrame
+            with columns, "year_vtg" and "year_act", in which each row is a
+            valid pair.
         """
         horizon = self.set('year')
         first = self.cat('year', 'firstmodelyear')[0] or horizon[0]
@@ -231,49 +283,41 @@ class Scenario(ixmp.Scenario):
         v_years, a_years = zip(*year_pairs)
         return pd.DataFrame({'year_vtg': v_years, 'year_act': a_years})
 
-    def solve(self, model='MESSAGE', **kwargs):
-        """Solve a MESSAGE Scenario. See ixmp.Scenario.solve() for arguments.
-        The default model is 'MESSAGE', but can be overwritten with, e.g.,
-        `message_ix.Scenario.solve(model='MESSAGE-MACRO')`.
-        """
-        return super(Scenario, self).solve(model=model, **kwargs)
-
-    def clone(self, model=None, scenario=None, annotation=None,
-              keep_solution=True, first_model_year=None, **kwargs):
-        """clone the current scenario and return the new scenario
+    def solve(self, model='MESSAGE', solve_options={}, **kwargs):
+        """Solve the Scenario.
 
         Parameters
         ----------
         model : string
-            new model name
-        scenario : string
-            new scenario name
-        annotation : string
-            explanatory comment (optional)
-        keep_solution : boolean, default, True
-            indicator whether to include an existing solution
-            in the cloned scenario
-        first_model_year: int, default None
-            new first model year in cloned scenario
-            ('slicing', only available for MESSAGE-scheme scenarios)
-        """
-        if 'keep_sol' in kwargs:
-            warnings.warn(
-                '`keep_sol` is deprecated and will be removed in the next' +
-                ' release, please use `keep_solution`')
-            keep_solution = kwargs.pop('keep_sol')
-        if 'scen' in kwargs:
-            warnings.warn(
-                '`scen` is deprecated and will be removed in the next' +
-                ' release, please use `scenario`')
-            scenario = kwargs.pop('scen')
+            the type of model to solve (e.g., MESSAGE or MESSAGE-MACRO)
+        solve_options : dict
+            name, value pairs to use for GAMS solver optfile,
+            see `message_ix.DEFAULT_SOLVE_OPTIONS` for defaults and see
+            https://www.gams.com/latest/docs/S_CPLEX.html for possible
+            arguments
 
-        self._keep_sol = keep_solution
-        self._first_model_year = first_model_year or 0
-        model = self.model if not model else model
-        scenario = self.scenario if not scenario else scenario
-        return Scenario(self.platform, model, scenario, annotation=annotation,
-                        cache=self._cache, clone=self)
+        By default, :meth:`ixmp.Scenario.solve` is called with "MESSAGE" as the
+        *model* argument; see the documentation of that method for other
+        arguments. *model* may also be overwritten, e.g.:
+
+        >>> s.solve(model='MESSAGE-MACRO')
+
+        """
+        # TODO: we generate the cplex.opt file on the fly. this is *not* safe
+        # agaisnt race conditions. It is possible to generate opt files with
+        # random names (see
+        # https://www.gams.com/latest/docs/UG_GamsCall.html#GAMSAOoptfile);
+        # however, we need to clean up the code in ixmp that passes arguments
+        # to gams to do so.
+        fname = os.path.join(default_paths.model_path(), 'cplex.opt')
+        opts = copy.deepcopy(DEFAULT_SOLVE_OPTIONS)
+        opts.update(solve_options)
+        lines = '\n'.join('{} = {}'.format(k, v) for k, v in opts.items())
+        with open(fname, 'w') as f:
+            f.writelines(lines)
+        ret = super(Scenario, self).solve(model=model, **kwargs)
+        os.remove(fname)
+        return ret
 
     def rename(self, name, mapping, keep=False):
         """Rename an element in a set
