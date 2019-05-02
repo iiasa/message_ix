@@ -10,9 +10,7 @@ testing the functionality of storage equations. The workflow is as follows:
 """
 
 from message_ix import Scenario
-
-# A flag to show if storage variables/parameters are added to ixmp java backend
-storage_in_java = False
+from itertools import product
 
 
 # A function for generating a simple MESSAGEix model with two technologies
@@ -25,40 +23,35 @@ def model_setup(scen, years):
     scen.add_set('technology', ['tec1', 'tec2'])
     scen.add_set('mode', 'mode')
     output_specs = ['node', 'electr', 'level', 'year', 'year']
-    dict_var_cost = {'tec1': 1, 'tec2': 2}
-
-    for yr in years:
-        scen.add_par('demand', ['node', 'electr', 'level', yr, 'year'],
+    # Two technologies, one cheaper than the other
+    var_cost = {'tec1': 1, 'tec2': 2}
+    for year, (tec, cost) in product(years, var_cost.items()):
+        scen.add_par('demand', ['node', 'electr', 'level', year, 'year'],
                      1, 'GWa')
-        for t in dict_var_cost.keys():
-            tec_specs = ['node', t, yr, yr, 'mode']
-            scen.add_par('output', tec_specs + output_specs, 1, 'GWa')
-            scen.add_par('var_cost',
-                         tec_specs + ['year'], dict_var_cost[t], 'USD/GWa')
+        tec_specs = ['node', tec, year, year, 'mode']
+        scen.add_par('output', tec_specs + output_specs, 1, 'GWa')
+        scen.add_par('var_cost', tec_specs + ['year'], cost, 'USD/GWa')
 
 
 # A function for adding sub-annual time steps to a MESSAGEix model
-def add_seasonality(scen, seasons_dict):
-    scen.add_set('time', list(set(seasons_dict.keys())))
+def add_seasonality(scen, time_duration):
+    scen.add_set('time', list(set(time_duration.keys())))
     scen.add_set('lvl_temporal', 'season')
-    for h in seasons_dict.keys():
+    for h, duration in time_duration.items():
         scen.add_set('map_temporal_hierarchy', ['season', h, 'year'])
-        scen.add_par('duration_time', [h], seasons_dict[h], '-')
+        scen.add_par('duration_time', [h], duration, '-')
 
 
 # A function for modifying model parameters after adding sub-annual time steps
-def year_to_time(scen, parname, dict_par, filters=None):
-    if filters:
-        old = scen.par(parname, filters)
-    else:
-        old = scen.par(parname)
+def year_to_time(scen, parname, time_share):
+    old = scen.par(parname)
     scen.remove_par(parname, old)
     time_idx = [x for x in scen.idx_names(parname) if 'time' in x]
-    for h in dict_par.keys():
+    for h, share in time_share.items():
         new = old.copy()
         for index in time_idx:
             new[index] = h
-        new['value'] = dict_par[h] * old['value']
+        new['value'] = share * old['value']
         scen.add_par(parname, new)
 
 
@@ -88,76 +81,65 @@ def add_storage_data(scen, time_order):
         scen.add_par('time_seq', h, time_order[h], '-')
 
     # Adding minimum and maximum bound, and losses for storage (percentage)
-    for y in set(scen.set('year')):
-        for h in time_order.keys():
-            scen.add_par('bound_storage_lo', ['node', 'dam', 'electr',
-                                              'storage', y, h], 0.0, '%')
-
-            scen.add_par('bound_storage_up', ['node', 'dam', 'electr',
-                                              'storage', y, h], 1.0, '%')
-
-            scen.add_par('storage_loss', ['node', 'dam', 'electr',
-                                          'storage', y, h], 0.05, '%')
+    for year, h in product(set(scen.set('year')), time_order.keys()):
+        storage_spec = ['node', 'dam', 'electr', 'storage', year, h]
+        scen.add_par('bound_storage_lo', storage_spec, 0.0, '%')
+        scen.add_par('bound_storage_up', storage_spec, 1.0, '%')
+        scen.add_par('storage_loss', storage_spec, 0.05, '%')
 
     # input, output, and capacity factor for storage technologies
-    output = {'dam': ['node', 'stored_com', 'storage'],
-              'pump': ['node', 'stored_com', 'storage'],
-              'turbine': ['node', 'electr', 'level']}
+    output_spec = {'dam': ['node', 'stored_com', 'storage'],
+                   'pump': ['node', 'stored_com', 'storage'],
+                   'turbine': ['node', 'electr', 'level'],
+                   }
 
-    inp = {'dam': ['node', 'stored_com', 'storage'],
-           'pump': ['node', 'electr', 'level'],
-           'turbine': ['node', 'stored_com', 'storage']}
+    input_spec = {'dam': ['node', 'stored_com', 'storage'],
+                  'pump': ['node', 'electr', 'level'],
+                  'turbine': ['node', 'stored_com', 'storage'],
+                  }
 
     var_cost = {'dam': 0, 'pump': 0.2, 'turbine': 0.3}
-
-    for y in set(scen.set('year')):
-        for h in time_order.keys():
-            for t in ['dam', 'pump', 'turbine']:
-                tec_sp = ['node', t, y, y, 'mode']
-                scen.add_par('output', tec_sp + output[t] + [h, h], 1, 'GWa')
-                scen.add_par('input', tec_sp + inp[t] + [h, h], 1, 'GWa')
-                scen.add_par('var_cost', tec_sp + [h], var_cost[t], 'USD/GWa')
+    stor_tecs = ['dam', 'pump', 'turbine']
+    for year, h, tec in product(set(scen.set('year')), time_order.keys(),
+                                stor_tecs):
+        tec_sp = ['node', tec, year, year, 'mode']
+        scen.add_par('output', tec_sp + output_spec[tec] + [h, h], 1, 'GWa')
+        scen.add_par('input', tec_sp + input_spec[tec] + [h, h], 1, 'GWa')
+        scen.add_par('var_cost', tec_sp + [h], var_cost[tec], 'USD/GWa')
 
 
 # Main function for building a model and adding seasonality and storage
-def test_storage(test_mp):
-    # First building a simple model
+def storage_setup(test_mp, time_duration, comment):
+    # First building a simple model and adding seasonality
     scen = Scenario(test_mp, 'no_storage', 'standard', version='new')
     model_setup(scen, [2020])
+    add_seasonality(scen, time_duration)
+    fixed_share = {'a': 1, 'b': 1, 'c': 1, 'd': 1}
+    year_to_time(scen, 'output', fixed_share)
+    year_to_time(scen, 'var_cost', fixed_share)
+    demand_share = {'a': 0.15, 'b': 0.2, 'c': 0.4, 'd': 0.25}
+    year_to_time(scen, 'demand', demand_share)
     scen.commit('initialized test model')
-    scen.solve(case='no_seasonality')
+    scen.solve(case='no_storage' + comment)
 
-    # Second, adding seasonality
-    seasons_dict = {'a': 0.25, 'b': 0.25, 'c': 0.25, 'd': 0.25}
+    # Second adding bound on the activity of the cheap technology
     scen.remove_solution()
     scen.check_out()
-    add_seasonality(scen, seasons_dict)
-    dict_fixed = {'a': 1, 'b': 1, 'c': 1, 'd': 1}
-    year_to_time(scen, 'output', dict_fixed)
-    year_to_time(scen, 'var_cost', dict_fixed)
-    dict_dem = {'a': 0.15, 'b': 0.2, 'c': 0.4, 'd': 0.25}
-    year_to_time(scen, 'demand', dict_dem)
-    scen.commit('initialized test model')
-    scen.solve(case='no_storage')
-
-    # Third, adding bound on the activity of the cheap technology
-    scen.remove_solution()
-    scen.check_out()
-    for h in seasons_dict.keys():
+    for h in time_duration.keys():
         scen.add_par('bound_activity_up',
                      ['node', 'tec1', 2020, 'mode', h], 0.25, 'GWa')
     scen.commit('activity bounded')
-    scen.solve(case='no_storage_bounded')
+    scen.solve(case='no_storage_bounded' + comment)
     cost_no_storage = scen.var('OBJ')['lvl']
     act_no = scen.var('ACT', {'technology': 'tec2'})['lvl'].sum()
 
-    # Forth, adding storage technologies and their parameters
+    # Third, adding storage technologies and their parameters
     scen.remove_solution()
     scen.check_out()
     time_order = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
     add_storage_data(scen, time_order)
     scen.commit('storage added')
-    scen.solve(case='with_storage')
+    scen.solve(case='with_storage' + comment)
     cost_with_storage = scen.var('OBJ')['lvl']
     act_with = scen.var('ACT', {'technology': 'tec2'})['lvl'].sum()
 
@@ -183,7 +165,7 @@ def test_storage(test_mp):
     assert max_turb <= cap_storage * (1 - loss)
 
     # II. Testing equations of storage (when added to ixmp variables)
-    if storage_in_java:
+    if scen.has_var('STORAGE'):
         # II.1. Equality: storage content in the beginning and end is equal
         storage_first = scen.var('STORAGE', {'time': 'a'})['lvl']
         storage_last = scen.var('STORAGE', {'time': 'd'})['lvl']
@@ -201,3 +183,15 @@ def test_storage(test_mp):
         storage = scen.var('STORAGE').set_index(['year', 'time'])['lvl']
         assert storage[(2020, 'b')] * (1 - loss[(2020, 'b')]
                                        ) == -change[(2020, 'c')]
+
+
+def test_storage(test_mp):
+    '''
+    Testing storage setup with equal and inaqual duration of seasons"
+
+    '''
+    time_duration = {'a': 0.25, 'b': 0.25, 'c': 0.25, 'd': 0.25}
+    storage_setup(test_mp, time_duration, '_equal_time')
+
+    time_duration = {'a': 0.3, 'b': 0.25, 'c': 0.25, 'd': 0.2}
+    storage_setup(test_mp, time_duration, '_inequal_time')
