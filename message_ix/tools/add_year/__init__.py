@@ -15,8 +15,8 @@ Sections of this code:
     III. The main class called "add_year"
     IV. Submodule "add_year_set" for adding and modifying the sets
     V. Submodule "add_year_par" for copying and modifying each parameter
-    VI. The submodule "add_year_par" calls two utility functions ("interpolate_1d"
-    and "df_interpolate_2D") for calculating missing values.
+    VI. Submodule "add_year_par" calls two utility functions ("interpolate_1d"
+    and "interpolate_2D") for calculating missing values.
     VII. Code for running the script as "main"
 
 
@@ -423,32 +423,21 @@ def add_year_par(sc_ref, sc_new, yrs_new, parname, region_list,
         if parname == 'relation_activity':
             tec_list = []
         else:
-            tec_list = [t for t in list(set(df[
-                    'technology'])) if t in list(set(par_tec[
-                            'technology']))]
+            tec_list = [t for t in (set(df['technology'])
+                                    ) if t in list(set(par_tec['technology']))]
 
         df_y = interpolate_2d(df, yrs_new, horizon, year_ref, year_col,
                               tec_list, par_tec, 'value', extrapolate,
                               extrapol_neg, year_diff)
         sc_new.add_par(parname, df_y)
         sc_new.commit(parname)
-        print(
-            '> Parameter "' + parname + '" copied and new years added '
-            'for node/s: "{}".'.format(nodes))
+        print('> Parameter "{}" copied and new years added'
+              ' for node/s: "{}".'.format(parname, nodes))
+
 
 # %% VI) Required functions
-# VI.A) A function to add new years to a datafarme by interpolation and
-# (extrapolation if needed)
-
-def interpolate_1d(
-        df,
-        yrs_new,
-        horizon,
-        year_col,
-        value_col='value',
-        extrapolate=False,
-        extrapol_neg=None,
-        bound_extend=True):
+def interpolate_1d(df, yrs_new, horizon, year_col, value_col='value',
+                   extrapolate=False, extrapol_neg=None, bound_extend=True):
     '''
     Description:
         This function receives a parameter data as a dataframe, and adds
@@ -467,9 +456,7 @@ def interpolate_1d(
             is outside the parameter years
         extrapol_neg: if True, negative values obtained by extrapolation
             are allowed.
-
-    Usage:
-        This function is called by function "add_year_par"
+        bound_extend: if True, allows extrapolation of bounds for new years
     '''
     horizon_new = sorted(horizon + yrs_new)
     idx = [x for x in df.columns if x not in [year_col, value_col]]
@@ -479,8 +466,8 @@ def interpolate_1d(
         # To sort the new years smaller than the first year for
         # extrapolation (e.g. 2025 values are calculated first; then
         # values of 2015 based on 2020 and 2025)
-        year_before = sorted(
-            [x for x in yrs_new if x < min(df2.columns)], reverse=True)
+        year_before = sorted([x for x in yrs_new if x < min(df2.columns
+                                                            )], reverse=True)
         if year_before and extrapolate:
             for y in year_before:
                 yrs_new.insert(len(yrs_new), yrs_new.pop(yrs_new.index(y)))
@@ -491,17 +478,13 @@ def interpolate_1d(
             else:
                 extrapol = extrapolate
 
-            # a) If this new year is after the current range of modeled
-            # years, do extrapolation
+            # a) If this new year greater than modeled years, do extrapolation
             if extrapol:
-                if yr == horizon_new[horizon_new.index(
-                        max(df2.columns)) + 1]:
+                if yr == horizon_new[horizon_new.index(max(df2.columns)) + 1]:
                     year_pre = max([x for x in df2.columns if x < yr])
 
                     if len([x for x in df2.columns if x < yr]) >= 2:
-                        year_pp = max(
-                            [x for x in df2.columns if x < year_pre])
-
+                        year_pp = max([x for x in df2.columns if x < year_pre])
                         df2[yr] = intpol(df2[year_pre], df2[year_pp],
                                          year_pre, year_pp, yr)
 
@@ -509,33 +492,30 @@ def interpolate_1d(
                             df2[yr] = df2[yr].fillna(df2[year_pre])
 
                         df2[yr][np.isinf(df2[year_pre])] = df2[year_pre]
-                        if extrapol_neg and not df2[yr].loc[(
-                                df2[yr] < 0) & (df2[year_pre] >= 0)].empty:
+                        if not df2[yr].loc[(df2[yr] < 0) & (df2[year_pre] >= 0)
+                                           ].empty and extrapol_neg:
                             df2.loc[(df2[yr] < 0) & (df2[year_pre] >= 0),
-                                    yr] = df2.loc[(df2[yr] < 0) & (df2[
-                                            year_pre] >= 0),
-                                            year_pre] * extrapol_neg
+                                    yr] = df2.loc[(df2[yr] < 0
+                                                   ) & (df2[year_pre] >= 0),
+                                                  year_pre] * extrapol_neg
                     else:
                         df2[yr] = df2[year_pre]
 
-            # b) If this new year is before the current range of modeled
-            # years, do extrapolation
+            # b) If the new year is smaller than modeled years, extrapolate
             elif yr < min(df2.columns) and extrapol:
                 year_next = min([x for x in df2.columns if x > yr])
 
                 if len([x for x in df2.columns if x > yr]) >= 2:
                     year_nn = horizon[horizon.index(yr) + 2]
-                    df2[yr] = intpol(
-                        df2[year_next], df2[year_nn],
-                        year_next, year_nn, yr)
+                    df2[yr] = intpol(df2[year_next], df2[year_nn],
+                                     year_next, year_nn, yr)
                     df2[yr][np.isinf(df2[year_next])] = df2[year_next]
-                    if extrapol_neg and not df2[yr].loc[(
-                            df2[yr] < 0) & (df2[year_next] >= 0)].empty:
-                        df2.loc[(df2[yr] < 0) &
-                                (df2[year_next] >= 0),
-                                yr] = df2.loc[(df2[yr] < 0) & (
-                                        df2[year_next] >= 0),
-                                        year_next] * extrapol_neg
+                    if not df2[yr].loc[(df2[yr] < 0) & (df2[year_next] >= 0)
+                                       ].empty and extrapol_neg:
+                        df2.loc[(df2[yr] < 0) & (df2[year_next] >= 0), yr
+                                ] = df2.loc[(df2[yr] < 0
+                                             ) & (df2[year_next] >= 0),
+                                            year_next] * extrapol_neg
 
                 elif bound_extend:
                     df2[yr] = df2[year_next]
@@ -544,47 +524,37 @@ def interpolate_1d(
             elif yr > min(df2.columns) and yr < max(df2.columns):
                 year_pre = max([x for x in df2.columns if x < yr])
                 year_next = min([x for x in df2.columns if x > yr])
-                df2[yr] = intpol(
-                    df2[year_pre], df2[year_next], year_pre, year_next, yr)
+                df2[yr] = intpol(df2[year_pre], df2[year_next],
+                                 year_pre, year_next, yr)
 
                 # Extrapolate for new years if the value exists for the
                 # previous year but not for the next years
                 # TODO: here is the place that should be changed if the
-                # new year should go the time step before the existing one
+                # new year should go to the time step before the existing one
                 if [x for x in df2.columns if x < year_pre]:
                     year_pp = max([x for x in df2.columns if x < year_pre])
-                    df2[yr] = df2[yr].fillna(
-                        intpol(
-                            df2[year_pre],
-                            df2[year_pp],
-                            year_pre,
-                            year_pp,
-                            yr))
-                    if extrapol_neg and not df2[yr].loc[(
-                            df2[yr] < 0) & (df2[year_pre] >= 0)].empty:
-                        df2.loc[(df2[yr] < 0) & (df2[year_pre] >= 0),
-                                yr] = df2.loc[(df2[yr] < 0) & (
-                                        df2[year_pre] >= 0),
-                                        year_pre] * extrapol_neg
+                    df2[yr] = df2[yr].fillna(intpol(df2[year_pre],
+                                                    df2[year_pp], year_pre,
+                                                    year_pp, yr))
+                    if not df2[yr].loc[(df2[yr] < 0) & (df2[year_pre] >= 0)
+                                       ].empty and extrapol_neg:
+                        df2.loc[(df2[yr] < 0) & (df2[year_pre] >= 0), yr
+                                ] = df2.loc[(df2[yr] < 0
+                                             ) & (df2[year_pre] >= 0),
+                                            year_pre] * extrapol_neg
 
                 if bound_extend:
                     df2[yr] = df2[yr].fillna(df2[year_pre])
                 df2[yr][np.isinf(df2[year_pre])] = df2[year_pre]
 
-        df2 = pd.melt(
-            df2.reset_index(),
-            id_vars=idx,
-            value_vars=[
-                x for x in df2.columns if x not in idx],
-            var_name=year_col,
-            value_name=value_col).dropna(
-            subset=[value_col]).reset_index(
-            drop=True)
+        df2 = pd.melt(df2.reset_index(), id_vars=idx,
+                      value_vars=[x for x in df2.columns if x not in idx],
+                      var_name=year_col, value_name=value_col
+                      ).dropna(subset=[value_col]).reset_index(drop=True)
         df2 = df2.sort_values(idx).reset_index(drop=True)
     else:
-        print(
-            '+++ WARNING: The submitted dataframe is empty, so returned' +
-            'empty results!!! +++')
+        print('+++ WARNING: The submitted dataframe is empty, so returned'
+              ' empty results!!! +++')
         df2 = df
     return df2
 
