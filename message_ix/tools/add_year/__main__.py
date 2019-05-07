@@ -24,7 +24,7 @@ import click
 import ixmp
 import message_ix
 
-from . import addNewYear
+from . import add_year
 
 
 def split_value(ctx, param, value, type=str):
@@ -121,8 +121,7 @@ def main(model_ref, scen_ref, version_ref, model_new, scen_new, create_new,
             'rewrite:', rewrite,
             'unit_check:', unit_check,
             'extrapol_neg:', extrapol_neg,
-            'bound_extend:', bound_extend,
-            sep='\n')
+            'bound_extend:', bound_extend)
         return
 
     # Load the ixmp Platform
@@ -141,7 +140,7 @@ def main(model_ref, scen_ref, version_ref, model_new, scen_new, create_new,
         sc_new.check_out()
 
     # Calling the main function
-    addNewYear(
+    add_year(
         sc_ref=sc_ref,
         sc_new=sc_new,
         years_new=years_new,
