@@ -3,19 +3,22 @@ Add model years to an existing Scenario
 
 Description
 -----------
-This functionality adds new modeling years to an existing scenario (hereafter "reference scenario"). This will be done by creating a new empty scenario (hereafter "new scenario") and:
+
+This tool adds new modeling years to an existing scenario (hereafter "reference scenario"). This will be done by creating a new empty scenario (hereafter "new scenario") and:
 
 - Copying all sets from reference scenario and adding new time steps to relevant sets (e.g., adding 2025 between 2020 and 2030 in the set "year")
 - Copying all parameters from reference scenario, adding new time steps to relevant parameters, and calculating missing values for the added time steps.
 
-Main features
--------------
+Features
+--------
+
 - It can be used for any MESSAGE scenario, from tutorials, country-level, and global models.
 - The new years can be consecutive, between existing years, and after the model horizon.
 - The user can define for what regions and parameters the new years should be added. This saves time when adding the new years to only one parameter of the reference scenario, when other parameters had been successfully added to the new scenario previously.
 
 Main steps
 ----------
+
 1. An existing scenario is loaded and the desired new years is specified.
 2. A new (empty) scenario is created for adding the new time steps.
 3. The new years are added to the relevant sets:
@@ -32,32 +35,34 @@ Main steps
    - the missing data is calculated by interpolation.
    - for the parameters with 2 year-related index (such as "output"), a final check is applied so ensure that the vintaging is correct. This step is done based on lifetime of each technology.
 
-5. The changes are commited and saved to the new scenario.
+5. The changes are committed and saved to the new scenario.
 
-Notice
-------
-I. This functionality in the current format does not ensure that the new scenario will solve after adding the new years. The user needs to load the new scenario, check some key parameters (like bounds) and solve the new scenario.
+.. warning::
+   The tool does not ensure that the new scenario will solve after adding the
+   new years. The user needs to load the new scenario, check some key
+   parameters (like bounds) and solve the new scenario.
 
 Usage
 -----
-This script can be used either:
 
-- By running directly from the command line, example::
-    
+The tool can be used either:
+
+1. Directly from the command line::
+
     $ python -m message_ix.tools.add_year \
         --model_ref MESSAGE_Model \
         --scen_ref baseline \
         --years_new 2015,2025,2035,2045
-    
-  For the full list of input arguments, run::
+
+   For the full list of input arguments, run::
 
     $ python -m message_ix.tools.add_year --help
 
-- By calling the class "addNewYear" from another python script.
+2. By calling the :meth:`message_ix.tools.add_year.add_year` from a Python
+   script.
 
 API
 ---
 
 .. automodule:: message_ix.tools.add_year
    :members:
-

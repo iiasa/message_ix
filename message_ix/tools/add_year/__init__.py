@@ -1,47 +1,30 @@
 # -*- coding: utf-8 -*-
-"""
-Description:
-    This functionality adds new time steps to an existing MESSAGE scenario
-    (hereafter "reference scenario"). This is done by creating a new empty
-    scenario (hereafter "new scenario") and:
-    - Copying all sets from reference scenario and adding new time steps to
-    relevant sets (e.g., adding 2025 between 2020 and 2030 in the set "year")
-    - Copying all parameters from reference scenario, adding new time steps to
-    relevant parameters, calculating missing values for the added time steps.
+"""Add model years to an existing Scenario."""
+# Sections of the code:
+#
+#   I. Required python packages are imported
+#  II. Generic utilities for dataframe manipulation
+# III. The main function, add_year()
+#  IV. Function add_year_set() for adding and modifying the sets
+#   V. Function add_year_par() for copying and modifying each parameter
+#  VI. Two utility functions, interpolate_1d() and interpolate_2d(), for
+#      calculating missing values
 
-Sections of this code:
-    I. Required python packages are imported and ixmp platform loaded.
-    II. Generic utilities for dataframe manipulation
-    III. The main class called "add_year"
-    IV. Submodule "add_year_set" for adding and modifying the sets
-    V. Submodule "add_year_par" for copying and modifying each parameter
-    VI. Submodule "add_year_par" calls two utility functions ("interpolate_1d"
-    and "interpolate_2D") for calculating missing values.
-    VII. Code for running the script as "main"
-
-
-Usage:
-    This script can be used either:
-    A) By running directly from the command line, example:
-    ---------------------------------------------------------------------------
-    python f_add_year.py --model_ref "MESSAGE_Model" --scen_ref "baseline"
-    --years_new "[2015,2025,2035,2045]"
-    ---------------------------------------------------------------------------
-    (Other input arguments are optional. For more info see Section V below.)
-
-    B) By calling the class "add_year" from other python scripts
-"""
-# %% I) Importing required packages and loading ixmp platform
+# %% I) Importing required packages
 
 import numpy as np
 import pandas as pd
 
-# %% II) Required utility functions for dataframe manupulation
-# II.A) Utility function for interpolation/extrapolation of two numbers,
-# lists or series (x: time steps, y: data points)
-
+# %% II) Utility functions for dataframe manupulation
 
 def intpol(y1, y2, x1, x2, x):
+    """Interpolate between (*x1*, *y1*) and (*x2*, *y2*) at *x*.
+
+    Parameters
+    ----------
+    y1, y2 : float or pd.Series
+    x1, x2, x : int
+    """
     if x2 == x1 and y2 != y1:
         print('>>> Warning <<<: No difference between x1 and x2,' +
               'returned empty!!!')
@@ -53,12 +36,20 @@ def intpol(y1, y2, x1, x2, x):
         return y
 
 # II.B) Utility function for slicing a MultiIndex dataframe and
-# setting a value to a specific level
-# df: dataframe, idx: list of indexes, level: string, locator: list,
-# value: integer/string
-
+#       setting a value to a specific level
 
 def slice_df(df, idx, level, locator, value):
+    """Slice a MultiIndex DataFrame and set a value to a specific level.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+    idx : list of indices
+    level: str
+    locator : list
+    value : int or str
+
+    """
     if locator:
         df = df.reset_index().loc[df.reset_index()[level].isin(locator)].copy()
     else:
@@ -67,19 +58,15 @@ def slice_df(df, idx, level, locator, value):
         df[level] = value
     return df.set_index(idx)
 
-# II.C) A function for creating a mask for removing extra values from a
-# dataframe
-
 
 def mask_df(df, index, count, value):
+    """Create a mask for removing extra values from *df*."""
     df.loc[index, df.columns > (df.loc[[index]].notnull().cumsum(
         axis=1) == count).idxmax(axis=1).values[0]] = value
 
-# II.D) Function for unifroming the "unit" in different years to prevent
-# mistakes in indexing and grouping
-
 
 def unit_uniform(df):
+    """Make units in *df* uniform."""
     column = [x for x in df.columns if x in ['commodity', 'emission']]
     if column:
         com_list = set(df[column[0]])
@@ -96,43 +83,44 @@ def add_year(sc_ref, sc_new, years_new, firstyear_new=None, lastyear_new=None,
              macro=False, baseyear_macro=None, parameter='all', region='all',
              rewrite=True, unit_check=True, extrapol_neg=None,
              bound_extend=True):
-    ''' This class does the following:
-    A. calls function "add_year_set" to add and modify required sets.
-    B. calls function "add_year_par" to add new years and modifications
-    to each parameter if needed.
+    """Add years to *sc_ref* to produce *sc_new*.
 
-    Parameters:
+    :meth:`add_year` does the following:
+
+    1. calls :meth:`add_year_set` to add and modify required sets.
+    2. calls :meth:`add_year_par` to add new years and modifications to each
+       parameter if needed.
+
+    Parameters
     -----------
-        sc_ref : string
-            reference scenario (MESSAGE model/scenario instance)
-        sc_new : string
-            new scenario for adding new years and required modifications
-            (MESSAGE model/scenario instance)
-        yrs_new : list of integers
-            new years to be added
-        firstyear_new : integer, default None
-            a new first model year for new scenario (optional)
-        macro : boolean, default False
-            a flag to add new years to macro parameters (True) or not (False)
-        baseyear_macro : integer, default None
-            a new base year for macro
-        parameter: list of strings, default all
-            parameters for adding new years
-        rewrite: boolean, default True
-            a flag to permit rewriting a parameter in new scenario when adding
-            new years (True) or not (False)
-        check_unit: boolean, default False
-            a flag to uniform the units under each commodity (if there is
-            inconsistency between units in two model years)
-                extrapol_neg: float, default None
-            a number to multiply by the data of the previous timestep,
-            when extrapolation is negative
-        bound_extend: boolean, default True
-            a flag to permit the duplication of the data from the previous
-            timestep, when there is only one data point for interpolation
-            (e.g., permitting the extension of a bound to 2025, when there
-            is only one value in 2020)
-    '''
+    sc_ref : str
+        Name of reference scenario (MESSAGE model/scenario instance)
+    sc_new : str
+        Name of new scenario for adding new years and required modifications
+        (MESSAGE model/scenario instance)
+    yrs_new : list of int
+        New years to be added.
+    firstyear_new : int, optional
+        New first model year for new scenario.
+    macro : bool
+        Add new years to parameters of the MACRO model.
+    baseyear_macro : int
+        New base year for the MACRO model.
+    parameter: list of str or 'all'
+        Parameters for adding new years.
+    rewrite: bool
+        Permit rewriting a parameter in new scenario when adding new years.
+    check_unit: bool
+        Harmonize the units for each commodity, if there is inconsistency
+        across model years.
+    extrapol_neg: float
+        When extrapolation produces negative values, replace with a multiple of
+        the value for the previous timestep.
+    bound_extend: bool
+        Duplicate data from the previous timestep when there is only one data
+        point for interpolation (e.g., permitting the extension of a bound to
+        2025, when there is only one value in 2020).
+    """
     # III.A) Adding sets and required modifications
     years_new = sorted([x for x in years_new if str(x)
                         not in set(sc_ref.set('year'))])
@@ -214,22 +202,15 @@ def add_year(sc_ref, sc_new, years_new, firstyear_new=None, lastyear_new=None,
 #   IV) Adding new years to sets
 def add_year_set(sc_ref, sc_new, years_new, firstyear_new=None,
                  lastyear_new=None, baseyear_macro=None):
-    '''
-    Description:
-        Adding required sets and relevant modifications:
-        This function adds additional years to an existing scenario,
-        by starting to make a new scenario from scratch.
-        After modification of the year-related sets, this function copeis
-        all other sets from the "reference" scenario
-        to the "new" scenario.
+    """Add new years to sets.
 
-    Input arguments:
-        Please see the description for the input arguments under the main
-        function "add_year"
+    :meth:`add_year_set` adds additional years to an existing scenario, by
+    starting to make a new scenario from scratch. After modification of the
+    year-related sets, all other sets are copied from *sc_ref* to *sc_new*.
 
-    Usage:
-        This module is called by function "add_year"
-    '''
+    See :meth:`add_year` for parameter descriptions.
+
+    """
 #   IV.A) Treatment of the additional years in the year-related sets
 
     # A.1. Set - year
@@ -310,22 +291,16 @@ def add_year_set(sc_ref, sc_new, years_new, firstyear_new=None,
 def add_year_par(sc_ref, sc_new, yrs_new, parname, region_list,
                  extrapolate=False, rewrite=True, unit_check=True,
                  extrapol_neg=None, bound_extend=True):
-    ''' Adding required parameters and relevant modifications:
-    Description:
-        This function adds additional years to a parameter.
-        The value of the parameter for additional years is calculated
-        mainly by interpolating and extrapolating of data from existing
-        years.
+    """Add new years to parameters.
 
-    Input arguments:
-        Please see the description for the input arguments under the
-        main function "add_year"
+    This function adds additional years to a parameter. The value of the
+    parameter for additional years is calculated mainly by interpolating and
+    extrapolating data from existing years.
 
-    Usage:
-        This module is called by function "add_year"
-    '''
+    See :meth:`add_year` for parameter descriptions.
 
-#  V.A) Initialization and checks
+    """
+    #  V.A) Initialization and checks
 
     par_list_new = sc_new.par_list().tolist()
     idx_names = sc_ref.idx_names(parname)
@@ -440,26 +415,31 @@ def add_year_par(sc_ref, sc_new, yrs_new, parname, region_list,
 # %% VI) Required functions
 def interpolate_1d(df, yrs_new, horizon, year_col, value_col='value',
                    extrapolate=False, extrapol_neg=None, bound_extend=True):
-    '''
-    Description:
-        This function receives a parameter data as a dataframe, and adds
-        new data for the additonal years by interpolation and
-        extrapolation.
+    """Interpolate data with one year dimension.
 
-    Input arguments:
-        df_par (dataframe): the dataframe of the parameter to which new
-            years to be added
-        yrs_new (list of integers): new years to be added
-        horizon (list of integers): the horizon of the reference scenario
-        year_col (string): the header of the column to which the new years
-            should be added, for example, "year_act"
-        value_col (string): the header of the column containing values
-        extrapolate: if True, the extrapolation is allowed when a new year
-            is outside the parameter years
-        extrapol_neg: if True, negative values obtained by extrapolation
-            are allowed.
-        bound_extend: if True, allows extrapolation of bounds for new years
-    '''
+    This function receives a parameter data as a dataframe, and adds new data
+    for the additonal years by interpolation and extrapolation.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The dataframe of the parameter to which new years to be added.
+    yrs_new : list of int
+        New years to be added.
+    horizon: list of int
+        The horizon of the reference scenario.
+    year_col : str
+        The header of the column to which the new years should be added, e.g.
+        `'year_act'`.
+    value_col : str
+        The header of the column containing values.
+    extrapolate : bool
+        Allow extrapolation when a new year is outside the parameter years.
+    extrapol_neg : bool
+        Allow negative values obtained by extrapolation.
+    bound_extend : bool
+        Allow extrapolation of bounds for new years
+    """
     horizon_new = sorted(horizon + yrs_new)
     idx = [x for x in df.columns if x not in [year_col, value_col]]
     if not df.empty:
@@ -565,27 +545,39 @@ def interpolate_1d(df, yrs_new, horizon, year_col, value_col='value',
 def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
                    value_col='value', extrapolate=False, extrapol_neg=None,
                    year_diff=None):
-    '''
-    Description:
-        This function receives a dataframe that has 2 time-related columns
-        (e.g., "input" or "relation_activity"), and adds new data for the
-        additonal years in both time-related columns by interpolation
-        and extrapolation.
+    """Interpolate parameters with two dimensions related year.
 
-    Input arguments:
-        df (dataframe): the parameter to which new years to be added
-        yrs_new (list of integers): new years to be added
-        horizon (list of integers): the horizon of the reference scenario
-        year_ref (string): the header of the first column to which the new
-            years should be added, for example, "year_vtg"
-        year_col (string): the header of the second column to which the
-            new years should be added, for example, "year_act"
-        value_col (string): the header of the column containing values
-        extrapolate: if True, the extrapolation is allowed when a new year
-            is outside the parameter years
-        extrapol_neg: if True, negative values obtained by extrapolation
-            are allowed.
-    '''
+    This function receives a dataframe that has 2 time-related columns (e.g.,
+    "input" or "relation_activity"), and adds new data for the additonal years
+    in both time-related columns by interpolation and extrapolation.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The dataframe of the parameter to which new years to be added.
+    yrs_new : list of int
+        New years to be added.
+    horizon: list of int
+        The horizon of the reference scenario.
+    year_ref : str
+        The header of the first column to which the new years should be added,
+        e.g. `'year_vtg'`.
+    year_col : str
+        The header of the column to which the new years should be added, e.g.
+        `'year_act'`.
+    tec_list : ???
+        ???
+    par_tec : ???
+        ???
+    value_col : str
+        The header of the column containing values.
+    extrapolate : bool
+        Allow extrapolation when a new year is outside the parameter years.
+    extrapol_neg : bool
+        Allow negative values obtained by extrapolation.
+    year_diff : ???
+        ???
+    """
     def idx_check(df1, df2):
         return df1.loc[df1.index.isin(df2.index)]
 
