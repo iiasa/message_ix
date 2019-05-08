@@ -15,8 +15,8 @@
 import numpy as np
 import pandas as pd
 
-# %% II) Utility functions for dataframe manupulation
 
+# %% II) Utility functions for dataframe manupulation
 def intpol(y1, y2, x1, x2, x):
     """Interpolate between (*x1*, *y1*) and (*x2*, *y2*) at *x*.
 
@@ -35,8 +35,6 @@ def intpol(y1, y2, x1, x2, x):
         y = y1 + ((y2 - y1) / (x2 - x1)) * (x - x1)
         return y
 
-# II.B) Utility function for slicing a MultiIndex dataframe and
-#       setting a value to a specific level
 
 def slice_df(df, idx, level, locator, value):
     """Slice a MultiIndex DataFrame and set a value to a specific level.
@@ -164,13 +162,17 @@ def add_year(sc_ref, sc_new, years_new, firstyear_new=None, lastyear_new=None,
                      'prfconst', 'grow', 'aeei', 'aeei_factor', 'gdp_rate']
         par_list = [x for x in par_list if x not in par_macro]
 
-    firstyear = sc_new.set('cat_year', {'type_year': 'firstmodelyear'})['year']
+    if not sc_new.set('cat_year', {'type_year': 'firstmodelyear'}).empty:
+        firstyear_new = sc_new.set('cat_year',
+                                   {'type_year': 'firstmodelyear'})['year']
+    else:
+        firstyear_new = min([int(x) for x in sc_new.set('year').tolist()])
     for parname in par_list:
         # For historical parameters extrapolation permitted (e.g., from
         # 2010 to 2015)
         if 'historical' in parname:
             extrapol = True
-            yrs_new = [x for x in years_new if x < int(firstyear)]
+            yrs_new = [x for x in years_new if x < int(firstyear_new)]
         else:
             extrapol = False
             yrs_new = years_new
@@ -186,12 +188,12 @@ def add_year(sc_ref, sc_new, years_new, firstyear_new=None, lastyear_new=None,
             # The loop over "node" is only for reducing the size of tables
             for node in reg_list:
                 add_year_par(sc_ref, sc_new, yrs_new, parname, [node],
-                             extrapol, rewrite, unit_check, extrapol_neg,
-                             bound_ext)
+                             firstyear_new, extrapol, rewrite, unit_check,
+                             extrapol_neg, bound_ext)
         else:
             add_year_par(sc_ref, sc_new, yrs_new, parname, reg_list,
-                         extrapol, rewrite, unit_check, extrapol_neg,
-                         bound_ext)
+                         firstyear_new, extrapol, rewrite, unit_check,
+                         extrapol_neg, bound_ext)
 
     sc_new.set_as_default()
     print('> All required parameters were successfully ' +
@@ -212,7 +214,6 @@ def add_year_set(sc_ref, sc_new, years_new, firstyear_new=None,
 
     """
 #   IV.A) Treatment of the additional years in the year-related sets
-
     # A.1. Set - year
     yrs_old = list(map(int, sc_ref.set('year')))
     horizon_new = sorted(yrs_old + years_new)
@@ -235,14 +236,15 @@ def add_year_set(sc_ref, sc_new, years_new, firstyear_new=None,
 
     # A.5. Changing the base year and initialization year of macro if a new
     # year specified
-    if not yr_cat.loc[yr_cat['type_year'] ==
-                      'baseyear_macro', 'year'].empty and baseyear_macro:
-        yr_cat.loc[yr_cat['type_year'] ==
-                   'baseyear_macro', 'year'] = baseyear_macro
-    if not yr_cat.loc[yr_cat['type_year'] ==
-                      'initializeyear_macro', 'year'].empty and baseyear_macro:
-        yr_cat.loc[yr_cat['type_year'] ==
-                   'initializeyear_macro', 'year'] = baseyear_macro
+    if baseyear_macro:
+        if not yr_cat.loc[yr_cat['type_year'] ==
+                          'baseyear_macro', 'year'].empty:
+            yr_cat.loc[yr_cat['type_year'] ==
+                       'baseyear_macro', 'year'] = baseyear_macro
+        if not yr_cat.loc[yr_cat['type_year'] ==
+                          'initializeyear_macro', 'year'].empty:
+            yr_cat.loc[yr_cat['type_year'] ==
+                       'initializeyear_macro', 'year'] = baseyear_macro
 
     yr_pair = []
     for yr in years_new:
@@ -255,11 +257,12 @@ def add_year_set(sc_ref, sc_new, years_new, firstyear_new=None,
                            ).sort_values('year').reset_index(drop=True)
 
     # A.6. Changing the cumulative years based on the new first model year
-    firstyear_new = int(yr_cat.loc[yr_cat['type_year'] == 'firstmodelyear',
-                                   'year'])
-    yr_cat = yr_cat.drop(yr_cat.loc[(yr_cat['type_year'] == 'cumulative'
-                                     ) & (yr_cat['year'] < firstyear_new)
-                                    ].index)
+    if 'firstmodelyear' in set(yr_cat['type_year']):
+        firstyear_new = int(yr_cat.loc[yr_cat['type_year'] == 'firstmodelyear',
+                                       'year'])
+        yr_cat = yr_cat.drop(yr_cat.loc[(yr_cat['type_year'] == 'cumulative'
+                                         ) & (yr_cat['year'] < firstyear_new)
+                                        ].index)
     sc_new.add_set('cat_year', yr_cat)
 
     # IV.B) Copying all other sets
@@ -288,7 +291,7 @@ def add_year_set(sc_ref, sc_new, years_new, firstyear_new=None,
 
 
 # %% V) Adding new years to parameters
-def add_year_par(sc_ref, sc_new, yrs_new, parname, region_list,
+def add_year_par(sc_ref, sc_new, yrs_new, parname, region_list, firstyear_new,
                  extrapolate=False, rewrite=True, unit_check=True,
                  extrapol_neg=None, bound_extend=True):
     """Add new years to parameters.
@@ -301,7 +304,6 @@ def add_year_par(sc_ref, sc_new, yrs_new, parname, region_list,
 
     """
     #  V.A) Initialization and checks
-
     par_list_new = sc_new.par_list().tolist()
     idx_names = sc_ref.idx_names(parname)
     horizon = sorted([int(x) for x in list(set(sc_ref.set('year')))])
@@ -349,8 +351,7 @@ def add_year_par(sc_ref, sc_new, yrs_new, parname, region_list,
     year_list = [c for c in col_list if c in ['year', 'year_vtg', 'year_act',
                                               'year_rel']]
 
-    # A uniform "unit" for values in different years to prevent mistakes in
-    # indexing and grouping
+    # A uniform "unit" for values in different years
     if 'unit' in col_list and unit_check:
         par_old = unit_uniform(par_old)
 #   ---------------------------------------------------------------------------
@@ -387,8 +388,6 @@ def add_year_par(sc_ref, sc_new, yrs_new, parname, region_list,
               ' "{}"...'.format(parname, nodes))
 
         # Flagging technologies that have lifetime for adding new timesteps
-        firstyear_new = sc_new.set('cat_year',
-                                   {'type_year': 'firstmodelyear'})['year']
         yr_list = [int(x) for x in set(sc_new.set('year')
                                        ) if int(x) > int(firstyear_new)]
         min_step = min(np.diff(sorted(yr_list)))
@@ -405,7 +404,7 @@ def add_year_par(sc_ref, sc_new, yrs_new, parname, region_list,
 
         df_y = interpolate_2d(df, yrs_new, horizon, year_ref, year_col,
                               tec_list, par_tec, 'value', extrapolate,
-                              extrapol_neg, year_diff)
+                              extrapol_neg, year_diff, bound_extend)
         sc_new.add_par(parname, df_y)
         sc_new.commit(parname)
         print('> Parameter "{}" copied and new years added'
@@ -544,7 +543,7 @@ def interpolate_1d(df, yrs_new, horizon, year_col, value_col='value',
 # %% VI.B) Interpolating parameters with two dimensions related to time
 def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
                    value_col='value', extrapolate=False, extrapol_neg=None,
-                   year_diff=None):
+                   year_diff=None, bound_extend=True):
     """Interpolate parameters with two dimensions related year.
 
     This function receives a dataframe that has 2 time-related columns (e.g.,
@@ -565,18 +564,20 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
     year_col : str
         The header of the column to which the new years should be added, e.g.
         `'year_act'`.
-    tec_list : ???
-        ???
-    par_tec : ???
-        ???
+    tec_list : list of str
+        List of technologies in the parameter `'technical_lifetime'`
+    par_tec : pandas.DataFrame
+        Parameter `'technical_lifetime'`
     value_col : str
         The header of the column containing values.
     extrapolate : bool
         Allow extrapolation when a new year is outside the parameter years.
     extrapol_neg : bool
         Allow negative values obtained by extrapolation.
-    year_diff : ???
-        ???
+    year_diff : list of int
+        List of model years with different time intervals before and after them
+    bound_extend : bool
+        Allow extrapolation of bounds for new years
     """
     def idx_check(df1, df2):
         return df1.loc[df1.index.isin(df2.index)]
@@ -598,8 +599,8 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
 
     def f(x, i):
         return x[i + 1] - x[i] > x[i] - x[i - 1]
-    yr_diff_new = [x for x in horizon_new[1:-1] if f(horizon,
-                                                     horizon.index(x))]
+    yr_diff_new = [x for x in horizon_new[1:-1] if f(horizon_new,
+                                                     horizon_new.index(x))]
 
     if year_diff and tec_list:
         if isinstance(year_diff, list):
@@ -618,10 +619,7 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
             df_y = df_count.loc[df_count['c_pre'] == df_count['c_next'] + 1]
 
             for i in df_y.index:
-                condition = ((df2.loc[[i]].notnull().cumsum(axis=1)
-                              ) == df_count['c_next'][i])
-                df2.loc[i, df2.columns > condition.idxmax(axis=1
-                                                          ).values[0]] = np.nan
+                mask_df(df2, i, df_count['c_next'][i], np.nan)
 
     # Generating duration_period_sum matrix for masking
     df_dur = pd.DataFrame(index=horizon_new[:-1], columns=horizon_new[1:])
@@ -758,8 +756,20 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
             df_next = slice_df(df2, idx, year_ref, [year_next], yr)
             df_yr = pd.concat((df_pre, idx_check(df_next, df_pre)),
                               axis=0).groupby(level=idx).mean()
-            df_yr[yr] = df_yr[yr].fillna(df_yr[[year_pre, year_next]
-                                               ].mean(axis=1))
+            if df_yr.empty:
+                continue
+            if not df_yr.empty and yr not in df_yr.columns:
+                df_yr[yr] = np.nan
+                # TODO: here is the place that should be changed if the
+                # new year should go to the time step before the existing one
+                if bound_extend and not df_next.empty:
+                    df_yr[yr] = df_yr[year_next]
+                elif bound_extend and not df_pre.empty:
+                    df_yr[yr] = df_yr[year_pre]
+
+            else:
+                df_yr[yr] = df_yr[yr].fillna(df_yr[[year_pre, year_next]
+                                                   ].mean(axis=1))
             df_yr[np.isinf(df_pre)] = df_pre
 
             # Creating a mask to remove extra values
@@ -794,10 +804,11 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
         df2 = df2.reindex(sorted(df2.columns), axis=1).sort_index()
     # -------------------------------------------------------------------------
     # Forth: final masking based on technical lifetime
-    if tec_list:
+    if tec_list and not df_dur.empty:
 
-        df3 = df2.copy()
-        idx_list = list(set(df2.index.get_level_values(year_ref)))
+        df3 = df2.loc[df2.index.get_level_values('technology').isin(tec_list),
+                      :].copy().dropna(how='all')
+        idx_list = list(set(df3.index.get_level_values(year_ref)))
         for y in sorted([x for x in idx_list if x in df_dur.index]):
             df3.loc[df3.index.get_level_values(year_ref).isin([y]),
                     df3.columns.isin(df_dur.columns)
