@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from message_ix import Scenario
 from message_ix.tools.add_year import add_year
-import math
+import pytest
 
 
 def model_setup(scen, data):
@@ -45,7 +45,7 @@ def assert_function(scen_ref, scen_new, years_new, yr_test):
     value_ref = ref['value'].mean()
     new = scen_new.par(parname, {'technology': 'tec', 'year_vtg': yr_test})
     value_new = float(new['value'])
-    assert math.isclose(value_ref, value_new, rel_tol=1e-04)
+    assert value_new == pytest.approx(value_ref, rel=1e-04)
 
     # 3. Testing parameter "var_cost" (function interpolate_2d)
     ref = scen_ref.par('var_cost', {'technology': 'tec',
@@ -60,7 +60,7 @@ def assert_function(scen_ref, scen_new, years_new, yr_test):
 
     # Asserting if the missing data is generated accurately by interpolation
     value_new = float(new['value'])
-    assert math.isclose(value_ref, value_new, rel_tol=1e-04)
+    assert value_new == pytest.approx(value_ref, rel=1e-04)
 
 
 def test_add_year(test_mp):
