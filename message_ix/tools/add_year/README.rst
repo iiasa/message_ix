@@ -8,13 +8,17 @@ This tool adds new modeling years to an existing :class:`ixmp.Scenario` (hereaft
 
     history = [690]
     model_horizon = [700, 710, 720]
-    scenario.add_horizon({'year': history + model_horizon,
+    sc_ref.add_horizon({'year': history + model_horizon,
                           'firstmodelyear': model_horizon[0]})
 
 …additional years can be added::
 
-    sc_new = scenario.clone()
-    add_year(scenario, sc_new, [705, 712, 718, 725])
+    sc_new = message_ix.Scenario(mp, sc_ref.model, sc_ref.scenario,
+                                 version='new')
+    add_year(sc_ref, sc_new, [705, 712, 718, 725])
+
+At this point, ``sc_new`` will have the years [700, 705, 710, 712, 718, 720, 725], and original or interpolated data for all these years in all parameters.
+
 
 The tool operates by creating a new empty Scenario (hereafter "new scenario") and:
 
