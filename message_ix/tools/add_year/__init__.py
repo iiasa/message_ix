@@ -91,11 +91,10 @@ def add_year(sc_ref, sc_new, years_new, firstyear_new=None, lastyear_new=None,
 
     Parameters
     -----------
-    sc_ref : str
-        Name of reference scenario (MESSAGE model/scenario instance)
-    sc_new : str
-        Name of new scenario for adding new years and required modifications
-        (MESSAGE model/scenario instance)
+    sc_ref : ixmp.Scenario
+        Reference scenario.
+    sc_new : ixmp.Scenario
+        New scenario.
     yrs_new : list of int
         New years to be added.
     firstyear_new : int, optional
@@ -565,9 +564,9 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
         The header of the column to which the new years should be added, e.g.
         `'year_act'`.
     tec_list : list of str
-        List of technologies in the parameter `'technical_lifetime'`
+        List of technologies in the parameter ``technical_lifetime``.
     par_tec : pandas.DataFrame
-        Parameter `'technical_lifetime'`
+        Parameter ``technical_lifetime``.
     value_col : str
         The header of the column containing values.
     extrapolate : bool
