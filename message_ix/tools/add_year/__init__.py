@@ -227,11 +227,17 @@ def add_year_set(sc_ref, sc_new, years_new, firstyear_new=None,
 
     # A.4. Changing the first year if needed
     if firstyear_new:
-        yr_cat.loc[yr_cat['type_year'] ==
-                   'firstmodelyear', 'year'] = firstyear_new
+        if not yr_cat.loc[yr_cat['type_year'] == 'firstmodelyear'].empty:
+            yr_cat.loc[yr_cat['type_year'] == 'firstmodelyear',
+                       'year'] = firstyear_new
+        else:
+            yr_cat.loc[len(yr_cat.index)] = ['firstmodelyear', firstyear_new]
     if lastyear_new:
-        yr_cat.loc[yr_cat['type_year'] ==
-                   'lastmodelyear', 'year'] = lastyear_new
+        if not yr_cat.loc[yr_cat['type_year'] == 'lastmodelyear'].empty:
+            yr_cat.loc[yr_cat['type_year'] == 'lastmodelyear',
+                       'year'] = lastyear_new
+        else:
+            yr_cat.loc[len(yr_cat.index)] = ['lastmodelyear', lastyear_new]
 
     # A.5. Changing the base year and initialization year of macro if a new
     # year specified
