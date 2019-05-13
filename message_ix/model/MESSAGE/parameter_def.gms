@@ -786,5 +786,6 @@ Parameters
     bound_storage_lo(node,tec,level,year_all,time)                      lower bound of storage content (percentage of capacity)
     bound_storage_up(node,tec,level,year_all,time)                      upper bound of storage content (percentage of capacity)
     storage_loss(node,tec,level,year_all,time)                          storage loss per timestep (percentage of capacity)
+    relation_storage(node,tec,level,year_all,year_all,time,time)        relation between the content of storage in two time steps (and two periods) (a value between -1 and +1)
     time_seq(time)                                                      sequence of subannual timesteps
 ;

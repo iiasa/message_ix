@@ -279,7 +279,7 @@ Equations
 * Added for storage
     STORAGE_CHANGE                  change in the content of storage
     STORAGE_BALANCE                 storage commodity (content) balance
-    STORAGE_EQUALITY                equality in the content of storage in two different time steps (like first and last timesteps)
+    STORAGE_REL                     relation between the content of storage in two different time steps (time_first * value = time_last)
     STORAGE_BOUND_LO                lower bound of the content of storage
     STORAGE_BOUND_UP                upper bound of the content of storage
 ;
@@ -2009,15 +2009,14 @@ STORAGE_BALANCE(node,storage_tec,level,year,time2)$ ( storage_loss(node,storage_
     (1 - storage_loss(node,storage_tec,level,year,time) ) ) ;
 
 ***
-* Equation STORAGE_EQUALITY
+* Equation STORAGE_RELATION
 * """""""""""""""""""""""""""""""
 *   .. math::
 *      STORAGE_{n,t,l,y,h} \eq ... (math notation to be added)
 ***
 * We can add a test to check if the storage bounds defined by the user in first and last time period doesn't violate this equation
-STORAGE_EQUALITY(node,storage_tec,level_storage,year,time)$(SUM(commodity, storage_loss(node,storage_tec,commodity,level_storage,year,time) ) AND
-    SUM((time2,year2), map_time_first_last(year,year2,time,time2) ) )..
-       STORAGE(node,storage_tec,level_storage,year,time) =E= SUM( (time2,year2)$map_time_first_last(year,year2,time,time2), STORAGE(node,storage_tec,level_storage,year,time2) );
+STORAGE_REL(node,storage_tec,level_storage,year,year2,time,time2)$(relation_storage(node,storage_tec,level_storage,year,year2,time,time2) )..
+       STORAGE(node,storage_tec,level_storage,year,time) =L= relation_storage(node,storage_tec,level_storage,year,year2,time,time2) * STORAGE(node,storage_tec,level_storage,year2,time2);
 
 ***
 * Equation STORAGE_BOUND_UP

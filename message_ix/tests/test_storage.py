@@ -80,6 +80,14 @@ def add_storage_data(scen, time_order):
     for h in time_order.keys():
         scen.add_par('time_seq', h, time_order[h], '-')
 
+    # Adding a relation between storage content of two time steps (optional)
+    yr_first = yr_last = scen.set('year').tolist()[0]
+    time_first = 'a'
+    time_last = 'd'
+    scen.add_par('relation_storage', ['node', 'dam', 'storage',
+                                      yr_first, yr_last,
+                                      time_first, time_last], 1.25, '%')
+
     # Adding minimum and maximum bound, and losses for storage (percentage)
     for year, h in product(set(scen.set('year')), time_order.keys()):
         storage_spec = ['node', 'dam', 'storage', year, h]

@@ -16,7 +16,6 @@ Sets
     macro_base_period(year_all)      flag for base year period in model horizon (period prior to first model period) - used in MACRO
 * Added for storage
     map_time_period(year_all,year_all2,time,time2)           mapping of one sub-annual timestep (time) to the next (time2)
-    map_time_first_last(year_all,year_all2,time,time2)       mapping of the first and last sub-annual timesteps in one period
 
 ;
 
@@ -50,11 +49,6 @@ map_period(year_all,year_all2)$( ORD(year_all) <= ORD(year_all2) ) = yes ;
 * mapping of sequence of time in a period
 map_time_period(year_all,year_all2,time,time2)$( ORD(year_all) = ORD(year_all2) AND time_seq(time) AND
     (time_seq(time) + 1 = time_seq(time2) ) ) = yes;
-
-* mapping of first and last time steps in a period
-map_time_first_last(year_all,year_all2,time,time2)$( ( ORD(year_all) = ORD(year_all2)) AND
-    (time_seq(time) = smin(time3$time_seq(time3),time_seq(time3) ) AND
-    time_seq(time2) = smax(time3$time_seq(time3),time_seq(time3) ) ) ) = yes;
 
 * dynamic sets (singleton) with first and last periods in model horizon of MESSAGEix (for easier reference)
 if ( sum(year_all$( cat_year("firstmodelyear",year_all) ), 1 ),

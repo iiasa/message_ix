@@ -37,6 +37,14 @@ def init_storage(scen, *args, **kwargs):
     # Initiating a parameter to specify the order of sub-annual time steps
     scen.init_par('time_seq', idx_sets=['time'])
 
+    # Initiating a parameter for relating the content f storage in two
+    # different time steps (in even in two periods) together
+    scen.init_par('relation_storage',
+                  idx_sets=['node', 'technology', 'level', 'year', 'year',
+                            'time', 'time'],
+                  idx_names=['node', 'technology', 'level', 'year_first',
+                             'year_last', 'time_first', 'time_last'])
+
     # Initiating two parameters for specifying lower and upper bounds of
     # storage reservoir, and storage losses all as % of installed capacity
     # (values should be between 0 and 1)
