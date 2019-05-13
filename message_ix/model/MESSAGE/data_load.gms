@@ -180,7 +180,7 @@ discharge_tec(tec)$(
 
 * mapping of storage reservoir technologies to their levels and charge/discharge technologies
 map_tec_storage_level(node,tec,storage_tec,level_storage,year_all,time)$(
-    SUM(commodity, storage_loss(node,storage_tec,commodity,level_storage,year_all,time) ) AND
+    storage_loss(node,storage_tec,level_storage,year_all,time) AND
     map_tec_storage(tec,storage_tec) ) = yes;
 
 *----------------------------------------------------------------------------------------------------------------------*

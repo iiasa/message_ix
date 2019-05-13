@@ -1998,7 +1998,7 @@ STORAGE_CHANGE(node,storage_tec,level,year,time)$( SUM( (mode,tec,commodity), ma
 *   .. math::
 *      STORAGE_{n,t,l,y,h} \eq ... (math notation to be added)
 ***
-STORAGE_BALANCE(node,storage_tec,level,year,time2)$ ( SUM(commodity, storage_loss(node,storage_tec,commodity,level,year,time2) )  )..
+STORAGE_BALANCE(node,storage_tec,level,year,time2)$ ( storage_loss(node,storage_tec,level,year,time2) )..
 * Showing the content level of storage at each timestep
        STORAGE(node,storage_tec,level,year,time2) =E=
 * change in the content of storage in the examined timestep
@@ -2006,7 +2006,7 @@ STORAGE_BALANCE(node,storage_tec,level,year,time2)$ ( SUM(commodity, storage_los
 * storage content in the previous subannual timestep
     + SUM((time,year2)$map_time_period(year,year2,time,time2), STORAGE(node,storage_tec,level,year,time)  *
 * considering storage losses due to keeping the storage media between two subannual timesteps
-    (1 - SUM(commodity, storage_loss(node,storage_tec,commodity,level,year,time) ) ) ) ;
+    (1 - storage_loss(node,storage_tec,level,year,time) ) ) ;
 
 ***
 * Equation STORAGE_EQUALITY
@@ -2025,9 +2025,9 @@ STORAGE_EQUALITY(node,storage_tec,level_storage,year,time)$(SUM(commodity, stora
 *   .. math::
 *      STORAGE_{n,t,l,y,h} \leq ... (math notation to be added)
 ***
-STORAGE_BOUND_UP(node,storage_tec,level,year,time)$(sum(commodity, bound_storage_up(node,storage_tec,commodity,level,year,time) ) )..
-    STORAGE(node,storage_tec,level,year,time) =L= sum( commodity, bound_storage_up(node,storage_tec,commodity,level,year,time)*
-    SUM(vintage, capacity_factor(node,storage_tec,vintage,year,time) * CAP(node,storage_tec,vintage,year) ) ) ;
+STORAGE_BOUND_UP(node,storage_tec,level,year,time)$(bound_storage_up(node,storage_tec,level,year,time) )..
+    STORAGE(node,storage_tec,level,year,time) =L= bound_storage_up(node,storage_tec,level,year,time)*
+    SUM(vintage, capacity_factor(node,storage_tec,vintage,year,time) * CAP(node,storage_tec,vintage,year) ) ;
 
 ***
 * Equation STORAGE_BOUND_LO
@@ -2035,9 +2035,9 @@ STORAGE_BOUND_UP(node,storage_tec,level,year,time)$(sum(commodity, bound_storage
 *   .. math::
 *      STORAGE_{n,t,l,y,h} \geq ... (math notation to be added)
 ***
-STORAGE_BOUND_LO(node,storage_tec,level,year,time)$(sum(commodity, bound_storage_lo(node,storage_tec,commodity,level,year,time) ) )..
-    STORAGE(node,storage_tec,level,year,time) =G= sum( commodity, bound_storage_lo(node,storage_tec,commodity,level,year,time)*
-    SUM(vintage, capacity_factor(node,storage_tec,vintage,year,time) * CAP(node,storage_tec,vintage,year) ) ) ;
+STORAGE_BOUND_LO(node,storage_tec,level,year,time)$(bound_storage_lo(node,storage_tec,level,year,time) )..
+    STORAGE(node,storage_tec,level,year,time) =G= bound_storage_lo(node,storage_tec,level,year,time)*
+    SUM(vintage, capacity_factor(node,storage_tec,vintage,year,time) * CAP(node,storage_tec,vintage,year) ) ;
 
 *----------------------------------------------------------------------------------------------------------------------*
 * model statements                                                                                                     *

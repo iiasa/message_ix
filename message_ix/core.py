@@ -38,14 +38,12 @@ def init_storage(scen, *args, **kwargs):
     scen.init_par('time_seq', idx_sets=['time'])
 
     # Initiating two parameters for specifying lower and upper bounds of
-    # storage reservoir as percentage of installed reservoir capacity
-    par_list_stor = ['bound_storage_lo', 'bound_storage_up']
-    for parname in par_list_stor:
-        scen.init_par(parname, idx_sets=['node', 'technology', 'commodity',
+    # storage reservoir, and storage losses all as % of installed capacity
+    # (values should be between 0 and 1)
+    par_stor = ['bound_storage_lo', 'bound_storage_up', 'storage_loss']
+    for parname in par_stor:
+        scen.init_par(parname, idx_sets=['node', 'technology',
                                          'level', 'year', 'time'])
-    # Initiating a parameter for specifying storage losses (percentage)
-    scen.init_par('storage_loss', idx_sets=['node', 'technology', 'commodity',
-                                            'level', 'year', 'time'])
 
 
 def _init_scenario(s, commit=False):
