@@ -35,7 +35,7 @@ def model_setup(scen, years):
 
 # A function for adding sub-annual time steps to a MESSAGEix model
 def add_seasonality(scen, time_duration):
-    scen.add_set('time', list(set(time_duration.keys())))
+    scen.add_set('time', sorted(list(set(time_duration.keys()))))
     scen.add_set('lvl_temporal', 'season')
     for h, duration in time_duration.items():
         scen.add_set('map_temporal_hierarchy', ['season', h, 'year'])

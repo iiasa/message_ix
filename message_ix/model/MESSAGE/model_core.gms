@@ -1998,7 +1998,7 @@ STORAGE_CHANGE(node,storage_tec,level,year,time)$( SUM( (mode,tec,commodity), ma
 *   .. math::
 *      STORAGE_{n,t,l,y,h} \eq ... (math notation to be added)
 ***
-STORAGE_BALANCE(node,storage_tec,level,year,time2)$ ( storage_loss(node,storage_tec,level,year,time2) )..
+STORAGE_BALANCE(node,storage_tec,level,year,time2)$ ( SUM(tec, map_tec_storage_level(node,tec,storage_tec,level,year,time2) ) )..
 * Showing the content level of storage at each timestep
        STORAGE(node,storage_tec,level,year,time2) =E=
 * change in the content of storage in the examined timestep
