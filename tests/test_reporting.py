@@ -20,7 +20,7 @@ def test_reporter(test_mp):
     assert 'demand:n-c-l-y-h' in rep.graph
 
     # Aggregates are available
-    assert len(rep.graph) == 2689
+    assert len(rep.graph) == 4824
     assert 'demand:n-l-h' in rep.graph
 
     # Quantities are available

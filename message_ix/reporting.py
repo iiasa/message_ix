@@ -1,11 +1,11 @@
-from ixmp.reporting import Reporter as IXMPReporter
-from ixmp.reporting.utils import ureg, rename_dims
+from ixmp.reporting import Reporter as IXMPReporter, configure
+from ixmp.reporting.utils import rename_dims
 
 
 # Adjust the ixmp default reporting for MESSAGEix
 
 # Units appearing in MESSAGEix test data
-ureg.define('y = year')
+configure(units='y = year')
 
 # Short names for dimensions
 rename_dims.update({
