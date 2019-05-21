@@ -3,6 +3,7 @@ from functools import partial
 from ixmp.reporting import Reporter as IXMPReporter, configure
 from ixmp.reporting.utils import Key, rename_dims
 
+from . import computations
 from .pyam import as_pyam
 
 # Adjust the ixmp default reporting for MESSAGEix
@@ -57,3 +58,12 @@ class Reporter(IXMPReporter):
                            'scenario', year_time_dim, qty))
             keys.append(key)
         return keys
+
+    def write(self, key, path):
+        """Write the report *key* to the file *path*.
+
+        In addition to the formats handled by :meth:`ixmp.Reporter.write`,
+        this version will write :mod:`pyam.IamDataFrame` to CSV or Excel files
+        using built-in methods.
+        """
+        computations.write_report(self.get(key), path)

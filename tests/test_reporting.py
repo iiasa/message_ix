@@ -1,5 +1,9 @@
 from functools import partial
 from logging import WARNING
+try:
+    from pathlib import Path
+except:
+    from pathlib2 import Path
 
 import pandas as pd
 from pandas.testing import assert_series_equal
@@ -37,7 +41,7 @@ def test_reporter(test_mp):
     assert_xr_equal(rep.get('demand:n-c-l-y-h').squeeze(drop=True), demand)
 
 
-def test_report_as_pyam(test_mp, caplog):
+def test_report_as_pyam(test_mp, caplog, tmp_path):
     scen = Scenario(test_mp,
                     'canning problem (MESSAGE scheme)',
                     'standard')
@@ -75,12 +79,13 @@ def test_report_as_pyam(test_mp, caplog):
 
     # Keys of added nodes are returned
     assert len(keys) == 1
-    assert keys[0] == str(ACT) + ':iamc'
+    key2, *_ = keys
+    assert key2 == str(ACT) + ':iamc'
 
     caplog.clear()
 
     # Result
-    idf2 = rep.get(keys[0])
+    idf2 = rep.get(key2)
     df2 = idf2.as_pandas()
 
     # Extra columns have been removed
@@ -98,3 +103,11 @@ def test_report_as_pyam(test_mp, caplog):
         'Activity|transport_from_seattle|to_topeka',
     ], name='variable')
     assert_series_equal(df2['variable'], variable)
+
+    # message_ix.Reporter uses pyam.IamDataFrame.to_csv() to write to file
+    path = tmp_path / 'activity.csv'
+    rep.write(key2, path)
+
+    # File contents are as expected
+    expected = Path(__file__).parent / 'data' / 'report-pyam-write.csv'
+    assert path.read_text() == expected.read_text()
