@@ -48,36 +48,37 @@ def test_report_as_pyam(test_mp, caplog, tmp_path):
     scen.solve()
     rep = Reporter.from_scenario(scen)
 
-    # TODO add an ixmp convenience for this
-    ACT = next(filter(lambda k: 'ACT:' in str(k), rep.graph['all']))
+    # Key for 'ACT' variable at full resolution
+    ACT = rep.full_key('ACT')
 
     # Add a computation that converts ACT to a pyam.IamDataFrame
-    rep.add('ACT IAMC', (partial(as_pyam, drop=['yv']),
-                         'scenario', 'ya', ACT))
+    rep.add('ACT IAMC', (partial(as_pyam, drop=['yv']), 'scenario', 'ya', ACT))
 
     # Result is an IamDataFrame
     idf1 = rep.get('ACT IAMC')
     assert isinstance(idf1, pyam.IamDataFrame)
 
-    # Expected length
+    # …of expected length
     assert len(idf1) == 8
 
-    # Variables are not renamed
+    # …in which variables are not renamed
     assert idf1['variable'].unique() == 'ACT'
-    # TODO add more assertions
 
     # Warning was logged because of extra columns
     w = "Extra columns ['h', 'm', 't'] when converting ['ACT'] to IAMC format"
     assert ('message_ix.reporting.pyam', WARNING, w) in caplog.record_tuples
 
-    # Using the message_ix.Reporter convenience function
+    # Repeat, using the message_ix.Reporter convenience function
     def m_t(row):
+        """Callback for collapsing ACT columns."""
+        # .pop() removes the named column from the returned row
         row['variable'] = '|'.join(['Activity', row.pop('t'), row.pop('m')])
         return row
 
+    # Use the convenience function to add the node
     keys = rep.as_pyam(ACT, 'ya', collapse=m_t)
 
-    # Keys of added nodes are returned
+    # Keys of added node(s) are returned
     assert len(keys) == 1
     key2, *_ = keys
     assert key2 == str(ACT) + ':iamc'
@@ -88,10 +89,12 @@ def test_report_as_pyam(test_mp, caplog, tmp_path):
     idf2 = rep.get(key2)
     df2 = idf2.as_pandas()
 
-    # Extra columns have been removed
+    # Extra columns have been removed:
+    # - m and t by the collapse callback.
+    # - h automatically, because 'ya' was used for the year index.
     assert not any(c in df2.columns for c in ['h', 'm', 't'])
 
-    # Variable names
+    # Variable names were formatted by the callback
     variable = pd.Series([
         'Activity|canning_plant|production',
         'Activity|transport_from_san-diego|to_chicago',
