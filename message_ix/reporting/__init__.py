@@ -1,6 +1,9 @@
-from ixmp.reporting import Reporter as IXMPReporter, configure
-from ixmp.reporting.utils import rename_dims
+from functools import partial
 
+from ixmp.reporting import Reporter as IXMPReporter, configure
+from ixmp.reporting.utils import Key, rename_dims
+
+from .pyam import as_pyam
 
 # Adjust the ixmp default reporting for MESSAGEix
 
@@ -39,6 +42,18 @@ rename_dims.update({
 
 class Reporter(IXMPReporter):
     """MESSAGEix Reporter."""
-    def __init__(self):
-        # TODO add MESSAGE_ix specific nodes from a file
-        super().__init__()
+
+    def as_pyam(self, quantities, year_time_dim, drop={}, collapse=None):
+        if not isinstance(quantities, list):
+            quantities = [quantities]
+        keys = []
+        for qty in quantities:
+            # Dimensions to drop automatically
+            qty = Key.from_str_or_key(qty)
+            to_drop = set(drop) | set(qty._dims) & (
+                {'h', 'y', 'ya', 'yr', 'yv'} - {year_time_dim})
+            key = Key.from_str_or_key(qty, tag='iamc')
+            self.add(key, (partial(as_pyam, drop=to_drop, collapse=collapse),
+                           'scenario', year_time_dim, qty))
+            keys.append(key)
+        return keys
