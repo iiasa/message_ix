@@ -18,9 +18,10 @@ before_install:
   - source activate testing
 
 install:
-  - git clone https://github.com/iiasa/ixmp.git
+  # FIXME temporary, for development
+  - git clone -b feature/reporting2 https://github.com/khaeru/ixmp.git
   - cd ixmp && python setup.py install && cd ..
-  - python setup.py install
+  - pip install .[reporting]
 
 script:
   - python -c "import os, sys; assert os.environ['PYVERSION'] == sys.version[0]"
