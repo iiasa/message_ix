@@ -26,10 +26,11 @@ install:
   - conda install --yes -c conda-forge ixmp xlsxwriter xlrd
   - conda remove --force --yes ixmp
 
-  - git clone https://github.com/iiasa/ixmp.git
+  # FIXME temporary, for development
+  - git clone -b feature/reporting2 https://github.com/khaeru/ixmp.git
   - cd ixmp && python setup.py install && cd ..
 
-  - python setup.py install
+  - pip install .[reporting]
 
 build: false
 
