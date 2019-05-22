@@ -2,7 +2,6 @@ from logging import getLogger
 
 import pandas as pd
 from pyam import IAMC_IDX, IamDataFrame
-import xarray as xr
 
 
 log = getLogger(__name__)
