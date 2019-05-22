@@ -24,7 +24,7 @@ def test_reporter(test_mp):
     rep = Reporter.from_scenario(scen)
 
     # Number of quantities available in a rudimentary MESSAGEix Scenario
-    assert len(rep.graph['all']) == 101
+    assert len(rep.graph['all']) == 101, rep.graph['all']
 
     # Quantities have short dimension names
     assert 'demand:n-c-l-y-h' in rep.graph
