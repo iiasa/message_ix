@@ -2,7 +2,7 @@ from functools import partial
 from logging import WARNING
 try:
     from pathlib import Path
-except:
+except ImportError:
     from pathlib2 import Path
 
 import pandas as pd
