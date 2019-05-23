@@ -6,7 +6,7 @@ except ImportError:
     from pathlib2 import Path
 
 import pandas as pd
-from pandas.testing import assert_series_equal
+from pandas.testing import assert_frame_equal
 import pyam
 import xarray as xr
 from xarray.testing import assert_equal as assert_xr_equal
@@ -95,17 +95,17 @@ def test_report_as_pyam(test_mp, caplog, tmp_path):
     assert not any(c in df2.columns for c in ['h', 'm', 't'])
 
     # Variable names were formatted by the callback
-    variable = pd.Series([
-        'Activity|canning_plant|production',
-        'Activity|transport_from_san-diego|to_chicago',
-        'Activity|transport_from_san-diego|to_new-york',
-        'Activity|transport_from_san-diego|to_topeka',
-        'Activity|canning_plant|production',
-        'Activity|transport_from_seattle|to_chicago',
-        'Activity|transport_from_seattle|to_new-york',
-        'Activity|transport_from_seattle|to_topeka',
-    ], name='variable')
-    assert_series_equal(df2['variable'], variable)
+    reg_var = pd.DataFrame([
+        ['san-diego', 'Activity|canning_plant|production'],
+        ['san-diego', 'Activity|transport_from_san-diego|to_chicago'],
+        ['san-diego', 'Activity|transport_from_san-diego|to_new-york'],
+        ['san-diego', 'Activity|transport_from_san-diego|to_topeka'],
+        ['seattle', 'Activity|canning_plant|production'],
+        ['seattle', 'Activity|transport_from_seattle|to_chicago'],
+        ['seattle', 'Activity|transport_from_seattle|to_new-york'],
+        ['seattle', 'Activity|transport_from_seattle|to_topeka'],
+    ], columns=['region', 'variable'])
+    assert_frame_equal(df2[['region', 'variable']], reg_var)
 
     # message_ix.Reporter uses pyam.IamDataFrame.to_csv() to write to file
     path = tmp_path / 'activity.csv'
