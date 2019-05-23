@@ -1974,12 +1974,53 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
     REL(relation,node,year)
 %SLACK_RELATION_BOUND_LO% + SLACK_RELATION_BOUND_LO(relation,node,year)
     =G= relation_lower(relation,node,year) ;
+*----------------------------------------------------------------------------------------------------------------------*
+***
+* .. _representation_of_storage_solutions:
+*
+* Representation of storage technologies
+* -------------------------------------------------
+*
+* Storage technologies can be used to store a commodity (e.g., water, heat, electricity, etc.) and shift it over sub-annual time slices.
+* The storage solution presented here has three distinctive parts:
+* charger: a technology for charging a commodity to the storage container, for example, a pump in a pumped hydropower storage (PHS) plant
+* discharger: a technology to convert the stored commodity to the output commodity, e.g., a turbine in PHS
+* storage container: a device for storing a commodity over time, such as a water reservoir in PHS
+*
+* Storage equations
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* The content of storage device depends on three factors: charge or discharge in one time step (i.e., represented as STORAGE_CHANGE),
+* the state of charge in the previous time step, and storage losses between two consecutive time steps.
+*
+* Equation STORAGE_CHANGE
+* """""""""""""""""""""""""""""
+*   .. math::
+*      STORAGE\_CHG_{n,t,l,y,h} = \sum_{t} \Bigg(
+*          & \ relation\_new\_capacity_{r,n,y,t} \cdot CAP\_NEW_{n,t,y} \\[4 pt]
+*          & + relation\_total\_capacity_{r,n,y,t} \cdot \sum_{y^V \leq y} \ CAP_{n,t,y^V,y} \\
+*          & + \sum_{n^L,y',m,h} \ relation\_activity_{r,n,y,n^L,t,y',m} \\
+*          & \quad \quad \cdot \Big( \sum_{y^V \leq y'} ACT_{n^L,t,y^V,y',m,h}
+*                              + historical\_activity_{n^L,t,y',m,h} \Big) \Bigg)
 
+*     \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} output_{n^L,t,y^V,y,m,n,c,l,h^A,h}
+*         \cdot duration\_time\_rel_{h,h^A} \cdot & ACT_{n^L,t,y^V,y,m,h^A} \\
+*     - \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} input_{n^L,t,y^V,y,m,n,c,l,h^A,h}
+*         \cdot duration\_time\_rel_{h,h^A} \cdot & ACT_{n^L,t,m,y,h^A} \\
+* The parameter :math:`historical\_new\_capacity_{r,n,y}` is not included here, because relations can only be active
+* in periods included in the model horizon and there is no "writing" of capacity relation factors across periods.
+***
 ***
 * Equation STORAGE_CHANGE
 * """""""""""""""""""""""""""""""
+* This equation shows the change in the content of a storage container in each sub-annual time slice based on
+* the activity of charger and discharge technologies connected to that storage container.
+* The notation :math:`S^{storage}` represents the mapping set `map_tec_storage_level` denoting charger-discharger
+* technologies connected to a specific storage technology in a specific node and storage level.
 *   .. math::
-*      STORAGE\_CHG_{n,t,l,y,h} \eq ... (math notation to be added)
+*      STORAGE\_CHG_{n,t^S,l,y,h} = \sum_{\substack{n^L,m,c,h^A \\ y^V \leq y, (n,t^C,t^S,l,y) \sim S^{storage}}} output_{n^L,t^C,y^V,y,m,n,c,l,h^A,h}
+*         \cdot & ACT_{n^L,t^C,y^V,y,m,h^A} \\
+*     - \sum_{\substack{n^L,m,c,h^A \\ y^V \leq y, (n,t^D,t^S,l,y) \sim S^{storage}}} input_{n^L,t^D,y^V,y,m,n,c,l,h^A,h}
+*         \cdot & ACT_{n^L,t^D,y^V,y,m,h^A} \\
 ***
 STORAGE_CHANGE(node,storage_tec,level,year,time)$( SUM( (mode,tec,commodity), map_tec_storage_level(node,tec,storage_tec,level,year,time) AND
     (map_tec_charge(node,tec,mode,commodity,level,year,time) OR map_tec_discharge(node,tec,mode,commodity,level,year,time) ) ) )..
@@ -1995,12 +2036,14 @@ STORAGE_CHANGE(node,storage_tec,level,year,time)$( SUM( (mode,tec,commodity), ma
 ***
 * Equation STORAGE_BALANCE
 * """""""""""""""""""""""""""""""
+* This equation ensures the commodity balance of storage technologies between sub-annual time steps within a model period.
 *   .. math::
-*      STORAGE_{n,t,l,y,h} \eq ... (math notation to be added)
+*      STORAGE_{n,t^S,l,y,h} \ = STORAGE\_CHG_{n,t^S,l,y,h} + \\
+*      STORAGE_{n,t^S,l,y,h^A} \cdot & (1 - storage\_loss_{n,t^S,l,y,h^A})
 ***
 STORAGE_BALANCE(node,storage_tec,level,year,time2)$ ( SUM(tec, map_tec_storage_level(node,tec,storage_tec,level,year,time2) ) )..
 * Showing the content level of storage at each timestep
-       STORAGE(node,storage_tec,level,year,time2) =E=
+    STORAGE(node,storage_tec,level,year,time2) =E=
 * change in the content of storage in the examined timestep
     STORAGE_CHG(node,storage_tec,level,year,time2)
 * storage content in the previous subannual timestep
@@ -2011,18 +2054,22 @@ STORAGE_BALANCE(node,storage_tec,level,year,time2)$ ( SUM(tec, map_tec_storage_l
 ***
 * Equation STORAGE_RELATION
 * """""""""""""""""""""""""""""""
+* The content of storage in two sub-annual time steps, either in one period or in two different periods, can be related together.
+* This equation will be only active if the input parameter `relation_storage` is defined by the user.
 *   .. math::
-*      STORAGE_{n,t,l,y,h} \eq ... (math notation to be added)
+*      STORAGE_{n,t^S,l,y^f,h^f} \leq relation\_storage_{n,t^S,l,y^f,y^l,h^f,h^l} \cdot & STORAGE_{n,t^S,l,y^l,h^l}
 ***
-* We can add a test to check if the storage bounds defined by the user in first and last time period doesn't violate this equation
 STORAGE_REL(node,storage_tec,level_storage,year,year2,time,time2)$(relation_storage(node,storage_tec,level_storage,year,year2,time,time2) )..
-       STORAGE(node,storage_tec,level_storage,year,time) =L= relation_storage(node,storage_tec,level_storage,year,year2,time,time2) * STORAGE(node,storage_tec,level_storage,year2,time2);
+    STORAGE(node,storage_tec,level_storage,year,time) =L=
+    relation_storage(node,storage_tec,level_storage,year,year2,time,time2) * STORAGE(node,storage_tec,level_storage,year2,time2);
 
 ***
 * Equation STORAGE_BOUND_UP
 * """""""""""""""""""""""""""""""
+* The upper bound on the content of storage can be defined as the percentage of installed capacity of storage device.
 *   .. math::
-*      STORAGE_{n,t,l,y,h} \leq ... (math notation to be added)
+*      STORAGE_{n,t^S,l,y,h} \leq bound\_storage\up_{n,t^S,l,y,h} \cdot &
+*      \sum_{\substack{y^V \leq y}} capacity\_factor_{n,t^S,y^V,y,h} \cdot CAP_{n,t^S,y^V,y}
 ***
 STORAGE_BOUND_UP(node,storage_tec,level,year,time)$(bound_storage_up(node,storage_tec,level,year,time) )..
     STORAGE(node,storage_tec,level,year,time) =L= bound_storage_up(node,storage_tec,level,year,time)*
@@ -2031,8 +2078,10 @@ STORAGE_BOUND_UP(node,storage_tec,level,year,time)$(bound_storage_up(node,storag
 ***
 * Equation STORAGE_BOUND_LO
 * """""""""""""""""""""""""""""""
+* The lower bound on the content of storage as the percentage of installed capacity of storage device.
 *   .. math::
-*      STORAGE_{n,t,l,y,h} \geq ... (math notation to be added)
+*      STORAGE_{n,t^S,l,y,h} \geq bound\_storage\lo_{n,t^S,l,y,h} \cdot &
+*      \sum_{\substack{y^V \leq y}} capacity\_factor_{n,t^S,y^V,y,h} \cdot CAP_{n,t^S,y^V,y}
 ***
 STORAGE_BOUND_LO(node,storage_tec,level,year,time)$(bound_storage_lo(node,storage_tec,level,year,time) )..
     STORAGE(node,storage_tec,level,year,time) =G= bound_storage_lo(node,storage_tec,level,year,time)*
