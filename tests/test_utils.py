@@ -2,7 +2,9 @@ import pytest
 
 import pandas as pd
 
+from message_ix import Scenario
 import message_ix.utils as utils
+import message_ix.testing
 import pandas.util.testing as pdt
 
 
@@ -15,3 +17,16 @@ def test_make_df():
 
 def test_make_df_raises():
     pytest.raises(ValueError, utils.make_df, 42, baz=[42, 42])
+
+
+def test_testing(test_mp):
+    # Check the model creation functions in testing.py
+    scen = message_ix.testing.make_dantzig(test_mp, True)
+    assert isinstance(scen, Scenario)
+
+    scen = message_ix.testing.make_dantzig(test_mp, solve=True,
+                                           multi_year=True)
+    assert isinstance(scen, Scenario)
+
+    with pytest.raises(NotImplementedError):
+        message_ix.testing.make_westeros(test_mp, True)

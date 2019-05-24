@@ -8,6 +8,7 @@ import pandas.util.testing as pdt
 
 from message_ix import Scenario
 
+
 msg_args = ('canning problem (MESSAGE scheme)', 'standard')
 msg_multiyear_args = ('canning problem (MESSAGE scheme)', 'multi-year')
 
