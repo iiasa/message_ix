@@ -5,6 +5,7 @@ try:
 except ImportError:
     from pathlib2 import Path
 
+from ixmp.reporting import Reporter as ixmp_Reporter
 import pandas as pd
 from pandas.testing import assert_frame_equal
 import pyam
@@ -20,25 +21,47 @@ def test_reporter(test_mp):
                     'canning problem (MESSAGE scheme)',
                     'standard')
 
-    # Reporter can be initialized
+    # Varies between local & CI contexts
+    # DEBUG may be due to reuse of test_mp in a non-deterministic order
+    if not scen.has_solution():
+        scen.solve()
+
+    # IXMPReporter can be initialized on a MESSAGE Scenario
+    rep_ix = ixmp_Reporter.from_scenario(scen)
+
+    # message_ix.Reporter can also be initialized
     rep = Reporter.from_scenario(scen)
 
     # Number of quantities available in a rudimentary MESSAGEix Scenario
-    assert len(rep.graph['all']) == 101, rep.graph['all']
+    assert len(rep.graph['all']) == 118
 
     # Quantities have short dimension names
     assert 'demand:n-c-l-y-h' in rep.graph
 
     # Aggregates are available
-    assert len(rep.graph) == 4824
     assert 'demand:n-l-h' in rep.graph
 
-    # Quantities are available
+    # Quantities contain expected data
     dims = dict(coords=['chicago new-york topeka'.split()], dims=['n'])
     demand = xr.DataArray([300, 325, 275], **dims)
 
     # NB the call to squeeze() drops the length-1 dimensions c-l-y-h
     assert_xr_equal(rep.get('demand:n-c-l-y-h').squeeze(drop=True), demand)
+
+    # ixmp.Reporter pre-populated with only model quantities and aggregates
+    assert len(rep_ix.graph) == 5102
+
+    # message_ix.Reporter pre-populated with additional, derived quantities
+    assert len(rep.graph) == 9630
+
+    # Derived quantities have expected dimensions
+    vom_key = rep.full_key('vom')
+    assert vom_key not in rep_ix
+    assert vom_key == 'vom:nl-t-yv-ya-m-h'
+
+    # …and expected values
+    vom = rep.get(rep.full_key('ACT')) * rep.get(rep.full_key('var_cost'))
+    assert_xr_equal(vom, rep.get(vom_key))
 
 
 def test_report_as_pyam(test_mp, caplog, tmp_path):

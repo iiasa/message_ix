@@ -1,10 +1,18 @@
 from functools import partial
+import logging
 
-from ixmp.reporting import Reporter as IXMPReporter, configure
+from ixmp.reporting import (
+    Reporter as IXMPReporter,
+    configure,
+)
 from ixmp.reporting.utils import Key, rename_dims
 
 from . import computations
 from .pyam import as_pyam
+
+
+log = logging.getLogger(__name__)
+
 
 # Adjust the ixmp default reporting for MESSAGEix
 
@@ -43,6 +51,46 @@ rename_dims.update({
 
 class Reporter(IXMPReporter):
     """MESSAGEix Reporter."""
+    @classmethod
+    def from_scenario(self, scenario, **kwargs):
+        # Invoke the ixmp method
+        rep = super().from_scenario(scenario, **kwargs)
+
+        # Add basic derived quantities
+        # NB this could be moved out to a utility method + YAML config
+        products = [
+            ('out',      ['output', 'ACT']),
+            ('out_hist', ['output', 'ref_activity']),
+            ('in',       ['input', 'ACT']),
+            ('in_hist',  ['input', 'ref_activity']),
+            ('emi',      ['emission_factor', 'ACT']),
+            ('emi_hist', ['emission_factor', 'ref_activity']),
+            ('inv',      ['inv_cost', 'CAP_NEW']),
+            ('inv_hist', ['inv_cost', 'ref_new_capacity']),
+            ('fom',      ['fix_cost', 'CAP']),
+            ('fom_hist', ['fix_cost', 'ref_capacity']),
+            ('vom',      ['var_cost', 'ACT']),
+            ('vom_hist', ['var_cost', 'ref_activity']),
+        ]
+        for name, quantities in products:
+            # Fetch the full key for each quantity
+            try:
+                base_keys = [rep.full_key(q) for q in quantities]
+            except KeyError as e:
+                log.info('{} not in scenario → not adding {}'
+                         .format(e.args[0], name))
+
+            # Compute a key for the result
+            key = Key.product(name, *base_keys)
+
+            # Add the basic product to the graph and index
+            rep.add(key, tuple([computations.product] + base_keys))
+            rep._index[name] = key
+
+            # Add partial sums of the product
+            rep.apply(key.iter_sums)
+
+        return rep
 
     def as_pyam(self, quantities, year_time_dim, drop={}, collapse=None):
         if not isinstance(quantities, list):
