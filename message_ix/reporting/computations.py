@@ -1,4 +1,7 @@
-from ixmp.reporting.computations import write_report as ixmp_write_report
+from ixmp.reporting.computations import (  # noqa: F401
+    product,
+    write_report as ixmp_write_report
+)
 import pyam
 
 
