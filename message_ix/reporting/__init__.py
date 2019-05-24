@@ -35,7 +35,7 @@ rename_dims.update({
     'technology': 't',
     'time': 'h',
     'year': 'y',
-    # New
+    # Aliases
     'node_dest': 'nd',
     'node_loc': 'nl',
     'node_origin': 'no',
@@ -48,47 +48,39 @@ rename_dims.update({
     'year_rel': 'yr',
 })
 
+# Basic derived quantities that are the product of two others
+products = (
+    ('out',      ('output', 'ACT')),
+    ('out_hist', ('output', 'ref_activity')),
+    ('in',       ('input', 'ACT')),
+    ('in_hist',  ('input', 'ref_activity')),
+    ('emi',      ('emission_factor', 'ACT')),
+    ('emi_hist', ('emission_factor', 'ref_activity')),
+    ('inv',      ('inv_cost', 'CAP_NEW')),
+    ('inv_hist', ('inv_cost', 'ref_new_capacity')),
+    ('fom',      ('fix_cost', 'CAP')),
+    ('fom_hist', ('fix_cost', 'ref_capacity')),
+    ('vom',      ('var_cost', 'ACT')),
+    ('vom_hist', ('var_cost', 'ref_activity')),
+)
+
 
 class Reporter(IXMPReporter):
     """MESSAGEix Reporter."""
     @classmethod
-    def from_scenario(self, scenario, **kwargs):
+    def from_scenario(cls, scenario, **kwargs):
         # Invoke the ixmp method
         rep = super().from_scenario(scenario, **kwargs)
 
-        # Add basic derived quantities
-        # NB this could be moved out to a utility method + YAML config
-        products = [
-            ('out',      ['output', 'ACT']),
-            ('out_hist', ['output', 'ref_activity']),
-            ('in',       ['input', 'ACT']),
-            ('in_hist',  ['input', 'ref_activity']),
-            ('emi',      ['emission_factor', 'ACT']),
-            ('emi_hist', ['emission_factor', 'ref_activity']),
-            ('inv',      ['inv_cost', 'CAP_NEW']),
-            ('inv_hist', ['inv_cost', 'ref_new_capacity']),
-            ('fom',      ['fix_cost', 'CAP']),
-            ('fom_hist', ['fix_cost', 'ref_capacity']),
-            ('vom',      ['var_cost', 'ACT']),
-            ('vom_hist', ['var_cost', 'ref_activity']),
-        ]
+        # Add basic derived quantities for MESSAGEix models
         for name, quantities in products:
-            # Fetch the full key for each quantity
-            try:
-                base_keys = [rep.full_key(q) for q in quantities]
-            except KeyError as e:
+            new_key = rep.add_product(name, *quantities)
+
+            # Give some log output
+            if new_key is None:
+                missing = [q for q in quantities if q not in rep._index]
                 log.info('{} not in scenario → not adding {}'
-                         .format(e.args[0], name))
-
-            # Compute a key for the result
-            key = Key.product(name, *base_keys)
-
-            # Add the basic product to the graph and index
-            rep.add(key, tuple([computations.product] + base_keys))
-            rep._index[name] = key
-
-            # Add partial sums of the product
-            rep.apply(key.iter_sums)
+                         .format(missing, name))
 
         return rep
 
