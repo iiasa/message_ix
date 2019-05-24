@@ -1,17 +1,17 @@
 import collections
 import copy
-import ixmp
 import itertools
 import os
 import warnings
 
-import pandas as pd
+import ixmp
 import numpy as np
-
-from message_ix import default_paths
-
 from ixmp.utils import pd_read, pd_write
-from message_ix.utils import isscalar, logger
+import pandas as pd
+
+from . import default_paths
+from .utils import isscalar, logger
+
 
 DEFAULT_SOLVE_OPTIONS = {
     'advind': 0,
