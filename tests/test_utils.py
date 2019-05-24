@@ -28,5 +28,5 @@ def test_testing(test_mp):
                                            multi_year=True)
     assert isinstance(scen, Scenario)
 
-    with pytest.raises(NotImplementedError):
-        message_ix.testing.make_westeros(test_mp, True)
+    scen = message_ix.testing.make_westeros(test_mp, True)
+    assert isinstance(scen, Scenario)

@@ -9,6 +9,10 @@ models = {
         'model': 'Canning problem (MESSAGE scheme)',
         'scenario': 'standard',
     },
+    'westeros': {
+        'model': 'Westeros Electrified',
+        'scenario': 'baseline',
+    },
 }
 
 
@@ -119,5 +123,239 @@ def make_dantzig(mp, solve=False, multi_year=False):
 
 
 def make_westeros(mp, solve=False):
-    """Define and optionally solve the Westeros model."""
-    raise NotImplementedError
+    """Define and optionally solve the Westeros model.
+
+    This method defines the same model used in the ``westeros_baseline.ipynb``
+    tutorial.
+    """
+    scen = Scenario(mp, **models['westeros'], version='new')
+
+    # Sets
+
+    history = [690]
+    model_horizon = [700, 710, 720]
+    scen.add_horizon({'year': history + model_horizon,
+                      'firstmodelyear': model_horizon[0]})
+
+    country = 'Westeros'
+    scen.add_spatial_sets({'country': country})
+
+    sets = {
+        'technology': 'coal_ppl wind_ppl grid bulb'.split(),
+        'mode': ['standard'],
+        'level': 'secondary final useful'.split(),
+        'commodity': 'electricity light'.split(),
+    }
+
+    for name, values in sets.items():
+        scen.add_set(name, values)
+
+    # Parameters — copy & paste from the tutorial notebook
+
+    gdp_profile = pd.Series([1., 1.5, 1.9],
+                            index=pd.Index(model_horizon, name='Time'))
+    gdp_profile.plot(title='Demand')
+    demand_per_year = 40 * 12 * 1000 / 8760
+    light_demand = pd.DataFrame({
+        'node': country,
+        'commodity': 'light',
+        'level': 'useful',
+        'year': model_horizon,
+        'time': 'year',
+        'value': (100 * gdp_profile).round(),
+        'unit': 'GWa',
+    })
+    scen.add_par("demand", light_demand)
+
+    year_df = scen.vintage_and_active_years()
+    vintage_years, act_years = year_df['year_vtg'], year_df['year_act']
+
+    base = {
+        'node_loc': country,
+        'year_vtg': vintage_years,
+        'year_act': act_years,
+        'mode': 'standard',
+        'time': 'year',
+        'unit': '-',
+    }
+
+    base_input = make_df(base, node_origin=country, time_origin='year')
+    base_output = make_df(base, node_dest=country, time_dest='year')
+
+    bulb_out = make_df(base_output, technology='bulb', commodity='light',
+                       level='useful', value=1.0)
+    scen.add_par('output', bulb_out)
+
+    bulb_in = make_df(base_input, technology='bulb', commodity='electricity',
+                      level='final', value=1.0)
+    scen.add_par('input', bulb_in)
+
+    grid_efficiency = 0.9
+    grid_out = make_df(base_output, technology='grid', commodity='electricity',
+                       level='final', value=grid_efficiency)
+    scen.add_par('output', grid_out)
+
+    grid_in = make_df(base_input, technology='grid', commodity='electricity',
+                      level='secondary', value=1.0)
+    scen.add_par('input', grid_in)
+
+    coal_out = make_df(base_output, technology='coal_ppl',
+                       commodity='electricity', level='secondary', value=1.)
+    scen.add_par('output', coal_out)
+
+    wind_out = make_df(base_output, technology='wind_ppl',
+                       commodity='electricity', level='secondary', value=1.)
+    scen.add_par('output', wind_out)
+
+    base_capacity_factor = {
+        'node_loc': country,
+        'year_vtg': vintage_years,
+        'year_act': act_years,
+        'time': 'year',
+        'unit': '-',
+    }
+
+    capacity_factor = {
+        'coal_ppl': 1,
+        'wind_ppl': 1,
+        'bulb': 1,
+    }
+
+    for tec, val in capacity_factor.items():
+        df = make_df(base_capacity_factor, technology=tec, value=val)
+        scen.add_par('capacity_factor', df)
+
+    base_technical_lifetime = {
+        'node_loc': country,
+        'year_vtg': model_horizon,
+        'unit': 'y',
+    }
+
+    lifetime = {
+        'coal_ppl': 20,
+        'wind_ppl': 20,
+        'bulb': 1,
+    }
+
+    for tec, val in lifetime.items():
+        df = make_df(base_technical_lifetime, technology=tec, value=val)
+        scen.add_par('technical_lifetime', df)
+
+    base_growth = {
+        'node_loc': country,
+        'year_act': model_horizon,
+        'time': 'year',
+        'unit': '-',
+    }
+
+    growth_technologies = [
+        "coal_ppl",
+        "wind_ppl",
+    ]
+
+    for tec in growth_technologies:
+        df = make_df(base_growth, technology=tec, value=0.1)
+        scen.add_par('growth_activity_up', df)
+
+    historic_demand = 0.85 * demand_per_year
+    historic_generation = historic_demand / grid_efficiency
+    coal_fraction = 0.6
+
+    base_capacity = {
+        'node_loc': country,
+        'year_vtg': history,
+        'unit': 'GWa',
+    }
+
+    base_activity = {
+        'node_loc': country,
+        'year_act': history,
+        'mode': 'standard',
+        'time': 'year',
+        'unit': 'GWa',
+    }
+
+    old_activity = {
+        'coal_ppl': coal_fraction * historic_generation,
+        'wind_ppl': (1 - coal_fraction) * historic_generation,
+    }
+
+    for tec, val in old_activity.items():
+        df = make_df(base_activity, technology=tec, value=val)
+        scen.add_par('historical_activity', df)
+
+    act_to_cap = {
+        # 20 year lifetime
+        'coal_ppl': 1 / 10 / capacity_factor['coal_ppl'] / 2,
+        'wind_ppl': 1 / 10 / capacity_factor['wind_ppl'] / 2,
+    }
+
+    for tec in act_to_cap:
+        value = old_activity[tec] * act_to_cap[tec]
+        df = make_df(base_capacity, technology=tec, value=value)
+        scen.add_par('historical_new_capacity', df)
+
+    rate = [0.05] * len(model_horizon)
+    unit = ['-'] * len(model_horizon)
+    scen.add_par("interestrate", key=model_horizon, val=rate, unit=unit)
+
+    base_inv_cost = {
+        'node_loc': country,
+        'year_vtg': model_horizon,
+        'unit': 'USD/GWa',
+    }
+
+    # in $ / kW
+    costs = {
+        'coal_ppl': 500,
+        'wind_ppl': 1500,
+        'bulb': 5,
+    }
+
+    for tec, val in costs.items():
+        df = make_df(base_inv_cost, technology=tec, value=val)
+        scen.add_par('inv_cost', df)
+
+    base_fix_cost = {
+        'node_loc': country,
+        'year_vtg': vintage_years,
+        'year_act': act_years,
+        'unit': 'USD/GWa',
+    }
+
+    # in $ / kW
+    costs = {
+        'coal_ppl': 30,
+        'wind_ppl': 10,
+    }
+
+    for tec, val in costs.items():
+        df = make_df(base_fix_cost, technology=tec, value=val)
+        scen.add_par('fix_cost', df)
+
+    base_var_cost = {
+        'node_loc': country,
+        'year_vtg': vintage_years,
+        'year_act': act_years,
+        'mode': 'standard',
+        'time': 'year',
+        'unit': 'USD/GWa',
+    }
+
+    # in $ / MWh
+    costs = {
+        'coal_ppl': 30,
+        'grid': 50,
+    }
+
+    for tec, val in costs.items():
+        df = make_df(base_var_cost, technology=tec, value=val)
+        scen.add_par('var_cost', df)
+
+    scen.commit('basic model of Westerosi electrification')
+    scen.set_as_default()
+
+    if solve:
+        scen.solve()
+
+    return scen
