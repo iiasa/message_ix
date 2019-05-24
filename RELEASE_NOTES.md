@@ -1,6 +1,7 @@
 
 # Next Release
 
+- [#196](https://github.com/iiasa/message_ix/pull/196): Improve testing by re-using :mod:`ixmp` apparatus.
 - [#182](https://github.com/iiasa/message_ix/pull/182): Fix cross-platform cloning.
 - [#173](https://github.com/iiasa/message_ix/pull/173): The `solve` command now takes additional arguments when solving with CPLEX. The `cplex.opt` file is now generated on the fly during the solve command and removed after successfully solving.
 - [#154](https://github.com/iiasa/message_ix/pull/154): Enable documentation build on ReadTheDocs.
