@@ -17,20 +17,17 @@ models = {
 
 
 def make_dantzig(mp, solve=False, multi_year=False):
-    """Define and optionally solve Dantzig's transport problem.
+    """Return an :class:`message_ix.Scenario` for Dantzig's canning problem.
 
     Parameters
     ----------
     mp : ixmp.Platform
-    solve : bool
+        Platform on which to create the scenario.
+    solve : bool, optional
         If True, the scenario is solved.
-    multi_year : bool
-        If True, the scenario has years 1964–1965 inclusive. Otherwise, the
+    multi_year : bool, optional
+        If True, the scenario has years 1963–1965 inclusive. Otherwise, the
         scenario has the single year 1963.
-
-    Returns
-    -------
-    :class:`ixmp.Scenario`
     """
     anno = "Dantzig's canning problem as a MESSAGE-scheme Scenario"
     args = models['dantzig'].copy()
@@ -123,10 +120,16 @@ def make_dantzig(mp, solve=False, multi_year=False):
 
 
 def make_westeros(mp, solve=False):
-    """Define and optionally solve the Westeros model.
+    """Return an :class:`message_ix.Scenario` for the Westeros model.
 
-    This method defines the same model used in the ``westeros_baseline.ipynb``
-    tutorial.
+    This is the same model used in the ``westeros_baseline.ipynb`` tutorial.
+
+    Parameters
+    ----------
+    mp : ixmp.Platform
+        Platform on which to create the scenario.
+    solve : bool, optional
+        If True, the scenario is solved.
     """
     scen = Scenario(mp, **models['westeros'], version='new')
 

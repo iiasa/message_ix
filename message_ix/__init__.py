@@ -5,7 +5,8 @@ import ixmp.model_settings as model_settings
 
 from . import default_paths
 from .core import (  # noqa: F401
-    Scenario
+    DEFAULT_SOLVE_OPTIONS,
+    Scenario,
 )
 
 
