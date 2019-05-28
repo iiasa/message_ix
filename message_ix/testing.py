@@ -31,7 +31,7 @@ def make_dantzig(mp, solve=False, multi_year=False):
     """
     anno = "Dantzig's canning problem as a MESSAGE-scheme Scenario"
     args = models['dantzig'].copy()
-    scen = Scenario(mp, **args, version='new', annotation=anno)
+    scen = Scenario(mp, version='new', annotation=anno, **args)
 
     # Sets
     # NB commit() is refused if technology and year are not given
@@ -131,7 +131,7 @@ def make_westeros(mp, solve=False):
     solve : bool, optional
         If True, the scenario is solved.
     """
-    scen = Scenario(mp, **models['westeros'], version='new')
+    scen = Scenario(mp, version='new', **models['westeros'])
 
     # Sets
 
