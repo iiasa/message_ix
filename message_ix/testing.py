@@ -157,7 +157,6 @@ def make_westeros(mp, solve=False):
 
     gdp_profile = pd.Series([1., 1.5, 1.9],
                             index=pd.Index(model_horizon, name='Time'))
-    gdp_profile.plot(title='Demand')
     demand_per_year = 40 * 12 * 1000 / 8760
     light_demand = pd.DataFrame({
         'node': country,
