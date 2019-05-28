@@ -26,7 +26,7 @@ def make_dantzig(mp, solve=False, multi_year=False):
     solve : bool, optional
         If True, the scenario is solved.
     multi_year : bool, optional
-        If True, the scenario has years 1963–1965 inclusive. Otherwise, the
+        If True, the scenario has years 1963--1965 inclusive. Otherwise, the
         scenario has the single year 1963.
     """
     anno = "Dantzig's canning problem as a MESSAGE-scheme Scenario"
