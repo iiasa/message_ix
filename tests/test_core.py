@@ -313,6 +313,13 @@ def test_clone(tmpdir):
     scen1.add_spatial_sets({'country': 'Austria'})
     scen1.add_set('technology', 'bar')
     scen1.add_horizon({'year': [2010, 2020]})
+    # ADDED: Store data
+    mp1.add_unit('$')
+    data = pd.DataFrame(dict(node_loc='Austria', technology='bar',
+                             year_vtg=2010, value=1.2, unit='$'), index=[0])
+    scen1.add_par('inv_cost', data)
+    pdt.assert_frame_equal(scen1.par('inv_cost').astype({'value': float}),
+                           data)
     scen1.commit('add minimal sets for testing')
 
     assert len(mp1.scenario_list(default=False)) == 1
@@ -322,6 +329,13 @@ def test_clone(tmpdir):
 
     # Return type of ixmp.Scenario.clone is message_ix.Scenario
     assert isinstance(scen2, Scenario)
+
+    # ADDED: Data can be retrieved from clone
+    print('Cloned data:')
+    print(scen2.par('inv_cost'))
+    print('Original data:')
+    print(data)
+    pdt.assert_frame_equal(scen2.par('inv_cost'), data)
 
     # Close and re-open both databases
     mp1.close_db()  # TODO this should be done automatically on del
@@ -341,3 +355,6 @@ def test_clone(tmpdir):
     # Contents are identical
     assert all(scen1.set('node') == scen2.set('node'))
     assert all(scen1.set('year') == scen2.set('year'))
+
+    # ADDED
+    pdt.assert_frame_equal(scen1.par('inv_cost'), scen2.par('inv_cost'))
