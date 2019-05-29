@@ -3,8 +3,11 @@ import re
 
 import ixmp.model_settings as model_settings
 
-from message_ix import default_paths
-from message_ix.core import *
+from . import default_paths
+from .core import (  # noqa: F401
+    DEFAULT_SOLVE_OPTIONS,
+    Scenario,
+)
 
 
 model_file = os.path.join(default_paths.model_path(), '{model}_run.gms')
