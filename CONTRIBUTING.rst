@@ -30,6 +30,25 @@ Code submitted via pull requests must adhere to the following style:
 
 - Other (file names, CLI, etc.): follow the style of the existing code base.
 
+Development rule of thumb
+-------------------------
+
+Pull requests for new features
+
+- Open a new PR as soon as you create a branch for a new feature. This lets you (and others) keep track of the changes, and automatically runs tests to ensure you don't break anything. Use "WIP:" at the beginning of the PR title to indicate work in progress.
+- Write a short (one sentence) description of the PR, followed by a detailed description. This is like the abstract of a publication: it should help a developer/reviewer/user quickly learn what the PR is about.
+- Learn how to `rebase <https://git-scm.com/docs/git-rebase>`_ your feature branch onto the tip of ``master``. Do this frequently to ensure your added code can still be merged.
+
+Milestones
+
+- We use `semantic versioning. <https://semver.org>`_
+- We keep at least two active milestones on ``message_ix`` and ``ixmp``.
+
+  - The next minor version. E.g. if the last release was 3.5, the next minor release/milestone is 3.6.
+  - The next major version. E.g. 4.0.
+
+- Choose a milestone for every issue and PR to indicate a desire/consensus to release it at a certain time.
+
 .. _`Contributor License Agreement`: contributor_license.html
 .. _`cla-assistant`: https://github.com/cla-assistant/
 .. _`PEP 8`: https://www.python.org/dev/peps/pep-0008/
