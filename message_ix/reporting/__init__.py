@@ -15,9 +15,11 @@ log = logging.getLogger(__name__)
 
 
 # Adjust the ixmp default reporting for MESSAGEix
-
-# Units appearing in MESSAGEix test data
-configure(units='y = year')
+configure(
+    units={
+        # Units appearing in MESSAGEix test data
+        'define': 'y = year',
+    })
 
 # Short names for dimensions
 rename_dims.update({
