@@ -13,7 +13,8 @@ import xarray as xr
 from xarray.testing import assert_equal as assert_xr_equal
 
 from message_ix import Scenario
-from message_ix.reporting import Reporter, as_pyam
+from message_ix.reporting import Reporter, as_pyam, configure
+from message_ix.testing import make_dantzig, make_westeros
 
 
 def test_reporter(test_mp):
@@ -62,6 +63,29 @@ def test_reporter(test_mp):
     # …and expected values
     vom = rep.get(rep.full_key('ACT')) * rep.get(rep.full_key('var_cost'))
     assert_xr_equal(vom, rep.get(vom_key))
+
+
+def test_reporter_from_dantzig(test_mp):
+    scen = make_dantzig(test_mp)
+
+    # Reporter.from_scenario can handle Dantzig example model
+    rep = Reporter.from_scenario(scen)
+
+    # Default target can be calculated
+    rep.get('all')
+
+
+def test_reporter_from_westeros(test_mp):
+    scen = make_westeros(test_mp)
+
+    # Reporter.from_scenario can handle Westeros example model
+    rep = Reporter.from_scenario(scen)
+
+    # Westeros-specific configuration: '-' is a reserved character in pint
+    configure(units={'replace': {'-': ''}})
+
+    # Default target can be calculated
+    rep.get('all')
 
 
 def test_report_as_pyam(test_mp, caplog, tmp_path):
