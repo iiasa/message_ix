@@ -5,7 +5,7 @@ from ixmp.reporting import (
     Reporter as IXMPReporter,
     configure,
 )
-from ixmp.reporting.utils import Key, rename_dims
+from ixmp.reporting.utils import Key
 
 from . import computations
 from .pyam import as_pyam
@@ -16,39 +16,38 @@ log = logging.getLogger(__name__)
 
 # Adjust the ixmp default reporting for MESSAGEix
 configure(
+    # Units appearing in MESSAGEix test data
     units={
-        # Units appearing in MESSAGEix test data
         'define': 'y = year',
+    },
+    # Short names for dimensions
+    rename_dims={
+        # As defined in the documentation
+        'commodity': 'c',
+        'emission': 'e',
+        'grade': 'g',
+        'land_scenario': 's',
+        'land_type': 'u',
+        'level': 'l',
+        'mode': 'm',
+        'node': 'n',
+        'rating': 'q',
+        'relation': 'r',
+        'technology': 't',
+        'time': 'h',
+        'year': 'y',
+        # Aliases
+        'node_dest': 'nd',
+        'node_loc': 'nl',
+        'node_origin': 'no',
+        'node_rel': 'nr',
+        'node_share': 'ns',
+        'time_dest': 'hd',
+        'time_origin': 'ho',
+        'year_act': 'ya',
+        'year_vtg': 'yv',
+        'year_rel': 'yr',
     })
-
-# Short names for dimensions
-rename_dims.update({
-    # As defined in the documentation
-    'commodity': 'c',
-    'emission': 'e',
-    'grade': 'g',
-    'land_scenario': 's',
-    'land_type': 'u',
-    'level': 'l',
-    'mode': 'm',
-    'node': 'n',
-    'rating': 'q',
-    'relation': 'r',
-    'technology': 't',
-    'time': 'h',
-    'year': 'y',
-    # Aliases
-    'node_dest': 'nd',
-    'node_loc': 'nl',
-    'node_origin': 'no',
-    'node_rel': 'nr',
-    'node_share': 'ns',
-    'time_dest': 'hd',
-    'time_origin': 'ho',
-    'year_act': 'ya',
-    'year_vtg': 'yv',
-    'year_rel': 'yr',
-})
 
 # Basic derived quantities that are the product of two others
 products = (  # noqa: E241
