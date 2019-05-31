@@ -49,7 +49,7 @@ rename_dims.update({
 })
 
 # Basic derived quantities that are the product of two others
-products = (
+products = (  # noqa: E241
     ('out',      ('output', 'ACT')),
     ('out_hist', ('output', 'ref_activity')),
     ('in',       ('input', 'ACT')),
