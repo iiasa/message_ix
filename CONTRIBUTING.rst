@@ -111,10 +111,10 @@ Tutorial documentation structure
   - Results should be retrieved using the generic reporting tool.
   - Plots to depict results should use `pyam <https://github.com/IAMconsortium/pyam/>`_.
   
-- Additional notes
+Additional notes
   
-  - All users of the message_ix framework can contribute tutorials, as long as the tutorials adhere to guidelines provided above.
-  - Tutorials will become part of the general message_ix test suite and publicly available.
+- All users of the message_ix framework can contribute tutorials, as long as the tutorials adhere to guidelines provided above.
+- Tutorials will become part of the general message_ix test suite and publicly available.
 
 .. _`Contributor License Agreement`: contributor_license.html
 .. _`cla-assistant`: https://github.com/cla-assistant/
