@@ -49,6 +49,48 @@ Milestones
 
 - Choose a milestone for every issue and PR to indicate a desire/consensus to release it at a certain time.
 
+Tutorials
+---------
+
+- When adding tutorials, including those accompany new features or ``message_ix.tools``, conform to the style guide detailed below.
+- Add a line to test_tutorials.py so that the parametrized test function runs the tutorial (as noted at `#196 <https://github.com/iiasa/message_ix/pull/196>`_).
+
+Style Guide
+
+- General requirements
+
+  - When relevant, provide links to publications or sources that provide greater detail for the methodology, data, or other packages used.
+  - Providing the mathematical formulation in the tutorial itself is optional.
+  - Making a tutorial such that it can be viewed as a presentation is optional.
+  - Framework specific variables and parameters or functions must be in italic.
+
+- Naming scheme of tutorials:
+
+  - westeros_<hierarchy_level>_.ipynb
+  - Name all in lower case
+
+- Tutorial structure
+
+  - The general overview of tutorial.
+  - The expected outcome.
+  - An explanation of which features are covered.
+  - Reference and provide links to any tutorials that are interlinked or part of a series.
+  
+- Description of individual steps
+ 
+  - A brief explanation of the step.
+  - A link to any relevant mathematical documentation.
+   
+- Results
+ 
+  - Results should be retrieved using the generic reporting tool.
+  - Plots to depict results should use `pyam <https://github.com/IAMconsortium/pyam/>`_.
+  
+- Additional notes
+  
+  - All users of the message_ix framework can contribute tutorials, as long as the tutorials adhere to guidelines provided above.
+  - Tutorials will become part of the general message_ix test suite and publicly available.
+
 .. _`Contributor License Agreement`: contributor_license.html
 .. _`cla-assistant`: https://github.com/cla-assistant/
 .. _`PEP 8`: https://www.python.org/dev/peps/pep-0008/
