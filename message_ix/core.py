@@ -258,7 +258,7 @@ class Scenario(ixmp.Scenario):
             valid pair.
         """
         horizon = self.set('year')
-        first = self.cat('year', 'firstmodelyear')[0] or horizon[0]
+        first = self.firstmodelyear()
 
         if ya_args:
             if len(ya_args) != 3:
@@ -268,8 +268,6 @@ class Scenario(ixmp.Scenario):
         else:
             combos = itertools.product(horizon, horizon)
 
-        # TODO: casting to int here is probably bad, but necessary for now
-        first = int(first)
         combos = [(int(y1), int(y2)) for y1, y2 in combos]
 
         def valid(y_v, y_a):
@@ -282,6 +280,10 @@ class Scenario(ixmp.Scenario):
         year_pairs = [(y_v, y_a) for y_v, y_a in combos if valid(y_v, y_a)]
         v_years, a_years = zip(*year_pairs)
         return pd.DataFrame({'year_vtg': v_years, 'year_act': a_years})
+
+    def firstmodelyear(self):
+        """Returns the first model year of the scenario."""
+        return self._jobj.getFirstModelYear()
 
     def solve(self, model='MESSAGE', solve_options={}, **kwargs):
         """Solve the model for the Scenario.
