@@ -15,7 +15,7 @@ The electronic signature is collected via the `cla-assistant`_ when issuing the 
 Coding style
 ------------
 
-Code submitted via pull requests must adhere to the following style:
+**Code submitted via pull requests must adhere to the following style:**
 
 - Python: follow `PEP 8`_.
 - R: follow the style of the existing code base.
@@ -33,13 +33,13 @@ Code submitted via pull requests must adhere to the following style:
 Development rule of thumb
 -------------------------
 
-Pull requests for new features
+**Pull requests for new features**
 
 - Open a new PR as soon as you create a branch for a new feature. This lets you (and others) keep track of the changes, and automatically runs tests to ensure you don't break anything. Use "WIP:" at the beginning of the PR title to indicate work in progress.
 - Write a short (one sentence) description of the PR, followed by a detailed description. This is like the abstract of a publication: it should help a developer/reviewer/user quickly learn what the PR is about.
 - Learn how to `rebase <https://git-scm.com/docs/git-rebase>`_ your feature branch onto the tip of ``master``. Do this frequently to ensure your added code can still be merged.
 
-Milestones
+**Milestones**
 
 - We use `semantic versioning. <https://semver.org>`_
 - We keep at least two active milestones on ``message_ix`` and ``ixmp``.
@@ -55,7 +55,7 @@ Tutorials
 - When adding tutorials, including those accompany new features or ``message_ix.tools``, conform to the style guide detailed below.
 - Add a line to test_tutorials.py so that the parametrized test function runs the tutorial (as noted at `#196 <https://github.com/iiasa/message_ix/pull/196>`_).
 
-Style Guide
+**Style Guide**
 
 - General requirements
 
@@ -92,7 +92,7 @@ Style Guide
   - westeros_<hierarchy_level>_.ipynb
   - Name all in lower case
   
-Tutorial documentation structure
+**Tutorial documentation structure**
 
 - Tutorial introduction
 
@@ -111,7 +111,7 @@ Tutorial documentation structure
   - Results should be retrieved using the generic reporting tool.
   - Plots to depict results should use `pyam <https://github.com/IAMconsortium/pyam/>`_.
   
-Additional notes
+**Additional notes**
   
 - All users of the message_ix framework can contribute tutorials, as long as the tutorials adhere to guidelines provided above.
 - Tutorials will become part of the general message_ix test suite and publicly available.
