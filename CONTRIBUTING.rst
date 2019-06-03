@@ -63,13 +63,36 @@ Style Guide
   - Providing the mathematical formulation in the tutorial itself is optional.
   - Making a tutorial such that it can be viewed as a presentation is optional.
   - Framework specific variables and parameters or functions must be in italic.
+  
+- Tutorial structure
+
+  - baseline
+  - basic_modelling_features (basic)
+    
+    - emmission_bounds
+    - emission_taxes
+    - fossil_resources
+  
+  - advanced_modelling_features (adv)
+  
+    - renewables
+    
+      - firm_capacity
+      - flexible_generation
+      - renewable_resources
+      
+    - addon_technologies
+    - share_constraints
+    
+  - tools
+  - rscript
 
 - Naming scheme of tutorials:
 
   - westeros_<hierarchy_level>_.ipynb
   - Name all in lower case
 
-- Tutorial structure
+- Tutorial introduction
 
   - The general overview of tutorial.
   - The expected outcome.
