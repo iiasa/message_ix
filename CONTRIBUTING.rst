@@ -91,6 +91,8 @@ Style Guide
 
   - westeros_<hierarchy_level>_.ipynb
   - Name all in lower case
+  
+Tutorial documentation structure
 
 - Tutorial introduction
 
