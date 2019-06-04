@@ -6,6 +6,13 @@ import pyam
 
 
 def write_report(quantity, path):
+    """Write the report identified by *key* to the file at *path*.
+
+    If *quantity* is a :class:`pyam.IamDataFrame` and *path* ends with '.csv'
+    or '.xlsx', use :mod:`pyam` methods to write the file to CSV or Excel
+    format, respectively. Otherwise, equivalent to
+    :meth:`ixmp.reporting.computations.write_report`.
+    """
     if not isinstance(quantity, pyam.IamDataFrame):
         return ixmp_write_report(quantity, path)
 

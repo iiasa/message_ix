@@ -8,3 +8,4 @@ common model design choices.
 
    efficiency
    debugging
+   reporting
