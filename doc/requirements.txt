@@ -1,4 +1,4 @@
--e git://github.com/iiasa/ixmp.git#egg=ixmp
+-e git://github.com/khaeru/ixmp.git@feature/reporting2#egg=ixmp
 jupyter
 nbformat
 numpydoc
