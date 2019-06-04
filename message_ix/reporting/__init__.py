@@ -70,6 +70,34 @@ class Reporter(IXMPReporter):
     """MESSAGEix Reporter."""
     @classmethod
     def from_scenario(cls, scenario, **kwargs):
+        """Create a Reporter by introspecting *scenario*.
+
+        In addition to the keys automatically added by
+        :meth:`ixmp.reporting.Reporter.from_scenario`, keys are added for
+        derived quantities specific to the MESSAGEix framework. For instance:
+
+        - ``out``: the product of ``output`` (output efficiency) and ``ACT``
+          (activity).
+        - ``out_hist``: ``output`` × ``ref_activity`` (historical reference
+          activity),
+        - ``in``:      ``input`` × ``ACT``,
+        - ``in_hist``: ``input`` × ``ref_activity``,
+        - ``emi``:      ``emission_factor`` × ``ACT``,
+        - ``emi_hist``: ``emission_factor`` × ``ref_activity``,
+        - ``inv``:      ``inv_cost`` × ``CAP_NEW``,
+        - ``inv_hist``: ``inv_cost`` × ``ref_new_capacity``,
+        - ``fom``:      ``fix_cost`` × ``CAP``,
+        - ``fom_hist``: ``fix_cost`` × ``ref_capacity``,
+        - ``vom``:      ``var_cost`` × ``ACT``, and
+        - ``vom_hist``: ``var_cost`` × ``ref_activity``.
+
+        .. tip:: Use :meth:`full_key` to retrieve the full-dimensionality
+           :class:`Key` for these quantities.
+
+        Returns
+        -------
+        message_ix.reporting.Reporter
+        """
         # Invoke the ixmp method
         rep = super().from_scenario(scenario, **kwargs)
 
@@ -86,6 +114,30 @@ class Reporter(IXMPReporter):
         return rep
 
     def as_pyam(self, quantities, year_time_dim, drop={}, collapse=None):
+        """Add conversion of **quantities** to :class:`pyam.IamDataFrame`.
+
+        Parameters
+        ----------
+        quantities : str or Key or list of (str, Key)
+            Quantities to transform to :mod:`pyam` format.
+        year_time_dim : str
+            Label of the dimension use for the `year` or `time` column of the
+            :class:`pyam.IamDataFrame`. The column is labelled "Time" if
+            `year_time_dim` is ``h``, otherwise "Year".
+        drop : iterable of str, optional
+            Label of additional dimensions to drop from the resulting data
+            frame. Dimensions ``h``, ``y``, ``ya``, ``yr``, and ``yv``—
+            except for the one named by `year_time_dim`—are automatically
+            dropped.
+        collapse : callable, optional
+            Callback to handle additional dimensions of the data frame.
+
+        Returns
+        -------
+        list of Key
+            Keys for the reporting targets that create the IamDataFrames
+            corresponding to *quantities*. The keys have the added tag ‘iamc’.
+        """
         if not isinstance(quantities, list):
             quantities = [quantities]
         keys = []

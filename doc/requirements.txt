@@ -2,6 +2,7 @@
 jupyter
 nbformat
 numpydoc
+pyam-iamc
 sphinx>=1.8
 sphinx_rtd_theme
 sphinxcontrib-bibtex
