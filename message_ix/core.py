@@ -2,15 +2,13 @@ import collections
 import copy
 import itertools
 import os
-import warnings
 
 import ixmp
 import numpy as np
-from ixmp.utils import pd_read, pd_write
+from ixmp.utils import pd_read, pd_write, isscalar, isyear, logger
 import pandas as pd
 
 from . import default_paths
-from .utils import isscalar, logger
 
 
 DEFAULT_SOLVE_OPTIONS = {
