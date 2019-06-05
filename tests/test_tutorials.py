@@ -8,12 +8,6 @@ from ixmp.testing import run_notebook, get_cell_output
 import numpy as np
 import pytest
 
-<<<<<<<
-
-=======
-from distutils.spawn import find_executable
-from conftest import here
->>>>>>>
 
 # Skip the entire file on Python 2
 if sys.version_info[0] == 2:
