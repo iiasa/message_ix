@@ -123,12 +123,19 @@ class Scenario(ixmp.Scenario):
         """
         return ixmp.to_pylist(self._jobj.getCatEle(name, cat))
 
-    def has_solution(self):
-        """Returns True if scenario currently has a solution"""
-        try:
-            return not np.isnan(self.var('OBJ')['lvl'])
-        except Exception:
-            return False
+    def remove_solution(self):
+        """Remove the solution from the scenario
+
+        Delete the model solution (variables and equations) and timeseries
+        data marked as `meta=False` (see :meth:`TimeSeries.add_timeseries`)
+        prior to the first model year.
+        """
+        self._jobj.removeSolution()
+        if self.has_solution():
+            self.clear_cache()  # reset Python data cache
+            self._jobj.removeSolution()
+        else:
+            raise ValueError('This Scenario does not have a solution!')
 
     def add_spatial_sets(self, data):
         """Add sets related to spatial dimensions of the model.
