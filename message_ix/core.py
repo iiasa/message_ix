@@ -53,8 +53,8 @@ class Scenario(ixmp.Scenario):
     """
 
     def __init__(self, mp, model, scenario=None, version=None, annotation=None,
-                 cache=False, clone=None, **kwargs):
-        """Initialize a new message_ix.Scenario (structured input data and solution)
+                 cache=False):
+        """Initialize a new message_ix.Scenario (input data and solution)
         or get an existing scenario from the ixmp database instance
 
         Parameters
@@ -71,32 +71,15 @@ class Scenario(ixmp.Scenario):
             a short annotation/comment (when initializing a new scenario)
         cache : boolean
             keep all dataframes in memory after first query (default: False)
-        clone : Scenario, optional
-            make a clone of an existing scenario
         """
-        if 'scen' in kwargs:
-            warnings.warn(
-                '`scen` is deprecated and will be removed in the next' +
-                ' release, please use `scenario`')
-            scenario = kwargs.pop('scen')
-
-        if version is not None and clone is not None:
-            raise ValueError(
-                'Can not provide both version and clone as arguments')
-        if clone is not None:
-            jscen = clone._jobj.clone(model, scenario, annotation,
-                                      clone._keep_sol, clone._first_model_year)
-        elif version == 'new':
-            scheme = 'MESSAGE'
-            jscen = mp._jobj.newScenario(model, scenario, scheme, annotation)
-        elif isinstance(version, int):
-            jscen = mp._jobj.getScenario(model, scenario, version)
-        else:
-            jscen = mp._jobj.getScenario(model, scenario)
-
+        # it not a new scenario, `ixmp.Scenario` uses scheme assigned in the db
+        scheme = 'MESSAGE' if version == 'new' else None
+        # `ixmp.Scenario` verifies that MESSAGE-scheme scenarios are
+        # initialized as `message_ix.Scenario` for correct API
         self.is_message_scheme = True
 
-        super(Scenario, self).__init__(mp, model, scenario, jscen, cache=cache)
+        super(Scenario, self).__init__(mp, model, scenario, version, scheme,
+                                       annotation, cache)
 
         if not self.has_solution():
             _init_scenario(self, commit=version != 'new')
@@ -269,7 +252,6 @@ class Scenario(ixmp.Scenario):
         combos = [(int(y1), int(y2)) for y1, y2 in combos]
 
         def valid(y_v, y_a):
-            # TODO: casting to int here is probably bad
             ret = y_v <= y_a
             if in_horizon:
                 ret &= y_a >= first
@@ -282,6 +264,62 @@ class Scenario(ixmp.Scenario):
     def firstmodelyear(self):
         """Returns the first model year of the scenario."""
         return self._jobj.getFirstModelYear()
+
+    def clone(self, model=None, scenario=None, annotation=None,
+              keep_solution=True, shift_first_model_year=None, platform=None,
+              **kwargs):
+        """Clone the current scenario and return the clone.
+
+        If the (`model`, `scenario`) given already exist on the
+        :class:`Platform`, the `version` for the cloned Scenario follows the
+        last existing version. Otherwise, the `version` for the cloned Scenario
+        is 1.
+
+        .. note::
+            :meth:`clone` does not set or alter default versions. This means
+            that a clone to new (`model`, `scenario`) names has no default
+            version, and will not be returned by
+            :meth:`Platform.scenario_list` unless `default=False` is given.
+
+        Parameters
+        ----------
+        model : str, optional
+            New model name. If not given, use the existing model name.
+        scenario : str, optional
+            New scenario name. If not given, use the existing scenario name.
+        annotation : str, optional
+            Explanatory comment for the clone commit message to the database.
+        keep_solution : bool, default True
+            If :py:const:`True`, include all timeseries data and the solution
+            (vars and equs) from the source scenario in the clone.
+            Otherwise, only timeseries data marked as `meta=True` (see
+            :meth:`TimeSeries.add_timeseries`) or prior to `first_model_year`
+            (see :meth:`TimeSeries.add_timeseries`) are cloned.
+        shift_first_model_year: int, optional
+            If given, all timeseries data in the Scenario is omitted from the
+            clone for years from `first_model_year` onwards. Timeseries data
+            with the `meta` flag (see :meth:`TimeSeries.add_timeseries`) are
+            cloned for all years.
+        platform : :class:`Platform`, optional
+            Platform to clone to (default: current platform)
+        """
+        if keep_solution and shift_first_model_year is not None:
+            raise ValueError('Use `keep_solution=False` when shifting the '
+                             'first model year!')
+
+        if platform is not None and not keep_solution:
+            raise ValueError('Cloning across platforms is only possible '
+                             'with `keep_solution=True`!')
+
+        platform = platform or self.platform
+        model = model or self.model
+        scenario = scenario or self.scenario
+        args = [platform._jobj, model, scenario, annotation, keep_solution]
+        if isyear(shift_first_model_year, 'shift_first_model_year'):
+            args.append(shift_first_model_year)
+
+        return Scenario(platform, model, scenario, cache=self._cache,
+                        version=self._jobj.clone(*args))
 
     def solve(self, model='MESSAGE', solve_options={}, **kwargs):
         """Solve the model for the Scenario.
