@@ -206,25 +206,21 @@ def test_new_timeseries_long_name64plus(test_mp):
 
 def test_rename_technology(test_mp):
     scen = Scenario(test_mp, *msg_args)
-    scen.solve()
     assert scen.par('output')['technology'].isin(['canning_plant']).any()
-    exp_obj = scen.var('OBJ')['lvl']
 
-    clone = scen.clone('foo', 'bar', keep_solution=False)
+    clone = scen.clone('foo', 'bar')
     clone.rename('technology', {'canning_plant': 'foo_bar'})
     assert not clone.par('output')['technology'].isin(['canning_plant']).any()
     assert clone.par('output')['technology'].isin(['foo_bar']).any()
     clone.solve()
-    obs_obj = clone.var('OBJ')['lvl']
-    assert obs_obj == exp_obj
+    assert np.isclose(clone.var('OBJ')['lvl'], 153.675)
 
 
 def test_rename_technology_no_rm(test_mp):
     scen = Scenario(test_mp, *msg_args)
-    scen.solve()
     assert scen.par('output')['technology'].isin(['canning_plant']).any()
 
-    clone = scen.clone('foo', 'bar', keep_solution=False)
+    clone = scen.clone('foo', 'bar')
     # also test if already checked out
     clone.check_out()
 
@@ -246,12 +242,9 @@ def test_excel_read_write(test_mp):
     obs = scen2.par('input')
     pdt.assert_frame_equal(exp, obs)
 
-    scen1.solve()
     scen2.commit('foo')  # must be checked in
     scen2.solve()
-    exp = scen1.var('OBJ')['lvl']
-    obs = scen2.var('OBJ')['lvl']
-    assert exp == obs
+    assert np.isclose(scen2.var('OBJ')['lvl'], 153.675)
 
     os.remove(fname)
 
