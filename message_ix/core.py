@@ -4,7 +4,6 @@ import itertools
 import os
 
 import ixmp
-import numpy as np
 from ixmp.utils import pd_read, pd_write, isscalar, isyear, logger
 import pandas as pd
 
@@ -130,7 +129,6 @@ class Scenario(ixmp.Scenario):
         data marked as `meta=False` (see :meth:`TimeSeries.add_timeseries`)
         prior to the first model year.
         """
-        self._jobj.removeSolution()
         if self.has_solution():
             self.clear_cache()  # reset Python data cache
             self._jobj.removeSolution()
@@ -273,8 +271,7 @@ class Scenario(ixmp.Scenario):
         return self._jobj.getFirstModelYear()
 
     def clone(self, model=None, scenario=None, annotation=None,
-              keep_solution=True, shift_first_model_year=None, platform=None,
-              **kwargs):
+              keep_solution=True, shift_first_model_year=None, platform=None):
         """Clone the current scenario and return the clone.
 
         If the (`model`, `scenario`) given already exist on the
