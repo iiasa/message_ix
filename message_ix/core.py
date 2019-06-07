@@ -300,21 +300,24 @@ class Scenario(ixmp.Scenario):
             :meth:`TimeSeries.add_timeseries`) or prior to `first_model_year`
             (see :meth:`TimeSeries.add_timeseries`) are cloned.
         shift_first_model_year: int, optional
-            If given, all timeseries data in the Scenario is omitted from the
-            clone for years from `first_model_year` onwards. Timeseries data
-            with the `meta` flag (see :meth:`TimeSeries.add_timeseries`) are
-            cloned for all years. The solution is removed.
+            If given, the values of the solution are transfered to parameters
+            `historical_*`, parameter `resource_volume` is updated, and the
+            `first_model_year` is shifted. The solution is then discarded,
+            see :meth:`TimeSeries.remove_solution`.
         platform : :class:`Platform`, optional
             Platform to clone to (default: current platform)
         """
+        err = 'Cloning across platforms is only possible {}'
+        if platform is not None and not keep_solution:
+            raise ValueError(err.format('`with keep_solution=True`!'))
+
+        if platform is not None and shift_first_model_year is not None:
+            raise ValueError(err.format('without shifting model horizon!'))
+
         if shift_first_model_year is not None:
             keep_solution = False
             msg = 'Shifting first model year to {} and removing solution'
             logger().info(msg.format(shift_first_model_year))
-
-        if platform is not None and not keep_solution:
-            raise ValueError('Cloning across platforms is only possible '
-                             'with `keep_solution=True`!')
 
         platform = platform or self.platform
         model = model or self.model
