@@ -32,9 +32,6 @@ def test_run_clone(tmpdir):
     assert np.isnan(scen3.var('OBJ')['lvl'])
     pdt.assert_frame_equal(scen3.timeseries(iamc=True), TS_DF_CLEARED)
 
-    # cloning with `keep_solution=True` and `shift_first_model_year` raises
-    pytest.raises(ValueError, scen.clone, shift_first_model_year=2005)
-
 
 def test_run_remove_solution(test_mp):
     # create a new instance of the transport problem and solve it
@@ -50,15 +47,19 @@ def test_run_remove_solution(test_mp):
 
     # check that removing solution does not delete timeseries data
     # before first model year (DIFFERENT behaviour from `ixmp.Scenario`)
-    # scen.remove_solution()
-    # pdt.assert_frame_equal(scen.timeseries(iamc=True), TS_DF_CLEARED)
+    scen.remove_solution()
+    pdt.assert_frame_equal(scen.timeseries(iamc=True), TS_DF_CLEARED)
 
 
 def test_shift_first_model_year(test_mp):
     scen = make_dantzig(test_mp, solve=True, multi_year=True)
     clone = scen.clone(shift_first_model_year=1964)
+
+    # check that solution and timeseries in new model horizon have been removed
     assert np.isnan(clone.var('OBJ')['lvl'])
     pdt.assert_frame_equal(clone.timeseries(iamc=True), TS_DF_SHIFT)
+    # check that the variable `ACT` is now the parameter `historical_activity`
+    assert not clone.par('historical_activity').empty
 
 
 def scenario_list(mp):
@@ -80,7 +81,9 @@ def test_multi_db_run(tmpdir):
     mp2.add_region('wrong_region', 'country')
 
     # check that cloning across platforms must copy the full solution
-    pytest.raises(ValueError, scen1.clone, platform=mp2, keep_solution=False)
+    dest = dict(platform=mp2)
+    pytest.raises(ValueError, scen1.clone, **dest, keep_solution=False)
+    pytest.raises(ValueError, scen1.clone, **dest, shift_first_model_year=1964)
 
     # clone solved model across platforms (with default settings)
     scen2 = scen1.clone(platform=mp2, keep_solution=True)
