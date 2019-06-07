@@ -43,8 +43,11 @@ seq_period(year_all,year_all2)$( ORD(year_all) + 1 = ORD(year_all2) ) = yes ;
 map_period(year_all,year_all2)$( ORD(year_all) <= ORD(year_all2) ) = yes ;
 
 * dynamic sets (singleton) with first and last periods in model horizon of MESSAGEix (for easier reference)
-first_period(year_all) = no ;
-first_period(year_all)$( cat_year("firstmodelyear",year_all) ) = yes ;
+if ( sum(year_all$( cat_year("firstmodelyear",year_all) ), 1 ),
+    first_period(year_all)$( cat_year("firstmodelyear",year_all) ) = yes ;
+else
+    first_period(year_all)$( ORD(year_all) eq 1 ) = yes ;
+) ;
 if ( sum(year_all$( cat_year("lastmodelyear",year_all) ), 1 ),
     last_period(year_all)$( cat_year("lastmodelyear",year_all) ) = yes;
 else
