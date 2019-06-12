@@ -4,7 +4,7 @@ import itertools
 import os
 
 import ixmp
-from ixmp.utils import pd_read, pd_write, isscalar, isyear, logger
+from ixmp.utils import pd_read, pd_write, isscalar, check_year, logger
 import pandas as pd
 
 from . import default_paths
@@ -323,7 +323,7 @@ class Scenario(ixmp.Scenario):
         model = model or self.model
         scenario = scenario or self.scenario
         args = [platform._jobj, model, scenario, annotation, keep_solution]
-        if isyear(shift_first_model_year, 'shift_first_model_year'):
+        if check_year(shift_first_model_year, 'shift_first_model_year'):
             args.append(shift_first_model_year)
 
         return Scenario(platform, model, scenario, cache=self._cache,
