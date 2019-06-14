@@ -51,8 +51,8 @@ def test_reporter(test_mp):
 
     # NB the call to squeeze() drops the length-1 dimensions c-l-y-h
     obs = rep.get('demand:n-c-l-y-h').squeeze(drop=True)
-    # TODO: Squeeze on AttrSeries still returns full index, whereas xarray drops
-    # everything except node
+    # TODO: Squeeze on AttrSeries still returns full index, whereas xarray
+    # drops everything except node
     obs = obs.reset_index(['c', 'l', 'y', 'h'], drop=True)
     # check_dtype is false because of casting in pd.Series to float
     # check_attrsis false because we don't get the unit addition in bare xarray
