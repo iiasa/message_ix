@@ -92,15 +92,15 @@ def test_multi_db_run(tmpdir):
     pytest.raises(ValueError, scen1.clone, **dest, keep_solution=False)
     pytest.raises(ValueError, scen1.clone, **dest, shift_first_model_year=1964)
 
-    # clone solved model across platforms (with default settings)
+    # clone solved model across platforms (with default settings), close the db
     scen1.clone(platform=mp2, keep_solution=True)
 
     mp2.close_db()
     del mp2
 
+    # reopen the connection to the second platform and reload scenario
     _mp2 = Platform(tmpdir / 'mp2', dbtype='HSQLDB')
-    info = models['dantzig']
-    scen2 = Scenario(_mp2, info['model'], info['scenario'])
+    scen2 = Scenario(_mp2, **models['dantzig'])
     assert_multi_db(mp1, _mp2)
 
     # check that sets, variables and parameter were copied correctly
