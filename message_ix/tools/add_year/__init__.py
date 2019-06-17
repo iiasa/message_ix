@@ -26,7 +26,7 @@ def intpol(y1, y2, x1, x2, x):
     x1, x2, x : int
     """
     if x2 == x1 and y2 != y1:
-        print('>>> Warning <<<: No difference between x1 and x2,' +
+        print('>>> Warning <<<: No difference between x1 and x2,'
               'returned empty!!!')
         return []
     elif x2 == x1 and y2 == y1:
@@ -195,7 +195,7 @@ def add_year(sc_ref, sc_new, years_new, firstyear_new=None, lastyear_new=None,
                          extrapol_neg, bound_ext)
 
     sc_new.set_as_default()
-    print('> All required parameters were successfully ' +
+    print('> All required parameters were successfully '
           'added to the new scenario.')
 
 
@@ -242,14 +242,14 @@ def add_year_set(sc_ref, sc_new, years_new, firstyear_new=None,
     # A.5. Changing the base year and initialization year of macro if a new
     # year specified
     if baseyear_macro:
-        if not yr_cat.loc[yr_cat['type_year'] ==
-                          'baseyear_macro', 'year'].empty:
-            yr_cat.loc[yr_cat['type_year'] ==
-                       'baseyear_macro', 'year'] = baseyear_macro
-        if not yr_cat.loc[yr_cat['type_year'] ==
-                          'initializeyear_macro', 'year'].empty:
-            yr_cat.loc[yr_cat['type_year'] ==
-                       'initializeyear_macro', 'year'] = baseyear_macro
+        if not yr_cat.loc[yr_cat['type_year'] == 'baseyear_macro',
+                          'year'].empty:
+            yr_cat.loc[yr_cat['type_year'] == 'baseyear_macro',
+                       'year'] = baseyear_macro
+        if not yr_cat.loc[yr_cat['type_year'] == 'initializeyear_macro',
+                          'year'].empty:
+            yr_cat.loc[yr_cat['type_year'] == 'initializeyear_macro',
+                       'year'] = baseyear_macro
 
     yr_pair = []
     for yr in years_new:
