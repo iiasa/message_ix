@@ -398,3 +398,36 @@ def make_westeros(mp, solve=False):
         scen.solve()
 
     return scen
+
+
+def make_westeros_full(mp, solve=False):
+    scen = make_westeros(mp, solve=False)
+    country = 'Westeros'
+    year_df = scen.vintage_and_active_years()
+    vintage_years, act_years = year_df['year_vtg'], year_df['year_act']
+
+    scen.check_out()
+
+    # first we introduce the emission specis CO2 and the emission category GHG
+    scen.add_set('emission', 'CO2')
+    scen.add_cat('emission', 'GHG', 'CO2')
+
+    # we now add CO2 emissions to the coal powerplant
+    base_emission_factor = {
+        'node_loc': country,
+        'year_vtg': vintage_years,
+        'year_act': act_years,
+        'mode': 'standard',
+        'unit': 'USD/GWa',
+    }
+
+    emission_factor = make_df(
+        base_emission_factor, technology='coal_ppl', emission='CO2', value=100.)
+    scen.add_par('emission_factor', emission_factor)
+
+    scen.commit('Added additional westeros params to baseline model')
+
+    if solve:
+        scen.solve()
+
+    return scen
