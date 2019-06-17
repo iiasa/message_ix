@@ -1,3 +1,9 @@
+
+import pyam
+
+import pandas as pd
+import xarray as xr
+
 from functools import partial
 from logging import WARNING
 try:
@@ -6,11 +12,8 @@ except ImportError:
     from pathlib2 import Path
 
 from ixmp.reporting import Reporter as ixmp_Reporter
-import pandas as pd
+from ixmp.testing import assert_qty_equal
 from pandas.testing import assert_frame_equal
-import pyam
-import xarray as xr
-from xarray.testing import assert_equal as assert_xr_equal
 
 from message_ix import Scenario
 from message_ix.reporting import Reporter, as_pyam, configure
@@ -47,7 +50,14 @@ def test_reporter(test_mp):
     demand = xr.DataArray([300, 325, 275], **dims)
 
     # NB the call to squeeze() drops the length-1 dimensions c-l-y-h
-    assert_xr_equal(rep.get('demand:n-c-l-y-h').squeeze(drop=True), demand)
+    obs = rep.get('demand:n-c-l-y-h').squeeze(drop=True)
+    # TODO: Squeeze on AttrSeries still returns full index, whereas xarray
+    # drops everything except node
+    obs = obs.reset_index(['c', 'l', 'y', 'h'], drop=True)
+    # check_dtype is false because of casting in pd.Series to float
+    # check_attrsis false because we don't get the unit addition in bare xarray
+    assert_qty_equal(obs.sort_index(), demand,
+                     check_attrs=False, check_dtype=False)
 
     # ixmp.Reporter pre-populated with only model quantities and aggregates
     assert len(rep_ix.graph) == 5102
@@ -62,7 +72,8 @@ def test_reporter(test_mp):
 
     # …and expected values
     vom = rep.get(rep.full_key('ACT')) * rep.get(rep.full_key('var_cost'))
-    assert_xr_equal(vom, rep.get(vom_key))
+    # check_attrs false because `vom` multiply above does not add units
+    assert_qty_equal(vom, rep.get(vom_key), check_attrs=False)
 
 
 def test_reporter_from_dantzig(test_mp):
