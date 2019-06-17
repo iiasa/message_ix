@@ -422,7 +422,8 @@ def make_westeros_full(mp, solve=False):
     }
 
     emission_factor = make_df(
-        base_emission_factor, technology='coal_ppl', emission='CO2', value=100.)
+        base_emission_factor, technology='coal_ppl', emission='CO2', value=100.
+    )
     scen.add_par('emission_factor', emission_factor)
 
     scen.commit('Added additional westeros params to baseline model')
