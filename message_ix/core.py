@@ -1,17 +1,17 @@
 import collections
 import copy
-import ixmp
 import itertools
 import os
 import warnings
 
-import pandas as pd
+import ixmp
 import numpy as np
-
-from message_ix import default_paths
-
 from ixmp.utils import pd_read, pd_write
-from message_ix.utils import isscalar, logger
+import pandas as pd
+
+from . import default_paths
+from .utils import isscalar, logger
+
 
 DEFAULT_SOLVE_OPTIONS = {
     'advind': 0,
@@ -284,27 +284,27 @@ class Scenario(ixmp.Scenario):
         return pd.DataFrame({'year_vtg': v_years, 'year_act': a_years})
 
     def solve(self, model='MESSAGE', solve_options={}, **kwargs):
-        """Solve the Scenario.
+        """Solve the model for the Scenario.
 
-        Parameters
-        ----------
-        model : string
-            the type of model to solve (e.g., MESSAGE or MESSAGE-MACRO)
-        solve_options : dict
-            name, value pairs to use for GAMS solver optfile,
-            see `message_ix.DEFAULT_SOLVE_OPTIONS` for defaults and see
-            https://www.gams.com/latest/docs/S_CPLEX.html for possible
-            arguments
-
-        By default, :meth:`ixmp.Scenario.solve` is called with "MESSAGE" as the
+        By default, :meth:`ixmp.Scenario.solve` is called with 'MESSAGE' as the
         *model* argument; see the documentation of that method for other
         arguments. *model* may also be overwritten, e.g.:
 
         >>> s.solve(model='MESSAGE-MACRO')
 
+        Parameters
+        ----------
+        model : str, optional
+            Type of model to solve, e.g. 'MESSAGE' or 'MESSAGE-MACRO'.
+        solve_options : dict, optional
+            name, value pairs to use for GAMS solver optfile. See
+            :obj:`message_ix.DEFAULT_SOLVE_OPTIONS` for defaults
+            and https://www.gams.com/latest/docs/S_CPLEX.html for possible
+            keys.
+
         """
         # TODO: we generate the cplex.opt file on the fly. this is *not* safe
-        # agaisnt race conditions. It is possible to generate opt files with
+        # against race conditions. It is possible to generate opt files with
         # random names (see
         # https://www.gams.com/latest/docs/UG_GamsCall.html#GAMSAOoptfile);
         # however, we need to clean up the code in ixmp that passes arguments

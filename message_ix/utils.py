@@ -1,6 +1,5 @@
 import collections
 import copy
-import itertools
 import logging
 import six
 

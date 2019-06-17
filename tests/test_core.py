@@ -1,14 +1,13 @@
 import os
-import ixmp
-import message_ix
-import pytest
 
+import ixmp
 import numpy as np
+from numpy import testing as npt
 import pandas as pd
 import pandas.util.testing as pdt
 
 from message_ix import Scenario
-from numpy import testing as npt
+
 
 msg_args = ('canning problem (MESSAGE scheme)', 'standard')
 msg_multiyear_args = ('canning problem (MESSAGE scheme)', 'multi-year')
@@ -181,7 +180,8 @@ def test_new_timeseries_long_name64(test_mp):
     scen.check_out(timeseries_only=True)
     df = pd.DataFrame({
         'region': ['India', ],
-        'variable': ['Emissions|CO2|Energy|Demand|Transportation|Aviation|Domestic|Fre', ],
+        'variable': [('Emissions|CO2|Energy|Demand|Transportation|Aviation|'
+                      'Domestic|Fre'), ],
         'unit': ['Mt CO2/yr', ],
         '2012': [0.257009, ]
     })
@@ -195,7 +195,8 @@ def test_new_timeseries_long_name64plus(test_mp):
     scen.check_out(timeseries_only=True)
     df = pd.DataFrame({
         'region': ['India', ],
-        'variable': ['Emissions|CO2|Energy|Demand|Transportation|Aviation|Domestic|Freight|Oil', ],
+        'variable': [('Emissions|CO2|Energy|Demand|Transportation|Aviation|'
+                      'Domestic|Freight|Oil'), ],
         'unit': ['Mt CO2/yr', ],
         '2012': [0.257009, ]
     })
