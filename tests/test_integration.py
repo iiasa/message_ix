@@ -4,8 +4,15 @@ from numpy import testing as npt
 import pandas.util.testing as pdt
 
 from ixmp import Platform
+from message_ix import Scenario
 
-from message_ix.testing import make_dantzig, TS_DF, TS_DF_CLEARED, TS_DF_SHIFT
+from message_ix.testing import (
+    make_dantzig,
+    models,
+    TS_DF,
+    TS_DF_CLEARED,
+    TS_DF_SHIFT
+)
 
 
 def test_run_clone(tmpdir):
@@ -86,8 +93,15 @@ def test_multi_db_run(tmpdir):
     pytest.raises(ValueError, scen1.clone, **dest, shift_first_model_year=1964)
 
     # clone solved model across platforms (with default settings)
-    scen2 = scen1.clone(platform=mp2, keep_solution=True)
-    assert_multi_db(mp1, mp2)
+    scen1.clone(platform=mp2, keep_solution=True)
+
+    mp2.close_db()
+    del mp2
+
+    _mp2 = Platform(tmpdir / 'mp2', dbtype='HSQLDB')
+    info = models['dantzig']
+    scen2 = Scenario(_mp2, info['model'], info['scenario'])
+    assert_multi_db(mp1, _mp2)
 
     # check that sets, variables and parameter were copied correctly
     npt.assert_array_equal(scen1.set('node'), scen2.set('node'))
