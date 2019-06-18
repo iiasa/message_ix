@@ -40,7 +40,7 @@ def as_pyam(scenario, year_time_dim, *quantities, drop=[], collapse=None):
     df = df.rename(columns={year_time_dim: year_or_time}) \
            .drop(drop, axis=1)
     if collapse:
-        df = df.apply(collapse, axis=1)
+        df = collapse(df)
 
     # Warn about extra columns
     extra = sorted(set(df.columns) - set(IAMC_IDX + ['year', 'time', 'value']))

@@ -127,11 +127,12 @@ def test_report_as_pyam(test_mp, caplog, tmp_path):
     assert ('message_ix.reporting.pyam', WARNING, w) in caplog.record_tuples
 
     # Repeat, using the message_ix.Reporter convenience function
-    def m_t(row):
+    def m_t(df):
         """Callback for collapsing ACT columns."""
         # .pop() removes the named column from the returned row
-        row['variable'] = '|'.join(['Activity', row.pop('t'), row.pop('m')])
-        return row
+        df['variable'] = 'Activity|' + df['t'] + '|' + df['m']
+        df.drop(['t', 'm'], axis=1, inplace=True)
+        return df
 
     # Use the convenience function to add the node
     keys = rep.as_pyam(ACT, 'ya', collapse=m_t)
