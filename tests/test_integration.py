@@ -63,7 +63,7 @@ def test_shift_first_model_year(test_mp):
 
     # assert that `historical_activity` is empty in the source scenario
     assert scen.par('historical_activity').empty
-    
+
     # clone and shift first model year
     clone = scen.clone(shift_first_model_year=1964)
 
