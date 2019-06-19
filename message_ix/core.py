@@ -244,7 +244,7 @@ class Scenario(ixmp.Scenario):
             valid pair.
         """
         horizon = self.set('year')
-        first = self.firstmodelyear()
+        first = self.firstmodelyear
 
         if ya_args:
             if len(ya_args) != 3:
