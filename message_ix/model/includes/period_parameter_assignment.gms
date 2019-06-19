@@ -74,7 +74,7 @@ macro_horizon(year_all)$model_horizon(year_all) = yes;
 *----------------------------------------------------------------------------------------------------------------------*
 
 * simple method to compute discount factor (but this approach implicitly assumes a constant interest rate)
-*discountfactor(year_all) = POWER( 1 / ( 1+interestrate(year_all) ), sum(year_all2$( ORD(year_all2) < ORD(year_all) ),
+*df_year(year_all) = POWER( 1 / ( 1+interestrate(year_all) ), sum(year_all2$( ORD(year_all2) < ORD(year_all) ),
 *    duration_period(year_all2) ) ) ;
 
 * compute per-year discount factor (using a recursive method) - set to 1 by default (interest rate = 0)
@@ -86,9 +86,6 @@ loop(year_all$( ORD(year_all) > 1 ),
         sum(year_all2$( seq_period(year_all2,year_all) ), df_year(year_all2)
             * POWER( 1 / ( 1 + interestrate(year_all) ), duration_period(year_all) ) ) ;
 ) ;
-
-* store the per-year discount factor for later use in the file 'MESSAGE/scaling_investment_costs.gms'
-*discountfactor('last_year') = sum(last_period, df_year(last_period) ) ;
 
 * multiply per-year discount factor by discounted period duration
 df_period(year_all) =

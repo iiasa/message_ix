@@ -93,7 +93,7 @@ construction_time_factor(node,inv_tec,year)$( map_tec(node,inv_tec,year) AND con
 * if the investment variable :math:`CAP\_NEW_{n,t,y} > 0`:
 *
 * .. math::
-*    inv\_cost_{n,t,y^V} = \sum_{y \in Y^{lifetime}_{n,t,y^V}} discountfactor_{y} \cdot \beta_{n,t},
+*    inv\_cost_{n,t,y^V} = \sum_{y \in Y^{lifetime}_{n,t,y^V}} df\_year_{y} \cdot \beta_{n,t},
 *
 * Here, :math:`\beta_{n,t} > 0` is the dual variable to the capacity constraint (assumed constant over future periods)
 * and :math:`Y^{lifetime}_{n,t,y^V}` is the set of periods in the lifetime of a plant built in period :math:`y^V`.
@@ -101,8 +101,8 @@ construction_time_factor(node,inv_tec,year)$( map_tec(node,inv_tec,year) AND con
 *
 * .. math::
 *    end\_of\_horizon\_factor_{n,t,y^V} :=
-*    \frac{\sum_{y \in Y^{lifetime}_{n,t,y^V} \cap Y^{model}} discountfactor_{y} }
-*        {\sum_{y' \in Y^{lifetime}_{n,t,y^V}} discountfactor_{y'} + beyond\_horizon\_factor_{n,t,y^V} }
+*    \frac{\sum_{y \in Y^{lifetime}_{n,t,y^V} \cap Y^{model}} df\_year_{y} }
+*        {\sum_{y' \in Y^{lifetime}_{n,t,y^V}} df\_year_{y'} + beyond\_horizon\_factor_{n,t,y^V} }
 *    \in (0,1],
 *
 * where the parameter :math:`beyond\_horizon\_factor_{n,t,y^V}` accounts for the discount factor beyond the
@@ -115,7 +115,7 @@ construction_time_factor(node,inv_tec,year)$( map_tec(node,inv_tec,year) AND con
 *
 * .. math::
 *    beyond\_horizon\_factor_{n,t,y^V} :=
-*        discountfactor_{\widehat{y}} \cdot \frac{1}{ \left( 1 + interestrate_{\widehat{y}} \right)^{|\widehat{y}|} }
+*        df\_year_{\widehat{y}} \cdot \frac{1}{ \left( 1 + interestrate_{\widehat{y}} \right)^{|\widehat{y}|} }
 *        \cdot \frac{ 1 - \left( \frac{1}{1 + interestrate_{\widehat{y}}} \right)^{|\widetilde{y}|}}
 *                   { 1 - \frac{1}{1 + interestrate_{\widehat{y}}}}
 *
