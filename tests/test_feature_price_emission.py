@@ -54,9 +54,8 @@ def add_many_tecs(scen, years, n=50):
             tec_specs = ['node', t, y, y, 'mode']
             # variable costs grow quadratically over technologies
             # to get rid of the curse of linearity
-            # Py2 compatibility with explicit casting to float
-            c = (10. * i / n)**2 * (1.045)**(y - years[0])
-            e = 1 - float(i) / n
+            c = (10 * i / n)**2 * (1.045)**(y - years[0])
+            e = 1 - i / n
             scen.add_par('output', tec_specs + output_specs, 1, 'GWa')
             scen.add_par('var_cost', tec_specs + ['year'], c, 'USD/GWa')
             scen.add_par('emission_factor', tec_specs + ['co2'], e, 'tCO2')
