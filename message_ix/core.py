@@ -266,6 +266,7 @@ class Scenario(ixmp.Scenario):
         v_years, a_years = zip(*year_pairs)
         return pd.DataFrame({'year_vtg': v_years, 'year_act': a_years})
 
+    @property
     def firstmodelyear(self):
         """Returns the first model year of the scenario."""
         return self._jobj.getFirstModelYear()
@@ -309,7 +310,7 @@ class Scenario(ixmp.Scenario):
         """
         err = 'Cloning across platforms is only possible {}'
         if platform is not None and not keep_solution:
-            raise ValueError(err.format('`with keep_solution=True`!'))
+            raise ValueError(err.format('with `keep_solution=True`!'))
 
         if platform is not None and shift_first_model_year is not None:
             raise ValueError(err.format('without shifting model horizon!'))
