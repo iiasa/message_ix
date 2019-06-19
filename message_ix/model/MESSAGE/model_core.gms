@@ -1352,7 +1352,7 @@ SHARE_CONSTRAINT_COMMODITY_UP(shares,node_share,year,time)$( share_commodity_up(
 * activity by type_tec_share technologies with map_shares_generic_share entries and a specific mode
     SUM( (node,location,type_tec_share,tec,vintage,mode,commodity,level,time2)$(
         ( map_shares_commodity_share(shares,node_share,node,type_tec_share,mode,commodity,level) OR
-           map_shares_commodity_share(shares,node_share,node,type_tec_share,'all',commodity,level) ) AND
+          map_shares_commodity_share(shares,node_share,node,type_tec_share,'all',commodity,level) ) AND
         cat_tec(type_tec_share,tec) AND
         map_tec_act(location,tec,year,mode,time2) AND
         map_tec_lifetime(location,tec,vintage,year)

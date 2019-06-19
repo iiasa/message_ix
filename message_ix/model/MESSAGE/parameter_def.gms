@@ -65,8 +65,8 @@ Parameters
     duration_period_sum(year_all,year_all2)  number of years between two periods ('year_all' must precede 'year_all2')
     duration_time_rel(time,time2)  relative duration of subannual time period ('time2' relative to parent 'time')
     interestrate(year_all)         interest rate (to compute discount factor)
-    df_period(year_all)            cumulative discount factor
-    df_year(year_all)              cumulative discount factor
+    df_period(year_all)            cumulative discount factor over period duration
+    df_year(year_all)              discount factor of the last year in the period
 ;
 
 ***
