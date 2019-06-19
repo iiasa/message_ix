@@ -60,6 +60,11 @@ def test_run_remove_solution(test_mp):
 
 def test_shift_first_model_year(test_mp):
     scen = make_dantzig(test_mp, solve=True, multi_year=True)
+
+    # assert that `historical_activity` is empty in the source scenario
+    assert scen.par('historical_activity').empty
+    
+    # clone and shift first model year
     clone = scen.clone(shift_first_model_year=1964)
 
     # check that solution and timeseries in new model horizon have been removed
@@ -92,9 +97,10 @@ def test_multi_db_run(tmpdir):
     pytest.raises(ValueError, scen1.clone, **dest, keep_solution=False)
     pytest.raises(ValueError, scen1.clone, **dest, shift_first_model_year=1964)
 
-    # clone solved model across platforms (with default settings), close the db
+    # clone solved model across platforms (with default settings)
     scen1.clone(platform=mp2, keep_solution=True)
 
+    # close the db to ensure that data and solution of the clone are saved
     mp2.close_db()
     del mp2
 
