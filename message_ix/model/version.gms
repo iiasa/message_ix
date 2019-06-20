@@ -10,7 +10,7 @@
 * using `conda update -c conda-forge message-ix`.
 
 $SETGLOBAL VERSION_MAJOR "1"
-$SETGLOBAL VERSION_MINOR "1"
+$SETGLOBAL VERSION_MINOR "2"
 $SETGLOBAL VERSION_PATCH "0"
 
 * This file is imported by `message_ix/__init__.py`.
