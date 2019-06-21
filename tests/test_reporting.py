@@ -72,8 +72,7 @@ def test_reporter(test_mp):
 
     # …and expected values
     vom = (
-        rep.get(rep.full_key('ACT')) *
-        rep.get(rep.full_key('var_cost'))
+        rep.get(rep.full_key('ACT')) * rep.get(rep.full_key('var_cost'))
     ).dropna()
     # check_attrs false because `vom` multiply above does not add units
     assert_qty_equal(vom, rep.get(vom_key), check_attrs=False)
