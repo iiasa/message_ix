@@ -17,7 +17,7 @@ as well as some utility classes and methods:
 
    ixmp.config.Config
    ixmp.model_settings.register_model
-   ixmp.testing.dantzig_transport
+   ixmp.testing.make_dantzig
 
 Core classes
 ------------
@@ -35,4 +35,4 @@ Utility methods
    :members: register_model
 
 .. automodule:: ixmp.testing
-   :members: dantzig_transport
+   :members: make_dantzig
