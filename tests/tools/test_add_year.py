@@ -24,7 +24,7 @@ def model_setup(scen, data):
 
 def adding_years(test_mp, scen_ref, years_new):
     scen_new = Scenario(test_mp, model='add_year', scenario='standard',
-                        version='new', annonation=' ')
+                        version='new', annotation=' ')
     add_year(scen_ref, scen_new, years_new)
     return scen_new
 
