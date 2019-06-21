@@ -3,9 +3,9 @@ Postprocessing and reporting
 
 .. warning::
 
-   :mod:`message_ix.reporting` is **experimental** in message_ix 1.2. The API
-   and functionality may change without advance notice or a deprecation period
-   in subsequent releases.
+   :mod:`message_ix.reporting` is **experimental** in message_ix 1.2 and only
+   supports Python 3. The API and functionality may change without advance
+   notice or a deprecation period in subsequent releases.
 
 The |ixmp| provides powerful features to perform calculations and other postprocessing after a :class:`message_ix.Scenario` has been solved by the associated model. The |MESSAGEix| framework uses these features to provide zero-configuration reporting of models built on the framework.
 
