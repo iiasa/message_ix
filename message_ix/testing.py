@@ -1,4 +1,7 @@
+import numpy as np
 import pandas as pd
+
+from ixmp import IAMC_IDX
 
 from . import Scenario
 from .utils import make_df
@@ -16,6 +19,30 @@ models = {
 }
 
 
+# Create and populate ixmp databases
+
+MODEL = models['dantzig']['model']
+SCENARIO = models['dantzig']['scenario']
+HIST_DF = pd.DataFrame(
+    [[MODEL, SCENARIO, 'DantzigLand', 'GDP', 'USD', 850., 900., 950.], ],
+    columns=IAMC_IDX + [1962, 1963, 1964],
+)
+INP_DF = pd.DataFrame(
+    [[MODEL, SCENARIO, 'DantzigLand', 'Demand', 'cases', 850., 900., 950.], ],
+    columns=IAMC_IDX + [1962, 1963, 1964],
+)
+TS_DF = pd.concat([HIST_DF, INP_DF], sort=False)
+TS_DF.sort_values(by='variable', inplace=True)
+TS_DF.index = range(len(TS_DF.index))
+
+TS_DF_CLEARED = TS_DF.copy()
+TS_DF_CLEARED.loc[0, 1963] = np.nan
+TS_DF_CLEARED.loc[0, 1964] = np.nan
+
+TS_DF_SHIFT = TS_DF.copy()
+TS_DF_SHIFT.loc[0, 1964] = np.nan
+
+
 def make_dantzig(mp, solve=False, multi_year=False):
     """Return an :class:`message_ix.Scenario` for Dantzig's canning problem.
 
@@ -29,6 +56,11 @@ def make_dantzig(mp, solve=False, multi_year=False):
         If True, the scenario has years 1963--1965 inclusive. Otherwise, the
         scenario has the single year 1963.
     """
+    # add custom units and region for timeseries data
+    mp.add_unit('USD_per_km')
+    mp.add_region('DantzigLand', 'country')
+
+    # initialize a new (empty) instance of an `ixmp.Scenario`
     anno = "Dantzig's canning problem as a MESSAGE-scheme Scenario"
     args = models['dantzig'].copy()
     scen = Scenario(mp, version='new', annotation=anno, **args)
@@ -115,6 +147,11 @@ def make_dantzig(mp, solve=False, multi_year=False):
 
     if solve:
         scen.solve()
+
+    scen.check_out(timeseries_only=True)
+    scen.add_timeseries(HIST_DF, meta=True)
+    scen.add_timeseries(INP_DF)
+    scen.commit("Import Dantzig's transport problem for testing.")
 
     return scen
 

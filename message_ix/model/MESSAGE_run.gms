@@ -73,40 +73,7 @@ $INCLUDE MESSAGE/model_solve.gms
 * post-processing and export to gdx                                                                                    *
 *----------------------------------------------------------------------------------------------------------------------*
 
-* calculation of commodity import costs by node, commodity and year
-import_cost(node2, commodity, year) =
-          SUM( (node,tec,vintage,mode,level,time,time2)$( (NOT sameas(node,node2)) AND map_tec_act(node2,tec,year,mode,time2)
-            AND map_tec_lifetime(node2,tec,vintage,year) AND map_commodity(node,commodity,level,year,time) ),
-* import into node2 from other nodes
-          input(node2,tec,vintage,year,mode,node,commodity,level,time2,time)
-        * duration_time_rel(time,time2) * ACT.L(node2,tec,vintage,year,mode,time2)
-        * COMMODITY_BALANCE.M(node,commodity,level,year,time) / discountfactor(year) )
-;
-
-* calculation of commodity export costs by node, commodity and year
-export_cost(node2, commodity, year) =
-          SUM( (node,tec,vintage,mode,level,time,time2)$( (NOT sameas(node,node2)) AND map_tec_act(node2,tec,year,mode,time2)
-            AND map_tec_lifetime(node2,tec,vintage,year) AND map_commodity(node,commodity,level,year,time) ),
-* export from node2 to other market
-          output(node2,tec,vintage,year,mode,node,commodity,level,time2,time)
-        * duration_time_rel(time,time2) * ACT.L(node2,tec,vintage,year,mode,time2)
-        * COMMODITY_BALANCE.M(node,commodity,level,year,time) / discountfactor(year) )
-;
-
-* net commodity trade costs by node and year
-trade_cost(node2, year) = SUM(commodity, import_cost(node2, commodity, year) - export_cost(node2, commodity, year)) ;
-
-* reporting of net total costs (excluding emission taxes) as result of MESSAGE run
-COST_NODAL_NET.L(location,year) =
-    COST_NODAL.L(location,year) + trade_cost(location,year)
-* subtract emission taxes applied at any higher nodal level (via map_node set)
-    - sum((type_emission,emission,type_tec,type_year,node)$( emission_scaling(type_emission,emission)
-            AND map_node(node,location) AND cat_year(type_year,year) ),
-        emission_scaling(type_emission,emission) * tax_emission(node,type_emission,type_tec,type_year)
-        * EMISS.L(location,emission,type_tec,year) )
-;
-
-* include MESSAGE reporting
+* include MESSAGE GAMS-internal reporting
 $INCLUDE MESSAGE/reporting.gms
 
 * dump all input data, processed data and results to a gdx file

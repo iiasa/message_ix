@@ -37,6 +37,7 @@ doc/source/model
 # files generated during install
 ixmp/default_paths.py
 build
+dist
 
 # rixmp build folder and rhistory
 rmessageix/rmessageix*.zip
@@ -54,3 +55,6 @@ tests/testdb/test.properties
 tests/testdb/ixmptest.properties
 tests/testdb/ixmptest.lck
 .Rproj.user
+
+# pytest cache
+.pytest_cache/**
