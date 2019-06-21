@@ -2,10 +2,12 @@
 
 \b
 Examples:
-$ python f_addYear.py --model_ref Austria_tutorial --scen_ref test_core \
-                      --scen_new test_5y --years_new 2015,2025,2035,2045
-$ python f_addNewYear.py --model_ref CD_Links_SSP2 --scen_ref baseline \
-                         --years_new "[2015,2025,2035,2045,2055,2120]"
+$ python -m message_ix.tools.add_year \
+    --model_ref Austria_tutorial --scen_ref test_core \
+    --scen_new test_5y --years_new 2015,2025,2035,2045
+$ python -m message_ix.tools.add_year \
+    --model_ref CD_Links_SSP2 --scen_ref baseline \
+    --years_new "[2015,2025,2035,2045,2055,2120]"
 
 If --create_new=False is given, the target Scenario must already exist.
 
@@ -81,7 +83,7 @@ def main(model_ref, scen_ref, version_ref, model_new, scen_new, create_new,
          dry_run):
 
     start = timer()
-    print('>> Running the script f_addYears.py...')
+    print('>> message_ix.tools.add_year...')
 
     # Handle default arguments
     ref_kw = dict(model=model_ref, scen=scen_ref)
