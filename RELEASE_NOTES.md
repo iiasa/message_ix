@@ -1,6 +1,7 @@
 
 # Next Release
 
+- [#161](https://github.com/iiasa/message_ix/pull/161): A feature for adding new periods to a scenario.
 - [#205](https://github.com/iiasa/message_ix/pull/205): Implement required changes related to timeseries-support and cloning across platforms (see [ixmp:#142](https://github.com/iiasa/ixmp/pull/142)).
 - [#196](https://github.com/iiasa/message_ix/pull/196): Improve testing by re-using :mod:`ixmp` apparatus.
 - [#187](https://github.com/iiasa/message_ix/pull/187): Test for cumulative bound on emissions.

@@ -5,7 +5,7 @@ import os
 import re
 import shutil
 
-from setuptools import setup
+from setuptools import find_packages, setup
 from setuptools.command.install import install
 
 fname = os.path.join(os.path.dirname(os.path.realpath(__file__)),
@@ -47,9 +47,6 @@ def all_gams_files(path, strip=None):
 
 
 def main():
-    packages = [
-        'message_ix'
-    ]
     pack_dir = {
         'message_ix': 'message_ix',
     }
@@ -74,7 +71,7 @@ def main():
         "url": 'http://github.com/iiasa/message_ix',
         "install_requires": INSTALL_REQUIRES,
         "extras_require": EXTRAS_REQUIRE,
-        "packages": packages,
+        "packages": find_packages(),
         "package_dir": pack_dir,
         "package_data": pack_data,
         "entry_points": entry_points,
