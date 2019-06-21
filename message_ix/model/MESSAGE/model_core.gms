@@ -588,7 +588,7 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
 * This constraint ensures that supply is greater or equal than demand for every commodity-level combination.
 *
 *  .. math::
-*     \text{COMMODITY_BALANCE}_{n,c,l,y,h} \geq 0
+*     COMMODITY\_BALANCE_{n,c,l,y,h} \geq 0
 *
 ***
 COMMODITY_BALANCE_GT(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
@@ -606,7 +606,7 @@ COMMODITY_BALANCE_GT(node,commodity,level,year,time)$( map_commodity(node,commod
 * is (exactly) equal to demand.
 *
 *  .. math::
-*     \text{COMMODITY_BALANCE}_{n,c,l,y,h} \leq 0
+*     COMMODITY\_BALANCE_{n,c,l,y,h} \leq 0
 *
 ***
 COMMODITY_BALANCE_LT(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
