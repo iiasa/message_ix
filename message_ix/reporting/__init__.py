@@ -115,7 +115,7 @@ class Reporter(IXMPReporter):
 
         # Add basic derived quantities for MESSAGEix models
         for name, quantities in products:
-            new_key = rep.add_product(name, *quantities)
+            new_key = rep.add_product(name, quantities)
 
             # Give some log output
             if new_key is None:

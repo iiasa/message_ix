@@ -37,7 +37,7 @@ def test_reporter(test_mp):
     rep = Reporter.from_scenario(scen)
 
     # Number of quantities available in a rudimentary MESSAGEix Scenario
-    assert len(rep.graph['all']) == 118
+    assert len(rep.graph['all']) == 120
 
     # Quantities have short dimension names
     assert 'demand:n-c-l-y-h' in rep.graph
@@ -60,10 +60,10 @@ def test_reporter(test_mp):
                      check_attrs=False, check_dtype=False)
 
     # ixmp.Reporter pre-populated with only model quantities and aggregates
-    assert len(rep_ix.graph) == 5102
+    assert len(rep_ix.graph) == 5088
 
     # message_ix.Reporter pre-populated with additional, derived quantities
-    assert len(rep.graph) == 9614
+    assert len(rep.graph) == 9600
 
     # Derived quantities have expected dimensions
     vom_key = rep.full_key('vom')
@@ -71,7 +71,10 @@ def test_reporter(test_mp):
     assert vom_key == 'vom:nl-t-yv-ya-m-h'
 
     # …and expected values
-    vom = rep.get(rep.full_key('ACT')) * rep.get(rep.full_key('var_cost'))
+    vom = (
+        rep.get(rep.full_key('ACT')) *
+        rep.get(rep.full_key('var_cost'))
+    ).dropna()
     # check_attrs false because `vom` multiply above does not add units
     assert_qty_equal(vom, rep.get(vom_key), check_attrs=False)
 
@@ -103,7 +106,8 @@ def test_report_as_pyam(test_mp, caplog, tmp_path):
     scen = Scenario(test_mp,
                     'canning problem (MESSAGE scheme)',
                     'standard')
-    scen.solve()
+    if not scen.has_solution():
+        scen.solve()
     rep = Reporter.from_scenario(scen)
 
     # Key for 'ACT' variable at full resolution
