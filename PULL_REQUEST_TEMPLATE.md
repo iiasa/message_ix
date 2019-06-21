@@ -1,13 +1,13 @@
-# Please confirm that this PR has done the following:
+**Required:** write a single sentence here describing the changes made by this PR.
 
-- [ ] Tests Added
-- [ ] Documentation Added
-- [ ] Description in RELEASE_NOTES.md Added
+(Optional: write a longer description here to help a reviewer understand the PR in 3–5 minutes.)
 
-# Adding to RELEASE_NOTES.md
+**PR checklist:**
 
-Please add a single line in the release notes similar to the following:
-
-```
-- (#XX)[http://link-to-pr.com] Added feature which does something
-```
+- [ ] Tests added.
+- [ ] Documentation added.
+- [ ] Release notes updated. Add a single line at the top of `RELEASE_NOTES.md` similar to…
+  ```
+  - [#999](https://github.com/iiasa/message_ix/pull/999) Description from above.
+  ```
+  …then, delete this sentence to confirm you've understood the instructions.
