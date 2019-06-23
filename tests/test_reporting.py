@@ -1,6 +1,7 @@
 
 import pyam
 
+import numpy as np
 import pandas as pd
 import xarray as xr
 
@@ -14,10 +15,10 @@ except ImportError:
 from ixmp.reporting import Reporter as ixmp_Reporter
 from ixmp.testing import assert_qty_equal
 from pandas.testing import assert_frame_equal
-
+from numpy.testing import assert_allclose
 from message_ix import Scenario
 from message_ix.reporting import Reporter, as_pyam, configure
-from message_ix.testing import make_dantzig, make_westeros
+from message_ix.testing import make_dantzig, make_westeros, make_westeros_full
 
 
 def test_reporter(test_mp):
@@ -63,7 +64,7 @@ def test_reporter(test_mp):
     assert len(rep_ix.graph) == 5088
 
     # message_ix.Reporter pre-populated with additional, derived quantities
-    assert len(rep.graph) == 9600
+    assert len(rep.graph) == 9615
 
     # Derived quantities have expected dimensions
     vom_key = rep.full_key('vom')
@@ -87,9 +88,12 @@ def test_reporter_from_dantzig(test_mp):
     # Default target can be calculated
     rep.get('all')
 
-
+# TODO: this test fails if run as part of the larger test suite likely due to
+# common state shared between tests. If run in isolation, it passes. However,
+# *IF* the call to `rep.get('all') is uncommented, then the test passes as part
+# of the larger test suite. not sure why..
 def test_reporter_from_westeros(test_mp):
-    scen = make_westeros(test_mp)
+    scen = make_westeros_full(test_mp, solve=True)
 
     # Reporter.from_scenario can handle Westeros example model
     rep = Reporter.from_scenario(scen)
@@ -98,8 +102,47 @@ def test_reporter_from_westeros(test_mp):
     configure(units={'replace': {'-': ''}})
 
     # Default target can be calculated
-    rep.get('all')
+    # TODO: if this line is uncommented, then the test passes as part of the larger suite 
+    # rep.get('all')
 
+    # message default target can be calculated
+    # TODO: if df is empty, year is cast to float
+    x = rep.get('message:default')
+
+
+    # TODO: need to flatten/ravel/chain, but none of these are working as expected
+    # x as coded looks like [[list of dfs len(3)], [list of dfs len(3)], [list of dfs len(1)]]
+    dfs = []
+    def recurse_dfs(arr):
+        if isinstance(arr, pyam.IamDataFrame):
+            if not arr.data.empty:
+                dfs.append(arr)
+        else:
+            for a in arr:
+                recurse_dfs(a)
+    recurse_dfs(x)
+
+    # all expected reporting exists
+    obs = pyam.concat(dfs)
+    assert len(obs.data) == 69
+
+    # custom values are correct
+    obs = obs.filter(variable='total om*')
+    assert len(obs.data) == 9
+    assert all(
+        obs['variable'] == \
+        ['total om cost|coal_ppl'] * 3 + \
+        ['total om cost|grid'] * 3 + \
+        ['total om cost|wind_ppl'] * 3
+    )
+    assert all(obs['year'] == [700, 710, 720] * 3)
+
+    obs = obs['value'].values
+    exp = [4832.177734, 8786.515625, 12666.666016, 5555.555664, 8333.333984,
+           10555.555664, 305.748138, 202.247391, 0.]
+    assert len(obs) == len(exp)
+    assert_allclose(obs, exp)
+        
 
 def test_report_as_pyam(test_mp, caplog, tmp_path):
     scen = Scenario(test_mp,

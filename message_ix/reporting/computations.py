@@ -5,6 +5,9 @@ from ixmp.reporting.computations import (  # noqa: F401
 import pyam
 
 
+def add(a, b, fill_value=0.0):
+    return a.add(b, fill_value=fill_value).dropna()
+
 def write_report(quantity, path):
     """Write the report identified by *key* to the file at *path*.
 

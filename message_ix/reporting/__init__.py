@@ -1,14 +1,16 @@
-from functools import partial
 import logging
+
+from functools import partial
 
 from ixmp.reporting import (
     Reporter as IXMPReporter,
+    computations as ix_computations,
     configure,
 )
 from ixmp.reporting.utils import Key
 
 from . import computations
-from .pyam import as_pyam
+from .pyam import as_pyam, AS_PYAM_ARGS
 
 
 log = logging.getLogger(__name__)
@@ -50,7 +52,7 @@ configure(
     })
 
 # Basic derived quantities that are the product of two others
-products = (
+PRODUCTS = (
     ('out',
         ('output', 'ACT')),
     ('out_hist',
@@ -76,6 +78,20 @@ products = (
     ('vom_hist',
         ('var_cost', 'ref_activity')),
 )
+
+# derived quantities
+DERIVED = [
+    ('tom:nl-t-yv-ya', (computations.add, 'fom:nl-t-yv-ya', 'vom:nl-t-yv-ya')),
+    ('tom:nl-t-ya', (ix_computations.sum, 'tom:nl-t-yv-ya', None, ['yv'])),
+]
+
+
+# standard reporting values
+STANDARD_REPORTING = {
+    'message:system': ['pyam:out', 'pyam:in', 'pyam:cap', 'pyam:new_cap'],
+    'message:costs': ['pyam:inv', 'pyam:fom', 'pyam:vom', 'pyam:tom'],
+    'message:emissions': ['pyam:emis'],
+}
 
 
 class Reporter(IXMPReporter):
@@ -112,9 +128,9 @@ class Reporter(IXMPReporter):
         """
         # Invoke the ixmp method
         rep = super().from_scenario(scenario, **kwargs)
-
-        # Add basic derived quantities for MESSAGEix models
-        for name, quantities in products:
+        
+        # Add basic quantities for MESSAGEix models
+        for name, quantities in PRODUCTS:
             new_key = rep.add_product(name, quantities)
 
             # Give some log output
@@ -122,10 +138,25 @@ class Reporter(IXMPReporter):
                 missing = [q for q in quantities if q not in rep._index]
                 log.info('{} not in scenario → not adding {}'
                          .format(missing, name))
+            
 
+        # Add derived quantities for MESSAGEix models
+        for key, args in DERIVED:
+            rep.add(key, args)
+
+        # TODO: can probably be done with something like chain(standard_reporting.values())
+        for group, pyam_keys in STANDARD_REPORTING.items():
+            for key in pyam_keys:
+                qty, yr, collapse = AS_PYAM_ARGS[key]
+                rep.as_pyam(qty, yr, key=key, collapse=collapse)
+            rep.add(group, pyam_keys)
+
+        # add all standard reporting to the default message node
+        rep.add('message:default', list(STANDARD_REPORTING.keys()))
+        
         return rep
 
-    def as_pyam(self, quantities, year_time_dim, drop={}, collapse=None):
+    def as_pyam(self, quantities, year_time_dim, key=None, drop={}, collapse=None):
         """Add conversion of **quantities** to :class:`pyam.IamDataFrame`.
 
         Parameters
@@ -150,6 +181,8 @@ class Reporter(IXMPReporter):
             Keys for the reporting targets that create the IamDataFrames
             corresponding to *quantities*. The keys have the added tag ‘iamc’.
         """
+        
+        # TODO, this should check for any viable container
         if not isinstance(quantities, list):
             quantities = [quantities]
         keys = []
@@ -158,7 +191,7 @@ class Reporter(IXMPReporter):
             qty = Key.from_str_or_key(qty)
             to_drop = set(drop) | set(qty._dims) & (
                 {'h', 'y', 'ya', 'yr', 'yv'} - {year_time_dim})
-            key = Key.from_str_or_key(qty, tag='iamc')
+            key = key or Key.from_str_or_key(qty, tag='iamc')
             self.add(key, (partial(as_pyam, drop=to_drop, collapse=collapse),
                            'scenario', year_time_dim, qty))
             keys.append(key)

@@ -1,4 +1,5 @@
 from logging import getLogger
+from functools import partial
 
 import pandas as pd
 from pyam import IAMC_IDX, IamDataFrame
@@ -7,9 +8,13 @@ from pyam import IAMC_IDX, IamDataFrame
 log = getLogger(__name__)
 
 
-def as_pyam(scenario, year_time_dim, *quantities, drop=[], collapse=None):
+def as_pyam(scenario, year_time_dim, quantities, drop=[], collapse=None):
     """Return a :class:`pyam.IamDataFrame` containing *quantities*."""
 
+    # TODO, this should check for any viable container
+    if not isinstance(quantities, list):
+        quantities = [quantities]
+        
     # Renamed automatically
     IAMC_columns = {
         'n': 'region',
@@ -49,3 +54,46 @@ def as_pyam(scenario, year_time_dim, *quantities, drop=[], collapse=None):
                     .format(extra, [q.name for q in quantities]))
 
     return IamDataFrame(df)
+
+
+# TODO: this should be a generalized function instead of many different collapse
+# functions using pandas' eval
+def collapse_ene_cols(df, kind):
+    df['variable'] = kind + '|' + df['l'] + \
+        '|' + df['c'] + '|' + df['t'] + '|' + df['m']
+    rcol = 'nd' if kind == 'out' else 'no'
+    df['region'] = df['region'] + '|' + df[rcol]
+    df.drop(['l', 'c', 't', 'm'] + [rcol], axis=1, inplace=True)
+    return df
+
+
+def collapse_capacity_cols(df, kind):
+    df['variable'] = kind + '|' + df['t']
+    df.drop(['t'], axis=1, inplace=True)
+    return df
+
+
+def collapse_cost_cols(df, kind):
+    df['variable'] = kind + '|' + df['t']
+    df.drop(['t'], axis=1, inplace=True)
+    return df
+
+
+def collapse_emi_cols(df):
+    df['variable'] = 'emis|' + df['e'] + '|' + df['t'] + '|' + df['m']
+    df.drop(['e', 't', 'm'], axis=1, inplace=True)
+    return df
+
+AS_PYAM_ARGS = {
+    'pyam:out': ('out:nl-t-ya-m-nd-c-l', 'ya', partial(collapse_ene_cols, kind='out')),
+    'pyam:in': ('in:nl-t-ya-m-no-c-l', 'ya', partial(collapse_ene_cols, kind='in')),
+    'pyam:cap': ('CAP:nl-t-ya', 'ya', partial(collapse_capacity_cols, kind='capacity')),
+    'pyam:new_cap': ('CAP_NEW:nl-t-yv', 'yv', partial(collapse_capacity_cols, kind='new capacity')),
+    'pyam:inv': ('inv:nl-t-yv', 'yv', partial(collapse_cost_cols, kind='inv cost')),
+    'pyam:fom': ('fom:nl-t-ya', 'ya', partial(collapse_cost_cols, kind='fom cost')),
+    'pyam:vom': ('vom:nl-t-ya', 'ya', partial(collapse_cost_cols, kind='vom cost')),
+    'pyam:tom': ('tom:nl-t-ya', 'ya', partial(collapse_cost_cols, kind='total om cost')),
+    'pyam:emis': ('emi:nl-t-ya-m-e', 'ya', collapse_emi_cols),
+}
+
+
