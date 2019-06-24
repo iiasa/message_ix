@@ -202,11 +202,7 @@ Alias(mode, mode2);
 *      - :math:`\widehat{t} \in \widehat{T}^{LAND} \subseteq \widehat{T}`
 *      - Mapping set of technology types and land use
 *    * - balance_equality (commodity,level)
-*      - .. math::
-*
-*           c \in C^{FULL} \subseteq C
-*
-*           l \in L^{FULL} \subseteq L
+*      - :math:`c \in C, l \in L`
 *      - Commodities and level related to :doc:`Equation COMMODITY_BALANCE_LT
 *        <model_core>`
 *
