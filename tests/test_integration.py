@@ -24,12 +24,14 @@ def test_run_clone(tmpdir):
     mp = Platform(tmpdir, dbtype='HSQLDB')
     scen = make_dantzig(mp, solve=True)
     assert np.isclose(scen.var('OBJ')['lvl'], 153.675)
+    assert scen.firstmodelyear == 1963
     pdt.assert_frame_equal(scen.timeseries(iamc=True), TS_DF)
 
     # cloning with `keep_solution=True` keeps all timeseries and the solution
     # (same behaviour as `ixmp.Scenario`)
     scen2 = scen.clone(keep_solution=True)
     assert np.isclose(scen2.var('OBJ')['lvl'], 153.675)
+    assert scen2.firstmodelyear == 1963
     pdt.assert_frame_equal(scen2.timeseries(iamc=True), TS_DF)
 
     # cloning with `keep_solution=False` drops the solution and only keeps
@@ -37,6 +39,7 @@ def test_run_clone(tmpdir):
     # (DIFFERENT behaviour from `ixmp.Scenario`)
     scen3 = scen.clone(keep_solution=False)
     assert np.isnan(scen3.var('OBJ')['lvl'])
+    assert scen3.firstmodelyear == 1963
     pdt.assert_frame_equal(scen3.timeseries(iamc=True), TS_DF_CLEARED)
 
 
@@ -55,6 +58,7 @@ def test_run_remove_solution(test_mp):
     # check that removing solution does not delete timeseries data
     # before first model year (DIFFERENT behaviour from `ixmp.Scenario`)
     scen.remove_solution()
+    assert scen.firstmodelyear == 1963
     pdt.assert_frame_equal(scen.timeseries(iamc=True), TS_DF_CLEARED)
 
 
@@ -70,6 +74,7 @@ def test_shift_first_model_year(test_mp):
     # check that solution and timeseries in new model horizon have been removed
     assert np.isnan(clone.var('OBJ')['lvl'])
     pdt.assert_frame_equal(clone.timeseries(iamc=True), TS_DF_SHIFT)
+    assert clone.firstmodelyear == 1964
     # check that the variable `ACT` is now the parameter `historical_activity`
     assert not clone.par('historical_activity').empty
 
@@ -113,6 +118,7 @@ def test_multi_db_run(tmpdir):
 
     # check that sets, variables and parameter were copied correctly
     npt.assert_array_equal(scen1.set('node'), scen2.set('node'))
+    scen2.firstmodelyear == 1963
     pdt.assert_frame_equal(scen1.par('var_cost'), scen2.par('var_cost'))
     assert np.isclose(scen2.var('OBJ')['lvl'], 153.675)
     pdt.assert_frame_equal(scen1.var('ACT'), scen2.var('ACT'))
