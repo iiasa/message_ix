@@ -86,10 +86,6 @@ def test_reporter_from_dantzig(test_mp):
     rep.get('all')
 
 
-# TODO: this test fails if run as part of the larger test suite likely due to
-# common state shared between tests. If run in isolation, it passes. However,
-# *IF* the call to `rep.get('all') is uncommented, then the test passes as part
-# of the larger test suite. not sure why..
 def test_reporter_from_westeros(test_mp):
     scen = make_westeros(test_mp, emissions=True, solve=True)
 
@@ -100,32 +96,13 @@ def test_reporter_from_westeros(test_mp):
     configure(units={'replace': {'-': ''}})
 
     # Default target can be calculated
-    # TODO if this line is uncommented, then the test passes as part of the
-    #      larger suite
-    # rep.get('all')
+    rep.get('all')
 
     # message default target can be calculated
     # TODO if df is empty, year is cast to float
-    x = rep.get('message:default')
-
-    # TODO need to flatten/ravel/chain, but none of these are working as
-    #      expected
-    # x as coded looks like [[list of dfs len(3)], [list of dfs len(3)],
-    # [list of dfs len(1)]]
-    dfs = []
-
-    def recurse_dfs(arr):
-        if isinstance(arr, pyam.IamDataFrame):
-            if not arr.data.empty:
-                dfs.append(arr)
-        else:
-            for a in arr:
-                recurse_dfs(a)
-
-    recurse_dfs(x)
+    obs = rep.get('message:default')
 
     # all expected reporting exists
-    obs = pyam.concat(dfs)
     assert len(obs.data) == 69
 
     # custom values are correct

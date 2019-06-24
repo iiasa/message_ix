@@ -146,7 +146,9 @@ class Reporter(IXMPReporter):
           - ``cap:pyam`` (from ``CAP``)
           - ``new_cap:pyam`` (from ``CAP_NEW``)
 
-        - Standard reports as in :obj:`REPORTS`.
+          ...according to :obj:`PYAM_CONVERT`.
+
+        - Standard reports according to :obj:`REPORTS`.
         - The report ``message:default``, collecting all of the above reports.
 
         Returns
@@ -173,16 +175,17 @@ class Reporter(IXMPReporter):
 
         # Add conversions to pyam
         for key, args in PYAM_CONVERT.items():
-            qty, yr, collapse = args
-            rep.as_pyam(qty, yr, key=key + ':pyam',
-                        collapse=partial(collapse_message_cols, **collapse))
+            qty, year_dim, collapse_kw = args
+            rep.as_pyam(qty, year_dim, key=key + ':pyam',
+                        collapse=partial(collapse_message_cols, **collapse_kw))
 
         # Add standard reports
         for group, pyam_keys in REPORTS.items():
-            rep.add(group, pyam_keys)
+            rep.add(group, tuple([computations.concat] + pyam_keys))
 
-        # add all standard reporting to the default message node
-        rep.add('message:default', list(REPORTS.keys()))
+        # Add all standard reporting to the default message node
+        rep.add('message:default',
+                tuple([computations.concat] + list(REPORTS.keys())))
 
         return rep
 
@@ -212,7 +215,6 @@ class Reporter(IXMPReporter):
             Keys for the reporting targets that create the IamDataFrames
             corresponding to *quantities*. The keys have the added tag ‘iamc’.
         """
-
         # TODO, this should check for any viable container
         if not isinstance(quantities, list):
             quantities = [quantities]
