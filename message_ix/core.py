@@ -48,7 +48,8 @@ def init_storage(scen, *args, **kwargs):
     # Initiating two parameters for specifying lower and upper bounds of
     # storage reservoir, and storage losses all as % of installed capacity
     # (values should be between 0 and 1)
-    par_stor = ['bound_storage_lo', 'bound_storage_up', 'storage_loss']
+    par_stor = ['bound_storage_lo', 'bound_storage_up', 'storage_loss',
+                'init_storage']
     for parname in par_stor:
         scen.init_par(parname, idx_sets=['node', 'technology',
                                          'level', 'year', 'time'])

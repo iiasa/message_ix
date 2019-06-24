@@ -80,22 +80,7 @@ def add_storage_data(scen, time_order):
     for h in time_order.keys():
         scen.add_par('time_seq', h, time_order[h], '-')
 
-    # Adding a relation between storage content of two time steps (optional)
-    yr_first = yr_last = scen.set('year').tolist()[0]
-    time_first = 'a'
-    time_last = 'd'
-    scen.add_par('relation_storage', ['node', 'dam', 'storage',
-                                      yr_first, yr_last,
-                                      time_first, time_last], 1.25, '%')
-
-    # Adding minimum and maximum bound, and losses for storage (percentage)
-    for year, h in product(set(scen.set('year')), time_order.keys()):
-        storage_spec = ['node', 'dam', 'storage', year, h]
-        scen.add_par('bound_storage_lo', storage_spec, 0.0, '%')
-        scen.add_par('bound_storage_up', storage_spec, 1.0, '%')
-        scen.add_par('storage_loss', storage_spec, 0.05, '%')
-
-    # input, output, and capacity factor for storage technologies
+    # Adding input, output, and capacity factor for storage technologies
     output_spec = {'dam': ['node', 'stored_com', 'storage'],
                    'pump': ['node', 'stored_com', 'storage'],
                    'turbine': ['node', 'electr', 'level'],
@@ -114,6 +99,25 @@ def add_storage_data(scen, time_order):
         scen.add_par('output', tec_sp + output_spec[tec] + [h, h], 1, 'GWa')
         scen.add_par('input', tec_sp + input_spec[tec] + [h, h], 1, 'GWa')
         scen.add_par('var_cost', tec_sp + [h], var_cost[tec], 'USD/GWa')
+
+    # Adding minimum and maximum bound, and losses for storage (percentage)
+    for year, h in product(set(scen.set('year')), time_order.keys()):
+        storage_spec = ['node', 'dam', 'storage', year, h]
+        scen.add_par('bound_storage_lo', storage_spec, 0.0, '%')
+        scen.add_par('bound_storage_up', storage_spec, 1.0, '%')
+        scen.add_par('storage_loss', storage_spec, 0.05, '%')
+
+    # Adding initial content of storage (optional)
+    storage_spec = ['node', 'dam', 'storage', year, 'a']
+    scen.add_par('init_storage', storage_spec, 0.08, 'GWa')
+
+    # Adding a relation between storage content of two time steps (optional)
+    yr_first = yr_last = scen.set('year').tolist()[0]
+    time_first = 'a'
+    time_last = 'd'
+    scen.add_par('relation_storage', ['node', 'dam', 'storage',
+                                      yr_first, yr_last,
+                                      time_last, time_first], 0.5, '%')
 
 
 # Main function for building a model and adding seasonality and storage

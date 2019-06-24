@@ -277,6 +277,7 @@ Equations
     RELATION_CONSTRAINT_LO          lower bound of relations (linear constraints)
     STORAGE_CHANGE                  change in the content of storage
     STORAGE_BALANCE                 storage commodity (content) balance
+    STORAGE_BALANCE_f               storage commodity (content) balance for the first time step
     STORAGE_REL                     relation between the content of storage in two different time steps (time_first * value = time_last)
     STORAGE_BOUND_LO                lower bound of the content of storage
     STORAGE_BOUND_UP                upper bound of the content of storage
@@ -2026,29 +2027,37 @@ STORAGE_CHANGE(node,storage_tec,level,year,time)$( SUM( (mode,tec,commodity), ma
 * change in the content of storage in the examined timestep
     STORAGE_CHG(node,storage_tec,level,year,time) =E=
 * increase in the content of storage due to the activity of charging technologies
-        SUM((location,vintage,mode,tec,commodity,time2)$(map_tec_lifetime(node,tec,vintage,year) AND charge_tec(tec) AND map_tec_storage_level(node,tec,storage_tec,level,year,time) ),
+        SUM( (location,vintage,mode,tec,commodity,time2)$(map_tec_lifetime(node,tec,vintage,year) AND charge_tec(tec)
+            AND map_tec_storage_level(node,tec,storage_tec,level,year,time) ),
         output(location,tec,vintage,year,mode,node,commodity,level,time2,time) * ACT(location,tec,vintage,year,mode,time) )
 * decrease in the content of storage due to the activity of discharging technologies
-        - SUM((location,vintage,mode,tec,commodity,time2)$(map_tec_lifetime(node,tec,vintage,year) AND discharge_tec(tec) AND map_tec_storage_level(node,tec,storage_tec,level,year,time) ),
+        - SUM( (location,vintage,mode,tec,commodity,time2)$(map_tec_lifetime(node,tec,vintage,year) AND discharge_tec(tec)
+              AND map_tec_storage_level(node,tec,storage_tec,level,year,time) ),
         input(location,tec,vintage,year,mode,node,commodity,level,time2,time) * ACT(location,tec,vintage,year,mode,time) );
 
 ***
 * Equation STORAGE_BALANCE
 * """""""""""""""""""""""""""""""
-* This equation ensures the commodity balance of storage technologies between sub-annual time steps within a model period.
+* This equation ensures the commodity balance of storage technologies, where the commodity is shifted between sub-annual time steps within a model period.
 *   .. math::
-*      STORAGE_{n,t^S,l,y,h} \ = STORAGE\_CHG_{n,t^S,l,y,h} + \\
+*      STORAGE_{n,t^S,l,y,h} \ = init\_storage_{n,t^S,l,y,h} + STORAGE\_CHG_{n,t^S,l,y,h} + \\
 *      STORAGE_{n,t^S,l,y,h^A} \cdot & (1 - storage\_loss_{n,t^S,l,y,h^A})
 ***
-STORAGE_BALANCE(node,storage_tec,level,year,time2)$ ( SUM(tec, map_tec_storage_level(node,tec,storage_tec,level,year,time2) ) )..
-* Showing the content level of storage at each timestep
+STORAGE_BALANCE(node,storage_tec,level,year,time2)$ ( SUM(tec, map_tec_storage_level(node,tec,storage_tec,level,year,time2) ) AND NOT (time_seq(time2) = 1 ) )..
+* Showing the content of storage at each timestep
     STORAGE(node,storage_tec,level,year,time2) =E=
-* change in the content of storage in the examined timestep
-    STORAGE_CHG(node,storage_tec,level,year,time2)
+* initial content of storage and change in the content of storage in the examined timestep
+    init_storage(node,storage_tec,level,year,time2) + STORAGE_CHG(node,storage_tec,level,year,time2)
 * storage content in the previous subannual timestep
     + SUM((time,year2)$map_time_period(year,year2,time,time2), STORAGE(node,storage_tec,level,year,time)  *
 * considering storage losses due to keeping the storage media between two subannual timesteps
     (1 - storage_loss(node,storage_tec,level,year,time) ) ) ;
+
+STORAGE_BALANCE_f(node,storage_tec,level,year,time)$ ( SUM(tec, map_tec_storage_level(node,tec,storage_tec,level,year,time) ) AND (time_seq(time) = 1 ) )..
+* Showing the content of storage at the first timestep
+    STORAGE(node,storage_tec,level,year,time) =E=
+* initial content of storage and change in the content of storage in the examined timestep
+    init_storage(node,storage_tec,level,year,time) + STORAGE_CHG(node,storage_tec,level,year,time) ;
 
 ***
 * Equation STORAGE_RELATION

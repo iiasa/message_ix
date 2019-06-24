@@ -71,7 +71,7 @@ demand_fixed=demand
 is_fixed_extraction, is_fixed_stock, is_fixed_new_capacity, is_fixed_capacity, is_fixed_activity, is_fixed_land
 fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activity, fixed_land
 * storage parameters
-bound_storage_lo, bound_storage_up, storage_loss, relation_storage, time_seq
+init_storage, bound_storage_lo, bound_storage_up, storage_loss, relation_storage, time_seq
 ;
 
 
@@ -178,8 +178,7 @@ discharge_tec(tec)$(
 
 * mapping of storage reservoir technologies to their levels and charge/discharge technologies
 map_tec_storage_level(node,tec,storage_tec,level_storage,year_all,time)$(
-    storage_loss(node,storage_tec,level_storage,year_all,time) AND
-    map_tec_storage(tec,storage_tec) ) = yes;
+    storage_loss(node,storage_tec,level_storage,year_all,time) AND map_tec_storage(tec,storage_tec) ) = yes;
 
 *----------------------------------------------------------------------------------------------------------------------*
 * sanity checks on the data set                                                                                        *

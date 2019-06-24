@@ -44,9 +44,10 @@ if ( sum(year_all$( cat_year("initializeyear_macro",year_all) ), 1 ) > 1 ,
 seq_period(year_all,year_all2)$( ORD(year_all) + 1 = ORD(year_all2) ) = yes ;
 map_period(year_all,year_all2)$( ORD(year_all) <= ORD(year_all2) ) = yes ;
 
-* mapping of sequence of time in a period
+* mapping of sequence of sub-annual time steps in a period and temporal level
 map_time_period(year_all,year_all2,time,time2)$( ORD(year_all) = ORD(year_all2) AND time_seq(time) AND
-    (time_seq(time) + 1 = time_seq(time2) ) ) = yes;
+    ( time_seq(time)$sum( (lvl_temporal,time3), map_temporal_hierarchy(lvl_temporal,time,time3) ) + 1 =
+      time_seq(time2)$sum( (lvl_temporal,time3), map_temporal_hierarchy(lvl_temporal,time2,time3) ) ) )= yes;
 
 * dynamic sets (singleton) with first and last periods in model horizon of MESSAGEix (for easier reference)
 if ( sum(year_all$( cat_year("firstmodelyear",year_all) ), 1 ),
@@ -98,7 +99,7 @@ df_period(year_all) =
     df_year(year_all) * (
 * multiply the per-year discount factor by the geometric series of over the duration of the period
         ( ( 1 - POWER( 1 / ( 1 + interestrate(year_all) ), duration_period(year_all) ) )
-	/ ( 1 - 1 / ( 1 + interestrate(year_all) ) ) )$( interestrate(year_all) )
+        / ( 1 - 1 / ( 1 + interestrate(year_all) ) ) )$( interestrate(year_all) )
 * if interest rate = 0, multiply by the number of years in that period
         + ( duration_period(year_all) )$( interestrate(year_all) eq 0 ) )
 ;
