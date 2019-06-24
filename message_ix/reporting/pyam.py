@@ -14,7 +14,7 @@ def as_pyam(scenario, year_time_dim, quantities, drop=[], collapse=None):
     # TODO, this should check for any viable container
     if not isinstance(quantities, list):
         quantities = [quantities]
-        
+
     # Renamed automatically
     IAMC_columns = {
         'n': 'region',
@@ -56,8 +56,8 @@ def as_pyam(scenario, year_time_dim, quantities, drop=[], collapse=None):
     return IamDataFrame(df)
 
 
-# TODO: this should be a generalized function instead of many different collapse
-# functions using pandas' eval
+# TODO this should be a generalized function instead of many different
+#      collapse functions using pandas' eval
 def collapse_ene_cols(df, kind):
     df['variable'] = kind + '|' + df['l'] + \
         '|' + df['c'] + '|' + df['t'] + '|' + df['m']
@@ -84,16 +84,42 @@ def collapse_emi_cols(df):
     df.drop(['e', 't', 'm'], axis=1, inplace=True)
     return df
 
+
 AS_PYAM_ARGS = {
-    'pyam:out': ('out:nl-t-ya-m-nd-c-l', 'ya', partial(collapse_ene_cols, kind='out')),
-    'pyam:in': ('in:nl-t-ya-m-no-c-l', 'ya', partial(collapse_ene_cols, kind='in')),
-    'pyam:cap': ('CAP:nl-t-ya', 'ya', partial(collapse_capacity_cols, kind='capacity')),
-    'pyam:new_cap': ('CAP_NEW:nl-t-yv', 'yv', partial(collapse_capacity_cols, kind='new capacity')),
-    'pyam:inv': ('inv:nl-t-yv', 'yv', partial(collapse_cost_cols, kind='inv cost')),
-    'pyam:fom': ('fom:nl-t-ya', 'ya', partial(collapse_cost_cols, kind='fom cost')),
-    'pyam:vom': ('vom:nl-t-ya', 'ya', partial(collapse_cost_cols, kind='vom cost')),
-    'pyam:tom': ('tom:nl-t-ya', 'ya', partial(collapse_cost_cols, kind='total om cost')),
-    'pyam:emis': ('emi:nl-t-ya-m-e', 'ya', collapse_emi_cols),
+    'pyam:out': (
+        'out:nl-t-ya-m-nd-c-l', 'ya',
+        partial(collapse_ene_cols, kind='out')
+    ),
+    'pyam:in': (
+        'in:nl-t-ya-m-no-c-l', 'ya',
+        partial(collapse_ene_cols, kind='in')
+    ),
+    'pyam:cap': (
+        'CAP:nl-t-ya', 'ya',
+        partial(collapse_capacity_cols, kind='capacity')
+    ),
+    'pyam:new_cap': (
+        'CAP_NEW:nl-t-yv', 'yv',
+        partial(collapse_capacity_cols, kind='new capacity')
+    ),
+    'pyam:inv': (
+        'inv:nl-t-yv', 'yv',
+        partial(collapse_cost_cols, kind='inv cost')
+    ),
+    'pyam:fom': (
+        'fom:nl-t-ya', 'ya',
+        partial(collapse_cost_cols, kind='fom cost')
+    ),
+    'pyam:vom': (
+        'vom:nl-t-ya', 'ya',
+        partial(collapse_cost_cols, kind='vom cost')
+    ),
+    'pyam:tom': (
+        'tom:nl-t-ya', 'ya',
+        partial(collapse_cost_cols, kind='total om cost')
+    ),
+    'pyam:emis': (
+        'emi:nl-t-ya-m-e', 'ya',
+        collapse_emi_cols
+    ),
 }
-
-

@@ -1,10 +1,3 @@
-
-import pyam
-
-import numpy as np
-import pandas as pd
-import xarray as xr
-
 from functools import partial
 from logging import WARNING
 try:
@@ -14,11 +7,15 @@ except ImportError:
 
 from ixmp.reporting import Reporter as ixmp_Reporter
 from ixmp.testing import assert_qty_equal
-from pandas.testing import assert_frame_equal
 from numpy.testing import assert_allclose
+import pandas as pd
+from pandas.testing import assert_frame_equal
+import pyam
+import xarray as xr
+
 from message_ix import Scenario
 from message_ix.reporting import Reporter, as_pyam, configure
-from message_ix.testing import make_dantzig, make_westeros, make_westeros_full
+from message_ix.testing import make_dantzig, make_westeros_full
 
 
 def test_reporter(test_mp):
@@ -88,6 +85,7 @@ def test_reporter_from_dantzig(test_mp):
     # Default target can be calculated
     rep.get('all')
 
+
 # TODO: this test fails if run as part of the larger test suite likely due to
 # common state shared between tests. If run in isolation, it passes. However,
 # *IF* the call to `rep.get('all') is uncommented, then the test passes as part
@@ -102,17 +100,20 @@ def test_reporter_from_westeros(test_mp):
     configure(units={'replace': {'-': ''}})
 
     # Default target can be calculated
-    # TODO: if this line is uncommented, then the test passes as part of the larger suite 
+    # TODO if this line is uncommented, then the test passes as part of the
+    #      larger suite
     # rep.get('all')
 
     # message default target can be calculated
-    # TODO: if df is empty, year is cast to float
+    # TODO if df is empty, year is cast to float
     x = rep.get('message:default')
 
-
-    # TODO: need to flatten/ravel/chain, but none of these are working as expected
-    # x as coded looks like [[list of dfs len(3)], [list of dfs len(3)], [list of dfs len(1)]]
+    # TODO need to flatten/ravel/chain, but none of these are working as
+    #      expected
+    # x as coded looks like [[list of dfs len(3)], [list of dfs len(3)],
+    # [list of dfs len(1)]]
     dfs = []
+
     def recurse_dfs(arr):
         if isinstance(arr, pyam.IamDataFrame):
             if not arr.data.empty:
@@ -130,9 +131,9 @@ def test_reporter_from_westeros(test_mp):
     obs = obs.filter(variable='total om*')
     assert len(obs.data) == 9
     assert all(
-        obs['variable'] == \
-        ['total om cost|coal_ppl'] * 3 + \
-        ['total om cost|grid'] * 3 + \
+        obs['variable'] ==
+        ['total om cost|coal_ppl'] * 3 +
+        ['total om cost|grid'] * 3 +
         ['total om cost|wind_ppl'] * 3
     )
     assert all(obs['year'] == [700, 710, 720] * 3)
@@ -142,7 +143,7 @@ def test_reporter_from_westeros(test_mp):
            10555.555664, 305.748138, 202.247391, 0.]
     assert len(obs) == len(exp)
     assert_allclose(obs, exp)
-        
+
 
 def test_report_as_pyam(test_mp, caplog, tmp_path):
     scen = Scenario(test_mp,

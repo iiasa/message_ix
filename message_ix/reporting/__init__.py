@@ -1,6 +1,5 @@
-import logging
-
 from functools import partial
+import logging
 
 from ixmp.reporting import (
     Reporter as IXMPReporter,
@@ -128,7 +127,7 @@ class Reporter(IXMPReporter):
         """
         # Invoke the ixmp method
         rep = super().from_scenario(scenario, **kwargs)
-        
+
         # Add basic quantities for MESSAGEix models
         for name, quantities in PRODUCTS:
             new_key = rep.add_product(name, quantities)
@@ -138,13 +137,13 @@ class Reporter(IXMPReporter):
                 missing = [q for q in quantities if q not in rep._index]
                 log.info('{} not in scenario → not adding {}'
                          .format(missing, name))
-            
 
         # Add derived quantities for MESSAGEix models
         for key, args in DERIVED:
             rep.add(key, args)
 
-        # TODO: can probably be done with something like chain(standard_reporting.values())
+        # TODO can probably be done with something like
+        #      chain(standard_reporting.values())
         for group, pyam_keys in STANDARD_REPORTING.items():
             for key in pyam_keys:
                 qty, yr, collapse = AS_PYAM_ARGS[key]
@@ -153,10 +152,11 @@ class Reporter(IXMPReporter):
 
         # add all standard reporting to the default message node
         rep.add('message:default', list(STANDARD_REPORTING.keys()))
-        
+
         return rep
 
-    def as_pyam(self, quantities, year_time_dim, key=None, drop={}, collapse=None):
+    def as_pyam(self, quantities, year_time_dim, key=None, drop={},
+                collapse=None):
         """Add conversion of **quantities** to :class:`pyam.IamDataFrame`.
 
         Parameters
@@ -181,7 +181,7 @@ class Reporter(IXMPReporter):
             Keys for the reporting targets that create the IamDataFrames
             corresponding to *quantities*. The keys have the added tag ‘iamc’.
         """
-        
+
         # TODO, this should check for any viable container
         if not isinstance(quantities, list):
             quantities = [quantities]
