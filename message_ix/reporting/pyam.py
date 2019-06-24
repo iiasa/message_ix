@@ -7,8 +7,12 @@ from pyam import IAMC_IDX, IamDataFrame
 log = getLogger(__name__)
 
 
-def as_pyam(scenario, year_time_dim, *quantities, drop=[], collapse=None):
+def as_pyam(scenario, year_time_dim, quantities, drop=[], collapse=None):
     """Return a :class:`pyam.IamDataFrame` containing *quantities*."""
+
+    # TODO, this should check for any viable container
+    if not isinstance(quantities, list):
+        quantities = [quantities]
 
     # Renamed automatically
     IAMC_columns = {
@@ -49,3 +53,33 @@ def as_pyam(scenario, year_time_dim, *quantities, drop=[], collapse=None):
                     .format(extra, [q.name for q in quantities]))
 
     return IamDataFrame(df)
+
+
+def collapse_message_cols(df, var, kind=None):
+    """:meth:`as_pyam` collapse=... callback for MESSAGE quantities.
+
+    Parameters
+    ----------
+    var : str
+        Name for 'variable' column.
+    kind : None or 'ene' or 'emi', optional
+        Determines which other columns are combined into the 'region' and
+        'variable' columns.
+    """
+    if kind == 'ene':
+        # Region column
+        rcol = 'nd' if var == 'out' else 'no'
+        df['region'] = df['region'].str.cat(df[rcol], sep='|')
+        df.drop(rcol, axis=1, inplace=True)
+
+        var_cols = ['l', 'c', 't', 'm']
+    elif kind == 'emi':
+        var_cols = ['e', 't', 'm']
+    else:
+        var_cols = ['t']
+
+    # Assemble variable column
+    df['variable'] = var
+    df['variable'] = df['variable'].str.cat([df[c] for c in var_cols], sep='|')
+
+    return df.drop(var_cols, axis=1)

@@ -1,9 +1,3 @@
-
-import pyam
-
-import pandas as pd
-import xarray as xr
-
 from functools import partial
 from logging import WARNING
 try:
@@ -13,7 +7,11 @@ except ImportError:
 
 from ixmp.reporting import Reporter as ixmp_Reporter
 from ixmp.testing import assert_qty_equal
+from numpy.testing import assert_allclose
+import pandas as pd
 from pandas.testing import assert_frame_equal
+import pyam
+import xarray as xr
 
 from message_ix import Scenario
 from message_ix.reporting import Reporter, as_pyam, configure
@@ -63,7 +61,7 @@ def test_reporter(test_mp):
     assert len(rep_ix.graph) == 5088
 
     # message_ix.Reporter pre-populated with additional, derived quantities
-    assert len(rep.graph) == 9600
+    assert len(rep.graph) == 9615
 
     # Derived quantities have expected dimensions
     vom_key = rep.full_key('vom')
@@ -89,7 +87,7 @@ def test_reporter_from_dantzig(test_mp):
 
 
 def test_reporter_from_westeros(test_mp):
-    scen = make_westeros(test_mp)
+    scen = make_westeros(test_mp, emissions=True, solve=True)
 
     # Reporter.from_scenario can handle Westeros example model
     rep = Reporter.from_scenario(scen)
@@ -99,6 +97,30 @@ def test_reporter_from_westeros(test_mp):
 
     # Default target can be calculated
     rep.get('all')
+
+    # message default target can be calculated
+    # TODO if df is empty, year is cast to float
+    obs = rep.get('message:default')
+
+    # all expected reporting exists
+    assert len(obs.data) == 69
+
+    # custom values are correct
+    obs = obs.filter(variable='total om*')
+    assert len(obs.data) == 9
+    assert all(  # noqa: W504
+        obs['variable'] ==
+        ['total om cost|coal_ppl'] * 3 +
+        ['total om cost|grid'] * 3 +
+        ['total om cost|wind_ppl'] * 3
+    )
+    assert all(obs['year'] == [700, 710, 720] * 3)
+
+    obs = obs['value'].values
+    exp = [4832.177734, 8786.515625, 12666.666016, 5555.555664, 8333.333984,
+           10555.555664, 305.748138, 202.247391, 0.]
+    assert len(obs) == len(exp)
+    assert_allclose(obs, exp)
 
 
 def test_report_as_pyam(test_mp, caplog, tmp_path):

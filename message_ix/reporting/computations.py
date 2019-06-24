@@ -5,6 +5,16 @@ from ixmp.reporting.computations import (  # noqa: F401
 import pyam
 
 
+def add(a, b, fill_value=0.0):
+    """Sum of *a* and *b*."""
+    return a.add(b, fill_value=fill_value).dropna()
+
+
+def concat(*args):
+    """Concatenate *args*, which must be :class:`pyam.IamDataFrame`."""
+    return pyam.concat(args)
+
+
 def write_report(quantity, path):
     """Write the report identified by *key* to the file at *path*.
 
