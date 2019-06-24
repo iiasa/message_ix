@@ -15,7 +15,7 @@ import xarray as xr
 
 from message_ix import Scenario
 from message_ix.reporting import Reporter, as_pyam, configure
-from message_ix.testing import make_dantzig, make_westeros_full
+from message_ix.testing import make_dantzig, make_westeros
 
 
 def test_reporter(test_mp):
@@ -91,7 +91,7 @@ def test_reporter_from_dantzig(test_mp):
 # *IF* the call to `rep.get('all') is uncommented, then the test passes as part
 # of the larger test suite. not sure why..
 def test_reporter_from_westeros(test_mp):
-    scen = make_westeros_full(test_mp, solve=True)
+    scen = make_westeros(test_mp, emissions=True, solve=True)
 
     # Reporter.from_scenario can handle Westeros example model
     rep = Reporter.from_scenario(scen)
