@@ -436,7 +436,10 @@ Sets
     is_fixed_land(node,land_scenario,year_all)             flag whether land level is fixed
 ;
 
-* Added for storage
+*----------------------------------------------------------------------------------------------------------------------*
+* Storage sets and mappings                                                                             *
+*----------------------------------------------------------------------------------------------------------------------*
+
 Sets
     level_storage(level)                                               levels of storage
     map_tec_charge(node,tec,mode,commodity,level,year_all,time)        mapping of charging technologies (for storage) to their commodities

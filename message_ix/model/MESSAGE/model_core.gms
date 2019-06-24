@@ -94,6 +94,9 @@ Positive Variables
     ACT_LO(node,tec,year_all,time)   relaxation variable for dynamic constraints on activity (downwards)
 * land-use model emulator
     LAND(node,land_scenario,year_all) relative share of land-use scenario
+* content of storage
+    STORAGE(node,tec,level,year_all,time)       content of storage at each sub-annual time step (positive)
+;
 
 Variables
 * intertemporal stock variables (input or output quantity into the stock)
@@ -110,7 +113,7 @@ Variables
     REL(relation,node,year_all)                  auxiliary variable for left-hand side of user-defined relations
 * auxiliary variable for left-hand side of commodity balance
     COMM(node,commodity,level,year_all,time)         auxiliary variable for left-hand side of commodity balance
-* BZ added for storage
+* change in the content of storage device
     STORAGE_CHG(node,tec,level,year_all,time)   change in the content of storage (positive or negative)
 ;
 
@@ -209,9 +212,6 @@ Positive variables
     SLACK_LAND_TYPE_LO(node,year_all,land_type)       slack variable for dynamic land type constraint relaxation (downwards)
     SLACK_RELATION_BOUND_UP(relation,node,year_all)   slack variable for upper bound of generic relation
     SLACK_RELATION_BOUND_LO(relation,node,year_all)   slack variable for lower bound of generic relation
-
-* Added for storage
-    STORAGE(node,tec,level,year_all,time)       content of storage (positive)
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
@@ -275,8 +275,6 @@ Equations
     RELATION_EQUIVALENCE            auxiliary equation to simplify the implementation of relations
     RELATION_CONSTRAINT_UP          upper bound of relations (linear constraints)
     RELATION_CONSTRAINT_LO          lower bound of relations (linear constraints)
-
-* Added for storage
     STORAGE_CHANGE                  change in the content of storage
     STORAGE_BALANCE                 storage commodity (content) balance
     STORAGE_REL                     relation between the content of storage in two different time steps (time_first * value = time_last)
@@ -543,7 +541,8 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 *     = COMMODITY\_BALANCE_{n,c,l,y,h} \quad \forall \ l \notin (L^{RES}, & l^{REN} \subseteq L)
 *
 * The commodity balance constraint at the resource level is included in the `Equation RESOURCE_CONSTRAINT`_,
-* while at the renewable level, it is included in the `Equation RENEWABLES_EQUIVALENCE`_.
+* while at the renewable level, it is included in the `Equation RENEWABLES_EQUIVALENCE`_,
+* and at the storage level, it is included in the `Equation STORAGE_BALANCE`_.
 ***
 $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                                                             \
     SUM( (location,tec,vintage,mode,time2)$( map_tec_act(location,tec,year,mode,time2)                                 \
@@ -576,7 +575,7 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
 *
 ***
 COMMODITY_BALANCE_GT(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
-        AND NOT level_resource(level) AND NOT level_renewable(level) )..
+        AND NOT level_resource(level) AND NOT level_renewable(level) AND NOT level_storage(level) )..
     COMMODITY_BALANCE(node,commodity,level,year,time)
 * relaxation of constraints for debugging
 %SLACK_COMMODITY_EQUIVALENCE% + SLACK_COMMODITY_EQUIVALENCE_UP(node,commodity,level,year,time)
@@ -596,7 +595,7 @@ COMMODITY_BALANCE_GT(node,commodity,level,year,time)$( map_commodity(node,commod
 *
 ***
 COMMODITY_BALANCE_LT(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
-        AND NOT level_resource(level) AND NOT level_renewable(level)
+        AND NOT level_resource(level) AND NOT level_renewable(level) AND NOT level_storage(level)
         AND balance_equality(commodity,level) )..
     COMMODITY_BALANCE(node,commodity,level,year,time)
 * relaxation of constraints for debugging
