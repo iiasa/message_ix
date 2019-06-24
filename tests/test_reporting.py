@@ -131,10 +131,10 @@ def test_reporter_from_westeros(test_mp):
     obs = obs.filter(variable='total om*')
     assert len(obs.data) == 9
     assert all(
-        obs['variable'] ==
-        ['total om cost|coal_ppl'] * 3 +
-        ['total om cost|grid'] * 3 +
-        ['total om cost|wind_ppl'] * 3
+        obs['variable']
+        == ['total om cost|coal_ppl'] * 3
+        + ['total om cost|grid'] * 3
+        + ['total om cost|wind_ppl'] * 3
     )
     assert all(obs['year'] == [700, 710, 720] * 3)
 
