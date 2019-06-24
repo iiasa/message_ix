@@ -11,10 +11,7 @@ from ixmp.reporting.utils import Key
 from . import computations
 from .pyam import (
     as_pyam,
-    collapse_capacity_cols,
-    collapse_cost_cols,
-    collapse_ene_cols,
-    collapse_emi_cols,
+    collapse_message_cols,
 )
 
 
@@ -92,42 +89,15 @@ DERIVED = [
 
 #: Quantities to automatically convert to pyam format.
 PYAM_CONVERT = {
-    'out:pyam': (
-        'out:nl-t-ya-m-nd-c-l', 'ya',
-        partial(collapse_ene_cols, kind='out')
-    ),
-    'in:pyam': (
-        'in:nl-t-ya-m-no-c-l', 'ya',
-        partial(collapse_ene_cols, kind='in')
-    ),
-    'cap:pyam': (
-        'CAP:nl-t-ya', 'ya',
-        partial(collapse_capacity_cols, kind='capacity')
-    ),
-    'new_cap:pyam': (
-        'CAP_NEW:nl-t-yv', 'yv',
-        partial(collapse_capacity_cols, kind='new capacity')
-    ),
-    'inv:pyam': (
-        'inv:nl-t-yv', 'yv',
-        partial(collapse_cost_cols, kind='inv cost')
-    ),
-    'fom:pyam': (
-        'fom:nl-t-ya', 'ya',
-        partial(collapse_cost_cols, kind='fom cost')
-    ),
-    'vom:pyam': (
-        'vom:nl-t-ya', 'ya',
-        partial(collapse_cost_cols, kind='vom cost')
-    ),
-    'tom:pyam': (
-        'tom:nl-t-ya', 'ya',
-        partial(collapse_cost_cols, kind='total om cost')
-    ),
-    'emis:pyam': (
-        'emi:nl-t-ya-m-e', 'ya',
-        collapse_emi_cols
-    ),
+    'out': ('out:nl-t-ya-m-nd-c-l', 'ya', dict(kind='ene', var='out')),
+    'in': ('in:nl-t-ya-m-no-c-l', 'ya', dict(kind='ene', var='in')),
+    'cap': ('CAP:nl-t-ya', 'ya', dict(var='capacity')),
+    'new_cap': ('CAP_NEW:nl-t-yv', 'yv', dict(var='new capacity')),
+    'inv': ('inv:nl-t-yv', 'yv', dict(var='inv cost')),
+    'fom': ('fom:nl-t-ya', 'ya', dict(var='fom cost')),
+    'vom': ('vom:nl-t-ya', 'ya', dict(var='vom cost')),
+    'tom': ('tom:nl-t-ya', 'ya', dict(var='total om cost')),
+    'emis': ('emi:nl-t-ya-m-e', 'ya', dict(kind='emi', var='emis')),
 }
 
 
@@ -204,7 +174,8 @@ class Reporter(IXMPReporter):
         # Add conversions to pyam
         for key, args in PYAM_CONVERT.items():
             qty, yr, collapse = args
-            rep.as_pyam(qty, yr, key=key, collapse=collapse)
+            rep.as_pyam(qty, yr, key=key + ':pyam',
+                        collapse=partial(collapse_message_cols, **collapse))
 
         # Add standard reports
         for group, pyam_keys in REPORTS.items():

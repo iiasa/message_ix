@@ -209,8 +209,10 @@ Reporters
 Computations
 ------------
 
+.. automethod:: message_ix.reporting.computations.add
 .. automethod:: message_ix.reporting.computations.write_report
 .. automethod:: message_ix.reporting.pyam.as_pyam
+.. automethod:: message_ix.reporting.pyam.collapse_message_cols
 
 
 Computations from ixmp
