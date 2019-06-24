@@ -14,7 +14,6 @@ Sets
     last_period(year_all)            flag for last period in model horizon
     macro_initial_period(year_all)   flag for period in model horizon in which to initialize model parameters in (period prior to first model period) - used in MACRO
     macro_base_period(year_all)      flag for base year period in model horizon (period prior to first model period) - used in MACRO
-* Added for storage
     map_time_period(year_all,year_all2,time,time2)           mapping of one sub-annual timestep (time) to the next (time2)
 
 ;
@@ -45,7 +44,6 @@ if ( sum(year_all$( cat_year("initializeyear_macro",year_all) ), 1 ) > 1 ,
 seq_period(year_all,year_all2)$( ORD(year_all) + 1 = ORD(year_all2) ) = yes ;
 map_period(year_all,year_all2)$( ORD(year_all) <= ORD(year_all2) ) = yes ;
 
-* Added for storage
 * mapping of sequence of time in a period
 map_time_period(year_all,year_all2,time,time2)$( ORD(year_all) = ORD(year_all2) AND time_seq(time) AND
     (time_seq(time) + 1 = time_seq(time2) ) ) = yes;

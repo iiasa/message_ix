@@ -18,8 +18,7 @@ $LOAD inv_tec, renewable_tec
 $LOAD balance_equality
 $LOAD shares
 $LOAD addon, type_addon, cat_addon, map_tec_addon
-* Added for storage
-$LOAD storage_tec, level_storage, map_tec_storage, relation_storage
+$LOAD storage_tec, level_storage, map_tec_storage
 $GDXIN
 
 Execute_load '%in%'
@@ -71,8 +70,8 @@ demand_fixed=demand
 * fixing variables to pre-specified values
 is_fixed_extraction, is_fixed_stock, is_fixed_new_capacity, is_fixed_capacity, is_fixed_activity, is_fixed_land
 fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activity, fixed_land
-* Added for storage
-bound_storage_lo, bound_storage_up, storage_loss, time_seq
+* storage parameters
+bound_storage_lo, bound_storage_up, storage_loss, relation_storage, time_seq
 ;
 
 
@@ -162,7 +161,6 @@ addon_up(node,tec,year_all,mode,time,type_addon)$(
 emission_scaling(type_emission,emission)$( cat_emission(type_emission,emission)
         and not emission_scaling(type_emission,emission) ) = 1 ;
 
-* Added for storage
 * mapping of charging technologies to their level and commodity
 map_tec_charge(node,tec,mode,commodity,level_storage,year_all,time)$( Not storage_tec(tec) AND
     SUM((node2,year_all2,time_act),
