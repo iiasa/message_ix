@@ -9,7 +9,13 @@ from ixmp.reporting import (
 from ixmp.reporting.utils import Key
 
 from . import computations
-from .pyam import as_pyam, AS_PYAM_ARGS
+from .pyam import (
+    as_pyam,
+    collapse_capacity_cols,
+    collapse_cost_cols,
+    collapse_ene_cols,
+    collapse_emi_cols,
+)
 
 
 log = logging.getLogger(__name__)
@@ -84,6 +90,46 @@ DERIVED = [
     ('tom:nl-t-ya', (ix_computations.sum, 'tom:nl-t-yv-ya', None, ['yv'])),
 ]
 
+#: Quantities to automatically convert to pyam format.
+PYAM_CONVERT = {
+    'out:pyam': (
+        'out:nl-t-ya-m-nd-c-l', 'ya',
+        partial(collapse_ene_cols, kind='out')
+    ),
+    'in:pyam': (
+        'in:nl-t-ya-m-no-c-l', 'ya',
+        partial(collapse_ene_cols, kind='in')
+    ),
+    'cap:pyam': (
+        'CAP:nl-t-ya', 'ya',
+        partial(collapse_capacity_cols, kind='capacity')
+    ),
+    'new_cap:pyam': (
+        'CAP_NEW:nl-t-yv', 'yv',
+        partial(collapse_capacity_cols, kind='new capacity')
+    ),
+    'inv:pyam': (
+        'inv:nl-t-yv', 'yv',
+        partial(collapse_cost_cols, kind='inv cost')
+    ),
+    'fom:pyam': (
+        'fom:nl-t-ya', 'ya',
+        partial(collapse_cost_cols, kind='fom cost')
+    ),
+    'vom:pyam': (
+        'vom:nl-t-ya', 'ya',
+        partial(collapse_cost_cols, kind='vom cost')
+    ),
+    'tom:pyam': (
+        'tom:nl-t-ya', 'ya',
+        partial(collapse_cost_cols, kind='total om cost')
+    ),
+    'emis:pyam': (
+        'emi:nl-t-ya-m-e', 'ya',
+        collapse_emi_cols
+    ),
+}
+
 
 #: Standard reports that collect quantities converted to pyam format.
 REPORTS = {
@@ -155,12 +201,13 @@ class Reporter(IXMPReporter):
         for key, args in DERIVED:
             rep.add(key, args)
 
-        # TODO can probably be done with something like
-        #      chain(standard_reporting.values())
+        # Add conversions to pyam
+        for key, args in PYAM_CONVERT.items():
+            qty, yr, collapse = args
+            rep.as_pyam(qty, yr, key=key, collapse=collapse)
+
+        # Add standard reports
         for group, pyam_keys in REPORTS.items():
-            for key in pyam_keys:
-                qty, yr, collapse = AS_PYAM_ARGS[key]
-                rep.as_pyam(qty, yr, key=key, collapse=collapse)
             rep.add(group, pyam_keys)
 
         # add all standard reporting to the default message node

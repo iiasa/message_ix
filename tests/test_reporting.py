@@ -121,6 +121,7 @@ def test_reporter_from_westeros(test_mp):
         else:
             for a in arr:
                 recurse_dfs(a)
+
     recurse_dfs(x)
 
     # all expected reporting exists
