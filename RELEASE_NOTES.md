@@ -1,5 +1,5 @@
 
-# Next Release
+# v1.2
 
 - [#161](https://github.com/iiasa/message_ix/pull/161): A feature for adding new periods to a scenario.
 - [#205](https://github.com/iiasa/message_ix/pull/205): Implement required changes related to timeseries-support and cloning across platforms (see [ixmp:#142](https://github.com/iiasa/ixmp/pull/142)).
