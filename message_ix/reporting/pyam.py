@@ -8,8 +8,12 @@ log = getLogger(__name__)
 
 
 def as_pyam(scenario, year_time_dim, quantities, drop=[], collapse=None):
-    """Return a :class:`pyam.IamDataFrame` containing *quantities*."""
+    """Return a :class:`pyam.IamDataFrame` containing *quantities*.
 
+    See also
+    --------
+    Reporter.as_pyam for documentation of the arguments.
+    """
     # TODO, this should check for any viable container
     if not isinstance(quantities, list):
         quantities = [quantities]
@@ -56,7 +60,7 @@ def as_pyam(scenario, year_time_dim, quantities, drop=[], collapse=None):
 
 
 def collapse_message_cols(df, var, kind=None):
-    """:meth:`as_pyam` collapse=... callback for MESSAGE quantities.
+    """:meth:`as_pyam` `collapse=...` callback for MESSAGE quantities.
 
     Parameters
     ----------
@@ -64,7 +68,17 @@ def collapse_message_cols(df, var, kind=None):
         Name for 'variable' column.
     kind : None or 'ene' or 'emi', optional
         Determines which other columns are combined into the 'region' and
-        'variable' columns.
+        'variable' columns:
+
+        - 'ene': 'variable' is
+          ``'<var>|<level>|<commodity>|<technology>|<mode>'`` and 'region' is
+          ``'<region>|<node_dest>'`` (if `var='out'`) or
+          ``'<region>|<node_origin>'`` (if `'var='in'`).
+        - 'emi': 'variable' is ``'<var>|<emission>|<technology>|<mode>'``.
+        - Otherwise: 'variable' is ``'<var>|<technology>'``.
+
+        The referenced columns are also dropped, so it is not necessary to
+        provide the `drop` argument of :meth:`as_pyam`.
     """
     if kind == 'ene':
         # Region column
@@ -82,4 +96,5 @@ def collapse_message_cols(df, var, kind=None):
     df['variable'] = var
     df['variable'] = df['variable'].str.cat([df[c] for c in var_cols], sep='|')
 
+    # Drop same columns
     return df.drop(var_cols, axis=1)

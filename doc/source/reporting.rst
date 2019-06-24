@@ -27,7 +27,9 @@ Terminology
 
 Every quantity and report is identified by a **key**, which is a :py:class:`str` or other :py:term:`hashable` object. Special keys are used for multidimensional quantities. For instance: the |MESSAGEix| parameter ``resource_cost``, defined with the dimensions (node `n`, commodity `c`, grade `g`, year `y`) is identified by the key ``'resource_cost:n-c-g-y'``. When summed across the grade/`g` dimension, it has dimensions `n`, `c`, `y` and is identified by the key ``'resource_cost:n-c-y'``.
 
-Non-model quantities and reports are produced by **computations**, which are atomic tasks that build on other computations. The most basic computations—for instance, ``resource_cost:n-c-g-y``—simply return raw/unprocessed quantities from a :class:`message_ix.Scenario`. Advanced computations can depend on many quantities, and combine them together into a structure like a document or spreadsheet. Computations are defined in :mod:`ixmp.reporting.computations` and :mod:`message_ix.reporting.computations`, but most common computations can be added using the methods of :class:`Reporter <message_ix.reporting.Reporter>`.
+Non-model [1]_ quantities and reports are produced by **computations**, which are atomic tasks that build on other computations. The most basic computations—for instance, ``resource_cost:n-c-g-y``—simply retrieve raw/unprocessed data from a :class:`message_ix.Scenario` and return it as a :class:`Quantity <ixmp.reporting.utils.Quantity>`. Advanced computations can depend on many quantities, and/or combine quantities together into a structure like a document or spreadsheet. Computations are defined in :mod:`ixmp.reporting.computations` and :mod:`message_ix.reporting.computations`, but most common computations can be added using the methods of :class:`Reporter <message_ix.reporting.Reporter>`.
+
+.. [1] i.e. quantities that do not exist within the mathematical formulation of the model itself, and do not affect its solution.
 
 Basic usage
 -----------
@@ -42,14 +44,6 @@ A basic reporting workflow has the following steps:
 4. Use :meth:`get() <ixmp.reporting.Reporter.get>` to retrieve the
    results (or trigger the effects) of one or more computations.
 
-.. note:: :class:`Reporter <message_ix.reporting.Reporter>` stores defined
-   computations, but these **are not executed** until :meth:`get()
-   <ixmp.reporting.Reporter.get>` is called—or the results of one
-   computation are required by another. This allows the Reporter to skip
-   unneeded (and potentially slow) computations. A Reporter may contain
-   thousands of model quantities and derived quantities, but only be used for
-   one (or a few) calls to :meth:`get() <ixmp.reporting.Reporter.get>`.
-
 >>> from ixmp import Platform
 >>> from message_ix import Scenario, Reporter
 >>>
@@ -57,6 +51,14 @@ A basic reporting workflow has the following steps:
 >>> scen = Scenario(scen)
 >>> rep = Reporter.from_scenario(scen)
 >>> rep.get('all')
+
+.. note:: :class:`Reporter <message_ix.reporting.Reporter>` stores defined
+   computations, but these **are not executed** until :meth:`get()
+   <ixmp.reporting.Reporter.get>` is called—or the results of one
+   computation are required by another. This allows the Reporter to skip
+   unneeded (and potentially slow) computations. A Reporter may contain computations for thousands of model quantities and derived quantities, but
+   a call to :meth:`get() <ixmp.reporting.Reporter.get>` may only execute a
+   few of these.
 
 
 Customization
@@ -93,8 +95,46 @@ Reporters
 
 .. autoclass:: Reporter
    :show-inheritance:
-   :members: from_scenario, write
-   :exclude-members: as_pyam
+   :members: write
+   :exclude-members: as_pyam, from_scenario
+
+   .. automethod:: from_scenario
+
+      In addition to the keys automatically added by
+      :meth:`ixmp.reporting.Reporter.from_scenario`, keys are added for
+      derived quantities specific to the MESSAGEix framework, as defined in
+      :obj:`PRODUCTS` and :obj:`DERIVED`.
+
+      - ``out``: the product of ``output`` (output efficiency) and ``ACT``
+        (activity).
+      - ``out_hist``: ``output`` × ``ref_activity`` (historical reference
+        activity),
+      - ``in``:      ``input`` × ``ACT``,
+      - ``in_hist``: ``input`` × ``ref_activity``,
+      - ``emi``:      ``emission_factor`` × ``ACT``,
+      - ``emi_hist``: ``emission_factor`` × ``ref_activity``,
+      - ``inv``:      ``inv_cost`` × ``CAP_NEW``,
+      - ``inv_hist``: ``inv_cost`` × ``ref_new_capacity``,
+      - ``fom``:      ``fix_cost`` × ``CAP``,
+      - ``fom_hist``: ``fix_cost`` × ``ref_capacity``,
+      - ``vom``:      ``var_cost`` × ``ACT``, and
+      - ``vom_hist``: ``var_cost`` × ``ref_activity``.
+      - ``tom``: ``fom`` + ``vom``.
+
+      .. tip:: Use :meth:`full_key` to retrieve the full-dimensionality
+         :class:`Key` for these quantities.
+
+      Other added keys include:
+
+      - ``<name>:pyam`` for the above quantities, plus:
+
+        - ``cap:pyam`` (from ``CAP``)
+        - ``new_cap:pyam`` (from ``CAP_NEW``)
+
+      ...according to :obj:`PYAM_CONVERT`.
+
+      - Standard reports according to :obj:`REPORTS`.
+      - The report ``message:default``, collecting all of the above reports.
 
    .. automethod:: message_ix.reporting.Reporter.as_pyam
 
@@ -119,17 +159,18 @@ Reporters
       For example, here the values for the MESSAGEix ``technology`` and
       ``mode`` dimensions are appended to the 'Variable' column::
 
-          def m_t(row):
+          def m_t(df):
               """Callback for collapsing ACT columns."""
               # .pop() removes the named column from the returned row
-              row['variable'] = '|'.join(['Activity', row.pop('t'), row.pop('m')])
-              return row
+              df['variable'] = Activity + '|' + df['t'] + '|' + df['m']
+              return df
 
           ACT = rep.full_key('ACT')
-          keys = rep.as_pyam(ACT, 'ya', collapse=m_t)
+          keys = rep.as_pyam(ACT, 'ya', collapse=m_t, drop=['t', 'm'])
 
 .. autodata:: PRODUCTS
 .. autodata:: DERIVED
+.. autodata:: PYAM_CONVERT
 .. autodata:: REPORTS
 
 .. automethod:: ixmp.reporting.configure
@@ -209,24 +250,64 @@ Reporters
 Computations
 ------------
 
-.. automethod:: message_ix.reporting.computations.add
-.. automethod:: message_ix.reporting.computations.write_report
-.. automethod:: message_ix.reporting.pyam.as_pyam
-.. automethod:: message_ix.reporting.pyam.collapse_message_cols
+.. currentmodule:: message_ix.reporting
+
+.. automodule:: message_ix.reporting.computations
+   :members: add, write_report
+
+
+.. automodule:: message_ix.reporting.pyam
+   :members: as_pyam, collapse_message_cols
 
 
 Computations from ixmp
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. currentmodule:: ixmp.reporting.computations
-
-.. autosummary::
-
-   aggregate
-   disaggregate_shares
-   load_file
-   make_dataframe
-   write_report
+.. currentmodule:: ixmp.reporting
 
 .. automodule:: ixmp.reporting.computations
    :members:
+
+   .. autosummary::
+
+      aggregate
+      disaggregate_shares
+      load_file
+      make_dataframe
+      write_report
+
+
+Utilities
+---------
+
+.. autoclass:: ixmp.reporting.utils.Key
+   :members:
+
+   Quantities in a :class:`Scenario` can be indexed by one or more dimensions.
+   For example, a parameter with three dimensions can be initialized with:
+
+   >>> scenario.init_par('foo', ['a', 'b', 'c'], ['apple', 'bird', 'car'])
+
+   Computations for this scenario might use the quantity ``foo`` in different
+   ways:
+
+   1. in its full resolution, i.e. indexed by a, b, and c;
+   2. aggregated (e.g. summed) over any one dimension, e.g. aggregated over c
+      and thus indexed by a and b;
+   3. aggregated over any two dimensions; etc.
+
+   A Key for (1) will hash, display, and evaluate as equal to ``'foo:a-b-c'``.
+   A Key for (2) corresponds to ``'foo:a-b'``, and so forth.
+
+   Keys may be generated concisely by defining a convenience method:
+
+   >>> def foo(dims):
+   >>>     return Key('foo', dims.split(''))
+   >>> foo('a b')
+   foo:a-b
+
+.. autoclass:: ixmp.reporting.utils.AttrSeries
+
+.. automodule:: ixmp.reporting.utils
+   :members:
+   :exclude-members: AttrSeries, Key, combo_partition

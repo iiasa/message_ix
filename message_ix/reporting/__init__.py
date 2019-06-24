@@ -115,42 +115,6 @@ class Reporter(IXMPReporter):
     def from_scenario(cls, scenario, **kwargs):
         """Create a Reporter by introspecting *scenario*.
 
-        In addition to the keys automatically added by
-        :meth:`ixmp.reporting.Reporter.from_scenario`, keys are added for
-        derived quantities specific to the MESSAGEix framework, as defined in
-        :obj:`PRODUCTS` and :obj:`DERIVED`.
-
-        - ``out``: the product of ``output`` (output efficiency) and ``ACT``
-          (activity).
-        - ``out_hist``: ``output`` × ``ref_activity`` (historical reference
-          activity),
-        - ``in``:      ``input`` × ``ACT``,
-        - ``in_hist``: ``input`` × ``ref_activity``,
-        - ``emi``:      ``emission_factor`` × ``ACT``,
-        - ``emi_hist``: ``emission_factor`` × ``ref_activity``,
-        - ``inv``:      ``inv_cost`` × ``CAP_NEW``,
-        - ``inv_hist``: ``inv_cost`` × ``ref_new_capacity``,
-        - ``fom``:      ``fix_cost`` × ``CAP``,
-        - ``fom_hist``: ``fix_cost`` × ``ref_capacity``,
-        - ``vom``:      ``var_cost`` × ``ACT``, and
-        - ``vom_hist``: ``var_cost`` × ``ref_activity``.
-        - ``tom``: ``fom`` + ``vom``.
-
-        .. tip:: Use :meth:`full_key` to retrieve the full-dimensionality
-           :class:`Key` for these quantities.
-
-        Other added keys include:
-
-        - ``<name>:pyam`` for the above quantities, plus:
-
-          - ``cap:pyam`` (from ``CAP``)
-          - ``new_cap:pyam`` (from ``CAP_NEW``)
-
-          ...according to :obj:`PYAM_CONVERT`.
-
-        - Standard reports according to :obj:`REPORTS`.
-        - The report ``message:default``, collecting all of the above reports.
-
         Returns
         -------
         message_ix.reporting.Reporter
