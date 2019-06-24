@@ -89,9 +89,11 @@ small, indivisible) computations.
 Reporters
 ---------
 
-.. autoclass:: message_ix.reporting.Reporter
+.. currentmodule:: message_ix.reporting
+
+.. autoclass:: Reporter
    :show-inheritance:
-   :members:
+   :members: from_scenario, write
    :exclude-members: as_pyam
 
    .. automethod:: message_ix.reporting.Reporter.as_pyam
@@ -125,6 +127,10 @@ Reporters
 
           ACT = rep.full_key('ACT')
           keys = rep.as_pyam(ACT, 'ya', collapse=m_t)
+
+.. autodata:: PRODUCTS
+.. autodata:: DERIVED
+.. autodata:: REPORTS
 
 .. automethod:: ixmp.reporting.configure
 

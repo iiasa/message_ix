@@ -50,7 +50,7 @@ configure(
         'year_rel': 'yr',
     })
 
-# Basic derived quantities that are the product of two others
+#: Basic derived quantities that are the product of two others.
 PRODUCTS = (
     ('out',
         ('output', 'ACT')),
@@ -78,18 +78,18 @@ PRODUCTS = (
         ('var_cost', 'ref_activity')),
 )
 
-# derived quantities
+#: Other standard derived quantities.
 DERIVED = [
     ('tom:nl-t-yv-ya', (computations.add, 'fom:nl-t-yv-ya', 'vom:nl-t-yv-ya')),
     ('tom:nl-t-ya', (ix_computations.sum, 'tom:nl-t-yv-ya', None, ['yv'])),
 ]
 
 
-# standard reporting values
-STANDARD_REPORTING = {
-    'message:system': ['pyam:out', 'pyam:in', 'pyam:cap', 'pyam:new_cap'],
-    'message:costs': ['pyam:inv', 'pyam:fom', 'pyam:vom', 'pyam:tom'],
-    'message:emissions': ['pyam:emis'],
+#: Standard reports that collect quantities converted to pyam format.
+REPORTS = {
+    'message:system': ['out:pyam', 'in:pyam', 'cap:pyam', 'new_cap:pyam'],
+    'message:costs': ['inv:pyam', 'fom:pyam', 'vom:pyam', 'tom:pyam'],
+    'message:emissions': ['emis:pyam'],
 }
 
 
@@ -101,7 +101,8 @@ class Reporter(IXMPReporter):
 
         In addition to the keys automatically added by
         :meth:`ixmp.reporting.Reporter.from_scenario`, keys are added for
-        derived quantities specific to the MESSAGEix framework. For instance:
+        derived quantities specific to the MESSAGEix framework, as defined in
+        :obj:`PRODUCTS` and :obj:`DERIVED`.
 
         - ``out``: the product of ``output`` (output efficiency) and ``ACT``
           (activity).
@@ -117,13 +118,25 @@ class Reporter(IXMPReporter):
         - ``fom_hist``: ``fix_cost`` × ``ref_capacity``,
         - ``vom``:      ``var_cost`` × ``ACT``, and
         - ``vom_hist``: ``var_cost`` × ``ref_activity``.
+        - ``tom``: ``fom`` + ``vom``.
 
         .. tip:: Use :meth:`full_key` to retrieve the full-dimensionality
            :class:`Key` for these quantities.
 
+        Other added keys include:
+
+        - ``<name>:pyam`` for the above quantities, plus:
+
+          - ``cap:pyam`` (from ``CAP``)
+          - ``new_cap:pyam`` (from ``CAP_NEW``)
+
+        - Standard reports as in :obj:`REPORTS`.
+        - The report ``message:default``, collecting all of the above reports.
+
         Returns
         -------
         message_ix.reporting.Reporter
+            A reporter for *scenario*.
         """
         # Invoke the ixmp method
         rep = super().from_scenario(scenario, **kwargs)
@@ -144,14 +157,14 @@ class Reporter(IXMPReporter):
 
         # TODO can probably be done with something like
         #      chain(standard_reporting.values())
-        for group, pyam_keys in STANDARD_REPORTING.items():
+        for group, pyam_keys in REPORTS.items():
             for key in pyam_keys:
                 qty, yr, collapse = AS_PYAM_ARGS[key]
                 rep.as_pyam(qty, yr, key=key, collapse=collapse)
             rep.add(group, pyam_keys)
 
         # add all standard reporting to the default message node
-        rep.add('message:default', list(STANDARD_REPORTING.keys()))
+        rep.add('message:default', list(REPORTS.keys()))
 
         return rep
 
