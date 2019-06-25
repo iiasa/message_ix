@@ -548,7 +548,7 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 * Auxiliary COMMODITY_BALANCE
 * """""""""""""""""""""""""""
 * For the commodity balance constraints below, we introduce an auxiliary `COMMODITY_BALANCE`. This is implemented
-* as a GAMS `$macro` function. 
+* as a GAMS `$macro` function.
 *
 *  .. math::
 *     \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} output_{n^L,t,y^V,y,m,n,c,l,h^A,h}
@@ -567,7 +567,7 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
     SUM( (location,tec,vintage,mode,time2)$( map_tec_act(location,tec,year,mode,time2)                                 \
             AND map_tec_lifetime(location,tec,vintage,year) ),                                                         \
 * import into node and output by all technologies located at 'location' sending to 'node' and 'time2' sending to 'time'
-        output(location,tec,vintage,year,mode,node,commodity,level,time2,time)                                         \                    
+        output(location,tec,vintage,year,mode,node,commodity,level,time2,time)                                         \
         * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2)                                    \
 * export from node and input into technologies located at 'location' taking from 'node' and 'time2' taking from 'time'
         - input(location,tec,vintage,year,mode,node,commodity,level,time2,time)                                        \
@@ -578,17 +578,17 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
     + SUM(land_scenario,                                                                                               \
         ( land_output(node,land_scenario,year,commodity,level,time)                                                    \
           - land_input(node,land_scenario,year,commodity,level,time) ) * LAND(node,land_scenario,year) )               \
-* final demand (exogenous parameter to be satisfied by the commodity system)                              
+* final demand (exogenous parameter to be satisfied by the commodity system)
     - demand_fixed(node,commodity,level,year,time)                                                                     \
     )$( map_commodity(node,commodity,level,year,time) AND NOT level_resource(level) AND NOT level_renewable(level) )
 
-
+***
 * Equation COMMODITY_BALANCE_GT
 * """""""""""""""""""""""""""""
 * This constraint ensures that supply is greater or equal than demand for every commodity-level combination.
 *
 *  .. math::
-*     COMMODITY\_BALANCE{n,c,l,y,h} \geq 0
+*     COMMODITY\_BALANCE_{n,c,l,y,h} \geq 0
 *
 ***
 COMMODITY_BALANCE_GT(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
@@ -598,6 +598,7 @@ COMMODITY_BALANCE_GT(node,commodity,level,year,time)$( map_commodity(node,commod
 %SLACK_COMMODITY_EQUIVALENCE% + SLACK_COMMODITY_EQUIVALENCE_UP(node,commodity,level,year,time)
      =G= 0 ;
 
+***
 * Equation COMMODITY_BALANCE_LT
 * """""""""""""""""""""""""""""
 * This constraint ensures the supply is smaller than or equal to the demand for all commodity-level combinatio
@@ -605,7 +606,7 @@ COMMODITY_BALANCE_GT(node,commodity,level,year,time)$( map_commodity(node,commod
 * is (exactly) equal to demand.
 *
 *  .. math::
-*     COMMODITY\_BALANCE{n,c,l,y,h} \leq 0
+*     COMMODITY\_BALANCE_{n,c,l,y,h} \leq 0
 *
 ***
 COMMODITY_BALANCE_LT(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
