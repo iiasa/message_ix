@@ -6,6 +6,7 @@ import re
 
 from setuptools import find_packages, setup
 
+
 fname = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                      'message_ix', 'model', 'version.gms')
 with open(fname) as f:
@@ -17,8 +18,11 @@ VERSION = '{}.{}.{}'.format(
     re.search('VERSION_PATCH "(.+?)"', s).group(1),
 )
 
+with open('README.md') as f:
+    LONG_DESCRIPTION = f.read()
+
 INSTALL_REQUIRES = [
-    'ixmp>=0.1.3',
+    'ixmp>=0.2.0',
     'pandas',
     'xlrd',
     'XlsxWriter',
@@ -45,39 +49,26 @@ def all_gams_files(path, strip=None):
     return paths
 
 
-def main():
-    pack_dir = {
-        'message_ix': 'message_ix',
-    }
-    entry_points = {
+setup(
+    name='message_ix',
+    version=VERSION,
+    description='The MESSAGEix Integrated Assessment Model',
+    author='IIASA Energy Program',
+    author_email='message_ix@iiasa.ac.at',
+    long_description=LONG_DESCRIPTION,
+    long_description_content_type='text/markdown',
+    url='http://github.com/iiasa/message_ix',
+    install_requires=INSTALL_REQUIRES,
+    extras_require=EXTRAS_REQUIRE,
+    packages=find_packages(),
+    package_dir={'message_ix': 'message_ix'},
+    package_data={
+        'message_ix': all_gams_files('message_ix/model', strip='message_ix')
+    },
+    entry_points={
         'console_scripts': [
             'messageix-config=message_ix.cli:config',
             'messageix-dl=message_ix.cli:dl',
         ],
     }
-    cmdclass = {
-    }
-    pack_data = {
-        'message_ix': all_gams_files('message_ix/model', strip='message_ix')
-    }
-    setup_kwargs = {
-        "name": "message_ix",
-        "version": VERSION,
-        "description": 'The MESSAGEix Integrated Assessment Model',
-        "author": 'Daniel Huppmann, Matthew Gidden, Volker Krey,  '
-                  'Oliver Fricko, Peter Kolp',
-        "author_email": 'message_ix@iiasa.ac.at',
-        "url": 'http://github.com/iiasa/message_ix',
-        "install_requires": INSTALL_REQUIRES,
-        "extras_require": EXTRAS_REQUIRE,
-        "packages": find_packages(),
-        "package_dir": pack_dir,
-        "package_data": pack_data,
-        "entry_points": entry_points,
-        "cmdclass": cmdclass,
-    }
-    rtn = setup(**setup_kwargs)
-
-
-if __name__ == "__main__":
-    main()
+)
