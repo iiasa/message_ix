@@ -3,16 +3,13 @@
 
 environment:
   matrix:
-      - PYTHON_VERSION: "2.7"	
-        MINICONDA: "C:\\Miniconda-x64"
-        PYTHON_ARCH: "64"
       - PYTHON_VERSION: "3.6"
         MINICONDA: "C:\\Miniconda36-x64"
         PYTHON_ARCH: "64"
 
 init:
   - "ECHO %PYTHON_VERSION% %MINICONDA%"
-  
+
 install:
   # these correspond to folder naming of miniconda installs on appveyor.  See
   # https://www.appveyor.com/docs/installed-software#python
@@ -28,11 +25,11 @@ install:
   - "SET PATH=%cd%\\gams;%PATH%"
   - conda install --yes -c conda-forge ixmp xlsxwriter xlrd
   - conda remove --force --yes ixmp
-  
+
   - git clone https://github.com/iiasa/ixmp.git
   - cd ixmp && python setup.py install && cd ..
 
-  - python setup.py install
+  - pip install .[reporting]
 
 build: false
 

@@ -202,9 +202,9 @@ Alias(mode, mode2);
 *      - :math:`\widehat{t} \in \widehat{T}^{LAND} \subseteq \widehat{T}`
 *      - Mapping set of technology types and land use
 *    * - balance_equality (commodity,level)
-*      - :math:`c \in C^{FULL} \subseteq C`
-*      - :math:`l \in L^{FULL} \subseteq L`
-*      - Commodities and level related to `Equation COMMODITY_BALANCE_LT`_
+*      - :math:`c \in C, l \in L`
+*      - Commodities and level related to :doc:`Equation COMMODITY_BALANCE_LT
+*        <model_core>`
 *
 * .. [#level_res] The constraint ``EXTRACTION_EQUIVALENCE`` is active only for the levels included in this set,
 *    and the constraint ``COMMODITY_BALANCE`` is deactivated for these levels.
