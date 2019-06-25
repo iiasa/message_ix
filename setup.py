@@ -53,8 +53,7 @@ setup(
     name='message_ix',
     version=VERSION,
     description='The MESSAGEix Integrated Assessment Model',
-    author='Daniel Huppmann, Matthew Gidden, Volker Krey, '
-           'Oliver Fricko, Peter Kolp',
+    author='IIASA Energy Program',
     author_email='message_ix@iiasa.ac.at',
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',

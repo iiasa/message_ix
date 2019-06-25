@@ -19,4 +19,4 @@ The following persons contributed to the development of the |MESSAGEix| framewor
 - Nikolay Kushin, [@zikolach](https://github.com/zikolach)
   [iiasa](http://www.iiasa.ac.at/staff/staff.php?type=auto&visibility=visible&search=true&login=kushin)
 - Paul Natsuo Kishimoto, [@khaeru](https://github.com/khaeru)
-  [iiasa](http://www.iiasa.ac.at/staff/staff.php?type=auto&visibility=visible&search=true&login=kishimot)
+  [web](https://paul.kishimoto.name)
