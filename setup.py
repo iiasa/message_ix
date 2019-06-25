@@ -12,7 +12,7 @@ fname = os.path.join(os.path.dirname(os.path.realpath(__file__)),
 with open(fname) as f:
     s = str(f.readlines())
 
-VERSION = '{}.{}.{}.dev0'.format(
+VERSION = '{}.{}.{}'.format(
     re.search('VERSION_MAJOR "(.+?)"', s).group(1),
     re.search('VERSION_MINOR "(.+?)"', s).group(1),
     re.search('VERSION_PATCH "(.+?)"', s).group(1),
