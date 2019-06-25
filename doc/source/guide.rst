@@ -8,6 +8,7 @@ common model design choices.
 
    efficiency
    debugging
+   reporting
 
 Model-building tools
 --------------------

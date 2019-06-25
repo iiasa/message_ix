@@ -157,7 +157,7 @@ def make_dantzig(mp, solve=False, multi_year=False):
     return scen
 
 
-def make_westeros(mp, solve=False):
+def make_westeros(mp, emissions=False, solve=False):
     """Return an :class:`message_ix.Scenario` for the Westeros model.
 
     This is the same model used in the ``westeros_baseline.ipynb`` tutorial.
@@ -166,6 +166,8 @@ def make_westeros(mp, solve=False):
     ----------
     mp : ixmp.Platform
         Platform on which to create the scenario.
+    emissions : bool, optional
+        If True, the ``emissions_factor`` parameter is also populated for CO2.
     solve : bool, optional
         If True, the scenario is solved.
     """
@@ -394,6 +396,30 @@ def make_westeros(mp, solve=False):
 
     scen.commit('basic model of Westerosi electrification')
     scen.set_as_default()
+
+    if emissions:
+        scen.check_out()
+
+        # Introduce the emission species CO2 and the emission category GHG
+        scen.add_set('emission', 'CO2')
+        scen.add_cat('emission', 'GHG', 'CO2')
+
+        # we now add CO2 emissions to the coal powerplant
+        base_emission_factor = {
+            'node_loc': country,
+            'year_vtg': vintage_years,
+            'year_act': act_years,
+            'mode': 'standard',
+            'unit': 'USD/GWa',
+        }
+
+        emission_factor = make_df(
+            base_emission_factor, technology='coal_ppl', emission='CO2',
+            value=100.
+        )
+        scen.add_par('emission_factor', emission_factor)
+
+        scen.commit('Added emissions sets/params to Westeros model.')
 
     if solve:
         scen.solve()

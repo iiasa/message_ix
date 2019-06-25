@@ -4,12 +4,8 @@ matrix:
     include:
         - os: linux
           env: PYENV=py37
-        - os: linux
-          env: PYENV=py27
         - os: osx
           env: PYENV=py37
-        - os: osx
-          env: PYENV=py27
 # turn these on once travis support gets a little better
 #        - os: windows
 #          env: PYENV=py37
@@ -24,7 +20,7 @@ before_install:
 install:
   - git clone https://github.com/iiasa/ixmp.git
   - cd ixmp && python setup.py install && cd ..
-  - python setup.py install
+  - pip install .[reporting]
 
 script:
   - python -c "import os, sys; assert os.environ['PYVERSION'] == sys.version[0]"

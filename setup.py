@@ -3,10 +3,8 @@ from __future__ import print_function
 
 import os
 import re
-import shutil
 
 from setuptools import find_packages, setup
-from setuptools.command.install import install
 
 fname = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                      'message_ix', 'model', 'version.gms')
@@ -30,6 +28,7 @@ EXTRAS_REQUIRE = {
     'tests': ['pytest>=3.0.6'],
     'docs': ['numpydoc', 'sphinx>=1.8', 'sphinx_rtd_theme',
              'sphinxcontrib-bibtex'],
+    'reporting': ['pyam-iamc'],
     'tutorial': ['jupyter', 'matplotlib'],
 }
 
