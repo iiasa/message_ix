@@ -1,4 +1,6 @@
 
+# Next Release
+
 # v1.2.0
 
 MESSAGEix 1.2.0 adds an option to set the commodity balance to strict equality,
