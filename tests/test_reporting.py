@@ -181,7 +181,7 @@ def test_report_as_pyam(test_mp, caplog, tmp_path):
 
     # Result
     idf2 = rep.get(key2)
-    df2 = idf2.as_pandas()
+    df2 = idf2.as_pandas().sort_values(by=['region']).reset_index()
 
     # Extra columns have been removed:
     # - m and t by the collapse callback.
