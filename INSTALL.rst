@@ -68,7 +68,7 @@ Install |MESSAGEix| from source
 
 
 .. _`GAMS`: http://www.gams.com
-.. _`Anaconda`: https://www.continuum.io/downloads
+.. _`Anaconda`: https://www.anaconda.com/distribution/#download-section
 .. _`ixmp`: https://github.com/iiasa/ixmp
 .. _`Github Desktop`: https://desktop.github.com
 .. _`README`: https://github.com/iiasa/message_ix#install-from-source-advanced-users
