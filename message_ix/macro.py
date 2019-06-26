@@ -54,8 +54,16 @@ def init(s):
         s.init_set(*args)
     for args in MACRO_INIT['pars']:
         s.init_par(*args)
-    # for args in MACRO_INIT['vars']:
-    #     print(args)
-    #     s.init_var(*args)
-    # for args in MACRO_INIT['equs']:
-    #     s.init_equ(*args)
+    for args in MACRO_INIT['vars']:
+        if not s.has_var(args[0]):
+            try:
+                # TODO: this seems required because for some reason DEMAND (and
+                # perhaps others) seem to already be listed in the java code,
+                # but still needs to be initialized in the python code. However,
+                # you cannot init it with dimensions, only with the variable
+                # name.
+                s.init_var(*args)
+            except:
+                s.init_var(args[0])
+    for args in MACRO_INIT['equs']:
+        s.init_equ(*args)

@@ -15,3 +15,7 @@ def test_init(test_mp):
     scen.solve()
 
     assert np.isclose(scen.var('OBJ')['lvl'], 153.675)
+    assert 'mapping_macro_sector' in scen.set_list()
+    assert 'aeei' in scen.par_list()
+    assert 'DEMAND' in scen.var_list()
+    assert 'COST_ACCOUNTING_NODAL' in scen.equ_list()
