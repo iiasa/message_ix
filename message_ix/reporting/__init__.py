@@ -58,28 +58,16 @@ configure(
 PRODUCTS = (
     ('out',
         ('output', 'ACT')),
-    ('out_hist',
-        ('output', 'ref_activity')),
     ('in',
         ('input', 'ACT')),
-    ('in_hist',
-        ('input', 'ref_activity')),
     ('emi',
         ('emission_factor', 'ACT')),
-    ('emi_hist',
-        ('emission_factor', 'ref_activity')),
     ('inv',
         ('inv_cost', 'CAP_NEW')),
-    ('inv_hist',
-        ('inv_cost', 'ref_new_capacity')),
     ('fom',
         ('fix_cost', 'CAP')),
-    ('fom_hist',
-        ('fix_cost', 'ref_capacity')),
     ('vom',
         ('var_cost', 'ACT')),
-    ('vom_hist',
-        ('var_cost', 'ref_activity')),
 )
 
 #: Other standard derived quantities.

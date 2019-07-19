@@ -61,7 +61,7 @@ def test_reporter(test_mp):
     assert len(rep_ix.graph) == 5088
 
     # message_ix.Reporter pre-populated with additional, derived quantities
-    assert len(rep.graph) == 9615
+    assert len(rep.graph) == 7367
 
     # Derived quantities have expected dimensions
     vom_key = rep.full_key('vom')
