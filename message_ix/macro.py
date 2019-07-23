@@ -77,3 +77,67 @@ def init(s):
                 s.init_var(key)
     for key, values in MACRO_INIT['equs'].items():
         s.init_equ(key, values)
+
+
+def _validate_data(name, df, nodes, sectors, years):
+    def validate(kind, values, df):
+        if kind not in df:
+            return
+
+        diff = set(values) - set(df[kind])
+        if diff:
+            raise ValueError(
+                'Not all {}s included in {} data: {}'.format(kind, name, diff)
+            )
+
+    # check required columns
+    if name in MACRO_DATA_FOR_DERIVATION:
+        cols = MACRO_DATA_FOR_DERIVATION[name]
+    else:
+        cols = MACRO_INIT['pars'][name]
+    col_diff = set(cols) - set(df.columns)
+    if col_diff:
+        msg = 'Missing expected columns for {}: {}'
+        raise ValueError(msg.format(name, col_diff))
+
+    # check required column values
+    checks = (
+        ('node', nodes),
+        ('sector', sectors),
+        ('year', years),
+    )
+
+    for kind, values in checks:
+        validate(kind, values, df)
+
+
+class Calculate(object):
+
+    def __init__(self, s, data):
+        """
+        s : solved message scenario
+        data : dict of parameter names to dataframes
+        """
+        self.data = data
+        self.s = s
+
+        if not s.has_solution():
+            raise RuntimeError('Scenario must have a solution to add MACRO')
+
+        demand = s.var('DEMAND')
+        self.nodes = demand['nodes'].unique()
+        self.sectors = demand['sector'].unique()
+        self.years = demand['year'].unique()
+
+    def read_data(self):
+        if os.path.exists(self.data):
+            self.data = pd.read_excel(self.data, sheet_name=None)
+
+        par_diff = set(VERIFY_INPUT_DATA) - set(self.data)
+        if par_diff:
+            raise ValueError(
+                'Missing required input data: {}'.format(par_diff))
+
+        for name in self.data:
+            _validate_data(name, self.data[name],
+                           self.nodes, self.sectors, self.years)
