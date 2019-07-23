@@ -18,3 +18,7 @@ def test_init(message_test_mp):
     assert 'aeei' in scen.par_list()
     assert 'DEMAND' in scen.var_list()
     assert 'COST_ACCOUNTING_NODAL' in scen.equ_list()
+
+
+def test_calc_valid_data(test_mp):
+    pass
