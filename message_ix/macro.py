@@ -128,7 +128,7 @@ class Calculate(object):
         good = isinstance(data, collections.Mapping) or os.path.exists(data)
         if not good:
             raise ValueError('Data argument is not a dictionary nor a file')
-        if os.path.exists(data):
+        if not isinstance(data, collections.Mapping) and os.path.exists(data):
             if not str(self.data).endswith('xlsx'):
                 raise ValueError('Must provide excel-based data file')
             self.data = pd.read_excel(self.data, sheet_name=None)
