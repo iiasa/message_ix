@@ -1,7 +1,12 @@
 import numpy as np
 
+try:
+    from pathlib import Path
+except ImportError:
+    from pathlib2 import Path
+
 from message_ix import Scenario, macro
-from message_ix.testing import SCENARIO
+from message_ix.testing import make_westeros
 
 
 def test_init(message_test_mp):
@@ -21,4 +26,7 @@ def test_init(message_test_mp):
 
 
 def test_calc_valid_data(test_mp):
-    pass
+    s = make_westeros(test_mp, solve=True)
+    path = Path(__file__).parent / 'data' / 'westeros_macro_input.xlsx'
+    c = macro.Calculate(s, path)
+    c.read_data()

@@ -1,3 +1,7 @@
+import collections
+import os
+
+import pandas as pd
 
 MACRO_INIT = {
     'sets': {
@@ -49,7 +53,7 @@ MACRO_INIT = {
 }
 
 MACRO_DATA_FOR_DERIVATION = {
-    'cost_ref': ['node', 'sector', ],
+    'cost_ref': ['node', ],
     'demand_ref': ['node', 'sector', ],
 }
 
@@ -121,18 +125,23 @@ class Calculate(object):
         self.data = data
         self.s = s
 
+        good = isinstance(data, collections.Mapping) or os.path.exists(data)
+        if not good:
+            raise ValueError('Data argument is not a dictionary nor a file')
+        if os.path.exists(data):
+            if not str(self.data).endswith('xlsx'):
+                raise ValueError('Must provide excel-based data file')
+            self.data = pd.read_excel(self.data, sheet_name=None)
+
         if not s.has_solution():
             raise RuntimeError('Scenario must have a solution to add MACRO')
 
         demand = s.var('DEMAND')
-        self.nodes = demand['nodes'].unique()
-        self.sectors = demand['sector'].unique()
+        self.nodes = demand['node'].unique()
+        self.sectors = demand['commodity'].unique()
         self.years = demand['year'].unique()
 
     def read_data(self):
-        if os.path.exists(self.data):
-            self.data = pd.read_excel(self.data, sheet_name=None)
-
         par_diff = set(VERIFY_INPUT_DATA) - set(self.data)
         if par_diff:
             raise ValueError(
