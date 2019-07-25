@@ -72,26 +72,6 @@ VERIFY_INPUT_DATA = [
 ]
 
 
-def init(s):
-    for key, values in MACRO_INIT['sets'].items():
-        s.init_set(key, values)
-    for key, values in MACRO_INIT['pars'].items():
-        s.init_par(key, values)
-    for key, values in MACRO_INIT['vars'].items():
-        if not s.has_var(key):
-            try:
-                # TODO: this seems required because for some reason DEMAND (and
-                # perhaps others) seem to already be listed in the java code,
-                # but still needs to be initialized in the python code. However,
-                # you cannot init it with dimensions, only with the variable
-                # name.
-                s.init_var(key, values)
-            except:
-                s.init_var(key)
-    for key, values in MACRO_INIT['equs'].items():
-        s.init_equ(key, values)
-
-
 def _validate_data(name, df, nodes, sectors, years):
     def validate(kind, values, df):
         if kind not in df:
@@ -147,7 +127,7 @@ class Calculate(object):
         if not s.has_solution():
             raise RuntimeError('Scenario must have a solution to add MACRO')
 
-        demand = s.var('DEMAND')
+        demand = s.var('DEMAND', filters={'level': 'useful'})
         self.nodes = demand['node'].unique()
         self.sectors = demand['commodity'].unique()
         self.years = demand['year'].unique()
@@ -177,8 +157,27 @@ class Calculate(object):
         self.base_year = max(data_years[data_years < min_year_model])
 
     def derive_data(self):
+        # calculate all necessary derived data, adding to self.data this is
+        # done through method chaining, the bottom of which is aconst()
+        self._growth()
         self._rho()
+        self._gdp0()
         self._k0()
+        self._total_cost()
+        self._price()
+        self._demand()
+        self._bconst()
+        self._aconst()
+
+    @lru_cache()
+    def _growth(self):
+        gdp = self.data['gdp_calibrate']
+        diff = gdp.groupby(level='node').diff()
+        years = gdp.index.get_level_values('year')
+        dt = pd.Series(years, name='year', index=years).diff()
+        growth = (diff / gdp + 1) ** (1 / dt) - 1
+        self.data['growth'] = growth.dropna()
+        return self.data['growth']
 
     @lru_cache()
     def _rho(self):
@@ -278,3 +277,29 @@ class Calculate(object):
         aconst = ((gdp0 / 1e3) ** rho - partmp) / (k0 / 1e3) ** (rho * kpvs)
         self.data['aconst'] = aconst
         return self.data['aconst']
+
+
+def init(s):
+    for key, values in MACRO_INIT['sets'].items():
+        s.init_set(key, values)
+    for key, values in MACRO_INIT['pars'].items():
+        s.init_par(key, values)
+    for key, values in MACRO_INIT['vars'].items():
+        if not s.has_var(key):
+            try:
+                # TODO: this seems required because for some reason DEMAND (and
+                # perhaps others) seem to already be listed in the java code,
+                # but still needs to be initialized in the python code. However,
+                # you cannot init it with dimensions, only with the variable
+                # name.
+                s.init_var(key, values)
+            except:
+                s.init_var(key)
+    for key, values in MACRO_INIT['equs'].items():
+        s.init_equ(key, values)
+
+
+def add_model_data(s, data):
+    c = Calculate(s, data)
+    c.read_data()
+    c.derive_data()
