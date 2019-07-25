@@ -114,6 +114,8 @@ def _validate_data(name, df, nodes, sectors, years):
     for kind, values in checks:
         validate(kind, values, df)
 
+    return cols
+
 
 class Calculate(object):
 
@@ -148,5 +150,28 @@ class Calculate(object):
                 'Missing required input data: {}'.format(par_diff))
 
         for name in self.data:
-            _validate_data(name, self.data[name],
-                           self.nodes, self.sectors, self.years)
+            idx = _validate_data(name, self.data[name],
+                                 self.nodes, self.sectors, self.years)
+            self.data[name] = self.data[name].set_index(idx)['value']
+
+        # special check for gdp_calibrate
+        check = self.data['gdp_calibrate']
+        min_year_model = min(self.years)
+        min_year_data = min(check.index.get_level_values('year'))
+        if not min_year_data < min_year_model:
+            raise ValueError(
+                'Must provide gdp_calibrate data prior to the modeling' +
+                ' period in order to calculate growth rates'
+            )
+
+    def derive_data(self):
+        self._rho()
+        self._k0()
+
+    def _rho(self):
+        esub = self.data['esub']
+        self.data['rho'] = (esub - 1) / esub
+        return self.data['rho']
+
+    def _k0(self):
+        pass
