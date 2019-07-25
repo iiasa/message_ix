@@ -30,22 +30,6 @@ def westeros_not_solved(test_mp):
     return make_westeros(test_mp, solve=False)
 
 
-def test_init(test_mp):
-    scen = Scenario(test_mp, *MSG_ARGS)
-
-    scen = scen.clone('foo', 'bar')
-    scen.check_out()
-    macro.init(scen)
-    scen.commit('foo')
-    scen.solve()
-
-    assert np.isclose(scen.var('OBJ')['lvl'], 153.675)
-    assert 'mapping_macro_sector' in scen.set_list()
-    assert 'aeei' in scen.par_list()
-    assert 'DEMAND' in scen.var_list()
-    assert 'COST_ACCOUNTING_NODAL' in scen.equ_list()
-
-
 def test_calc_valid_data_file(westeros_solved):
     s = westeros_solved
     c = macro.Calculate(s, DATA_PATH)
@@ -196,3 +180,28 @@ def test_calc_aconst(westeros_solved):
     obs = obs[0]
     exp = 26.027323
     assert np.isclose(obs, exp)
+
+
+def test_init(test_mp):
+    scen = Scenario(test_mp, *MSG_ARGS)
+
+    scen = scen.clone('foo', 'bar')
+    scen.check_out()
+    macro.init(scen)
+    scen.commit('foo')
+    scen.solve()
+
+    assert np.isclose(scen.var('OBJ')['lvl'], 153.675)
+    assert 'mapping_macro_sector' in scen.set_list()
+    assert 'aeei' in scen.par_list()
+    assert 'DEMAND' in scen.var_list()
+    assert 'COST_ACCOUNTING_NODAL' in scen.equ_list()
+
+
+def test_add_model_data(westeros_solved):
+    base = westeros_solved
+    clone = base.clone('foo', 'bar', keep_solution=False)
+    clone.check_out()
+    macro.init(clone)
+    macro.add_model_data(base, clone, DATA_PATH)
+    clone.commit('finished adding macro')
