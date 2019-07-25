@@ -236,6 +236,7 @@ class Calculate(object):
         years = gdp.index.get_level_values('year')
         dt = pd.Series(years, name='year', index=years).diff()
         growth = (diff / gdp + 1) ** (1 / dt) - 1
+        growth.name = 'value'
         self.data['growth'] = growth.dropna()
         return self.data['growth']
 
