@@ -366,7 +366,7 @@ def init(s):
         s.init_equ(key, values)
 
 
-def add_model_data(base, clone, data):
+def add_macro_data(base, clone, data):
     c = Calculate(base, data)
     c.read_data()
     c.derive_data()
