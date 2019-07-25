@@ -258,15 +258,12 @@ class Calculate(object):
     @lru_cache()
     def _bconst(self):
         price_ref = self.data['price_ref']
-        gdp = self.data['gdp_calibrate']
-        # TODO: drop index level 'year' after??
-        gdp0 = gdp.iloc[gdp.index.isin([self.base_year], level='year')]
         demand_ref = self.data['demand_ref']
         rho = self._rho()
-
-        print(price_ref)
-        print(gdp0)
-        print(demand_ref)
-        print(rho)
-
-        # (p_ref[node, commodity]/1e3 * (gdp_calibrate[first_period, node] / demand_ref[node, commodity])**(rho[node] - 1))
+        gdp0 = self._gdp0()
+        # TODO: is this calculation correct?
+        #       in (value) ^ (rho - 1), should value = gdp0 / demand_ref
+        #       or should value = price_ref * gdp0 / demand_ref / 1e3?
+        bconst = price_ref / 1e3 * (gdp0 / demand_ref) ** (rho - 1)
+        self.data['bconst'] = bconst
+        return self.data['bconst']
