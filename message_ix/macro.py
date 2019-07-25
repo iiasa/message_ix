@@ -18,23 +18,40 @@ MACRO_INIT = {
         'mapping_macro_sector': ['sector', 'commodity', 'level', ],
     },
     'pars': {
-        'demand_MESSAGE': ['node', 'sector', 'year', ],
-        'price_MESSAGE': ['node', 'sector', 'year', ],
-        'cost_MESSAGE': ['node', 'year', ],
-        'gdp_calibrate': ['node', 'year', ],
-        'historical_gdp': ['node', 'year', ],
-        'MERtoPPP': ['node', 'year', ],
-        'kgdp': ['node', ],
-        'kpvs': ['node', ],
-        'depr': ['node', ],
-        'drate': ['node', ],
-        'esub': ['node', ],
-        'lotol': ['node', ],
-        'price_ref': ['node', 'sector', ],
-        'lakl': ['node', ],
-        'prfconst': ['node', 'sector', ],
-        'grow': ['node', 'year', ],
-        'aeei': ['node', 'sector', 'year', ],
+        'demand_MESSAGE': {'idx': ['node', 'sector', 'year', ],
+                           'unit': ''},
+        'price_MESSAGE': {'idx': ['node', 'sector', 'year', ],
+                          'unit': ''},
+        'cost_MESSAGE': {'idx': ['node', 'year', ],
+                         'unit': ''},
+        'gdp_calibrate': {'idx': ['node', 'year', ],
+                          'unit': ''},
+        'historical_gdp': {'idx': ['node', 'year', ],
+                           'unit': ''},
+        'MERtoPPP': {'idx': ['node', 'year', ],
+                     'unit': ''},
+        'kgdp': {'idx': ['node', ],
+                 'unit': ''},
+        'kpvs': {'idx': ['node', ],
+                 'unit': ''},
+        'depr': {'idx': ['node', ],
+                 'unit': ''},
+        'drate': {'idx': ['node', ],
+                  'unit': ''},
+        'esub': {'idx': ['node', ],
+                 'unit': ''},
+        'lotol': {'idx': ['node', ],
+                  'unit': ''},
+        'price_ref': {'idx': ['node', 'sector', ],
+                      'unit': ''},
+        'lakl': {'idx': ['node', ],
+                 'unit': ''},
+        'prfconst': {'idx': ['node', 'sector', ],
+                     'unit': ''},
+        'grow': {'idx': ['node', 'year', ],
+                 'unit': ''},
+        'aeei': {'idx': ['node', 'sector', 'year', ],
+                 'unit': ''},
     },
     'vars': {
         'DEMAND': ['node', 'commodity', 'level', 'year', 'time', ],
@@ -88,7 +105,8 @@ def _validate_data(name, df, nodes, sectors, years):
     if name in MACRO_DATA_FOR_DERIVATION:
         cols = MACRO_DATA_FOR_DERIVATION[name]
     else:
-        cols = MACRO_INIT['pars'][name]
+        cols = MACRO_INIT['pars'][name]['idx']
+    # TODO: cols += ['unit'] ?
     col_diff = set(cols) - set(df.columns)
     if col_diff:
         msg = 'Missing expected columns for {}: {}'
@@ -289,7 +307,7 @@ def init(s):
         s.init_set(key, values)
     for key, values in MACRO_INIT['pars'].items():
         try:
-            s.init_par(key, values)
+            s.init_par(key, values['idx'])
         except:
             pass  # already exists in the model, known for 'historical_gdp'
     for key, values in MACRO_INIT['vars'].items():
@@ -305,6 +323,12 @@ def init(s):
                 s.init_var(key)
     for key, values in MACRO_INIT['equs'].items():
         s.init_equ(key, values)
+
+
+ADD_PAR_UNITS = {
+    'aeei': '=',
+
+}
 
 
 def add_model_data(base, clone, data):
