@@ -17,7 +17,7 @@ iter_file = os.path.join(default_paths.output_path(),
                          'MsgIterationReport_{case}.gdx')
 solve_args = ['--in="{inp}"', '--out="{outp}"', '--iter="' + iter_file + '"']
 
-for msg in ['MESSAGE', 'MESSAGE-MACRO']:
+for msg in ['MESSAGE', 'MESSAGE-MACRO', 'MACRO']:
     model_settings.register_model(
         msg,
         model_settings.ModelConfig(model_file='"{}"'.format(model_file),

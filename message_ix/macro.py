@@ -366,7 +366,7 @@ def init(s):
         s.init_equ(key, values)
 
 
-def add_macro_data(base, clone, data):
+def add_model_data(base, clone, data):
     c = Calculate(base, data)
     c.read_data()
     c.derive_data()
@@ -384,3 +384,12 @@ def add_macro_data(base, clone, data):
         except Exception as e:
             msg = 'Error in adding parameter {}\n'.format(name)
             raise type(e)(msg + str(e))
+
+
+def calibrate(s):
+    # run macro gams
+    # read aeei_calibrate and grow_calibrate
+    # add_par both
+    # check if calibration succeeded??
+    s.solve(model='MACRO')
+    return s
