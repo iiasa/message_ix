@@ -18,40 +18,81 @@ MACRO_INIT = {
         'mapping_macro_sector': ['sector', 'commodity', 'level', ],
     },
     'pars': {
-        'demand_MESSAGE': {'idx': ['node', 'sector', 'year', ],
-                           'unit': ''},
-        'price_MESSAGE': {'idx': ['node', 'sector', 'year', ],
-                          'unit': ''},
-        'cost_MESSAGE': {'idx': ['node', 'year', ],
-                         'unit': ''},
-        'gdp_calibrate': {'idx': ['node', 'year', ],
-                          'unit': ''},
-        'historical_gdp': {'idx': ['node', 'year', ],
-                           'unit': ''},
-        'MERtoPPP': {'idx': ['node', 'year', ],
-                     'unit': ''},
-        'kgdp': {'idx': ['node', ],
-                 'unit': ''},
-        'kpvs': {'idx': ['node', ],
-                 'unit': ''},
-        'depr': {'idx': ['node', ],
-                 'unit': ''},
-        'drate': {'idx': ['node', ],
-                  'unit': ''},
-        'esub': {'idx': ['node', ],
-                 'unit': ''},
-        'lotol': {'idx': ['node', ],
-                  'unit': ''},
-        'price_ref': {'idx': ['node', 'sector', ],
-                      'unit': ''},
-        'lakl': {'idx': ['node', ],
-                 'unit': ''},
-        'prfconst': {'idx': ['node', 'sector', ],
-                     'unit': ''},
-        'grow': {'idx': ['node', 'year', ],
-                 'unit': ''},
-        'aeei': {'idx': ['node', 'sector', 'year', ],
-                 'unit': ''},
+        'demand_MESSAGE': {
+            'idx': ['node', 'sector', 'year', ],
+            'unit': 'GWa',
+            'data_key': 'demand',
+        },
+        'price_MESSAGE': {
+            'idx': ['node', 'sector', 'year', ],
+            'unit': 'USD/kWa',
+            'data_key': 'price',
+        },
+        'cost_MESSAGE': {
+            'idx': ['node', 'year', ],
+            'unit': 'G$',
+            'data_key': 'total_cost',
+        },
+        'gdp_calibrate': {
+            'idx': ['node', 'year', ],
+            'unit': 'T$',
+        },
+        'historical_gdp': {
+            'idx': ['node', 'year', ],
+            'unit': 'T$',
+            'data_key': 'gdp0',
+        },
+        'MERtoPPP': {
+            'idx': ['node', 'year', ],
+            'unit': '-',
+        },
+        'kgdp': {
+            'idx': ['node', ],
+            'unit': '-',
+        },
+        'kpvs': {
+            'idx': ['node', ],
+            'unit': '-',
+        },
+        'depr': {
+            'idx': ['node', ],
+            'unit': '-',
+        },
+        'drate': {
+            'idx': ['node', ],
+            'unit': '-',
+        },
+        'esub': {
+            'idx': ['node', ],
+            'unit': '-',
+        },
+        'lotol': {
+            'idx': ['node', ],
+            'unit': '-',
+        },
+        'price_ref': {
+            'idx': ['node', 'sector', ],
+            'unit': 'USD/kWa',
+        },
+        'lakl': {
+            'idx': ['node', ],
+            'unit': '-',
+            'data_key': 'aconst',
+        },
+        'prfconst': {
+            'idx': ['node', 'sector', ],
+            'unit': '-',
+            'data_key': 'bconst',
+        },
+        'grow': {
+            'idx': ['node', 'year', ],
+            'unit': '-',
+            'data_key': 'growth',
+        },
+        'aeei': {
+            'idx': ['node', 'sector', 'year', ],
+            'unit': '-',
+        },
     },
     'vars': {
         'DEMAND': ['node', 'commodity', 'level', 'year', 'time', ],
@@ -325,12 +366,6 @@ def init(s):
         s.init_equ(key, values)
 
 
-ADD_PAR_UNITS = {
-    'aeei': '=',
-
-}
-
-
 def add_model_data(base, clone, data):
     c = Calculate(base, data)
     c.read_data()
@@ -340,6 +375,12 @@ def add_model_data(base, clone, data):
     for s in c.sectors:
         clone.add_set('sector', s)
 
-    aeei = c.data['aeei'].reset_index()
-    aeei['unit'] = '-'
-    clone.add_par('aeei', aeei)
+    for name, values in MACRO_INIT['pars'].items():
+        try:
+            key = values.get('data_key', name)
+            data = c.data[key].reset_index()
+            data['unit'] = values['unit']
+            clone.add_par(name, data)
+        except Exception as e:
+            msg = 'Error in adding parameter {}\n'.format(name)
+            raise type(e)(msg + str(e))
