@@ -95,6 +95,17 @@ def test_calc_data_missing_datapoint(westeros_solved):
 #
 
 
+def test_calc_growth(westeros_solved):
+    s = westeros_solved
+    c = macro.Calculate(s, DATA_PATH)
+    c.read_data()
+    obs = c._growth()
+    assert len(obs) == 3
+    obs = obs.values
+    exp = np.array([0.041380, 0.041380, 0.029186])
+    assert np.isclose(obs, exp).all()
+
+
 def test_calc_rho(westeros_solved):
     s = westeros_solved
     c = macro.Calculate(s, DATA_PATH)
@@ -134,7 +145,7 @@ def test_calc_total_cost(westeros_solved):
     c.read_data()
     obs = c._total_cost()
     # 4 values, 3 in model period, one in history
-    assert(len(obs) == 4)
+    assert len(obs) == 4
     obs = obs.values
     exp = np.array([15, 17.477751, 22.143633, 28.189798])
     assert np.isclose(obs, exp).all()
@@ -146,7 +157,7 @@ def test_calc_price(westeros_solved):
     c.read_data()
     obs = c._price()
     # 4 values, 3 in model period, one in history
-    assert(len(obs) == 4)
+    assert len(obs) == 4
     obs = obs.values
     exp = np.array([195, 183.094376, 161.645111, 161.645111])
     assert np.isclose(obs, exp).all()
@@ -158,7 +169,7 @@ def test_calc_demand(westeros_solved):
     c.read_data()
     obs = c._demand()
     # 4 values, 3 in model period, one in history
-    assert(len(obs) == 4)
+    assert len(obs) == 4
     obs = obs.values
     exp = np.array([90, 100, 150, 190])
     assert np.isclose(obs, exp).all()
