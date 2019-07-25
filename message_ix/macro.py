@@ -22,6 +22,7 @@ MACRO_INIT = {
         'price_MESSAGE': ['node', 'sector', 'year', ],
         'cost_MESSAGE': ['node', 'year', ],
         'gdp_calibrate': ['node', 'year', ],
+        'historical_gdp': ['node', 'year', ],
         'MERtoPPP': ['node', 'year', ],
         'kgdp': ['node', ],
         'kpvs': ['node', ],
@@ -287,7 +288,10 @@ def init(s):
     for key, values in MACRO_INIT['sets'].items():
         s.init_set(key, values)
     for key, values in MACRO_INIT['pars'].items():
-        s.init_par(key, values)
+        try:
+            s.init_par(key, values)
+        except:
+            pass  # already exists in the model, known for 'historical_gdp'
     for key, values in MACRO_INIT['vars'].items():
         if not s.has_var(key):
             try:
@@ -303,7 +307,15 @@ def init(s):
         s.init_equ(key, values)
 
 
-def add_model_data(s, data):
-    c = Calculate(s, data)
+def add_model_data(base, clone, data):
+    c = Calculate(base, data)
     c.read_data()
     c.derive_data()
+
+    # TODO: we shouldn't have to have a for loop here
+    for s in c.sectors:
+        clone.add_set('sector', s)
+
+    aeei = c.data['aeei'].reset_index()
+    aeei['unit'] = '-'
+    clone.add_par('aeei', aeei)
