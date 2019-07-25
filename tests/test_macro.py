@@ -14,6 +14,16 @@ from message_ix.testing import make_westeros
 msg_args = ('canning problem (MESSAGE scheme)', 'standard')
 
 
+@pytest.fixture(scope='module')
+def westeros_solved(test_mp):
+    return make_westeros(test_mp, solve=True)
+
+
+@pytest.fixture(scope='module')
+def westeros_not_solved(test_mp):
+    return make_westeros(test_mp, solve=False)
+
+
 def test_init(test_mp):
     scen = Scenario(test_mp, *msg_args)
 
@@ -30,29 +40,29 @@ def test_init(test_mp):
     assert 'COST_ACCOUNTING_NODAL' in scen.equ_list()
 
 
-def test_calc_valid_data_file(test_mp):
-    s = make_westeros(test_mp, solve=True)
+def test_calc_valid_data_file(westeros_solved):
+    s = westeros_solved
     path = Path(__file__).parent / 'data' / 'westeros_macro_input.xlsx'
     c = macro.Calculate(s, path)
     c.read_data()
 
 
-def test_calc_valid_data_dict(test_mp):
-    s = make_westeros(test_mp, solve=True)
+def test_calc_valid_data_dict(westeros_solved):
+    s = westeros_solved
     path = Path(__file__).parent / 'data' / 'westeros_macro_input.xlsx'
     data = pd.read_excel(path, sheet_name=None)
     c = macro.Calculate(s, data)
     c.read_data()
 
 
-def test_calc_no_solution(test_mp):
-    s = make_westeros(test_mp)
+def test_calc_no_solution(westeros_not_solved):
+    s = westeros_not_solved
     path = Path(__file__).parent / 'data' / 'westeros_macro_input.xlsx'
     pytest.raises(RuntimeError, macro.Calculate, s, path)
 
 
-def test_calc_data_missing_par(test_mp):
-    s = make_westeros(test_mp, solve=True)
+def test_calc_data_missing_par(westeros_solved):
+    s = westeros_solved
     path = Path(__file__).parent / 'data' / 'westeros_macro_input.xlsx'
     data = pd.read_excel(path, sheet_name=None)
     data.pop('gdp_calibrate')
@@ -60,8 +70,8 @@ def test_calc_data_missing_par(test_mp):
     pytest.raises(ValueError, c.read_data)
 
 
-def test_calc_data_missing_column(test_mp):
-    s = make_westeros(test_mp, solve=True)
+def test_calc_data_missing_column(westeros_solved):
+    s = westeros_solved
     path = Path(__file__).parent / 'data' / 'westeros_macro_input.xlsx'
     data = pd.read_excel(path, sheet_name=None)
     # skip first data point
@@ -70,8 +80,8 @@ def test_calc_data_missing_column(test_mp):
     pytest.raises(ValueError, c.read_data)
 
 
-def test_calc_data_missing_datapoint(test_mp):
-    s = make_westeros(test_mp, solve=True)
+def test_calc_data_missing_datapoint(westeros_solved):
+    s = westeros_solved
     path = Path(__file__).parent / 'data' / 'westeros_macro_input.xlsx'
     data = pd.read_excel(path, sheet_name=None)
     # skip first data point
