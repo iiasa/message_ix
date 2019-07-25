@@ -198,14 +198,24 @@ def test_init(test_mp):
     assert 'COST_ACCOUNTING_NODAL' in scen.equ_list()
 
 
-def test_add_macro_data(westeros_solved):
+def test_add_model_data(westeros_solved):
     base = westeros_solved
     clone = base.clone('foo', 'bar', keep_solution=False)
     clone.check_out()
     macro.init(clone)
-    macro.add_macro_data(base, clone, DATA_PATH)
+    macro.add_model_data(base, clone, DATA_PATH)
     clone.commit('finished adding macro')
     clone.solve()
     obs = clone.var('OBJ')['lvl']
     exp = base.var('OBJ')['lvl']
     assert np.isclose(obs, exp)
+
+
+def test_calibrate(westeros_solved):
+    base = westeros_solved
+    clone = base.clone('foo', 'bar', keep_solution=False)
+    clone.check_out()
+    macro.init(clone)
+    macro.add_model_data(base, clone, DATA_PATH)
+    clone.commit('finished adding macro')
+    macro.calibrate(clone)
