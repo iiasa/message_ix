@@ -156,13 +156,16 @@ class Calculate(object):
 
         # special check for gdp_calibrate
         check = self.data['gdp_calibrate']
+        data_years = check.index.get_level_values('year')
         min_year_model = min(self.years)
-        min_year_data = min(check.index.get_level_values('year'))
+        min_year_data = min(data_years)
         if not min_year_data < min_year_model:
             raise ValueError(
                 'Must provide gdp_calibrate data prior to the modeling' +
                 ' period in order to calculate growth rates'
             )
+        # base year is most recent period PRIOR to the modeled period
+        self.base_year = max(data_years[data_years < min_year_model])
 
     def derive_data(self):
         self._rho()
@@ -174,4 +177,9 @@ class Calculate(object):
         return self.data['rho']
 
     def _k0(self):
-        pass
+        kgdp = self.data['kgdp']
+        gdp = self.data['gdp_calibrate']
+        # TODO: drop index level 'year' after??
+        gdp0 = gdp.iloc[gdp.index.isin([self.base_year], level='year')]
+        self.data['k0'] = kgdp * gdp0
+        return self.data['k0']

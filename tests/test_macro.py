@@ -99,8 +99,19 @@ def test_calc_rho(westeros_solved):
     s = westeros_solved
     c = macro.Calculate(s, DATA_PATH)
     c.read_data()
-    obs = c._rho().values
+    obs = c._rho()
     assert len(obs) == 1
     obs = obs[0]
     exp = -4
+    assert obs == exp
+
+
+def test_calc_k0(westeros_solved):
+    s = westeros_solved
+    c = macro.Calculate(s, DATA_PATH)
+    c.read_data()
+    obs = c._k0()
+    assert len(obs) == 1
+    obs = obs[0]
+    exp = 15
     assert obs == exp
