@@ -261,9 +261,20 @@ class Calculate(object):
         demand_ref = self.data['demand_ref']
         rho = self._rho()
         gdp0 = self._gdp0()
-        # TODO: is this calculation correct?
-        #       in (value) ^ (rho - 1), should value = gdp0 / demand_ref
-        #       or should value = price_ref * gdp0 / demand_ref / 1e3?
         bconst = price_ref / 1e3 * (gdp0 / demand_ref) ** (rho - 1)
         self.data['bconst'] = bconst
         return self.data['bconst']
+
+    @lru_cache()
+    def _aconst(self):
+        bconst = self._bconst()
+        demand_ref = self.data['demand_ref']
+        rho = self._rho()
+        gdp0 = self._gdp0()
+        k0 = self._k0()
+        kpvs = self.data['kpvs']
+        # TODO: why name this partmp??
+        partmp = (bconst * demand_ref ** rho).groupby(level='node').sum()
+        aconst = ((gdp0 / 1e3) ** rho - partmp) / (k0 / 1e3) ** (rho * kpvs)
+        self.data['aconst'] = aconst
+        return self.data['aconst']

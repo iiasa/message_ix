@@ -173,3 +173,15 @@ def test_calc_bconst(westeros_solved):
     obs = obs[0]
     exp = 3.6846576e-05
     assert np.isclose(obs, exp)
+
+
+def test_calc_aconst(westeros_solved):
+    s = westeros_solved
+    c = macro.Calculate(s, DATA_PATH)
+    c.read_data()
+    obs = c._aconst()
+
+    assert len(obs) == 1
+    obs = obs[0]
+    exp = 26.027323
+    assert np.isclose(obs, exp)
