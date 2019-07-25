@@ -204,6 +204,8 @@ class Calculate(object):
     def _total_cost(self):
         # read from scenario
         idx = ['node', 'year']
+        # TODO: in the R code, this value is divided by 1000
+        # do we need to do that here?!!?
         model_cost = self.s.var('COST_NODAL_NET')
         model_cost.rename(columns={'lvl': 'value'}, inplace=True)
         model_cost = model_cost[idx + ['value']]
@@ -260,6 +262,7 @@ class Calculate(object):
         demand_ref = self.data['demand_ref']
         rho = self._rho()
         gdp0 = self._gdp0()
+        # TODO: automatically get the units here!!
         bconst = price_ref / 1e3 * (gdp0 / demand_ref) ** (rho - 1)
         self.data['bconst'] = bconst
         return self.data['bconst']
@@ -274,6 +277,7 @@ class Calculate(object):
         kpvs = self.data['kpvs']
         # TODO: why name this partmp??
         partmp = (bconst * demand_ref ** rho).groupby(level='node').sum()
+        # TODO: automatically get the units here!!
         aconst = ((gdp0 / 1e3) ** rho - partmp) / (k0 / 1e3) ** (rho * kpvs)
         self.data['aconst'] = aconst
         return self.data['aconst']
