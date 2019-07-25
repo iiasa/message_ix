@@ -11,6 +11,11 @@ except ImportError:
 from message_ix import Scenario, macro
 from message_ix.testing import make_westeros
 
+msg_args = ('canning problem (MESSAGE scheme)', 'standard')
+
+# tons of deprecation warnings come from reading excel (xlrd library), ignore
+# them for now
+pytestmark = pytest.mark.filterwarnings("ignore")
 
 @pytest.fixture(scope='module')
 def westeros_solved(test_mp):
