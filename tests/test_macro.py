@@ -113,7 +113,7 @@ def test_calc_gdp0(westeros_solved):
     obs = c._gdp0()
     assert len(obs) == 1
     obs = obs[0]
-    exp = 5
+    exp = 500
     assert obs == exp
 
 
@@ -124,7 +124,7 @@ def test_calc_k0(westeros_solved):
     obs = c._k0()
     assert len(obs) == 1
     obs = obs[0]
-    exp = 15
+    exp = 1500
     assert obs == exp
 
 
@@ -171,5 +171,5 @@ def test_calc_bconst(westeros_solved):
     obs = c._bconst()
     assert len(obs) == 1
     obs = obs[0]
-    exp = 368465.76
+    exp = 3.6846576e-05
     assert np.isclose(obs, exp)
