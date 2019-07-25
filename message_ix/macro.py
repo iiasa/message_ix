@@ -249,8 +249,7 @@ class Calculate(object):
     def _gdp0(self):
         gdp = self.data['gdp_calibrate']
         gdp0 = gdp.iloc[gdp.index.isin([self.base_year], level='year')]
-        # get rid of year index
-        self.data['gdp0'] = gdp0.reset_index(level='year', drop=True)
+        self.data['gdp0'] = gdp0
         return self.data['gdp0']
 
     @lru_cache()
