@@ -20,7 +20,7 @@ MACRO_INIT = {
         'drate': ['node', ],
         'esub': ['node', ],
         'lotol': ['node', ],
-        'p_ref': ['node', 'sector', ],
+        'price_ref': ['node', 'sector', ],
         'lakl': ['node', ],
         'prfconst': ['node', 'sector', ],
         'grow': ['node', 'year', ],
@@ -58,7 +58,7 @@ MACRO_DATA_FOR_DERIVATION = {
 }
 
 VERIFY_INPUT_DATA = [
-    'p_ref', 'lotol', 'esub', 'drate', 'depr', 'kpvs', 'kgdp',
+    'price_ref', 'lotol', 'esub', 'drate', 'depr', 'kpvs', 'kgdp',
     'gdp_calibrate', 'aeei', 'cost_ref', 'demand_ref', 'MERtoPPP',
 ]
 
@@ -183,3 +183,37 @@ class Calculate(object):
         gdp0 = gdp.iloc[gdp.index.isin([self.base_year], level='year')]
         self.data['k0'] = kgdp * gdp0
         return self.data['k0']
+
+    def _total_cost(self):
+        # read from scenario
+        idx = ['node', 'year']
+        model_cost = self.s.var('COST_NODAL_NET')
+        model_cost.rename(columns={'lvl': 'value'}, inplace=True)
+        model_cost = model_cost[idx + ['value']]
+        # get data provided in base year from data
+        cost_ref = self.data['cost_ref'].reset_index()
+        cost_ref['year'] = self.base_year
+        # combine into one value
+        total_cost = pd.concat([cost_ref, model_cost]).set_index(idx)['value']
+        if total_cost.isnull().any():
+            raise RuntimeError('NaN values found in total_cost calculation')
+        self.data['total_cost'] = total_cost
+        return total_cost
+
+    def _price(self):
+        # read from scenario
+        idx = ['node', 'sector', 'year']
+        model_price = self.s.var('PRICE_COMMODITY',
+                                 filters={'level': 'useful'})
+        model_price.rename(columns={'lvl': 'value', 'commodity': 'sector'},
+                           inplace=True)
+        model_price = model_price[idx + ['value']]
+        # get data provided in base year from data
+        price_ref = self.data['price_ref'].reset_index()
+        price_ref['year'] = self.base_year
+        # combine into one value
+        price = pd.concat([price_ref, model_price]).set_index(idx)['value']
+        if price.isnull().any():
+            raise RuntimeError('NaN values found in price calculation')
+        self.data['price'] = price
+        return price
