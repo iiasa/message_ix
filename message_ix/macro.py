@@ -3,6 +3,7 @@ import os
 
 import pandas as pd
 
+from functools import lru_cache
 
 #
 # TODOS:
@@ -179,19 +180,28 @@ class Calculate(object):
         self._rho()
         self._k0()
 
+    @lru_cache()
     def _rho(self):
         esub = self.data['esub']
         self.data['rho'] = (esub - 1) / esub
         return self.data['rho']
 
+    @lru_cache()
+    def _gdp0(self):
+        gdp = self.data['gdp_calibrate']
+        gdp0 = gdp.iloc[gdp.index.isin([self.base_year], level='year')]
+        # get rid of year index
+        self.data['gdp0'] = gdp0.reset_index(level='year', drop=True)
+        return self.data['gdp0']
+
+    @lru_cache()
     def _k0(self):
         kgdp = self.data['kgdp']
-        gdp = self.data['gdp_calibrate']
-        # TODO: drop index level 'year' after??
-        gdp0 = gdp.iloc[gdp.index.isin([self.base_year], level='year')]
+        gdp0 = self._gdp0()
         self.data['k0'] = kgdp * gdp0
         return self.data['k0']
 
+    @lru_cache()
     def _total_cost(self):
         # read from scenario
         idx = ['node', 'year']
@@ -208,6 +218,7 @@ class Calculate(object):
         self.data['total_cost'] = total_cost
         return total_cost
 
+    @lru_cache()
     def _price(self):
         # read from scenario
         idx = ['node', 'sector', 'year']
@@ -226,6 +237,7 @@ class Calculate(object):
         self.data['price'] = price
         return price
 
+    @lru_cache()
     def _demand(self):
         # read from scenario
         idx = ['node', 'sector', 'year']
@@ -242,3 +254,19 @@ class Calculate(object):
             raise RuntimeError('NaN values found in demand calculation')
         self.data['demand'] = demand
         return demand
+
+    @lru_cache()
+    def _bconst(self):
+        price_ref = self.data['price_ref']
+        gdp = self.data['gdp_calibrate']
+        # TODO: drop index level 'year' after??
+        gdp0 = gdp.iloc[gdp.index.isin([self.base_year], level='year')]
+        demand_ref = self.data['demand_ref']
+        rho = self._rho()
+
+        print(price_ref)
+        print(gdp0)
+        print(demand_ref)
+        print(rho)
+
+        # (p_ref[node, commodity]/1e3 * (gdp_calibrate[first_period, node] / demand_ref[node, commodity])**(rho[node] - 1))

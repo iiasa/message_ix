@@ -106,6 +106,17 @@ def test_calc_rho(westeros_solved):
     assert obs == exp
 
 
+def test_calc_gdp0(westeros_solved):
+    s = westeros_solved
+    c = macro.Calculate(s, DATA_PATH)
+    c.read_data()
+    obs = c._gdp0()
+    assert len(obs) == 1
+    obs = obs[0]
+    exp = 5
+    assert obs == exp
+
+
 def test_calc_k0(westeros_solved):
     s = westeros_solved
     c = macro.Calculate(s, DATA_PATH)
@@ -151,3 +162,10 @@ def test_calc_demand(westeros_solved):
     obs = obs.values
     exp = np.array([90, 100, 150, 190])
     assert np.isclose(obs, exp).all()
+
+
+def test_calc_bconst(westeros_solved):
+    s = westeros_solved
+    c = macro.Calculate(s, DATA_PATH)
+    c.read_data()
+    obs = c._bconst()
