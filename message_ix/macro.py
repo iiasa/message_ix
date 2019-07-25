@@ -3,6 +3,14 @@ import os
 
 import pandas as pd
 
+
+#
+# TODOS:
+#
+# 1) all demands/prices assumed to be on USEFUL level, need to extend this
+#    to support others
+#
+
 MACRO_INIT = {
     'sets': {
         'sector': None,
@@ -217,3 +225,20 @@ class Calculate(object):
             raise RuntimeError('NaN values found in price calculation')
         self.data['price'] = price
         return price
+
+    def _demand(self):
+        # read from scenario
+        idx = ['node', 'sector', 'year']
+        model_demand = self.s.var('DEMAND', filters={'level': 'useful'})
+        model_demand.rename(columns={'lvl': 'value', 'commodity': 'sector'},
+                            inplace=True)
+        model_demand = model_demand[idx + ['value']]
+        # get data provided in base year from data
+        demand_ref = self.data['demand_ref'].reset_index()
+        demand_ref['year'] = self.base_year
+        # combine into one value
+        demand = pd.concat([demand_ref, model_demand]).set_index(idx)['value']
+        if demand.isnull().any():
+            raise RuntimeError('NaN values found in demand calculation')
+        self.data['demand'] = demand
+        return demand

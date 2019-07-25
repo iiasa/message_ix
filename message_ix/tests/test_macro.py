@@ -139,3 +139,15 @@ def test_calc_price(westeros_solved):
     obs = obs.values
     exp = np.array([195, 183.094376, 161.645111, 161.645111])
     assert np.isclose(obs, exp).all()
+
+
+def test_calc_demand(westeros_solved):
+    s = westeros_solved
+    c = macro.Calculate(s, DATA_PATH)
+    c.read_data()
+    obs = c._demand()
+    # 4 values, 3 in model period, one in history
+    assert(len(obs) == 4)
+    obs = obs.values
+    exp = np.array([90, 100, 150, 190])
+    assert np.isclose(obs, exp).all()
