@@ -5,6 +5,8 @@ import pandas as pd
 
 from functools import lru_cache
 
+from ixmp.utils import logger
+
 #
 # TODOS:
 #
@@ -373,7 +375,8 @@ def init(s):
         pass  # already exists
 
     # keep track of number of iterations
-    s.init_var('NITER', None)
+    s.init_var('N_ITER', None)
+    s.init_var('MAX_ITER', None)
 
 
 def add_model_data(base, clone, data):
@@ -416,12 +419,16 @@ def calibrate(s):
     # add_par both
     # check if calibration succeeded??
 
-    # solve MACRO standalone to get calibrated values
-    var_list = ['UTILITY', 'NITER', 'aeei_calibrate', 'grow_calibrate']
+    # solve MACRO standalone
+    var_list = ['N_ITER', 'MAX_ITER', 'aeei_calibrate', 'grow_calibrate']
     gams_args = ['LogOption=2']  # pass everything to log file
     s.solve(model='MACRO', var_list=var_list, gams_args=gams_args)
-    util = s.var('UTILITY')['lvl']
-    niter = s.var('NITER')['lvl']
+    n_iter = s.var('N_ITER')['lvl']
+    max_iter = s.var('MAX_ITER')['lvl']
+    msg = 'MACRO converged after {} of a maximum of {} iterations'
+    logger().info(msg.format(n_iter, max_iter))
+
+    # get out calibrated values
     raw_aeei = s.var('aeei_calibrate')
     aeei = (raw_aeei
             .rename(columns={'lvl': 'value'})
@@ -435,24 +442,22 @@ def calibrate(s):
             )
     grow['unit'] = MACRO_INIT['pars']['grow']['unit']
 
-    # update parameters
+    # update calibrated value parameters
     s.remove_solution()
     s.check_out()
     s.add_par('aeei', aeei)
     s.add_par('grow', grow)
     s.commit('Updating MACRO values after calibration')
 
-    # test to make sure number of iterations is 1
-    test = s.clone(s.model, 'test to confirm MACRO converges',)
-    test.solve(model='MACRO', var_list=var_list, gams_args=gams_args)
+    # # test to make sure number of iterations is 1
+    # test = s.clone(s.model, 'test to confirm MACRO converges',)
+    # var_list = ['N_ITER', 'MAX_ITER']
+    # test.solve(model='MESSAGE-MACRO', var_list=var_list, gams_args=gams_args)
 
-    if test.var('NITER')['lvl'] > 1:
-        msg = 'Number of iterations after calibration > 1: {}'
-        raise RuntimeError(msg.format(test.var('NITER')['lvl']))
-
-    # TOO other checks?
-    print('FOO', niter, test.var('NITER'))
-    pd.testing.assert_frame_equal(raw_aeei, test.var('aeei_calibrate'))
-    pd.testing.assert_frame_equal(raw_grow, test.var('grow_calibrate'))
+    # n_iter = s.var('N_ITER')['lvl']
+    # max_iter = s.var('MAX_ITER')['lvl']
+    # if test.var('N_ITER')['lvl'] > 1:
+    #     msg = 'Number of iterations after calibration > 1: {}'
+    #     raise RuntimeError(msg.format(test.var('NITER')['lvl']))
 
     return s

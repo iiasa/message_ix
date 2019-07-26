@@ -15,7 +15,8 @@ Scalar
 Variables
          aeei_calibrate(node,sector,year_all)
          grow_calibrate(node,year_all)
-	 NITER
+	 N_ITER
+	 MAX_ITER
 ;
 
 * ------------------------------------------------------------------------------
@@ -94,7 +95,10 @@ finite_time_corr(node_macro, year) = abs(DRATE(node_macro) - grow(node_macro, ye
 * export calibration results as reporting variables to GDX
 aeei_calibrate.L(node_macro,sector,year) = aeei(node_macro,sector,year) ;
 grow_calibrate.L(node_macro,year) = grow(node_macro,year) ;
-NITER.L = ctr ;
+
+* subtract one due to 1-based indexing
+N_ITER.L = ctr - 1;
+MAX_ITER.L = max_it ;
     
 * write solution statistics
 status('MESSAGE_MACRO','modelstat') = 1 ;
