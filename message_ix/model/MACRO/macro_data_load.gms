@@ -102,7 +102,8 @@ Parameters
 * parameters for spatially and temporally flexible formulation, and for myopic/rolling-horizon optimization
     duration_period_sum(year_all,year_all2)   number of years between two periods ('year_all' must precede 'year_all2')
     interestrate(year_all)         interest rate (to compute discount factor)
-    discountfactor(*)              cumulative discount facor
+    df_period(year_all)            cumulative discount factor over period duration
+    df_year(year_all)              discount factor of the last year in the period
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
