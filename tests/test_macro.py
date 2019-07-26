@@ -219,11 +219,13 @@ def test_calibrate(westeros_solved):
     clone.check_out()
     macro.init(clone)
     macro.add_model_data(base, clone, DATA_PATH)
+    clone.commit('finished adding macro')
 
     start_aeei = clone.par('aeei')['value']
     start_grow = clone.par('grow')['value']
 
-    clone.commit('finished adding macro')
+    # TODO: this fails now because it takes 4 iterations to converge, don't know
+    # why, but the original macro-only iterations hit a max value (100)
     macro.calibrate(clone, check_convergence=True)
 
     end_aeei = clone.par('aeei')['value']
@@ -235,3 +237,8 @@ def test_calibrate(westeros_solved):
     assert not np.allclose(start_grow, end_grow, rtol=1e-2)
     assert not end_aeei.isnull().any()
     assert not end_grow.isnull().any()
+
+
+def test_calibrate_roundtrip(westeros_solved):
+    # TODO: make this true when we address above issue
+    westeros_solved.add_macro(DATA_PATH, check_convergence=False)

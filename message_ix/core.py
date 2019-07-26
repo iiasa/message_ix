@@ -8,7 +8,7 @@ from ixmp.utils import pd_read, pd_write, isscalar, check_year, logger
 import pandas as pd
 
 from . import default_paths
-
+from . import macro
 
 DEFAULT_SOLVE_OPTIONS = {
     'advind': 0,
@@ -365,6 +365,16 @@ class Scenario(ixmp.Scenario):
         ret = super(Scenario, self).solve(model=model, **kwargs)
         os.remove(fname)
         return ret
+
+    def add_macro(self, data, scenario=None, check_convergence=True):
+        scenario = scenario or '_'.join([self.scenario, 'macro'])
+        clone = self.clone(self.model, scenario, keep_solution=False)
+        clone.check_out()
+        macro.init(clone)
+        macro.add_model_data(self, clone, data)
+        clone.commit('finished adding macro')
+        macro.calibrate(clone, check_convergence=check_convergence)
+        return clone
 
     def rename(self, name, mapping, keep=False):
         """Rename an element in a set
