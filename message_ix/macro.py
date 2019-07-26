@@ -372,6 +372,9 @@ def init(s):
     except:  # TODO: should this already exist?
         pass  # already exists
 
+    # keep track of number of iterations
+    s.init_var('NITER', None)
+
 
 def add_model_data(base, clone, data):
     c = Calculate(base, data)
@@ -414,9 +417,11 @@ def calibrate(s):
     # check if calibration succeeded??
 
     # solve MACRO standalone to get calibrated values
-    var_list = ["UTILITY", "aeei_calibrate", "grow_calibrate"]
-    s.solve(model='MACRO', var_list=var_list)
+    var_list = ['UTILITY', 'NITER', 'aeei_calibrate', 'grow_calibrate']
+    gams_args = ['LogOption=2']  # pass everything to log file
+    s.solve(model='MACRO', var_list=var_list, gams_args=gams_args)
     util = s.var('UTILITY')['lvl']
+    niter = s.var('NITER')['lvl']
     raw_aeei = s.var('aeei_calibrate')
     aeei = (raw_aeei
             .rename(columns={'lvl': 'value'})
@@ -433,19 +438,20 @@ def calibrate(s):
     # update parameters
     s.remove_solution()
     s.check_out()
-    print('FOO')
-    print(s.par('aeei'))
-    print(s.par('grow'))
     s.add_par('aeei', aeei)
     s.add_par('grow', grow)
-    print('BAR')
-    print(s.par('aeei'))
-    print(s.par('grow'))
     s.commit('Updating MACRO values after calibration')
 
     # test to make sure number of iterations is 1
-    test = s.clone(s.model, 'test to confirm MACRO converges')
-    test.solve(model='MACRO', var_list=var_list)
+    test = s.clone(s.model, 'test to confirm MACRO converges',)
+    test.solve(model='MACRO', var_list=var_list, gams_args=gams_args)
+
+    if test.var('NITER')['lvl'] > 1:
+        msg = 'Number of iterations after calibration > 1: {}'
+        raise RuntimeError(msg.format(test.var('NITER')['lvl']))
+
+    # TOO other checks?
+    print('FOO', niter, test.var('NITER'))
     pd.testing.assert_frame_equal(raw_aeei, test.var('aeei_calibrate'))
     pd.testing.assert_frame_equal(raw_grow, test.var('grow_calibrate'))
 
