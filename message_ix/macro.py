@@ -424,14 +424,12 @@ def calibrate(s, check_convergence=True):
     logger().info(msg.format(n_iter, max_iter))
 
     # get out calibrated values
-    raw_aeei = s.var('aeei_calibrate')
-    aeei = (raw_aeei
+    aeei = (s.var('aeei_calibrate')
             .rename(columns={'lvl': 'value'})
             .drop('mrg', axis=1)
             )
     aeei['unit'] = MACRO_INIT['pars']['aeei']['unit']
-    raw_grow = s.var('grow_calibrate')
-    grow = (raw_grow
+    grow = (s.var('grow_calibrate')
             .rename(columns={'lvl': 'value'})
             .drop('mrg', axis=1)
             )
@@ -445,16 +443,16 @@ def calibrate(s, check_convergence=True):
     s.commit('Updating MACRO values after calibration')
 
     # test to make sure number of iterations is 1
-    test = s.clone(s.model, 'test to confirm MACRO converges',)
+    test = s.clone(s.model, 'test to confirm MACRO converges')
     var_list = ['N_ITER']
     test.solve(model='MESSAGE-MACRO', var_list=var_list, gams_args=gams_args)
 
     n_iter = test.var('N_ITER')['lvl']
     if n_iter > 1:
-        msg = 'Number of iterations after calibration > 1: {}'
+        msg = 'Number of iterations after calibration > 1: {}'.format(n_iter)
         if check_convergence:
-            raise RuntimeError(msg.format(n_iter))
+            raise RuntimeError(msg)
         else:
-            warnings.warn(msg.format(n_iter))
+            warnings.warn(msg)
 
     return s
