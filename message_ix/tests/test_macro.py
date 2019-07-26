@@ -20,12 +20,12 @@ MSG_ARGS = ('canning problem (MESSAGE scheme)', 'standard')
 DATA_PATH = Path(__file__).parent / 'data' / 'westeros_macro_input.xlsx'
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='function')
 def westeros_solved(test_mp):
     return make_westeros(test_mp, solve=True)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='function')
 def westeros_not_solved(test_mp):
     return make_westeros(test_mp, solve=False)
 
