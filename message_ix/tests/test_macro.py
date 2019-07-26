@@ -219,7 +219,19 @@ def test_calibrate(westeros_solved):
     clone.check_out()
     macro.init(clone)
     macro.add_model_data(base, clone, DATA_PATH)
+
+    start_aeei = clone.par('aeei')['value']
+    start_grow = clone.par('grow')['value']
+
     clone.commit('finished adding macro')
     macro.calibrate(clone)
-    print(clone.var('UTILITY'))
-    print(clone.var('aeei_calibrate'))
+
+    end_aeei = clone.par('aeei')['value']
+    end_grow = clone.par('grow')['value']
+
+    # calibration should have changed some/all of these values and none should
+    # be NaNs
+    assert not np.allclose(start_aeei, end_aeei)
+    assert not np.allclose(start_grow, end_grow)
+    assert not end_aeei.isnull().any()
+    assert not end_grow.isnull().any()
