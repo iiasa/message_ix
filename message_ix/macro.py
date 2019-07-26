@@ -1,5 +1,6 @@
 import collections
 import os
+import warnings
 
 import pandas as pd
 
@@ -413,12 +414,7 @@ def add_model_data(base, clone, data):
             raise type(e)(msg + str(e))
 
 
-def calibrate(s):
-    # run macro gams
-    # read aeei_calibrate and grow_calibrate
-    # add_par both
-    # check if calibration succeeded??
-
+def calibrate(s, check_convergence=True):
     # solve MACRO standalone
     var_list = ['N_ITER', 'MAX_ITER', 'aeei_calibrate', 'grow_calibrate']
     gams_args = ['LogOption=2']  # pass everything to log file
@@ -449,15 +445,17 @@ def calibrate(s):
     s.add_par('grow', grow)
     s.commit('Updating MACRO values after calibration')
 
-    # # test to make sure number of iterations is 1
-    # test = s.clone(s.model, 'test to confirm MACRO converges',)
-    # var_list = ['N_ITER', 'MAX_ITER']
-    # test.solve(model='MESSAGE-MACRO', var_list=var_list, gams_args=gams_args)
+    # test to make sure number of iterations is 1
+    test = s.clone(s.model, 'test to confirm MACRO converges',)
+    var_list = ['N_ITER']
+    test.solve(model='MESSAGE-MACRO', var_list=var_list, gams_args=gams_args)
 
-    # n_iter = s.var('N_ITER')['lvl']
-    # max_iter = s.var('MAX_ITER')['lvl']
-    # if test.var('N_ITER')['lvl'] > 1:
-    #     msg = 'Number of iterations after calibration > 1: {}'
-    #     raise RuntimeError(msg.format(test.var('NITER')['lvl']))
+    n_iter = test.var('N_ITER')['lvl']
+    if n_iter > 1:
+        msg = 'Number of iterations after calibration > 1: {}'
+        if check_convergence:
+            raise RuntimeError(msg.format(n_iter))
+        else:
+            warnings.warn(msg.format(n_iter))
 
     return s

@@ -224,7 +224,7 @@ def test_calibrate(westeros_solved):
     start_grow = clone.par('grow')['value']
 
     clone.commit('finished adding macro')
-    macro.calibrate(clone)
+    macro.calibrate(clone, check_convergence=True)
 
     end_aeei = clone.par('aeei')['value']
     end_grow = clone.par('grow')['value']
