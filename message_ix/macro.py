@@ -114,7 +114,6 @@ MACRO_INIT = {
         'PHYSENE': ['node', 'sector', 'year', ],
         'PRODENE': ['node', 'sector', 'year', ],
         'NEWENE': ['node', 'sector', 'year', ],
-        'EC': ['node', 'year', ],
         'grow_calibrate': ['node', 'year', ],
         'aeei_calibrate': ['node', 'sector', 'year', ],
     },
@@ -354,25 +353,26 @@ def init(s):
     for key, values in MACRO_INIT['pars'].items():
         try:
             s.init_par(key, values['idx'])
-        except:
+        except:  # noqa: ignore=E722
             pass  # already exists in the model, known for 'historical_gdp'
     for key, values in MACRO_INIT['vars'].items():
         if not s.has_var(key):
             try:
                 # TODO: this seems required because for some reason DEMAND (and
                 # perhaps others) seem to already be listed in the java code,
-                # but still needs to be initialized in the python code. However,
-                # you cannot init it with dimensions, only with the variable
-                # name.
+                # but still needs to be initialized in the python code.
+                # However, you cannot init it with dimensions, only with the
+                # variable name.
                 s.init_var(key, values)
-            except:
+            except:  # noqa: ignore=E722
                 s.init_var(key)
     for key, values in MACRO_INIT['equs'].items():
         s.init_equ(key, values)
 
     try:
+        # TODO: should this already exist?
         s.init_set("mapping_macro_sector", ("sector", "commodity", "level"))
-    except:  # TODO: should this already exist?
+    except:  # noqa: ignore=E722
         pass  # already exists
 
     # keep track of number of iterations
