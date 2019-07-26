@@ -211,10 +211,9 @@ class Calculate(object):
         min_year_model = min(self.years)
         min_year_data = min(data_years)
         if not min_year_data < min_year_model:
-            raise ValueError(
-                'Must provide gdp_calibrate data prior to the modeling' +
+            msg = 'Must provide gdp_calibrate data prior to the modeling' + \
                 ' period in order to calculate growth rates'
-            )
+            raise ValueError(msg)
         # init year is most recent period PRIOR to the modeled period
         self.init_year = max(data_years[data_years < min_year_model])
         # base year is first model period
