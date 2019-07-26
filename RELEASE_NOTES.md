@@ -21,7 +21,6 @@ other improvements. See the ixmp release notes for further details.
 
 ## All changes
 
-- [#161](https://github.com/iiasa/message_ix/pull/161): A feature for adding new periods to a scenario.
 - [#205](https://github.com/iiasa/message_ix/pull/205): Implement required changes related to timeseries-support and cloning across platforms (see [ixmp:#142](https://github.com/iiasa/ixmp/pull/142)).
 - [#196](https://github.com/iiasa/message_ix/pull/196): Improve testing by re-using :mod:`ixmp` apparatus.
 - [#187](https://github.com/iiasa/message_ix/pull/187): Test for cumulative bound on emissions.
@@ -30,6 +29,7 @@ other improvements. See the ixmp release notes for further details.
 - [#176](https://github.com/iiasa/message_ix/pull/176): Add `message_ix.reporting` module.
 - [#173](https://github.com/iiasa/message_ix/pull/173): The `solve` command now takes additional arguments when solving with CPLEX. The `cplex.opt` file is now generated on the fly during the solve command and removed after successfully solving.
 - [#172](https://github.com/iiasa/message_ix/pull/172): Add option to set `COMMODITY_BALANCE` to equality.
+- [#161](https://github.com/iiasa/message_ix/pull/161): A feature for adding new periods to a scenario.
 - [#154](https://github.com/iiasa/message_ix/pull/154): Enable documentation build on ReadTheDocs.
 - [#138](https://github.com/iiasa/message_ix/pull/138): Update documentation and tutorials.
 - [#131](https://github.com/iiasa/message_ix/pull/131): Update clone function argument `scen` to `scenario` with planned deprecation of the former.
