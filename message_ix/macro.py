@@ -378,17 +378,22 @@ def add_model_data(base, clone, data):
     c.read_data()
     c.derive_data()
 
-    # add sectoral set structure
-    # TODO: we shouldn't have to have a for loop here
-    for s in c.sectors:
-        clone.add_set('sector', s)
-        clone.add_set("mapping_macro_sector", [s, s, "useful"])
-
     # add temporal set structure
     clone.add_set("type_year", "initializeyear_macro")
     clone.add_set("cat_year", ["initializeyear_macro", c.init_year])
     clone.add_set("type_year", "baseyear_macro")
     clone.add_set("cat_year", ["baseyear_macro", c.base_year])
+
+    # add nodal set structure
+    clone.add_set("type_node", "economy")
+    for n in c.nodes:
+        clone.add_set("cat_node", ["economy", n])
+
+    # add sectoral set structure
+    # TODO: we shouldn't have to have a for loop here
+    for s in c.sectors:
+        clone.add_set('sector', s)
+        clone.add_set("mapping_macro_sector", [s, s, "useful"])
 
     # add parameters
     for name, values in MACRO_INIT['pars'].items():
@@ -407,5 +412,41 @@ def calibrate(s):
     # read aeei_calibrate and grow_calibrate
     # add_par both
     # check if calibration succeeded??
-    s.solve(model='MACRO', var_list=["aeei_calibrate", "grow_calibrate"])
+
+    # solve MACRO standalone to get calibrated values
+    var_list = ["UTILITY", "aeei_calibrate", "grow_calibrate"]
+    s.solve(model='MACRO', var_list=var_list)
+    util = s.var('UTILITY')['lvl']
+    raw_aeei = s.var('aeei_calibrate')
+    aeei = (raw_aeei
+            .rename(columns={'lvl': 'value'})
+            .drop('mrg', axis=1)
+            )
+    aeei['unit'] = MACRO_INIT['pars']['aeei']['unit']
+    raw_grow = s.var('grow_calibrate')
+    grow = (raw_grow
+            .rename(columns={'lvl': 'value'})
+            .drop('mrg', axis=1)
+            )
+    grow['unit'] = MACRO_INIT['pars']['grow']['unit']
+
+    # update parameters
+    s.remove_solution()
+    s.check_out()
+    print('FOO')
+    print(s.par('aeei'))
+    print(s.par('grow'))
+    s.add_par('aeei', aeei)
+    s.add_par('grow', grow)
+    print('BAR')
+    print(s.par('aeei'))
+    print(s.par('grow'))
+    s.commit('Updating MACRO values after calibration')
+
+    # test to make sure number of iterations is 1
+    test = s.clone(s.model, 'test to confirm MACRO converges')
+    test.solve(model='MACRO', var_list=var_list)
+    pd.testing.assert_frame_equal(raw_aeei, test.var('aeei_calibrate'))
+    pd.testing.assert_frame_equal(raw_grow, test.var('grow_calibrate'))
+
     return s
