@@ -231,7 +231,7 @@ def test_calibrate(westeros_solved):
 
     # calibration should have changed some/all of these values and none should
     # be NaNs
-    assert not np.allclose(start_aeei, end_aeei)
-    assert not np.allclose(start_grow, end_grow)
+    assert not np.allclose(start_aeei, end_aeei, rtol=1e-2)
+    assert not np.allclose(start_grow, end_grow, rtol=1e-2)
     assert not end_aeei.isnull().any()
     assert not end_grow.isnull().any()
