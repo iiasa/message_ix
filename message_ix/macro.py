@@ -213,8 +213,10 @@ class Calculate(object):
                 'Must provide gdp_calibrate data prior to the modeling' +
                 ' period in order to calculate growth rates'
             )
-        # base year is most recent period PRIOR to the modeled period
-        self.base_year = max(data_years[data_years < min_year_model])
+        # init year is most recent period PRIOR to the modeled period
+        self.init_year = max(data_years[data_years < min_year_model])
+        # base year is first model period
+        self.base_year = min_year_model
 
     def derive_data(self):
         # calculate all necessary derived data, adding to self.data this is
@@ -249,7 +251,7 @@ class Calculate(object):
     @lru_cache()
     def _gdp0(self):
         gdp = self.data['gdp_calibrate']
-        gdp0 = gdp.iloc[gdp.index.isin([self.base_year], level='year')]
+        gdp0 = gdp.iloc[gdp.index.isin([self.init_year], level='year')]
         self.data['gdp0'] = gdp0
         return self.data['gdp0']
 
@@ -269,9 +271,9 @@ class Calculate(object):
         model_cost = self.s.var('COST_NODAL_NET')
         model_cost.rename(columns={'lvl': 'value'}, inplace=True)
         model_cost = model_cost[idx + ['value']]
-        # get data provided in base year from data
+        # get data provided in init year from data
         cost_ref = self.data['cost_ref'].reset_index()
-        cost_ref['year'] = self.base_year
+        cost_ref['year'] = self.init_year
         # combine into one value
         total_cost = pd.concat([cost_ref, model_cost]).set_index(idx)['value']
         if total_cost.isnull().any():
@@ -288,9 +290,9 @@ class Calculate(object):
         model_price.rename(columns={'lvl': 'value', 'commodity': 'sector'},
                            inplace=True)
         model_price = model_price[idx + ['value']]
-        # get data provided in base year from data
+        # get data provided in init year from data
         price_ref = self.data['price_ref'].reset_index()
-        price_ref['year'] = self.base_year
+        price_ref['year'] = self.init_year
         # combine into one value
         price = pd.concat([price_ref, model_price]).set_index(idx)['value']
         if price.isnull().any():
@@ -306,9 +308,9 @@ class Calculate(object):
         model_demand.rename(columns={'lvl': 'value', 'commodity': 'sector'},
                             inplace=True)
         model_demand = model_demand[idx + ['value']]
-        # get data provided in base year from data
+        # get data provided in init year from data
         demand_ref = self.data['demand_ref'].reset_index()
-        demand_ref['year'] = self.base_year
+        demand_ref['year'] = self.init_year
         # combine into one value
         demand = pd.concat([demand_ref, model_demand]).set_index(idx)['value']
         if demand.isnull().any():
@@ -365,16 +367,30 @@ def init(s):
     for key, values in MACRO_INIT['equs'].items():
         s.init_equ(key, values)
 
+    try:
+        s.init_set("mapping_macro_sector", ("sector", "commodity", "level"))
+    except:  # TODO: should this already exist?
+        pass  # already exists
+
 
 def add_model_data(base, clone, data):
     c = Calculate(base, data)
     c.read_data()
     c.derive_data()
 
+    # add sectoral set structure
     # TODO: we shouldn't have to have a for loop here
     for s in c.sectors:
         clone.add_set('sector', s)
+        clone.add_set("mapping_macro_sector", [s, s, "useful"])
 
+    # add temporal set structure
+    clone.add_set("type_year", "initializeyear_macro")
+    clone.add_set("cat_year", ["initializeyear_macro", c.init_year])
+    clone.add_set("type_year", "baseyear_macro")
+    clone.add_set("cat_year", ["baseyear_macro", c.base_year])
+
+    # add parameters
     for name, values in MACRO_INIT['pars'].items():
         try:
             key = values.get('data_key', name)
@@ -391,5 +407,5 @@ def calibrate(s):
     # read aeei_calibrate and grow_calibrate
     # add_par both
     # check if calibration succeeded??
-    s.solve(model='MACRO')
+    s.solve(model='MACRO', var_list=["aeei_calibrate", "grow_calibrate"])
     return s

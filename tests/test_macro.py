@@ -213,9 +213,12 @@ def test_add_model_data(westeros_solved):
 
 def test_calibrate(westeros_solved):
     base = westeros_solved
-    clone = base.clone('foo', 'bar', keep_solution=False)
+    clone = base.clone(base.model, 'test macro calibration',
+                       keep_solution=False)
     clone.check_out()
     macro.init(clone)
     macro.add_model_data(base, clone, DATA_PATH)
     clone.commit('finished adding macro')
     macro.calibrate(clone)
+    print(clone.var('UTILITY'))
+    print(clone.var('aeei_calibrate'))
