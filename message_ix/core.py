@@ -6,6 +6,8 @@ import ixmp
 from ixmp.utils import as_str_list, pd_read, pd_write, isscalar, logger
 import pandas as pd
 
+from . import macro
+
 
 class Scenario(ixmp.Scenario):
     """|MESSAGEix| Scenario.
@@ -426,6 +428,16 @@ class Scenario(ixmp.Scenario):
             code; see :class:`.GAMSModel`.
         """
         super().solve(model=model, solve_options=solve_options, **kwargs)
+
+    def add_macro(self, data, scenario=None, check_convergence=True):
+        scenario = scenario or '_'.join([self.scenario, 'macro'])
+        clone = self.clone(self.model, scenario, keep_solution=False)
+        clone.check_out()
+        macro.init(clone)
+        macro.add_model_data(self, clone, data)
+        clone.commit('finished adding macro')
+        macro.calibrate(clone, check_convergence=check_convergence)
+        return clone
 
     def rename(self, name, mapping, keep=False):
         """Rename an element in a set
