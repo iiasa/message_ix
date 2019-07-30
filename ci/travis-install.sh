@@ -4,7 +4,8 @@ set -e
 
 # install gams
 echo "Starting download from $GAMSURL"
-wget -q --show-progress $GAMSURL 
+wget --help
+wget -q $GAMSURL 
 echo "Download complete from $GAMSURL"
 chmod u+x $GAMSFNAME
 ./$GAMSFNAME > install.out
@@ -12,7 +13,6 @@ which gams
 
 # install and update conda
 echo "Starting download from $CONDAURL"
-wget --help
 wget -q  $CONDAURL -O miniconda.sh
 echo "Download complete from $CONDAURL"
 chmod +x miniconda.sh
