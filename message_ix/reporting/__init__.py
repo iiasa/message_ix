@@ -51,7 +51,8 @@ configure(
         'year_act': 'ya',
         'year_vtg': 'yv',
         'year_rel': 'yr',
-    })
+    }
+)
 
 #: Basic derived quantities that are the product of two others.
 PRODUCTS = (
@@ -125,7 +126,7 @@ class Reporter(IXMPReporter):
 
         # Add basic quantities for MESSAGEix models
         for name, quantities in PRODUCTS:
-            new_key = rep.add_product(name, quantities)
+            new_key = rep.add_product(name, *quantities)
 
             # Give some log output
             if new_key is None:
