@@ -13,7 +13,7 @@ which gams
 # install and update conda
 echo "Starting download from $CONDAURL"
 wget --help
-wget -q --show-progress $CONDAURL -O miniconda.sh
+wget -q  $CONDAURL -O miniconda.sh
 echo "Download complete from $CONDAURL"
 chmod +x miniconda.sh
 ./miniconda.sh -b -p $HOME/miniconda
