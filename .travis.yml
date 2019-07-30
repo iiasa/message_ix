@@ -25,8 +25,8 @@ install:
 # Previously we used `pip install .[reporting]`, however, we also need
 # bleeding-edge pyam. For some reason, pip still installs `pyam-iamc`,
 # even though it already exists via the above (only on Mac...). So we
-# have reverted back to just installing with `pip install .`.
-  - pip install .
+# have reverted back to just installing with `pip install .[tests]`.
+  - pip install .[tests]
 
 script:
   - python -c "import os, sys; assert os.environ['PYVERSION'] == sys.version[0]"
