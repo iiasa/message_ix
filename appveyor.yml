@@ -32,7 +32,11 @@ install:
   - git clone https://github.com/IAMconsortium/pyam.git
   - cd pyam && python setup.py install && cd ..
 
-  - pip install .[reporting]
+# Previously we used `pip install .[reporting]`, however, we also need
+# bleeding-edge pyam. For some reason, pip still installs `pyam-iamc`,
+# even though it already exists via the above (only on Mac...). So we
+# have reverted back to just installing with `pip install .`.
+  - pip install .
 
 build: false
 
