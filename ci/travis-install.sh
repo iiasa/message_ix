@@ -4,7 +4,6 @@ set -e
 
 # install gams
 echo "Starting download from $GAMSURL"
-wget --help
 wget -q $GAMSURL 
 echo "Download complete from $GAMSURL"
 chmod u+x $GAMSFNAME
