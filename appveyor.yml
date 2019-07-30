@@ -29,6 +29,9 @@ install:
   - git clone https://github.com/iiasa/ixmp.git
   - cd ixmp && python setup.py install && cd ..
 
+  - git clone https://github.com/IAMconsortium/pyam.git
+  - cd pyam && python setup.py install && cd ..
+
   - pip install .[reporting]
 
 build: false
