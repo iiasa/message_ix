@@ -72,7 +72,7 @@ PRODUCTS = (
         ('var_cost', 'ACT')),
     ('land_out',
         ('land_output', 'LAND')),
-    ('land_use',  # TODO: better name!
+    ('land_use_qty',  # TODO: better name!
         ('land_use', 'LAND')),
     ('land_emi',
         ('land_emission', 'LAND')),
