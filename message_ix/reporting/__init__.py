@@ -150,11 +150,20 @@ class Reporter(IXMPReporter):
 
         # Add standard reports
         for group, pyam_keys in REPORTS.items():
-            rep.add(group, tuple([computations.concat] + pyam_keys))
+            # Filter out keys which are not added, above
+            keys = list(filter(lambda k: k in rep, pyam_keys))
+
+            # Log diagnostic information
+            missing = sorted(set(pyam_keys) - set(keys))
+            if missing:
+                log.info(f'missing {missing} omitted from {group}')
+
+            rep.add(group, tuple([computations.concat] + keys), strict=True)
 
         # Add all standard reporting to the default message node
         rep.add('message:default',
-                tuple([computations.concat] + list(REPORTS.keys())))
+                tuple([computations.concat] + list(REPORTS.keys())),
+                strict=True)
 
         return rep
 
