@@ -29,12 +29,17 @@ install:
   - git clone https://github.com/iiasa/ixmp.git
   - cd ixmp && python setup.py install && cd ..
 
-  - pip install .[reporting]
+# Upon the next pyam release (>0.2.0), these two lines should be removed.
+  - git clone https://github.com/IAMconsortium/pyam.git
+  - cd pyam && python setup.py install && cd ..
+
+# When https://github.com/IAMconsortium/pyam/issues/250 is resolved,
+# this line should change to `pip install .[reporting,tests]`
+  - pip install .[tests]
 
 build: false
 
 test_script:
-  - conda install --yes -c conda-forge pytest
   - pytest -v tests
   - messageix-config --model_path=message_ix\\model
 
