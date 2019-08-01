@@ -117,6 +117,9 @@ class Reporter(IXMPReporter):
         message_ix.reporting.Reporter
             A reporter for *scenario*.
         """
+        if not scenario.has_solution():
+            raise RuntimeError('Scenario must have a solution to be reported')
+
         # Invoke the ixmp method
         rep = super().from_scenario(scenario, **kwargs)
 

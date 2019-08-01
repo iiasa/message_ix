@@ -1,3 +1,5 @@
+import pytest
+
 from functools import partial
 from logging import WARNING
 try:
@@ -16,6 +18,14 @@ import xarray as xr
 from message_ix import Scenario
 from message_ix.reporting import Reporter, as_pyam, configure
 from message_ix.testing import make_dantzig, make_westeros
+
+
+def test_reporter_no_solution(test_mp):
+    scen = Scenario(test_mp,
+                    'canning problem (MESSAGE scheme)',
+                    'standard')
+
+    pytest.raises(RuntimeError, Reporter.from_scenario, scen)
 
 
 def test_reporter(test_mp):
