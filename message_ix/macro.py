@@ -2,6 +2,7 @@ import collections
 import os
 import warnings
 
+import numpy as np
 import pandas as pd
 
 from functools import lru_cache
@@ -288,9 +289,14 @@ class Calculate(object):
         idx = ['node', 'sector', 'year']
         model_price = self.s.var('PRICE_COMMODITY',
                                  filters={'level': 'useful'})
+        if np.isclose(model_price['lvl'], 0).any():
+            # TODO: this needs a test..
+            msg = '0-price found in MESSAGE variable PRICE_COMMODITY'
+            raise RuntimeError(msg)
         model_price.rename(columns={'lvl': 'value', 'commodity': 'sector'},
                            inplace=True)
         model_price = model_price[idx + ['value']]
+
         # get data provided in init year from data
         price_ref = self.data['price_ref'].reset_index()
         price_ref['year'] = self.init_year
