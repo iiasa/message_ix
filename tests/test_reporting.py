@@ -1,3 +1,5 @@
+import pytest
+
 from functools import partial
 from logging import WARNING
 try:
@@ -16,6 +18,14 @@ import xarray as xr
 from message_ix import Scenario
 from message_ix.reporting import Reporter, as_pyam, configure
 from message_ix.testing import make_dantzig, make_westeros
+
+
+def test_reporter_no_solution(test_mp):
+    scen = Scenario(test_mp,
+                    'canning problem (MESSAGE scheme)',
+                    'standard')
+
+    pytest.raises(RuntimeError, Reporter.from_scenario, scen)
 
 
 def test_reporter(test_mp):
@@ -61,7 +71,7 @@ def test_reporter(test_mp):
     assert len(rep_ix.graph) == 5088
 
     # message_ix.Reporter pre-populated with additional, derived quantities
-    assert len(rep.graph) == 9615
+    assert len(rep.graph) == 7975
 
     # Derived quantities have expected dimensions
     vom_key = rep.full_key('vom')
@@ -77,7 +87,7 @@ def test_reporter(test_mp):
 
 
 def test_reporter_from_dantzig(test_mp):
-    scen = make_dantzig(test_mp)
+    scen = make_dantzig(test_mp, solve=True)
 
     # Reporter.from_scenario can handle Dantzig example model
     rep = Reporter.from_scenario(scen)
