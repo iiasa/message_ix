@@ -74,10 +74,6 @@ MACRO_INIT = {
             'idx': ['node', ],
             'unit': '-',
         },
-        'price_ref': {
-            'idx': ['node', 'sector', ],
-            'unit': 'USD/kWa',
-        },
         'lakl': {
             'idx': ['node', ],
             'unit': '-',
@@ -126,6 +122,7 @@ MACRO_INIT = {
 MACRO_DATA_FOR_DERIVATION = {
     'cost_ref': ['node', ],
     'demand_ref': ['node', 'sector', ],
+    'price_ref': ['node', 'sector', ],
 }
 
 VERIFY_INPUT_DATA = [
@@ -207,6 +204,8 @@ class Calculate(object):
             self.data[name] = self.data[name].set_index(idx)['value']
 
         # special check for gdp_calibrate
+        # TODO: this now needs to check that there are *TWO* periods in history
+        # for gdp_calibrate
         check = self.data['gdp_calibrate']
         data_years = check.index.get_level_values('year')
         min_year_model = min(self.years)
@@ -348,7 +347,8 @@ class Calculate(object):
         partmp = (bconst * demand_ref ** rho).groupby(level='node').sum()
         # TODO: automatically get the units here!!
         aconst = ((gdp0 / 1e3) ** rho - partmp) / (k0 / 1e3) ** (rho * kpvs)
-        self.data['aconst'] = aconst
+        # want the series to only have index of node
+        self.data['aconst'] = aconst.reset_index(level='year', drop=True)
         return self.data['aconst']
 
 
@@ -413,6 +413,12 @@ def add_model_data(base, clone, data):
             key = values.get('data_key', name)
             data = c.data[key].reset_index()
             data['unit'] = values['unit']
+            # some data may have information prior to the MACRO initialization
+            # year which we need to remove in order to add it to the scenario
+            if 'year' in data:
+                data = data[data['year'] >= c.init_year]
+            print(name)
+            print(data)
             clone.add_par(name, data)
         except Exception as e:
             msg = 'Error in adding parameter {}\n'.format(name)
