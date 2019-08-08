@@ -417,8 +417,6 @@ def add_model_data(base, clone, data):
             # year which we need to remove in order to add it to the scenario
             if 'year' in data:
                 data = data[data['year'] >= c.init_year]
-            print(name)
-            print(data)
             clone.add_par(name, data)
         except Exception as e:
             msg = 'Error in adding parameter {}\n'.format(name)
