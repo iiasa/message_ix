@@ -154,7 +154,7 @@ DISPLAY node_macro ;
 $INCLUDE includes/period_parameter_assignment.gms
 
 year(year_all) = no ;
-year(year_all)$( ORD(year_all) >= sum(year_all2$cat_year("baseyear_macro",year_all2), ORD(year_all2) ) ) = yes ;
+year(year_all)$( ORD(year_all) >= sum(year_all2$cat_year("initializeyear_macro",year_all2), ORD(year_all2) ) ) = yes ;
 
 DISPLAY cat_year, macro_base_period, first_period, last_period, macro_horizon, year ;
 
