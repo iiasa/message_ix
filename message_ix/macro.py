@@ -203,19 +203,19 @@ class Calculate(object):
                                  self.nodes, self.sectors, self.years)
             self.data[name] = self.data[name].set_index(idx)['value']
 
-        # special check for gdp_calibrate
-        # TODO: this now needs to check that there are *TWO* periods in history
-        # for gdp_calibrate
+        # special check for gdp_calibrate - it must have at minimum two years
+        # prior to the model horizon in order to compute growth rates in the
+        # historical period (MACRO's "initializeyear")
         check = self.data['gdp_calibrate']
         data_years = check.index.get_level_values('year')
         min_year_model = min(self.years)
-        min_year_data = min(data_years)
-        if not min_year_data < min_year_model:
-            msg = 'Must provide gdp_calibrate data prior to the modeling' + \
-                ' period in order to calculate growth rates'
+        data_years_before_model = data_years[data_years < min_year_model]
+        if len(data_years_before_model) < 2:
+            msg = 'Must provide two gdp_calibrate data points prior to the ' + \
+                'modeling period in order to calculate growth rates'
             raise ValueError(msg)
         # init year is most recent period PRIOR to the modeled period
-        self.init_year = max(data_years[data_years < min_year_model])
+        self.init_year = max(data_years_before_model)
         # base year is first model period
         self.base_year = min_year_model
 

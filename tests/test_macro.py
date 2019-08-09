@@ -224,8 +224,6 @@ def test_calibrate(westeros_solved):
     start_aeei = clone.par('aeei')['value']
     start_grow = clone.par('grow')['value']
 
-    # TODO: this fails now because it takes 4 iterations to converge, don't
-    # know why, but the original macro-only iterations hit a max value (100)
     macro.calibrate(clone, check_convergence=True)
 
     end_aeei = clone.par('aeei')['value']
@@ -240,5 +238,5 @@ def test_calibrate(westeros_solved):
 
 
 def test_calibrate_roundtrip(westeros_solved):
-    # TODO: make this true when we address above issue
-    westeros_solved.add_macro(DATA_PATH, check_convergence=False)
+    westeros_solved.add_macro(DATA_PATH, check_convergence=True)
+    print(westeros_solved.par('aeei'))
