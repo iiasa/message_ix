@@ -193,12 +193,12 @@ class Calculate(object):
         self.years = set(demand['year'].unique())
 
     def read_data(self):
-        # if 'config' in self.data:
-        #     config = self.data['config']
-        #     rm_nodes = config.get('ignore_nodes', [])
-        #     self.nodes = np.array(set(self.nodes) - set(rm_nodes))
-        #     rm_sectors = config.get('ignore_sectors', [])
-        #     self.sectors = np.array(set(self.sectors) - set(rm_sectors))
+        if 'config' in self.data:
+            # users may remove certain nodes and sectors from the MACRO set
+            # definitions
+            config = self.data['config']
+            self.nodes -= set(config.get('ignore_nodes', []))
+            self.sectors -= set(config.get('ignore_sectors', []))
 
         par_diff = set(VERIFY_INPUT_DATA) - set(self.data)
         if par_diff:
@@ -206,6 +206,9 @@ class Calculate(object):
                 'Missing required input data: {}'.format(par_diff))
 
         for name in self.data:
+            # no need to validate configuration, it was processed above
+            if name == 'config':
+                continue
             idx = _validate_data(name, self.data[name],
                                  self.nodes, self.sectors, self.years)
             self.data[name] = self.data[name].set_index(idx)['value']
