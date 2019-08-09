@@ -206,8 +206,7 @@ class Calculate(object):
         # special check for gdp_calibrate - it must have at minimum two years
         # prior to the model horizon in order to compute growth rates in the
         # historical period (MACRO's "initializeyear")
-        check = self.data['gdp_calibrate']
-        data_years = check.index.get_level_values('year')
+        data_years = self.data['gdp_calibrate'].index.get_level_values('year')
         min_year_model = min(self.years)
         data_years_before_model = data_years[data_years < min_year_model]
         if len(data_years_before_model) < 2:
