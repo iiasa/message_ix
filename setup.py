@@ -29,7 +29,7 @@ INSTALL_REQUIRES = [
 ]
 
 EXTRAS_REQUIRE = {
-    'tests': ['pytest>=3.0.6'],
+    'tests': ['pytest>=4.0'],
     'docs': ['numpydoc', 'sphinx>=1.8', 'sphinx_rtd_theme',
              'sphinxcontrib-bibtex'],
     'reporting': ['pyam-iamc'],
