@@ -85,9 +85,9 @@ def test_calc_growth(westeros_solved):
     c = macro.Calculate(s, DATA_PATH)
     c.read_data()
     obs = c._growth()
-    assert len(obs) == 3
+    assert len(obs) == 4
     obs = obs.values
-    exp = np.array([0.041380, 0.041380, 0.029186])
+    exp = np.array([0.0265836, 0.041380, 0.041380, 0.029186])
     assert np.isclose(obs, exp).all()
 
 
