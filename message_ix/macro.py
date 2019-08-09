@@ -373,12 +373,6 @@ def init(s):
     for key, values in MACRO_INIT['equs'].items():
         s.init_equ(key, values)
 
-    try:
-        # TODO: should this already exist?
-        s.init_set("mapping_macro_sector", ("sector", "commodity", "level"))
-    except:  # noqa: ignore=E722
-        pass  # already exists
-
     # keep track of number of iterations
     s.init_var('N_ITER', None)
     s.init_var('MAX_ITER', None)
