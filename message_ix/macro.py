@@ -188,11 +188,18 @@ class Calculate(object):
             raise RuntimeError('Scenario must have a solution to add MACRO')
 
         demand = s.var('DEMAND', filters={'level': 'useful'})
-        self.nodes = demand['node'].unique()
-        self.sectors = demand['commodity'].unique()
-        self.years = demand['year'].unique()
+        self.nodes = set(demand['node'].unique())
+        self.sectors = set(demand['commodity'].unique())
+        self.years = set(demand['year'].unique())
 
     def read_data(self):
+        # if 'config' in self.data:
+        #     config = self.data['config']
+        #     rm_nodes = config.get('ignore_nodes', [])
+        #     self.nodes = np.array(set(self.nodes) - set(rm_nodes))
+        #     rm_sectors = config.get('ignore_sectors', [])
+        #     self.sectors = np.array(set(self.sectors) - set(rm_sectors))
+
         par_diff = set(VERIFY_INPUT_DATA) - set(self.data)
         if par_diff:
             raise ValueError(
