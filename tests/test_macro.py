@@ -44,6 +44,19 @@ def test_calc_valid_data_dict(westeros_solved):
     c.read_data()
 
 
+def test_config(westeros_solved):
+    s = westeros_solved
+    c = macro.Calculate(s, DATA_PATH)
+    c.nodes = set(list(c.nodes) + ['foo'])
+    c.sectors = set(list(c.sectors) + ['bar'])
+
+    assert c.nodes == set(['Westeros', 'foo'])
+    assert c.sectors == set(['light', 'bar'])
+    c.read_data()
+    assert c.nodes == set(['Westeros'])
+    assert c.sectors == set(['light'])
+
+
 def test_calc_no_solution(westeros_not_solved):
     s = westeros_not_solved
     pytest.raises(RuntimeError, macro.Calculate, s, DATA_PATH)
