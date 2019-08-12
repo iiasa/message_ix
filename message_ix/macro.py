@@ -245,8 +245,8 @@ class Calculate(object):
     def _growth(self):
         gdp = self.data['gdp_calibrate']
         diff = gdp.groupby(level='node').diff()
-        years = gdp.index.get_level_values('year')
-        dt = pd.Series(years, name='year', index=years).diff()
+        years = sorted(gdp.index.get_level_values('year').unique())
+        dt = pd.Series(years, index=pd.Index(years, name='year')).diff()
         growth = (diff / gdp + 1) ** (1 / dt) - 1
         growth.name = 'value'
         self.data['growth'] = growth.dropna()
