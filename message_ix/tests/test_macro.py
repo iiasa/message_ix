@@ -34,23 +34,24 @@ class MockScenario:
         return True
 
     def var(self, name, **kwargs):
+        df = self.data['aeei']
+        # add extra commodity to be removed
+        extra_commod = df[df.sector == 'i_therm']
+        extra_commod['sector'] = self.data['config']['ignore_sectors'][0]
+        # add extra region to be removed
+        extra_region = df[df.node == 'R11_AFR']
+        extra_region['node'] = self.data['config']['ignore_nodes'][0]
+        df = pd.concat([df, extra_commod, extra_region])
+
         if name == 'DEMAND':
-            df = (
-                self.data['aeei']
-                .rename(columns={'sector': 'commodity'})
-            )
-            # must provide two data points before history
-            return df
-        if name in ['COST_NODAL_NET', 'PRICE_COMMODITY']:
-            df = (
-                self.data['aeei']
-                .rename(columns={
-                    'sector': 'commodity',
-                    'value': 'lvl'
-                })
-            )
+            df = df.rename(columns={'sector': 'commodity'})
+        elif name in ['COST_NODAL_NET', 'PRICE_COMMODITY']:
+            df = df.rename(columns={
+                'sector': 'commodity',
+                'value': 'lvl'
+            })
             df['lvl'] = 1e3
-            return df
+        return df
 
 
 # TODO: what scope should these be?
