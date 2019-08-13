@@ -228,6 +228,15 @@ class Calculate(object):
         # base year is first model period
         self.base_year = min_year_model
 
+    def _clean_model_data(self, data):
+        if 'node' in data:
+            data = data[data['node'].isin(self.nodes)]
+        if 'commodity' in data:
+            data = data[data['commodity'].isin(self.sectors)]
+        if 'year' in data:
+            data = data[data['year'].isin(self.years)]
+        return data
+
     def derive_data(self):
         # calculate all necessary derived data, adding to self.data this is
         # done through method chaining, the bottom of which is aconst()
@@ -278,7 +287,7 @@ class Calculate(object):
         idx = ['node', 'year']
         # TODO: in the R code, this value is divided by 1000
         # do we need to do that here?!!?
-        model_cost = self.s.var('COST_NODAL_NET')
+        model_cost = self._clean_model_data(self.s.var('COST_NODAL_NET'))
         model_cost.rename(columns={'lvl': 'value'}, inplace=True)
         model_cost = model_cost[idx + ['value']]
         # get data provided in init year from data
@@ -295,8 +304,9 @@ class Calculate(object):
     def _price(self):
         # read from scenario
         idx = ['node', 'sector', 'year']
-        model_price = self.s.var('PRICE_COMMODITY',
-                                 filters={'level': 'useful'})
+        model_price = self._clean_model_data(
+            self.s.var('PRICE_COMMODITY', filters={'level': 'useful'})
+        )
         if np.isclose(model_price['lvl'], 0).any():
             # TODO: this needs a test..
             msg = '0-price found in MESSAGE variable PRICE_COMMODITY'
@@ -319,7 +329,9 @@ class Calculate(object):
     def _demand(self):
         # read from scenario
         idx = ['node', 'sector', 'year']
-        model_demand = self.s.var('DEMAND', filters={'level': 'useful'})
+        model_demand = self._clean_model_data(
+            self.s.var('DEMAND', filters={'level': 'useful'})
+        )
         model_demand.rename(columns={'lvl': 'value', 'commodity': 'sector'},
                             inplace=True)
         model_demand = model_demand[idx + ['value']]
@@ -381,7 +393,12 @@ def init(s):
             except:  # noqa: ignore=E722
                 s.init_var(key)
     for key, values in MACRO_INIT['equs'].items():
-        s.init_equ(key, values)
+        try:
+            s.init_equ(key, values)
+        except:
+            # TODO: what to do with scenarios that already have structure? It
+            # seems that some do and some dont.
+            pass
 
     # keep track of number of iterations
     s.init_var('N_ITER', None)
