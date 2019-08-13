@@ -375,7 +375,12 @@ class Calculate(object):
 
 def init(s):
     for key, values in MACRO_INIT['sets'].items():
-        s.init_set(key, values)
+        try:
+            s.init_set(key, values)
+        except:  # noqa: ignore=E722
+            # TODO: what to do with scenarios that already have structure? It
+            # seems that some do and some dont.
+            pass
     for key, values in MACRO_INIT['pars'].items():
         try:
             s.init_par(key, values['idx'])
