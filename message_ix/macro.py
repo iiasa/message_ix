@@ -395,7 +395,7 @@ def init(s):
     for key, values in MACRO_INIT['equs'].items():
         try:
             s.init_equ(key, values)
-        except:
+        except:  # noqa: ignore=E722
             # TODO: what to do with scenarios that already have structure? It
             # seems that some do and some dont.
             pass
