@@ -316,14 +316,21 @@ def test_multiregion_derive_data():
     c.read_data()
     c.derive_data()
 
+    nodes = ['R11_AFR', 'R11_CPA']
+    sectors = ['i_therm', 'rc_spec']
+
+    # make sure no extraneous data is there
+    check = c.data['demand'].reset_index()
+    assert (check['node'].unique() == nodes).all()
+    assert (check['sector'].unique() == sectors).all()
+
     obs = c.data['aconst']
     exp = pd.Series([3.74767687, 0.00285472], name='value',
-                    index=pd.Index(['R11_AFR', 'R11_CPA'], name='node'))
+                    index=pd.Index(nodes, name='node'))
     pd.testing.assert_series_equal(obs, exp)
 
     obs = c.data['bconst']
-    idx = pd.MultiIndex.from_product([['R11_AFR', 'R11_CPA'],
-                                      ['i_therm', 'rc_spec']],
+    idx = pd.MultiIndex.from_product([nodes, sectors],
                                      names=['node', 'sector'])
     exp = pd.Series([1.071971e-08, 1.487598e-11, 9.637483e-09, 6.955715e-13],
                     name='value', index=idx)
