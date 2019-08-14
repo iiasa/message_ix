@@ -285,11 +285,12 @@ class Calculate(object):
     def _total_cost(self):
         # read from scenario
         idx = ['node', 'year']
-        # TODO: in the R code, this value is divided by 1000
-        # do we need to do that here?!!?
         model_cost = self._clean_model_data(self.s.var('COST_NODAL_NET'))
         model_cost.rename(columns={'lvl': 'value'}, inplace=True)
         model_cost = model_cost[idx + ['value']]
+        # TODO: in the R code, this value is divided by 1000
+        # do we need to do that here?!!?
+        model_cost['value'] /= 1e3
         # get data provided in init year from data
         cost_ref = self.data['cost_ref'].reset_index()
         cost_ref['year'] = self.init_year
