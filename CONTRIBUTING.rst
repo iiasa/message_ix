@@ -25,7 +25,7 @@ Then, if your issue is not found, `open a new one <https://github.com/iiasa/mess
 
 
 Contributing code via Github PRs
---------------------------------``
+--------------------------------
 
 See the `short introduction to the Github flow <https://guides.github.com/introduction/flow/>`_, which describes a **pull request** and how it is used.
 Use online documentation for git, Github, and Python to ensure you are able to complete the process below.
@@ -36,15 +36,15 @@ Register a Github account, if you do not already have one.
 
 Decide: to which part of the |MESSAGEix| software stack should your code be added?
 
-``ixmp``:
+``ixmp``
    Contributions not specific to |MESSAGEix| model framework, e.g. that could be used for other, non-MESSAGE models.
-``message_ix``:
+``message_ix``
    Contributions not specific to *any particular MESSAGEix* model instance.
    Additions to ``message_ix`` should be usable in any MESSAGE-scheme model.
-``message_data``, ``message_doc``:
+``message_data`` or ``message_doc``
    Contributions to the MESSAGE-GLOBIOM family of models, including the global
    model; and its documentation, respectively.
-``ixmp_source``:
+``ixmp_source``
    Java / JDBC backend for ``ixmp``.
 
 2. Fork, branch, and open a pull request
@@ -148,7 +148,7 @@ Developers **must** ensure new features (including ``message_ix.tools`` submodul
 This can be done via the API documentation (this site) and, optionally, a tutorial.
 These have complementary purposes:
 
-- The API documentation, built using Sphinx and ReadTheDocs, must completely, but succintly, *describe the arguments and behaviour* of every class and method in the code.
+- The API documentation (built using Sphinx and ReadTheDocs) must completely, but succinctly, *describe the arguments and behaviour* of every class and method in the code.
 - Tutorials serve as *structured learning exercises* for the classroom or self-study.
   The intended learning outcome for each tutorial is that students understand how the model framework API may be used for scientific research, and can begin to implement their own models or model changes.
 
@@ -163,7 +163,10 @@ Coding & writing style
 - When relevant, provide links to publications or sources that provide greater detail for the methodology, data, or other packages used.
 - Providing the mathematical formulation in the tutorial itself is optional.
 - Framework specific variables and parameters or functions must be in italic.
+- Relevant figures, tables, or diagrams should be added to the tutorial if these can help users to understand concepts.
 
+  - Place rendered versions of graphics in a directory with the tutorial (see `Location`_ below).
+    Use SVG, PNG, JPG, or other web-ready formats.
 
 Structure
 ~~~~~~~~~
@@ -182,11 +185,13 @@ Generally, a tutorial should have the following elements or sections.
   - A brief explanation of the step.
   - A link to any relevant mathematical documentation.
 
-- Results:
+- Modeling results and visualizations:
 
-  - Results should be retrieved using the generic reporting tool.
+  - Model outputs and post-processing calculations in tutorials should demonstrate usage of the :doc:`message_ix.reporting module <reporting>`.
   - Plots to depict results should use `pyam <https://github.com/IAMconsortium/pyam/>`_.
+  - Include a brief discussion of insights from the results, in line with the learning objectives.
 
+- Exercises: include self-test questions, small activities, and exercises at the end of a tutorial so that users (and instructors, if any) can check their learning.
 
 Location
 ~~~~~~~~
