@@ -49,7 +49,7 @@ See `doc/README.md` for further details.
 
 ### Installation
 
-See [‘Installation’ in the documentation](https://message.iiasa.ac.at/en/v1.2/getting_started.html) or the file `INSTALL.rst`.
+See [‘Installation’ in the documentation](https://message.iiasa.ac.at/en/v1.2.0/getting_started.html) or the file `INSTALL.rst`.
 
 
 ### Tutorials
