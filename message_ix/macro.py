@@ -480,17 +480,16 @@ def calibrate(s, check_convergence=True):
     s.set_as_default()
 
     # test to make sure number of iterations is 1
-    test = s.clone(s.model, 'test to confirm MACRO converges')
-    test.set_as_default()
-    var_list = ['N_ITER']
-    test.solve(model='MESSAGE-MACRO', var_list=var_list, gams_args=gams_args)
+    if check_convergence:
+        test = s.clone(s.model, 'test to confirm MACRO converges')
+        var_list = ['N_ITER']
+        test.solve(model='MESSAGE-MACRO',
+                   var_list=var_list, gams_args=gams_args)
+        test.set_as_default()
 
-    n_iter = test.var('N_ITER')['lvl']
-    if n_iter > 1:
-        msg = 'Number of iterations after calibration > 1: {}'.format(n_iter)
-        if check_convergence:
-            raise RuntimeError(msg)
-        else:
-            warnings.warn(msg)
+        n_iter = test.var('N_ITER')['lvl']
+        if n_iter > 1:
+            msg = 'Number of iterations after calibration > 1: {}'
+            raise RuntimeError(msg.format(n_iter))
 
     return s
