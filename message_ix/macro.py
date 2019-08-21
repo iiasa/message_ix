@@ -477,9 +477,11 @@ def calibrate(s, check_convergence=True):
     s.add_par('aeei', aeei)
     s.add_par('grow', grow)
     s.commit('Updating MACRO values after calibration')
+    s.set_as_default()
 
     # test to make sure number of iterations is 1
     test = s.clone(s.model, 'test to confirm MACRO converges')
+    test.set_as_default()
     var_list = ['N_ITER']
     test.solve(model='MESSAGE-MACRO', var_list=var_list, gams_args=gams_args)
 
