@@ -429,14 +429,14 @@ class Scenario(ixmp.Scenario):
         """
         super().solve(model=model, solve_options=solve_options, **kwargs)
 
-    def add_macro(self, data, scenario=None, check_convergence=True):
+    def add_macro(self, data, scenario=None, check_convergence=True, **kwargs):
         scenario = scenario or '_'.join([self.scenario, 'macro'])
         clone = self.clone(self.model, scenario, keep_solution=False)
         clone.check_out()
         macro.init(clone)
         macro.add_model_data(self, clone, data)
         clone.commit('finished adding macro')
-        macro.calibrate(clone, check_convergence=check_convergence)
+        macro.calibrate(clone, check_convergence=check_convergence, **kwargs)
         return clone
 
     def rename(self, name, mapping, keep=False):
