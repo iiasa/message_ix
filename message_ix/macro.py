@@ -448,7 +448,7 @@ def add_model_data(base, clone, data):
             raise type(e)(msg + str(e))
 
 
-def calibrate(s, check_convergence=True):
+def calibrate(s, check_convergence=True, **kwargs):
     # solve MACRO standalone
     var_list = ['N_ITER', 'MAX_ITER', 'aeei_calibrate', 'grow_calibrate']
     gams_args = ['LogOption=2']  # pass everything to log file
@@ -482,8 +482,8 @@ def calibrate(s, check_convergence=True):
     if check_convergence:
         test = s.clone(s.model, 'test to confirm MACRO converges')
         var_list = ['N_ITER']
-        test.solve(model='MESSAGE-MACRO',
-                   var_list=var_list, gams_args=gams_args)
+        kwargs['gams_args'] = kwargs.get('gams_args', gams_args)
+        test.solve(model='MESSAGE-MACRO', var_list=var_list, **kwargs)
         test.set_as_default()
 
         n_iter = test.var('N_ITER')['lvl']
