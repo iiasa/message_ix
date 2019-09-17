@@ -382,7 +382,6 @@ def add_year_par(sc_ref, sc_new, yrs_new, parname, region_list, firstyear_new,
 #   V.B.3) Parameters with two indexes related to time (such as 'input')
     elif len(year_list) == 2:
         year_col = 'year_act'
-        node_col = 'node_loc'
         year_ref = [x for x in year_list if x != year_col][0]
 
         def f(x, i):
@@ -818,9 +817,10 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
             df3.loc[df3.index.get_level_values(year_ref).isin([y]),
                     df3.columns.isin(df_dur.columns)
                     ] = df_dur.loc[y, df_dur.columns.isin(df3.columns)].values
-
+        node_column = [x for x in idx if
+                       any(y in x for y in ['node', 'node_loc'])][0]
         df3 = df3.reset_index().set_index(
-            ['node_loc', 'technology', year_ref]).sort_index(level=1)
+            [node_column, 'technology', year_ref]).sort_index(level=1)
         par_tec = par_tec.set_index(
             ['node_loc', 'technology', year_ref]).sort_index(level=1)
 
