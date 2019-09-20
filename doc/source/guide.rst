@@ -8,3 +8,13 @@ common model design choices.
 
    efficiency
    debugging
+   reporting
+
+Model-building tools
+--------------------
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   tools/*

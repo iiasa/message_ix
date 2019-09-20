@@ -10,7 +10,7 @@ import zipfile
 from six.moves.urllib.request import urlretrieve
 
 from message_ix.default_path_constants import CONFIG_PATH, DEFAULT_MODEL_PATH
-from message_ix.utils import logger
+from ixmp.utils import logger
 
 
 def recursive_copy(src, dst, overwrite=False, skip_ext=[]):

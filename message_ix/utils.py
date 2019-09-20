@@ -1,34 +1,8 @@
 import collections
 import copy
-import itertools
-import logging
-import six
 
 import numpy as np
 import pandas as pd
-
-# globally accessible logger
-_LOGGER = None
-
-
-def logger():
-    """Access global logger"""
-    global _LOGGER
-    if _LOGGER is None:
-        logging.basicConfig()
-        _LOGGER = logging.getLogger()
-        _LOGGER.setLevel('INFO')
-    return _LOGGER
-
-
-def isstr(x):
-    """Returns True if x is a string"""
-    return isinstance(x, six.string_types)
-
-
-def isscalar(x):
-    """Returns True if x is a scalar"""
-    return not isinstance(x, collections.Iterable) or isstr(x)
 
 
 def make_df(base, **kwargs):

@@ -1,14 +1,13 @@
 import os
-import ixmp
-import message_ix
-import pytest
 
+import ixmp
 import numpy as np
+from numpy import testing as npt
 import pandas as pd
 import pandas.util.testing as pdt
 
 from message_ix import Scenario
-from numpy import testing as npt
+
 
 msg_args = ('canning problem (MESSAGE scheme)', 'standard')
 msg_multiyear_args = ('canning problem (MESSAGE scheme)', 'multi-year')
@@ -181,7 +180,8 @@ def test_new_timeseries_long_name64(test_mp):
     scen.check_out(timeseries_only=True)
     df = pd.DataFrame({
         'region': ['India', ],
-        'variable': ['Emissions|CO2|Energy|Demand|Transportation|Aviation|Domestic|Fre', ],
+        'variable': [('Emissions|CO2|Energy|Demand|Transportation|Aviation|'
+                      'Domestic|Fre'), ],
         'unit': ['Mt CO2/yr', ],
         '2012': [0.257009, ]
     })
@@ -195,7 +195,8 @@ def test_new_timeseries_long_name64plus(test_mp):
     scen.check_out(timeseries_only=True)
     df = pd.DataFrame({
         'region': ['India', ],
-        'variable': ['Emissions|CO2|Energy|Demand|Transportation|Aviation|Domestic|Freight|Oil', ],
+        'variable': [('Emissions|CO2|Energy|Demand|Transportation|Aviation|'
+                      'Domestic|Freight|Oil'), ],
         'unit': ['Mt CO2/yr', ],
         '2012': [0.257009, ]
     })
@@ -205,25 +206,21 @@ def test_new_timeseries_long_name64plus(test_mp):
 
 def test_rename_technology(test_mp):
     scen = Scenario(test_mp, *msg_args)
-    scen.solve()
     assert scen.par('output')['technology'].isin(['canning_plant']).any()
-    exp_obj = scen.var('OBJ')['lvl']
 
-    clone = scen.clone('foo', 'bar', keep_solution=False)
+    clone = scen.clone('foo', 'bar')
     clone.rename('technology', {'canning_plant': 'foo_bar'})
     assert not clone.par('output')['technology'].isin(['canning_plant']).any()
     assert clone.par('output')['technology'].isin(['foo_bar']).any()
     clone.solve()
-    obs_obj = clone.var('OBJ')['lvl']
-    assert obs_obj == exp_obj
+    assert np.isclose(clone.var('OBJ')['lvl'], 153.675)
 
 
 def test_rename_technology_no_rm(test_mp):
     scen = Scenario(test_mp, *msg_args)
-    scen.solve()
     assert scen.par('output')['technology'].isin(['canning_plant']).any()
 
-    clone = scen.clone('foo', 'bar', keep_solution=False)
+    clone = scen.clone('foo', 'bar')
     # also test if already checked out
     clone.check_out()
 
@@ -245,61 +242,11 @@ def test_excel_read_write(test_mp):
     obs = scen2.par('input')
     pdt.assert_frame_equal(exp, obs)
 
-    scen1.solve()
     scen2.commit('foo')  # must be checked in
     scen2.solve()
-    exp = scen1.var('OBJ')['lvl']
-    obs = scen2.var('OBJ')['lvl']
-    assert exp == obs
+    assert np.isclose(scen2.var('OBJ')['lvl'], 153.675)
 
     os.remove(fname)
-
-
-def test_add_bound_activity_up_modes(test_mp):
-    def calculate(scen):
-        return (
-            scen
-            .var('ACT')
-            .groupby(['technology', 'mode'])['lvl']
-            .sum()
-            .loc['transport_from_seattle']
-        )
-
-    scen = Scenario(test_mp, *msg_args)
-    scen.solve()
-
-    # data for act bound
-    data = pd.DataFrame({
-        'node_loc': 'seattle',
-        'technology': 'transport_from_seattle',
-        'year_act': 2010,
-        'time': 'year',
-        'unit': 'cases',
-    }, index=[0])
-
-    # test limiting one mode
-    clone = scen.clone('foo', 'bar', keep_solution=False)
-    clone.check_out()
-    exp = 0.5 * calculate(scen).sum()
-    data['mode'] = 'to_chicago'
-    data['value'] = exp
-    clone.add_par('bound_activity_up', data)
-    clone.commit('foo')
-    clone.solve()
-    obs = calculate(clone).loc['to_chicago']
-    assert np.isclose(obs, exp)
-
-    # test limiting all modes
-    clone2 = scen.clone('foo', 'baz', keep_solution=False)
-    clone2.check_out()
-    exp = 0.95 * calculate(scen).sum()
-    data['mode'] = 'all'
-    data['value'] = exp
-    clone2.add_par('bound_activity_up', data)
-    clone2.commit('foo')
-    clone2.solve()
-    obs = calculate(clone2).sum()
-    assert np.isclose(obs, exp)
 
 
 def test_clone(tmpdir):

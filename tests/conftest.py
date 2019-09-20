@@ -1,56 +1,46 @@
-import os
+try:
+    from pathlib import Path
+except ImportError:
+    from pathlib2 import Path
+
+import message_ix
+from ixmp import Platform
+from ixmp.testing import create_local_testdb
 import pytest
-import shutil
-import tempfile
-
-import ixmp
 
 
-here = os.path.dirname(os.path.realpath(__file__))
+# Use the fixtures test_mp, test_mp_props, and tmp_env from ixmp.testing
+pytest_plugins = ['ixmp.testing']
 
 
-def tempdir():
-    return os.path.join(tempfile._get_default_tempdir(),
-                        next(tempfile._get_candidate_names()))
+# Hooks
+
+def pytest_report_header(config, startdir):
+    """Add the message_ix import path to the pytest report header."""
+    return 'message_ix location: {}'.format(Path(message_ix.__file__).parent)
 
 
-def create_local_testdb():
-    # copy testdb
-    dst = tempdir()
-    test_props = os.path.join(dst, 'test.properties')
-    src = os.path.join(here, 'testdb')
-    shutil.copytree(src, dst)
+# Fixtures
 
-    # create properties file
-    fname = os.path.join(here, 'testdb', 'test.properties_template')
-    with open(fname, 'r') as f:
-        lines = f.read()
-        lines = lines.format(here=dst.replace("\\", "/"))
-    with open(test_props, 'w') as f:
-        f.write(lines)
-
-    return test_props
+@pytest.fixture(scope='session')
+def test_data_path(request):
+    """Path to the directory containing test data."""
+    return Path(__file__).parent / 'data'
 
 
-@pytest.fixture(scope="session")
-def test_mp():
-    test_props = create_local_testdb()
+@pytest.fixture(scope='session')
+def tutorial_path(request):
+    """Path to the directory containing the tutorials."""
+    return Path(__file__).parent / '..' / 'tutorial'
 
-    # start jvm
-    ixmp.start_jvm()
 
-    # launch Platform and connect to testdb (reconnect if closed)
-    mp = ixmp.Platform(test_props)
-    mp.open_db()
+@pytest.fixture(scope='session')
+def test_legacy_mp(tmp_path_factory, test_data_path):
+    """Path to a database properties file referring to a test database."""
+    # adapting `ixmp.testing:test_mp()`
+    db_path = Path(str(tmp_path_factory.mktemp('test_mp_props')))
+    db_name = 'message_ix_legacy'
+    props = create_local_testdb(db_path, test_data_path / 'testdb', db_name)
+    mp = Platform(props)
 
     yield mp
-
-
-@pytest.fixture(scope="session")
-def test_mp_props():
-    test_props = create_local_testdb()
-
-    # start jvm
-    ixmp.start_jvm()
-
-    yield test_props

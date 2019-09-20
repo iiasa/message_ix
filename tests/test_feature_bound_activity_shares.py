@@ -17,7 +17,7 @@ def calculate_activity(scen, tec='transport_from_seattle'):
 
 
 def test_add_bound_activity_up(test_mp):
-    scen = Scenario(test_mp, *msg_args)
+    scen = Scenario(test_mp, *msg_args).clone()
     scen.solve()
 
     # data for act bound
@@ -47,7 +47,7 @@ def test_add_bound_activity_up(test_mp):
 
 
 def test_add_bound_activity_up_all_modes(test_mp):
-    scen = Scenario(test_mp, *msg_args)
+    scen = Scenario(test_mp, *msg_args).clone()
     scen.solve()
 
     # data for act bound
@@ -132,7 +132,7 @@ def test_commodity_share_up(test_mp):
                   }, index=[0]))
 
     # initial data
-    scen = Scenario(test_mp, *msg_args)
+    scen = Scenario(test_mp, *msg_args).clone()
     scen.solve()
     exp = 0.5
 
@@ -195,7 +195,7 @@ def test_commodity_share_up(test_mp):
 
 
 def test_share_commodity_lo(test_mp):
-    scen = Scenario(test_mp, *msg_args)
+    scen = Scenario(test_mp, *msg_args).clone()
     scen.solve()
 
     # data for share bound
@@ -255,7 +255,7 @@ def test_share_commodity_lo(test_mp):
 
 
 def test_add_share_mode_up(test_mp):
-    scen = Scenario(test_mp, *msg_args)
+    scen = Scenario(test_mp, *msg_args).clone()
     scen.solve()
 
     # data for share bound
@@ -293,7 +293,7 @@ def test_add_share_mode_up(test_mp):
 
 
 def test_add_share_mode_lo(test_mp):
-    scen = Scenario(test_mp, *msg_args)
+    scen = Scenario(test_mp, *msg_args).clone()
     scen.solve()
 
     # data for share bound

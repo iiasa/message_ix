@@ -1,8 +1,33 @@
 
 # Next Release
 
+# v1.2.0
+
+MESSAGEix 1.2.0 adds an option to set the commodity balance to strict equality,
+rather than a supply > demand inequality. It also improves the support for
+models with non-equidistant years.
+
+Other improvements include an experimental reporting module, support for CPLEX
+solver options via `Scenario.solve()`, and a reusable `message_ix.testing`
+module.
+
+Release 1.2.0 coincides with ixmp
+[release 0.2.0](https://github.com/iiasa/ixmp/releases/tag/v0.2.0), which
+provides full support for `Scenario.clone()` across platforms (database
+instances), e.g. from a remote database to a local HSQL database; as well as
+other improvements. See the ixmp release notes for further details.
+
+## All changes
+
+- [#161](https://github.com/iiasa/message_ix/pull/161): A feature for adding new periods to a scenario.
+- [#205](https://github.com/iiasa/message_ix/pull/205): Implement required changes related to timeseries-support and cloning across platforms (see [ixmp:#142](https://github.com/iiasa/ixmp/pull/142)).
+- [#196](https://github.com/iiasa/message_ix/pull/196): Improve testing by re-using :mod:`ixmp` apparatus.
+- [#187](https://github.com/iiasa/message_ix/pull/187): Test for cumulative bound on emissions.
 - [#182](https://github.com/iiasa/message_ix/pull/182): Fix cross-platform cloning.
+- [#178](https://github.com/iiasa/message_ix/pull/178): Bugfix of the `PRICE_EMISSION` variable in models with non-equidistant period durations (#167)._
+- [#176](https://github.com/iiasa/message_ix/pull/176): Add `message_ix.reporting` module.
 - [#173](https://github.com/iiasa/message_ix/pull/173): The `solve` command now takes additional arguments when solving with CPLEX. The `cplex.opt` file is now generated on the fly during the solve command and removed after successfully solving.
+- [#172](https://github.com/iiasa/message_ix/pull/172): Add option to set `COMMODITY_BALANCE` to equality.
 - [#154](https://github.com/iiasa/message_ix/pull/154): Enable documentation build on ReadTheDocs.
 - [#138](https://github.com/iiasa/message_ix/pull/138): Update documentation and tutorials.
 - [#131](https://github.com/iiasa/message_ix/pull/131): Update clone function argument `scen` to `scenario` with planned deprecation of the former.
@@ -103,6 +128,7 @@ jdbc.pwd = ixmp
 
 ## Updates
 
+- [#202](https://github.com/iiasa/message_ix/pull/202): Added the "Development rule of thumb" section from the wiki and the Tutorial style guide to the Contributor guidelines. Tweaked some formatting to improve readibility
 - [#113](https://github.com/iiasa/message_ix/pull/113): Upgrading to MESSAGEix 1.1: improved representation of renewables, share constraints, etc.
 - [#109](https://github.com/iiasa/message_ix/pull/109): MACRO module added for initializing models to be solved with MACRO. Added scenario-based CI on circleci.
 - [#99](https://github.com/iiasa/message_ix/pull/99): Fixing an error in the compuation of the auxiliary GAMS reporting variable `PRICE_EMISSION`
@@ -119,5 +145,4 @@ jdbc.pwd = ixmp
 - [#65](https://github.com/iiasa/message_ix/pull/65): Bugfix for downloading tutorials. Now downloads current installed version by default.
 - [#60](https://github.com/iiasa/message_ix/pull/60): Add basic ability to write and read model input to/from Excel
 - [#59](https://github.com/iiasa/message_ix/pull/59): Added MacOSX CI support
-- [#187](https://github.com/iiasa/message_ix/pull/187): Test for cumulative bound on emissions
 - [#189](https://github.com/iiasa/message_ix/pull/189): Adding a Westeros tutorial for modelling seasonality
