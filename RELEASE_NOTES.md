@@ -31,6 +31,7 @@ other improvements. See the ixmp release notes for further details.
 - [#154](https://github.com/iiasa/message_ix/pull/154): Enable documentation build on ReadTheDocs.
 - [#138](https://github.com/iiasa/message_ix/pull/138): Update documentation and tutorials.
 - [#131](https://github.com/iiasa/message_ix/pull/131): Update clone function argument `scen` to `scenario` with planned deprecation of the former.
+- [#232](https://github.com/iiasa/message_ix/pull/189): Adding a Westeros tutorial for modelling seasonality and updating the existing ones
 
 # v1.1.0
 
@@ -145,4 +146,3 @@ jdbc.pwd = ixmp
 - [#65](https://github.com/iiasa/message_ix/pull/65): Bugfix for downloading tutorials. Now downloads current installed version by default.
 - [#60](https://github.com/iiasa/message_ix/pull/60): Add basic ability to write and read model input to/from Excel
 - [#59](https://github.com/iiasa/message_ix/pull/59): Added MacOSX CI support
-- [#189](https://github.com/iiasa/message_ix/pull/189): Adding a Westeros tutorial for modelling seasonality
