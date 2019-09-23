@@ -131,6 +131,7 @@ def storage_setup(test_mp, time_duration, comment):
     year_to_time(scen, 'var_cost', fixed_share)
     demand_share = {'a': 0.15, 'b': 0.2, 'c': 0.4, 'd': 0.25}
     year_to_time(scen, 'demand', demand_share)
+    # init_storage(scen)
     scen.commit('initialized test model')
     scen.solve(case='no_storage' + comment)
 
@@ -161,17 +162,18 @@ def storage_setup(test_mp, time_duration, comment):
     # Or, activity of expensive technology should be lower with storage
     assert act_with < act_no
 
-    # I.2. Activity of discharger should be always <= activity of charger
+    # I.2. Activity of discharger <= activity of charger + initial content
     act_pump = scen.var('ACT', {'technology': 'pump'})['lvl']
     act_turb = scen.var('ACT', {'technology': 'turbine'})['lvl']
-    assert act_turb.sum() <= act_pump.sum()
+    initial_content = float(scen.par('init_storage')['value'])
+    assert act_turb.sum() <= act_pump.sum() + initial_content
 
-    # I.3. Max activity of charger is lower than storage capacity
+    # I.3. Max activity of charger <= storage capacity
     max_pump = max(act_pump)
     cap_storage = float(scen.var('CAP', {'technology': 'dam'})['lvl'])
     assert max_pump <= cap_storage
 
-    # I.4. Max activity of discharger is lower than storage capacity - losses
+    # I.4. Max activity of discharger <= storage capacity - losses
     max_turb = max(act_turb)
     loss = scen.par('storage_loss')['value'][0]
     assert max_turb <= cap_storage * (1 - loss)
