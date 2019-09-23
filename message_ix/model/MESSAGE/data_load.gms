@@ -177,8 +177,11 @@ discharge_tec(tec)$(
      SUM((node,mode,commodity,level_storage,year_all,time), map_tec_discharge(node,tec,mode,commodity,level_storage,year_all,time) ) ) = yes;
 
 * mapping of storage reservoir technologies to their levels and charge/discharge technologies
-map_tec_storage_level(node,tec,storage_tec,level_storage,year_all,time)$(
-    storage_loss(node,storage_tec,level_storage,year_all,time) AND map_tec_storage(tec,storage_tec) ) = yes;
+map_tec_storage_level(node,tec,storage_tec,level_storage,year_all,time)$(map_tec_storage(tec, storage_tec) AND
+     ( SUM((node2,year_all2,mode,commodity,time_act),
+        input(node2,tec,year_all,year_all2,mode,node,commodity,level_storage,time_act,time) ) OR
+     SUM((node2,year_all2,mode,commodity,time_act),
+        output(node2,tec,year_all,year_all2,mode,node,commodity,level_storage,time_act,time) ) ) ) = yes;
 
 *----------------------------------------------------------------------------------------------------------------------*
 * sanity checks on the data set                                                                                        *

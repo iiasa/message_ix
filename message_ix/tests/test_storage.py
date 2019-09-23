@@ -122,6 +122,7 @@ def add_storage_data(scen, time_order):
 
 # Main function for building a model and adding seasonality and storage
 def storage_setup(test_mp, time_duration, comment):
+
     # First building a simple model and adding seasonality
     scen = Scenario(test_mp, 'no_storage', 'standard', version='new')
     model_setup(scen, [2020])
@@ -131,7 +132,6 @@ def storage_setup(test_mp, time_duration, comment):
     year_to_time(scen, 'var_cost', fixed_share)
     demand_share = {'a': 0.15, 'b': 0.2, 'c': 0.4, 'd': 0.25}
     year_to_time(scen, 'demand', demand_share)
-    # init_storage(scen)
     scen.commit('initialized test model')
     scen.solve(case='no_storage' + comment)
 
@@ -156,8 +156,8 @@ def storage_setup(test_mp, time_duration, comment):
     cost_with_storage = scen.var('OBJ')['lvl']
     act_with = scen.var('ACT', {'technology': 'tec2'})['lvl'].sum()
 
-    # I. Tests for functionality of storage
-    # I.1. Contribution of storage to the system
+    # I. Tests for the functionality of storage
+    # I.1. Check the contribution of storage to the system
     assert cost_with_storage < cost_no_storage
     # Or, activity of expensive technology should be lower with storage
     assert act_with < act_no
