@@ -79,7 +79,7 @@ class Plots(object):
         df = self.model_data('CAP', baseyear=baseyear, subset=subset)
         df.plot.bar(stacked=True)
         plt.title('{} Energy System Capacity'.format(self.country.title()))
-        plt.ylabel('GWa')
+        plt.ylabel('GW')
         plt.xlabel('Year')
         plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
 
@@ -91,7 +91,7 @@ class Plots(object):
         df = pd.concat([h, m]) if not h.empty else m
         df.plot.bar(stacked=True)
         plt.title('{} Energy System New Capcity'.format(self.country.title()))
-        plt.ylabel('GWa')
+        plt.ylabel('GW')
         plt.xlabel('Year')
         plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
 
