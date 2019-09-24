@@ -2,7 +2,7 @@
 jupyter
 nbformat
 numpydoc
-pyam-iamc
+-e git://github.com/IAMconsortium/pyam.git#egg=ixmp
 pytest
 sphinx>=1.8
 sphinx_rtd_theme
