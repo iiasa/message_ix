@@ -2,7 +2,8 @@
 jupyter
 nbformat
 numpydoc
-pyam-iamc
+# Temporary; remove once pyam 0.2.1 is released
+-e git://github.com/IAMconsortium/pyam.git#egg=pyam
 pytest
 sphinx>=1.8
 sphinx_rtd_theme
