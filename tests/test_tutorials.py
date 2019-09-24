@@ -26,7 +26,8 @@ AT = 'Austrian_energy_system'
 #    b. Expected objective value.
 tutorials = [
     (('westeros', 'westeros_baseline'),
-     [('solve-objective-value', 233404.359375)]),
+     [('solve-objective-value', 238193.291167)]),
+
     # on Python 2:
     # 'solve-objective-value', 187445.953125),
     (('westeros', 'westeros_emissions_bounds'), []),
