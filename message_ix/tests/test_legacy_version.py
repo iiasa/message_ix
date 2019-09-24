@@ -13,6 +13,6 @@ def test_solve_legacy_scenario(tmp_path, test_data_path):
     exp = scen.var('OBJ')['lvl']
 
     # solve scenario, assert that the new objective value is close to previous
-    scen.remove_solution()
+    scen = scen.clone(keep_solution=False)
     scen.solve()
     assert np.isclose(exp, scen.var('OBJ')['lvl'])
