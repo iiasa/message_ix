@@ -67,6 +67,7 @@ uses it to illustrate a range of framework features.
 3. `Limit emissions using a tax <https://github.com/iiasa/message_ix/blob/master/tutorial/westeros/westeros_emissions_taxes.ipynb>`_ instead of a bound.
 4. `Represent both coal and wind electricity <https://github.com/iiasa/message_ix/blob/master/tutorial/westeros/westeros_firm_capacity.ipynb>`_, using a “firm capacity” formulation: each generation technology can supply some firm capacity, but the variable, renewable technology (wind) supplies less than coal.
 5. Represent coal and wind electricity using a different, `“flexibility requirement” formulation <https://github.com/iiasa/message_ix/blob/master/tutorial/westeros/westeros_flexible_generation.ipynb>`_, wherein wind *requires* and coal *supplies* flexibility.
+6. `Variablity in energy supply and demand <https://github.com/iiasa/message_ix/blob/master/tutorial/westeros/westeros_seasonality.ipynb>`_, by adding two sub-annual time steps (winter and summer).
 
 Austrian energy system
 ----------------------
