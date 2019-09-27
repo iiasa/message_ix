@@ -2,6 +2,7 @@ from ixmp.reporting.computations import (  # noqa: F401
     product,
     write_report as ixmp_write_report
 )
+from ixmp.reporting.utils import concat as ixmp_concat
 import pyam
 
 
@@ -12,7 +13,10 @@ def add(a, b, fill_value=0.0):
 
 def concat(*args):
     """Concatenate *args*, which must be :class:`pyam.IamDataFrame`."""
-    return pyam.concat(args)
+    if isinstance(args[0], pyam.IamDataFrame):
+        return pyam.concat(args)
+    else:
+        return ixmp_concat(args)
 
 
 def write_report(quantity, path):
