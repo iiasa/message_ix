@@ -120,7 +120,7 @@ def add_storage_data(scen, time_order):
                                       time_last, time_first], 0.5, '%')
 
 
-# Main function for building a model and adding seasonality and storage
+# Main function for building a model with storage and testing the functionality
 def storage_setup(test_mp, time_duration, comment):
 
     # First building a simple model and adding seasonality
@@ -156,56 +156,56 @@ def storage_setup(test_mp, time_duration, comment):
     cost_with_storage = scen.var('OBJ')['lvl']
     act_with = scen.var('ACT', {'technology': 'tec2'})['lvl'].sum()
 
-    # I. Tests for the functionality of storage
-    # I.1. Check the contribution of storage to the system
+    # Forth. Tests for the functionality of storage
+    # 1. Check the contribution of storage to the system
     assert cost_with_storage < cost_no_storage
     # Or, activity of expensive technology should be lower with storage
     assert act_with < act_no
 
-    # I.2. Activity of discharger <= activity of charger + initial content
+    # 2. Activity of discharger <= activity of charger + initial content
     act_pump = scen.var('ACT', {'technology': 'pump'})['lvl']
     act_turb = scen.var('ACT', {'technology': 'turbine'})['lvl']
     initial_content = float(scen.par('init_storage')['value'])
     assert act_turb.sum() <= act_pump.sum() + initial_content
 
-    # I.3. Max activity of charger <= storage capacity
+    # 3. Max activity of charger <= storage capacity
     max_pump = max(act_pump)
     cap_storage = float(scen.var('CAP', {'technology': 'dam'})['lvl'])
     assert max_pump <= cap_storage
 
-    # I.4. Max activity of discharger <= storage capacity - losses
+    # 4. Max activity of discharger <= storage capacity - losses
     max_turb = max(act_turb)
     loss = scen.par('storage_loss')['value'][0]
     assert max_turb <= cap_storage * (1 - loss)
 
-    # II. Testing equations of storage (when added to ixmp variables)
+    # Fifth, testing equations of storage (when added to ixmp variables)
     if scen.has_var('STORAGE'):
-        # II.1. Equality: storage content in the beginning and end is equal
+        # 1. Equality: storage content in the beginning and end is equal
         storage_first = scen.var('STORAGE', {'time': 'a'})['lvl']
         storage_last = scen.var('STORAGE', {'time': 'd'})['lvl']
         assert storage_first == storage_last
 
-        # II.2. Storage content should never exceed storage capacity
+        # 2. Storage content should never exceed storage capacity
         assert max(scen.var('STORAGE')['lvl']) <= cap_storage
 
-        # II.3. Commodity balance: charge - discharge - losses = 0
+        # 3. Commodity balance: charge - discharge - losses = 0
         change = scen.var('STORAGE_CHG').set_index(['year_act', 'time'])['lvl']
         loss = scen.par('storage_loss').set_index(['year', 'time'])['value']
         assert sum(change[change > 0] * (1 - loss)) == -sum(change[change < 0])
 
-        # II.4. Energy balance: storage change + losses = storage content
+        # 4. Energy balance: storage change + losses = storage content
         storage = scen.var('STORAGE').set_index(['year', 'time'])['lvl']
         assert storage[(2020, 'b')] * (1 - loss[(2020, 'b')]
                                        ) == -change[(2020, 'c')]
 
-
+# Storage test for different duration times
 def test_storage(test_mp):
     '''
-    Testing storage setup with equal and inaqual duration of seasons"
+    Testing storage setup with equal and unequal duration of seasons"
 
     '''
     time_duration = {'a': 0.25, 'b': 0.25, 'c': 0.25, 'd': 0.25}
     storage_setup(test_mp, time_duration, '_equal_time')
 
     time_duration = {'a': 0.3, 'b': 0.25, 'c': 0.25, 'd': 0.2}
-    storage_setup(test_mp, time_duration, '_inequal_time')
+    storage_setup(test_mp, time_duration, '_unequal_time')
