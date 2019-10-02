@@ -1,6 +1,8 @@
 
 # Next Release
 
+- [#232](https://github.com/iiasa/message_ix/pull/232): Adding a Westeros tutorial for modelling seasonality and updating the existing ones
+
 # v1.2.0
 
 MESSAGEix 1.2.0 adds an option to set the commodity balance to strict equality,
@@ -31,6 +33,7 @@ other improvements. See the ixmp release notes for further details.
 - [#154](https://github.com/iiasa/message_ix/pull/154): Enable documentation build on ReadTheDocs.
 - [#138](https://github.com/iiasa/message_ix/pull/138): Update documentation and tutorials.
 - [#131](https://github.com/iiasa/message_ix/pull/131): Update clone function argument `scen` to `scenario` with planned deprecation of the former.
+
 
 # v1.1.0
 
