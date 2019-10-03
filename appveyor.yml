@@ -35,7 +35,7 @@ install:
 
 # When https://github.com/IAMconsortium/pyam/issues/250 is resolved,
 # this line should change to `pip install .[reporting,tests]`
-  - pip install .[tests]
+  - pip install .[tests,tutorial]
 
 build: false
 
