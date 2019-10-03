@@ -2,18 +2,20 @@ from functools import partial
 import logging
 
 from ixmp.reporting import (
+    Key,
     Reporter as IXMPReporter,
-    computations as ix_computations,
     configure,
 )
-from ixmp.reporting.utils import Key
 
 from . import computations
-from .pyam import (
-    as_pyam,
-    collapse_message_cols,
-)
+from .pyam import collapse_message_cols
 
+
+__all__ = [
+    'Key',
+    'Reporter',
+    'configure',
+]
 
 log = logging.getLogger(__name__)
 
@@ -81,7 +83,7 @@ PRODUCTS = (
 #: Other standard derived quantities.
 DERIVED = [
     ('tom:nl-t-yv-ya', (computations.add, 'fom:nl-t-yv-ya', 'vom:nl-t-yv-ya')),
-    ('tom:nl-t-ya', (ix_computations.sum, 'tom:nl-t-yv-ya', None, ['yv'])),
+    ('tom:nl-t-ya', (computations.sum, 'tom:nl-t-yv-ya', None, ['yv'])),
 ]
 
 #: Quantities to automatically convert to pyam format.
@@ -203,7 +205,8 @@ class Reporter(IXMPReporter):
             to_drop = set(drop) | set(qty.dims) & (
                 {'h', 'y', 'ya', 'yr', 'yv'} - {year_time_dim})
             key = key or Key.from_str_or_key(qty, tag='iamc')
-            self.add(key, (partial(as_pyam, drop=to_drop, collapse=collapse),
+            self.add(key, (partial(computations.as_pyam, drop=to_drop,
+                                   collapse=collapse),
                            'scenario', year_time_dim, qty))
             keys.append(key)
         return keys

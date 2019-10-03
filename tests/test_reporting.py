@@ -16,7 +16,7 @@ import pyam
 import xarray as xr
 
 from message_ix import Scenario
-from message_ix.reporting import Reporter, as_pyam, configure
+from message_ix.reporting import Reporter, configure, computations
 from message_ix.testing import make_dantzig, make_westeros
 
 
@@ -145,7 +145,8 @@ def test_report_as_pyam(test_mp, caplog, tmp_path):
     ACT = rep.full_key('ACT')
 
     # Add a computation that converts ACT to a pyam.IamDataFrame
-    rep.add('ACT IAMC', (partial(as_pyam, drop=['yv']), 'scenario', 'ya', ACT))
+    rep.add('ACT IAMC', (partial(computations.as_pyam, drop=['yv']),
+                         'scenario', 'ya', ACT))
 
     # Result is an IamDataFrame
     idf1 = rep.get('ACT IAMC')
