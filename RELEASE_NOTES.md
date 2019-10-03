@@ -2,6 +2,7 @@
 # Next Release
 
 - [#232](https://github.com/iiasa/message_ix/pull/232): Adding a Westeros tutorial for modelling seasonality and updating the existing ones
+- [#236](https://github.com/iiasa/message_ix/pull/236): Enhance reporting.
 
 # v1.2.0
 

@@ -18,6 +18,11 @@ These features are accessible through :class:`Reporter <message_ix.reporting.Rep
 - calculate only a requested subset of quantities; and
 - much, much more!
 
+Contents:
+
+.. contents::
+   :local:
+   :depth: 3
 
 Terminology
 -----------
@@ -90,6 +95,12 @@ small, indivisible) computations.
 
 Reporters
 ---------
+
+.. autosummary::
+
+   message_ix.reporting.Reporter
+   ixmp.reporting.Reporter
+   ixmp.reporting.Key
 
 .. currentmodule:: message_ix.reporting
 
@@ -168,13 +179,6 @@ Reporters
           ACT = rep.full_key('ACT')
           keys = rep.as_pyam(ACT, 'ya', collapse=m_t, drop=['t', 'm'])
 
-.. autodata:: PRODUCTS
-.. autodata:: DERIVED
-.. autodata:: PYAM_CONVERT
-.. autodata:: REPORTS
-
-.. automethod:: ixmp.reporting.configure
-
 .. autoclass:: ixmp.reporting.Reporter
    :members:
    :exclude-members: graph, add
@@ -247,40 +251,7 @@ Reporters
          computations.
 
 
-Computations
-------------
-
-.. currentmodule:: message_ix.reporting
-
-.. automodule:: message_ix.reporting.computations
-   :members: add, write_report
-
-
-.. automodule:: message_ix.reporting.pyam
-   :members: as_pyam, collapse_message_cols
-
-
-Computations from ixmp
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. currentmodule:: ixmp.reporting
-
-.. automodule:: ixmp.reporting.computations
-   :members:
-
-   .. autosummary::
-
-      aggregate
-      disaggregate_shares
-      load_file
-      make_dataframe
-      write_report
-
-
-Utilities
----------
-
-.. autoclass:: ixmp.reporting.utils.Key
+.. autoclass:: ixmp.reporting.Key
    :members:
 
    Quantities in a :class:`Scenario` can be indexed by one or more dimensions.
@@ -306,8 +277,90 @@ Utilities
    >>> foo('a b')
    foo:a-b
 
-.. autoclass:: ixmp.reporting.utils.AttrSeries
+
+Computations
+------------
+
+.. currentmodule:: message_ix.reporting
+
+.. automodule:: message_ix.reporting.computations
+   :members: add, as_pyam, concat, write_report
+
+Computations from ixmp
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. currentmodule:: ixmp.reporting
+
+.. automodule:: ixmp.reporting.computations
+   :members:
+
+   Unless otherwise specified, these methods accept and return
+   :class:`Quantity <ixmp.reporting.utils.Quantity>` objects for data
+   arguments/return values.
+
+   Calculations:
+
+   .. autosummary::
+      aggregate
+      concat
+      disaggregate_shares
+      product
+      ratio
+      sum
+
+   Input and output:
+
+   .. autosummary::
+      load_file
+      write_report
+
+   Conversion:
+
+   .. autosummary::
+      make_dataframe
+
+Configuration
+-------------
+
+.. autosummary::
+
+   ixmp.reporting.configure
+   ixmp.reporting.utils.RENAME_DIMS
+   ixmp.reporting.utils.REPLACE_UNITS
+   ixmp.reporting.utils.UNITS
+   message_ix.reporting.PRODUCTS
+   message_ix.reporting.DERIVED
+   message_ix.reporting.PYAM_CONVERT
+   message_ix.reporting.REPORTS
+
+.. automethod:: ixmp.reporting.configure
+
+.. currentmodule:: message_ix.reporting
+
+.. autodata:: PRODUCTS
+.. autodata:: DERIVED
+.. autodata:: PYAM_CONVERT
+.. autodata:: REPORTS
+
+.. currentmodule:: ixmp.reporting.utils
+
+.. autodata:: RENAME_DIMS
+
+   :mod:`message_ix` adds the standard short symbols for MESSAGE sets to this
+   variable.
+
+.. autodata:: REPLACE_UNITS
+.. autodata:: UNITS
+
+
+Utilities
+---------
+
+.. autoclass:: ixmp.reporting.attrseries.AttrSeries
 
 .. automodule:: ixmp.reporting.utils
    :members:
-   :exclude-members: AttrSeries, Key, combo_partition
+   :exclude-members: AttrSeries, RENAME_DIMS, REPLACE_UNITS, UNITS
+
+.. automodule:: message_ix.reporting.pyam
+   :members: collapse_message_cols

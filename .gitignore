@@ -29,25 +29,21 @@ message_ix/model/MESSAGE_master.gms
 # Apple file system
 .DS_Store
 
-# local version of auto-documentation features
-doc/build
-doc/source/_build
-doc/source/model
+# sphinx
+/doc/build
+/doc/source/_build
+/doc/source/model
 
-# files generated during install
+# setuptools
 ixmp/default_paths.py
-build
-dist
+/build
+/dist
 
 # rixmp build folder and rhistory
 rmessageix/rmessageix*.zip
 rmessageix/source/inst/docum/*.html
 rmessageix/source/.Rhistory
 !rmessageix/source/*.Rproj
-
-# credentials
-ixmp/*.properties
-config/*.properties
 
 # testdb
 .cache/**
@@ -56,5 +52,7 @@ tests/testdb/ixmptest.properties
 tests/testdb/ixmptest.lck
 .Rproj.user
 
-# pytest cache
-.pytest_cache/**
+# pytest and related
+.coverage
+.pytest_cache
+htmlcov
