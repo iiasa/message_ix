@@ -33,7 +33,7 @@ EXTRAS_REQUIRE = {
     'docs': ['numpydoc', 'sphinx>=1.8', 'sphinx_rtd_theme',
              'sphinxcontrib-bibtex'],
     'reporting': ['pyam-iamc'],
-    'tutorial': ['jupyter', 'matplotlib'],
+    'tutorial': ['jupyter', 'matplotlib', 'plotnine'],
 }
 
 
