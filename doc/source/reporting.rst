@@ -284,11 +284,7 @@ Computations
 .. currentmodule:: message_ix.reporting
 
 .. automodule:: message_ix.reporting.computations
-   :members: add, write_report
-
-.. automodule:: message_ix.reporting.pyam
-   :members: as_pyam, collapse_message_cols
-
+   :members: add, as_pyam, concat, write_report
 
 Computations from ixmp
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -306,6 +302,7 @@ Computations from ixmp
 
    .. autosummary::
       aggregate
+      concat
       disaggregate_shares
       product
       ratio
@@ -364,3 +361,6 @@ Utilities
 .. automodule:: ixmp.reporting.utils
    :members:
    :exclude-members: AttrSeries, RENAME_DIMS, REPLACE_UNITS, UNITS
+
+.. automodule:: message_ix.reporting.pyam
+   :members: collapse_message_cols

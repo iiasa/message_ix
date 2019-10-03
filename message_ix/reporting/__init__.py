@@ -9,10 +9,7 @@ from ixmp.reporting import (
 )
 
 from . import computations
-from .pyam import (
-    as_pyam,
-    collapse_message_cols,
-)
+from .pyam import collapse_message_cols
 
 
 log = logging.getLogger(__name__)
@@ -203,7 +200,8 @@ class Reporter(IXMPReporter):
             to_drop = set(drop) | set(qty.dims) & (
                 {'h', 'y', 'ya', 'yr', 'yv'} - {year_time_dim})
             key = key or Key.from_str_or_key(qty, tag='iamc')
-            self.add(key, (partial(as_pyam, drop=to_drop, collapse=collapse),
+            self.add(key, (partial(computations.as_pyam, drop=to_drop,
+                                   collapse=collapse),
                            'scenario', year_time_dim, qty))
             keys.append(key)
         return keys
