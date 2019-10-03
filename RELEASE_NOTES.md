@@ -1,7 +1,7 @@
 
 # Next Release
 
-- [#236](https://github.com/iiasa/message_ix/pull/236): Enchance reporting.
+- [#236](https://github.com/iiasa/message_ix/pull/236): Enhance reporting.
 
 # v1.2.0
 
