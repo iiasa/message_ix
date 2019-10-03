@@ -1,6 +1,8 @@
 
 # Next Release
 
+- [#236](https://github.com/iiasa/message_ix/pull/236): Enchance reporting.
+
 # v1.2.0
 
 MESSAGEix 1.2.0 adds an option to set the commodity balance to strict equality,
