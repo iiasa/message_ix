@@ -2,11 +2,11 @@ from functools import partial
 import logging
 
 from ixmp.reporting import (
+    Key,
     Reporter as IXMPReporter,
     computations as ix_computations,
     configure,
 )
-from ixmp.reporting.utils import Key
 
 from . import computations
 from .pyam import (
@@ -200,7 +200,7 @@ class Reporter(IXMPReporter):
         for qty in quantities:
             # Dimensions to drop automatically
             qty = Key.from_str_or_key(qty)
-            to_drop = set(drop) | set(qty._dims) & (
+            to_drop = set(drop) | set(qty.dims) & (
                 {'h', 'y', 'ya', 'yr', 'yv'} - {year_time_dim})
             key = key or Key.from_str_or_key(qty, tag='iamc')
             self.add(key, (partial(as_pyam, drop=to_drop, collapse=collapse),
