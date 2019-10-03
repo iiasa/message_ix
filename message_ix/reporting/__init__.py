@@ -4,13 +4,18 @@ import logging
 from ixmp.reporting import (
     Key,
     Reporter as IXMPReporter,
-    computations as ix_computations,
     configure,
 )
 
 from . import computations
 from .pyam import collapse_message_cols
 
+
+__all__ = [
+    'Key',
+    'Reporter',
+    'configure',
+]
 
 log = logging.getLogger(__name__)
 
@@ -78,7 +83,7 @@ PRODUCTS = (
 #: Other standard derived quantities.
 DERIVED = [
     ('tom:nl-t-yv-ya', (computations.add, 'fom:nl-t-yv-ya', 'vom:nl-t-yv-ya')),
-    ('tom:nl-t-ya', (ix_computations.sum, 'tom:nl-t-yv-ya', None, ['yv'])),
+    ('tom:nl-t-ya', (computations.sum, 'tom:nl-t-yv-ya', None, ['yv'])),
 ]
 
 #: Quantities to automatically convert to pyam format.
