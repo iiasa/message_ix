@@ -628,19 +628,19 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
             year_diff = year_diff[0]
 
         # Removing data from old transition year
-        if not yr_diff_new or year_diff not in yr_diff_new:
-            year_next = [x for x in df2.columns if x > year_diff][0]
-
-            df_pre = slice_df(df2_tec, idx, year_ref, [year_diff], year_diff)
-            df_next = slice_df(df2_tec, idx, year_ref, [year_next], year_diff)
-            df_count = pd.DataFrame({'c_pre': df_pre.count(axis=1),
-                                     'c_next': idx_check(df_next, df_pre
-                                                         ).count(axis=1)},
-                                    index=df_pre.index)
-            df_y = df_count.loc[df_count['c_pre'] == df_count['c_next'] + 1]
-
-            for i in df_y.index:
-                mask_df(df2, i, df_count['c_next'][i], np.nan)
+#        if not yr_diff_new or year_diff not in yr_diff_new:
+#            year_next = [x for x in df2.columns if x > year_diff][0]
+#
+#            df_pre = slice_df(df2_tec, idx, year_ref, [year_diff], year_diff)
+#            df_next = slice_df(df2_tec, idx, year_ref, [year_next], year_diff)
+#            df_count = pd.DataFrame({'c_pre': df_pre.count(axis=1),
+#                                     'c_next': idx_check(df_next, df_pre
+#                                                         ).count(axis=1)},
+#                                    index=df_pre.index)
+#            df_y = df_count.loc[df_count['c_pre'] == df_count['c_next'] + 1]
+#
+#            for i in df_y.index:
+#                mask_df(df2, i, df_count['c_next'][i], np.nan)
 
     # Generating duration_period_sum matrix for masking
     df_dur = pd.DataFrame(index=horizon_new[:-1], columns=horizon_new[1:])
