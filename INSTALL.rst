@@ -42,7 +42,7 @@ from source code (next section).
 Install |MESSAGEix| from source
 -------------------------------
 
-3. Install `ixmp`_ from source.
+3. Install :doc:`ixmp <ixmp:install>` from source.
 
 4. (Optional) If you intend to contribute changes to |MESSAGEix|, first register
    a Github account, and fork the `message_ix repository <https://github.com/iiasa/message_ix>`_. This will create a new repository ``<user>/message_ix``.

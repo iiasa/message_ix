@@ -307,6 +307,7 @@ texinfo_documents = [
 
 intersphinx_mapping = {
     'dask': ('http://docs.dask.org/en/stable/', None),
+    'ixmp': ('https://message.iiasa.ac.at/projects/ixmp/en/stable/', None),
     'python': ('https://docs.python.org/3/', None),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
     'pyam': ('https://pyam-iamc.readthedocs.io/en/stable/', None)
