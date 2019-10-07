@@ -526,17 +526,17 @@ def interpolate_1d(df, yrs_new, horizon, year_col, value_col='value',
                 # previous year but not for the next years
                 # TODO: here is the place that should be changed if the
                 # new year should go to the time step before the existing one
-                if [x for x in df2.columns if x < year_pre]:
-                    year_pp = max([x for x in df2.columns if x < year_pre])
-                    df2[yr] = df2[yr].fillna(intpol(df2[year_pre],
-                                                    df2[year_pp], year_pre,
-                                                    year_pp, yr))
-                    if not df2[yr].loc[(df2[yr] < 0) & (df2[year_pre] >= 0)
+                if [x for x in df2.columns if x > year_next]:
+                    year_nn = min([x for x in df2.columns if x > year_next])
+                    df2[yr] = df2[yr].fillna(intpol(df2[year_next],
+                                                    df2[year_nn], year_next,
+                                                    year_nn, yr))
+                    if not df2[yr].loc[(df2[yr] < 0) & (df2[year_next] >= 0)
                                        ].empty and extrapol_neg:
-                        df2.loc[(df2[yr] < 0) & (df2[year_pre] >= 0), yr
+                        df2.loc[(df2[yr] < 0) & (df2[year_next] >= 0), yr
                                 ] = df2.loc[(df2[yr] < 0
-                                             ) & (df2[year_pre] >= 0),
-                                            year_pre] * extrapol_neg
+                                             ) & (df2[year_next] >= 0),
+                                            year_next] * extrapol_neg
 
                 if bound_extend:
                     df2[yr] = df2[yr].fillna(df2[year_pre])
