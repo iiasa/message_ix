@@ -323,6 +323,8 @@ def add_year_par(sc_ref, sc_new, yrs_new, parname, reg_list, firstyear_new,
     idx_names = sc_ref.idx_names(parname)
     horizon = sorted([int(x) for x in list(set(sc_ref.set('year')))])
     node_col = [x for x in idx_names if x in ['node', 'node_loc', 'node_rel']]
+    year_list = [x for x in idx_names if x in ['year', 'year_vtg', 'year_act',
+                                               'year_rel']]
 
     if parname not in par_list_new:
         sc_new.check_out()
@@ -333,13 +335,13 @@ def add_year_par(sc_ref, sc_new, yrs_new, parname, reg_list, firstyear_new,
     if node_col:
         par_old = sc_ref.par(parname, {node_col[0]: reg_list})
         par_new = sc_new.par(parname, {node_col[0]: reg_list})
-        sort_order = [node_col[0], 'technology', 'commodity', 'year_vtg',
-                      'year_act']
+        sort_order = [node_col[0], 'technology',
+                      'commodity', 'mode', 'emission'] + year_list
         nodes = par_old[node_col[0]].unique().tolist()
     else:
         par_old = sc_ref.par(parname)
         par_new = sc_new.par(parname)
-        sort_order = ['technology', 'commodity', 'year_vtg', 'year_act']
+        sort_order = ['technology', 'commodity'] + year_list
         nodes = ['N/A']
 
     if not par_new.empty and not rewrite:
@@ -355,6 +357,8 @@ def add_year_par(sc_ref, sc_new, yrs_new, parname, reg_list, firstyear_new,
     sort_order = [x for x in sort_order if x in idx_names]
     if sort_order:
         par_old = par_old.sort_values(sort_order).reset_index(drop=True)
+        rem_idx = [x for x in par_old.columns if x not in sort_order]
+        par_old = par_old.reindex(columns=sort_order + rem_idx)
 
     sc_new.check_out()
     if not par_new.empty and rewrite:
@@ -362,12 +366,9 @@ def add_year_par(sc_ref, sc_new, yrs_new, parname, reg_list, firstyear_new,
               ' scenario to be updated for node/s in {}...'.format(nodes))
         sc_new.remove_par(parname, par_new)
 
-    col_list = sc_ref.idx_names(parname)
-    year_list = [c for c in col_list if c in ['year', 'year_vtg', 'year_act',
-                                              'year_rel']]
 
     # A uniform "unit" for values in different years
-    if 'unit' in col_list and unit_check:
+    if 'unit' in par_old.columns and unit_check:
         par_old = unit_uniform(par_old)
 #   ---------------------------------------------------------------------------
 #   V.B) Adding new years to a parameter based on time-related indexes
@@ -597,6 +598,12 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
         return df1.loc[df1.index.isin(df2.index)]
 
     idx = [x for x in df.columns if x not in [year_col, value_col]]
+#    if 'commodity' in idx:
+#        i = idx.index(year_ref)
+#        idx.insert(i, idx.pop(idx.index('commodity')))
+#    elif 'mode' in idx:
+#        i = idx.index(year_ref)
+#        idx.insert(i, idx.pop(idx.index('mode')))
     if df.empty:
         return df
         print('+++ WARNING: The submitted dataframe is empty, so'
