@@ -306,7 +306,7 @@ def add_year_set(sc_ref, sc_new, years_new, firstyear_new=None,
 
 
 # %% V) Adding new years to parameters
-def add_year_par(sc_ref, sc_new, yrs_new, parname, region_list, firstyear_new,
+def add_year_par(sc_ref, sc_new, yrs_new, parname, reg_list, firstyear_new,
                  extrapolate=False, rewrite=True, unit_check=True,
                  extrapol_neg=None, bound_extend=True):
     """Add new years to parameters.
@@ -331,8 +331,8 @@ def add_year_par(sc_ref, sc_new, yrs_new, parname, region_list, firstyear_new,
         sc_new.commit('New parameter initiated!')
 
     if node_col:
-        par_old = sc_ref.par(parname, {node_col[0]: region_list})
-        par_new = sc_new.par(parname, {node_col[0]: region_list})
+        par_old = sc_ref.par(parname, {node_col[0]: reg_list})
+        par_new = sc_new.par(parname, {node_col[0]: reg_list})
         sort_order = [node_col[0], 'technology', 'commodity', 'year_vtg',
                       'year_act']
         nodes = par_old[node_col[0]].unique().tolist()
@@ -344,11 +344,11 @@ def add_year_par(sc_ref, sc_new, yrs_new, parname, region_list, firstyear_new,
 
     if not par_new.empty and not rewrite:
         print('> Parameter "' + parname + '" already has data in new scenario'
-              ' and left unchanged for node/s: {}.'.format(region_list))
+              ' and left unchanged for node/s: {}.'.format(reg_list))
         return
     if par_old.empty:
         print('> Parameter "' + parname + '" is empty in reference scenario'
-              ' for node/s: {}!'.format(region_list))
+              ' for node/s: {}!'.format(reg_list))
         return
 
     # Sorting the data to make it ready for dataframe manupulation
@@ -714,20 +714,20 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
             df2_t = df2.loc[df2_tec.index, :].copy()
 
             # This part calculates the missing value if only the previous
-            # timestep has a value (and not the next)
+            # timestep has a value (and not the next) (TODO: extra end year is created )
             if tec_list:
-                df2_t[yr].loc[(pd.isna(df2_t[yr])
-                               ) & (~pd.isna(df2_t[year_pre]))
-                              ] = intpol(df2_t[year_pre],
-                                         df2_t[year_next].shift(-1),
-                                         year_pre, year_next, yr)
+                cond = (pd.isna(df2_t[yr])) & (~pd.isna(df2_t[year_pre]))
+                df2_t[yr].loc[cond] = intpol(df2_t[year_pre],
+                                             df2_t[year_next].shift(-1),
+                                             year_pre, year_next, yr)
 
                 # Treating technologies with phase-out in model years
                 if [x for x in df2.columns if x < year_pre]:
                     year_pp = max([x for x in df2.columns if x < year_pre])
-                    df2_t[yr].loc[(pd.isna(df2_t[yr])
-                                   ) & (pd.isna(df2_t[year_pre].shift(-1))
-                                        ) & (~pd.isna(df2_t[year_pre]))
+                    cond1 = (pd.isna(df2_t[yr])) & (~pd.isna(df2_t[year_pre]))
+                    cond2 = (pd.isna(df2_t[year_pre].shift(-1)))
+
+                    df2_t[yr].loc[cond1 & cond2
                                   ] = intpol(df2_t[year_pre], df2_t[year_pp],
                                              year_pre, year_pp, yr)
                     cond = (df2_t[yr] < 0) & (df2_t[year_pre] >= 0)
@@ -831,11 +831,11 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
                        any(y in x for y in ['node', 'node_loc'])][0]
         df3 = df3.reset_index().set_index(
             [node_column, 'technology', year_ref]).sort_index(level=1)
-        par_tec = par_tec.set_index(
+        par_t = par_tec.set_index(
             ['node_loc', 'technology', year_ref]).sort_index(level=1)
 
-        for i in [x for x in par_tec.index if x in df3.index]:
-            df3.loc[i, 'lifetime'] = par_tec.loc[i, 'value'].copy()
+        for i in [x for x in par_t.index if x in df3.index]:
+            df3.loc[i, 'lifetime'] = par_t.loc[i, 'value'].copy()
 
         df3 = df3.reset_index().set_index(idx).dropna(subset=['lifetime']
                                                       ).sort_index()
