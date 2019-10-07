@@ -801,9 +801,12 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
 
             for i in df_yr.index:
                 # Mainly for cases of two new consecutive new years
-                cond = df_count['c_pre'][i] >= df_count['c_next'][i] + 2
-                if ~np.isnan(df_count['c_next'][i]) and cond:
+                if ~np.isnan(df_count['c_next'][i]):
                     df_yr[year_pre] = np.nan
+                    # For the rest
+                    if (df_count['c_pre'][i] < df_count['c_next'][i] + 2):
+                        mask_df(df_yr, i, df_count['c_pre'][i], np.nan)
+
 
                 # For technologies phasing out before the end of horizon
                 elif np.isnan(df_count['c_next'][i]):
@@ -812,11 +815,6 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
                         mask_df(df_yr, i, df_count['c_pre'][i] + 1, np.nan)
                     else:
                         mask_df(df_yr, i, df_count['c_pre'][i], np.nan)
-
-                # For the rest
-                else:
-                    df_yr[year_pre] = np.nan
-                    mask_df(df_yr, i, df_count['c_pre'][i], np.nan)
 
         else:
             continue
