@@ -166,12 +166,22 @@ def add_year(sc_ref, sc_new, years_new, firstyear_new=None, lastyear_new=None,
                                    {'type_year': 'firstmodelyear'})['year']
     else:
         firstyear_new = min([int(x) for x in sc_new.set('year').tolist()])
+
+    if not sc_ref.set('cat_year', {'type_year': 'firstmodelyear'}).empty:
+        firstyear_ref = sc_ref.set('cat_year',
+                                   {'type_year': 'firstmodelyear'})['year']
+    else:
+        firstyear_ref = firstyear_new
+
     for parname in par_list:
         # For historical parameters extrapolation permitted (e.g., from
         # 2010 to 2015)
         if 'historical' in parname:
             extrapol = True
             yrs_new = [x for x in years_new if x < int(firstyear_new)]
+        elif int(firstyear_ref) > int(firstyear_new):
+            extrapol = True
+            yrs_new = years_new
         else:
             extrapol = False
             yrs_new = years_new
@@ -464,7 +474,7 @@ def interpolate_1d(df, yrs_new, horizon, year_col, value_col='value',
                 extrapol = extrapolate
 
             # a) If this new year greater than modeled years, do extrapolation
-            if extrapol:
+            if yr > max(df2.columns) and extrapol:
                 if yr == horizon_new[horizon_new.index(max(df2.columns)) + 1]:
                     year_pre = max([x for x in df2.columns if x < yr])
 
@@ -491,7 +501,7 @@ def interpolate_1d(df, yrs_new, horizon, year_col, value_col='value',
                 year_next = min([x for x in df2.columns if x > yr])
 
                 if len([x for x in df2.columns if x > yr]) >= 2:
-                    year_nn = horizon[horizon.index(yr) + 2]
+                    year_nn = min([x for x in df2.columns if x > year_next])
                     df2[yr] = intpol(df2[year_next], df2[year_nn],
                                      year_next, year_nn, yr)
                     df2[yr][np.isinf(df2[year_next])] = df2[year_next]
