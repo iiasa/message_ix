@@ -42,6 +42,7 @@ configure(
         'technology': 't',
         'time': 'h',
         'year': 'y',
+
         # Aliases
         'node_dest': 'nd',
         'node_loc': 'nl',
@@ -53,6 +54,10 @@ configure(
         'year_act': 'ya',
         'year_vtg': 'yv',
         'year_rel': 'yr',
+
+        # Created by reporting
+        'technology_addon': 'ta',
+        'technology_primary': 'tp',
     }
 )
 
@@ -80,10 +85,21 @@ PRODUCTS = (
         ('land_emission', 'LAND')),
 )
 
+PRODUCTS_2 = (
+    ('addon_act',
+        ('addon_conversion:n-tp-yv-ya-m-h-t:full', 'ACT')),
+)
+
 #: Other standard derived quantities.
 DERIVED = [
     ('tom:nl-t-yv-ya', (computations.add, 'fom:nl-t-yv-ya', 'vom:nl-t-yv-ya')),
     ('tom:nl-t-ya', (computations.sum, 'tom:nl-t-yv-ya', None, ['yv'])),
+    # addon_conversion broadcast across technology_addon
+    ('addon_conversion:n-tp-yv-ya-m-h-t:full',
+        (partial(computations.broadcast_map,
+                 rename={'t': 'tp', 'ta': 't', 'n': 'nl'}),
+         'addon_conversion:n-t-yv-ya-m-h-type_addon',
+         'map_addon')),
 ]
 
 #: Quantities to automatically convert to pyam format.
@@ -108,6 +124,16 @@ REPORTS = {
 }
 
 
+#: Sets with mappings
+MAPPING_SETS = [
+    'addon',
+    'emission',
+    # 'node',  # Automatic addition fails because 'map_node' is defined
+    'tec',
+    'year',
+]
+
+
 class Reporter(IXMPReporter):
     """MESSAGEix Reporter."""
     @classmethod
@@ -125,6 +151,11 @@ class Reporter(IXMPReporter):
         # Invoke the ixmp method
         rep = super().from_scenario(scenario, **kwargs)
 
+        # Add quantities that represent mapping sets
+        for name in MAPPING_SETS:
+            rep.add(f'map_{name}', (computations.map_as_qty, f'cat_{name}'),
+                    strict=True)
+
         # Add basic quantities for MESSAGEix models
         for name, quantities in PRODUCTS:
             try:
@@ -135,9 +166,16 @@ class Reporter(IXMPReporter):
         # Add derived quantities for MESSAGEix models
         for key, args in DERIVED:
             try:
-                rep.add(key, args, strict=True)
+                rep.add(key, args, strict=True, index=True, sums=True)
             except KeyError as e:
                 log.info(f'{e.args[0]} not in scenario → not adding {key}')
+
+        # More products
+        for name, quantities in PRODUCTS_2:
+            try:
+                rep.add_product(name, *quantities)
+            except KeyError as e:
+                log.info(f'{e.args[0]} not in scenario → not adding {name}')
 
         # Add conversions to pyam
         for key, args in PYAM_CONVERT.items():
