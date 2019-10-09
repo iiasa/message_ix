@@ -501,7 +501,10 @@ def interpolate_1d(df, yrs_new, horizon, year_col, value_col='value',
             elif yr < min(df2.columns) and extrapol:
                 year_next = min([x for x in df2.columns if x > yr])
 
-                if len([x for x in df2.columns if x > yr]) >= 2:
+                # To make sure the new year is not two steps smaller
+                cond = (year_next == horizon_new[horizon_new.index(yr) + 1])
+
+                if len([x for x in df2.columns if x > yr]) >= 2 and cond:
                     year_nn = min([x for x in df2.columns if x > year_next])
                     df2[yr] = intpol(df2[year_next], df2[year_nn],
                                      year_next, year_nn, yr)
@@ -513,7 +516,7 @@ def interpolate_1d(df, yrs_new, horizon, year_col, value_col='value',
                                              ) & (df2[year_next] >= 0),
                                             year_next] * extrapol_neg
 
-                elif bound_extend:
+                elif bound_extend and cond:
                     df2[yr] = df2[year_next]
 
             # c) Otherise, do intrapolation
@@ -608,7 +611,8 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
         return df
         print('+++ WARNING: The submitted dataframe is empty, so'
               ' returned empty results!!! +++')
-
+    # only for test
+    # df = df.loc[df['technology'].isin(tec_check)]
     df_tec = df.loc[df['technology'].isin(tec_list)]
     df2 = df.pivot_table(index=idx, columns=year_col, values='value')
     df2_tec = df_tec.pivot_table(index=idx, columns=year_col, values='value')
