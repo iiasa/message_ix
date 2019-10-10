@@ -1,6 +1,6 @@
 # Import other comps so they can be imported from this module
 from ixmp.reporting.computations import *        # noqa: F401, F403
-from ixmp.reporting.computations import product  # noqa: F401
+from ixmp.reporting.computations import product
 from ixmp.reporting.utils import RENAME_DIMS, as_quantity
 
 from .pyam import as_pyam, concat, write_report  # noqa: F401
