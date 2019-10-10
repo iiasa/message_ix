@@ -1,7 +1,9 @@
 from logging import getLogger
 
-from ixmp.reporting.computations import write_report as ixmp_write_report
-from ixmp.reporting.utils import concat as ixmp_concat
+from ixmp.reporting.computations import (
+    concat as ixmp_concat,
+    write_report as ixmp_write_report,
+)
 import pandas as pd
 from pyam import IAMC_IDX, IamDataFrame, concat as pyam_concat
 
