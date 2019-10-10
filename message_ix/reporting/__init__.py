@@ -83,19 +83,19 @@ PRODUCTS = (
         ('land_use', 'LAND')),
     ('land_emi',
         ('land_emission', 'LAND')),
-)
-
-PRODUCTS_2 = (
-    ('addon_act',
-        ('addon_conversion:n-tp-yv-ya-m-h-t:full', 'ACT')),
+    ('addon ACT',
+        ('addon conversion:n-tp-yv-ya-m-h-t:full', 'ACT')),
+    ('addon in',
+        ('input', 'addon ACT')),
+    ('addon out',
+        ('output', 'addon ACT')),
 )
 
 #: Other standard derived quantities.
 DERIVED = [
     ('tom:nl-t-yv-ya', (computations.add, 'fom:nl-t-yv-ya', 'vom:nl-t-yv-ya')),
-    ('tom:nl-t-ya', (computations.sum, 'tom:nl-t-yv-ya', None, ['yv'])),
     # addon_conversion broadcast across technology_addon
-    ('addon_conversion:n-tp-yv-ya-m-h-t:full',
+    ('addon conversion:n-tp-yv-ya-m-h-t:full',
         (partial(computations.broadcast_map,
                  rename={'t': 'tp', 'ta': 't', 'n': 'nl'}),
          'addon_conversion:n-t-yv-ya-m-h-type_addon',
@@ -151,58 +151,76 @@ class Reporter(IXMPReporter):
         # Invoke the ixmp method
         rep = super().from_scenario(scenario, **kwargs)
 
-        # Add quantities that represent mapping sets
+        # Use a queue pattern. This is more forgiving; e.g. 'addon ACT' from
+        # PRODUCTS depends on 'addon conversion::full'; but the latter is added
+        # to the queue later (from DERIVED). Using strict=True below means that
+        # this will raise an exception; so the failed item is re-appended to
+        # the queue and tried 1 more time later.
+
+        # Queue of items to add. Each element is a tuple:
+        # - The first element is the count of attempts to add the item;
+        # - the second element is the method to call;
+        # - the remainder are positional arguments.
+        to_add = []
+
+        def put(*args, **kwargs):
+            """Helper to add elements to the queue."""
+            to_add.append(tuple([0, partial(args[0], **kwargs)] +
+                                list(args[1:])))
+
+        # Quantities that represent mapping sets
         for name in MAPPING_SETS:
-            rep.add(f'map_{name}', (computations.map_as_qty, f'cat_{name}'),
-                    strict=True)
+            put(rep.add, f'map_{name}',
+                (computations.map_as_qty, f'cat_{name}'), strict=True)
 
-        # Add basic quantities for MESSAGEix models
+        # Product quantities
         for name, quantities in PRODUCTS:
-            try:
-                rep.add_product(name, *quantities)
-            except KeyError as e:
-                log.info(f'{e.args[0]} not in scenario → not adding {name}')
+            put(rep.add_product, name, *quantities)
 
-        # Add derived quantities for MESSAGEix models
+        # Derived quantities
         for key, args in DERIVED:
-            try:
-                rep.add(key, args, strict=True, index=True, sums=True)
-            except KeyError as e:
-                log.info(f'{e.args[0]} not in scenario → not adding {key}')
+            put(rep.add, key, args, strict=True, index=True, sums=True)
 
-        # More products
-        for name, quantities in PRODUCTS_2:
-            try:
-                rep.add_product(name, *quantities)
-            except KeyError as e:
-                log.info(f'{e.args[0]} not in scenario → not adding {name}')
-
-        # Add conversions to pyam
+        # Conversions to IAMC format/pyam objects
         for key, args in PYAM_CONVERT.items():
             qty, year_dim, collapse_kw = args
             collapse_cb = partial(collapse_message_cols, **collapse_kw)
             key += ':pyam'
-            try:
-                rep.as_pyam(qty, year_dim, key, collapse=collapse_cb)
-            except KeyError as e:
-                log.info(f'{e.args[0]} not in scenario → not adding {key}')
+            put(rep.as_pyam, qty, year_dim, key, collapse=collapse_cb)
 
-        # Add standard reports
+        # Standard reports
         for group, pyam_keys in REPORTS.items():
-            # Filter out keys which are not added, above
-            keys = list(filter(lambda k: k in rep, pyam_keys))
-
-            # Log diagnostic information
-            missing = sorted(set(pyam_keys) - set(keys))
-            if missing:
-                log.info(f'missing {missing} omitted from {group}')
-
-            rep.add(group, tuple([computations.concat] + keys), strict=True)
+            put(rep.add, group, tuple([computations.concat] + pyam_keys),
+                strict=True)
 
         # Add all standard reporting to the default message node
-        rep.add('message:default',
-                tuple([computations.concat] + list(REPORTS.keys())),
-                strict=True)
+        put(rep.add, 'message:default',
+            tuple([computations.concat] + list(REPORTS.keys())),
+            strict=True)
+
+        # Process the queue until empty
+        while len(to_add):
+            # Next call
+            count, method, *args = to_add.pop(0)
+
+            try:
+                # Call the method to add quantities
+                method(*args)
+            except KeyError as e:
+                # Adding failed
+
+                # Information for debugging
+                info = [repr(e), str(method), str(args)]
+
+                if count == 0:
+                    # First failure: this may only be due to items being out of
+                    # order, so retry silently
+                    to_add.append(tuple([count + 1, method] + args))
+
+                    log.debug('\n  '.join(['Will retry adding:'] + info))
+                elif count == 1:
+                    # Second failure: something is genuinely missing, discard
+                    log.info('\n  '.join(['Failed to add:'] + info))
 
         return rep
 
