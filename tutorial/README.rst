@@ -23,6 +23,12 @@ If you installed |MESSAGEix| using Anaconda, download the notebooks using the
 
     $ messageix-dl --local_path /path/to/tutorials
 
+.. note::
+
+   If you installed |MESSAGEix| using Anaconda, note that the version of
+   the tutorials that will be downloaded will depend on the version you are
+   currently in (it's indicated in green at the bottom left of this page).
+
 Running tutorials
 ~~~~~~~~~~~~~~~~~
 
