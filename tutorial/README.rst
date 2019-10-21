@@ -25,9 +25,10 @@ If you installed |MESSAGEix| using Anaconda, download the notebooks using the
 
 .. note::
 
-   If you installed |MESSAGEix| using Anaconda, note that the version of
-   the tutorials that will be downloaded will depend on the version you are
-   currently in (it's indicated in green at the bottom left of this page).
+   By default, the tutorials for your installed version of |MESSAGEix| are
+   downloaded. To download a different version, add e.g. ``--tag 1.2.0`` to the
+   above command. To download the tutorials from the development version,
+   add ``--branch master``.
 
 Running tutorials
 ~~~~~~~~~~~~~~~~~
