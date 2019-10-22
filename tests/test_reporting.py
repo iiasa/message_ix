@@ -62,10 +62,8 @@ def test_reporter(test_mp):
     # TODO: Squeeze on AttrSeries still returns full index, whereas xarray
     # drops everything except node
     obs = obs.reset_index(['c', 'l', 'y', 'h'], drop=True)
-    # check_dtype is false because of casting in pd.Series to float
-    # check_attrsis false because we don't get the unit addition in bare xarray
-    assert_qty_equal(obs.sort_index(), demand,
-                     check_attrs=False, check_dtype=False)
+    # check_attrs False because we don't get the unit addition in bare xarray
+    assert_qty_equal(obs.sort_index(), demand, check_attrs=False)
 
     # ixmp.Reporter pre-populated with only model quantities and aggregates
     assert len(rep_ix.graph) == 5088
@@ -177,7 +175,7 @@ def test_reporter_convert_pyam(test_mp, caplog, tmp_path):
     # Keys of added node(s) are returned
     assert len(keys) == 1
     key2, *_ = keys
-    assert key2 == str(ACT) + ':iamc'
+    assert key2 == ACT.name + ':iamc'
 
     caplog.clear()
 

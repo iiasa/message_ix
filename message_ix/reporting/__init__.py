@@ -103,24 +103,24 @@ DERIVED = [
 ]
 
 #: Quantities to automatically convert to pyam format.
-PYAM_CONVERT = {
-    'out': ('out:nl-t-ya-m-nd-c-l', 'ya', dict(kind='ene', var='out')),
-    'in': ('in:nl-t-ya-m-no-c-l', 'ya', dict(kind='ene', var='in')),
-    'cap': ('CAP:nl-t-ya', 'ya', dict(var='capacity')),
-    'new_cap': ('CAP_NEW:nl-t-yv', 'yv', dict(var='new capacity')),
-    'inv': ('inv:nl-t-yv', 'yv', dict(var='inv cost')),
-    'fom': ('fom:nl-t-ya', 'ya', dict(var='fom cost')),
-    'vom': ('vom:nl-t-ya', 'ya', dict(var='vom cost')),
-    'tom': ('tom:nl-t-ya', 'ya', dict(var='total om cost')),
-    'emis': ('emi:nl-t-ya-m-e', 'ya', dict(kind='emi', var='emis')),
-}
+PYAM_CONVERT = [
+    ('out:nl-t-ya-m-nd-c-l', 'ya', dict(kind='ene', var='out')),
+    ('in:nl-t-ya-m-no-c-l', 'ya', dict(kind='ene', var='in')),
+    ('CAP:nl-t-ya', 'ya', dict(var='capacity')),
+    ('CAP_NEW:nl-t-yv', 'yv', dict(var='new capacity')),
+    ('inv:nl-t-yv', 'yv', dict(var='inv cost')),
+    ('fom:nl-t-ya', 'ya', dict(var='fom cost')),
+    ('vom:nl-t-ya', 'ya', dict(var='vom cost')),
+    ('tom:nl-t-ya', 'ya', dict(var='total om cost')),
+    ('emi:nl-t-ya-m-e', 'ya', dict(kind='emi', var='emis')),
+]
 
 
 #: Standard reports that collect quantities converted to pyam format.
 REPORTS = {
-    'message:system': ['out:pyam', 'in:pyam', 'cap:pyam', 'new_cap:pyam'],
+    'message:system': ['out:pyam', 'in:pyam', 'CAP:pyam', 'CAP_NEW:pyam'],
     'message:costs': ['inv:pyam', 'fom:pyam', 'vom:pyam', 'tom:pyam'],
-    'message:emissions': ['emis:pyam'],
+    'message:emissions': ['emi:pyam'],
 }
 
 
@@ -182,8 +182,7 @@ class Reporter(IXMPReporter):
             put(rep.add, key, args, strict=True, index=True, sums=True)
 
         # Conversions to IAMC format/pyam objects
-        for key, args in PYAM_CONVERT.items():
-            qty, year_dim, collapse_kw = args
+        for qty, year_dim, collapse_kw in PYAM_CONVERT:
             collapse_cb = partial(collapse_message_cols, **collapse_kw)
             put(rep.convert_pyam, qty, year_dim, 'pyam', collapse=collapse_cb)
 
@@ -267,11 +266,11 @@ class Reporter(IXMPReporter):
             qty = Key.from_str_or_key(qty)
             to_drop = set(drop) | set(qty.dims) & (
                 {'h', 'y', 'ya', 'yr', 'yv'} - {year_time_dim})
-            key = Key.from_str_or_key(qty, tag=tag)
-            self.add(key, (partial(computations.as_pyam, drop=to_drop,
-                                   collapse=collapse),
-                           'scenario', year_time_dim, qty))
-            keys.append(key)
+            new_key = ':'.join([qty.name, tag])
+            self.add(new_key, (partial(computations.as_pyam, drop=to_drop,
+                                       collapse=collapse),
+                               'scenario', year_time_dim, qty))
+            keys.append(new_key)
         return keys
 
     def write(self, key, path):
