@@ -14,9 +14,12 @@ log = getLogger(__name__)
 def as_pyam(scenario, year_time_dim, quantities, drop=[], collapse=None):
     """Return a :class:`pyam.IamDataFrame` containing *quantities*.
 
+    A warning is raised if the arguments result in additional, unhandled
+    columns in the resulting data frame that are not part of the IAMC spec.
+
     See also
     --------
-    Reporter.as_pyam for documentation of the arguments.
+    message_ix.reporting.Reporter.convert_pyam
     """
     # TODO, this should check for any viable container
     if not isinstance(quantities, list):

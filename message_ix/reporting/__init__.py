@@ -185,8 +185,7 @@ class Reporter(IXMPReporter):
         for key, args in PYAM_CONVERT.items():
             qty, year_dim, collapse_kw = args
             collapse_cb = partial(collapse_message_cols, **collapse_kw)
-            key += ':pyam'
-            put(rep.as_pyam, qty, year_dim, key, collapse=collapse_cb)
+            put(rep.convert_pyam, qty, year_dim, 'pyam', collapse=collapse_cb)
 
         # Standard reports
         for group, pyam_keys in REPORTS.items():
@@ -224,31 +223,39 @@ class Reporter(IXMPReporter):
 
         return rep
 
-    def as_pyam(self, quantities, year_time_dim, key=None, drop={},
-                collapse=None):
-        """Add conversion of **quantities** to :class:`pyam.IamDataFrame`.
+    def convert_pyam(self, quantities, year_time_dim, tag='iamc', drop={},
+                     collapse=None):
+        """Add conversion of one or more **quantities** to IAMC format.
 
         Parameters
         ----------
         quantities : str or Key or list of (str, Key)
-            Quantities to transform to :mod:`pyam` format.
+            Quantities to transform to :mod:`pyam`/IAMC format.
         year_time_dim : str
-            Label of the dimension use for the `year` or `time` column of the
-            :class:`pyam.IamDataFrame`. The column is labelled "Time" if
-            `year_time_dim` is ``h``, otherwise "Year".
+            Label of the dimension use for the ‘Year’ or ‘Time’ column of the
+            resulting :class:`pyam.IamDataFrame`. The column is labelled ‘Time’
+            if ``year_time_dim=='h'``, otherwise ‘Year’.
+        tag : str, optional
+            Tag to append to new Keys.
         drop : iterable of str, optional
             Label of additional dimensions to drop from the resulting data
             frame. Dimensions ``h``, ``y``, ``ya``, ``yr``, and ``yv``—
             except for the one named by `year_time_dim`—are automatically
             dropped.
         collapse : callable, optional
-            Callback to handle additional dimensions of the data frame.
+            Callback to handle additional dimensions of the quantity. A
+            :class:`pandas.DataFrame` is passed as the sole argument to
+            `collapse`, which must return a modified dataframe.
 
         Returns
         -------
         list of Key
-            Keys for the reporting targets that create the IamDataFrames
-            corresponding to *quantities*. The keys have the added tag ‘iamc’.
+            Each key converts a :class:`Quantity
+            <ixmp.reporting.utils.Quantity>` into a :class:`pyam.IamDataFrame`.
+
+        See also
+        --------
+        message_ix.reporting.computations.as_pyam
         """
         if isinstance(quantities, (str, Key)):
             quantities = [quantities]
@@ -260,7 +267,7 @@ class Reporter(IXMPReporter):
             qty = Key.from_str_or_key(qty)
             to_drop = set(drop) | set(qty.dims) & (
                 {'h', 'y', 'ya', 'yr', 'yv'} - {year_time_dim})
-            key = key or Key.from_str_or_key(qty, tag='iamc')
+            key = Key.from_str_or_key(qty, tag=tag)
             self.add(key, (partial(computations.as_pyam, drop=to_drop,
                                    collapse=collapse),
                            'scenario', year_time_dim, qty))

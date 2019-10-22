@@ -147,13 +147,13 @@ Reporters
       - Standard reports according to :obj:`REPORTS`.
       - The report ``message:default``, collecting all of the above reports.
 
-   .. automethod:: message_ix.reporting.Reporter.as_pyam
+   .. automethod:: message_ix.reporting.Reporter.convert_pyam
 
       The :pyam:doc:`IAMC data format <data>` includes columns named 'Model',
       'Scenario', 'Region', 'Variable', 'Unit'; one of 'Year' or 'Time'; and
       'value'.
 
-      Using :meth:`as_pyam` :
+      Using :meth:`convert_pyam`:
 
       - 'Model' and 'Scenario' are populated from the attributes of the
         Scenario identified by the key ``scenario``;
@@ -161,11 +161,12 @@ Reporters
       - 'Unit' contains the units associated with the `quantities`; and
       - 'Year' or 'Time' is created according to `year_time_dim`.
 
-      Additional dimensions of quantities pass through :meth:`as_pyam` and
+      Additional dimensions of quantities pass through :meth:`convert_pyam` and
       appear as additional columns in the resulting :class:`IamDataFrame`.
-      While this is valid IAMC data, :meth:`as_pyam` also supports dropping
-      additional columns (with `drop`), and a custom callback (`collapse`) that
-      can be used to manipulate values along other dimensions.
+      While this is valid IAMC data, :meth:`convert_pyam` also supports
+      dropping additional columns (with `drop`), and a custom callback
+      (`collapse`) that can be used to manipulate values along other
+      dimensions.
 
       For example, here the values for the MESSAGEix ``technology`` and
       ``mode`` dimensions are appended to the 'Variable' column::
@@ -173,11 +174,11 @@ Reporters
           def m_t(df):
               """Callback for collapsing ACT columns."""
               # .pop() removes the named column from the returned row
-              df['variable'] = Activity + '|' + df['t'] + '|' + df['m']
+              df['variable'] = 'Activity|' + df['t'] + '|' + df['m']
               return df
 
           ACT = rep.full_key('ACT')
-          keys = rep.as_pyam(ACT, 'ya', collapse=m_t, drop=['t', 'm'])
+          keys = rep.convert_pyam(ACT, 'ya', collapse=m_t, drop=['t', 'm'])
 
 .. autoclass:: ixmp.reporting.Reporter
    :members:
@@ -259,27 +260,55 @@ Reporters
    :members:
 
    Quantities in a :class:`Scenario` can be indexed by one or more dimensions.
-   For example, a parameter with three dimensions can be initialized with:
+   A Key refers to a quantity using three components:
+
+   1. a string :attr:`name`,
+   2. zero or more ordered :attr:`dims`, and
+   3. an optional :attr:`tag`.
+
+   For example, an ixmp parameter with three dimensions can be initialized
+   with:
 
    >>> scenario.init_par('foo', ['a', 'b', 'c'], ['apple', 'bird', 'car'])
 
-   Computations for this scenario might use the quantity ``foo`` in different
-   ways:
+   Key allows a specific, explicit reference to various forms of “foo”:
 
-   1. in its full resolution, i.e. indexed by a, b, and c;
-   2. aggregated (e.g. summed) over any one dimension, e.g. aggregated over c
-      and thus indexed by a and b;
-   3. aggregated over any two dimensions; etc.
+   - in its full resolution, i.e. indexed by a, b, and c:
 
-   A Key for (1) will hash, display, and evaluate as equal to ``'foo:a-b-c'``.
-   A Key for (2) corresponds to ``'foo:a-b'``, and so forth.
+     >>> k1 = Key('foo', ['a', 'b', 'c'])
+     >>> k1 == 'foo:a-b-c'
+     True
+
+   - in a partial sum over one dimension, e.g. summed along c with dimensions
+     a and b:
+
+     >>> k2 = k1.drop('c')
+     >>> k2 == 'foo:a-b'
+     True
+
+   - in a partial sum over multiple dimensions, etc.:
+
+     >>> k1.drop('a', 'c') == k2.drop('a') == 'foo:b'
+     True
+
+   **Notes:**
+
+   A Key has the same hash, and compares equal to its ``str()``. ``repr(key)``
+   prints the Key in angle brackets ('<>') to signify it is a Key object.
+
+   >>> repr(k1)
+   <foo:a-b-c>
+
+   Keys are *immutable*: the properties :attr:`name`, :attr:`dims`, and
+   :attr:`tag` are read-only, and the methods :meth:`append`, :meth:`drop`, and
+   :meth:`add_tag` return *new* Key objects.
 
    Keys may be generated concisely by defining a convenience method:
 
    >>> def foo(dims):
-   >>>     return Key('foo', dims.split(''))
-   >>> foo('a b')
-   foo:a-b
+   >>>     return Key('foo', dims.split())
+   >>> foo('a b c')
+   foo:a-b-c
 
 
 Computations

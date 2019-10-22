@@ -134,7 +134,7 @@ def test_reporter_from_westeros(test_mp):
     assert_allclose(obs, exp)
 
 
-def test_report_as_pyam(test_mp, caplog, tmp_path):
+def test_reporter_convert_pyam(test_mp, caplog, tmp_path):
     scen = Scenario(test_mp,
                     'canning problem (MESSAGE scheme)',
                     'standard')
@@ -172,7 +172,7 @@ def test_report_as_pyam(test_mp, caplog, tmp_path):
         return df
 
     # Use the convenience function to add the node
-    keys = rep.as_pyam(ACT, 'ya', collapse=m_t)
+    keys = rep.convert_pyam(ACT, 'ya', collapse=m_t)
 
     # Keys of added node(s) are returned
     assert len(keys) == 1
