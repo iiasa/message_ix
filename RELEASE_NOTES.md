@@ -2,7 +2,8 @@
 # Next Release
 
 - [#235](https://github.com/iiasa/message_ix/pull/236): Add a reporting tutorial.
-- [#236](https://github.com/iiasa/message_ix/pull/236): Enhance reporting.
+- [#236](https://github.com/iiasa/message_ix/pull/236),
+  [#242](https://github.com/iiasa/message_ix/pull/242): Enhance reporting.
 - [#232](https://github.com/iiasa/message_ix/pull/232): Add Westeros tutorial for modelling seasonality, update existing tutorials.
 
 # v1.2.0
