@@ -165,8 +165,8 @@ class Reporter(IXMPReporter):
 
         def put(*args, **kwargs):
             """Helper to add elements to the queue."""
-            to_add.append(tuple([0, partial(args[0], **kwargs)] +
-                                list(args[1:])))
+            to_add.append(tuple([0, partial(args[0], **kwargs)]
+                                + list(args[1:])))
 
         # Quantities that represent mapping sets
         for name in MAPPING_SETS:
