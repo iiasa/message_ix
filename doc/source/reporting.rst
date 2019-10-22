@@ -212,15 +212,19 @@ Reporters
    .. autosummary::
       add
       add_file
+      add_product
       aggregate
       apply
+      check_keys
       configure
       describe
       disaggregate
       finalize
       full_key
       get
+      keys
       read_config
+      set_filters
       visualize
       write
 
