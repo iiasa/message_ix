@@ -293,65 +293,6 @@ class Scenario(ixmp.Scenario):
         """Returns the first model year of the scenario."""
         return self._jobj.getFirstModelYear()
 
-    def clone(self, model=None, scenario=None, annotation=None,
-              keep_solution=True, shift_first_model_year=None, platform=None):
-        """Clone the current scenario and return the clone.
-
-        If the (`model`, `scenario`) given already exist on the
-        :class:`Platform`, the `version` for the cloned Scenario follows the
-        last existing version. Otherwise, the `version` for the cloned Scenario
-        is 1.
-
-        .. note::
-            :meth:`clone` does not set or alter default versions. This means
-            that a clone to new (`model`, `scenario`) names has no default
-            version, and will not be returned by
-            :meth:`Platform.scenario_list` unless `default=False` is given.
-
-        Parameters
-        ----------
-        model : str, optional
-            New model name. If not given, use the existing model name.
-        scenario : str, optional
-            New scenario name. If not given, use the existing scenario name.
-        annotation : str, optional
-            Explanatory comment for the clone commit message to the database.
-        keep_solution : bool, default True
-            If :py:const:`True`, include all timeseries data and the solution
-            (vars and equs) from the source scenario in the clone.
-            Otherwise, only timeseries data marked as `meta=True` (see
-            :meth:`TimeSeries.add_timeseries`) or prior to `first_model_year`
-            (see :meth:`TimeSeries.add_timeseries`) are cloned.
-        shift_first_model_year: int, optional
-            If given, the values of the solution are transfered to parameters
-            `historical_*`, parameter `resource_volume` is updated, and the
-            `first_model_year` is shifted. The solution is then discarded,
-            see :meth:`TimeSeries.remove_solution`.
-        platform : :class:`Platform`, optional
-            Platform to clone to (default: current platform)
-        """
-        err = 'Cloning across platforms is only possible {}'
-        if platform is not None and not keep_solution:
-            raise ValueError(err.format('with `keep_solution=True`!'))
-
-        if platform is not None and shift_first_model_year is not None:
-            raise ValueError(err.format('without shifting model horizon!'))
-
-        if shift_first_model_year is not None:
-            keep_solution = False
-            msg = 'Shifting first model year to {} and removing solution'
-            logger().info(msg.format(shift_first_model_year))
-
-        platform = platform or self.platform
-        model = model or self.model
-        scenario = scenario or self.scenario
-        args = [platform._jobj, model, scenario, annotation, keep_solution]
-        if check_year(shift_first_model_year, 'shift_first_model_year'):
-            args.append(shift_first_model_year)
-
-        return Scenario(platform, model, scenario, cache=self._cache,
-                        version=self._jobj.clone(*args))
-
     def solve(self, model='MESSAGE', solve_options={}, **kwargs):
         """Solve the model for the Scenario.
 
