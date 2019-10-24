@@ -129,7 +129,8 @@ class Scenario(ixmp.Scenario):
             If `True`, then *cat* must have only one element. An exception is
             raised if *cat* already has an element, or if ``len(keys) > 1``.
         """
-        self._jobj.addCatEle(name, str(cat), ixmp.to_jlist(keys), is_unique)
+        self._backend('cat_set_elements', name, str(cat), as_str_list(keys),
+                      is_unique)
 
     def cat(self, name, cat):
         """return a list of all set elements mapped to a category
