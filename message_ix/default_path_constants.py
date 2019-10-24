@@ -1,8 +1,5 @@
-import os
+from pathlib import Path
 
 
-DEFAULT_MODEL_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'model')
-
-CONFIG_PATH = os.path.expanduser(os.path.join(
-    '~', '.local', 'message_ix', 'config.json'))
+DEFAULT_MODEL_PATH = Path(__file__).parent / 'model'
+CONFIG_PATH = Path('~', '.local', 'message_ix', 'config.json').expanduser()
