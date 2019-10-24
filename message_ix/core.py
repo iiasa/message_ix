@@ -96,14 +96,6 @@ class Scenario(ixmp.Scenario):
         except AttributeError:
             return super()._backend(method, *args, **kwargs)
 
-    @property
-    def _jobj(self):
-        """Shim to allow existing code that references ._jobj to work."""
-        # TODO address all such warnings, then remove
-        loc = inspect.stack()[1].function
-        warn(f'Accessing Scenario._jobj in {loc}')
-        return self.platform._backend.jindex[self]
-
     def cat_list(self, name):
         """return a list of all categories for a set
 
@@ -112,7 +104,7 @@ class Scenario(ixmp.Scenario):
         name : string
             name of the set
         """
-        return to_pylist(self._jobj.getTypeList(name))
+        return self._backend('get_cat_list', name)
 
     def add_cat(self, name, cat, keys, is_unique=False):
         """Map elements from *keys* to category *cat* within set *name*.
@@ -142,7 +134,7 @@ class Scenario(ixmp.Scenario):
         cat : string
             name of the category
         """
-        return to_pylist(self._jobj.getCatEle(name, cat))
+        return self._backend('cat_get_elements', name, cat)
 
     def add_spatial_sets(self, data):
         """Add sets related to spatial dimensions of the model.
@@ -287,12 +279,12 @@ class Scenario(ixmp.Scenario):
         yr_vtg : str
             vintage year
         """
-        return list(self._jobj.getTecActYrs(node, tec, str(yr_vtg)))
+        return self._backend('years_active', node, tec, str(yr_vtg))
 
     @property
     def firstmodelyear(self):
         """Returns the first model year of the scenario."""
-        return self._jobj.getFirstModelYear()
+        return self._backend('year_first_model')
 
     def solve(self, model='MESSAGE', solve_options={}, **kwargs):
         """Solve the model for the Scenario.
