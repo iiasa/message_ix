@@ -1,10 +1,15 @@
 import collections
 import copy
+import inspect
 import itertools
 import os
+from warnings import warn
 
 import ixmp
-from ixmp.utils import pd_read, pd_write, isscalar, check_year, logger
+from ixmp.utils import pd_read, pd_write, isscalar, logger
+# TODO remove this import
+from ixmp.backend.jdbc import to_pylist
+from ixmp.utils import as_str_list
 import pandas as pd
 
 from . import default_paths
@@ -83,6 +88,22 @@ class Scenario(ixmp.Scenario):
         if not self.has_solution():
             _init_scenario(self, commit=version != 'new')
 
+    def _backend(self, method, *args, **kwargs):
+        """Convenience for calling *method* on the backend."""
+        try:
+            func = getattr(self.platform._backend, f'ms_{method}')
+            return func(self, *args, **kwargs)
+        except AttributeError:
+            return super()._backend(method, *args, **kwargs)
+
+    @property
+    def _jobj(self):
+        """Shim to allow existing code that references ._jobj to work."""
+        # TODO address all such warnings, then remove
+        loc = inspect.stack()[1].function
+        warn(f'Accessing Scenario._jobj in {loc}')
+        return self.platform._backend.jindex[self]
+
     def cat_list(self, name):
         """return a list of all categories for a set
 
@@ -91,7 +112,7 @@ class Scenario(ixmp.Scenario):
         name : string
             name of the set
         """
-        return ixmp.to_pylist(self._jobj.getTypeList(name))
+        return to_pylist(self._jobj.getTypeList(name))
 
     def add_cat(self, name, cat, keys, is_unique=False):
         """Map elements from *keys* to category *cat* within set *name*.
@@ -120,20 +141,7 @@ class Scenario(ixmp.Scenario):
         cat : string
             name of the category
         """
-        return ixmp.to_pylist(self._jobj.getCatEle(name, cat))
-
-    def remove_solution(self):
-        """Remove the solution from the scenario
-
-        Delete the model solution (variables and equations) and timeseries
-        data marked as `meta=False` (see :meth:`TimeSeries.add_timeseries`)
-        prior to the first model year.
-        """
-        if self.has_solution():
-            self.clear_cache()  # reset Python data cache
-            self._jobj.removeSolution()
-        else:
-            raise ValueError('This Scenario does not have a solution!')
+        return to_pylist(self._jobj.getCatEle(name, cat))
 
     def add_spatial_sets(self, data):
         """Add sets related to spatial dimensions of the model.
@@ -265,6 +273,20 @@ class Scenario(ixmp.Scenario):
         year_pairs = [(y_v, y_a) for y_v, y_a in combos if valid(y_v, y_a)]
         v_years, a_years = zip(*year_pairs)
         return pd.DataFrame({'year_vtg': v_years, 'year_act': a_years})
+
+    def years_active(self, node, tec, yr_vtg):
+        """return a list of years in which a technology of certain vintage
+        at a specific node can be active
+        Parameters
+        ----------
+        node : str
+            node name
+        tec : str
+            name of the technology
+        yr_vtg : str
+            vintage year
+        """
+        return list(self._jobj.getTecActYrs(node, tec, str(yr_vtg)))
 
     @property
     def firstmodelyear(self):
