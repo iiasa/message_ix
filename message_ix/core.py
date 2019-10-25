@@ -1,14 +1,10 @@
 import collections
 import copy
-import inspect
 import itertools
 import os
-from warnings import warn
 
 import ixmp
 from ixmp.utils import pd_read, pd_write, isscalar, logger
-# TODO remove this import
-from ixmp.backend.jdbc import to_pylist
 from ixmp.utils import as_str_list
 import pandas as pd
 
@@ -95,6 +91,8 @@ class Scenario(ixmp.Scenario):
             return func(self, *args, **kwargs)
         except AttributeError:
             return super()._backend(method, *args, **kwargs)
+
+
 
     def cat_list(self, name):
         """return a list of all categories for a set
@@ -285,6 +283,28 @@ class Scenario(ixmp.Scenario):
     def firstmodelyear(self):
         """Returns the first model year of the scenario."""
         return self._backend('year_first_model')
+
+    def clone(self, *args, **kwargs):
+        """Clone the current scenario and return the clone.
+
+        See :meth:`ixmp.Scenario.clone` for other parameters.
+
+        Parameters
+        ----------
+        keep_solution : bool, optional
+            If :py:const:`True`, include all timeseries data and the solution
+            (vars and equs) from the source scenario in the clone.
+            Otherwise, only timeseries data marked as `meta=True` (see
+            :meth:`TimeSeries.add_timeseries`) or prior to `first_model_year`
+            (see :meth:`TimeSeries.add_timeseries`) are cloned.
+        shift_first_model_year: int, optional
+            If given, the values of the solution are transfered to parameters
+            `historical_*`, parameter `resource_volume` is updated, and the
+            `first_model_year` is shifted. The solution is then discarded,
+            see :meth:`TimeSeries.remove_solution`.
+        """
+        # Call the parent method
+        return super().clone(*args, **kwargs)
 
     def solve(self, model='MESSAGE', solve_options={}, **kwargs):
         """Solve the model for the Scenario.
