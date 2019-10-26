@@ -4,6 +4,10 @@
 # TODO remove after https://github.com/iiasa/ixmp/pull/182 is merged
 git+git://github.com/khaeru/ixmp.git@feature/backend#egg=ixmp
 
+JPype
+pint
+plotnine
+
 # pyam-iamc
 # Temporary: see https://github.com/IAMconsortium/pyam/issues/259
 git+git://github.com/IAMconsortium/pyam.git#egg=pyam-iamc

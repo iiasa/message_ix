@@ -1,14 +1,11 @@
 click
 codecov
 dask
-JPype
 jupyter
 matplotlib
 numpy
 numpydoc
 pandas
-pint
-plotnine
 pytest>=3.9
 pytest-cov
 seaborn
