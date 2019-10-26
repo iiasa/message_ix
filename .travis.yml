@@ -12,6 +12,12 @@ matrix:
   # - os: windows
   #   env: PYENV=py27
 
+cache:
+  # Travis ensures these directories are created if they do not already exist
+  directories:
+  - $HOME/.conda/pkgs
+  - $HOME/.cache/message_ix
+
 before_install:
   # Set other environment variables
   - . ci/env.sh

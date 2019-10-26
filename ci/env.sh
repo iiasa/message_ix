@@ -1,17 +1,21 @@
+# Set environment variables for Linux/macOS CI on Travis
+
+export CACHE=$HOME/.cache/message_ix
+
 # gams info
 case "${TRAVIS_OS_NAME}" in
-    linux)
-	OSFIX=linux
-	GAMSPATH=linux_x64_64_sfx
-    ;;
-    osx)
-	OSFIX=macosx
-	GAMSPATH=osx_x64_64_sfx
-    ;;
-    windows)
-	OSFIX=windows
-	GAMSPATH=windows_x64_64
-    ;;
+  linux)
+    OSFIX=linux
+    GAMSPATH=linux_x64_64_sfx
+  ;;
+  osx)
+    OSFIX=macosx
+    GAMSPATH=osx_x64_64_sfx
+  ;;
+  windows)
+    OSFIX=windows
+    GAMSPATH=windows_x64_64
+  ;;
 esac
 
 GAMS_VERSION_SHORT=25.1
@@ -23,29 +27,29 @@ export PATH=$PATH:$PWD/gams"$GAMS_VERSION_SHORT"_"$GAMSPATH"
 
 # miniconda info
 case "${TRAVIS_OS_NAME}" in
-    linux)
-        OSNAME=Linux
-        EXT=sh
-    ;;
-    osx)
-        OSNAME=MacOSX
-        EXT=sh
-    ;;
-    windows)
-        OSNAME=Windows
-        EXT=exe
-    ;;
+  linux)
+    OSNAME=Linux
+    EXT=sh
+  ;;
+  osx)
+    OSNAME=MacOSX
+    EXT=sh
+  ;;
+  windows)
+    OSNAME=Windows
+    EXT=exe
+  ;;
 esac
 
 case "${PYENV}" in
-    py27)
-        export PYVERSION=2
-    ;;
-    py37)
-        export PYVERSION=3
-    ;;
+  py37)
+    export PYVERSION=3
+  ;;
 esac
 
-export CONDAURL="https://repo.anaconda.com/miniconda/Miniconda$PYVERSION-latest-$OSNAME-x86_64.$EXT"
+export CONDAFNAME=Miniconda$PYVERSION-latest-$OSNAME-x86_64.$EXT
+export CONDAURL=https://repo.anaconda.com/miniconda/$CONDAFNAME
 export PATH=$HOME/miniconda/bin:$PATH
 
+# Echo all environment variables for debugging
+env | sort
