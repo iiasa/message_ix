@@ -4,7 +4,6 @@
 # TODO remove after https://github.com/iiasa/ixmp/pull/182 is merged
 git+git://github.com/khaeru/ixmp.git@feature/backend#egg=ixmp
 
-JPype
 pint
 plotnine
 

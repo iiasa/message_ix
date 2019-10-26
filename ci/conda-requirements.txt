@@ -1,6 +1,7 @@
 click
 codecov
 dask
+JPype1
 jupyter
 matplotlib
 numpy
