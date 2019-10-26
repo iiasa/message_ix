@@ -72,7 +72,8 @@ Exec { conda update --quiet --yes conda pip }
 #    dependencies are installed into the base conda environment.
 
 Progress 'Install dependencies'
-Exec { pip install --upgrade --requirement ci/requirements.txt }
+Exec { conda install --file ci/conda-requirements.txt }
+Exec { pip install --requirement ci/pip-requirements.txt }
 
 Progress 'Conda information'
 conda info --all
