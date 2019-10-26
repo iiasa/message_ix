@@ -63,7 +63,7 @@ Progress 'Update conda'
 # The installed conda on Appveyor workers is 4.5.x, while the latest is >4.7.
 # --quiet here and below suppresses progress bars, which show up as many lines
 # in the Appveyor build logs.
-Exec { conda update --quiet --yes conda }
+Exec { conda update --quiet --yes conda pip }
 
 # NB at the corresponding location, travis-install.sh creates a new conda
 #    environment, and later activates it. This was attempted for Windows/
@@ -72,7 +72,6 @@ Exec { conda update --quiet --yes conda }
 #    dependencies are installed into the base conda environment.
 
 Progress 'Install dependencies'
-Exec { pip install --upgrade pip }
 Exec { pip install --upgrade --requirement ci/requirements.txt }
 
 Progress 'Conda information'
