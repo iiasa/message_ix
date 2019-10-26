@@ -1,6 +1,7 @@
 
 # Next Release
 
+- [#249](https://github.com/iiasa/message_ix/pull/249): Build MESSAGE and MESSAGE_MACRO classes on ixmp model API; adjust Scenario.
 - [#235](https://github.com/iiasa/message_ix/pull/236): Add a reporting tutorial.
 - [#236](https://github.com/iiasa/message_ix/pull/236): Enhance reporting.
 - [#232](https://github.com/iiasa/message_ix/pull/232): Add Westeros tutorial for modelling seasonality, update existing tutorials.
