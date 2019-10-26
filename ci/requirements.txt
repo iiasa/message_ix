@@ -8,6 +8,7 @@ git+git://github.com/khaeru/ixmp.git@feature/backend#egg=ixmp
 
 jupyter
 matplotlib
+numpy
 numpydoc
 pandas
 pytest>=3.9
