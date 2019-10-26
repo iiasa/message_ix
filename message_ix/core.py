@@ -92,8 +92,6 @@ class Scenario(ixmp.Scenario):
         except AttributeError:
             return super()._backend(method, *args, **kwargs)
 
-
-
     def cat_list(self, name):
         """return a list of all categories for a set
 
@@ -123,14 +121,18 @@ class Scenario(ixmp.Scenario):
                       is_unique)
 
     def cat(self, name, cat):
-        """return a list of all set elements mapped to a category
+        """Return a list of all set elements mapped to a category.
 
         Parameters
         ----------
-        name : string
-            name of the set
-        cat : string
-            name of the category
+        name : str
+            Name of the set.
+        cat : str
+            Name of the category.
+
+        Returns
+        -------
+        list of str
         """
         return self._backend('cat_get_elements', name, cat)
 
@@ -214,7 +216,7 @@ class Scenario(ixmp.Scenario):
 
         first = data['firstmodelyear'] if 'firstmodelyear'\
             in data else horizon[0]
-        self.add_cat("year", "firstmodelyear", first, is_unique=True)
+        self.add_cat('year', 'firstmodelyear', first, is_unique=True)
 
     def vintage_and_active_years(self, ya_args=None, in_horizon=True):
         """Return sets of vintage and active years for use in data input.
@@ -282,7 +284,7 @@ class Scenario(ixmp.Scenario):
     @property
     def firstmodelyear(self):
         """Returns the first model year of the scenario."""
-        return self._backend('year_first_model')
+        return self.cat('year', 'firstmodelyear')[0]
 
     def clone(self, *args, **kwargs):
         """Clone the current scenario and return the clone.
