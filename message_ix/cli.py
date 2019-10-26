@@ -48,8 +48,8 @@ def do_config(model_path=None, overwrite=False):
         if not os.path.exists(model_path):
             logger().info('Creating model directory: {}'.format(model_path))
             os.makedirs(model_path)
-        recursive_copy(DEFAULT_MODEL_PATH, model_path, overwrite=overwrite,
-                       skip_ext=['gdx'])
+        recursive_copy(str(DEFAULT_MODEL_PATH), model_path,
+                       overwrite=overwrite, skip_ext=['gdx'])
         config['MODEL_PATH'] = model_path
 
     # overwrite config if already exists
