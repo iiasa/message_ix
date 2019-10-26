@@ -1,7 +1,7 @@
 codecov
 
 # Always track ixmp master
-git://github.com/iiasa/ixmp.git#egg=ixmp
+git+git://github.com/iiasa/ixmp.git#egg=ixmp
 
 jupyter
 matplotlib
@@ -11,7 +11,7 @@ pytest>=3.9
 pytest-cov
 
 # Temporary; see https://github.com/IAMconsortium/pyam/issues/259
-git://github.com/IAMconsortium/pyam.git#egg=ixmp
+git+git://github.com/IAMconsortium/pyam.git#egg=ixmp
 
 sphinx>=1.8
 sphinx_rtd_theme
