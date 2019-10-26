@@ -15,6 +15,7 @@ matrix:
 cache:
   # Travis ensures these directories are created if they do not already exist
   directories:
+  - $HOME/miniconda/pkgs
   - $HOME/.conda/pkgs
   - $HOME/.cache/message_ix
 
@@ -27,13 +28,11 @@ before_install:
 install:
   # Install GAMS, conda, and Python dependencies needed for testing
   - . ci/travis-install.sh
-  - conda info --all
   # Install the Python package
   - pip install --editable .[reporting,tests,tutorial]
 
 script:
   - python -c "import os, sys; assert os.environ['PYVERSION'] == sys.version[0]"
-  - conda info --all
   # Run tests
   - pytest --verbose
   # Run slow-running CRON tests
