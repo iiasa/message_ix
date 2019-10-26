@@ -14,15 +14,13 @@ which gams
 $CACHE/$CONDAFNAME -b -u -p $HOME/miniconda
 conda update --yes conda pip
 
-# Create named environment
+# Create and activate named environment
 conda create --yes --name testing python=$PYVERSION pip
+. activate testing
 
 # Install dependencies
 conda install --yes --name testing --file ci/conda-requirements.txt
 pip install --requirement ci/pip-requirements.txt
-
-# Activate the environment. Use '.' (POSIX) instead of 'source' (a bashism).
-. activate testing
 
 # Show information
 conda info --all
