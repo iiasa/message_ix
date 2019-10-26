@@ -53,6 +53,7 @@ tests/testdb/ixmptest.lck
 .Rproj.user
 
 # pytest and related
-.coverage
+.coverage*
 .pytest_cache
+coverage.xml
 htmlcov

@@ -1,3 +1,5 @@
+import logging
+
 from ixmp.model import MODELS
 
 from .core import (  # noqa: F401
@@ -12,3 +14,5 @@ MODELS['MESSAGE-MACRO'] = MESSAGE_MACRO
 
 
 __version__ = MESSAGE.read_version()
+
+log = logging.getLogger(__name__)

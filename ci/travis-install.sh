@@ -1,30 +1,27 @@
-#!/bin/bash
-set -x
-set -e
+# Installation script for Linux/macOS CI on Travis
 
-# install gams
-echo "Starting download from $GAMSURL"
-wget -q $GAMSURL 
-echo "Download complete from $GAMSURL"
-chmod u+x $GAMSFNAME
-./$GAMSFNAME > install.out
+# Install GAMS
+$CACHE/$GAMSFNAME > install.out
+
+# Show location
 which gams
 
-# install and update conda
-echo "Starting download from $CONDAURL"
-wget -q  $CONDAURL -O miniconda.sh
-echo "Download complete from $CONDAURL"
-chmod +x miniconda.sh
-./miniconda.sh -b -p $HOME/miniconda
+
+# Install and update conda
+# -b: run in batch mode with no user input
+# -u: update existing installation
+# -p: install prefix
+$CACHE/$CONDAFNAME -b -u -p $HOME/miniconda
 conda update --yes conda
 
-# create named env
+# Create named environment
 conda create -n testing python=$PYVERSION --yes
 
-# install deps
-conda install -n testing -c conda-forge --yes \
-      ixmp \
-      pytest \
-      coveralls \
-      pytest-cov 
-conda remove -n testing --force --yes ixmp
+# Install dependencies
+pip install --upgrade --requirement ci/requirements.txt
+
+# Activate the environment. Use '.' (POSIX) instead of 'source' (a bashism).
+. activate testing
+
+# Show information
+conda info --all
