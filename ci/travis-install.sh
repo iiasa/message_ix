@@ -15,10 +15,10 @@ $CACHE/$CONDAFNAME -b -u -p $HOME/miniconda
 conda update --yes conda pip
 
 # Create named environment
-conda create --yes -n testing python=$PYVERSION pip
+conda create --yes --name testing python=$PYVERSION pip
 
 # Install dependencies
-conda install --yes --file ci/conda-requirements.txt
+conda install --yes --name testing --file ci/conda-requirements.txt
 pip install --requirement ci/pip-requirements.txt
 
 # Activate the environment. Use '.' (POSIX) instead of 'source' (a bashism).
