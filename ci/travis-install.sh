@@ -18,6 +18,7 @@ conda update --yes conda
 conda create -n testing python=$PYVERSION --yes
 
 # Install dependencies
+pip install --upgrade pip
 pip install --upgrade --requirement ci/requirements.txt
 
 # Activate the environment. Use '.' (POSIX) instead of 'source' (a bashism).
