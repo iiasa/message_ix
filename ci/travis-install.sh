@@ -12,13 +12,12 @@ which gams
 # -u: update existing installation
 # -p: install prefix
 $CACHE/$CONDAFNAME -b -u -p $HOME/miniconda
-conda update --yes conda
+conda update --yes conda pip
 
 # Create named environment
 conda create -n testing python=$PYVERSION --yes
 
 # Install dependencies
-pip install --upgrade pip
 pip install --upgrade --requirement ci/requirements.txt
 
 # Activate the environment. Use '.' (POSIX) instead of 'source' (a bashism).
