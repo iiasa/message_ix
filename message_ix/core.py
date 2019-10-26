@@ -283,8 +283,13 @@ class Scenario(ixmp.Scenario):
 
     @property
     def firstmodelyear(self):
-        """Returns the first model year of the scenario."""
-        return self.cat('year', 'firstmodelyear')[0]
+        """The first model year of the scenario.
+
+        Returns
+        -------
+        int
+        """
+        return int(self.cat('year', 'firstmodelyear')[0])
 
     def clone(self, *args, **kwargs):
         """Clone the current scenario and return the clone.
@@ -362,7 +367,6 @@ class Scenario(ixmp.Scenario):
         except:
             commit = False
         keys = list(mapping.keys())
-        values = list(mapping.values())
 
         # search for from_tech in sets and replace
         for item in self.set_list():
