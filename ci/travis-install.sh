@@ -14,6 +14,9 @@ which gams
 $CACHE/$CONDAFNAME -b -u -p $HOME/miniconda
 conda update --yes conda pip
 
+# Search conda-forge in addition to the default channels, for e.g. JPype
+conda config --append channels conda-forge
+
 # Create and activate named environment
 conda create --yes --name testing python=$PYVERSION pip
 . activate testing

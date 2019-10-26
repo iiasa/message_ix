@@ -65,6 +65,9 @@ Progress 'Update conda'
 # in the Appveyor build logs.
 Exec { conda update --yes --quiet conda pip }
 
+# Search conda-forge in addition to the default channels, for e.g. JPype
+Exec { conda config --append channels conda-forge }
+
 # NB at the corresponding location, travis-install.sh creates a new conda
 #    environment, and later activates it. This was attempted for Windows/
 #    Appveyor in iiasa/ixmp#192, but for unclear reasons the 'activate testing'
