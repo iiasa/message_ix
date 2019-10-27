@@ -51,6 +51,8 @@ class Scenario(ixmp.Scenario):
     defines additional methods specific to |MESSAGEix|.
 
     """
+    # Name prefix for ixmp Backend methods called through ._backend()
+    _backend_prefix = 'ms'
 
     def __init__(self, mp, model, scenario=None, version=None, annotation=None,
                  cache=False):
@@ -83,14 +85,6 @@ class Scenario(ixmp.Scenario):
 
         if not self.has_solution():
             _init_scenario(self, commit=version != 'new')
-
-    def _backend(self, method, *args, **kwargs):
-        """Convenience for calling *method* on the backend."""
-        try:
-            func = getattr(self.platform._backend, f'ms_{method}')
-            return func(self, *args, **kwargs)
-        except AttributeError:
-            return super()._backend(method, *args, **kwargs)
 
     def cat_list(self, name):
         """return a list of all categories for a set
