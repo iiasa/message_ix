@@ -45,13 +45,6 @@ Support for R usage of the core classes is provided through the `reticulate`_ pa
 
 |MESSAGEix| models are created using the :py:class:`message_ix.Scenario` class. Several utility methods are also provided in the module :py:mod:`message_ix.utils`.
 
-.. autoattribute:: message_ix.core.DEFAULT_SOLVE_OPTIONS
-
-   Solver options used by :meth:`message_ix.Scenario.solve`. These configure
-   the GAMS CPLEX solver (or another solver, if selected); see `the solver
-   documentation <https://www.gams.com/latest/docs/S_CPLEX.html>`_ for possible
-   values.
-
 .. automodule:: message_ix
    :members: Scenario
 
@@ -59,14 +52,21 @@ Support for R usage of the core classes is provided through the `reticulate`_ pa
 Model classes
 -------------
 
+.. currentmodule:: message_ix.models
+
 .. automodule:: message_ix.models
    :exclude-members: MESSAGE, MESSAGE_MACRO
+
+.. autodata:: DEFAULT_CPLEX_OPTIONS
+
+   These configure the GAMS CPLEX solver (or another solver, if selected); see `the solver documentation <https://www.gams.com/latest/docs/S_CPLEX.html>`_ for possible values.
 
 .. autoclass:: MESSAGE
    :members:
    :show-inheritance:
 
-   The MESSAGE Python class encapsulates the GAMS code for the core MESSAGE mathematical formulation. 
+   The MESSAGE Python class encapsulates the GAMS code for the core MESSAGE mathematical formulation.
+   The *model_options* arguments are received from :meth:`.Scenario.solve`, and—except for *solve_options*, are passed on to the parent class :class:`GAMSModel`; see there for a full list of options.
 
 .. autoclass:: MESSAGE_MACRO
    :members:

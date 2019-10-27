@@ -11,14 +11,6 @@ import pandas as pd
 from . import default_paths
 
 
-DEFAULT_SOLVE_OPTIONS = {
-    'advind': 0,
-    'lpmethod': 2,
-    'threads': 4,
-    'epopt': 1e-6,
-}
-
-
 def _init_scenario(s, commit=False):
     """Initialize a MESSAGEix Scenario object with default values"""
     inits = (
@@ -325,11 +317,10 @@ class Scenario(ixmp.Scenario):
         return super().clone(*args, **kwargs)
 
     def solve(self, model='MESSAGE', solve_options={}, **kwargs):
-        """Solve the model for the Scenario.
+        """Solve MESSAGE or MESSAGE-MACRO for the Scenario.
 
         By default, :meth:`ixmp.Scenario.solve` is called with 'MESSAGE' as the
-        *model* argument; see the documentation of that method for other
-        arguments. *model* may also be overwritten, e.g.:
+        *model* argument. *model* may also be overwritten, e.g.:
 
         >>> s.solve(model='MESSAGE-MACRO')
 
@@ -337,28 +328,14 @@ class Scenario(ixmp.Scenario):
         ----------
         model : str, optional
             Type of model to solve, e.g. 'MESSAGE' or 'MESSAGE-MACRO'.
-        solve_options : dict, optional
-            name, value pairs to use for GAMS solver optfile. See
-            :obj:`message_ix.DEFAULT_SOLVE_OPTIONS` for defaults
-            and https://www.gams.com/latest/docs/S_CPLEX.html for possible
-            keys.
-
+        solve_options : dict (str -> str), optional
+            Name to value mapping to use for GAMS CPLEX solver options file.
+            See :class:`.MESSAGE` and :obj:`.DEFAULT_CPLEX_OPTIONS`.
+        kwargs
+            Many other options control the execution of the underlying GAMS
+            code; see :class:`.GAMSModel`.
         """
-        # TODO: we generate the cplex.opt file on the fly. this is *not* safe
-        # against race conditions. It is possible to generate opt files with
-        # random names (see
-        # https://www.gams.com/latest/docs/UG_GamsCall.html#GAMSAOoptfile);
-        # however, we need to clean up the code in ixmp that passes arguments
-        # to gams to do so.
-        fname = os.path.join(default_paths.model_path(), 'cplex.opt')
-        opts = copy.deepcopy(DEFAULT_SOLVE_OPTIONS)
-        opts.update(solve_options)
-        lines = '\n'.join('{} = {}'.format(k, v) for k, v in opts.items())
-        with open(fname, 'w') as f:
-            f.writelines(lines)
-        ret = super(Scenario, self).solve(model=model, **kwargs)
-        os.remove(fname)
-        return ret
+        super().solve(model=model, solve_options=solve_options, **kwargs)
 
     def rename(self, name, mapping, keep=False):
         """Rename an element in a set
