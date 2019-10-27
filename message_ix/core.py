@@ -262,18 +262,35 @@ class Scenario(ixmp.Scenario):
         return pd.DataFrame({'year_vtg': v_years, 'year_act': a_years})
 
     def years_active(self, node, tec, yr_vtg):
-        """return a list of years in which a technology of certain vintage
-        at a specific node can be active
+        """Return years in which *tec* of *yr_vtg* can be active in *node*.
+
         Parameters
         ----------
         node : str
-            node name
+            Node name.
         tec : str
-            name of the technology
+            Technology name.
         yr_vtg : str
-            vintage year
+            Vintage year.
+
+        Returns
+        -------
+        list of int
         """
-        return self._backend('years_active', node, tec, str(yr_vtg))
+        # Handle arguments
+        filters = dict(node_loc=[node], technology=[tec])
+        yv = int(yr_vtg)
+
+        # Lifetime of the technology at the node
+        lt = self.par('technical_lifetime', filters=filters).at[0, 'value']
+
+        # Duration of periods
+        data = self.par('duration_period')
+        # Cumulative sum of period duration for periods after the vintage year
+        data['age'] = data.where(data.year >= yv)['value'].cumsum()
+
+        # Return years where the age is less than or equal to the lifetime
+        return data.where(data.age <= lt)['year'].dropna().astype(int).tolist()
 
     @property
     def firstmodelyear(self):
