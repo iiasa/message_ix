@@ -66,7 +66,7 @@ Model classes
    :show-inheritance:
 
    The MESSAGE Python class encapsulates the GAMS code for the core MESSAGE mathematical formulation.
-   The *model_options* arguments are received from :meth:`.Scenario.solve`, and—except for *solve_options*, are passed on to the parent class :class:`GAMSModel`; see there for a full list of options.
+   The *model_options* arguments are received from :meth:`.Scenario.solve`, and—except for *solve_options*—are passed on to the parent class :class:`~ixmp.model.gams.GAMSModel`; see there for a full list of options.
 
 .. autoclass:: MESSAGE_MACRO
    :members:
