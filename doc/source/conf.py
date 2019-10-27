@@ -307,7 +307,10 @@ texinfo_documents = [
 
 intersphinx_mapping = {
     'dask': ('http://docs.dask.org/en/stable/', None),
-    'ixmp': ('https://message.iiasa.ac.at/projects/ixmp/en/stable/', None),
+    # 'ixmp': ('https://message.iiasa.ac.at/projects/ixmp/en/stable/', None),
+    # Temporary, for https://github.com/iiasa/message_ix/pulls/249
+    # TODO revert before merging
+    'ixmp': ('https://ixmp-khaeru.readthedocs.io/en/feature-backend/', None),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
     'pint': ('https://pint.readthedocs.io/en/stable/', None),
     'pyam': ('https://pyam-iamc.readthedocs.io/en/stable/', None),
