@@ -1,90 +1,41 @@
 import collections
-import copy
 import itertools
-import os
 
 import ixmp
-from ixmp.utils import pd_read, pd_write, isscalar, logger
-from ixmp.utils import as_str_list
+from ixmp.utils import as_str_list, pd_read, pd_write, isscalar, logger
 import pandas as pd
-
-from . import default_paths
-
-
-def _init_scenario(s, commit=False):
-    """Initialize a MESSAGEix Scenario object with default values"""
-    inits = (
-        # {
-        #  'test': False  # some test,
-        #  'exec': [(pass, {'args': ()}), ],
-        # },
-    )
-
-    pass_idx = [i for i, init in enumerate(inits) if init['test']]
-    if len(pass_idx) == 0:
-        return  # leave early, all init tests pass
-
-    if commit:
-        s.check_out()
-    for idx in pass_idx:
-        for exec_info in inits[idx]['exec']:
-            func = exec_info[0]
-            args = exec_info[1].pop('args', tuple())
-            kwargs = exec_info[1].pop('kwargs', dict())
-            func(*args, **kwargs)
-    if commit:
-        s.commit('Initialized wtih standard sets and params')
 
 
 class Scenario(ixmp.Scenario):
     """|MESSAGEix| Scenario.
 
-    This class extends :class:`ixmp.Scenario` and inherits all its methods. It
-    defines additional methods specific to |MESSAGEix|.
-
+    See :class:`ixmp.TimeSeries` for the meaning of arguments `mp`, `model`,
+    `scenario`, `version`, and `annotation`; :class:`ixmp.Scenario` for the
+    meaning of `cache`. The `scheme` of a newly-created
+    :class:`message_ix.Scenario` is always 'MESSAGE'.
     """
     # Name prefix for ixmp Backend methods called through ._backend()
     _backend_prefix = 'ms'
 
     def __init__(self, mp, model, scenario=None, version=None, annotation=None,
                  cache=False):
-        """Initialize a new message_ix.Scenario (input data and solution)
-        or get an existing scenario from the ixmp database instance
-
-        Parameters
-        ----------
-        mp : ixmp.Platform
-        model : string
-            model name
-        scenario : string
-            scenario name
-        version : string or integer
-            initialize a new scenario (if version == 'new'), or
-            load a specific version from the database (if version is integer)
-        annotation : string
-            a short annotation/comment (when initializing a new scenario)
-        cache : boolean
-            keep all dataframes in memory after first query (default: False)
-        """
-        # it not a new scenario, `ixmp.Scenario` uses scheme assigned in the db
+        # If not a new scenario, use the scheme stored in the Backend
         scheme = 'MESSAGE' if version == 'new' else None
+
         # `ixmp.Scenario` verifies that MESSAGE-scheme scenarios are
         # initialized as `message_ix.Scenario` for correct API
         self.is_message_scheme = True
 
-        super(Scenario, self).__init__(mp, model, scenario, version, scheme,
-                                       annotation, cache)
-
-        if not self.has_solution():
-            _init_scenario(self, commit=version != 'new')
+        super().__init__(mp, model, scenario, version, scheme, annotation,
+                         cache)
 
     def cat_list(self, name):
-        """return a list of all categories for a set
+        """Return a list of all categories for a mapping set.
 
         Parameters
         ----------
-        name : string
-            name of the set
+        name : str
+            Name of the set.
         """
         return self._backend('get_cat_list', name)
 
