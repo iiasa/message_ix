@@ -11,12 +11,9 @@ class Scenario(ixmp.Scenario):
 
     See :class:`ixmp.TimeSeries` for the meaning of arguments `mp`, `model`,
     `scenario`, `version`, and `annotation`; :class:`ixmp.Scenario` for the
-    meaning of `cache`. The `scheme` of a newly-created
-    :class:`message_ix.Scenario` is always 'MESSAGE'.
+    meaning of `cache`. The `scheme` of a newly-created Scenario is always
+    'MESSAGE'.
     """
-    # Name prefix for ixmp Backend methods called through ._backend()
-    _backend_prefix = 'ms'
-
     def __init__(self, mp, model, scenario=None, version=None, annotation=None,
                  cache=False):
         # If not a new scenario, use the scheme stored in the Backend

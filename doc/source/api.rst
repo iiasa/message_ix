@@ -51,7 +51,7 @@ Support for R usage of the core classes is provided through the `reticulate`_ pa
    :inherited-members:
 
    This class extends :class:`ixmp.Scenario` and :class:`ixmp.TimeSeries` and
-   inherits all their methods. Documentation of theses inherited methods is
+   inherits all their methods. Documentation of these inherited methods is
    included here for convenience. :class:`message_ix.Scenario` defines
    additional methods specific to |MESSAGEix|:
 

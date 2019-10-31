@@ -71,9 +71,9 @@ class MESSAGE(GAMSModel):
         # simulatenously with the same dp.model_path, then they will try to
         # write/unlink the same optfile.
         #
-        # TODO enhance GAMSModel (in ixmp) to run GAMS in a temporary,
-        #      copying source and GDX files if needed. Then the cplex.opt file
-        #      will be specific to that directory.
+        # TODO enhance GAMSModel (in ixmp) to run GAMS in a temporary
+        #      directory, copying source and GDX files if needed. Then the
+        #      cplex.opt file will be specific to that directory.
 
         # Write CPLEX options into an options file
         optfile = dp.model_path() / 'cplex.opt'
