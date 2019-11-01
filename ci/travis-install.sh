@@ -25,5 +25,8 @@ conda create --yes --name testing python=$PYVERSION pip
 conda install --yes --name testing --file ci/conda-requirements.txt
 pip install --requirement ci/pip-requirements.txt
 
+# Temporary: see https://github.com/IAMconsortium/pyam/issues/281
+pip install "matplotlib>3.0.2"
+
 # Show information
 conda info --all

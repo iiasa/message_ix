@@ -78,5 +78,8 @@ Progress 'Install dependencies'
 Exec { conda install --yes --file ci/conda-requirements.txt }
 Exec { pip install --requirement ci/pip-requirements.txt }
 
+# Temporary: see https://github.com/IAMconsortium/pyam/issues/281
+Exec { pip install "matplotlib>3.0.2" }
+
 Progress 'Conda information'
 conda info --all
