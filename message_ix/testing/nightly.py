@@ -60,10 +60,6 @@ def download_license():
             'Failed download with user/pass: {}/{}'.format(USERNAME, PASSWORD))
 
 
-def generate_test_file():
-    pass
-
-
 def fetch_scenarios():
     mp = ixmp.Platform()
     with open('scenarios.yaml', 'r') as f:

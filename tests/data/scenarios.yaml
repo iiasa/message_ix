@@ -9,7 +9,7 @@ CD_Links_SSP2_baseline:
   cases:
   - obs: scen.var('OBJ')['lvl']
     exp: 2486801.25
-    test: np.isclose(obs, exp, rtol=3e-6) # not sure why 1e-6 doesn't work
+    test: partial(np.isclose, rtol=3e-6)  # not sure why 1e-6 doesn't work
 
 CD_Links_SSP2_v2_1000:
   model: CD_Links_SSP2_v2
@@ -20,4 +20,4 @@ CD_Links_SSP2_v2_1000:
   cases:
   - obs: scen.var('OBJ')['lvl']
     exp: 2175644.25
-    test: np.isclose(obs, exp, rtol=3e-6) # not sure why 1e-6 doesn't work
+    test: partial(np.isclose, rtol=3e-6)  # not sure why 1e-6 doesn't work
