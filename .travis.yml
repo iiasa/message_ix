@@ -1,44 +1,50 @@
 language: minimal
 
 matrix:
-    include:
-        - os: linux
-          env: PYENV=py37
-        - os: osx
-          env: PYENV=py37
-# turn these on once travis support gets a little better
-#        - os: windows
-#          env: PYENV=py37
-#        - os: windows
-#          env: PYENV=py27
+  include:
+  - os: linux
+    env: PYENV=py37
+  - os: osx
+    env: PYENV=py37
+  # Turn these on once Travis Windows support improves
+  # - os: windows
+  #   env: PYENV=py37
+  # - os: windows
+  #   env: PYENV=py27
+
+cache:
+  # Travis ensures these directories are created if they do not already exist
+  directories:
+  - $HOME/miniconda/pkgs
+  - $HOME/.conda/pkgs
+  - $HOME/.cache/message_ix
 
 before_install:
-  - source ./ci/env.sh
-  - bash ./ci/travis-install.sh
-  - source activate testing
+  # Set other environment variables
+  - . ci/env.sh
+  # Download GAMS and Miniconda
+  - . ci/travis-before_install.sh
 
 install:
-  - git clone https://github.com/iiasa/ixmp.git
-  - cd ixmp && python setup.py install && cd ..
-# Upon the next pyam release (>0.2.0), these two lines should be removed.
-  - git clone https://github.com/IAMconsortium/pyam.git
-  - cd pyam && python setup.py install && cd ..
-# When https://github.com/IAMconsortium/pyam/issues/250 is resolved,
-# this line should change to `pip install .[reporting,tests]`
-  - pip install .[tests,tutorial]
+  # Install GAMS, conda, and Python dependencies needed for testing
+  - . ci/travis-install.sh
+  # Install the Python package
+  - pip install --editable .[reporting,tests,tutorial]
 
 script:
   - python -c "import os, sys; assert os.environ['PYVERSION'] == sys.version[0]"
-  - cd tests
-  - py.test --verbose --cov=message_ix --cov-config ../ci/.coveragerc --cov-report term-missing
-  - cd ..
+  # Run tests
+  - pytest --verbose
+  # Run slow-running CRON tests
   - cd tests/ci
   - if [[ ! -z "${MESSAGE_IX_CI_USER}" ]]; then ./run_on_ci.sh; fi
   - cd ../..
   - messageix-config --model_path=message_ix/model
+  # Test that documentation can be built
   - cd doc
   - pip install -r requirements.txt
   - make html
 
 after_success:
-  - coveralls
+  - coverage combine
+  - codecov

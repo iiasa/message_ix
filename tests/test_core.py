@@ -158,8 +158,10 @@ def test_add_cat_unique(test_mp):
 
 def test_years_active(test_mp):
     scen = Scenario(test_mp, *msg_multiyear_args)
-    df = scen.years_active('seattle', 'canning_plant', '2020')
-    npt.assert_array_equal(df, [2020, 2030])
+    years = scen.years_active('seattle', 'canning_plant', '2020')
+    assert isinstance(years, list)
+    assert isinstance(years[0], int)
+    npt.assert_array_equal(years, [2020, 2030])
 
 
 def test_years_active_extend(test_mp):
@@ -169,8 +171,8 @@ def test_years_active_extend(test_mp):
     scen.add_set('year', ['2040', '2050'])
     scen.add_par('duration_period', '2040', 10, 'y')
     scen.add_par('duration_period', '2050', 10, 'y')
-    df = scen.years_active('seattle', 'canning_plant', '2020')
-    npt.assert_array_equal(df, [2020, 2030, 2040])
+    years = scen.years_active('seattle', 'canning_plant', '2020')
+    npt.assert_array_equal(years, [2020, 2030, 2040])
     scen.discard_changes()
 
 
