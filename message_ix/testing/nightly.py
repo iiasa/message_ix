@@ -1,8 +1,18 @@
 import os
-import requests
+from pathlib import Path
+import shutil
 import subprocess
 import tarfile
 
+import ixmp
+import message_ix
+import requests
+import yaml
+
+
+HERE = Path(__file__).resolve()
+DBFOLDER = os.path.join(HERE, 'db')
+DBPATH = os.path.join(DBFOLDER, 'scenarios')
 
 PASSWORD = os.environ['MESSAGE_IX_CI_PW']
 URL = 'https://data.ene.iiasa.ac.at/continuous_integration/scenario_db/'
@@ -55,11 +65,26 @@ def generate_test_file():
 
 
 def fetch_scenarios():
-    pass
+    mp = ixmp.Platform()
+    with open('scenarios.yaml', 'r') as f:
+        for name, data in yaml.load(f).items():
+            scen = message_ix.Scenario(mp, data['model'], data['scenario'])
+            scen.to_excel(name + '.xlsx')
 
 
 def make_db():
-    pass
+    if os.path.exists(DBFOLDER):
+        shutil.rmtree(DBFOLDER)
+
+    mp = ixmp.Platform(DBPATH, dbtype='HSQLDB')
+    with open('scenarios.yaml', 'r') as f:
+        for name, data in yaml.load(f).items():
+            scen = message_ix.Scenario(
+                mp, data['model'], data['scenario'], version='new')
+            message_ix.macro.init(scen)
+            scen.read_excel(name + '.xlsx', add_units=True)
+            scen.commit('saving')
+    mp.close_db()
 
 
 def upload_db():
