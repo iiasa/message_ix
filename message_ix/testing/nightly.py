@@ -63,8 +63,16 @@ def make_db():
 
 
 def upload_db():
+    # TODO implement the following in Python
+    # tar cvzf db.tar.gz db
+    # scp db.tar.gz $1:/opt/data.ene.iiasa.ac.at/docs/continuous_integration/
+    #   scenario_db/
+    # rm db.tar.gz
     pass
 
 
 def upload_license():
+    # TODO implement the following in Python
+    # scp $2 $1:/opt/data.ene.iiasa.ac.at/docs/continuous_integration/
+    #   scenario_db/$(basename $2)
     pass
