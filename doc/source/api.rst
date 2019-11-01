@@ -94,7 +94,7 @@ Model classes
    .. autoattribute:: name
 
    .. autoattribute:: defaults
-      :annotation:
+      :annotation: = dict(...)
 
       The paths to MESSAGE GAMS source files use the ``MODEL_PATH`` configuration setting.
       ``MODEL_PATH``, in turn, defaults to "message_ix/model" inside the directory where :mod:`message_ix` is installed.
