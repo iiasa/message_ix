@@ -85,14 +85,45 @@ Model classes
 
 .. autoclass:: MESSAGE
    :members:
+   :exclude-members: defaults
    :show-inheritance:
 
    The MESSAGE Python class encapsulates the GAMS code for the core MESSAGE mathematical formulation.
    The *model_options* arguments are received from :meth:`.Scenario.solve`, and—except for *solve_options*—are passed on to the parent class :class:`~ixmp.model.gams.GAMSModel`; see there for a full list of options.
 
+   .. autoattribute:: name
+
+   .. autoattribute:: defaults
+      :annotation:
+
+      The paths to MESSAGE GAMS source files use the ``MODEL_PATH`` configuration setting.
+      ``MODEL_PATH``, in turn, defaults to "message_ix/model" inside the directory where :mod:`message_ix` is installed.
+
+      ================== ===
+      Key                Value
+      ================== ===
+      MESSAGE defaults
+      ----------------------
+      **model_file**     ``'{MODEL_PATH}/{model_name}_run.gms'``
+      **in_file**        ``'{MODEL_PATH}/data/MsgData_{case}.gdx'``
+      **out_file**       ``'{MODEL_PATH}/output/MsgOutput_{case}.gdx'``
+      **solve_args**     ``['--in="{in_file}"', '--out="{out_file}"', '--iter="{MODEL_PATH}/output/MsgIterationReport_{case}.gdx"']``
+      ------------------ ---
+      Inherited from :class:`~ixmp.model.gams.GAMSModel`
+      ----------------------
+      **case**           ``'{scenario.model}_{scenario.scenario}'``
+      **gams_args**      ``['LogOption=4']``
+      **check_solution** :obj:`True`
+      **comment**        :obj:`None`
+      **equ_list**       :obj:`None`
+      **var_list**       :obj:`None`
+      ================== ===
+
 .. autoclass:: MESSAGE_MACRO
    :members:
    :show-inheritance:
+
+   .. autoattribute:: name
 
 
 .. _utils:
