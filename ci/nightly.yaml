@@ -1,0 +1,11 @@
+http base: https://data.ene.iiasa.ac.at/
+
+ssh:
+  host: data.ene.iiasa.ac.at
+  base: /opt/data.ene.iiasa.ac.at/docs/
+
+path: continuous_integration/scenario_db/
+
+filename:
+  data: db.tar.gz
+  license: gamslice.txt

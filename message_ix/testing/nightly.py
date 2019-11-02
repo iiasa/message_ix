@@ -1,63 +1,65 @@
+from asyncio import get_event_loop
+import logging
 import os
 from pathlib import Path
-import shutil
 import subprocess
-import tarfile
+from tarfile import TarFile
 
+from asyncssh import connect, scp
+import click
 import ixmp
 import message_ix
 import requests
 import yaml
 
 
+log = logging.getLogger(__name__)
+
 HERE = Path(__file__).resolve()
 DBFOLDER = os.path.join(HERE, 'db')
 DBPATH = os.path.join(DBFOLDER, 'scenarios')
 
-PASSWORD = os.environ['MESSAGE_IX_CI_PW']
-URL = 'https://data.ene.iiasa.ac.at/continuous_integration/scenario_db/'
-USERNAME = os.environ['MESSAGE_IX_CI_USER']
-FILENAME = 'db.tar.gz'
+
+def _config():
+    with open(HERE.parents[2] / 'ci' / 'nightly.yaml') as f:
+        return yaml.load(f)
 
 
-def download_db():
-    r = requests.get(URL + FILENAME, auth=(USERNAME, PASSWORD))
+def download(path):
+    auth = (os.environ['MESSAGE_IX_CI_USER'], os.environ['MESSAGE_IX_CI_PW'])
 
-    if r.status_code == 200:
-        print('Downloading {} from {}'.format(FILENAME, URL))
-        with open(FILENAME, 'wb') as out:
-            for bits in r.iter_content():
-                out.write(bits)
-        print('Untarring {}'.format(FILENAME))
-        tar = tarfile.open(FILENAME, "r:gz")
-        tar.extractall()
-        tar.close()
-        os.remove(FILENAME)
-    else:
-        raise IOError(
-            'Failed download with user/pass: {}/{}'.format(USERNAME, PASSWORD))
+    cfg = _config()
 
+    # Download database
+    fn = cfg['filename']['data']
+    url = cfg['http base'] + cfg['path'] + fn
+    log.info('Downloading from {}'.format(url))
 
-def download_license():
-    filename = 'gamslice.txt'
+    r = requests.get(url, auth=auth)
+    r.raise_for_status()
 
-    print(subprocess.check_output('which gams', shell=True).strip())
+    data_path = path / fn
+    with open(data_path, 'wb') as out:
+        for bits in r.iter_content():
+            out.write(bits)
 
-    localpath = os.path.dirname(
-        subprocess.check_output(['which', 'gams']).strip())
-    localpath = localpath.decode()  # py3
+    log.info('Untarring {}'.format(fn))
+    with TarFile(data_path, 'r:gz') as tf:
+        tf.extractall(path)
 
-    r = requests.get(URL + filename, auth=(USERNAME, PASSWORD))
+    data_path.unlink()
 
-    if r.status_code == 200:
-        outpath = os.path.join(localpath, filename)
-        print('Downloading {} from {} to {}'.format(filename, URL, localpath))
-        with open(outpath, 'wb') as out:
-            for bits in r.iter_content():
-                out.write(bits)
-    else:
-        raise IOError(
-            'Failed download with user/pass: {}/{}'.format(USERNAME, PASSWORD))
+    # Download license
+    gams_dir = Path(subprocess.check_output(['which', 'gams']).strip()).parent
+    log.info('Located GAMS executable at {}'.format(gams_dir))
+
+    fn = cfg['filename']['license']
+    url = cfg['http base'] + cfg['path'] + fn
+    log.info('Downloading from {}'.format(url))
+
+    r = requests.get(url, auth=auth)
+    r.raise_for_status()
+    (gams_dir / fn).write_text(r.text)
 
 
 def fetch_scenarios():
@@ -68,32 +70,45 @@ def fetch_scenarios():
             scen.to_excel(name + '.xlsx')
 
 
-def make_db():
-    if os.path.exists(DBFOLDER):
-        shutil.rmtree(DBFOLDER)
+def iter_scenarios():
+    with open(HERE.parents[2] / 'tests' / 'data' / 'scenarios.yaml', 'r') as f:
+        scenarios = yaml.load(f)
 
-    mp = ixmp.Platform(DBPATH, dbtype='HSQLDB')
-    with open('scenarios.yaml', 'r') as f:
-        for name, data in yaml.load(f).items():
-            scen = message_ix.Scenario(
-                mp, data['model'], data['scenario'], version='new')
-            message_ix.macro.init(scen)
-            scen.read_excel(name + '.xlsx', add_units=True)
-            scen.commit('saving')
+    for id, data in scenarios.items():
+        yield id, (
+            data['model'],
+            data['scenario'],
+            data['solve'],
+            data.get('solve_options', {}),
+            data['cases']
+        )
+
+
+def make_db(path):
+    mp = ixmp.Platform(dbprops=path / 'scenarios', dbtype='HSQLDB')
+    for id, data in iter_scenarios():
+        scen = message_ix.Scenario(mp, data['model'], data['scenario'],
+                                   version='new')
+        message_ix.macro.init(scen)
+        scen.read_excel(id + '.xlsx', add_units=True)
+        scen.commit('saving')
     mp.close_db()
 
-
-def upload_db():
-    # TODO implement the following in Python
-    # tar cvzf db.tar.gz db
-    # scp db.tar.gz $1:/opt/data.ene.iiasa.ac.at/docs/continuous_integration/
-    #   scenario_db/
-    # rm db.tar.gz
-    pass
+    # Pack the HSQLDB files into an archive
+    cfg = _config()
+    with TarFile(path / cfg['filename']['data'], 'w:gz') as tf:
+        for fn in path.glob('scenarios*'):
+            tf.add(fn)
 
 
-def upload_license():
-    # TODO implement the following in Python
-    # scp $2 $1:/opt/data.ene.iiasa.ac.at/docs/continuous_integration/
-    #   scenario_db/$(basename $2)
-    pass
+def upload(path, username, password):
+    get_event_loop().run_until_complete(_upload(path, username, password))
+
+
+async def _upload(path, username, password):
+    cfg = _config()
+    async with connect(cfg['ssh']['host'], username=username,
+                       password=password) as conn:
+        target = (conn, cfg['ssh']['base'] + cfg['path'])
+        await scp(path / cfg['filename']['data'], target)
+        await scp(path / cfg['filename']['license'], target)
