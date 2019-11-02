@@ -15,6 +15,7 @@ import pytest
 ids, args = zip(*iter_scenarios())
 
 
+@pytest.fixture(scope='module')
 def scenarios_mp(tmp_path):
     download(tmp_path)
     # TODO remove the 'db' directory
