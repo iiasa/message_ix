@@ -41,7 +41,7 @@ def download(path, cli=False):
 
     data_path = path / fn
     with open(data_path, 'wb') as out:
-        for bits in r.iter_content():
+        for bits in r.iter_content(None):
             out.write(bits)
 
     log.info('Extracting from {}'.format(fn))
