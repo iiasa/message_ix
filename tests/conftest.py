@@ -1,11 +1,7 @@
-try:
-    from pathlib import Path
-except ImportError:
-    from pathlib2 import Path
+from pathlib import Path
 
+import ixmp
 import message_ix
-from ixmp import Platform
-from ixmp.testing import create_local_testdb
 import pytest
 
 
@@ -37,10 +33,12 @@ def tutorial_path(request):
 @pytest.fixture(scope='session')
 def test_legacy_mp(tmp_path_factory, test_data_path):
     """Path to a database properties file referring to a test database."""
+    from ixmp.testing import create_local_testdb
+
     # adapting `ixmp.testing:test_mp()`
     db_path = Path(str(tmp_path_factory.mktemp('test_mp_props')))
     db_name = 'message_ix_legacy'
     props = create_local_testdb(db_path, test_data_path / 'testdb', db_name)
-    mp = Platform(props)
+    mp = ixmp.Platform(props)
 
     yield mp

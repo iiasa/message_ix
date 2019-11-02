@@ -5,7 +5,6 @@ import os
 import ixmp
 import message_ix
 from message_ix.testing.nightly import (
-    DBPATH,
     download,
     iter_scenarios,
 )
@@ -18,10 +17,17 @@ ids, args = zip(*iter_scenarios())
 
 def scenarios_mp(tmp_path):
     download(tmp_path)
-    yield ixmp.Platform(dbprops=tmp_path / 'scenarios', dbtype='HSQLDB')
+    # TODO remove the 'db' directory
+    yield ixmp.Platform(dbprops=tmp_path / 'db' / 'scenarios', dbtype='HSQLDB')
 
 
-@pytest.mark.skipif(os.environ.get('TRAVIS_EVENT_TYPE', '') != 'cron')
+# commented: temporarily disabled to develop the current PR
+# @pytest.mark.skipif(
+#     os.environ.get('TRAVIS_EVENT_TYPE', '') != 'cron',
+#     reason="Nightly scenario tests only run on Travis 'cron' events.")
+@pytest.mark.skipif(
+    'TRAVIS_EVENT_TYPE' not in os.environ,
+    reason='Run on all Travis jobs, for debugging.')
 @pytest.mark.parametrize('model,scenario,solve,solve_opts,cases',
                          args, ids=ids)
 def test_scenario(scenarios_mp, model, scenario, solve, solve_opts, cases):
