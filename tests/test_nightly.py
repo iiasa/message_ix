@@ -16,10 +16,11 @@ ids, args = zip(*iter_scenarios())
 
 
 @pytest.fixture(scope='module')
-def scenarios_mp(tmp_path):
-    download(tmp_path)
+def scenarios_mp(tmp_path_factory):
+    path = tmp_path_factory.mktemp('nightly')
+    download(path)
     # TODO remove the 'db' directory
-    yield ixmp.Platform(dbprops=tmp_path / 'db' / 'scenarios', dbtype='HSQLDB')
+    yield ixmp.Platform(dbprops=path / 'db' / 'scenarios', dbtype='HSQLDB')
 
 
 # commented: temporarily disabled to develop the current PR

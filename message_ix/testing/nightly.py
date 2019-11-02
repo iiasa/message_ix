@@ -40,9 +40,9 @@ def download(path, cli=False):
     r.raise_for_status()
 
     data_path = path / fn
-    # with open(data_path, 'wb') as out:
-    #     for bits in r.iter_content():
-    #         out.write(bits)
+    with open(data_path, 'wb') as out:
+        for bits in r.iter_content():
+            out.write(bits)
 
     log.info('Extracting from {}'.format(fn))
     with tarfile.open(data_path, 'r:gz') as tf:
