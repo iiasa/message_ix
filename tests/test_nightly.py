@@ -19,8 +19,18 @@ ids, args = zip(*iter_scenarios())
 def scenarios_mp(tmp_path_factory):
     path = tmp_path_factory.mktemp('nightly')
     download(path)
-    # TODO remove the 'db' directory
-    yield ixmp.Platform(dbprops=path / 'db' / 'scenarios', dbtype='HSQLDB')
+
+    platform_args = dict(
+        # TODO remove the 'db' directory
+        dbprops=path / 'db' / 'scenarios',
+        dbtype='HSQLDB',
+    )
+
+    if os.environ.get('TRAVIS_OS_NAME', None) == 'osx':
+        # Avoid heap space issues on Travis macOS workers
+        platform_args['jvmargs'] = ['-Xmx4G']
+
+    yield ixmp.Platform(**platform_args)
 
 
 # commented: temporarily disabled to develop the current PR
