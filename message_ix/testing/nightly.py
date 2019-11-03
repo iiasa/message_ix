@@ -23,7 +23,7 @@ DBPATH = os.path.join(DBFOLDER, 'scenarios')
 
 def _config():
     with open(HERE.parents[2] / 'ci' / 'nightly.yaml') as f:
-        return yaml.load(f)
+        return yaml.safe_load(f)
 
 
 def download(path, cli=False):
@@ -75,7 +75,7 @@ def fetch_scenarios(path, dbprops):
 
 def iter_scenarios():
     with open(HERE.parents[2] / 'tests' / 'data' / 'scenarios.yaml', 'r') as f:
-        scenarios = yaml.load(f)
+        scenarios = yaml.safe_load(f)
 
     for id, data in scenarios.items():
         yield id, (
