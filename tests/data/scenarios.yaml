@@ -6,9 +6,9 @@ CD_Links_SSP2_baseline:
   solve: MESSAGE-MACRO
   solve_options:
     lpmethod: 4
-  cases:
+  cases: # Each entry in this list is eval()'d in Python, so must be a string
   - obs: scen.var('OBJ')['lvl']
-    exp: 2486801.25
+    exp: '2486801.25'
     test: partial(np.isclose, rtol=3e-6)  # not sure why 1e-6 doesn't work
 
 CD_Links_SSP2_v2_1000:
@@ -19,5 +19,5 @@ CD_Links_SSP2_v2_1000:
     lpmethod: 4
   cases:
   - obs: scen.var('OBJ')['lvl']
-    exp: 2175644.25
+    exp: '2175644.25'
     test: partial(np.isclose, rtol=3e-6)  # not sure why 1e-6 doesn't work
