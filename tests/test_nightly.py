@@ -12,6 +12,19 @@ import numpy as np  # noqa: F401
 import pytest
 
 
+pytestmark = pytest.mark.skipif()
+
+# commented: temporarily disabled to develop the current PR
+# pytestmark = pytest.mark.skipif(
+#     os.environ.get('TRAVIS_EVENT_TYPE', '') != 'cron'
+#     or os.environ.get('TRAVIS_OS_NAME', '') == 'osx',
+#     reason="Nightly scenario tests only run on Travis 'cron' events.")
+pytestmark = pytest.mark.skipif(
+    'TRAVIS_EVENT_TYPE' not in os.environ
+    or os.environ.get('TRAVIS_OS_NAME', '') == 'osx',
+    reason='Run on all Travis jobs, for debugging.')
+
+
 ids, args = zip(*iter_scenarios())
 
 
@@ -26,20 +39,9 @@ def scenarios_mp(tmp_path_factory):
         dbtype='HSQLDB',
     )
 
-    if os.environ.get('TRAVIS_OS_NAME', None) == 'osx':
-        # Avoid heap space issues on Travis macOS workers
-        platform_args['jvmargs'] = ['-Xmx4G']
-
     yield ixmp.Platform(**platform_args)
 
 
-# commented: temporarily disabled to develop the current PR
-# @pytest.mark.skipif(
-#     os.environ.get('TRAVIS_EVENT_TYPE', '') != 'cron',
-#     reason="Nightly scenario tests only run on Travis 'cron' events.")
-@pytest.mark.skipif(
-    'TRAVIS_EVENT_TYPE' not in os.environ,
-    reason='Run on all Travis jobs, for debugging.')
 @pytest.mark.parametrize('model,scenario,solve,solve_opts,cases',
                          args, ids=ids)
 def test_scenario(scenarios_mp, model, scenario, solve, solve_opts, cases):
