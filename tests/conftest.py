@@ -4,7 +4,6 @@ except ImportError:
     from pathlib2 import Path
 
 import message_ix
-from ixmp.testing import create_test_mp
 import pytest
 
 
@@ -36,4 +35,6 @@ def tutorial_path(request):
 @pytest.fixture(scope='function')
 def test_legacy_mp(request, tmp_env, test_data_path):
     """Path to a database properties file referring to a test database."""
+    from ixmp.testing import create_test_mp
+
     yield from create_test_mp(request, test_data_path, 'message_ix_legacy')

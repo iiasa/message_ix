@@ -112,7 +112,7 @@ def test_multi_db_run(tmpdir):
     del mp2
 
     # reopen the connection to the second platform and reload scenario
-    _mp2 = Platform(tmpdir / 'mp2', dbtype='HSQLDB')
+    _mp2 = Platform(driver='hsqldb', path=tmpdir / 'mp2')
     scen2 = Scenario(_mp2, **models['dantzig'])
     assert_multi_db(mp1, _mp2)
 
