@@ -1,16 +1,20 @@
 import argparse
-import json
-import message_ix
 import os
+from pathlib import Path
 import shutil
 import tempfile
 import zipfile
 
-
+import click
+from ixmp import config
+from ixmp.cli import main
+from ixmp.utils import logger
+import message_ix
 from six.moves.urllib.request import urlretrieve
 
-from message_ix.default_path_constants import CONFIG_PATH, DEFAULT_MODEL_PATH
-from ixmp.utils import logger
+
+main.__doc__ == \
+    """MESSAGEix command-line interface."""
 
 
 def recursive_copy(src, dst, overwrite=False, skip_ext=[]):
@@ -34,46 +38,30 @@ def recursive_copy(src, dst, overwrite=False, skip_ext=[]):
                 shutil.copyfile(fromf, tof)
 
 
-def do_config(model_path=None, overwrite=False):
-    config = {}
+@main.command('copy-model')
+@click.option('--set-default', is_flag=True,
+              help='Set the copy to be the default used when running MESSAGE.')
+@click.option('--overwrite', is_flag=True,
+              help='Overwrite existing files.')
+@click.argument('path', type=click.Path(file_okay=False))
+def copy_model(path, overwrite, set_default):
+    """Copy the MESSAGE GAMS files to a new PATH.
 
-    # make directory for config if doesn't exist
-    dirname = os.path.dirname(CONFIG_PATH)
-    if not os.path.exists(dirname):
-        os.makedirs(dirname)
+    To use an existing set of GAMS files, use instead:
 
-    # update default path to model directory
-    if model_path:
-        model_path = os.path.abspath(os.path.expanduser(model_path))
-        if not os.path.exists(model_path):
-            logger().info('Creating model directory: {}'.format(model_path))
-            os.makedirs(model_path)
-        recursive_copy(str(DEFAULT_MODEL_PATH), model_path,
+    message-ix config set "message model dir" PATH
+    """
+    path = Path(path).resolve()
+
+    if not path.exists():
+        print('Creating model directory: {}'.format(path))
+        path.mkdir()
+        recursive_copy(Path(__file__).parent / 'model', path,
                        overwrite=overwrite, skip_ext=['gdx'])
-        config['MODEL_PATH'] = model_path
 
-    # overwrite config if already exists
-    if os.path.exists(CONFIG_PATH):
-        with open(CONFIG_PATH, mode='r') as f:
-            data = json.load(f)
-        data.update(config)
-        config = data
-
-    # write new config
-    if config:
-        with open(CONFIG_PATH, mode='w') as f:
-            logger().info('Updating configuration file: {}'.format(CONFIG_PATH))
-            json.dump(config, f)
-
-
-def config():
-    parser = argparse.ArgumentParser()
-    model_path = 'Copy model files to a new path and configure MESSAGEix to use those files.'
-    parser.add_argument('--model_path', help=model_path, default=None)
-    overwrite = 'Overwrite existing files.'
-    parser.add_argument('--overwrite', help=overwrite, action='store_true')
-    args = parser.parse_args()
-    do_config(model_path=args.model_path, overwrite=args.overwrite)
+    if set_default:
+        config.set('message model dir', path)
+        config.save()
 
 
 def tempdir_name():

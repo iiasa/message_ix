@@ -253,8 +253,8 @@ def test_excel_read_write(test_mp):
 
 def test_clone(tmpdir):
     # Two local platforms
-    mp1 = ixmp.Platform(tmpdir / 'mp1', dbtype='HSQLDB')
-    mp2 = ixmp.Platform(tmpdir / 'mp2', dbtype='HSQLDB')
+    mp1 = ixmp.Platform(driver='hsqldb', path=tmpdir / 'mp1')
+    mp2 = ixmp.Platform(driver='hsqldb', path=tmpdir / 'mp2')
 
     # A minimal scenario
     scen1 = Scenario(mp1, model='model', scenario='scenario', version='new')
