@@ -34,6 +34,9 @@ def downloaded_scenarios(tmp_path_factory):
     # Download scenarios database into the temporary path; install GAMS license
     download(path)
 
+    # NB could `yield ixmp.Platform(...)` here, but Travis/macOS jobs fail due
+    #    to excessive memory use in Java/ixmp_source. Instead, create multiple
+    #    Platforms so that memory is released after each is destroyed.
     yield dict(
         # TODO repack the archive without a 'db' directory, and remove from the
         #      path here
@@ -42,18 +45,11 @@ def downloaded_scenarios(tmp_path_factory):
     )
 
 
-@pytest.fixture(scope='function')
-def mp(downloaded_scenarios):
-    """Modeling platform."""
-    # NB this must be a *function*-scoped fixture (rather than the *module*-
-    #    scoped fixture above) because JDBCBackend doesn't free up enough
-    #    memory after the first usage.
-    yield ixmp.Platform(**downloaded_scenarios)
-
-
 @pytest.mark.parametrize('model,scenario,solve,solve_opts,cases',
                          args, ids=ids)
-def test_scenario(mp, model, scenario, solve, solve_opts, cases):
+def test_scenario(downloaded_scenarios, model, scenario, solve, solve_opts,
+                  cases):
+    mp = ixmp.Platform(**downloaded_scenarios)
     scen = message_ix.Scenario(mp, model, scenario)
     scen.solve(model=solve, solve_options=solve_opts)
 
