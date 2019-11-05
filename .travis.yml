@@ -1,16 +1,16 @@
 language: minimal
 
-matrix:
-  include:
-  - os: linux
-    env: PYENV=py37
-  - os: osx
-    env: PYENV=py37
-  # Turn these on once Travis Windows support improves
-  # - os: windows
-  #   env: PYENV=py37
-  # - os: windows
-  #   env: PYENV=py27
+env:
+  global:
+  - PYENV=py37
+  # Encrypted values for MESSAGE_IX_CI_USER, MESSAGE_IX_CI_PW
+  - secure: "KMFK5CBtfnJj2i/qP0QI9CLvGACjEVuemJ7y7taMholQRa/retn2LWoMp6GCYtUPzINUKHbWWmDyZl2St9/2ocFEPfNc3F6L7R0D0zHoj+R/4piuxlIx+QjAAYVtf/LX5E1zDtw8vDS5EraIQrHuYJaibeI2HeQPSEWGrGVw9aA1IcXPf4n0bXOOIZOLtq0DyMYe5Gm9uNNEgHyg1yZgkkbIVtW/Z58n38hCwwWHS4R8488Smxutba1SAoZQtuiEM4+JBpGvTxCcEeiyk8qR+WkutssL6GDk1DtSOzVrNuh44vTjn9MgW3S6reeUJLu8IJhH8ljjWk9Cex+FEKMLE053rVr2P/PI05aQORUjkJBsdT03yLNVAwtd72nBsnatT+gXbnEQxz5cd0rYTrwAlXp8K7vevx+zD4rPLeElo4Af5HXM/Uqf/yKU+TkOi0Y4F9KDx4iJpkUSdSRN1pKepL2Kk59vZVJG0dLHmz/I2QWKTtuY/jJh9ZUfr13eus/gHrfkKc7EmoaDKd1jv8Z4csRFQA4WypNOSsynFJcSLjLkvf2RGvRf89OPC7kNg68+1Y21Yk5N6zoL7YIiqpZEH966VSYNye5gdGiy6Vv1JmFfvVHxVo0SVek58sqL5KEKvuJmXdrekISUohdFZ1mKbCGQ5z0VVeBYqVJ427VR7yw="
+
+os:
+- linux
+- osx
+# Turn this on once Travis Windows support improves
+# - windows
 
 cache:
   # Travis ensures these directories are created if they do not already exist
@@ -35,11 +35,6 @@ script:
   - python -c "import os, sys; assert os.environ['PYVERSION'] == sys.version[0]"
   # Run tests
   - pytest --verbose
-  # Run slow-running CRON tests
-  - cd tests/ci
-  - if [[ ! -z "${MESSAGE_IX_CI_USER}" ]]; then ./run_on_ci.sh; fi
-  - cd ../..
-  - messageix-config --model_path=message_ix/model
   # Test that documentation can be built
   - cd doc
   - pip install -r requirements.txt

@@ -3,8 +3,8 @@ import pandas as pd
 
 from ixmp import IAMC_IDX
 
-from . import Scenario
-from .utils import make_df
+from message_ix import Scenario
+from message_ix.utils import make_df
 
 
 models = {
