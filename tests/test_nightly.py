@@ -14,12 +14,14 @@ import pytest
 
 # commented: temporarily disabled to develop the current PR
 # pytestmark = pytest.mark.skipif(
-#     os.environ.get('TRAVIS_EVENT_TYPE', '') != 'cron',
+#     os.environ.get('TRAVIS_EVENT_TYPE', '') != 'cron'
+#     or os.environ.get('TRAVIS_OS_NAME', '') == 'osx',
 #     reason="Nightly scenario tests only run on Travis 'cron' events.")
 
 # For development/debugging, uncomment the following
 pytestmark = pytest.mark.skipif(
-    'TRAVIS_EVENT_TYPE' not in os.environ,
+    'TRAVIS_EVENT_TYPE' not in os.environ
+    or os.environ.get('TRAVIS_OS_NAME', '') == 'osx',
     reason='Run on all Travis jobs, for debugging.')
 
 
