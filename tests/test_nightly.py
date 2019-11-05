@@ -12,40 +12,49 @@ import numpy as np  # noqa: F401
 import pytest
 
 
-pytestmark = pytest.mark.skipif()
-
 # commented: temporarily disabled to develop the current PR
 # pytestmark = pytest.mark.skipif(
-#     os.environ.get('TRAVIS_EVENT_TYPE', '') != 'cron'
-#     or os.environ.get('TRAVIS_OS_NAME', '') == 'osx',
+#     os.environ.get('TRAVIS_EVENT_TYPE', '') != 'cron',
 #     reason="Nightly scenario tests only run on Travis 'cron' events.")
+
+# For development/debugging, uncomment the following
 pytestmark = pytest.mark.skipif(
-    'TRAVIS_EVENT_TYPE' not in os.environ
-    or os.environ.get('TRAVIS_OS_NAME', '') == 'osx',
+    'TRAVIS_EVENT_TYPE' not in os.environ,
     reason='Run on all Travis jobs, for debugging.')
 
 
+# Information about nightly scenarios to run
 ids, args = zip(*iter_scenarios())
 
 
 @pytest.fixture(scope='module')
-def scenarios_mp(tmp_path_factory):
+def downloaded_scenarios(tmp_path_factory):
     path = tmp_path_factory.mktemp('nightly')
+
+    # Download scenarios database into the temporary path; install GAMS license
     download(path)
 
-    platform_args = dict(
-        # TODO remove the 'db' directory
+    yield dict(
+        # TODO repack the archive without a 'db' directory, and remove from the
+        #      path here
         dbprops=path / 'db' / 'scenarios',
         dbtype='HSQLDB',
     )
 
-    yield ixmp.Platform(**platform_args)
+
+@pytest.fixture(scope='function')
+def mp(downloaded_scenarios):
+    """Modeling platform."""
+    # NB this must be a *function*-scoped fixture (rather than the *module*-
+    #    scoped fixture above) because JDBCBackend doesn't free up enough
+    #    memory after the first usage.
+    yield ixmp.Platform(**downloaded_scenarios)
 
 
 @pytest.mark.parametrize('model,scenario,solve,solve_opts,cases',
                          args, ids=ids)
-def test_scenario(scenarios_mp, model, scenario, solve, solve_opts, cases):
-    scen = message_ix.Scenario(scenarios_mp, model, scenario)
+def test_scenario(mp, model, scenario, solve, solve_opts, cases):
+    scen = message_ix.Scenario(mp, model, scenario)
     scen.solve(model=solve, solve_options=solve_opts)
 
     for case in cases:
