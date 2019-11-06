@@ -1,12 +1,24 @@
-import subprocess
+from click.testing import CliRunner
+import pytest
+
+from message_ix import cli
 
 
-def test_dl_default(tmp_path):
-    cmd = ['messageix-dl', '--local_path={}'.format(tmp_path)]
-    subprocess.check_call(cmd)
+@pytest.fixture(scope='session')
+def message_ix_cli(tmp_env):
+    """A CliRunner object that invokes the message_ix command-line interface.
+
+    :obj:`None` in *args* is automatically discarded.
+    """
+    class Runner(CliRunner):
+        def invoke(self, *args, **kwargs):
+            return super().invoke(cli.main, list(filter(None, args)),
+                                  env=tmp_env, **kwargs)
+
+    yield Runner().invoke
 
 
-def test_dl_master(tmp_path):
-    cmd = ['messageix-dl', '--branch=master',
-           '--local_path={}'.format(tmp_path)]
-    subprocess.check_call(cmd)
+@pytest.mark.parametrize('opts', ['', '--branch=master', '--tag=1.2.0'])
+def test_dl(message_ix_cli, opts, tmp_path):
+    r = message_ix_cli('dl', opts, str(tmp_path))
+    assert r.exit_code == 0

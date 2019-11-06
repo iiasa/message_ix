@@ -1,7 +1,7 @@
-import argparse
 import os
 from pathlib import Path
 import shutil
+from urllib.request import urlretrieve
 import tempfile
 import zipfile
 
@@ -10,7 +10,6 @@ from ixmp import config
 from ixmp.cli import main
 from ixmp.utils import logger
 import message_ix
-from six.moves.urllib.request import urlretrieve
 
 
 # Override the docstring of the ixmp CLI so that it masquerades as the
@@ -75,53 +74,33 @@ def tempdir_name():
                         next(tempfile._get_candidate_names()))
 
 
-def do_dl(tag=None, branch=None, repo_path=None, local_path='.'):
-    if tag is not None and branch is not None:
-        raise ValueError('Can only provide one of `tag` and `branch`')
-    if tag is None and branch is None:
+@main.command()
+@click.option('--branch',
+              help='Repository branch to download from (e.g., master).')
+@click.option('--tag',
+              help='Repository tag to download from (e.g., 1.0.0).')
+@click.argument('path', type=click.Path())
+def dl(branch, tag, path):
+    if tag and branch:
+        raise click.BadOptionUsage('Can only provide one of `tag` or `branch`')
+    elif tag is None and branch is None:
         tag = '{}'.format(message_ix.__version__)
+        print(tag)
 
     zipname = '{}.zip'.format(branch or 'v' + tag)
     url = 'https://github.com/iiasa/message_ix/archive/{}'.format(zipname)
+    path = Path(path)
 
-    tmp = tempdir_name()
-    os.makedirs(tmp)
-    try:
-        logger().info('Retrieving {}'.format(url))
-        dst = os.path.join(tmp, zipname)
+    with tempfile.TemporaryDirectory() as td:
+        print('Retrieving {}'.format(url))
+        dst = Path(td) / zipname
         urlretrieve(url, dst)
 
         archive = zipfile.ZipFile(dst)
-        logger().info('Unzipping {} to {}'.format(dst, tmp))
-        archive.extractall(tmp)
 
-        if not os.path.exists(local_path):
-            os.makedirs(local_path)
-
-        cpfrom = '{}/message_ix-{}/{}'.format(tmp, branch or tag, repo_path)
-        cpto = '{}/{}'.format(local_path, repo_path)
-        logger().info('Copying {} to {}'.format(cpfrom, cpto))
-        recursive_copy(cpfrom, cpto, overwrite=True)
-
-        shutil.rmtree(tmp)
-
-    except Exception as e:
-        logger().info("Could not delete {} because {}".format(tmp, e))
-
-
-def dl():
-    parser = argparse.ArgumentParser()
-    repo_path = 'Path to files to download from repository (e.g., tutorial).'
-    parser.add_argument('--repo_path', help=repo_path, default='tutorial')
-    local_path = 'Path on place files on local machine.'
-    parser.add_argument('--local_path', help=local_path, default='.')
-    tag = 'Repository tag to download from (e.g., 1.0.0).'
-    parser.add_argument('--tag', help=tag, default=None)
-    branch = 'Repository branch to download from (e.g., master).'
-    parser.add_argument('--branch', help=branch, default=None)
-    args = parser.parse_args()
-    do_dl(tag=args.tag, branch=args.branch, repo_path=args.repo_path,
-          local_path=args.local_path)
+        print('Unzipping {} to {}'.format(dst, path))
+        path.mkdir(parents=True, exist_ok=True)
+        archive.extractall(path)
 
 
 try:

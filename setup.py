@@ -69,7 +69,6 @@ setup(
     entry_points={
         'console_scripts': [
             'message-ix=message_ix.cli:main'
-            'messageix-dl=message_ix.cli:dl',
         ],
     }
 )
