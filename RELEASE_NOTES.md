@@ -2,6 +2,9 @@
 # Next Release
 
 - [#223](https://github.com/iiasa/message_ix/pull/223): Explicit MACRO parameterization and calibration support
+- [#235](https://github.com/iiasa/message_ix/pull/236): Add a reporting tutorial.
+- [#236](https://github.com/iiasa/message_ix/pull/236): Enhance reporting.
+- [#232](https://github.com/iiasa/message_ix/pull/232): Add Westeros tutorial for modelling seasonality, update existing tutorials.
 
 # v1.2.0
 
@@ -33,6 +36,7 @@ other improvements. See the ixmp release notes for further details.
 - [#154](https://github.com/iiasa/message_ix/pull/154): Enable documentation build on ReadTheDocs.
 - [#138](https://github.com/iiasa/message_ix/pull/138): Update documentation and tutorials.
 - [#131](https://github.com/iiasa/message_ix/pull/131): Update clone function argument `scen` to `scenario` with planned deprecation of the former.
+
 
 # v1.1.0
 
@@ -130,6 +134,7 @@ jdbc.pwd = ixmp
 
 ## Updates
 
+- [#202](https://github.com/iiasa/message_ix/pull/202): Added the "Development rule of thumb" section from the wiki and the Tutorial style guide to the Contributor guidelines. Tweaked some formatting to improve readibility
 - [#113](https://github.com/iiasa/message_ix/pull/113): Upgrading to MESSAGEix 1.1: improved representation of renewables, share constraints, etc.
 - [#109](https://github.com/iiasa/message_ix/pull/109): MACRO module added for initializing models to be solved with MACRO. Added scenario-based CI on circleci.
 - [#99](https://github.com/iiasa/message_ix/pull/99): Fixing an error in the compuation of the auxiliary GAMS reporting variable `PRICE_EMISSION`
