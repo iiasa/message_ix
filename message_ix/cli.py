@@ -13,8 +13,14 @@ import message_ix
 from six.moves.urllib.request import urlretrieve
 
 
-main.__doc__ == \
-    """MESSAGEix command-line interface."""
+# Override the docstring of the ixmp CLI so that it masquerades as the
+# message_ix CLI
+main.help == \
+    """MESSAGEix command-line interface
+
+    To view/run the 'nightly' commands, you need the testing dependencies.
+    Run `pip install [--editable] .[tests]`.
+    """
 
 
 def recursive_copy(src, dst, overwrite=False, skip_ext=[]):
@@ -116,3 +122,12 @@ def dl():
     args = parser.parse_args()
     do_dl(tag=args.tag, branch=args.branch, repo_path=args.repo_path,
           local_path=args.local_path)
+
+
+try:
+    import message_ix.testing.nightly
+except ImportError:
+    # Dependencies of testing.nightly are missing; don't show the command
+    pass
+else:
+    main.add_command(message_ix.testing.nightly.cli)

@@ -22,6 +22,7 @@ with open('README.md') as f:
     LONG_DESCRIPTION = f.read()
 
 INSTALL_REQUIRES = [
+    'click',
     'ixmp>=0.2.0',
     'pandas',
     'xlrd',
@@ -29,7 +30,7 @@ INSTALL_REQUIRES = [
 ]
 
 EXTRAS_REQUIRE = {
-    'tests': ['pytest>=4.0'],
+    'tests': ['asyncssh', 'pytest>=4.0'],
     'docs': ['numpydoc', 'sphinx', 'sphinx_rtd_theme',
              'sphinxcontrib-bibtex'],
     'reporting': ['pyam-iamc'],
