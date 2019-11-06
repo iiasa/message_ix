@@ -99,10 +99,10 @@ def test_multi_db_run(tmpdir):
 
     # check that cloning across platforms must copy the full solution
     dest = dict(platform=mp2)
-    pytest.raises(ValueError, scen1.clone, keep_solution=False,
+    pytest.raises(NotImplementedError, scen1.clone, keep_solution=False,
                   **dest)
-    pytest.raises(ValueError, scen1.clone, shift_first_model_year=1964,
-                  **dest)
+    pytest.raises(NotImplementedError, scen1.clone,
+                  shift_first_model_year=1964, **dest)
 
     # clone solved model across platforms (with default settings)
     scen1.clone(platform=mp2, keep_solution=True)

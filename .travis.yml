@@ -1,44 +1,45 @@
 language: minimal
 
-matrix:
-    include:
-        - os: linux
-          env: PYENV=py37
-        - os: osx
-          env: PYENV=py37
-# turn these on once travis support gets a little better
-#        - os: windows
-#          env: PYENV=py37
-#        - os: windows
-#          env: PYENV=py27
+env:
+  global:
+  - PYENV=py37
+  # Encrypted values for MESSAGE_IX_CI_USER, MESSAGE_IX_CI_PW
+  - secure: "KMFK5CBtfnJj2i/qP0QI9CLvGACjEVuemJ7y7taMholQRa/retn2LWoMp6GCYtUPzINUKHbWWmDyZl2St9/2ocFEPfNc3F6L7R0D0zHoj+R/4piuxlIx+QjAAYVtf/LX5E1zDtw8vDS5EraIQrHuYJaibeI2HeQPSEWGrGVw9aA1IcXPf4n0bXOOIZOLtq0DyMYe5Gm9uNNEgHyg1yZgkkbIVtW/Z58n38hCwwWHS4R8488Smxutba1SAoZQtuiEM4+JBpGvTxCcEeiyk8qR+WkutssL6GDk1DtSOzVrNuh44vTjn9MgW3S6reeUJLu8IJhH8ljjWk9Cex+FEKMLE053rVr2P/PI05aQORUjkJBsdT03yLNVAwtd72nBsnatT+gXbnEQxz5cd0rYTrwAlXp8K7vevx+zD4rPLeElo4Af5HXM/Uqf/yKU+TkOi0Y4F9KDx4iJpkUSdSRN1pKepL2Kk59vZVJG0dLHmz/I2QWKTtuY/jJh9ZUfr13eus/gHrfkKc7EmoaDKd1jv8Z4csRFQA4WypNOSsynFJcSLjLkvf2RGvRf89OPC7kNg68+1Y21Yk5N6zoL7YIiqpZEH966VSYNye5gdGiy6Vv1JmFfvVHxVo0SVek58sqL5KEKvuJmXdrekISUohdFZ1mKbCGQ5z0VVeBYqVJ427VR7yw="
+
+os:
+- linux
+- osx
+# Turn this on once Travis Windows support improves
+# - windows
+
+cache:
+  # Travis ensures these directories are created if they do not already exist
+  directories:
+  - $HOME/miniconda/pkgs
+  - $HOME/.conda/pkgs
+  - $HOME/.cache/message_ix
 
 before_install:
-  - source ./ci/env.sh
-  - bash ./ci/travis-install.sh
-  - source activate testing
+  # Set other environment variables
+  - . ci/env.sh
+  # Download GAMS and Miniconda
+  - . ci/travis-before_install.sh
 
 install:
-  - git clone https://github.com/iiasa/ixmp.git
-  - cd ixmp && python setup.py install && cd ..
-# Upon the next pyam release (>0.2.0), these two lines should be removed.
-  - git clone https://github.com/IAMconsortium/pyam.git
-  - cd pyam && python setup.py install && cd ..
-# When https://github.com/IAMconsortium/pyam/issues/250 is resolved,
-# this line should change to `pip install .[reporting,tests]`
-  - pip install .[tests,tutorial]
+  # Install GAMS, conda, and Python dependencies needed for testing
+  - . ci/travis-install.sh
+  # Install the Python package
+  - pip install --editable .[reporting,tests,tutorial]
 
 script:
   - python -c "import os, sys; assert os.environ['PYVERSION'] == sys.version[0]"
-  - cd tests
-  - py.test --verbose --cov=message_ix --cov-config ../ci/.coveragerc --cov-report term-missing
-  - cd ..
-  - cd tests/ci
-  - if [[ ! -z "${MESSAGE_IX_CI_USER}" ]]; then ./run_on_ci.sh; fi
-  - cd ../..
-  - messageix-config --model_path=message_ix/model
+  # Run tests
+  - pytest --verbose
+  # Test that documentation can be built
   - cd doc
   - pip install -r requirements.txt
   - make html
 
 after_success:
-  - coveralls
+  - coverage combine
+  - codecov

@@ -6,7 +6,7 @@ import shutil
 import tempfile
 import zipfile
 
-
+import click
 from six.moves.urllib.request import urlretrieve
 
 from message_ix.default_path_constants import CONFIG_PATH, DEFAULT_MODEL_PATH
@@ -48,8 +48,8 @@ def do_config(model_path=None, overwrite=False):
         if not os.path.exists(model_path):
             logger().info('Creating model directory: {}'.format(model_path))
             os.makedirs(model_path)
-        recursive_copy(DEFAULT_MODEL_PATH, model_path, overwrite=overwrite,
-                       skip_ext=['gdx'])
+        recursive_copy(str(DEFAULT_MODEL_PATH), model_path,
+                       overwrite=overwrite, skip_ext=['gdx'])
         config['MODEL_PATH'] = model_path
 
     # overwrite config if already exists
@@ -128,3 +128,20 @@ def dl():
     args = parser.parse_args()
     do_dl(tag=args.tag, branch=args.branch, repo_path=args.repo_path,
           local_path=args.local_path)
+
+
+@click.group()
+def main():
+    """MESSAGEix tools.
+
+    To view/run the 'nightly' commands, you need the testing dependencies.
+    Run `pip install [--editable] .[tests]`.
+    """
+
+
+try:
+    import message_ix.testing.nightly
+except ImportError:
+    pass
+else:
+    main.add_command(message_ix.testing.nightly.cli)
