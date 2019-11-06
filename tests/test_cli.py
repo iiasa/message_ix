@@ -1,7 +1,10 @@
+from pathlib import Path
+
 from click.testing import CliRunner
 import pytest
 
-from message_ix import cli
+import message_ix
+from message_ix import cli, config
 
 
 @pytest.fixture(scope='session')
@@ -16,6 +19,28 @@ def message_ix_cli(tmp_env):
                                   env=tmp_env, **kwargs)
 
     yield Runner().invoke
+
+
+def test_copy_model(message_ix_cli, tmp_path, tmp_env):
+    r = message_ix_cli('copy-model', str(tmp_path))
+    assert r.exit_code == 0
+
+    # Copying again without --overwrite fails
+    r = message_ix_cli('copy-model', str(tmp_path))
+    assert r.exit_code == 0
+    assert 'will not overwrite' in r.output
+
+    # Copying with --overwrite succeeds
+    r = message_ix_cli('copy-model', '--overwrite', str(tmp_path))
+    assert r.exit_code == 0
+    assert 'Overwriting' in r.output
+
+    # --set-default causes a configuration change
+    assert config.get('message model dir') == \
+        Path(message_ix.__file__).parent / 'model'
+    r = message_ix_cli('copy-model', '--set-default', str(tmp_path))
+    assert r.exit_code == 0
+    assert config.get('message model dir') == tmp_path
 
 
 @pytest.mark.parametrize('opts', ['', '--branch=master', '--tag=1.2.0'])

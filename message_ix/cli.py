@@ -1,6 +1,5 @@
-import os
 from pathlib import Path
-import shutil
+from shutil import copyfile
 from urllib.request import urlretrieve
 import tempfile
 import zipfile
@@ -8,7 +7,6 @@ import zipfile
 import click
 from ixmp import config
 from ixmp.cli import main
-from ixmp.utils import logger
 import message_ix
 
 
@@ -20,27 +18,6 @@ main.help == \
     To view/run the 'nightly' commands, you need the testing dependencies.
     Run `pip install [--editable] .[tests]`.
     """
-
-
-def recursive_copy(src, dst, overwrite=False, skip_ext=[]):
-    """Copy src to dst recursively"""
-    for root, dirs, files in os.walk(src):
-        for f in [f for f in files if os.path.splitext(f)[1] not in skip_ext]:
-            rel_path = root.replace(src, '').lstrip(os.sep)
-            dst_path = os.path.join(dst, rel_path)
-
-            if not os.path.isdir(dst_path):
-                os.makedirs(dst_path)
-
-            fromf = os.path.join(root, f)
-            tof = os.path.join(dst_path, f)
-            exists = os.path.exists(tof)
-            if exists and not overwrite:
-                logger().info('{} exists, will not overwrite'.format(tof))
-            else:
-                logger().info('Writing to {} (overwrite is {})'.format(
-                    tof, 'ON' if overwrite else 'OFF'))
-                shutil.copyfile(fromf, tof)
 
 
 @main.command('copy-model')
@@ -58,20 +35,39 @@ def copy_model(path, overwrite, set_default):
     """
     path = Path(path).resolve()
 
-    if not path.exists():
-        print('Creating model directory: {}'.format(path))
-        path.mkdir()
-        recursive_copy(Path(__file__).parent / 'model', path,
-                       overwrite=overwrite, skip_ext=['gdx'])
+    src_dir = Path(__file__).parent / 'model'
+    for src in src_dir.rglob('*'):
+        # Skip certain files
+        if src.suffix in ('.gdx', '.log', '.lst'):
+            continue
+
+        # Destination path
+        dst = path / src.relative_to(src_dir)
+
+        # Create parent directory
+        dst.parent.mkdir(parents=True, exist_ok=True)
+
+        if dst.is_dir():
+            # No further action for directories
+            continue
+
+        # Display output
+        if dst.exists:
+            if not overwrite:
+                print('{} exists, will not overwrite'.format(dst))
+
+                # Skip copyfile() below
+                continue
+            else:
+                print('Overwriting {}'.format(dst))
+        else:
+            print('Copying to {}'.format(dst))
+
+        copyfile(src, dst)
 
     if set_default:
         config.set('message model dir', path)
         config.save()
-
-
-def tempdir_name():
-    return os.path.join(tempfile._get_default_tempdir(),
-                        next(tempfile._get_candidate_names()))
 
 
 @main.command()
