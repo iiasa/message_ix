@@ -13,7 +13,7 @@ This tool adds new modeling years to an existing :class:`ixmp.Scenario` (hereaft
 
 …additional years can be added after importing the add_year function::
 
-    from tools.add_year import add_year
+    from message_ix.tools.add_year import add_year
     sc_new = message_ix.Scenario(mp, sc_ref.model, sc_ref.scenario,
                                  version='new')
     add_year(sc_ref, sc_new, [705, 712, 718, 725])
