@@ -110,7 +110,7 @@ class Plots(object):
                      values='lvl')
               .rename(columns={'lvl': 'value'})
               )
-        df = df / 8760 * 100 / 1e6 * self.cost_unit_conv
+        df = df / 8760 * 100 * self.cost_unit_conv
         df.plot.bar(stacked=False)
         plt.title('{} Energy System Prices'.format(self.country.title()))
         plt.ylabel('cents/kWhr')
