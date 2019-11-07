@@ -32,7 +32,7 @@ Support for R usage of the core classes is provided through the `reticulate`_ pa
 
 .. autosummary::
 
-   ixmp.config.Config
+   ixmp.config
    ixmp.model.MODELS
    ixmp.model.get_model
    ixmp.testing.make_dantzig

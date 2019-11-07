@@ -19,9 +19,9 @@ If you installed |MESSAGEix| from source, all notebooks are in the ``tutorial``
 directory.
 
 If you installed |MESSAGEix| using Anaconda, download the notebooks using the
-``messageix-dl`` utility. In a command prompt::
+``message-ix`` command-line program. In a command prompt::
 
-    $ messageix-dl --local_path /path/to/tutorials
+    $ message-ix dl /path/to/tutorials
 
 .. note::
 
@@ -54,7 +54,7 @@ Anaconda. If it was not, install it::
 From the command line
 .....................
 
-1. Navigate to the tutorial folder. For instance, if ``messageix-dl`` was used
+1. Navigate to the tutorial folder. For instance, if ``message-ix dl`` was used
    above::
 
        $ cd /path/to/tutorials

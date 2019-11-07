@@ -27,4 +27,3 @@ build: false
 
 test_script:
   - pytest --verbose
-  - messageix-config --model_path=message_ix\\model

@@ -21,7 +21,7 @@ def test_run_clone(tmpdir):
     # - create a new scenario based on Dantzigs tutorial transport model
     # - solve the model and read back the solution from the output
     # - perform tests on the objective value and the timeseries data
-    mp = Platform(tmpdir, dbtype='HSQLDB')
+    mp = Platform(driver='hsqldb', path=tmpdir / 'db')
     scen = make_dantzig(mp, solve=True)
     assert np.isclose(scen.var('OBJ')['lvl'], 153.675)
     assert scen.firstmodelyear == 1963
@@ -89,10 +89,10 @@ def assert_multi_db(mp1, mp2):
 
 def test_multi_db_run(tmpdir):
     # create a new instance of the transport problem and solve it
-    mp1 = Platform(tmpdir / 'mp1', dbtype='HSQLDB')
+    mp1 = Platform(driver='hsqldb', path=tmpdir / 'mp1')
     scen1 = make_dantzig(mp1, solve=True)
 
-    mp2 = Platform(tmpdir / 'mp2', dbtype='HSQLDB')
+    mp2 = Platform(driver='hsqldb', path=tmpdir / 'mp2')
     # add other unit to make sure that the mapping is correct during clone
     mp2.add_unit('wrong_unit')
     mp2.add_region('wrong_region', 'country')
@@ -112,7 +112,7 @@ def test_multi_db_run(tmpdir):
     del mp2
 
     # reopen the connection to the second platform and reload scenario
-    _mp2 = Platform(tmpdir / 'mp2', dbtype='HSQLDB')
+    _mp2 = Platform(driver='hsqldb', path=tmpdir / 'mp2')
     scen2 = Scenario(_mp2, **models['dantzig'])
     assert_multi_db(mp1, _mp2)
 

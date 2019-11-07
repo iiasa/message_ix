@@ -3,15 +3,9 @@ from copy import copy
 from pathlib import Path
 import re
 
+from ixmp import config
 from ixmp.model.gams import GAMSModel
 
-from message_ix import default_paths as dp
-
-
-model_file = Path(dp.model_path(), '{model_name}_run.gms')
-in_file = Path(dp.data_path(), 'MsgData_{case}.gdx')
-out_file = Path(dp.output_path(), 'MsgOutput_{case}.gdx')
-iter_file = Path(dp.output_path(), 'MsgIterationReport_{case}.gdx')
 
 #: Solver options used by :meth:`message_ix.Scenario.solve`.
 DEFAULT_CPLEX_OPTIONS = {
@@ -22,25 +16,34 @@ DEFAULT_CPLEX_OPTIONS = {
 }
 
 
+def _template(*parts):
+    """Helper to make a template string relative to model_dir."""
+    return str(Path('{model_dir}', *parts))
+
+
 class MESSAGE(GAMSModel):
     name = 'MESSAGE'
 
     #: Default model options.
     defaults = ChainMap({
-        'model_file': str(model_file),
-        'in_file': str(in_file),
-        'out_file': str(out_file),
+        # New keys for MESSAGE
+        'model_dir': Path(__file__).parent / 'model',
+        'iter_file': _template('output', 'MsgIterationReport_{case}.gdx'),
+        # Update keys from GAMSModel
+        'model_file': _template('{model_name}_run.gms'),
+        'in_file': _template('data', 'MsgData_{case}.gdx'),
+        'out_file': _template('output', 'MsgOutput_{case}.gdx'),
         'solve_args': [
             '--in="{in_file}"',
             '--out="{out_file}"',
-            '--iter="{}"'.format(iter_file),
+            '--iter="{iter_file}"',
             ],
     }, GAMSModel.defaults)
 
     @classmethod
     def read_version(cls):
         """Retrieve MESSAGE version string from version.gms."""
-        version_file = Path(dp.model_path(), 'version.gms')
+        version_file = Path(config.get('message model dir'), 'version.gms')
         if not version_file.exists():
             # Only exists here on install
             version_file = Path(__file__).parent / 'model' / 'version.gms'
@@ -55,6 +58,7 @@ class MESSAGE(GAMSModel):
 
     def __init__(self, name=None, **model_options):
         # Update the default options with any user-provided options
+        model_options.setdefault('model_dir', config.get('message model dir'))
         self.cplex_opts = copy(DEFAULT_CPLEX_OPTIONS)
         self.cplex_opts.update(model_options.pop('solve_options', {}))
 
@@ -76,7 +80,7 @@ class MESSAGE(GAMSModel):
         #      cplex.opt file will be specific to that directory.
 
         # Write CPLEX options into an options file
-        optfile = dp.model_path() / 'cplex.opt'
+        optfile = self.model_dir / 'cplex.opt'
         lines = ('{} = {}'.format(*kv) for kv in self.cplex_opts.items())
         optfile.write_text('\n'.join(lines))
 
