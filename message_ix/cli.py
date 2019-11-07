@@ -29,9 +29,9 @@ main.help == \
 def copy_model(path, overwrite, set_default):
     """Copy the MESSAGE GAMS files to a new PATH.
 
-    To use an existing set of GAMS files, use instead:
+    To use an existing set of GAMS files, you can also call:
 
-    message-ix config set "message model dir" PATH
+        $ message-ix config set "message model dir" PATH
     """
     path = Path(path).resolve()
 
@@ -94,11 +94,11 @@ def dl(branch, tag, path):
 
         archive = zipfile.ZipFile(zippath)
 
-        print('Creating {}'.format(path))
-        path.mkdir(parents=True, exist_ok=True)
         print('Unzipping {} to {}'.format(zippath, path))
+        path.mkdir(parents=True, exist_ok=True)
         archive.extractall(path)
-        print('Closing {}'.format(zippath))
+
+        # Close *zipfile* so it can be deleted with *td*
         archive.close()
 
 
