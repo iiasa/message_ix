@@ -89,14 +89,17 @@ def dl(branch, tag, path):
 
     with tempfile.TemporaryDirectory() as td:
         print('Retrieving {}'.format(url))
-        dst = Path(td) / zipname
-        urlretrieve(url, dst)
+        zippath = Path(td) / zipname
+        urlretrieve(url, zippath)
 
-        archive = zipfile.ZipFile(dst)
+        archive = zipfile.ZipFile(zippath)
 
-        print('Unzipping {} to {}'.format(dst, path))
+        print('Creating {}'.format(path))
         path.mkdir(parents=True, exist_ok=True)
+        print('Unzipping {} to {}'.format(zippath, path))
         archive.extractall(path)
+        print('Closing {}'.format(zippath))
+        archive.close()
 
 
 try:
