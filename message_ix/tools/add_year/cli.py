@@ -1,12 +1,14 @@
-"""Add additional years to a MESSAGE model/scenario instance
+"""Add years to a MESSAGE Scenario.
 
 \b
 Examples:
-$ python -m message_ix.tools.add_year \
-    --model_ref Austria_tutorial --scen_ref test_core \
+$ message-ix \
+    --platform default --model Austria_tutorial --scenario test_core \
+    add-years
     --scen_new test_5y --years_new 2015,2025,2035,2045
-$ python -m message_ix.tools.add_year \
-    --model_ref CD_Links_SSP2 --scen_ref baseline \
+$ message-ix \
+    --platform default --model CD_Links_SSP2 --scenario baseline \
+    add-years
     --years_new "[2015,2025,2035,2045,2055,2120]"
 
 If --create_new=False is given, the target Scenario must already exist.
@@ -45,11 +47,7 @@ def split_value(ctx, param, value, type=str):
         raise click.BadParameter(param.human_readable_name, value)
 
 
-@click.command(help=__doc__)
-@click.option('--model_ref', help='reference model name', required=True)
-@click.option('--scen_ref', help='reference scenario name', required=True)
-@click.option('--version_ref', help='version number of reference scenario',
-              default=None, type=int)
+@click.command('add-years', help=__doc__)
 @click.option('--model_new', help='new model name', default=None)
 @click.option('--scen_new', help='new scenario name', default=None)
 @click.option('--create_new', help='create new scenario', type=bool,
@@ -77,31 +75,37 @@ def split_value(ctx, param, value, type=str):
 @click.option('--bound_extend', help='copy data from previous timestep',
               type=bool, default=True, show_default=True)
 @click.option('--dry-run', help='Only parse arguments & exit.', is_flag=True)
-def main(model_ref, scen_ref, version_ref, model_new, scen_new, create_new,
-         years_new, firstyear_new, lastyear_new, macro, baseyear_macro,
-         parameter, region, rewrite, unit_check, extrapol_neg, bound_extend,
-         dry_run):
+@click.pass_obj
+def main(context, model_new, scen_new, create_new, years_new, firstyear_new,
+         lastyear_new, macro, baseyear_macro, parameter, region, rewrite,
+         unit_check, extrapol_neg, bound_extend, dry_run):
+    # The reference scenario is loaded according to the options given to
+    # the top-level message-ix (=ixmp) CLI:
+
+    try:
+        sc_ref = context.get('scen', None)  # AttributeError if context is None
+        if not isinstance(sc_ref, ixmp.Scenario):
+            raise AttributeError
+    except AttributeError:
+        raise click.UsageError('add-years requires a base scenario; use'
+                               '--url or --platform, --model, --scenario, and '
+                               'optionally --version')
 
     start = timer()
     print('>> message_ix.tools.add_year...')
 
     # Handle default arguments
-    ref_kw = dict(model=model_ref, scen=scen_ref)
-    if version_ref:
-        ref_kw['version'] = version_ref
-
     if model_new is None:
-        model_new = model_ref
+        model_new = sc_ref.model
 
     if scen_new is None:
         # FIXME is this a good default?
-        scen_new = scen_ref + '_5y'
+        scen_new = sc_ref.scenario + '_5y'
 
-    new_kw = dict(model=model_new, scen=scen_new)
+    new_kw = dict(model=model_new, scenario=scen_new)
     if create_new:
         new_kw.update(dict(
             version='new',
-            scheme='MESSAGE',
             annotation='5 year modelling',
         ))
 
@@ -111,7 +115,7 @@ def main(model_ref, scen_ref, version_ref, model_new, scen_new, create_new,
     if dry_run:
         # Print arguments debugging and return
         print(
-            'sc_ref:', ref_kw,
+            'sc_ref:', (sc_ref.model, sc_ref.scenario, sc_ref.version),
             'sc_new:', new_kw,
             'years_new:', years_new,
             'firstyear_new:', firstyear_new,
@@ -126,17 +130,14 @@ def main(model_ref, scen_ref, version_ref, model_new, scen_new, create_new,
             'bound_extend:', bound_extend)
         return
 
-    # Load the ixmp Platform
-    mp = ixmp.Platform(dbtype='HSQLDB')
+    # Retrieve the Platform that sc_ref is stored on
+    mp = sc_ref.platform
 
-    # Loading the reference scenario and creating a new scenario to add the
-    # additional years
-    sc_ref = message_ix.Scenario(mp, **ref_kw)
+    # Load or create the new scenario to which to add years
+    sc_new = message_ix.Scenario(mp, **new_kw)
 
-    if create_new:
-        sc_new = message_ix.Scenario(mp, **new_kw)
-    else:
-        sc_new = message_ix.Scenario(mp, **new_kw)
+    if not create_new:
+        # Existing scenario: remove solution and check out
         if sc_new.has_solution():
             sc_new.remove_solution()
         sc_new.check_out()
@@ -164,9 +165,6 @@ def main(model_ref, scen_ref, version_ref, model_new, scen_new, create_new,
     print('> Elapsed time for adding new years:', round((end - start) / 60),
           'min and', round((end - start) % 60, 1), 'sec.')
 
-    print('> New scenario with additional years is: "{}"|"{}"|{}'.format(
-        sc_new.model, sc_new.scenario, str(sc_new.version)))
-
-
-# Execute the script
-main()
+    print('> New scenario with additional years is:\n'
+          '  ixmp://{}/{}/{}#{}'.format(sc_new.platform.name, sc_new.model,
+                                        sc_new.scenario, sc_new.version))
