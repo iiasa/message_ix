@@ -68,9 +68,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'message-ix=message_ix.cli:main',
-            'messageix-config=message_ix.cli:config',
-            'messageix-dl=message_ix.cli:dl',
+            'message-ix=message_ix.cli:main'
         ],
     }
 )

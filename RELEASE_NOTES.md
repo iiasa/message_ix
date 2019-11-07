@@ -1,7 +1,17 @@
 
 # Next Release
 
-- [#223](https://github.com/iiasa/message_ix/pull/223): Explicit MACRO parameterization and calibration support
+## Migrating
+
+**Command-line interface (CLI).** Use `message-ix` as the program for all command-line operations:
+- `message-ix copy-model` replaces `messageix-config`.
+- `message-ix dl` replaces `messageix-dl`.
+- `message-ix` also provides all the features of the :mod:`ixmp` CLI.
+
+## All changes
+
+- [#223](https://github.com/iiasa/message_ix/pull/223): Add :meth:`Scenario.add_macro` to parametrize and calibrate (MESSAGE-)MACRO from a MESSAGE scenario.
+- [#256](https://github.com/iiasa/message_ix/pull/256): Update to use :obj:`ixmp.config` and improve CLI.
 - [#255](https://github.com/iiasa/message_ix/pull/249): Add :mod:`message_ix.testing.nightly` and `nightly` CLI command group for slow-running tests.
 - [#249](https://github.com/iiasa/message_ix/pull/249): Build MESSAGE and MESSAGE_MACRO classes on ixmp model API; adjust Scenario.
 - [#235](https://github.com/iiasa/message_ix/pull/236): Add a reporting tutorial.

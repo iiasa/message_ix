@@ -253,8 +253,8 @@ def test_excel_read_write(test_mp):
 
 def test_clone(tmpdir):
     # Two local platforms
-    mp1 = ixmp.Platform(tmpdir / 'mp1', dbtype='HSQLDB')
-    mp2 = ixmp.Platform(tmpdir / 'mp2', dbtype='HSQLDB')
+    mp1 = ixmp.Platform(driver='hsqldb', path=tmpdir / 'mp1')
+    mp2 = ixmp.Platform(driver='hsqldb', path=tmpdir / 'mp2')
 
     # A minimal scenario
     scen1 = Scenario(mp1, model='model', scenario='scenario', version='new')
@@ -275,8 +275,8 @@ def test_clone(tmpdir):
     mp1.close_db()  # TODO this should be done automatically on del
     mp2.close_db()  # TODO this should be done automatically on del
     del mp1, mp2
-    mp1 = ixmp.Platform(tmpdir / 'mp1', dbtype='HSQLDB')
-    mp2 = ixmp.Platform(tmpdir / 'mp2', dbtype='HSQLDB')
+    mp1 = ixmp.Platform(driver='hsqldb', path=tmpdir / 'mp1')
+    mp2 = ixmp.Platform(driver='hsqldb', path=tmpdir / 'mp2')
 
     # Same scenarios present in each database
     assert all(mp1.scenario_list(default=False) ==
