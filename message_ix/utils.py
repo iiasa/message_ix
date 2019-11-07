@@ -43,7 +43,7 @@ def make_df(base, **kwargs):
     return pd.DataFrame(base)
 
 
-def multiply_df(df1, column1, df2, column2):
+def multiply_df(df1, column1, df2, column2):  # pragma: no cover
     '''The function merges dataframe df1 with df2 and multiplies column1 with
     column2. The function returns the new merged dataframe with the result
     of the muliplication in the column 'product'.
@@ -56,7 +56,7 @@ def multiply_df(df1, column1, df2, column2):
     return df
 
 
-def make_ts(df, time_col, value_col, metadata={}):
+def make_ts(df, time_col, value_col, metadata={}):  # pragma: no cover
     '''The function groups the dataframe by the year specified in year_col_name
     (year_act Vs. year_vtg). It then reshapes the dataframe df to reseble the
     timeseries requirements: sets the unit, the variable name, and the
@@ -78,7 +78,7 @@ def make_ts(df, time_col, value_col, metadata={}):
     return df
 
 
-def matching_rows(df, row, match_columns=[]):
+def matching_rows(df, row, match_columns=[]):  # pragma: no cover
     '''The function finds all the columns in a dataframe that are specified
     in the match columns list.
     '''
