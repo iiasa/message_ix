@@ -22,6 +22,7 @@ with open('README.md') as f:
     LONG_DESCRIPTION = f.read()
 
 INSTALL_REQUIRES = [
+    'click',
     'ixmp>=0.2.0',
     'pandas',
     'xlrd',
@@ -29,8 +30,8 @@ INSTALL_REQUIRES = [
 ]
 
 EXTRAS_REQUIRE = {
-    'tests': ['pytest>=4.0'],
-    'docs': ['numpydoc', 'sphinx>=1.8', 'sphinx_rtd_theme',
+    'tests': ['asyncssh', 'pytest>=4.0'],
+    'docs': ['numpydoc', 'sphinx', 'sphinx_rtd_theme',
              'sphinxcontrib-bibtex'],
     'reporting': ['pyam-iamc'],
     'tutorial': ['jupyter', 'matplotlib', 'plotnine'],
@@ -67,8 +68,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'messageix-config=message_ix.cli:config',
-            'messageix-dl=message_ix.cli:dl',
+            'message-ix=message_ix.cli:main'
         ],
     }
 )

@@ -3,8 +3,8 @@ import pandas as pd
 
 from ixmp import IAMC_IDX
 
-from . import Scenario
-from .utils import make_df
+from message_ix import Scenario
+from message_ix.utils import make_df
 
 
 models = {
@@ -339,7 +339,7 @@ def make_westeros(mp, emissions=False, solve=False):
 
     rate = [0.05] * len(model_horizon)
     unit = ['-'] * len(model_horizon)
-    scen.add_par("interestrate", key=model_horizon, val=rate, unit=unit)
+    scen.add_par("interestrate", model_horizon, rate, unit)
 
     base_inv_cost = {
         'node_loc': country,
