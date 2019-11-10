@@ -4,7 +4,7 @@ Add model years to an existing Scenario
 Description
 -----------
 
-This tool adds new modeling years to an existing :class:`ixmp.Scenario` (hereafter "reference scenario"). For instance, in a scenario define with::
+This tool adds new modeling years to an existing :class:`message_ix.Scenario` (hereafter "reference scenario"). For instance, in a scenario define with::
 
     history = [690]
     model_horizon = [700, 710, 720]
@@ -40,16 +40,18 @@ The tool can be used either:
 
 1. Directly from the command line::
 
-    $ python -m message_ix.tools.add_year \
-        --model_ref MESSAGE_Model \
-        --scen_ref baseline \
+    $ message-ix \
+        --platform default
+        --model MESSAGE_Model \
+        --scenario baseline \
+        add-years
         --years_new 2015,2025,2035,2045
 
    For the full list of input arguments, run::
 
-    $ python -m message_ix.tools.add_year --help
+    $ message-ix add-years --help
 
-2. By calling the function :meth:`message_ix.tools.add_year.add_year` from a Python script.
+2. By calling the function :meth:`~message_ix.tools.add_year.add_year` from a Python script.
 
 
 Technical details

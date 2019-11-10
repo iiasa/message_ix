@@ -126,7 +126,7 @@ def add_year(sc_ref, sc_new, years_new, firstyear_new=None, lastyear_new=None,
     # -------------------------------------------------------------------------
     # III.B)  Adding parameters and calculating the missing values for the
     # additonal years
-    if parameter == 'all':
+    if parameter in ('all', ['all']):
         par_list = sorted(sc_ref.par_list())
     elif isinstance(parameter, list):
         par_list = parameter
@@ -139,7 +139,7 @@ def add_year(sc_ref, sc_new, years_new, firstyear_new=None, lastyear_new=None,
     if 'technical_lifetime' in par_list:
         par_list.insert(0, par_list.pop(par_list.index('technical_lifetime')))
 
-    if region == 'all':
+    if region in ('all', ['all']):
         reg_list = sc_ref.set('node').tolist()
     elif isinstance(region, list):
         reg_list = region

@@ -8,6 +8,7 @@ import click
 from ixmp import config
 from ixmp.cli import main
 import message_ix
+import message_ix.tools.add_year.cli
 
 
 # Override the docstring of the ixmp CLI so that it masquerades as the
@@ -101,6 +102,9 @@ def dl(branch, tag, path):
         # Close *zipfile* so it can be deleted with *td*
         archive.close()
 
+
+# Add subcommands
+main.add_command(message_ix.tools.add_year.cli.main)
 
 try:
     import message_ix.testing.nightly

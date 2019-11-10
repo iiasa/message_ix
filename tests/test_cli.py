@@ -1,24 +1,9 @@
 from pathlib import Path
 
-from click.testing import CliRunner
 import pytest
 
 import message_ix
-from message_ix import cli, config
-
-
-@pytest.fixture(scope='session')
-def message_ix_cli(tmp_env):
-    """A CliRunner object that invokes the message_ix command-line interface.
-
-    :obj:`None` in *args* is automatically discarded.
-    """
-    class Runner(CliRunner):
-        def invoke(self, *args, **kwargs):
-            return super().invoke(cli.main, list(filter(None, args)),
-                                  env=tmp_env, **kwargs)
-
-    yield Runner().invoke
+from message_ix import config
 
 
 def test_copy_model(message_ix_cli, tmp_path, tmp_env):

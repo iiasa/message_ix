@@ -28,7 +28,6 @@ class MESSAGE(GAMSModel):
     defaults = ChainMap({
         # New keys for MESSAGE
         'model_dir': Path(__file__).parent / 'model',
-        'iter_file': _template('output', 'MsgIterationReport_{case}.gdx'),
         # Update keys from GAMSModel
         'model_file': _template('{model_name}_run.gms'),
         'in_file': _template('data', 'MsgData_{case}.gdx'),
@@ -36,7 +35,8 @@ class MESSAGE(GAMSModel):
         'solve_args': [
             '--in="{in_file}"',
             '--out="{out_file}"',
-            '--iter="{iter_file}"',
+            '--iter="{}"'.format(
+                _template('output', 'MsgIterationReport_{case}.gdx')),
             ],
     }, GAMSModel.defaults)
 

@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from click.testing import CliRunner
 import message_ix
 import pytest
 
@@ -35,3 +36,19 @@ def test_legacy_mp(request, tmp_env, test_data_path):
     from ixmp.testing import create_test_mp
 
     yield from create_test_mp(request, test_data_path, 'message_ix_legacy')
+
+
+@pytest.fixture(scope='session')
+def message_ix_cli(tmp_env):
+    """A CliRunner object that invokes the message_ix command-line interface.
+
+    :obj:`None` in *args* is automatically discarded.
+    """
+    from message_ix import cli
+
+    class Runner(CliRunner):
+        def invoke(self, *args, **kwargs):
+            return super().invoke(cli.main, list(filter(None, args)),
+                                  env=tmp_env, **kwargs)
+
+    yield Runner().invoke
