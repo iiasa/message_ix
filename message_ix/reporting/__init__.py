@@ -61,7 +61,8 @@ configure(
     }
 )
 
-#: Basic derived quantities that are the product of two others.
+#: Automatic quantities that are the :meth:`~computations.product` of two
+#: others.
 PRODUCTS = (
     ('out',
         ('output', 'ACT')),
@@ -91,7 +92,7 @@ PRODUCTS = (
         ('output', 'addon ACT')),
 )
 
-#: Other standard derived quantities.
+#: Automatic quantities derived by other calculations.
 DERIVED = [
     ('tom:nl-t-yv-ya', (computations.add, 'fom:nl-t-yv-ya', 'vom:nl-t-yv-ya')),
     # addon_conversion broadcast across technology_addon
@@ -102,7 +103,8 @@ DERIVED = [
          'map_addon')),
 ]
 
-#: Quantities to automatically convert to pyam format.
+#: Quantities to automatically convert to IAMC format using
+#: :meth:`~computations.as_pyam`.
 PYAM_CONVERT = [
     ('out:nl-t-ya-m-nd-c-l', 'ya', dict(kind='ene', var='out')),
     ('in:nl-t-ya-m-no-c-l', 'ya', dict(kind='ene', var='in')),
@@ -116,7 +118,8 @@ PYAM_CONVERT = [
 ]
 
 
-#: Standard reports that collect quantities converted to pyam format.
+#: Automatic reports that :meth:`~computations.concat` quantities converted to
+#: IAMC format.
 REPORTS = {
     'message:system': ['out:pyam', 'in:pyam', 'CAP:pyam', 'CAP_NEW:pyam'],
     'message:costs': ['inv:pyam', 'fom:pyam', 'vom:pyam', 'tom:pyam'],
@@ -124,7 +127,8 @@ REPORTS = {
 }
 
 
-#: Sets with mappings
+#: MESSAGE mapping sets, converted to quantities using
+#: :meth:`~computations.map_as_qty`.
 MAPPING_SETS = [
     'addon',
     'emission',
@@ -274,10 +278,10 @@ class Reporter(IXMPReporter):
         return keys
 
     def write(self, key, path):
-        """Write the report *key* to the file *path*.
+        """Compute *key* and write its value to the file at *path*.
 
         In addition to the formats handled by :meth:`ixmp.Reporter.write`,
-        this version will write :mod:`pyam.IamDataFrame` to CSV or Excel files
-        using built-in methods.
+        this version will write :class:`pyam.IamDataFrame` to CSV or Excel
+        files using built-in methods.
         """
         computations.write_report(self.get(key), path)

@@ -102,52 +102,60 @@ Reporters
    ixmp.reporting.Reporter
    ixmp.reporting.Key
 
+The :meth:`ixmp.Reporter <ixmp.reporting.Reporter.from_scenario>` automatically adds keys based on the contents of the :class:`ixmp.Scenario` argument.
+The :class:`message_ix.reporting.Reporter` adds additional keys for **derived quantities** specific to the MESSAGEix model framework.
+These include:
+
+- ``out``: the product of ``output`` (output efficiency) and ``ACT``
+  (activity).
+- ``out_hist``: ``output`` × ``ref_activity`` (historical reference activity),
+- ``in``:      ``input`` × ``ACT``,
+- ``in_hist``: ``input`` × ``ref_activity``,
+- ``emi``:      ``emission_factor`` × ``ACT``,
+- ``emi_hist``: ``emission_factor`` × ``ref_activity``,
+- ``inv``:      ``inv_cost`` × ``CAP_NEW``,
+- ``inv_hist``: ``inv_cost`` × ``ref_new_capacity``,
+- ``fom``:      ``fix_cost`` × ``CAP``,
+- ``fom_hist``: ``fix_cost`` × ``ref_capacity``,
+- ``vom``:      ``var_cost`` × ``ACT``, and
+- ``vom_hist``: ``var_cost`` × ``ref_activity``.
+- ``tom``: ``fom`` + ``vom``.
+
+.. tip:: Use :meth:`~.full_key` to retrieve the full-dimensionality
+   :class:`Key` for any of these quantities.
+
+Other added keys include:
+
+- ``<name>:pyam`` for the above quantities, plus:
+
+  - ``CAP:pyam`` (from ``CAP``)
+  - ``CAP_NEW:pyam`` (from ``CAP_NEW``)
+
+  These keys return the values in the IAMC data format, as :mod:`pyam` objects.
+
+- Standard reports ``message:system``, ``message_costs``, and
+  ``message:emissions``.
+- The report ``message:default``, collecting all of the above reports.
+
+These automatic features of :class:`~message_ix.reporting.Reporter` are
+controlled by:
+
 .. currentmodule:: message_ix.reporting
+
+.. autosummary::
+
+   PRODUCTS
+   DERIVED
+   MAPPING_SETS
+   PYAM_CONVERT
+   REPORTS
 
 .. autoclass:: Reporter
    :show-inheritance:
    :members: write
-   :exclude-members: as_pyam, from_scenario
+   :exclude-members: as_pyam
 
-   .. automethod:: from_scenario
-
-      In addition to the keys automatically added by
-      :meth:`ixmp.reporting.Reporter.from_scenario`, keys are added for
-      derived quantities specific to the MESSAGEix framework, as defined in
-      :obj:`PRODUCTS` and :obj:`DERIVED`.
-
-      - ``out``: the product of ``output`` (output efficiency) and ``ACT``
-        (activity).
-      - ``out_hist``: ``output`` × ``ref_activity`` (historical reference
-        activity),
-      - ``in``:      ``input`` × ``ACT``,
-      - ``in_hist``: ``input`` × ``ref_activity``,
-      - ``emi``:      ``emission_factor`` × ``ACT``,
-      - ``emi_hist``: ``emission_factor`` × ``ref_activity``,
-      - ``inv``:      ``inv_cost`` × ``CAP_NEW``,
-      - ``inv_hist``: ``inv_cost`` × ``ref_new_capacity``,
-      - ``fom``:      ``fix_cost`` × ``CAP``,
-      - ``fom_hist``: ``fix_cost`` × ``ref_capacity``,
-      - ``vom``:      ``var_cost`` × ``ACT``, and
-      - ``vom_hist``: ``var_cost`` × ``ref_activity``.
-      - ``tom``: ``fom`` + ``vom``.
-
-      .. tip:: Use :meth:`full_key` to retrieve the full-dimensionality
-         :class:`Key` for these quantities.
-
-      Other added keys include:
-
-      - ``<name>:pyam`` for the above quantities, plus:
-
-        - ``cap:pyam`` (from ``CAP``)
-        - ``new_cap:pyam`` (from ``CAP_NEW``)
-
-      ...according to :obj:`PYAM_CONVERT`.
-
-      - Standard reports according to :obj:`REPORTS`.
-      - The report ``message:default``, collecting all of the above reports.
-
-   .. automethod:: message_ix.reporting.Reporter.convert_pyam
+   .. automethod:: convert_pyam
 
       The :pyam:doc:`IAMC data format <data>` includes columns named 'Model',
       'Scenario', 'Region', 'Variable', 'Unit'; one of 'Year' or 'Time'; and
@@ -156,20 +164,16 @@ Reporters
       Using :meth:`convert_pyam`:
 
       - 'Model' and 'Scenario' are populated from the attributes of the
-        Scenario identified by the key ``scenario``;
+        Scenario returned by the Reporter key ``scenario``;
       - 'Variable' contains the name(s) of the `quantities`;
       - 'Unit' contains the units associated with the `quantities`; and
       - 'Year' or 'Time' is created according to `year_time_dim`.
 
-      Additional dimensions of quantities pass through :meth:`convert_pyam` and
-      appear as additional columns in the resulting :class:`IamDataFrame`.
-      While this is valid IAMC data, :meth:`convert_pyam` also supports
-      dropping additional columns (with `drop`), and a custom callback
-      (`collapse`) that can be used to manipulate values along other
-      dimensions.
+      A callback function (`collapse`) can be supplied that modifies the data before it is converted to an :class:`~pyam.IamDataFrame`; for instance, to concatenate extra dimensions into the 'Variable' column.
+      Other dimensions can simply be dropped (with `drop`).
+      Dimensions that are not collapsed or dropped will appear as additional columns in the resulting :class:`~pyam.IamDataFrame`; this is valid, but non-standard IAMC data.
 
-      For example, here the values for the MESSAGEix ``technology`` and
-      ``mode`` dimensions are appended to the 'Variable' column::
+      For example, here the values for the MESSAGEix ``technology`` and ``mode`` dimensions are appended to the 'Variable' column::
 
           def m_t(df):
               """Callback for collapsing ACT columns."""
@@ -260,10 +264,10 @@ Reporters
    :members:
 
    Quantities in a :class:`Scenario` can be indexed by one or more dimensions.
-   A Key refers to a quantity using three components:
+   Keys **refer** to quantities, using three components:
 
    1. a string :attr:`name`,
-   2. zero or more ordered :attr:`dims`, and
+   2. zero or more ordered dimensions :attr:`dims`, and
    3. an optional :attr:`tag`.
 
    For example, an ixmp parameter with three dimensions can be initialized
@@ -276,39 +280,49 @@ Reporters
    - in its full resolution, i.e. indexed by a, b, and c:
 
      >>> k1 = Key('foo', ['a', 'b', 'c'])
-     >>> k1 == 'foo:a-b-c'
-     True
+     >>> k1
+     <foo:a-b-c>
 
-   - in a partial sum over one dimension, e.g. summed along c with dimensions
-     a and b:
+   - in a partial sum over one dimension, e.g. summed across dimension c, with  remaining dimensions a and b:
 
      >>> k2 = k1.drop('c')
-     >>> k2 == 'foo:a-b'
-     True
+     >>> k2
+     <foo:a-b>
 
    - in a partial sum over multiple dimensions, etc.:
 
      >>> k1.drop('a', 'c') == k2.drop('a') == 'foo:b'
      True
 
+   - after it has been manipulated by different reporting computations, e.g.
+
+     >>> k3 = k1.add_tag('normalized')
+     >>> k3
+     <foo:a-b-c:normalized>
+     >>> k4 = k3.add_tag('rescaled')
+     >>> k4
+     <foo:a-b-c:normalized+rescaled>
+
    **Notes:**
 
-   A Key has the same hash, and compares equal to its ``str()``. ``repr(key)``
-   prints the Key in angle brackets ('<>') to signify it is a Key object.
+   A Key has the same hash, and compares equal to its :type:`str`.
+   ``repr(key)`` prints the Key in angle brackets ('<>') to signify that it is a Key object.
 
+   >>> str(k1)
+   'foo:a-b-c'
    >>> repr(k1)
-   <foo:a-b-c>
+   '<foo:a-b-c>'
+   >>> hash(k1) == hash('foo:a-b-c')
+   True
 
-   Keys are *immutable*: the properties :attr:`name`, :attr:`dims`, and
-   :attr:`tag` are read-only, and the methods :meth:`append`, :meth:`drop`, and
-   :meth:`add_tag` return *new* Key objects.
+   Keys are **immutable**: the properties :attr:`name`, :attr:`dims`, and :attr:`tag` are *read-only*, and the methods :meth:`append`, :meth:`drop`, and :meth:`add_tag` return *new* Key objects.
 
    Keys may be generated concisely by defining a convenience method:
 
    >>> def foo(dims):
    >>>     return Key('foo', dims.split())
    >>> foo('a b c')
-   foo:a-b-c
+   <foo:a-b-c>
 
 
 Computations
@@ -317,7 +331,7 @@ Computations
 .. currentmodule:: message_ix.reporting
 
 .. automodule:: message_ix.reporting.computations
-   :members: add, as_pyam, concat, write_report
+   :members: add, as_pyam, broadcast_map, concat, map_as_qty, write_report
 
 Computations from ixmp
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -335,7 +349,6 @@ Computations from ixmp
 
    .. autosummary::
       aggregate
-      concat
       disaggregate_shares
       product
       ratio
@@ -347,10 +360,11 @@ Computations from ixmp
       load_file
       write_report
 
-   Conversion:
+   Data manipulation:
 
    .. autosummary::
-      make_dataframe
+      concat
+
 
 Configuration
 -------------
@@ -361,10 +375,6 @@ Configuration
    ixmp.reporting.utils.RENAME_DIMS
    ixmp.reporting.utils.REPLACE_UNITS
    ixmp.reporting.utils.UNITS
-   message_ix.reporting.PRODUCTS
-   message_ix.reporting.DERIVED
-   message_ix.reporting.PYAM_CONVERT
-   message_ix.reporting.REPORTS
 
 .. automethod:: ixmp.reporting.configure
 
@@ -374,6 +384,7 @@ Configuration
 .. autodata:: DERIVED
 .. autodata:: PYAM_CONVERT
 .. autodata:: REPORTS
+.. autodata:: MAPPING_SETS
 
 .. currentmodule:: ixmp.reporting.utils
 
