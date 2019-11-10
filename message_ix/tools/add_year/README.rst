@@ -11,8 +11,9 @@ This tool adds new modeling years to an existing :class:`message_ix.Scenario` (h
     sc_ref.add_horizon({'year': history + model_horizon,
                           'firstmodelyear': model_horizon[0]})
 
-…additional years can be added::
+…additional years can be added after importing the add_year function::
 
+    from message_ix.tools.add_year import add_year
     sc_new = message_ix.Scenario(mp, sc_ref.model, sc_ref.scenario,
                                  version='new')
     add_year(sc_ref, sc_new, [705, 712, 718, 725])

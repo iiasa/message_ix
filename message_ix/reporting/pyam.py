@@ -1,7 +1,9 @@
 from logging import getLogger
 
-from ixmp.reporting.computations import write_report as ixmp_write_report
-from ixmp.reporting.utils import concat as ixmp_concat
+from ixmp.reporting.computations import (
+    concat as ixmp_concat,
+    write_report as ixmp_write_report,
+)
 import pandas as pd
 from pyam import IAMC_IDX, IamDataFrame, concat as pyam_concat
 
@@ -12,13 +14,26 @@ log = getLogger(__name__)
 def as_pyam(scenario, year_time_dim, quantities, drop=[], collapse=None):
     """Return a :class:`pyam.IamDataFrame` containing *quantities*.
 
+    Warnings are logged if the arguments result in additional, unhandled
+    columns in the
+    resulting data frame that are not part of the IAMC spec.
+
+    Raises
+    ------
+    ValueError
+        If the resulting data frame has duplicate values in the standard IAMC
+        index columns. :class:`pyam.IamDataFrame` cannot handle this data.
+
     See also
     --------
-    Reporter.as_pyam for documentation of the arguments.
+    message_ix.reporting.Reporter.convert_pyam
     """
     # TODO, this should check for any viable container
     if not isinstance(quantities, list):
         quantities = [quantities]
+
+    # If collapse is not provided, it is a pass-through
+    collapse = collapse or (lambda df: df)
 
     # Renamed automatically
     IAMC_columns = {
@@ -48,9 +63,14 @@ def as_pyam(scenario, year_time_dim, quantities, drop=[], collapse=None):
     # columns
     year_or_time = 'year' if year_time_dim.startswith('y') else 'time'
     df = df.rename(columns={year_time_dim: year_or_time}) \
+           .pipe(collapse) \
            .drop(drop, axis=1)
-    if collapse:
-        df = collapse(df)
+
+    # Raise exception for non-unique data
+    duplicates = df.duplicated(subset=set(df.columns) - {'value'})
+    if duplicates.any():
+        raise ValueError('Duplicate IAMC indices cannot be converted:\n'
+                         + str(df[duplicates]))
 
     # Warn about extra columns
     extra = sorted(set(df.columns) - set(IAMC_IDX + ['year', 'time', 'value']))

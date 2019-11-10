@@ -35,7 +35,8 @@ tutorials = [
     (('westeros', 'westeros_firm_capacity'), []),
     (('westeros', 'westeros_flexible_generation'), []),
     (('westeros', 'westeros_report'),
-     [('len-rep-graph', 7975)]),
+     # NB this is the same value as in test_reporter()
+     [('len-rep-graph', 16569)]),
     # FIXME use get_cell_by_name instead of assuming cell count/order is fixed
     ((AT, 'austria'), [(-13, 133105106944.0)]),
     ((AT, 'austria_single_policy'), [(-8, 132452155392.0)]),
