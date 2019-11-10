@@ -62,16 +62,15 @@ def test_reporter(test_mp):
     # TODO: Squeeze on AttrSeries still returns full index, whereas xarray
     # drops everything except node
     obs = obs.reset_index(['c', 'l', 'y', 'h'], drop=True)
-    # check_dtype is false because of casting in pd.Series to float
-    # check_attrsis false because we don't get the unit addition in bare xarray
-    assert_qty_equal(obs.sort_index(), demand,
-                     check_attrs=False, check_dtype=False)
+    # check_attrs False because we don't get the unit addition in bare xarray
+    assert_qty_equal(obs.sort_index(), demand, check_attrs=False)
 
     # ixmp.Reporter pre-populated with only model quantities and aggregates
     assert len(rep_ix.graph) == 5088
 
     # message_ix.Reporter pre-populated with additional, derived quantities
-    assert len(rep.graph) == 7975
+    # This is the same value as in test_tutorials.py
+    assert len(rep.graph) == 16569
 
     # Derived quantities have expected dimensions
     vom_key = rep.full_key('vom')
@@ -133,7 +132,7 @@ def test_reporter_from_westeros(test_mp):
     assert_allclose(obs, exp)
 
 
-def test_report_as_pyam(test_mp, caplog, tmp_path):
+def test_reporter_convert_pyam(test_mp, caplog, tmp_path):
     scen = Scenario(test_mp,
                     'canning problem (MESSAGE scheme)',
                     'standard')
@@ -171,12 +170,12 @@ def test_report_as_pyam(test_mp, caplog, tmp_path):
         return df
 
     # Use the convenience function to add the node
-    keys = rep.as_pyam(ACT, 'ya', collapse=m_t)
+    keys = rep.convert_pyam(ACT, 'ya', collapse=m_t)
 
     # Keys of added node(s) are returned
     assert len(keys) == 1
     key2, *_ = keys
-    assert key2 == str(ACT) + ':iamc'
+    assert key2 == ACT.name + ':iamc'
 
     caplog.clear()
 
