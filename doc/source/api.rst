@@ -132,7 +132,7 @@ Utility methods
 ---------------
 
 .. automodule:: message_ix.utils
-   :members: make_df, make_ts, matching_rows, multiply_df
+   :members: make_df
 
 
 Testing utilities
