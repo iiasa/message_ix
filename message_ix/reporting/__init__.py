@@ -272,8 +272,8 @@ class Reporter(IXMPReporter):
                 {'h', 'y', 'ya', 'yr', 'yv'} - {year_time_dim})
             new_key = ':'.join([qty.name, tag])
             self.add(new_key, (partial(computations.as_pyam, drop=to_drop,
-                                       collapse=collapse),
-                               'scenario', year_time_dim, qty))
+                                       collapse=collapse, year_time_dim=year_time_dim),
+                               'scenario', qty))
             keys.append(new_key)
         return keys
 
