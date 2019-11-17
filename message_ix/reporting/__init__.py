@@ -271,9 +271,11 @@ class Reporter(IXMPReporter):
             to_drop = set(drop) | set(qty.dims) & (
                 {'h', 'y', 'ya', 'yr', 'yv'} - {year_time_dim})
             new_key = ':'.join([qty.name, tag])
-            self.add(new_key, (partial(computations.as_pyam, drop=to_drop,
-                                       collapse=collapse),
-                               'scenario', year_time_dim, qty))
+            comp = partial(computations.as_pyam,
+                           year_time_dim=year_time_dim,
+                           drop=to_drop,
+                           collapse=collapse)
+            self.add(new_key, (comp, 'scenario', qty))
             keys.append(new_key)
         return keys
 

@@ -144,8 +144,9 @@ def test_reporter_convert_pyam(test_mp, caplog, tmp_path):
     ACT = rep.full_key('ACT')
 
     # Add a computation that converts ACT to a pyam.IamDataFrame
-    rep.add('ACT IAMC', (partial(computations.as_pyam, drop=['yv']),
-                         'scenario', 'ya', ACT))
+    rep.add('ACT IAMC', (partial(computations.as_pyam, drop=['yv'],
+                                 year_time_dim='ya'),
+                         'scenario', ACT))
 
     # Result is an IamDataFrame
     idf1 = rep.get('ACT IAMC')
