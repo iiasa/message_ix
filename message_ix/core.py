@@ -390,6 +390,15 @@ class Scenario(ixmp.Scenario):
             'par': self.add_par,
         }
 
+        def is_init(ix_type, name, idx_sets=None):
+            if ix_type == 'set':
+                if name not in self.set_list():
+                    self.init_set(name, idx_sets)
+            elif ix_type == 'par':
+                if name not in self.par_list():
+                    self.init_par(name, idx_sets)
+
+
         logger().info('Reading data from {}'.format(fname))
         dfs = pd_read(fname, sheet_name=None)
 
@@ -409,6 +418,7 @@ class Scenario(ixmp.Scenario):
             if len(data) > 0:
                 ix_type = ix_types[name]
                 logger().info('Loading data for {}'.format(name))
+                is_init(ix_type, name)
                 funcs[ix_type](name, data)
         if commit_steps:
             self.commit('Loaded initial data from {}'.format(fname))
@@ -428,6 +438,8 @@ class Scenario(ixmp.Scenario):
                         self.platform.add_unit(unit)
                 # load data
                 ix_type = ix_types[sheet_name]
+                indxs = [x for x in df.columns if x not in ['unit', 'value']]
+                is_init(ix_type, sheet_name, indxs)
                 funcs[ix_type](sheet_name, df)
                 if commit_steps:
                     self.commit('Loaded {} from {}'.format(sheet_name, fname))
