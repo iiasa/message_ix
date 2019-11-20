@@ -4,12 +4,13 @@
 from typing import Optional
 
 import ixmp
-import message_ix
 
+import message_ix
 from . import get_tech_description
 
 
-def main(model_ref: str, scen_ref: str, filters: dict, filename: str, key_filter:Optional[str] ='technology',
+def main(model_ref: str, scen_ref: str, filters: dict, filename: str,
+         key_filter: Optional[str] = 'technology',
          version_ref: Optional[int] = None):
     print('>> message_ix.tools.get_tech_data...')
 
@@ -25,9 +26,11 @@ def main(model_ref: str, scen_ref: str, filters: dict, filename: str, key_filter
     base = message_ix.Scenario(mp, **ref_kw)
 
     # Calling the main function
-    get_tech_description(base=base, key_filter=key_filter, filters=filters, filename=filename)
+    get_tech_description(base=base, key_filter=key_filter, filters=filters,
+                         filename=filename)
 
     mp.close_db()
+
 
 # Execute the script
 main()
