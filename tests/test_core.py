@@ -235,6 +235,13 @@ def test_excel_read_write(test_mp):
     fname = 'test_excel_read_write.xlsx'
 
     scen1 = Scenario(test_mp, *msg_args)
+    scen1 = scen1.clone(keep_solution=False)
+    scen1.check_out()
+    scen1.init_set('new_set')
+    scen1.add_set('new_set', 'member')
+    scen1.init_par('new_par', idx_sets=['new_set'])
+    scen1.add_par('new_par', 'member', 2, '-')
+    scen1.commit('new set and parameter added.')
     scen1.to_excel(fname)
 
     scen2 = Scenario(test_mp, model='foo', scenario='bar', version='new')
@@ -243,6 +250,9 @@ def test_excel_read_write(test_mp):
     exp = scen1.par('input')
     obs = scen2.par('input')
     pdt.assert_frame_equal(exp, obs)
+
+    assert scen2.has_par('new_par')
+    assert float(scen2.par('new_par')['value']) == 2
 
     scen2.commit('foo')  # must be checked in
     scen2.solve()
