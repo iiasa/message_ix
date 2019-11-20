@@ -198,6 +198,7 @@ def storage_setup(test_mp, time_duration, comment):
         assert storage[(2020, 'b')] * (1 - loss[(2020, 'b')]
                                        ) == -change[(2020, 'c')]
 
+
 # Storage test for different duration times
 def test_storage(test_mp):
     '''

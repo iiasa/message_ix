@@ -2051,7 +2051,7 @@ STORAGE_BALANCE(node,storage_tec,level,year,time2)$ (
     init_storage(node,storage_tec,level,year,time2)
     + STORAGE_CHG(node,storage_tec,level,year,time2)
 * storage content in the previous subannual timestep
-    + SUM((year2,lvl_temporal,time)$map_time_period(year,year2,lvl_temporal,time,time2),
+    + SUM((lvl_temporal,time)$map_time_period(year,lvl_temporal,time,time2),
         STORAGE(node,storage_tec,level,year,time)
 * considering storage losses due to keeping the storage media between two subannual timesteps
         * (1 - storage_loss(node,storage_tec,level,year,time) ) ) ;

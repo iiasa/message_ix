@@ -14,7 +14,7 @@ Sets
     last_period(year_all)            flag for last period in model horizon
     macro_initial_period(year_all)   flag for period in model horizon in which to initialize model parameters in (period prior to first model period) - used in MACRO
     macro_base_period(year_all)      flag for base year period in model horizon (period prior to first model period) - used in MACRO
-    map_time_period(year_all,year_all2,lvl_temporal,time,time2)           mapping of one sub-annual timestep (time) to the next (time2)
+    map_time_period(year_all,lvl_temporal,time,time2)           mapping of one sub-annual timestep (time) to the next (time2)
 
 ;
 
@@ -45,10 +45,10 @@ seq_period(year_all,year_all2)$( ORD(year_all) + 1 = ORD(year_all2) ) = yes ;
 map_period(year_all,year_all2)$( ORD(year_all) <= ORD(year_all2) ) = yes ;
 
 * mapping of sequence of sub-annual time steps in a period and temporal level
-map_time_period(year_all,year_all2,lvl_temporal,time,time2)$( ORD(year_all) = ORD(year_all2) AND time_seq(lvl_temporal,time) AND
+map_time_period(year_all,lvl_temporal,time,time2)$( time_seq(lvl_temporal,time) AND
      time_seq(lvl_temporal,time) + 1 = time_seq(lvl_temporal,time2) ) = yes;
 
-map_time_period(year_all,year_all2,lvl_temporal,time,time2)$( ORD(year_all) = ORD(year_all2) AND time_seq(lvl_temporal,time) AND
+map_time_period(year_all,lvl_temporal,time,time2)$( time_seq(lvl_temporal,time) AND
      time_seq(lvl_temporal,time) = SMAX(time3,time_seq(lvl_temporal,time3) ) AND time_seq(lvl_temporal,time2) = 1 ) = yes;
 
 * dynamic sets (singleton) with first and last periods in model horizon of MESSAGEix (for easier reference)
