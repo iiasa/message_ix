@@ -19,6 +19,7 @@
   [#242](https://github.com/iiasa/message_ix/pull/242),
   [#263](https://github.com/iiasa/message_ix/pull/263): Enhance reporting.
 - [#232](https://github.com/iiasa/message_ix/pull/232): Add Westeros tutorial for modelling seasonality, update existing tutorials.
+- [#265](https://github.com/iiasa/message_ix/pull/265): Modifies excel_read for initializing new sets and parameters when reading from Excel.
 
 # v1.2.0
 
