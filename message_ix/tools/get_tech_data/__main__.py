@@ -1,4 +1,5 @@
-"""Get all parameters related to a certain technology/commodity/year ect. from the data base
+"""Get all parameters related to a certain technology/commodity/year ect. from
+the data base
 
 """
 from typing import Optional

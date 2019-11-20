@@ -17,10 +17,10 @@ import message_ix
 # %% II) Utility functions for data manupulation
 def dict_to_df(filter_dict: dict) -> pd.DataFrame:
     """Transforms the filter (given as a dictionary) into a data frame
-    
+
     Parameter
     ----------
-    filter_dict: dictionary 
+    filter_dict: dictionary
     """
     if list not in [type(i) for i in filter_dict.values()]:
         filter_dict = pd.DataFrame.from_dict(
@@ -33,8 +33,8 @@ def dict_to_df(filter_dict: dict) -> pd.DataFrame:
 
 # %% III) The main function
 def get_tech_description(base: message_ix.Scenario, key_filter: str,
-                         filters: dict, filename: str) -> dict[
-                                                          str:pd.DataFrame]:
+                         filters: dict, filename: str
+                         ) -> dict[str:pd.DataFrame]:
     """Find all parameters that relate to a technology / a year/ a commodity /
         ect. given in the filter
 
