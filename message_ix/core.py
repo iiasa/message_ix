@@ -35,7 +35,7 @@ def init_storage(scen, *args, **kwargs):
     scen.init_set('map_tec_storage', idx_sets=['technology', 'storage_tec'])
 
     # Initiating a parameter to specify the order of sub-annual time steps
-    scen.init_par('time_seq', idx_sets=['time'])
+    scen.init_par('time_seq', idx_sets=['lvl_temporal', 'time'])
 
     # Initiating a parameter for relating the content f storage in two
     # different time steps (in even in two periods) together

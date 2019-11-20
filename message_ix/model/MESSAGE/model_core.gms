@@ -2044,21 +2044,21 @@ STORAGE_CHANGE(node,storage_tec,level,year,time)$( SUM( (mode,tec,commodity),
 ***
 STORAGE_BALANCE(node,storage_tec,level,year,time2)$ (
     SUM(tec, map_tec_storage_level(node,tec,storage_tec,level,year,time2) )
-    AND NOT (time_seq(time2) = 1 ) )..
+    AND NOT (SUM(lvl_temporal,time_seq(lvl_temporal,time2) ) = 1 ) )..
 * Showing the content of storage at each timestep
     STORAGE(node,storage_tec,level,year,time2) =E=
 * initial content of storage and change in the content of storage in the examined timestep
     init_storage(node,storage_tec,level,year,time2)
     + STORAGE_CHG(node,storage_tec,level,year,time2)
 * storage content in the previous subannual timestep
-    + SUM((time,year2)$map_time_period(year,year2,time,time2),
+    + SUM((year2,lvl_temporal,time)$map_time_period(year,year2,lvl_temporal,time,time2),
         STORAGE(node,storage_tec,level,year,time)
 * considering storage losses due to keeping the storage media between two subannual timesteps
         * (1 - storage_loss(node,storage_tec,level,year,time) ) ) ;
 
 STORAGE_BALANCE_INIT(node,storage_tec,level,year,time)$ (
     SUM(tec, map_tec_storage_level(node,tec,storage_tec,level,year,time) )
-    AND (time_seq(time) = 1 ) )..
+    AND (SUM(lvl_temporal,time_seq(lvl_temporal,time) ) = 1 ) )..
 * Showing the content of storage at the first timestep
     STORAGE(node,storage_tec,level,year,time) =E=
 * initial content of storage and change in the content of storage in the examined timestep

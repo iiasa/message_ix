@@ -78,7 +78,7 @@ def add_storage_data(scen, time_order):
 
     # Adding time sequence
     for h in time_order.keys():
-        scen.add_par('time_seq', h, time_order[h], '-')
+        scen.add_par('time_seq', ['season', h], time_order[h], '-')
 
     # Adding input, output, and capacity factor for storage technologies
     output_spec = {'dam': ['node', 'stored_com', 'storage'],
