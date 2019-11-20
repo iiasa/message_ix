@@ -30,8 +30,7 @@ def dict_to_df(filter_dict: dict) -> pd.DataFrame:
 
 
 # %% III) The main function
-def get_tech_description(base: message_ix.Scenario, key_filter: str, filters: dict,
-                         filename: str) -> dict[str:pd.DataFrame]:
+def get_tech_description(base: message_ix.Scenario, key_filter: str, filters: dict, filename: str) -> dict[str:pd.DataFrame]:
     """Find all parameters that relate to a technology / a year/ a commodity / ect. given in the filter
 
     :meth:`find_tech_description` does the following:
