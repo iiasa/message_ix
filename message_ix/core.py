@@ -371,7 +371,8 @@ class Scenario(ixmp.Scenario):
 
         pd_write(dfs, fname, index=False)
 
-    def read_excel(self, fname, add_units=False, commit_steps=False):
+    def read_excel(self, fname, add_units=False, commit_steps=False,
+                   init_items=True):
         """Read Excel file data and load into the scenario.
 
         Parameters
@@ -384,6 +385,9 @@ class Scenario(ixmp.Scenario):
         commit_steps : bool
             commit changes after every data addition.
             default: False
+        init_items : bool
+            initializes new sets and parameters when reading from Excel.
+            default: True
         """
         funcs = {
             'set': self.add_set,
@@ -418,7 +422,8 @@ class Scenario(ixmp.Scenario):
             if len(data) > 0:
                 ix_type = ix_types[name]
                 logger().info('Loading data for {}'.format(name))
-                is_init(ix_type, name)
+                if init_items:
+                    is_init(ix_type, name)
                 funcs[ix_type](name, data)
         if commit_steps:
             self.commit('Loaded initial data from {}'.format(fname))
@@ -439,7 +444,8 @@ class Scenario(ixmp.Scenario):
                 # load data
                 ix_type = ix_types[sheet_name]
                 indxs = [x for x in df.columns if x not in ['unit', 'value']]
-                is_init(ix_type, sheet_name, indxs)
+                if init_items:
+                    is_init(ix_type, sheet_name, indxs)
                 funcs[ix_type](sheet_name, df)
                 if commit_steps:
                     self.commit('Loaded {} from {}'.format(sheet_name, fname))
