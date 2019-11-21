@@ -24,61 +24,6 @@ DEFAULT_SOLVE_OPTIONS = {
 }
 
 
-def init_storage(scen, *args, **kwargs):
-    # Initiating a set to specifiy storage level (no commodity balance needed)
-    scen.init_set('level_storage')
-
-    # Initiating a set to specifiy storage reservoir technology
-    scen.init_set('storage_tec')
-
-    # Initiating a set to map storage reservoir to its charger/discharger
-    scen.init_set('map_tec_storage', idx_sets=['technology', 'storage_tec'])
-
-    # Initiating a parameter to specify the order of sub-annual time steps
-    scen.init_par('time_seq', idx_sets=['lvl_temporal', 'time'])
-
-    # Initiating a parameter for relating the content f storage in two
-    # different time steps (in even in two periods) together
-    scen.init_par('relation_storage',
-                  idx_sets=['node', 'technology', 'level', 'year', 'year',
-                            'time', 'time'],
-                  idx_names=['node', 'technology', 'level', 'year_first',
-                             'year_last', 'time_first', 'time_last'])
-
-    # Initiating two parameters for specifying lower and upper bounds of
-    # storage reservoir, and storage losses all as % of installed capacity
-    # (values should be between 0 and 1)
-    par_stor = ['bound_storage_lo', 'bound_storage_up', 'storage_loss',
-                'init_storage']
-    for parname in par_stor:
-        scen.init_par(parname, idx_sets=['node', 'technology',
-                                         'level', 'year', 'time'])
-
-
-def _init_scenario(s, commit=False):
-    """Initialize a MESSAGEix Scenario object with default values"""
-    inits = (
-        {
-            'test': 'level_storage' not in s.set_list(),
-            'exec': [(init_storage, {'args': (s,)}), ],
-        },
-    )
-    pass_idx = [i for i, init in enumerate(inits) if init['test']]
-    if len(pass_idx) == 0:
-        return  # leave early, all init tests pass
-
-    if commit:
-        s.check_out()
-    for idx in pass_idx:
-        for exec_info in inits[idx]['exec']:
-            func = exec_info[0]
-            args = exec_info[1].pop('args', tuple())
-            kwargs = exec_info[1].pop('kwargs', dict())
-            func(*args, **kwargs)
-    if commit:
-        s.commit('Initialized wtih standard sets and params')
-
-
 class Scenario(ixmp.Scenario):
     """|MESSAGEix| Scenario.
 
