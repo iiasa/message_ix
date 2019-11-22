@@ -40,13 +40,13 @@ MESSAGE_ITEMS = (
          idx_names=['node', 'technology', 'level', 'year_first', 'year_last',
                     'time_first', 'time_last']),
     # Lower bound of storage reservoir
-    dict(ix_type='par', name='bound_storage_lo', idx_sets=idx_common),
+    dict(ix_type='par', name='bound_storage_lo', idx_sets=_idx_common),
     # Upper bound of storage reservoir
-    dict(ix_type='par', name='bound_storage_up', idx_sets=idx_common),
+    dict(ix_type='par', name='bound_storage_up', idx_sets=_idx_common),
     # Storage losses as a percentage of installed capacity
-    dict(ix_type='par', name='storage_loss', idx_sets=idx_common),
+    dict(ix_type='par', name='storage_loss', idx_sets=_idx_common),
     # Initial amount of storage
-    dict(ix_type='par', name='init_storage', idx_sets=idx_common),
+    dict(ix_type='par', name='init_storage', idx_sets=_idx_common),
 )
 
 
