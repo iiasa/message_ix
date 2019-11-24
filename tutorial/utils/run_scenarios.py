@@ -24,7 +24,7 @@ def check_local_model(model, notebook, shell=False):
 def read_scenario(platform, name, scen):
     mp = platform
     mp.open_db()
-    ds = mp.Scenario(name, scen)
+    ds = message_ix.Scenario(mp, name, scen)
 
     yield ds
 
