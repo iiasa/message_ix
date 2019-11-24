@@ -17,8 +17,8 @@ msg_multiyear_args = ('canning problem (MESSAGE scheme)', 'multi-year')
 def test_year_int(test_mp):
     scen = make_dantzig(test_mp, solve=True, multi_year=True)
 
-    # Dimensions indexed by 'year' are returned as integers for 'equ', 'par',
-    # and 'var'
+    # Dimensions indexed by 'year' are returned as integers for all item types
+    assert scen.set('cat_year').dtypes['year'] == 'int'
     assert scen.par('demand').dtypes['year'] == 'int'
     assert scen.par('bound_activity_up').dtypes['year_act'] == 'int'
     assert scen.var('ACT').dtypes['year_vtg'] == 'int'

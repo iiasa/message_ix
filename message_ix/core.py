@@ -46,7 +46,7 @@ class Scenario(ixmp.Scenario):
             return df
 
     # Override ixmp methods to convert 'year'-indexed columns to int
-    def equ(self, name, *args, **kwargs):
+    def equ(self, name, filters=None):
         """Return equation data.
 
         Same as :meth:`ixmp.Scenario.equ`, except columns indexed by the
@@ -64,9 +64,9 @@ class Scenario(ixmp.Scenario):
         pd.DataFrame
             Filtered elements of the equation.
         """
-        return self._year_as_int(name, super().equ(name, *args, **kwargs))
+        return self._year_as_int(name, super().equ(name, filters))
 
-    def par(self, name, *args, **kwargs):
+    def par(self, name, filters=None):
         """Return parameter data.
 
         Same as :meth:`ixmp.Scenario.par`, except columns indexed by the
@@ -84,9 +84,35 @@ class Scenario(ixmp.Scenario):
         pd.DataFrame
             Filtered elements of the parameter.
         """
-        return self._year_as_int(name, super().par(name, *args, **kwargs))
+        return self._year_as_int(name, super().par(name, filters))
 
-    def var(self, name, *args, **kwargs):
+    def set(self, name, filters=None):
+        """Return elements of a set.
+
+        Same as :meth:`ixmp.Scenario.set`, except columns for multi-dimensional
+        sets indexed by the |MESSAGEix| set ``year`` are returned with
+        :obj:`int` dtype.
+
+        Parameters
+        ----------
+        name : str
+            Name of the set.
+        filters : dict (str -> list of str), optional
+            Mapping of `dimension_name` → `elements`, where `dimension_name`
+            is one of the `idx_names` given when the set was initialized (see
+            :meth:`init_set`), and `elements` is an iterable of labels to
+            include in the return value.
+
+        Returns
+        -------
+        pd.Series
+            If *name* is an index set.
+        pd.DataFrame
+            If *name* is a set defined over one or more other, index sets.
+        """
+        return self._year_as_int(name, super().set(name, filters))
+
+    def var(self, name, filters=None):
         """Return variable data.
 
         Same as :meth:`ixmp.Scenario.var`, except columns indexed by the
@@ -104,7 +130,7 @@ class Scenario(ixmp.Scenario):
         pd.DataFrame
             Filtered elements of the variable.
         """
-        return self._year_as_int(name, super().var(name, *args, **kwargs))
+        return self._year_as_int(name, super().var(name, filters))
 
     def cat_list(self, name):
         """Return a list of all categories for a mapping set.
