@@ -62,10 +62,13 @@ Support for R usage of the core classes is provided through the `reticulate`_ pa
       add_spatial_sets
       cat
       cat_list
+      equ
       firstmodelyear
+      par
       read_excel
       rename
       to_excel
+      var
       vintage_and_active_years
       years_active
 

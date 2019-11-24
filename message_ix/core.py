@@ -1,4 +1,5 @@
 import collections
+from functools import lru_cache
 import itertools
 
 import ixmp
@@ -25,6 +26,85 @@ class Scenario(ixmp.Scenario):
 
         super().__init__(mp, model, scenario, version, scheme, annotation,
                          cache)
+
+    @lru_cache()
+    def _year_idx(self, name):
+        """Return (idx_set, idx_name) for 'year'-indexed dims of *name*."""
+        # NB Since item dimensionality is fixed, the result can be cached for
+        #    performance
+        return list(filter(
+            lambda e: e[0] == 'year',
+            zip(self.idx_sets(name), self.idx_names(name))
+            ))
+
+    def _year_as_int(self, name, df):
+        """Convert 'year'-indexed columns of *df* to int dtypes."""
+        year_idx = self._year_idx(name)
+        if len(year_idx):
+            return df.astype({c: 'int' for _, c in year_idx})
+        else:
+            return df
+
+    # Override ixmp methods to convert 'year'-indexed columns to int
+    def equ(self, name, *args, **kwargs):
+        """Return equation data.
+
+        Same as :meth:`ixmp.Scenario.equ`, except columns indexed by the
+        |MESSAGEix| set ``year`` are returned with :obj:`int` dtype.
+
+        Parameters
+        ----------
+        name : str
+            Name of the equation.
+        filters : dict (str -> list of str), optional
+            Filters for the dimensions of the equation.
+
+        Returns
+        -------
+        pd.DataFrame
+            Filtered elements of the equation.
+        """
+        return self._year_as_int(name, super().equ(name, *args, **kwargs))
+
+    def par(self, name, *args, **kwargs):
+        """Return parameter data.
+
+        Same as :meth:`ixmp.Scenario.par`, except columns indexed by the
+        |MESSAGEix| set ``year`` are returned with :obj:`int` dtype.
+
+        Parameters
+        ----------
+        name : str
+            Name of the parameter.
+        filters : dict (str -> list of str), optional
+            Filters for the dimensions of the parameter.
+
+        Returns
+        -------
+        pd.DataFrame
+            Filtered elements of the parameter.
+        """
+        return self._year_as_int(name, super().par(name, *args, **kwargs))
+
+    def var(self, name, *args, **kwargs):
+        """Return variable data.
+
+        Same as :meth:`ixmp.Scenario.var`, except columns indexed by the
+        |MESSAGEix| set ``year`` are returned with :obj:`int` dtype.
+
+        Parameters
+        ----------
+        name : str
+            Name of the variable.
+        filters : dict (str -> list of str), optional
+            Filters for the dimensions of the variable.
+
+        Returns
+        -------
+        pd.DataFrame
+            Filtered elements of the variable.
+        """
+        return self._year_as_int(name, super().var(name, *args, **kwargs))
 
     def cat_list(self, name):
         """Return a list of all categories for a mapping set.
