@@ -84,7 +84,7 @@ def main(context, model_new, scen_new, create_new, years_new, firstyear_new,
     try:
         # AttributeError if context is None
         sc_ref = context.get('scen', None)
-        if not issubclass(sc_ref, ixmp.Scenario):
+        if not issubclass(type(sc_ref), ixmp.Scenario):
             raise AttributeError
     except AttributeError:
         raise click.UsageError('add-years requires a base scenario; use'
