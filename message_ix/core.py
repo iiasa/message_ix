@@ -27,25 +27,40 @@ class Scenario(ixmp.Scenario):
         super().__init__(mp, model, scenario, version, scheme, annotation,
                          cache)
 
+    # Utility methods used by .equ(), .par(), .set(), and .var()
+
     @lru_cache()
     def _year_idx(self, name):
-        """Return (idx_set, idx_name) for 'year'-indexed dims of *name*."""
-        # NB Since item dimensionality is fixed, the result can be cached for
-        #    performance
-        return list(filter(
-            lambda e: e[0] == 'year',
-            zip(self.idx_sets(name), self.idx_names(name))
-        ))
+        """Return a sequence of (idx_set, idx_name) for 'year'-indexed dims.
+
+        Since item dimensionality does not change, the the return value is
+        lru_cache()'d for performance.
+        """
+        # filter() returns a 1-time generator, so convert to a fixed tuple()
+        return tuple(
+            # Keep only tuples where the idx_set is 'year'
+            filter(lambda e: e[0] == 'year',
+                   # Generate 2-tuples of (idx_set, idx_name)
+                   zip(self.idx_sets(name), self.idx_names(name))))
 
     def _year_as_int(self, name, df):
-        """Convert 'year'-indexed columns of *df* to int dtypes."""
+        """Convert 'year'-indexed columns of *df* to :obj:`int` dtypes.
+
+        :meth:`_year_idx` is used to retrieve a sequence of (idx_set, idx_name)
+        for *only* the 'year'-indexed dimensions of item *name*.
+
+        If at least one dimension is indexed by 'year', all such dimensions are
+        converted to :obj:`int`. Otherwise, *df* is returned unmodified.
+        """
         year_idx = self._year_idx(name)
+
         if len(year_idx):
-            return df.astype({c: 'int' for _, c in year_idx})
+            return df.astype({col_name: 'int' for _, col_name in year_idx})
         else:
             return df
 
     # Override ixmp methods to convert 'year'-indexed columns to int
+
     def equ(self, name, filters=None):
         """Return equation data.
 
@@ -64,6 +79,7 @@ class Scenario(ixmp.Scenario):
         pd.DataFrame
             Filtered elements of the equation.
         """
+        # Call ixmp.Scenario.equ(), then convert 'year'-indexed columns to ints
         return self._year_as_int(name, super().equ(name, filters))
 
     def par(self, name, filters=None):

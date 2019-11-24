@@ -25,6 +25,7 @@ from functools import partial
 from timeit import default_timer as timer
 
 import click
+import ixmp
 import message_ix
 
 from . import add_year
@@ -79,11 +80,11 @@ def main(context, model_new, scen_new, create_new, years_new, firstyear_new,
          lastyear_new, macro, baseyear_macro, parameter, region, rewrite,
          unit_check, extrapol_neg, bound_extend, dry_run):
     # The reference scenario is loaded according to the options given to
-    # the top-level message-ix (=ixmp) CLI:
-
+    # the top-level message-ix (=ixmp) CLI
     try:
-        sc_ref = context.get('scen', None)  # AttributeError if context is None
-        if not sc_ref:
+        # AttributeError if context is None
+        sc_ref = context.get('scen', None)
+        if not issubclass(sc_ref, ixmp.Scenario):
             raise AttributeError
     except AttributeError:
         raise click.UsageError('add-years requires a base scenario; use'
