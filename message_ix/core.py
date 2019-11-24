@@ -35,7 +35,7 @@ class Scenario(ixmp.Scenario):
         return list(filter(
             lambda e: e[0] == 'year',
             zip(self.idx_sets(name), self.idx_names(name))
-            ))
+        ))
 
     def _year_as_int(self, name, df):
         """Convert 'year'-indexed columns of *df* to int dtypes."""
