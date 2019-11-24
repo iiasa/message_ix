@@ -43,7 +43,7 @@ TS_DF_SHIFT = TS_DF.copy()
 TS_DF_SHIFT.loc[0, 1964] = np.nan
 
 
-def make_dantzig(mp, solve=False, multi_year=False):
+def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
     """Return an :class:`message_ix.Scenario` for Dantzig's canning problem.
 
     Parameters
@@ -143,11 +143,18 @@ def make_dantzig(mp, solve=False, multi_year=False):
         scen.add_par('technical_lifetime', ['seattle', 'canning_plant', 1964],
                      3, 'y')
 
+    if solve:
+        # Always read one equation. Used by test_core.test_year_int.
+        scen.init_equ('COMMODITY_BALANCE_GT',
+                      ['node', 'commodity', 'level', 'year', 'time'])
+        solve_opts['equ_list'] = solve_opts.get('equ_list', []) \
+            + ['COMMODITY_BALANCE_GT']
+
     scen.commit('Created a MESSAGE-scheme version of the transport problem.')
     scen.set_as_default()
 
     if solve:
-        scen.solve()
+        scen.solve(**solve_opts)
 
     scen.check_out(timeseries_only=True)
     scen.add_timeseries(HIST_DF, meta=True)

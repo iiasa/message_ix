@@ -7,10 +7,22 @@ import pandas as pd
 import pandas.util.testing as pdt
 
 from message_ix import Scenario
+from message_ix.testing import make_dantzig
 
 
 msg_args = ('canning problem (MESSAGE scheme)', 'standard')
 msg_multiyear_args = ('canning problem (MESSAGE scheme)', 'multi-year')
+
+
+def test_year_int(test_mp):
+    scen = make_dantzig(test_mp, solve=True, multi_year=True)
+
+    # Dimensions indexed by 'year' are returned as integers for all item types
+    assert scen.set('cat_year').dtypes['year'] == 'int'
+    assert scen.par('demand').dtypes['year'] == 'int'
+    assert scen.par('bound_activity_up').dtypes['year_act'] == 'int'
+    assert scen.var('ACT').dtypes['year_vtg'] == 'int'
+    assert scen.equ('COMMODITY_BALANCE_GT').dtypes['year'] == 'int'
 
 
 def test_add_spatial_single(test_mp):

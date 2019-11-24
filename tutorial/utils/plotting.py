@@ -28,7 +28,8 @@ class Plots(object):
                       values='value')
         return df
 
-    def model_data(self, var, year_col='year_act', baseyear=False, subset=None):
+    def model_data(self, var, year_col='year_act', baseyear=False,
+                   subset=None):
         df = self.ds.var(var)
         if subset is not None:
             df = df[df['technology'].isin(subset)]

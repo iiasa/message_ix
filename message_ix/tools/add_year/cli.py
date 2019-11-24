@@ -80,16 +80,24 @@ def main(context, model_new, scen_new, create_new, years_new, firstyear_new,
          lastyear_new, macro, baseyear_macro, parameter, region, rewrite,
          unit_check, extrapol_neg, bound_extend, dry_run):
     # The reference scenario is loaded according to the options given to
-    # the top-level message-ix (=ixmp) CLI:
-
+    # the top-level message-ix (=ixmp) CLI
     try:
-        sc_ref = context.get('scen', None)  # AttributeError if context is None
-        if not isinstance(sc_ref, ixmp.Scenario):
+        # AttributeError if context is None
+        sc_ref = context.get('scen', None)
+        if not issubclass(type(sc_ref), ixmp.Scenario):
             raise AttributeError
     except AttributeError:
         raise click.UsageError('add-years requires a base scenario; use'
                                '--url or --platform, --model, --scenario, and '
                                'optionally --version')
+    else:
+        # the ixmp CLI pre-loads sc_ref as an ixmp.Scenario;
+        # convert to a message_ix.Scenario
+        sc_ref = message_ix.Scenario(
+            mp=context['mp'],
+            model=sc_ref.model,
+            scenario=sc_ref.scenario,
+            version=sc_ref.version)
 
     start = timer()
     print('>> message_ix.tools.add_year...')
