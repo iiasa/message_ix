@@ -25,7 +25,6 @@ from functools import partial
 from timeit import default_timer as timer
 
 import click
-import ixmp
 import message_ix
 
 from . import add_year
@@ -84,12 +83,20 @@ def main(context, model_new, scen_new, create_new, years_new, firstyear_new,
 
     try:
         sc_ref = context.get('scen', None)  # AttributeError if context is None
-        if not isinstance(sc_ref, ixmp.Scenario):
+        if not sc_ref:
             raise AttributeError
     except AttributeError:
         raise click.UsageError('add-years requires a base scenario; use'
                                '--url or --platform, --model, --scenario, and '
                                'optionally --version')
+    else:
+        # the ixmp CLI pre-loads sc_ref as an ixmp.Scenario;
+        # convert to a message_ix.Scenario
+        sc_ref = message_ix.Scenario(
+            mp=context['mp'],
+            model=sc_ref.model,
+            scenario=sc_ref.scenario,
+            version=sc_ref.version)
 
     start = timer()
     print('>> message_ix.tools.add_year...')
