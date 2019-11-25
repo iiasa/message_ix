@@ -218,9 +218,9 @@ Parameter
 * .. [#construction] The construction time only has an effect on the investment costs; in |MESSAGEix|,
 *    each unit of new-built capacity is available instantaneously at the beginning of the model period.
 *
-* .. [#rating] The upper bound of a contribution by any technology to the constraints on system reliability
-*    (:ref:`reliability_constraint`) and flexibility (:ref:`flexibility_constraint`) can depend on the share
-*    of the technology output in the total commodity use at a specific level.
+* .. [#rating] Maximum share of technology in commodity use per rating. The upper bound of a contribution by any technology to the constraints on system reliability
+*    (:ref:`reliability_constraint`) and flexibility (:ref:`flexibility_constraint`) can depend on the share of the technology output in the total commodity use at
+*    a specific level.
 ***
 
 ***
@@ -481,9 +481,11 @@ Parameters
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
 * The implementation of |MESSAGEix| includes the functionality to introduce "add-on technologies" that are specifically
-* linked to parent technologies. This feature can be used to model mitigation options (scrubber, cooling).
-* Note, that no default addon_conversion is set, to avoid default conversion factors of 1 being set for technologies
-* with mutiple modes, of which only a single mode should be linked to the add-on technology.
+* linked to parent technologies. This feature can be used to model mitigation options (scrubber, cooling).Note, that no
+* default addon_conversion factor (conversion factor between add-on and parent technology activity) is set, to avoid
+* default conversion factors of 1 being set for technologies with mutiple modes, of which only a single mode should be
+* linked to the add-on technology. Upper and lower bounds of add on technologies are defined relative to the parent
+* technology. 
 *
 * .. list-table::
 *    :widths: 20 80
@@ -498,7 +500,6 @@ Parameters
 *    * - addon_lo
 *      - ``node`` | ``tec`` | ``vintage`` | ``year`` | ``mode`` | ``time`` | ``type_addon``
 *
-* The upper bound of
 ***
 
 Parameters
@@ -517,7 +518,8 @@ Parameters
 *
 * The implementation of |MESSAGEix| includes the functionality for 'soft' relaxations of dynamic constraints on
 * new-built capacity and activity (see Keppo and Strubegger, 2010 :cite:`keppo_short_2010`).
-* Refer to the section :ref:`dynamic_constraints`.
+* Refer to the section :ref:`dynamic_constraints`. Absolute cost and levelized cost multipliers are used
+* for the relaxation of upper and lower bounds. 
 *
 * .. list-table::
 *    :widths: 20 80
@@ -585,7 +587,30 @@ Parameters
 ***
 * Auxiliary investment cost parameters and multipliers
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-* Documentation not yet included.
+* .. list-table::
+*    :widths: 35 65 50
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index names
+*      - Explanatory comments 
+*    * - construction_time_factor
+*      - ``node`` | ``tec`` | ``year_all``
+*      - scaling factor to account for construction time of new capacity
+*    * -  remaining_capacity
+*      - ``node`` | ``tec`` | ``year_all`` 
+*      - scaling factor to account for remaining capacity in period 
+*    * - end_of_horizon_factor
+*      - ``node`` | ``tec`` | ``year_all`` 
+*      - multiplier for value of investment at end of model horizon
+*    * - beyond_horizon_lifetime
+*      - ``node`` | ``tec`` | ``year_all`` 
+*      - remaining technical lifetime at the end of model horizon
+*    * - beyond_horizon_factor
+*      - ``node`` | ``tec`` | ``year_all``
+*      - discount factor of remaining lifetime beyond model horizon 
+*
+*
 ***
 
 Parameters
@@ -623,8 +648,9 @@ Parameters
 *    * - tax_emission
 *      - ``node`` | ``type_emission`` | ``type_tec`` | ``type_year``
 *
-* .. [#em_scaling] The parameters ``emission_scaling`` allows to efficiently aggregate different emissions/pollutants
-*    and set bounds or taxes on various categories.
+* .. [#em_scaling] The parameter ``emission_scaling`` is the scaling factor to harmonize bounds or taxes across types of
+*    emisisons. It allows to efficiently aggregate different emissions/pollutants and set bounds or taxes on various categories.
+* 
 ***
 
 Parameters
@@ -748,9 +774,9 @@ Parameters
 * Parameters of the `Relations` section
 * -------------------------------------
 *
-* Generic linear relations are implemented in |MESSAGEix|.
-* This feature is intended for development and testing only - all new features should be implemented
-* as specific new mathematical formulations and associated sets & parameters.
+* Generic linear relations are implemented in |MESSAGEix|.This feature is intended for development and testing only - all new features
+* should be implemented as specific new mathematical formulations and associated sets & parameters. For the formulation of the relations
+* refer to  :ref:`section_of_generic_relations`. 
 *
 * .. list-table::
 *    :widths: 25 75
