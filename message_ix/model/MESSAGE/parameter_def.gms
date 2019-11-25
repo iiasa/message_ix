@@ -223,6 +223,89 @@ Parameter
 *    of the technology output in the total commodity use at a specific level.
 ***
 
+***
+* Parameters of the `Technology` section Option 2
+* -----------------------------------------------
+*
+* Input/output mapping, costs and engineering specifications
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*
+* .. list-table::
+*    :widths: 25 50 75
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index names
+*      - Explanatory comments
+*    * - input [#tecvintage2]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` |
+*        ``node_origin`` | ``commodity`` | ``level`` | ``time`` | ``time_origin``
+*      - relative share of input per unit of activity
+*    * - output [#tecvintage2]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` |
+*        ``node_dest`` | ``commodity`` | ``level`` | ``time`` | ``time_dest``
+*      - relative share of output per unit of activity
+*    * - inv_cost [#tecvintage2]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg``
+*      - investment costs (per unit of new capacity)
+*    * - fix_cost [#tecvintage2]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act``
+*      - fixed costs per year (per unit of capacity maintained)
+*    * - var_cost [#tecvintage2]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``time``
+*      - variable costs of operation (per unit of capacity maintained)
+*    * - levelized_cost [#levelizedcost2]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``time``
+*      - levelized costs (per unit of new capacity)
+*    * - construction_time [#construction2]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg``
+*      - duration of construction of new capacity (in years)
+*    * - technical_lifetime
+*      - ``node_loc`` | ``tec`` | ``year_vtg``
+*      - maximum technical lifetime (from year of construction)
+*    * - capacity_factor [#tecvintage2]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``time``
+*      - capacity factor by subannual time slice
+*    * - operation_factor [#tecvintage2]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act``
+*      - yearly total operation factor
+*    * - min_utilization_factor [#tecvintage2]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act``
+*      - yearly minimum utilization factor
+*    * - rating_bin [#rating2]_
+*      - ``node`` | ``technology`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
+*      - maximum share of technology in commodity use per rating
+*    * - reliability_factor [#peakload]_
+*      - ``node`` | ``technology`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
+*      - reliability of a technology (per rating)
+*    * - flexibility_factor
+*      - ``node_loc`` | ``technology`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``commodity`` | ``level`` | ``time`` | ``rating``
+*      - contribution of technologies towards operation flexibility constraint
+*    * - renewable_capacity_factor
+*      - ``node_loc`` | ``commodity`` | ``grade`` | ``level`` | ``year``
+*      - quality of renewable potential grade (>= 1)
+*    * - renewable_potential
+*      - ``node`` | ``commodity`` | ``grade`` | ``level`` | ``year``
+*      - size of renewable potential per grade
+*    * - emission_factor
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``emission``
+*      - emission intensity of activity
+*
+* .. [#tecvintage2] Fixed and variable cost parameters and technical specifications are indexed over both
+*    the year of construction (vintage) and the year of operation (actual).
+*    This allows to represent changing technology characteristics depending on the age of the plant.
+*
+* .. [#levelizedcost2] The parameter ``levelized_cost`` is computed in the GAMS pre-processing under the assumption of
+*    full capacity utilization until the end of the technical lifetime.
+*
+* .. [#construction2] The construction time only has an effect on the investment costs; in |MESSAGEix|,
+*    each unit of new-built capacity is available instantaneously at the beginning of the model period.
+*
+* .. [#rating2] The upper bound of a contribution by any technology to the constraints on system reliability
+*    (:ref:`reliability_constraint`) and flexibility (:ref:`flexibility_constraint`) can depend on the share
+*    of the technology output in the total commodity use at a specific level.
+***
+
 Parameters
 * technology input-output mapping and costs parameters
     input(node,tec,vintage,year_all,mode,node,commodity,level,time,time)  relative share of input per unit of activity
@@ -277,6 +360,42 @@ Parameters
 *    * - bound_activity_lo
 *      - lower bound on activity
 *      - ``node_loc`` | ``tec`` | ``year_act`` | ``mode`` | ``time``
+*
+* The bounds on activity are implemented as the aggregate over all vintages in a specific period
+* (cf. Equation ``ACTIVITY_BOUND_UP`` and ``ACTIVITY_BOUND_LO``).
+***
+
+***
+* Bounds on capacity and activity Option 2
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*
+* The following parameters specify upper and lower bounds on new capacity, total installed capacity, and activity.
+*
+* .. list-table::
+*    :widths: 20 30 50
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index names
+*      - Explanatory comments
+*    * - bound_new_capacity_up
+*      - ``node_loc`` | ``tec`` | ``year_vtg``
+*      - upper bound on new capacity
+*    * - bound_new_capacity_lo
+*      - ``node_loc`` | ``tec`` | ``year_vtg``
+*      - lower bound on new capacity
+*    * - bound_total_capacity_up
+*      - ``node_loc`` | ``tec`` | ``year_act``
+*      - upper bound on total installed capacity
+*    * - bound_total_capacity_lo
+*      - ``node_loc`` | ``tec`` | ``year_act``
+*      - lower bound on total installed capacity
+*    * - bound_activity_up
+*      - ``node_loc`` | ``tec`` | ``year_act`` | ``mode`` | ``time``
+*      - upper bound on activity (aggregated over all vintages)
+*    * - bound_activity_lo
+*      - ``node_loc`` | ``tec`` | ``year_act`` | ``mode`` | ``time``
+*      - lower bound on activity
 *
 * The bounds on activity are implemented as the aggregate over all vintages in a specific period
 * (cf. Equation ``ACTIVITY_BOUND_UP`` and ``ACTIVITY_BOUND_LO``).
