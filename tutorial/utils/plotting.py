@@ -28,7 +28,8 @@ class Plots(object):
                       values='value')
         return df
 
-    def model_data(self, var, year_col='year_act', baseyear=False, subset=None):
+    def model_data(self, var, year_col='year_act', baseyear=False,
+                   subset=None):
         df = self.ds.var(var)
         if subset is not None:
             df = df[df['technology'].isin(subset)]
@@ -110,7 +111,7 @@ class Plots(object):
                      values='lvl')
               .rename(columns={'lvl': 'value'})
               )
-        df = df / 8760 * 100 / 1e6 * self.cost_unit_conv
+        df = df / 8760 * 100 * self.cost_unit_conv
         df.plot.bar(stacked=False)
         plt.title('{} Energy System Prices'.format(self.country.title()))
         plt.ylabel('cents/kWhr')

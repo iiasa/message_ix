@@ -1,11 +1,7 @@
-try:
-    from pathlib import Path
-except ImportError:
-    from pathlib2 import Path
+from pathlib import Path
 
+from click.testing import CliRunner
 import message_ix
-from ixmp import Platform
-from ixmp.testing import create_local_testdb
 import pytest
 
 
@@ -34,13 +30,25 @@ def tutorial_path(request):
     return Path(__file__).parent / '..' / 'tutorial'
 
 
-@pytest.fixture(scope='session')
-def test_legacy_mp(tmp_path_factory, test_data_path):
+@pytest.fixture(scope='function')
+def test_legacy_mp(request, tmp_env, test_data_path):
     """Path to a database properties file referring to a test database."""
-    # adapting `ixmp.testing:test_mp()`
-    db_path = Path(str(tmp_path_factory.mktemp('test_mp_props')))
-    db_name = 'message_ix_legacy'
-    props = create_local_testdb(db_path, test_data_path / 'testdb', db_name)
-    mp = Platform(props)
+    from ixmp.testing import create_test_mp
 
-    yield mp
+    yield from create_test_mp(request, test_data_path, 'message_ix_legacy')
+
+
+@pytest.fixture(scope='session')
+def message_ix_cli(tmp_env):
+    """A CliRunner object that invokes the message_ix command-line interface.
+
+    :obj:`None` in *args* is automatically discarded.
+    """
+    from message_ix import cli
+
+    class Runner(CliRunner):
+        def invoke(self, *args, **kwargs):
+            return super().invoke(cli.main, list(filter(None, args)),
+                                  env=tmp_env, **kwargs)
+
+    yield Runner().invoke

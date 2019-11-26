@@ -49,13 +49,13 @@ See `doc/README.md` for further details.
 
 ### Installation
 
-See [‘Installation’ in the documentation](https://message.iiasa.ac.at/en/v1.2/getting_started.html) or the file `INSTALL.rst`.
+See [‘Installation’ in the documentation](https://message.iiasa.ac.at/en/1.2.x/getting_started.html) or the file `INSTALL.rst`.
 
 
 ### Tutorials
 
 Several introductory tutorials are provided.
-See [‘Tutorials’ in the documentation](https://message.iiasa.ac.at/en/v1.2/tutorials.html) or the file
+See [‘Tutorials’ in the documentation](https://message.iiasa.ac.at/en/1.2.x/tutorials.html) or the file
 `tutorial/README.rst`.
 
 

@@ -7,10 +7,22 @@ import pandas as pd
 import pandas.util.testing as pdt
 
 from message_ix import Scenario
+from message_ix.testing import make_dantzig
 
 
 msg_args = ('canning problem (MESSAGE scheme)', 'standard')
 msg_multiyear_args = ('canning problem (MESSAGE scheme)', 'multi-year')
+
+
+def test_year_int(test_mp):
+    scen = make_dantzig(test_mp, solve=True, multi_year=True)
+
+    # Dimensions indexed by 'year' are returned as integers for all item types
+    assert scen.set('cat_year').dtypes['year'] == 'int'
+    assert scen.par('demand').dtypes['year'] == 'int'
+    assert scen.par('bound_activity_up').dtypes['year_act'] == 'int'
+    assert scen.var('ACT').dtypes['year_vtg'] == 'int'
+    assert scen.equ('COMMODITY_BALANCE_GT').dtypes['year'] == 'int'
 
 
 def test_add_spatial_single(test_mp):
@@ -158,8 +170,10 @@ def test_add_cat_unique(test_mp):
 
 def test_years_active(test_mp):
     scen = Scenario(test_mp, *msg_multiyear_args)
-    df = scen.years_active('seattle', 'canning_plant', '2020')
-    npt.assert_array_equal(df, [2020, 2030])
+    years = scen.years_active('seattle', 'canning_plant', '2020')
+    assert isinstance(years, list)
+    assert isinstance(years[0], int)
+    npt.assert_array_equal(years, [2020, 2030])
 
 
 def test_years_active_extend(test_mp):
@@ -169,8 +183,8 @@ def test_years_active_extend(test_mp):
     scen.add_set('year', ['2040', '2050'])
     scen.add_par('duration_period', '2040', 10, 'y')
     scen.add_par('duration_period', '2050', 10, 'y')
-    df = scen.years_active('seattle', 'canning_plant', '2020')
-    npt.assert_array_equal(df, [2020, 2030, 2040])
+    years = scen.years_active('seattle', 'canning_plant', '2020')
+    npt.assert_array_equal(years, [2020, 2030, 2040])
     scen.discard_changes()
 
 
@@ -251,8 +265,8 @@ def test_excel_read_write(test_mp):
 
 def test_clone(tmpdir):
     # Two local platforms
-    mp1 = ixmp.Platform(tmpdir / 'mp1', dbtype='HSQLDB')
-    mp2 = ixmp.Platform(tmpdir / 'mp2', dbtype='HSQLDB')
+    mp1 = ixmp.Platform(driver='hsqldb', path=tmpdir / 'mp1')
+    mp2 = ixmp.Platform(driver='hsqldb', path=tmpdir / 'mp2')
 
     # A minimal scenario
     scen1 = Scenario(mp1, model='model', scenario='scenario', version='new')
@@ -273,8 +287,8 @@ def test_clone(tmpdir):
     mp1.close_db()  # TODO this should be done automatically on del
     mp2.close_db()  # TODO this should be done automatically on del
     del mp1, mp2
-    mp1 = ixmp.Platform(tmpdir / 'mp1', dbtype='HSQLDB')
-    mp2 = ixmp.Platform(tmpdir / 'mp2', dbtype='HSQLDB')
+    mp1 = ixmp.Platform(driver='hsqldb', path=tmpdir / 'mp1')
+    mp2 = ixmp.Platform(driver='hsqldb', path=tmpdir / 'mp2')
 
     # Same scenarios present in each database
     assert all(mp1.scenario_list(default=False) ==

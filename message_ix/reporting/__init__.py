@@ -42,6 +42,7 @@ configure(
         'technology': 't',
         'time': 'h',
         'year': 'y',
+
         # Aliases
         'node_dest': 'nd',
         'node_loc': 'nl',
@@ -53,10 +54,15 @@ configure(
         'year_act': 'ya',
         'year_vtg': 'yv',
         'year_rel': 'yr',
+
+        # Created by reporting
+        'technology_addon': 'ta',
+        'technology_primary': 'tp',
     }
 )
 
-#: Basic derived quantities that are the product of two others.
+#: Automatic quantities that are the :meth:`~computations.product` of two
+#: others.
 PRODUCTS = (
     ('out',
         ('output', 'ACT')),
@@ -78,34 +84,58 @@ PRODUCTS = (
         ('land_use', 'LAND')),
     ('land_emi',
         ('land_emission', 'LAND')),
+    ('addon ACT',
+        ('addon conversion:n-tp-yv-ya-m-h-t:full', 'ACT')),
+    ('addon in',
+        ('input', 'addon ACT')),
+    ('addon out',
+        ('output', 'addon ACT')),
 )
 
-#: Other standard derived quantities.
+#: Automatic quantities derived by other calculations.
 DERIVED = [
     ('tom:nl-t-yv-ya', (computations.add, 'fom:nl-t-yv-ya', 'vom:nl-t-yv-ya')),
-    ('tom:nl-t-ya', (computations.sum, 'tom:nl-t-yv-ya', None, ['yv'])),
+    # addon_conversion broadcast across technology_addon
+    ('addon conversion:n-tp-yv-ya-m-h-t:full',
+        (partial(computations.broadcast_map,
+                 rename={'t': 'tp', 'ta': 't', 'n': 'nl'}),
+         'addon_conversion:n-t-yv-ya-m-h-type_addon',
+         'map_addon')),
 ]
 
-#: Quantities to automatically convert to pyam format.
-PYAM_CONVERT = {
-    'out': ('out:nl-t-ya-m-nd-c-l', 'ya', dict(kind='ene', var='out')),
-    'in': ('in:nl-t-ya-m-no-c-l', 'ya', dict(kind='ene', var='in')),
-    'cap': ('CAP:nl-t-ya', 'ya', dict(var='capacity')),
-    'new_cap': ('CAP_NEW:nl-t-yv', 'yv', dict(var='new capacity')),
-    'inv': ('inv:nl-t-yv', 'yv', dict(var='inv cost')),
-    'fom': ('fom:nl-t-ya', 'ya', dict(var='fom cost')),
-    'vom': ('vom:nl-t-ya', 'ya', dict(var='vom cost')),
-    'tom': ('tom:nl-t-ya', 'ya', dict(var='total om cost')),
-    'emis': ('emi:nl-t-ya-m-e', 'ya', dict(kind='emi', var='emis')),
-}
+#: Quantities to automatically convert to IAMC format using
+#: :meth:`~computations.as_pyam`.
+PYAM_CONVERT = [
+    ('out:nl-t-ya-m-nd-c-l', 'ya', dict(kind='ene', var='out')),
+    ('in:nl-t-ya-m-no-c-l', 'ya', dict(kind='ene', var='in')),
+    ('CAP:nl-t-ya', 'ya', dict(var='capacity')),
+    ('CAP_NEW:nl-t-yv', 'yv', dict(var='new capacity')),
+    ('inv:nl-t-yv', 'yv', dict(var='inv cost')),
+    ('fom:nl-t-ya', 'ya', dict(var='fom cost')),
+    ('vom:nl-t-ya', 'ya', dict(var='vom cost')),
+    ('tom:nl-t-ya', 'ya', dict(var='total om cost')),
+    ('emi:nl-t-ya-m-e', 'ya', dict(kind='emi', var='emis')),
+]
 
 
-#: Standard reports that collect quantities converted to pyam format.
+#: Automatic reports that :meth:`~computations.concat` quantities converted to
+#: IAMC format.
 REPORTS = {
-    'message:system': ['out:pyam', 'in:pyam', 'cap:pyam', 'new_cap:pyam'],
+    'message:system': ['out:pyam', 'in:pyam', 'CAP:pyam', 'CAP_NEW:pyam'],
     'message:costs': ['inv:pyam', 'fom:pyam', 'vom:pyam', 'tom:pyam'],
-    'message:emissions': ['emis:pyam'],
+    'message:emissions': ['emi:pyam'],
 }
+
+
+#: MESSAGE mapping sets, converted to quantities using
+#: :meth:`~computations.map_as_qty`.
+MAPPING_SETS = [
+    'addon',
+    'emission',
+    # 'node',  # Automatic addition fails because 'map_node' is defined
+    'tec',
+    'year',
+]
 
 
 class Reporter(IXMPReporter):
@@ -125,74 +155,110 @@ class Reporter(IXMPReporter):
         # Invoke the ixmp method
         rep = super().from_scenario(scenario, **kwargs)
 
-        # Add basic quantities for MESSAGEix models
+        # Use a queue pattern. This is more forgiving; e.g. 'addon ACT' from
+        # PRODUCTS depends on 'addon conversion::full'; but the latter is added
+        # to the queue later (from DERIVED). Using strict=True below means that
+        # this will raise an exception; so the failed item is re-appended to
+        # the queue and tried 1 more time later.
+
+        # Queue of items to add. Each element is a tuple:
+        # - The first element is the count of attempts to add the item;
+        # - the second element is the method to call;
+        # - the remainder are positional arguments.
+        to_add = []
+
+        def put(*args, **kwargs):
+            """Helper to add elements to the queue."""
+            to_add.append(tuple([0, partial(args[0], **kwargs)]
+                                + list(args[1:])))
+
+        # Quantities that represent mapping sets
+        for name in MAPPING_SETS:
+            put(rep.add, f'map_{name}',
+                (computations.map_as_qty, f'cat_{name}'), strict=True)
+
+        # Product quantities
         for name, quantities in PRODUCTS:
-            try:
-                rep.add_product(name, *quantities)
-            except KeyError as e:
-                log.info(f'{e.args[0]} not in scenario → not adding {name}')
+            put(rep.add_product, name, *quantities)
 
-        # Add derived quantities for MESSAGEix models
+        # Derived quantities
         for key, args in DERIVED:
-            try:
-                rep.add(key, args, strict=True)
-            except KeyError as e:
-                log.info(f'{e.args[0]} not in scenario → not adding {key}')
+            put(rep.add, key, args, strict=True, index=True, sums=True)
 
-        # Add conversions to pyam
-        for key, args in PYAM_CONVERT.items():
-            qty, year_dim, collapse_kw = args
+        # Conversions to IAMC format/pyam objects
+        for qty, year_dim, collapse_kw in PYAM_CONVERT:
             collapse_cb = partial(collapse_message_cols, **collapse_kw)
-            key += ':pyam'
-            try:
-                rep.as_pyam(qty, year_dim, key, collapse=collapse_cb)
-            except KeyError as e:
-                log.info(f'{e.args[0]} not in scenario → not adding {key}')
+            put(rep.convert_pyam, qty, year_dim, 'pyam', collapse=collapse_cb)
 
-        # Add standard reports
+        # Standard reports
         for group, pyam_keys in REPORTS.items():
-            # Filter out keys which are not added, above
-            keys = list(filter(lambda k: k in rep, pyam_keys))
-
-            # Log diagnostic information
-            missing = sorted(set(pyam_keys) - set(keys))
-            if missing:
-                log.info(f'missing {missing} omitted from {group}')
-
-            rep.add(group, tuple([computations.concat] + keys), strict=True)
+            put(rep.add, group, tuple([computations.concat] + pyam_keys),
+                strict=True)
 
         # Add all standard reporting to the default message node
-        rep.add('message:default',
-                tuple([computations.concat] + list(REPORTS.keys())),
-                strict=True)
+        put(rep.add, 'message:default',
+            tuple([computations.concat] + list(REPORTS.keys())),
+            strict=True)
+
+        # Process the queue until empty
+        while len(to_add):
+            # Next call
+            count, method, *args = to_add.pop(0)
+
+            try:
+                # Call the method to add quantities
+                method(*args)
+            except KeyError as e:
+                # Adding failed
+
+                # Information for debugging
+                info = [repr(e), str(method), str(args)]
+
+                if count == 0:
+                    # First failure: this may only be due to items being out of
+                    # order, so retry silently
+                    to_add.append(tuple([count + 1, method] + args))
+
+                    log.debug('\n  '.join(['Will retry adding:'] + info))
+                elif count == 1:
+                    # Second failure: something is genuinely missing, discard
+                    log.info('\n  '.join(['Failed to add:'] + info))
 
         return rep
 
-    def as_pyam(self, quantities, year_time_dim, key=None, drop={},
-                collapse=None):
-        """Add conversion of **quantities** to :class:`pyam.IamDataFrame`.
+    def convert_pyam(self, quantities, year_time_dim, tag='iamc', drop={},
+                     collapse=None):
+        """Add conversion of one or more **quantities** to IAMC format.
 
         Parameters
         ----------
         quantities : str or Key or list of (str, Key)
-            Quantities to transform to :mod:`pyam` format.
+            Quantities to transform to :mod:`pyam`/IAMC format.
         year_time_dim : str
-            Label of the dimension use for the `year` or `time` column of the
-            :class:`pyam.IamDataFrame`. The column is labelled "Time" if
-            `year_time_dim` is ``h``, otherwise "Year".
+            Label of the dimension use for the ‘Year’ or ‘Time’ column of the
+            resulting :class:`pyam.IamDataFrame`. The column is labelled ‘Time’
+            if ``year_time_dim=='h'``, otherwise ‘Year’.
+        tag : str, optional
+            Tag to append to new Keys.
         drop : iterable of str, optional
             Label of additional dimensions to drop from the resulting data
             frame. Dimensions ``h``, ``y``, ``ya``, ``yr``, and ``yv``—
             except for the one named by `year_time_dim`—are automatically
             dropped.
         collapse : callable, optional
-            Callback to handle additional dimensions of the data frame.
+            Callback to handle additional dimensions of the quantity. A
+            :class:`pandas.DataFrame` is passed as the sole argument to
+            `collapse`, which must return a modified dataframe.
 
         Returns
         -------
         list of Key
-            Keys for the reporting targets that create the IamDataFrames
-            corresponding to *quantities*. The keys have the added tag ‘iamc’.
+            Each key converts a :class:`Quantity
+            <ixmp.reporting.utils.Quantity>` into a :class:`pyam.IamDataFrame`.
+
+        See also
+        --------
+        message_ix.reporting.computations.as_pyam
         """
         if isinstance(quantities, (str, Key)):
             quantities = [quantities]
@@ -204,18 +270,20 @@ class Reporter(IXMPReporter):
             qty = Key.from_str_or_key(qty)
             to_drop = set(drop) | set(qty.dims) & (
                 {'h', 'y', 'ya', 'yr', 'yv'} - {year_time_dim})
-            key = key or Key.from_str_or_key(qty, tag='iamc')
-            self.add(key, (partial(computations.as_pyam, drop=to_drop,
-                                   collapse=collapse),
-                           'scenario', year_time_dim, qty))
-            keys.append(key)
+            new_key = ':'.join([qty.name, tag])
+            comp = partial(computations.as_pyam,
+                           year_time_dim=year_time_dim,
+                           drop=to_drop,
+                           collapse=collapse)
+            self.add(new_key, (comp, 'scenario', qty))
+            keys.append(new_key)
         return keys
 
     def write(self, key, path):
-        """Write the report *key* to the file *path*.
+        """Compute *key* and write its value to the file at *path*.
 
         In addition to the formats handled by :meth:`ixmp.Reporter.write`,
-        this version will write :mod:`pyam.IamDataFrame` to CSV or Excel files
-        using built-in methods.
+        this version will write :class:`pyam.IamDataFrame` to CSV or Excel
+        files using built-in methods.
         """
         computations.write_report(self.get(key), path)

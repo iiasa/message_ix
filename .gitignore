@@ -35,7 +35,6 @@ message_ix/model/MESSAGE_master.gms
 /doc/source/model
 
 # setuptools
-ixmp/default_paths.py
 /build
 /dist
 
@@ -47,12 +46,14 @@ rmessageix/source/.Rhistory
 
 # testdb
 .cache/**
-tests/testdb/test.properties
-tests/testdb/ixmptest.properties
-tests/testdb/ixmptest.lck
+tests/data/nightly
+tests/data/testdb/test.properties
+tests/data/testdb/ixmptest.properties
+tests/data/testdb/ixmptest.lck
 .Rproj.user
 
 # pytest and related
-.coverage
+.coverage*
 .pytest_cache
+coverage.xml
 htmlcov

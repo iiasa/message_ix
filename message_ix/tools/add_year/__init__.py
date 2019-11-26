@@ -126,7 +126,7 @@ def add_year(sc_ref, sc_new, years_new, firstyear_new=None, lastyear_new=None,
     # -------------------------------------------------------------------------
     # III.B)  Adding parameters and calculating the missing values for the
     # additonal years
-    if parameter == 'all':
+    if parameter in ('all', ['all']):
         par_list = sorted(sc_ref.par_list())
     elif isinstance(parameter, list):
         par_list = parameter
@@ -139,7 +139,7 @@ def add_year(sc_ref, sc_new, years_new, firstyear_new=None, lastyear_new=None,
     if 'technical_lifetime' in par_list:
         par_list.insert(0, par_list.pop(par_list.index('technical_lifetime')))
 
-    if region == 'all':
+    if region in ('all', ['all']):
         reg_list = sc_ref.set('node').tolist()
     elif isinstance(region, list):
         reg_list = region
@@ -287,8 +287,8 @@ def add_year_set(sc_ref, sc_new, years_new, firstyear_new=None,
                                               ) if x not in sc_ref.set_list()]
         if set_name not in sc_new.set_list() and not new_set:
             sc_new.init_set(set_name,
-                            idx_sets=sc_ref.idx_sets(set_name).tolist(),
-                            idx_names=sc_ref.idx_names(set_name).tolist())
+                            idx_sets=sc_ref.idx_sets(set_name),
+                            idx_names=sc_ref.idx_names(set_name))
         sc_new.add_set(set_name, sc_ref.set(set_name))
 
     sc_new.commit('sets added!')
@@ -316,8 +316,8 @@ def add_year_par(sc_ref, sc_new, yrs_new, parname, region_list, firstyear_new,
 
     if parname not in par_list_new:
         sc_new.check_out()
-        sc_new.init_par(parname, idx_sets=sc_ref.idx_sets(parname).tolist(),
-                        idx_names=sc_ref.idx_names(parname).tolist())
+        sc_new.init_par(parname, idx_sets=sc_ref.idx_sets(parname),
+                        idx_names=sc_ref.idx_names(parname))
         sc_new.commit('New parameter initiated!')
 
     if node_col:
@@ -352,7 +352,7 @@ def add_year_par(sc_ref, sc_new, yrs_new, parname, region_list, firstyear_new,
               ' scenario to be updated for node/s in {}...'.format(nodes))
         sc_new.remove_par(parname, par_new)
 
-    col_list = sc_ref.idx_names(parname).tolist()
+    col_list = sc_ref.idx_names(parname)
     year_list = [c for c in col_list if c in ['year', 'year_vtg', 'year_act',
                                               'year_rel']]
 
