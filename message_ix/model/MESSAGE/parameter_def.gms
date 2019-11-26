@@ -148,64 +148,46 @@ Parameter
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
 * .. list-table::
-*    :widths: 25 50 60
+*    :widths: 25 75
 *    :header-rows: 1
 *
 *    * - Parameter name
-*      - Explanatory comments
-*      - Index Dimensions 
+*      - Index names
 *    * - input [#tecvintage]_
-*      - relative share of input per unit of activity
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` |
 *        ``node_origin`` | ``commodity`` | ``level`` | ``time`` | ``time_origin``
 *    * - output [#tecvintage]_
-*      - relative share of output per unit of activity
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` |
 *        ``node_dest`` | ``commodity`` | ``level`` | ``time`` | ``time_dest``
 *    * - inv_cost [#tecvintage]_
-*      - investment costs (per unit of new capacity)
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - fix_cost [#tecvintage]_
-*      - fixed costs per year (per unit of capacity maintained)
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act``
 *    * - var_cost [#tecvintage]_
-*      - variable costs of operation (per unit of capacity maintained)
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``time``
 *    * - levelized_cost [#levelizedcost]_
-*      - levelized costs (per unit of new capacity)
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``time``
-*    * - construction_time [#construction]_ 
-*      - duration of construction of new capacity (in years)
+*    * - construction_time
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - technical_lifetime
-*      - maximum technical lifetime (from year of construction)
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - capacity_factor [#tecvintage]_
-*      - capacity factor by subannual time slice
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``time``
 *    * - operation_factor [#tecvintage]_
-*      - yearly total operation factor
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act``
 *    * - min_utilization_factor [#tecvintage]_
-*      - yearly minimum utilization factor
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act``
 *    * - rating_bin [#rating]_
-*      - maximum share of technology in commodity use per rating
 *      - ``node`` | ``technology`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
 *    * - reliability_factor [#peakload]_
-*      - reliability of a technology (per rating)
 *      - ``node`` | ``technology`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
 *    * - flexibility_factor
-*      - contribution of technologies towards operation flexibility constraint
 *      - ``node_loc`` | ``technology`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``commodity`` | ``level`` | ``time`` | ``rating``
 *    * - renewable_capacity_factor
-*      - quality of renewable potential grade (>= 1)
 *      - ``node_loc`` | ``commodity`` | ``grade`` | ``level`` | ``year``
 *    * - renewable_potential
-*      - size of renewable potential per grade
 *      - ``node`` | ``commodity`` | ``grade`` | ``level`` | ``year``
 *    * - emission_factor
-*      - emission intensity of activity
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``emission``
 *
 * .. [#tecvintage] Fixed and variable cost parameters and technical specifications are indexed over both
@@ -218,90 +200,7 @@ Parameter
 * .. [#construction] The construction time only has an effect on the investment costs; in |MESSAGEix|,
 *    each unit of new-built capacity is available instantaneously at the beginning of the model period.
 *
-* .. [#rating] Maximum share of technology in commodity use per rating. The upper bound of a contribution by any technology to the constraints on system reliability
-*    (:ref:`reliability_constraint`) and flexibility (:ref:`flexibility_constraint`) can depend on the share of the technology output in the total commodity use at
-*    a specific level.
-***
-
-***
-* Parameters of the `Technology` section Option 2
-* -----------------------------------------------
-*
-* Input/output mapping, costs and engineering specifications
-* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-*
-* .. list-table::
-*    :widths: 25 50 75
-*    :header-rows: 1
-*
-*    * - Parameter name
-*      - Index names
-*      - Explanatory comments
-*    * - input [#tecvintage2]_
-*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` |
-*        ``node_origin`` | ``commodity`` | ``level`` | ``time`` | ``time_origin``
-*      - relative share of input per unit of activity
-*    * - output [#tecvintage2]_
-*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` |
-*        ``node_dest`` | ``commodity`` | ``level`` | ``time`` | ``time_dest``
-*      - relative share of output per unit of activity
-*    * - inv_cost [#tecvintage2]_
-*      - ``node_loc`` | ``tec`` | ``year_vtg``
-*      - investment costs (per unit of new capacity)
-*    * - fix_cost [#tecvintage2]_
-*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act``
-*      - fixed costs per year (per unit of capacity maintained)
-*    * - var_cost [#tecvintage2]_
-*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``time``
-*      - variable costs of operation (per unit of capacity maintained)
-*    * - levelized_cost [#levelizedcost2]_
-*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``time``
-*      - levelized costs (per unit of new capacity)
-*    * - construction_time [#construction2]_
-*      - ``node_loc`` | ``tec`` | ``year_vtg``
-*      - duration of construction of new capacity (in years)
-*    * - technical_lifetime
-*      - ``node_loc`` | ``tec`` | ``year_vtg``
-*      - maximum technical lifetime (from year of construction)
-*    * - capacity_factor [#tecvintage2]_
-*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``time``
-*      - capacity factor by subannual time slice
-*    * - operation_factor [#tecvintage2]_
-*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act``
-*      - yearly total operation factor
-*    * - min_utilization_factor [#tecvintage2]_
-*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act``
-*      - yearly minimum utilization factor
-*    * - rating_bin [#rating2]_
-*      - ``node`` | ``technology`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
-*      - maximum share of technology in commodity use per rating
-*    * - reliability_factor [#peakload]_
-*      - ``node`` | ``technology`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
-*      - reliability of a technology (per rating)
-*    * - flexibility_factor
-*      - ``node_loc`` | ``technology`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``commodity`` | ``level`` | ``time`` | ``rating``
-*      - contribution of technologies towards operation flexibility constraint
-*    * - renewable_capacity_factor
-*      - ``node_loc`` | ``commodity`` | ``grade`` | ``level`` | ``year``
-*      - quality of renewable potential grade (>= 1)
-*    * - renewable_potential
-*      - ``node`` | ``commodity`` | ``grade`` | ``level`` | ``year``
-*      - size of renewable potential per grade
-*    * - emission_factor
-*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``emission``
-*      - emission intensity of activity
-*
-* .. [#tecvintage2] Fixed and variable cost parameters and technical specifications are indexed over both
-*    the year of construction (vintage) and the year of operation (actual).
-*    This allows to represent changing technology characteristics depending on the age of the plant.
-*
-* .. [#levelizedcost2] The parameter ``levelized_cost`` is computed in the GAMS pre-processing under the assumption of
-*    full capacity utilization until the end of the technical lifetime.
-*
-* .. [#construction2] The construction time only has an effect on the investment costs; in |MESSAGEix|,
-*    each unit of new-built capacity is available instantaneously at the beginning of the model period.
-*
-* .. [#rating2] The upper bound of a contribution by any technology to the constraints on system reliability
+* .. [#rating] The upper bound of a contribution by any technology to the constraints on system reliability
 *    (:ref:`reliability_constraint`) and flexibility (:ref:`flexibility_constraint`) can depend on the share
 *    of the technology output in the total commodity use at a specific level.
 ***
@@ -336,66 +235,23 @@ Parameters
 * The following parameters specify upper and lower bounds on new capacity, total installed capacity, and activity.
 *
 * .. list-table::
-*    :widths: 25 50 60
-*    :header-rows: 1
-*
-*    * - Parameter name
-*      - Explanatory comments
-*      - Index names
-*    * - bound_new_capacity_up
-*      - upper bound on new capacity
-*      - ``node_loc`` | ``tec`` | ``year_vtg``
-*    * - bound_new_capacity_lo
-*      - lower bound on new capacity
-*      - ``node_loc`` | ``tec`` | ``year_vtg``
-*    * - bound_total_capacity_up
-*      - upper bound on total installed capacity
-*      - ``node_loc`` | ``tec`` | ``year_act``
-*    * - bound_total_capacity_lo
-*      - lower bound on total installed capacity
-*      - ``node_loc`` | ``tec`` | ``year_act``
-*    * - bound_activity_up
-*      - upper bound on activity (aggregated over all vintages)
-*      - ``node_loc`` | ``tec`` | ``year_act`` | ``mode`` | ``time``
-*    * - bound_activity_lo
-*      - lower bound on activity
-*      - ``node_loc`` | ``tec`` | ``year_act`` | ``mode`` | ``time``
-*
-* The bounds on activity are implemented as the aggregate over all vintages in a specific period
-* (cf. Equation ``ACTIVITY_BOUND_UP`` and ``ACTIVITY_BOUND_LO``).
-***
-
-***
-* Bounds on capacity and activity Option 2
-* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-*
-* The following parameters specify upper and lower bounds on new capacity, total installed capacity, and activity.
-*
-* .. list-table::
-*    :widths: 20 30 50
+*    :widths: 20 80
 *    :header-rows: 1
 *
 *    * - Parameter name
 *      - Index names
-*      - Explanatory comments
 *    * - bound_new_capacity_up
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
-*      - upper bound on new capacity
 *    * - bound_new_capacity_lo
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
-*      - lower bound on new capacity
 *    * - bound_total_capacity_up
 *      - ``node_loc`` | ``tec`` | ``year_act``
-*      - upper bound on total installed capacity
 *    * - bound_total_capacity_lo
 *      - ``node_loc`` | ``tec`` | ``year_act``
-*      - lower bound on total installed capacity
 *    * - bound_activity_up
 *      - ``node_loc`` | ``tec`` | ``year_act`` | ``mode`` | ``time``
-*      - upper bound on activity (aggregated over all vintages)
 *    * - bound_activity_lo
 *      - ``node_loc`` | ``tec`` | ``year_act`` | ``mode`` | ``time``
-*      - lower bound on activity
 *
 * The bounds on activity are implemented as the aggregate over all vintages in a specific period
 * (cf. Equation ``ACTIVITY_BOUND_UP`` and ``ACTIVITY_BOUND_LO``).
@@ -481,11 +337,9 @@ Parameters
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
 * The implementation of |MESSAGEix| includes the functionality to introduce "add-on technologies" that are specifically
-* linked to parent technologies. This feature can be used to model mitigation options (scrubber, cooling).Note, that no
-* default addon_conversion factor (conversion factor between add-on and parent technology activity) is set, to avoid
-* default conversion factors of 1 being set for technologies with mutiple modes, of which only a single mode should be
-* linked to the add-on technology. Upper and lower bounds of add on technologies are defined relative to the parent
-* technology. 
+* linked to parent technologies. This feature can be used to model mitigation options (scrubber, cooling).
+* Note, that no default addon_conversion is set, to avoid default conversion factors of 1 being set for technologies
+* with mutiple modes, of which only a single mode should be linked to the add-on technology.
 *
 * .. list-table::
 *    :widths: 20 80
@@ -500,6 +354,7 @@ Parameters
 *    * - addon_lo
 *      - ``node`` | ``tec`` | ``vintage`` | ``year`` | ``mode`` | ``time`` | ``type_addon``
 *
+* The upper bound of
 ***
 
 Parameters
@@ -518,8 +373,7 @@ Parameters
 *
 * The implementation of |MESSAGEix| includes the functionality for 'soft' relaxations of dynamic constraints on
 * new-built capacity and activity (see Keppo and Strubegger, 2010 :cite:`keppo_short_2010`).
-* Refer to the section :ref:`dynamic_constraints`. Absolute cost and levelized cost multipliers are used
-* for the relaxation of upper and lower bounds. 
+* Refer to the section :ref:`dynamic_constraints`.
 *
 * .. list-table::
 *    :widths: 20 80
@@ -587,30 +441,7 @@ Parameters
 ***
 * Auxiliary investment cost parameters and multipliers
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-* .. list-table::
-*    :widths: 35 65 50
-*    :header-rows: 1
-*
-*    * - Parameter name
-*      - Index names
-*      - Explanatory comments 
-*    * - construction_time_factor
-*      - ``node`` | ``tec`` | ``year_all``
-*      - scaling factor to account for construction time of new capacity
-*    * -  remaining_capacity
-*      - ``node`` | ``tec`` | ``year_all`` 
-*      - scaling factor to account for remaining capacity in period 
-*    * - end_of_horizon_factor
-*      - ``node`` | ``tec`` | ``year_all`` 
-*      - multiplier for value of investment at end of model horizon
-*    * - beyond_horizon_lifetime
-*      - ``node`` | ``tec`` | ``year_all`` 
-*      - remaining technical lifetime at the end of model horizon
-*    * - beyond_horizon_factor
-*      - ``node`` | ``tec`` | ``year_all``
-*      - discount factor of remaining lifetime beyond model horizon 
-*
-*
+* Documentation not yet included.
 ***
 
 Parameters
@@ -648,9 +479,8 @@ Parameters
 *    * - tax_emission
 *      - ``node`` | ``type_emission`` | ``type_tec`` | ``type_year``
 *
-* .. [#em_scaling] The parameter ``emission_scaling`` is the scaling factor to harmonize bounds or taxes across types of
-*    emisisons. It allows to efficiently aggregate different emissions/pollutants and set bounds or taxes on various categories.
-* 
+* .. [#em_scaling] The parameters ``emission_scaling`` allows to efficiently aggregate different emissions/pollutants
+*    and set bounds or taxes on various categories.
 ***
 
 Parameters
@@ -774,9 +604,9 @@ Parameters
 * Parameters of the `Relations` section
 * -------------------------------------
 *
-* Generic linear relations are implemented in |MESSAGEix|.This feature is intended for development and testing only - all new features
-* should be implemented as specific new mathematical formulations and associated sets & parameters. For the formulation of the relations
-* refer to  :ref:`section_of_generic_relations`. 
+* Generic linear relations are implemented in |MESSAGEix|.
+* This feature is intended for development and testing only - all new features should be implemented
+* as specific new mathematical formulations and associated sets & parameters.
 *
 * .. list-table::
 *    :widths: 25 75
