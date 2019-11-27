@@ -366,7 +366,6 @@ def add_year_par(sc_ref, sc_new, yrs_new, parname, reg_list, firstyear_new,
               ' scenario to be updated for node/s in {}...'.format(nodes))
         sc_new.remove_par(parname, par_new)
 
-
     # A uniform "unit" for values in different years
     if 'unit' in par_old.columns and unit_check:
         par_old = unit_uniform(par_old)
@@ -627,25 +626,6 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
     yr_diff_new = [x for x in horizon_new[1:-1] if f(horizon_new,
                                                      horizon_new.index(x))]
 
-    if year_diff and tec_list:
-        if isinstance(year_diff, list):
-            year_diff = year_diff[0]
-
-        # Removing data from old transition year
-#        if not yr_diff_new or year_diff not in yr_diff_new:
-#            year_next = [x for x in df2.columns if x > year_diff][0]
-#
-#            df_pre = slice_df(df2_tec, idx, year_ref, [year_diff], year_diff)
-#            df_next = slice_df(df2_tec, idx, year_ref, [year_next], year_diff)
-#            df_count = pd.DataFrame({'c_pre': df_pre.count(axis=1),
-#                                     'c_next': idx_check(df_next, df_pre
-#                                                         ).count(axis=1)},
-#                                    index=df_pre.index)
-#            df_y = df_count.loc[df_count['c_pre'] == df_count['c_next'] + 1]
-#
-#            for i in df_y.index:
-#                mask_df(df2, i, df_count['c_next'][i], np.nan)
-
     # Generating duration_period_sum matrix for masking
     df_dur = pd.DataFrame(index=horizon_new[:-1], columns=horizon_new[1:])
     for i in df_dur.index:
@@ -725,7 +705,7 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
             df2_t = df2.loc[df2_tec.index, :].copy()
 
             # This part calculates the missing value if only the previous
-            # timestep has a value (and not the next) (TODO: extra end year is created )
+            # timestep has a value (and not the next)
             if tec_list:
                 cond = (pd.isna(df2_t[yr])) & (~pd.isna(df2_t[year_pre]))
                 df2_t[yr].loc[cond] = intpol(df2_t[year_pre],
@@ -810,7 +790,6 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
                     # For the rest
                     if (df_count['c_pre'][i] < df_count['c_next'][i] + 2):
                         mask_df(df_yr, i, df_count['c_pre'][i], np.nan)
-
 
                 # For technologies phasing out before the end of horizon
                 elif np.isnan(df_count['c_next'][i]):
