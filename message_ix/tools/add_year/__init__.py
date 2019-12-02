@@ -599,20 +599,13 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
     def idx_check(df1, df2):
         return df1.loc[df1.index.isin(df2.index)]
 
-    idx = [x for x in df.columns if x not in [year_col, value_col]]
-#    if 'commodity' in idx:
-#        i = idx.index(year_ref)
-#        idx.insert(i, idx.pop(idx.index('commodity')))
-#    elif 'mode' in idx:
-#        i = idx.index(year_ref)
-#        idx.insert(i, idx.pop(idx.index('mode')))
     if df.empty:
         return df
         print('+++ WARNING: The submitted dataframe is empty, so'
               ' returned empty results!!! +++')
-    # only for test
-    # df = df.loc[df['technology'].isin(tec_check)]
+
     df_tec = df.loc[df['technology'].isin(tec_list)]
+    idx = [x for x in df.columns if x not in [year_col, value_col]]
     df2 = df.pivot_table(index=idx, columns=year_col, values='value')
     df2_tec = df_tec.pivot_table(index=idx, columns=year_col, values='value')
 
