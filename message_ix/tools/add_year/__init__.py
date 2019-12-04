@@ -594,7 +594,7 @@ def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
     year_diff : list of int
         List of model years with different time intervals before and after them
     bound_extend : bool
-        Allow extrapolation of bounds for new years
+        Allow extrapolation of bounds for new years based on one data point
     """
     def idx_check(df1, df2):
         return df1.loc[df1.index.isin(df2.index)]
