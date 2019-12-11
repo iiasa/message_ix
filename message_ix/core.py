@@ -348,8 +348,8 @@ class Scenario(ixmp.Scenario):
 
         # Duration of periods
         data = self.par('duration_period')
-        # Cumulative sum for periods *after* the vintage year
-        data['age'] = data.where(data.year > yv, 0)['value'].cumsum()
+        # Cumulative sum for periods including the vintage period
+        data['age'] = data.where(data.year >= yv, 0)['value'].cumsum()
 
         # Return periods:
         # - the tec's age at the end of the *prior* period is less than or
