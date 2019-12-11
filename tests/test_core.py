@@ -85,19 +85,15 @@ def test_add_spatial_hierarchy(test_mp):
 
 def test_vintage_and_active_years(test_mp):
     scen = Scenario(test_mp, *msg_args, version='new')
-    scen.add_horizon({'year': ['2000', '2010', '2020'],
-                      'firstmodelyear': '2010'})
+
+    years = [2000, 2010, 2020]
+    scen.add_horizon({'year': years, 'firstmodelyear': 2010})
     obs = scen.vintage_and_active_years()
     exp = pd.DataFrame({'year_vtg': (2000, 2000, 2010, 2010, 2020),
                         'year_act': (2010, 2020, 2010, 2020, 2020)})
     pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
 
-
-def test_vintage_and_active_years_with_lifetime(test_mp):
-    scen = Scenario(test_mp, *msg_args, version='new')
-    years = ['2000', '2010', '2020']
-    scen.add_horizon({'year': years,
-                      'firstmodelyear': '2010'})
+    # Add a technology, its lifetime, and period durations
     scen.add_set('node', 'foo')
     scen.add_set('technology', 'bar')
     scen.add_par('duration_period', pd.DataFrame({
@@ -136,6 +132,17 @@ def test_vintage_and_active_years_with_lifetime(test_mp):
     exp = pd.DataFrame({'year_vtg': (2020,),
                         'year_act': (2020,)})
     pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+
+    # Advance the first model year
+    scen.add_cat('year', 'firstmodelyear', years[-1], is_unique=True)
+
+    # Empty data frame: only 2000 and 2010 valid year_act for this node/tec;
+    # but both are before the first model year
+    obs = scen.vintage_and_active_years(ya_args=('foo', 'bar', years[0]),
+                                        in_horizon=True)
+    pdt.assert_frame_equal(
+        pd.DataFrame(columns=['year_vtg', 'year_act']),
+        obs)
 
 
 def test_cat_all(test_mp):
