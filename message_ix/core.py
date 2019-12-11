@@ -292,15 +292,16 @@ class Scenario(ixmp.Scenario):
 
         Parameters
         ----------
-        ya_args : tuple of (node, technology, year_vtg), optional
-            Arguments to :meth:`ixmp.Scenario.years_active`.
+        ya_args : tuple of (node, tec, yr_vtg), optional
+            Arguments to :meth:`years_active`.
         in_horizon : bool, optional
-            Restrict years returned to be within the current model horizon.
+            Only return years within the model horizon
+            (:obj:`firstmodelyear` or later).
 
         Returns
         -------
         pandas.DataFrame
-            with columns, "year_vtg" and "year_act", in which each row is a
+            with columns 'year_vtg' and 'year_act', in which each row is a
             valid pair.
         """
         first = self.firstmodelyear
@@ -330,13 +331,17 @@ class Scenario(ixmp.Scenario):
     def years_active(self, node, tec, yr_vtg):
         """Return years in which *tec* of *yr_vtg* can be active in *node*.
 
+        The :ref:`parameters <params-tech>` ``duration_period`` and
+        ``technical_lifetime`` are used to determine which periods are partly
+        or fully within the lifetime of the technology.
+
         Parameters
         ----------
         node : str
             Node name.
         tec : str
             Technology name.
-        yr_vtg : str
+        yr_vtg : int or str
             Vintage year.
 
         Returns
