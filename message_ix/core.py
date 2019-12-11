@@ -58,7 +58,7 @@ class Scenario(ixmp.Scenario):
             return df.astype({col_name: 'int' for _, col_name in year_idx})
         elif name == 'year':
             # The 'year' set itself
-            return list(map(int, df))
+            return df.astype(int)
         else:
             return df
 
