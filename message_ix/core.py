@@ -277,7 +277,7 @@ class Scenario(ixmp.Scenario):
             in data else horizon[0]
         self.add_cat('year', 'firstmodelyear', first, is_unique=True)
 
-    def vintage_and_active_years(ya_args=None, in_horizon=True):
+    def vintage_and_active_years(self, ya_args=None, in_horizon=True):
         """Return sets of vintage and active years for use in data input.
 
         For a valid pair `(year_vtg, year_act)`, the following conditions are
