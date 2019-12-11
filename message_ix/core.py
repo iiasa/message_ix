@@ -355,7 +355,7 @@ class Scenario(ixmp.Scenario):
         # - the tec's age at the end of the *prior* period is less than or
         #   equal to its lifetime, and
         # - at or later than the vintage year.
-        return data.where(data.age.shift(1) < lt) \
+        return data.where(data.age.shift(1, fill_value=0) < lt) \
                    .where(data.year >= yv)['year'] \
                    .dropna().astype(int).tolist()
 
