@@ -5,6 +5,7 @@ import numpy as np
 from numpy import testing as npt
 import pandas as pd
 import pandas.util.testing as pdt
+import pytest
 
 from message_ix import Scenario
 from message_ix.testing import make_dantzig
@@ -143,6 +144,11 @@ def test_vintage_and_active_years(test_mp):
     pdt.assert_frame_equal(
         pd.DataFrame(columns=['year_vtg', 'year_act']),
         obs)
+
+    # Exception is raised for incorrect arguments
+    with pytest.raises(ValueError,
+                       match='3 arguments are required if using `ya_args`'):
+        scen.vintage_and_active_years(ya_args=('foo', 'bar'))
 
 
 def test_cat_all(test_mp):
