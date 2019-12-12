@@ -4,6 +4,7 @@ codecov
 dask
 JPype1
 jupyter
+jupyter_console>=6
 matplotlib
 numpy
 numpydoc
