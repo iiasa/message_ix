@@ -510,7 +510,7 @@ Parameters
 *    * - Parameter name
 *      - Index dimensions
 *    * - historical_emission [#hist]_
-*      - ``node`` | ``emission`` | ``type_tec`` | ``year``
+*      - ``node`` | ``type_emission`` | ``type_tec`` | ``year``
 *    * - emission_scaling [#em_scaling]_
 *      - ``type_emission`` | ``emission``
 *    * - bound_emission
