@@ -5,6 +5,7 @@ import numpy as np
 from numpy import testing as npt
 import pandas as pd
 import pandas.util.testing as pdt
+import pytest
 
 from message_ix import Scenario
 from message_ix.testing import make_dantzig
@@ -85,19 +86,15 @@ def test_add_spatial_hierarchy(test_mp):
 
 def test_vintage_and_active_years(test_mp):
     scen = Scenario(test_mp, *msg_args, version='new')
-    scen.add_horizon({'year': ['2000', '2010', '2020'],
-                      'firstmodelyear': '2010'})
+
+    years = [2000, 2010, 2020]
+    scen.add_horizon({'year': years, 'firstmodelyear': 2010})
     obs = scen.vintage_and_active_years()
     exp = pd.DataFrame({'year_vtg': (2000, 2000, 2010, 2010, 2020),
                         'year_act': (2010, 2020, 2010, 2020, 2020)})
     pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
 
-
-def test_vintage_and_active_years_with_lifetime(test_mp):
-    scen = Scenario(test_mp, *msg_args, version='new')
-    years = ['2000', '2010', '2020']
-    scen.add_horizon({'year': years,
-                      'firstmodelyear': '2010'})
+    # Add a technology, its lifetime, and period durations
     scen.add_set('node', 'foo')
     scen.add_set('technology', 'bar')
     scen.add_par('duration_period', pd.DataFrame({
@@ -137,6 +134,22 @@ def test_vintage_and_active_years_with_lifetime(test_mp):
                         'year_act': (2020,)})
     pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
 
+    # Advance the first model year
+    scen.add_cat('year', 'firstmodelyear', years[-1], is_unique=True)
+
+    # Empty data frame: only 2000 and 2010 valid year_act for this node/tec;
+    # but both are before the first model year
+    obs = scen.vintage_and_active_years(ya_args=('foo', 'bar', years[0]),
+                                        in_horizon=True)
+    pdt.assert_frame_equal(
+        pd.DataFrame(columns=['year_vtg', 'year_act']),
+        obs)
+
+    # Exception is raised for incorrect arguments
+    with pytest.raises(ValueError,
+                       match='3 arguments are required if using `ya_args`'):
+        scen.vintage_and_active_years(ya_args=('foo', 'bar'))
+
 
 def test_cat_all(test_mp):
     scen = Scenario(test_mp, *msg_args)
@@ -169,23 +182,63 @@ def test_add_cat_unique(test_mp):
 
 
 def test_years_active(test_mp):
-    scen = Scenario(test_mp, *msg_multiyear_args)
-    years = scen.years_active('seattle', 'canning_plant', '2020')
+    test_mp.add_unit('year')
+    scen = Scenario(test_mp, *msg_args, version='new')
+    scen.add_set('node', 'foo')
+    scen.add_set('technology', 'bar')
+
+    # Periods of uneven length
+    years = [1990, 1995, 2000, 2005, 2010, 2020, 2030]
+
+    # First period length is immaterial
+    duration = [1900, 5, 5, 5, 5, 10, 10]
+    scen.add_horizon({'year': years, 'firstmodelyear': years[-1]})
+    scen.add_par('duration_period',
+                 pd.DataFrame(zip(years, duration), columns=['year', 'value']))
+
+    # 'bar' built in period '1995' with 25-year lifetime:
+    # - is constructed in 1991-01-01.
+    # - by 1995-12-31, has operated 5 years.
+    # - operates until 2015-12-31. This is within the period '2020'.
+    scen.add_par('technical_lifetime', pd.DataFrame(dict(
+        node_loc='foo',
+        technology='bar',
+        unit='year',
+        value=25,
+        year_vtg=years[1]), index=[0]))
+
+    result = scen.years_active('foo', 'bar', years[1])
+
+    # Correct return type
     assert isinstance(years, list)
     assert isinstance(years[0], int)
-    npt.assert_array_equal(years, [2020, 2030])
+
+    # Years 1995 through 2020
+    npt.assert_array_equal(result, years[1:-1])
 
 
 def test_years_active_extend(test_mp):
     scen = Scenario(test_mp, *msg_multiyear_args)
-    scen = scen.clone(keep_solution=False)
+
+    # Existing time horizon
+    years = [2010, 2020, 2030]
+    result = scen.years_active('seattle', 'canning_plant', years[1])
+    npt.assert_array_equal(result, years[1:])
+
+    # Add years to the scenario
+    years.extend([2040, 2050])
     scen.check_out()
-    scen.add_set('year', ['2040', '2050'])
+    scen.add_set('year', years[-2:])
     scen.add_par('duration_period', '2040', 10, 'y')
     scen.add_par('duration_period', '2050', 10, 'y')
-    years = scen.years_active('seattle', 'canning_plant', '2020')
-    npt.assert_array_equal(years, [2020, 2030, 2040])
-    scen.discard_changes()
+
+    # technical_lifetime of seattle/canning_plant/2020 is 30 years.
+    # - constructed in 2011-01-01.
+    # - by 2020-12-31, has operated 10 years.
+    # - operates until 2040-12-31.
+    # - is NOT active within the period '2050' (2041-01-01 to 2050-12-31)
+    result = scen.years_active('seattle', 'canning_plant', '2020')
+    npt.assert_array_equal(result, years[1:-1])
 
 
 def test_new_timeseries_long_name64(test_mp):
