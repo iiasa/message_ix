@@ -277,12 +277,14 @@ class Scenario(ixmp.Scenario):
         self.add_set("lvl_spatial", levels)
         self.add_set("map_spatial_hierarchy", hierarchy)
 
-    def add_horizon(self, data):
+    def add_horizon(self, **kwargs):
         """Add sets related to temporal dimensions of the model.
+
+        Also, automatically sets the
 
         Parameters
         ----------
-        data : dict-like
+        **kwargs : key-worded variable-length dictionary
             Year sets. "year" is a required key. "firstmodelyear" is optional;
             if not provided, the first element of "year" is used.
 
@@ -293,14 +295,34 @@ class Scenario(ixmp.Scenario):
         >>> s.add_horizon({'year': [2010, 2020], 'firstmodelyear': 2020})
 
         """
-        if 'year' not in data:
+        if 'year' not in kwargs:
             raise ValueError('"year" must be in temporal sets')
-        horizon = data['year']
+        horizon = kwargs['year']
         self.add_set("year", horizon)
 
-        first = data['firstmodelyear'] if 'firstmodelyear'\
-            in data else horizon[0]
+        first = kwargs['firstmodelyear'] if 'firstmodelyear'\
+            in kwargs else horizon[0]
         self.add_cat('year', 'firstmodelyear', first, is_unique=True)
+
+        # Now, automatically adding the *duration_period* par based on the input *horizon*
+        # First, calculate the duration of the different time steps in *horizon*
+        duration = []
+        i = 1
+        while i < len(kwargs['year']):
+            duration.append(kwargs['year'][i] - kwargs['year'][i-1])
+            i += 1
+
+        # Infer the duration of the **first** time step of *horizon* based on the most
+        # repeated time interval in *horizon*
+        def most_common(lst):
+            return max(set(lst), key=lst.count)
+        duration.insert(0, most_common(duration))
+
+        self.add_par('duration_period', pd.DataFrame({
+            'unit': 'y',
+            'value': duration,
+            'year': horizon
+        }))
 
     def vintage_and_active_years(self, ya_args=None, in_horizon=True):
         """Return sets of vintage and active years for use in data input.
