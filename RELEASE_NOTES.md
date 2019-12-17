@@ -3,6 +3,10 @@
 
 ## Migrating
 
+**Support for Python 2.7 is dropped** as it has reached end-of-life, meaning no further releases will be made even to fix bugs.
+See [PEP-0373](https://legacy.python.org/dev/peps/pep-0373/) and https://python3statement.org.
+``message_ix`` users must upgrade to Python 3.
+
 **Command-line interface (CLI).** Use `message-ix` as the program for all command-line operations:
 - `message-ix copy-model` replaces `messageix-config`.
 - `message-ix dl` replaces `messageix-dl`.
