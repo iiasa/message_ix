@@ -280,7 +280,9 @@ class Scenario(ixmp.Scenario):
     def add_horizon(self, **kwargs):
         """Add sets related to temporal dimensions of the model.
 
-        Also, automatically sets the
+        Also, automatically adds the parameter 'duration_period'
+        representing the duration of each time step given plus
+        an inferred duration for the first element of the horizon.
 
         Parameters
         ----------
@@ -304,16 +306,18 @@ class Scenario(ixmp.Scenario):
             in kwargs else horizon[0]
         self.add_cat('year', 'firstmodelyear', first, is_unique=True)
 
-        # Now, automatically adding the *duration_period* par based on the input *horizon*
-        # First, calculate the duration of the different time steps in *horizon*
+        # Automatically adding the *duration_period* parameter based on
+        # the 'year' entry.
+
+        # Calculate the duration of the different time steps in *horizon*.
         duration = []
         i = 1
         while i < len(kwargs['year']):
-            duration.append(kwargs['year'][i] - kwargs['year'][i-1])
+            duration.append(kwargs['year'][i] - kwargs['year'][i - 1])
             i += 1
 
-        # Infer the duration of the **first** time step of *horizon* based on the most
-        # repeated time interval in *horizon*
+        # Infer the duration of the **first** time step of *horizon* based on
+        # the most repeated time interval in *horizon*
         def most_common(lst):
             return max(set(lst), key=lst.count)
         duration.insert(0, most_common(duration))
