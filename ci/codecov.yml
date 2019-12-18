@@ -1,1 +1,5 @@
 comment: off
+
+ignore:
+# Prevent false check failures on GitHub
+- message_ix/testing/nightly.py
