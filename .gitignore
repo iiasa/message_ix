@@ -57,3 +57,7 @@ tests/data/testdb/ixmptest.lck
 .pytest_cache
 coverage.xml
 htmlcov
+
+# JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
+/**/.idea
+

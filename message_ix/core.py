@@ -1,6 +1,6 @@
 import collections
 from functools import lru_cache
-import itertools
+from itertools import product
 
 import ixmp
 from ixmp.utils import as_str_list, pd_read, pd_write, isscalar, logger
@@ -56,6 +56,9 @@ class Scenario(ixmp.Scenario):
 
         if len(year_idx):
             return df.astype({col_name: 'int' for _, col_name in year_idx})
+        elif name == 'year':
+            # The 'year' set itself
+            return df.astype(int)
         else:
             return df
 
@@ -289,42 +292,48 @@ class Scenario(ixmp.Scenario):
 
         Parameters
         ----------
-        ya_args : tuple of (node, technology, year_vtg), optional
-            Arguments to :meth:`ixmp.Scenario.years_active`.
+        ya_args : tuple of (node, tec, yr_vtg), optional
+            Arguments to :meth:`years_active`.
         in_horizon : bool, optional
-            Restrict years returned to be within the current model horizon.
+            Only return years within the model horizon
+            (:obj:`firstmodelyear` or later).
 
         Returns
         -------
         pandas.DataFrame
-            with columns, "year_vtg" and "year_act", in which each row is a
+            with columns 'year_vtg' and 'year_act', in which each row is a
             valid pair.
         """
-        horizon = self.set('year')
         first = self.firstmodelyear
 
+        # Prepare lists of vintage (yv) and active (ya) years
         if ya_args:
             if len(ya_args) != 3:
                 raise ValueError('3 arguments are required if using `ya_args`')
-            years_active = self.years_active(*ya_args)
-            combos = itertools.product([ya_args[2]], years_active)
+            ya = self.years_active(*ya_args)
+            yv = ya[0:1]  # Just the first element, as a list
         else:
-            combos = itertools.product(horizon, horizon)
+            # Product of all years
+            yv = ya = self.set('year')
 
-        combos = [(int(y1), int(y2)) for y1, y2 in combos]
+        # Predicate for filtering years
+        def _valid(elem):
+            yv, ya = elem
+            return (yv <= ya) and (not in_horizon or (first <= ya))
 
-        def valid(y_v, y_a):
-            ret = y_v <= y_a
-            if in_horizon:
-                ret &= y_a >= first
-            return ret
-
-        year_pairs = [(y_v, y_a) for y_v, y_a in combos if valid(y_v, y_a)]
-        v_years, a_years = zip(*year_pairs)
-        return pd.DataFrame({'year_vtg': v_years, 'year_act': a_years})
+        # - Cartesian product of all yv and ya.
+        # - Filter only valid years.
+        # - Convert to data frame.
+        return pd.DataFrame(
+            filter(_valid, product(yv, ya)),
+            columns=['year_vtg', 'year_act'])
 
     def years_active(self, node, tec, yr_vtg):
         """Return years in which *tec* of *yr_vtg* can be active in *node*.
+
+        The :ref:`parameters <params-tech>` ``duration_period`` and
+        ``technical_lifetime`` are used to determine which periods are partly
+        or fully within the lifetime of the technology.
 
         Parameters
         ----------
@@ -332,7 +341,7 @@ class Scenario(ixmp.Scenario):
             Node name.
         tec : str
             Technology name.
-        yr_vtg : str
+        yr_vtg : int or str
             Vintage year.
 
         Returns
@@ -348,11 +357,16 @@ class Scenario(ixmp.Scenario):
 
         # Duration of periods
         data = self.par('duration_period')
-        # Cumulative sum of period duration for periods after the vintage year
-        data['age'] = data.where(data.year >= yv)['value'].cumsum()
+        # Cumulative sum for periods including the vintage period
+        data['age'] = data.where(data.year >= yv, 0)['value'].cumsum()
 
-        # Return years where the age is less than or equal to the lifetime
-        return data.where(data.age <= lt)['year'].dropna().astype(int).tolist()
+        # Return periods:
+        # - the tec's age at the end of the *prior* period is less than or
+        #   equal to its lifetime, and
+        # - at or later than the vintage year.
+        return data.where(data.age.shift(1, fill_value=0) < lt) \
+                   .where(data.year >= yv)['year'] \
+                   .dropna().astype(int).tolist()
 
     @property
     def firstmodelyear(self):

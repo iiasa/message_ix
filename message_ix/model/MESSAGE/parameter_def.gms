@@ -147,6 +147,8 @@ Parameter
 ;
 
 ***
+* .. _params-tech:
+*
 * Parameters of the `Technology` section
 * --------------------------------------
 *
