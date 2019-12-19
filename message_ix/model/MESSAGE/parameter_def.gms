@@ -73,10 +73,11 @@ Parameters
 * Parameters of the `Resources` section
 * -------------------------------------
 *
-* The quantity of the resources in |MESSAGEix| is represented by two parameters: ``resource_volume`` and ``resource_remaining``.
-* The first parameter is the volume of resources at the start of the model horizon while the second is the maximum extraction relative
-* to remaining resources by year. The maximum extraction of the resources (by grade) in a year is constrained by the parameter
-* ``bound_extraction_up``. Extraction costs for resources are represented by ``resource_cost`` parameter.
+* In |MESSAGEix|, the volume of resources at the start of the model horizon is defined by ``resource_volume``. The quantity of the
+* resources that are extracted per year is dependent on two parameters. The first is ``bound_extraction_up``, which constraints
+* the maximum extraction of the resources (by grade) in a year. The second is ``resource_remaining``, which is the maximum
+* extraction of the remaining resources in a certain year, as a percentage. Extraction costs for resources are represented by
+* ``resource_cost`` parameter.
 *
 * .. list-table::
 *    :widths: 25 75
@@ -282,7 +283,9 @@ Parameters
 * Dynamic constraints on capacity and activity
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
-* The following parameters specify constraints on the growth of new capacity and activity, i.e., market penetration.
+* The following parameters specify constraints on the growth of new capacity and activity, i.e., market penetration. The implementation of |MESSAGEix|
+* includes the functionality for 'soft' relaxations of dynamic constraints on new-built capacity and activity (see Keppo and Strubegger, 2010
+* :cite:`keppo_short_2010`). For more information, please refer to the equations in section :ref:`dynamic_constraints` of the mathematical formulation.
 *
 * .. list-table::
 *    :widths: 30 70
@@ -294,34 +297,31 @@ Parameters
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - growth_new_capacity_up [#mpx]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
-*    * - soft_new_capacity_up [#mpx]_ [#soft]_
+*    * - soft_new_capacity_up [#mpx]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - initial_new_capacity_lo
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - growth_new_capacity_lo [#mpx]_
 *      - ``node_loc`` | ``tec_actual`` | ``year_vtg``
-*    * - soft_new_capacity_lo [#mpx]_ [#soft]_
+*    * - soft_new_capacity_lo [#mpx]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - initial_activity_up [#mpa]_
 *      - ``node_loc`` | ``tec`` | ``year_act`` | ``time``
 *    * - growth_activity_up [#mpx]_ [#mpa]_
 *      - ``node_loc`` | ``tec`` | ``year_act`` | ``time``
-*    * - soft_activity_up [#mpx]_ [#soft]_
+*    * - soft_activity_up [#mpx]_
 *      - ``node_loc`` | ``tec`` | ``year_act`` | ``time``
 *    * - initial_activity_lo [#mpa]_
 *      - ``node_loc`` | ``tec`` | ``year_act`` | ``time``
 *    * - growth_activity_lo [#mpx]_ [#mpa]_
 *      - ``node_loc`` | ``tec`` | ``year_act`` | ``time``
-*    * - soft_activity_lo [#mpx]_ [#soft]_
+*    * - soft_activity_lo [#mpx]_
 *      - ``node_loc`` | ``tec`` | ``year_act`` | ``time``
 *
 * .. [#mpx] All parameters related to the dynamic constraints are understood as the bound on the rate
 *    of growth/decrease, not as in percentage points and not as (1+growth rate).
 *
 * .. [#mpa] The dynamic constraints are not indexed over modes in the |MESSAGEix| implementation.
-*
-* .. [#soft] The implementation of |MESSAGEix| includes the functionality for 'soft' relaxations of dynamic constraints on
-*            new-built capacity and activity (see Keppo and Strubegger, 2010 :cite:`keppo_short_2010`). Refer to the section :ref:`dynamic_constraints`
 *
 ***
 
