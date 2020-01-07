@@ -158,6 +158,15 @@ def test_cat_all(test_mp):
                                 'transport_from_san-diego'])
 
 
+def test_cat_list(test_mp):
+    scen = Scenario(test_mp, *msg_args, version='new')
+    years = [2000, 2010, 2020]
+    scen.add_horizon({'year': years, 'firstmodelyear': 2010})
+    obs = scen.cat_list('year')
+    exp = pd.DataFrame({'firstmodelyear': (2010)})
+    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+
+
 def test_add_cat(test_mp):
     scen = Scenario(test_mp, *msg_args)
     scen2 = scen.clone(keep_solution=False)
