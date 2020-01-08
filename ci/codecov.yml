@@ -1,1 +1,13 @@
-comment: off
+codecov:
+  notify:
+    wait_for_ci: false
+
+coverage:
+  precision: 1
+
+comment:
+  layout: "diff, files"
+
+ignore:
+# Prevent false check failures on GitHub
+- message_ix/testing/nightly.py
