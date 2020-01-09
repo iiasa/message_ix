@@ -305,7 +305,7 @@ controlled by:
 
    **Notes:**
 
-   A Key has the same hash, and compares equal to its :type:`str`.
+   A Key has the same hash, and compares equal to its :class:`str` representation.
    ``repr(key)`` prints the Key in angle brackets ('<>') to signify that it is a Key object.
 
    >>> str(k1)
