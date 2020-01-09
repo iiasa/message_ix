@@ -14,14 +14,14 @@ which gams
 $CACHE/$CONDAFNAME -b -u -p $HOME/miniconda
 
 # - Less noisy output
-# - Search conda-forge in addition to the default channels, for e.g. JPype
 # conda config --set quiet true
-conda config --set always_yes true \
-             --append channels conda-forge
+conda config --set always_yes true
+# - Search conda-forge in addition to the default channels, for e.g. JPype
+conda config --append channels conda-forge
+conda update --name base conda
 
-# Create, update, and activate named environment
+# Create and activate named environment
 conda create --name testing python=$PYVERSION pip
-conda update --name testing conda
 . activate testing
 
 # Install dependencies
