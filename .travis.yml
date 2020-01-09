@@ -20,8 +20,12 @@ cache:
   - $HOME/.cache/message_ix
 
 addons:
+  apt:
+    packages:
+    - graphviz
   homebrew:
-    update: true
+    packages:
+    - graphviz
 
 before_install:
   # Set other environment variables
