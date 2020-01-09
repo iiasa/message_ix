@@ -42,7 +42,11 @@ def split_value(ctx, param, value, type=str):
     try:
         if value is None:
             value = ''
-        return list(map(type, value.strip('[]').split(',')))
+
+        if value == 'all':
+            return value
+        else:
+            return list(map(type, value.strip('[]').split(',')))
     except ValueError:
         raise click.BadParameter(param.human_readable_name, value)
 
