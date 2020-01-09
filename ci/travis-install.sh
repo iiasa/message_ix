@@ -30,3 +30,6 @@ pip install "matplotlib>3.0.2"
 
 # Show information
 conda info --all
+
+# Install graphiz on OS X
+if [ `uname` = "Darwin" ]; then brew install graphviz; fi

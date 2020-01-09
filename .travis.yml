@@ -19,6 +19,10 @@ cache:
   - $HOME/.conda/pkgs
   - $HOME/.cache/message_ix
 
+addons:
+  homebrew:
+    update: true
+
 before_install:
   # Set other environment variables
   - . ci/env.sh
