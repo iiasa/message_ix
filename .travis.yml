@@ -15,7 +15,7 @@ os:
 cache:
   # Travis ensures these directories are created if they do not already exist
   directories:
-  - $HOME/miniconda/pkgs
+  # - $HOME/miniconda/pkgs
   - $HOME/.conda/pkgs
   - $HOME/.cache/message_ix
 
