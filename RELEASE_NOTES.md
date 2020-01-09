@@ -15,6 +15,7 @@ See [PEP-0373](https://legacy.python.org/dev/peps/pep-0373/) and https://python3
 ## All changes
 
 - [#285](https://github.com/iiasa/message_ix/pull/285): Drop support for Python 2.
+- [#284](https://github.com/iiasa/message_ix/pull/284): Add a suggested sequence/structure to how to run the westeros tutorials.
 - [#281](https://github.com/iiasa/message_ix/pull/281): Test and improve logic of `years_active` and `vintage_and_active_years`.
 - [#269](https://github.com/iiasa/message_ix/pull/269): Enforce 'year'-indexed columns as integers.
 - [#256](https://github.com/iiasa/message_ix/pull/256): Update to use :obj:`ixmp.config` and improve CLI.
