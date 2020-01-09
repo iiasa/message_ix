@@ -1,18 +1,8 @@
-try:
-    from pathlib import Path
-except ImportError:
-    from pathlib2 import Path
-import sys
+from pathlib import Path
 
 from ixmp.testing import run_notebook, get_cell_output
 import numpy as np
 import pytest
-
-
-# Skip the entire file on Python 2
-if sys.version_info[0] == 2:
-    py2_deprecated = 'Python 2 is deprecated in the tutorials'
-    pytestmark = pytest.mark.skip(reason=py2_deprecated)
 
 
 AT = 'Austrian_energy_system'
@@ -27,9 +17,6 @@ AT = 'Austrian_energy_system'
 tutorials = [
     (('westeros', 'westeros_baseline'),
      [('solve-objective-value', 238193.291167)]),
-
-    # on Python 2:
-    # 'solve-objective-value', 187445.953125),
     (('westeros', 'westeros_emissions_bounds'), []),
     (('westeros', 'westeros_emissions_taxes'), []),
     (('westeros', 'westeros_firm_capacity'), []),

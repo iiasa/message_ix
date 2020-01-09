@@ -2,10 +2,7 @@ import pytest
 
 from functools import partial
 from logging import WARNING
-try:
-    from pathlib import Path
-except ImportError:
-    from pathlib2 import Path
+from pathlib import Path
 
 from ixmp.reporting import Reporter as ixmp_Reporter
 from ixmp.testing import assert_qty_equal
