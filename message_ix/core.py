@@ -304,6 +304,11 @@ class Scenario(ixmp.Scenario):
         >>> s.add_horizon({'year': [2010, 2020]}, 2020)
 
         """
+        # To check that there is not a previously defined horizon. If so,
+        # delete it
+        if self.set("year"):
+            self.remove_set("year")
+
         if isinstance(year, dict):
             if 'year' not in year:
                 raise ValueError('"year" must be a dict key, in temporal sets')
@@ -311,9 +316,12 @@ class Scenario(ixmp.Scenario):
             # Warning about using the old signature
             # raise Warning('Using a *dict* as argument for add_horizon() is \
             #               deprecated')
+
+            # Define the model horizon
             horizon = year['year']
             self.add_set("year", horizon)
 
+            # Assign a value to the fist time step of the model horizon
             if firstmodelyear:
                 first = firstmodelyear
             else:
@@ -321,7 +329,6 @@ class Scenario(ixmp.Scenario):
                                             in year else horizon[0]
 
             self.add_cat('year', 'firstmodelyear', first, is_unique=True)
-
         else:
             horizon = year
             self.add_set("year", horizon)
