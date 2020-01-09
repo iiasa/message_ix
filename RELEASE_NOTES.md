@@ -22,7 +22,7 @@
   [#242](https://github.com/iiasa/message_ix/pull/242),
   [#263](https://github.com/iiasa/message_ix/pull/263): Enhance reporting.
 - [#232](https://github.com/iiasa/message_ix/pull/232): Add Westeros tutorial for modelling seasonality, update existing tutorials.
-
+- [#276](https://github.com/iiasa/message_ix/pull/276): Improving add_year for bounds and code cleanup
 # v1.2.0
 
 MESSAGEix 1.2.0 adds an option to set the commodity balance to strict equality,
