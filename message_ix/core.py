@@ -277,34 +277,56 @@ class Scenario(ixmp.Scenario):
         self.add_set("lvl_spatial", levels)
         self.add_set("map_spatial_hierarchy", hierarchy)
 
-    def add_horizon(self, **kwargs):
+    def add_horizon(self, year=[], firstmodelyear=None):
         """Add sets related to temporal dimensions of the model.
 
         Also, automatically adds the parameter 'duration_period'
         representing the duration of each time step given plus
-        an inferred duration for the first element of the horizon.
+        an inferred duration for the first element of the full horizon.
 
         Parameters
         ----------
-        **kwargs : key-worded variable-length dictionary
-            Year sets. "year" is a required key. "firstmodelyear" is optional;
-            if not provided, the first element of "year" is used.
+        year : either list or dict
+            Year sets.
+                If dict: "year" is a required key. "firstmodelyear" is
+                optional; if not provided, the first element of "year" is used.
+        firstmodelyear : int, optional
+            First time step of the model horizon.
 
         Examples
         --------
         >>> s = message_ix.Scenario()
         >>> s.add_horizon({'year': [2010, 2020]})
         >>> s.add_horizon({'year': [2010, 2020], 'firstmodelyear': 2020})
+        >>> s.add_horizon([2020, 2030, 2040])
+        >>> s.add_horizon(year=[2020, 2030, 2040], firstmodelyear=2020)
+        >>> s.add_horizon([2020, 2030, 2040], 2020)
+        >>> s.add_horizon({'year': [2010, 2020]}, 2020)
 
         """
-        if 'year' not in kwargs:
-            raise ValueError('"year" must be in temporal sets')
-        horizon = kwargs['year']
-        self.add_set("year", horizon)
+        if isinstance(year, dict):
+            if 'year' not in year:
+                raise ValueError('"year" must be a dict key, in temporal sets')
 
-        first = kwargs['firstmodelyear'] if 'firstmodelyear'\
-            in kwargs else horizon[0]
-        self.add_cat('year', 'firstmodelyear', first, is_unique=True)
+            # Warning about using the old signature
+            # raise Warning('Using a *dict* as argument for add_horizon() is \
+            #               deprecated')
+            horizon = year['year']
+            self.add_set("year", horizon)
+
+            if firstmodelyear:
+                first = firstmodelyear
+            else:
+                first = year['firstmodelyear'] if 'firstmodelyear' \
+                                            in year else horizon[0]
+
+            self.add_cat('year', 'firstmodelyear', first, is_unique=True)
+
+        else:
+            horizon = year
+            self.add_set("year", horizon)
+            first = firstmodelyear if firstmodelyear else horizon[0]
+            self.add_cat('year', 'firstmodelyear', first, is_unique=True)
 
         # Automatically adding the *duration_period* parameter based on
         # the 'year' entry.
@@ -312,8 +334,8 @@ class Scenario(ixmp.Scenario):
         # Calculate the duration of the different time steps in *horizon*.
         duration = []
         i = 1
-        while i < len(kwargs['year']):
-            duration.append(kwargs['year'][i] - kwargs['year'][i - 1])
+        while i < len(horizon):
+            duration.append(horizon[i] - horizon[i - 1])
             i += 1
 
         # Infer the duration of the **first** time step of *horizon* based on
