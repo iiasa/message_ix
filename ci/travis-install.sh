@@ -12,17 +12,20 @@ which gams
 # -u: update existing installation
 # -p: install prefix
 $CACHE/$CONDAFNAME -b -u -p $HOME/miniconda
-conda update --yes conda pip
 
-# Search conda-forge in addition to the default channels, for e.g. JPype
-conda config --append channels conda-forge
+# - Less noisy output
+# - Search conda-forge in addition to the default channels, for e.g. JPype
+# conda config --set quiet true
+conda config --set always_yes true \
+             --append channels conda-forge
 
-# Create and activate named environment
-conda create --yes --name testing python=$PYVERSION pip
+# Create, update, and activate named environment
+conda create --name testing python=$PYVERSION pip
+conda update --name testing conda
 . activate testing
 
 # Install dependencies
-conda install --yes --name testing --file ci/conda-requirements.txt
+conda install --name testing --file ci/conda-requirements.txt
 pip install --requirement ci/pip-requirements.txt
 
 # Temporary: see https://github.com/IAMconsortium/pyam/issues/281
