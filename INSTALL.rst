@@ -9,6 +9,8 @@ Install GAMS
 1. Download the latest version of `GAMS`_ for your operating system; run the
    installer.
 
+   .. note:: MESSAGE-MACRO requires GAMS 24.8.1 or later (see :attr:`.MESSAGE_MACRO.GAMS_min_version`).
+
 2. Add GAMS to the ``PATH`` environment variable. This is **required** in order
    for |MESSAGEix| to run the mathematical model core:
 
