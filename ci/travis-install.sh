@@ -34,10 +34,13 @@ conda info --all
 # Install graphiz on OS X
 if [ `uname` = "Darwin" ];
 then
-  brew info graphviz
-  brew deps graphviz
-  brew info glib
-  brew deps glib
-  brew install --ignore-dependencies glib
-  brew install graphviz
+  brew --verbose info graphviz
+  brew --verbose deps graphviz
+  brew --verbose info glib
+  brew --verbose deps glib
+  brew --verbose install --ignore-dependencies gd
+  brew --verbose upgrade --ignore-dependencies glib
+  brew --verbose install --ignore-dependencies netpbm
+  brew --verbose install --ignore-dependencies gts
+  brew --verbose install --ignore-dependencies graphviz
 fi
