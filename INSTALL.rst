@@ -38,11 +38,6 @@ from source code (next section).
 
     $ conda install -c conda-forge message-ix
 
-.. note:: If you get an error containing ``No JVM shared library file (jvm.dll)
-          found.`` when running ``mp = ix.Platform(dbtype='HSQLDB')``, it is
-          likely that you need to set the `JAVA_HOME` environment variable (for
-          instructions, see for example `Java Tutorial`_).
-
 Install |MESSAGEix| from source
 -------------------------------
 
@@ -70,14 +65,20 @@ Install |MESSAGEix| from source
     $ pip install .[tests]
     $ py.test tests
 
-.. note:: If you get an error containing ``No JVM shared library file (jvm.dll)
-          found.`` when running ``mp = ix.Platform(dbtype='HSQLDB')``, it is
-          likely that you need to set the `JAVA_HOME` environment variable (for
-          instructions, see for example `Java Tutorial`_).
+Common issues
+-------------
+
+No JVM shared library file (jvm.dll) found
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you get an error containing ``No JVM shared library file (jvm.dll) found.``
+when running ``mp = ix.Platform(dbtype='HSQLDB')``, it is likely that you need
+to set the `JAVA_HOME` environment variable (for instructions, see for example
+`these instructions`_).
 
 .. _`GAMS`: http://www.gams.com
 .. _`Anaconda`: https://www.anaconda.com/distribution/#download-section
 .. _`ixmp`: https://github.com/iiasa/ixmp
 .. _`Github Desktop`: https://desktop.github.com
 .. _`README`: https://github.com/iiasa/message_ix#install-from-source-advanced-users
-.. _`Java Tutorial`: https://javatutorial.net/set-java-home-windows-10
+.. _`these instructions`: https://javatutorial.net/set-java-home-windows-10
