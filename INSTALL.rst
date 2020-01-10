@@ -71,10 +71,7 @@ Common issues
 No JVM shared library file (jvm.dll) found
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you get an error containing ``No JVM shared library file (jvm.dll) found.``
-when running ``mp = ix.Platform(dbtype='HSQLDB')``, it is likely that you need
-to set the `JAVA_HOME` environment variable (for instructions, see for example
-`these instructions`_).
+If you get an error containing “No JVM shared library file (jvm.dll) found” when creating a :class:`Platform` object (e.g. ``mp = ix.Platform(driver='HSQLDB')``), it is likely that you need to set the ``JAVA_HOME`` environment variable (see for example `these instructions`_).
 
 .. _`GAMS`: http://www.gams.com
 .. _`Anaconda`: https://www.anaconda.com/distribution/#download-section
