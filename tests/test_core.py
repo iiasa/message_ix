@@ -158,6 +158,14 @@ def test_cat_all(test_mp):
                                 'transport_from_san-diego'])
 
 
+def test_cat_list(test_mp):
+    scen = Scenario(test_mp, *msg_args, version='new')
+
+    # cat_list() returns default 'year' categories in a new message_ix.Scenario
+    exp = ['firstmodelyear', 'lastmodelyear', 'initializeyear_macro']
+    assert all(exp == scen.cat_list('year'))
+
+
 def test_add_cat(test_mp):
     scen = Scenario(test_mp, *msg_args)
     scen2 = scen.clone(keep_solution=False)
