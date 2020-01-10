@@ -44,7 +44,6 @@ from source code (next section).
 
     $ conda install -c conda-forge message-ix
 
-
 Install |MESSAGEix| from source
 -------------------------------
 
@@ -72,9 +71,17 @@ Install |MESSAGEix| from source
     $ pip install --editable .[tests]
     $ py.test tests
 
+Common issues
+-------------
+
+No JVM shared library file (jvm.dll) found
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you get an error containing “No JVM shared library file (jvm.dll) found” when creating a :class:`Platform` object (e.g. ``mp = ix.Platform(driver='HSQLDB')``), it is likely that you need to set the ``JAVA_HOME`` environment variable (see for example `these instructions`_).
 
 .. _`GAMS`: http://www.gams.com
 .. _`Anaconda`: https://www.anaconda.com/distribution/#download-section
 .. _`ixmp`: https://github.com/iiasa/ixmp
 .. _`Github Desktop`: https://desktop.github.com
 .. _`README`: https://github.com/iiasa/message_ix#install-from-source-advanced-users
+.. _`these instructions`: https://javatutorial.net/set-java-home-windows-10
