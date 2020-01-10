@@ -159,7 +159,7 @@ class Scenario(ixmp.Scenario):
         name : str
             Name of the set.
         """
-        return self._backend('get_cat_list', name)
+        return self._backend('cat_list', name)
 
     def add_cat(self, name, cat, keys, is_unique=False):
         """Map elements from *keys* to category *cat* within set *name*.
