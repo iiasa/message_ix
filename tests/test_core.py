@@ -160,11 +160,10 @@ def test_cat_all(test_mp):
 
 def test_cat_list(test_mp):
     scen = Scenario(test_mp, *msg_args, version='new')
-    years = [2000, 2010, 2020]
-    scen.add_horizon({'year': years, 'firstmodelyear': 2010})
-    obs = scen.cat_list('year')
-    exp = pd.DataFrame({'firstmodelyear': (2010)})
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+
+    # cat_list() returns default 'year' categories in a new message_ix.Scenario
+    exp = ['firstmodelyear', 'lastmodelyear', 'initializeyear_macro']
+    assert all(exp == scen.cat_list('year'))
 
 
 def test_add_cat(test_mp):
