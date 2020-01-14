@@ -104,7 +104,7 @@ $ONEMPTY
 *    the period '2010' comprises the years :math:`[2006, .. ,2010]`.
 *
 * .. [#time] The set ``time`` collects all sub-annual temporal units across all levels of temporal disaggregation.
-*    In a ``MESSAGE``-scheme ``ixmp``.Scenario, this set always includes an element "year",
+*    In a ``MESSAGE``-scheme ``ixmp.Scenario``, this set always includes an element "year",
 *    and the duration of that element is 1 (:math:`duration\_time_{'year'} = 1`).
 *
 * .. [#shares] A generic formulation of share constraints is implemented in |MESSAGEix|,
