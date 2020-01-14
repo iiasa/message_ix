@@ -32,51 +32,51 @@ $ONEMPTY
 *      - Explanatory comments
 *    * - node [#node]_
 *      - :math:`n \in N`
-*      - regions, countries, grid cells
+*      - Regions, countries, grid cells
 *    * - commodity
 *      - :math:`c \in C`
-*      - resources, electricity, water, land availability, etc.
+*      - Resources, electricity, water, land availability, etc.
 *    * - level
 *      - :math:`l \in L`
-*      - levels of the reference energy system or supply chain (primary, secondary, ... , useful)
+*      - Levels of the reference energy system or supply chain (primary, secondary, ... , useful)
 *    * - grade
 *      - :math:`g \in G`
-*      - grades of resource quality in the extraction & mining sector
+*      - Grades of resource quality in the extraction & mining sector
 *    * - technology [tec]
 *      - :math:`t \in T`
-*      - | technologies that use input commodities to produce outputs;
+*      - | Technologies that use input commodities to produce outputs;
 *        | the short-hand notation "tec" is used in the GAMS implementation
 *    * - mode [#mode]_
 *      - :math:`m \in M`
-*      - modes of operation for specific technologies
+*      - Modes of operation for specific technologies
 *    * - emission
 *      - :math:`e \in E`
-*      - greenhouse gases, pollutants, etc.
+*      - Greenhouse gases, pollutants, etc.
 *    * - land_scenario
 *      - :math:`s \in S`
-*      - scenarios of land use (for land-use model emulator)
+*      - Scenarios of land use (for land-use model emulator)
 *    * - land_type
 *      - :math:`u \in U`
-*      - land-use types (e.g., field, forest, pasture)
+*      - Land-use types (e.g., field, forest, pasture)
 *    * - year [year_all] [#year_all]_ [#period_year]_
 *      - :math:`y \in Y`
-*      - model horizon (including historical periods for vintage structure of installed capacity
+*      - Model horizon (including historical periods for vintage structure of installed capacity
 *        and dynamic constraints)
 *    * - time [#time]_
 *      - :math:`h \in H`
-*      - subannual time periods (seasons, days, hours)
+*      - Subannual time periods (seasons, days, hours)
 *    * - relation [#relations]_
 *      - :math:`r \in R`
-*      - set of generic linear constraints
-*    * - rating
-*      - :math:`q \in Q`
-*      - identifies the 'quality' of the renewable energy potential
+*      - Set of generic linear constraints
 *    * - lvl_spatial
 *      -
-*      - set of spatial hierarchy levels (global, region, country, grid cell)
+*      - Set of spatial hierarchy levels (global, region, country, grid cell)
 *    * - lvl_temporal
 *      -
-*      - set of temporal hierarchy levels (year, season, day, hour)
+*      - Set of temporal hierarchy levels (year, season, day, hour)
+*    * - rating
+*      - :math:`q \in Q`
+*      - Identifies the 'quality' of the renewable energy potential
 *
 * .. [#node] The set ``node`` includes spatial units across all levels of spatial disaggregation
 *    (global, regions, countries, basins, grid cells).
