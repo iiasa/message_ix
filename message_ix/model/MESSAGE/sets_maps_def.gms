@@ -192,7 +192,7 @@ Alias(mode, mode2);
 *    * - type_tec [#type_tec]_
 *      - :math:`\widehat{t} \in \widehat{T}`
 *      - Category types for technologies
-*    * - cat_tec (type_tec,tec)
+*    * - cat_tec (type_tec,tec) [#type_tec]_
 *      - :math:`t \in T(\widehat{t})`
 *      - Category mapping between tec types and technologies
 *    * - inv_tec (tec) [#inv_tec]_
