@@ -36,7 +36,7 @@ def test_copy_model(message_ix_cli, tmp_path, tmp_env):
     # '',
     '--branch=master',
     '--tag=1.2.0',
-    ])
+])
 def test_dl(message_ix_cli, opts, tmp_path):
     r = message_ix_cli('dl', opts, str(tmp_path))
     if r.exit_code != 0:
