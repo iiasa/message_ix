@@ -1281,7 +1281,7 @@ ACTIVITY_BOUND_ALL_MODES_LO(node,tec,year,time)$( bound_activity_lo(node,tec,yea
 *   .. math::
 *     ACT_{n^L,t,y^V,y,m,h^A}
 *     \leq share\_mode\_up_{s,n,t,y,m,h} \cdot
-*     \sum_{m\prime} ACT_{n^L,t,y^V,y,m\prime,h^A}
+*     \sum_{m'} ACT_{n^L,t,y^V,y,m',h^A}
 *
 ***
 SHARE_CONSTRAINT_MODE_UP(shares,node,tec,mode,year,time)$(
@@ -1309,7 +1309,7 @@ SHARE_CONSTRAINT_MODE_UP(shares,node,tec,mode,year,time)$(
 *   .. math::
 *     ACT_{n^L,t,y^V,y,m,h^A}
 *     \geq share\_mode\_lo_{s,n,y,m,h} \cdot
-*     \sum_{m\prime} ACT_{n^L,t,y^V,y,m\prime,h^A}
+*     \sum_{m'} ACT_{n^L,t,y^V,y,m',h^A}
 *
 ***
 SHARE_CONSTRAINT_MODE_LO(shares,node,tec,mode,year,time)$(
