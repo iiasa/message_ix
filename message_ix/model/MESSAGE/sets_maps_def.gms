@@ -218,7 +218,7 @@ Alias(mode, mode2);
 * .. [#level_res] The constraint ``EXTRACTION_EQUIVALENCE`` is active only for the levels included in this set,
 *    and the constraint ``COMMODITY_BALANCE`` is deactivated for these levels.
 *
-* .. [#type_node] The element "economy" is added by default as part of the ``MESSAGE``-scheme ``ixmp``.Scenario.
+* .. [#type_node] The element "economy" is added by default as part of the ``MESSAGE``-scheme ``ixmp.Scenario``.
 *
 * .. [#type_tec] The element "all" in ``type_tec`` and the associated mapping to all technologies in the set ``cat_tec``
 *    are added by default as part of the ``MESSAGE``-scheme ``message_ix``.Scenario.
@@ -269,7 +269,7 @@ Alias(type_tec,type_tec_total);
 * Mappings sets
 * -------------
 *
-* These sets are generated automatically when exporting a ``MESSAGE``-scheme ``ixmp``.Scenario to gdx using the API.
+* These sets are generated automatically when exporting a ``MESSAGE``-scheme ``ixmp.Scenario`` to gdx using the API.
 * They are used in the GAMS model to reduce model size by excluding non-relevant variables and equations
 * (e.g., actitivity of a technology outside of its technical lifetime).
 *
