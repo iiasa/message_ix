@@ -21,7 +21,7 @@ a data warehouse for high-powered numerical scenario analysis.
 
 ## License
 
-Copyright © 2018–2019 IIASA Energy Program
+Copyright © 2018–2020 IIASA Energy Program
 
 The MESSAGEix framework is licensed under the Apache License, Version 2.0 (the
 "License"); you may not use the files in this repository except in compliance
