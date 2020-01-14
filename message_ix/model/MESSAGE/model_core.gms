@@ -1280,7 +1280,7 @@ ACTIVITY_BOUND_ALL_MODES_LO(node,tec,year,time)$( bound_activity_lo(node,tec,yea
 *
 *   .. math::
 *     ACT_{n^L,t,y^V,y,m,h^A}
-*     \leq share\_mode\_up_{s,n,y,m,h} \cdot
+*     \leq share\_mode\_up_{s,n,t,y,m,h} \cdot
 *     \sum_{m\prime} ACT_{n^L,t,y^V,y,m\prime,h^A}
 *
 ***
