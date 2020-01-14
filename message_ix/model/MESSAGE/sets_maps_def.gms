@@ -302,8 +302,10 @@ Alias(type_tec,type_tec_total);
 *    * - map_tec_mode(node,tec,year_all,mode)
 *      - Mapping of technology to modes
 *
-* To see the full list of mapping sets, please refere to the documentation
-* file found in ``message_ix\model\MESSAGE\sets_maps_def.gms``.
+* .. note::
+*
+*    To see the full list of mapping sets, please refere to the documentation
+*    file found in ``message_ix\model\MESSAGE\sets_maps_def.gms``.
 ***
 
 Sets
@@ -356,8 +358,10 @@ Sets
 * Such mapping sets are necessary because GAMS does not distinguish between 0 and 'no value assigned',
 * i.e., it cannot differentiate between a bound of 0 and 'no bound assigned'.
 *
-* To see the full list of mapping sets for bounds, please refere to the documentation
-* file found in ``message_ix\model\MESSAGE\sets_maps_def.gms``.
+* .. note::
+*
+*    To see the full list of mapping sets for bounds, please refere to the documentation
+*    file found in ``message_ix\model\MESSAGE\sets_maps_def.gms``.
 ***
 
 Sets
@@ -399,8 +403,10 @@ Sets
 * This can be used to represent imperfect foresight where a policy shift or parameter change is introduced in later
 * years. The names of these sets follow the format ``is_fixed_<variable>``.
 *
-* To see the full list of mapping sets for fixed variables, please refere to the documentation
-* file found in ``message_ix\model\MESSAGE\sets_maps_def.gms``.
+* .. note::
+*
+*    To see the full list of mapping sets for fixed variables, please refere to the documentation
+*    file found in ``message_ix\model\MESSAGE\sets_maps_def.gms``.
 ***
 
 Sets
