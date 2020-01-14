@@ -215,8 +215,10 @@ Alias(mode, mode2);
 *      - Commodities and level related to :doc:`Equation COMMODITY_BALANCE_LT
 *        <model_core>`
 *
-* .. [#level_res] The constraint ``EXTRACTION_EQUIVALENCE`` is active only for the levels included in this set,
-*    and the constraint ``COMMODITY_BALANCE`` is deactivated for these levels.
+* .. [#level_res] The constraint :doc:`Equation EXTRACTION_EQUIVALENCE
+*        <model_core>` is active only for the levels included in this set,
+*    and the constraint :doc:`Equation COMMODITY_BALANCE
+*        <model_core>` is deactivated for these levels.
 *
 * .. [#type_node] The element "economy" is added by default as part of the ``MESSAGE``-scheme ``ixmp.Scenario``.
 *
