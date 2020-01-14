@@ -179,10 +179,10 @@ Alias(mode, mode2);
 *      - Explanatory comments
 *    * - level_resource (level) [#level_res]_
 *      - :math:`l \in L^{RES} \subseteq L`
-*      - levels related to `fossil resources` representation
+*      - Levels related to `fossil resources` representation
 *    * - level_renewable (level) [#level_res]_
 *      - :math:`l \in L^{REN} \subseteq L`
-*      - levels related to `renewables` representation
+*      - Levels related to `renewables` representation
 *    * - type_node [#type_node]_
 *      - :math:`\widehat{n} \in \widehat{N}`
 *      - Category types for nodes
