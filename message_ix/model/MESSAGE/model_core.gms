@@ -1280,7 +1280,7 @@ ACTIVITY_BOUND_ALL_MODES_LO(node,tec,year,time)$( bound_activity_lo(node,tec,yea
 *
 *   .. math::
 *     ACT_{n^L,t,y^V,y,m,h^A}
-*     \leq share\_mode\_up_{s,n,t,y,m,h} \cdot
+*     \leq share\_mode\_up_{p,n,t,y,m,h} \cdot
 *     \sum_{m'} ACT_{n^L,t,y^V,y,m',h^A}
 *
 ***
@@ -1308,7 +1308,7 @@ SHARE_CONSTRAINT_MODE_UP(shares,node,tec,mode,year,time)$(
 *
 *   .. math::
 *     ACT_{n^L,t,y^V,y,m,h^A}
-*     \geq share\_mode\_lo_{s,n,y,m,h} \cdot
+*     \geq share\_mode\_lo_{p,n,t,y,m,h} \cdot
 *     \sum_{m'} ACT_{n^L,t,y^V,y,m',h^A}
 *
 ***
@@ -1338,23 +1338,23 @@ SHARE_CONSTRAINT_MODE_LO(shares,node,tec,mode,year,time)$(
 * The implementation is generic and flexible, so that any combination of commodities, levels, technologies and nodes
 * can be put in relation to any other combination.
 *
-* The notation :math:`S^{share}` represents the mapping set `map_shares_commodity_share` denoting all technology types,
-* nodes, commodities and levels to be included in the numerator, and :math:`S^{total}` is
+* The notation :math:`P^{share}` represents the mapping set `map_shares_commodity_share` denoting all technology types,
+* nodes, commodities and levels to be included in the numerator, and :math:`P^{total}` is
 * the equivalent mapping set `map_shares_commodity_total` for the denominator.
 *
 * Equation SHARE_CONSTRAINT_COMMODITY_UP
 * """"""""""""""""""""""""""""""""""""""
 *   .. math::
-*      & \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim S^{share}}}
+*      & \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim P^{share}}}
 *         ( output_{n^L,t,y^V,y,m,n,c,l,h^A,h} + input_{n^L,t,y^V,y,m,n,c,l,h^A,h} ) \\
 *      & \quad \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,y^V,y,m,h^A} \\
 *      & \geq
-*        share\_commodity\_up_{s,n,y,h} \cdot
-*        \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim S^{total}}}
+*        share\_commodity\_up_{p,n,y,h} \cdot
+*        \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim P^{total}}}
 *            ( output_{n^L,t,y^V,y,m,n,c,l,h^A,h} + input_{n^L,t,y^V,y,m,n,c,l,h^A,h} ) \\
 *      & \quad \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,y^V,y,m,h^A}
 *
-* This constraint is only active if :math:`share\_commodity\_up_{s,n,y,h}` is defined.
+* This constraint is only active if :math:`share\_commodity\_up_{p,n,y,h}` is defined.
 ***
 SHARE_CONSTRAINT_COMMODITY_UP(shares,node_share,year,time)$( share_commodity_up(shares,node_share,year,time) )..
 * activity by type_tec_share technologies with map_shares_generic_share entries and a specific mode
@@ -1394,16 +1394,16 @@ SHARE_CONSTRAINT_COMMODITY_UP(shares,node_share,year,time)$( share_commodity_up(
 * Equation SHARE_CONSTRAINT_COMMODITY_LO
 * """"""""""""""""""""""""""""""""""""""
 *   .. math::
-*      & \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim S^{share}}}
+*      & \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim P^{share}}}
 *         ( output_{n^L,t,y^V,y,m,n,c,l,h^A,h} + input_{n^L,t,y^V,y,m,n,c,l,h^A,h} ) \\
 *      & \quad \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,y^V,y,m,h^A} \\
 *      & \leq
-*        share\_commodity\_lo_{s,n,y,h} \cdot
-*        \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim S^{total}}}
+*        share\_commodity\_lo_{p,n,y,h} \cdot
+*        \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim P^{total}}}
 *            ( output_{n^L,t,y^V,y,m,n,c,l,h^A,h} + input_{n^L,t,y^V,y,m,n,c,l,h^A,h} ) \\
 *      & \quad \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,y^V,y,m,h^A}
 *
-* This constraint is only active if :math:`share\_commodity\_lo_{s,n,y,h}` is defined.
+* This constraint is only active if :math:`share\_commodity\_lo_{p,n,y,h}` is defined.
 ***
 SHARE_CONSTRAINT_COMMODITY_LO(shares,node_share,year,time)$( share_commodity_lo(shares,node_share,year,time) )..
 * total input and output by `type_tec_share` technologies mapped to respective commodity, level and node
