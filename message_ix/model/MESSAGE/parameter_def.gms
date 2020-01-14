@@ -237,12 +237,12 @@ Parameters
     capacity_factor(node,tec,vintage,year_all,time)         capacity factor by subannual time slice
     operation_factor(node,tec,vintage,year_all)             yearly total operation factor
     min_utilization_factor(node,tec,vintage,year_all)       yearly minimum utilization factor
-    emission_factor(node,tec,year_all,year_all,mode,emission) emission intensity of activity
     rating_bin(node,tec,year_all,commodity,level,time,rating) maximum share of technology in commodity use per rating
     reliability_factor(node,tec,year_all,commodity,level,time,rating) reliability of a technology (per rating)
     flexibility_factor(node,tec,vintage,year_all,mode,commodity,level,time,rating) contribution of technologies towards operation flexibility constraint
     renewable_capacity_factor(node,commodity,grade,level,year_all) quality of renewable potential grade (>= 1)
     renewable_potential(node,commodity,grade,level,year_all) size of renewable potential per grade
+    emission_factor(node,tec,year_all,year_all,mode,emission) emission intensity of activity
 ;
 
 ***
