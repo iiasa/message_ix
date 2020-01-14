@@ -221,20 +221,20 @@ Alias(mode, mode2);
 * .. [#type_node] The element "economy" is added by default as part of the ``MESSAGE``-scheme ``ixmp.Scenario``.
 *
 * .. [#type_tec] The element "all" in ``type_tec`` and the associated mapping to all technologies in the set ``cat_tec``
-*    are added by default as part of the ``MESSAGE``-scheme ``message_ix``.Scenario.
+*    are added by default as part of the ``MESSAGE``-scheme ``message_ix.Scenario``.
 *
 * .. [#inv_tec] The auxiliary set ``inv_tec`` (subset of ``technology``) is a short-hand notation for all technologies
 *    with defined investment costs. This activates the investment cost part in the objective function and the
 *    constraints for all technologies where investment decisions are relevant.
-*    It is added by default when exporting ``MESSAGE``-scheme ``message_ix``.Scenario to gdx.
+*    It is added by default when exporting ``MESSAGE``-scheme ``message_ix.Scenario`` to gdx.
 *
 * .. [#renewable_tec] The auxiliary set ``renewable_tec`` (subset of ``technology``) is a short-hand notation
 *    for all technologies with defined parameters relevant for the equations in the "Renewable" section.
-*    It is added by default when exporting ``MESSAGE``-scheme ``message_ix``.Scenario to gdx.
+*    It is added by default when exporting ``MESSAGE``-scheme ``message_ix.Scenario`` to gdx.
 *
 * .. [#type_tec_land] The mapping set ``type_tec_land`` is a dynamic subset of ``type_tec`` and specifies whether
 *    emissions from the land-use model emulator module are included when aggregrating over a specific technology type.
-*    The element "all" is added by default in a ``MESSAGE``-scheme ``message_ix``.Scenario.
+*    The element "all" is added by default in a ``MESSAGE``-scheme ``message_ix.Scenario``.
 ***
 
 * category types and mappings
