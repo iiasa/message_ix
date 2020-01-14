@@ -470,6 +470,8 @@ COST_ACCOUNTING_NODAL(node, year)..
 * Constraints on resource extraction
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
+* .. _extraction_equivalence:
+*
 * Equation EXTRACTION_EQUIVALENCE
 * """""""""""""""""""""""""""""""
 *
@@ -546,6 +548,8 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 * Constraints on commodities and stocks
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
+* .. _commodity_balance:
+*
 * Auxiliary COMMODITY_BALANCE
 * """""""""""""""""""""""""""
 * For the commodity balance constraints below, we introduce an auxiliary `COMMODITY_BALANCE`. This is implemented
@@ -600,6 +604,8 @@ COMMODITY_BALANCE_GT(node,commodity,level,year,time)$( map_commodity(node,commod
      =G= 0 ;
 
 ***
+* .. _commodity_balance_lt:
+*
 * Equation COMMODITY_BALANCE_LT
 * """""""""""""""""""""""""""""
 * This constraint ensures the supply is smaller than or equal to the demand for all commodity-level combinatio

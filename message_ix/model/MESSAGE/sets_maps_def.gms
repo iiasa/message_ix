@@ -227,13 +227,10 @@ Alias(mode, mode2);
 *      - Mapping set of technology types and land use
 *    * - balance_equality (commodity,level)
 *      - :math:`c \in C, l \in L`
-*      - Commodities and level related to :doc:`Equation COMMODITY_BALANCE_LT
-*        <model_core>`
+*      - Commodities and level related to :ref:`commodity_balance_lt`
 *
-* .. [#level_res] The constraint :doc:`Equation EXTRACTION_EQUIVALENCE
-*    <model_core>` is active only for the levels included in this set,
-*    and the constraint :doc:`Equation COMMODITY_BALANCE
-*    <model_core>` is deactivated for these levels.
+* .. [#level_res] The constraint :ref:`extraction_equivalence` is active only for the levels included in this set,
+*    and the constraint :ref:`commodity_balance` is deactivated for these levels.
 *
 * .. [#type_node] The element "economy" is added by default as part of the ``MESSAGE``-scheme ``ixmp.Scenario``.
 *
