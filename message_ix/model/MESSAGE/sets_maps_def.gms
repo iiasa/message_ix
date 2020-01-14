@@ -201,6 +201,21 @@ Alias(mode, mode2);
 *    * - renewable_tec (tec) [#renewable_tec]_
 *      - :math:`t \in T^{REN} \subseteq T`
 *      - Specific subset of renewable-energy technologies
+*    * - addon(tec)
+*      - 
+*      - Category mapping technologies that are an add-on to other (parent) technologies
+*    * - type_addon
+*      - 
+*      - Category types for add-on technologies (that can be applied mutually exclusive)
+*    * - cat_addon(type_addon,addon)
+*      - 
+*      - Category mapping add-on technologies to respective add-on technology types
+*    * - type_year
+*      - 
+*      - Category types for year aggregations
+*    * - cat_year(type_year,year_all)
+*      - 
+*      - Category mapping years to respective categories
 *    * - type_emission
 *      - :math:`\widehat{e} \in \widehat{E}`
 *      - Category types for emissions (greenhouse gases, pollutants, etc.)
