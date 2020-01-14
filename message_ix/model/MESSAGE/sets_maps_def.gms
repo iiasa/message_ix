@@ -65,6 +65,9 @@ $ONEMPTY
 *    * - time [#time]_
 *      - :math:`h \in H`
 *      - Subannual time periods (seasons, days, hours)
+*    * - shares [#shares]_
+*      - :math:`p \in P`
+*      - Set of constraints on shares of technologies and commodities
 *    * - relation [#relations]_
 *      - :math:`r \in R`
 *      - Set of generic linear constraints
@@ -103,6 +106,9 @@ $ONEMPTY
 * .. [#time] The set ``time`` collects all sub-annual temporal units across all levels of temporal disaggregation.
 *    In a ``MESSAGE``-scheme ``ixmp``.Scenario, this set always includes an element "year",
 *    and the duration of that element is 1 (:math:`duration\_time_{'year'} = 1`).
+*
+* .. [#shares] A generic formulation of share constraints is implemented in |MESSAGEix|,
+*    see :ref:`share_constraints`.
 *
 * .. [#relations] A generic formulation of linear constraints is implemented in |MESSAGEix|,
 *    see :ref:`section_of_generic_relations`. These constraints can be used for testing and development,
