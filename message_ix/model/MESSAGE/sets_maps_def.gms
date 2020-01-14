@@ -274,15 +274,36 @@ Alias(type_tec,type_tec_total);
 * (e.g., actitivity of a technology outside of its technical lifetime).
 *
 * .. list-table::
-*    :widths: 25 15 60
+*    :widths: 40 60
 *    :header-rows: 1
 *
 *    * - Set name
-*      - Notation
 *      - Explanatory comments
 *    * - map_node(node,location)
-*      -
-*      - mapping of nodes across hierarchy levels (location is in node)
+*      - Mapping of nodes across hierarchy levels (location is in node)
+*    * - map_time(time,time2)
+*      - Mapping of time periods across hierarchy levels (time2 is in time)
+*    * - map_resource(node,commodity,grade,year_all)
+*      - Mapping of resources and grades to node over time
+*    * - map_ren_grade(node,commodity,grade,year_all)
+*      - Mapping of renewables and grades to node over time
+*    * - map_ren_com(node,tec,commodity,year_all)
+*      - Mapping of technologies to renewable energy source as input
+*    * - map_rating(node,tec,commodity,level,rating,year_all)
+*      - Mapping of technologues to ratings bin assignment
+*    * - map_commodity(node,commodity,level,year_all,time)
+*      - Mapping of commodity-level to node and time
+*    * - map_stocks(node,commodity,level,year_all)
+*      - Mapping of commodity-level to node and time
+*    * - map_tec(node,tec,year_all)
+*      - Mapping of technology to node and years
+*    * - map_tec_time(node,tec,year_all,time)
+*      - Mapping of technology to temporal dissagregation (time)
+*    * - map_tec_mode(node,tec,year_all,mode)
+*      - Mapping of technology to modes
+*
+* To see the full list of mapping sets, please refere to the documentation
+* file found in ``message_ix\model\MESSAGE\sets_maps_def.gms``.
 ***
 
 Sets
@@ -334,6 +355,9 @@ Sets
 *
 * Such mapping sets are necessary because GAMS does not distinguish between 0 and 'no value assigned',
 * i.e., it cannot differentiate between a bound of 0 and 'no bound assigned'.
+*
+* To see the full list of mapping sets for bounds, please refere to the documentation
+* file found in ``message_ix\model\MESSAGE\sets_maps_def.gms``.
 ***
 
 Sets
@@ -374,6 +398,9 @@ Sets
 * are pre-defined to a specific value, usually taken from a solution of another model instance.
 * This can be used to represent imperfect foresight where a policy shift or parameter change is introduced in later
 * years. The names of these sets follow the format ``is_fixed_<variable>``.
+*
+* To see the full list of mapping sets for fixed variables, please refere to the documentation
+* file found in ``message_ix\model\MESSAGE\sets_maps_def.gms``.
 ***
 
 Sets
