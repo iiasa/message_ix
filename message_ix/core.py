@@ -387,7 +387,7 @@ class Scenario(ixmp.Scenario):
         ----------
         keep_solution : bool, optional
             If :py:const:`True`, include all timeseries data and the solution
-            (vars and equs) from the source scenario in the clone.
+            (vars and equs) from the source Scenario in the clone.
             Otherwise, only timeseries data marked as `meta=True` (see
             :meth:`TimeSeries.add_timeseries`) or prior to `first_model_year`
             (see :meth:`TimeSeries.add_timeseries`) are cloned.

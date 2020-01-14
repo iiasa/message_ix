@@ -65,6 +65,7 @@ Anyone is encouraged to use the framework to develop energy system and integrate
 .. toctree::
    :maxdepth: 1
 
+   whatsnew
    notice
    contributing
 
