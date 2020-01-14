@@ -25,24 +25,27 @@
 *    * - Parameter name
 *      - Index dimensions
 *      - Explanatory comments
-*    * - *duration_period* (:math:`|y|`) [#short_dur]_
+*    * - duration_period (:math:`|y|`) [#short_dur]_
 *      - ``year``
-*      - duration of multi-year period (in number of years) [#year_auto]_
+*      - Duration of multi-year period (in number of years) [#year_auto]_
+*    * - duration_period_sum
+*      - ``year`` | ``year``
+*      - Number of years between two periods [#df_auto]_
 *    * - duration_time
 *      - ``time``
-*      - duration of sub-annual time slices (relative to 1) [#duration_time_year]_
-*    * - *duration_time_rel*
+*      - Duration of sub-annual time slices (relative to 1) [#duration_time_year]_
+*    * - duration_time_rel
 *      - ``time`` | ``time``
-*      - relative duration between sub-annual time slices [#df_auto]_
+*      - Relative duration between sub-annual time slices [#df_auto]_
 *    * - interestrate
 *      - ``year``
-*      - economy-wide interest rate or social discount rate
-*    * - *df_period*
+*      - Economy-wide interest rate or social discount rate
+*    * - df_period
 *      - ``year``
-*      -  cumulative discount factor over period duration [#df_auto]_
-*    * - *df_year*
+*      - Cumulative discount factor over period duration [#df_auto]_
+*    * - df_year
 *      - ``year``
-*      -  discount factor of the last year in the period [#df_auto]_
+*      - Discount factor of the last year in the period [#df_auto]_
 *
 * .. [#short_dur] The short-hand notation :math:`|y|` is used for the parameters :math:`duration\_period_y`
 *    in the mathematical model documentation for exponents.
@@ -61,8 +64,8 @@
 Parameters
 * general parameters
     duration_period(year_all)      duration of one multi-year period (in years)
-    duration_time(time)            duration of one time slice (relative to 1)
     duration_period_sum(year_all,year_all2)  number of years between two periods ('year_all' must precede 'year_all2')
+    duration_time(time)            duration of one time slice (relative to 1)
     duration_time_rel(time,time2)  relative duration of subannual time period ('time2' relative to parent 'time')
     interestrate(year_all)         interest rate (to compute discount factor)
     df_period(year_all)            cumulative discount factor over period duration
