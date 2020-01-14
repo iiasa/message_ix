@@ -59,28 +59,28 @@
 ***
 * Decision variables
 * ^^^^^^^^^^^^^^^^^^
-* ============================================= ========================================================================
-* Variable                                      Explanatory text
-* ============================================= ========================================================================
-* :math:`OBJ \in \mathbb{R}`                    Objective value of the optimization program
-* :math:`EXT_{n,c,g,y} \in \mathbb{R}_+`        Extraction of non-renewable/exhaustible resources from reserves
-* :math:`STOCK_{n,c,l,y} \in \mathbb{R}_+`      Quantity in stock (storage) at start of period :math:`y`
-* :math:`STOCK\_CHG_{n,c,l,y,h} \in \mathbb{R}` Input or output quantity into intertemporal commodity stock (storage)
-* :math:`REN_{n,t,c,g,y,h} \in \mathbb{R}_+`    Activity of renewable technologies per grade
-* :math:`CAP\_NEW_{n,t,y} \in \mathbb{R}_+`     Newly installed capacity (yearly average over period duration)
-* :math:`CAP_{n,t,y^V,y} \in \mathbb{R}_+`      Maintained capacity in year :math:`y` of vintage :math:`y^V`
-* :math:`CAP\_FIRM_{n,t,c,l,y,q} \in \mathbb{R}_+`   Capacity counting towards firm (dispatchable)
-* :math:`ACT_{n,t,y^V,y,m,h} \in \mathbb{R}`    Activity of a technology (by vintage, mode, subannual time)
-* :math:`ACT\_RATING_{n,t,y^V,y,c,l,h,q} \in \mathbb{R}_+`   Auxiliary variable for activity attributed to a particular rating bin [#ACT_RATING]_
-* :math:`CAP\_NEW\_UP_{n,t,y} \in \mathbb{R}_+` Relaxation of upper dynamic constraint on new capacity
-* :math:`CAP\_NEW\_LO_{n,t,y} \in \mathbb{R}_+` Relaxation of lower dynamic constraint on new capacity
-* :math:`ACT\_UP_{n,t,y,h} \in \mathbb{R}_+`    Relaxation of upper dynamic constraint on activity [#ACT_BD]_
-* :math:`ACT\_LO_{n,t,y,h} \in \mathbb{R}_+`    Relaxation of lower dynamic constraint on activity [#ACT_BD]_
-* :math:`LAND_{n,s,y} \in [0,1]`                Relative share of land-use scenario (for land-use model emulator)
-* :math:`EMISS_{n,e,\widehat{t},y} \in \mathbb{R}`   Auxiliary variable for aggregate emissions by technology type
-* :math:`REL_{r,n,y} \in \mathbb{R}`            Auxiliary variable for left-hand side of relations (linear constraints)
-* :math:`COMMODITY\_USE_{n,c,l,y} \in \mathbb{R}`   Auxiliary variable for amount of commodity used at specific level
-* ============================================= ========================================================================
+* ======================================================== ====================================================================================
+* Variable                                                 Explanatory text
+* ======================================================== ====================================================================================
+* :math:`OBJ \in \mathbb{R}`                               Objective value of the optimization program
+* :math:`EXT_{n,c,g,y} \in \mathbb{R}_+`                   Extraction of non-renewable/exhaustible resources from reserves
+* :math:`STOCK_{n,c,l,y} \in \mathbb{R}_+`                 Quantity in stock (storage) at start of period :math:`y`
+* :math:`STOCK\_CHG_{n,c,l,y,h} \in \mathbb{R}`            Input or output quantity into intertemporal commodity stock (storage)
+* :math:`REN_{n,t,c,g,y,h} \in \mathbb{R}_+`               Activity of renewable technologies per grade
+* :math:`CAP\_NEW_{n,t,y} \in \mathbb{R}_+`                Newly installed capacity (yearly average over period duration)
+* :math:`CAP_{n,t,y^V,y} \in \mathbb{R}_+`                 Maintained capacity in year :math:`y` of vintage :math:`y^V`
+* :math:`CAP\_FIRM_{n,t,c,l,y,q} \in \mathbb{R}_+`         Capacity counting towards firm (dispatchable)
+* :math:`ACT_{n,t,y^V,y,m,h} \in \mathbb{R}`               Activity of a technology (by vintage, mode, subannual time)
+* :math:`ACT\_RATING_{n,t,y^V,y,c,l,h,q} \in \mathbb{R}_+` Auxiliary variable for activity attributed to a particular rating bin [#ACT_RATING]_
+* :math:`CAP\_NEW\_UP_{n,t,y} \in \mathbb{R}_+`            Relaxation of upper dynamic constraint on new capacity
+* :math:`CAP\_NEW\_LO_{n,t,y} \in \mathbb{R}_+`            Relaxation of lower dynamic constraint on new capacity
+* :math:`ACT\_UP_{n,t,y,h} \in \mathbb{R}_+`               Relaxation of upper dynamic constraint on activity [#ACT_BD]_
+* :math:`ACT\_LO_{n,t,y,h} \in \mathbb{R}_+`               Relaxation of lower dynamic constraint on activity [#ACT_BD]_
+* :math:`LAND_{n,s,y} \in [0,1]`                           Relative share of land-use scenario (for land-use model emulator)
+* :math:`EMISS_{n,e,\widehat{t},y} \in \mathbb{R}`         Auxiliary variable for aggregate emissions by technology type
+* :math:`REL_{r,n,y} \in \mathbb{R}`                       Auxiliary variable for left-hand side of relations (linear constraints)
+* :math:`COMMODITY\_USE_{n,c,l,y} \in \mathbb{R}`          Auxiliary variable for amount of commodity used at specific level
+* ======================================================== ====================================================================================
 *
 * The index :math:`y^V` is the year of construction (vintage) wherever it is necessary to
 * clearly distinguish between year of construction and the year of operation.
@@ -147,15 +147,15 @@ Variables
 ***
 * Auxiliary variables
 * ^^^^^^^^^^^^^^^^^^^
-* ============================================= ========================================================================
-* Variable                                      Explanatory text
-* ============================================= ========================================================================
-* :math:`DEMAND_{n,c,l,y,h} \in \mathbb{R}`     Demand level (in equilibrium with MACRO integration)
-* :math:`PRICE\_COMMODITY_{n,c,l,y,h}`          Commodity price (undiscounted marginals of the commodity balances)
-* :math:`PRICE\_EMISSION_{n,\widehat{e},\widehat{t},y}`   Emission price (undiscounted marginals of EMISSION_BOUND constraint)
-* :math:`COST\_NODAL\_NET_{n,y} \in \mathbb{R}` System costs at the node level net of energy trade revenues/cost
-* :math:`GDP_{n,y} \in \mathbb{R}`              gross domestic product (GDP) in market exchange rates for MACRO reporting
-* ============================================= ========================================================================
+* ==================================================================== ========================================================================
+* Variable                                                             Explanatory text
+* ==================================================================== ========================================================================
+* :math:`DEMAND_{n,c,l,y,h} \in \mathbb{R}`                            Demand level (in equilibrium with MACRO integration)
+* :math:`PRICE\_COMMODITY_{n,c,l,y,h} \in \mathbb{R}`                  Commodity price (undiscounted marginals of the commodity balances)
+* :math:`PRICE\_EMISSION_{n,\widehat{e},\widehat{t},y} \in \mathbb{R}` Emission price (undiscounted marginals of EMISSION_BOUND constraint)
+* :math:`COST\_NODAL\_NET_{n,y} \in \mathbb{R}`                        System costs at the node level net of energy trade revenues/cost
+* :math:`GDP_{n,y} \in \mathbb{R}`                                     Gross domestic product (GDP) in market exchange rates for MACRO reporting
+* ==================================================================== ========================================================================
 *
 ***
 
@@ -1175,7 +1175,7 @@ TOTAL_CAPACITY_BOUND_LO(node,inv_tec,year)$( is_bound_total_capacity_lo(node,inv
 
 ***
 * .. _activity_bound_up:
-* 
+*
 * Equation ACTIVITY_BOUND_UP
 * """"""""""""""""""""""""""
 * This constraint provides upper bounds by mode of a technology activity, summed over all vintages.
@@ -1217,7 +1217,7 @@ ACTIVITY_BOUND_ALL_MODES_UP(node,tec,year,time)$( is_bound_activity_up(node,tec,
 
 ***
 * .. _acitvity_bound_lo:
-* 
+*
 * Equation ACTIVITY_BOUND_LO
 * """"""""""""""""""""""""""
 * This constraint provides lower bounds by mode of a technology activity, summed over
@@ -1263,7 +1263,7 @@ ACTIVITY_BOUND_ALL_MODES_LO(node,tec,year,time)$( bound_activity_lo(node,tec,yea
 *----------------------------------------------------------------------------------------------------------------------*
 ***
 * .. _share_constraints:
-* 
+*
 * Constraints on shares of technologies and commodities
 * -----------------------------------------------------
 * This section allows to include upper and lower bounds on the shares of modes used by a technology
