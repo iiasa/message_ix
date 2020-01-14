@@ -735,6 +735,32 @@ Parameters
 * Auxiliary reporting parameters                                                                                       *
 *----------------------------------------------------------------------------------------------------------------------*
 
+***
+* Auxiliary reporting parameters
+* ------------------------------
+*
+* The following parameters are used for reporting (post-processing) solved models. They assign monetary value to
+* the `net` total system costs from trading and emission taxes (``total_cost``). Morevoer, they also assign a value
+* to the `total` trade of commodities (the difference between the revenues from exports and the costs of imports,
+* ``trade_cost``) and to the costs from importing (``import_cost``) and the revenues from exporting (``export_cost``)
+* in each node and year.
+*
+* .. list-table::
+*    :widths: 25 75
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index dimensions
+*    * - total_cost
+*      - ``node`` | ``year``
+*    * - trade_cost
+*      - ``node`` | ``year``
+*    * - import_cost
+*      - ``node`` | ``commodity`` | ``year``
+*    * - export_cost
+*      - ``node`` | ``commodity`` | ``year``
+***
+
 Parameters
     total_cost(node, year_all)              total system costs net of trade costs and emissions taxes by node and year
     trade_cost(node, year_all)              net of commodity import costs and commodity export revenues by node and year
