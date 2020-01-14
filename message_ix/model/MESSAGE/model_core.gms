@@ -706,7 +706,7 @@ CAPACITY_MAINTENANCE_HIST(node,inv_tec,vintage,first_period)$( map_tec_lifetime(
 *      CAP_{n,t,y^V,y^V} =
 *          remaining\_capacity_{n,t,y^V,y^V} \cdot
 *          duration\_period_{y^V} \cdot
-*          CAP\_NEW{n,t,y^V}
+*          CAP\_NEW_{n,t,y^V}
 *      \quad \forall \ t \in T^{INV}
 *
 * The current formulation does not account for construction time in the constraints, but only adds a mark-up
