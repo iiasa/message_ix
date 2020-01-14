@@ -51,12 +51,12 @@
 *    in the mathematical model documentation for exponents.
 *
 * .. [#year_auto] The values for this parameter are computed automatically when exporting a ``MESSAGE``-scheme
-*    ``ixmp``.Scenario to gdx.
+*    ``ixmp.Scenario`` to gdx.
 *    Note that in |MESSAGEix|, the elements of the ``year`` set are understood to be the last year in a period,
 *    see :ref:`this footnote <period_year_footnote>`.
 *
 * .. [#duration_time_year] The element 'year' in the set of subannual time slices ``time`` has the value of 1.
-*    This value is assigned by default when creating a new ``ixmp``.Scenario based on the ``MESSAGE`` scheme.
+*    This value is assigned by default when creating a new ``ixmp.Scenario`` based on the ``MESSAGE`` scheme.
 *
 * .. [#df_auto] These parameters are computed during the GAMS execution.
 ***
@@ -134,7 +134,7 @@ Parameter
 *    * - peak_load_factor [#peakload]_
 *      - ``node`` | ``commodity`` | ``year``
 *
-* .. [#demand] The parameter ``demand`` in a ``MESSAGE``-scheme ``ixmp``.Scenario is translated
+* .. [#demand] The parameter ``demand`` in a ``MESSAGE``-scheme ``ixmp.Scenario`` is translated
 *    to the parameter ``demand_fixed`` in the |MESSAGEix| implementation in GAMS. The variable ``DEMAND`` is introduced
 *    as an auxiliary reporting variable; it equals ``demand_fixed`` in a `MESSAGE`-standalone run and reports
 *    the final demand including the price response in an iterative `MESSAGE-MACRO` solution.
