@@ -733,7 +733,6 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 Parameters
-    total_cost(node, year_all)              total system costs net of trade costs and emissions taxes by node and year
     trade_cost(node, year_all)              net of commodity import costs and commodity export revenues by node and year
     import_cost(node, commodity, year_all)  import costs by commodity and node and year
     export_cost(node, commodity, year_all)  export revenues by commodity and node and year

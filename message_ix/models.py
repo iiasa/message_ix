@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 
 from ixmp import config
-from ixmp.model.gams import GAMSModel
+import ixmp.model.gams
 
 
 #: Solver options used by :meth:`message_ix.Scenario.solve`.
@@ -21,7 +21,8 @@ def _template(*parts):
     return str(Path('{model_dir}', *parts))
 
 
-class MESSAGE(GAMSModel):
+class GAMSModel(ixmp.model.gams.GAMSModel):
+    """Extended :class:`ixmp.model.gams.GAMSModel` for MESSAGE & MACRO."""
     name = 'MESSAGE'
 
     #: Default model options.
@@ -38,7 +39,7 @@ class MESSAGE(GAMSModel):
             '--iter="{}"'.format(
                 _template('output', 'MsgIterationReport_{case}.gdx')),
             ],
-    }, GAMSModel.defaults)
+    }, ixmp.model.gams.GAMSModel.defaults)
 
     @classmethod
     def read_version(cls):
@@ -67,9 +68,9 @@ class MESSAGE(GAMSModel):
     def run(self, scenario):
         """Execute the model.
 
-        :class:`MESSAGE` creates a file named ``cplex.opt`` in the model
-        directory, containing the options in :obj:`DEFAULT_CPLEX_OPTIONS`,
-        or any overrides passed to :meth:`~message_ix.Scenario.solve`.
+        GAMSModel creates a file named ``cplex.opt`` in the model directory
+        containing the options in :obj:`DEFAULT_CPLEX_OPTIONS`, or any
+        overrides passed to :meth:`~message_ix.Scenario.solve`.
         """
         # This is not safe against race conditions; if two runs are kicked off
         # simulatenously with the same dp.model_path, then they will try to
@@ -94,11 +95,15 @@ class MESSAGE(GAMSModel):
         return result
 
 
-class MESSAGE_MACRO(MESSAGE):
-    name = 'MESSAGE-MACRO'
+class MESSAGE(GAMSModel):
+    name = 'MESSAGE'
 
-    #: MESSAGE-MACRO uses the GAMS ``break;`` statement, and thus requires GAMS
-    #: 24.8.1 or later.
+
+class MACRO(GAMSModel):
+    name = 'MACRO'
+
+    #: MACRO uses the GAMS ``break;`` statement, and thus requires GAMS 24.8.1
+    #: or later.
     GAMS_min_version = '24.8.1'
 
     def __init__(self, *args, **kwargs):
@@ -109,6 +114,10 @@ class MESSAGE_MACRO(MESSAGE):
             raise RuntimeError(message)
 
         super().__init__(*args, **kwargs)
+
+
+class MESSAGE_MACRO(MACRO):
+    name = 'MESSAGE-MACRO'
 
 
 def gams_release():

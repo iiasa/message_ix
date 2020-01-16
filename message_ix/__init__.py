@@ -5,10 +5,11 @@ from ixmp import config
 from ixmp.model import MODELS
 
 from .core import Scenario  # noqa: F401
-from .models import MESSAGE, MESSAGE_MACRO
+from .models import MACRO, MESSAGE, MESSAGE_MACRO
 
 
 __all__ = [
+    'MACRO',
     'MESSAGE',
     'MESSAGE_MACRO',
     'MODELS',
@@ -21,6 +22,7 @@ config.register('message model dir', Path, Path(__file__).parent / 'model')
 
 
 # Register models with ixmp core
+MODELS['MACRO'] = MACRO
 MODELS['MESSAGE'] = MESSAGE
 MODELS['MESSAGE-MACRO'] = MESSAGE_MACRO
 

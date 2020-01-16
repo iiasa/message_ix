@@ -91,6 +91,8 @@ Scalar
     max_adjustment     maximum adjustment in current iteration
     convergence_status status of convergence (1 if successful) / 0 /
     scaling            scaling factor to adjust step size when iteration oscillates / 1 /
+    max_it /%MAX_ITERATION%/
+    ctr /0/
 ;
 
 * declarations moved from solve files to avoid inclusion in loop
@@ -107,6 +109,13 @@ Parameters
 
     report_iteration(iteration,*)
 ;
+
+* variables to report back to user if needed
+Variables
+    N_ITER
+    MAX_ITER
+;
+
 
 price_init(node,sector,year_all) = 0 ;
 
@@ -133,6 +142,8 @@ if (check,
 LOOP(iteration,
 
 put_utility 'log' /"+++ Starting iteration ", ORD(iteration):0:0, " of MESSAGEix-MACRO... +++ " ;
+
+ctr = ctr + 1 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
 * solve MESSAGE model                                                                                                  *
@@ -273,6 +284,10 @@ $INCLUDE includes/aux_computation_time.gms
 *----------------------------------------------------------------------------------------------------------------------*
 * post-processing and export to gdx                                                                                    *
 *----------------------------------------------------------------------------------------------------------------------*
+
+N_ITER.L = ctr ;
+MAX_ITER.L = max_it ;
+
 
 $INCLUDE MESSAGE/reporting.gms
 
