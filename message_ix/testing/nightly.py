@@ -74,17 +74,23 @@ def fetch_scenarios(path, dbprops):
 
 
 def iter_scenarios():
-    with open(HERE.parents[2] / 'tests' / 'data' / 'scenarios.yaml', 'r') as f:
-        scenarios = yaml.safe_load(f)
+    try:
+        with open(HERE.parents[2] / 'tests' / 'data' / 'scenarios.yaml',
+                  'r') as f:
+            scenarios = yaml.safe_load(f)
 
-    for id, data in scenarios.items():
-        yield id, (
-            data['model'],
-            data['scenario'],
-            data['solve'],
-            data.get('solve_options', {}),
-            data['cases']
-        )
+        for id, data in scenarios.items():
+            yield id, (
+                data['model'],
+                data['scenario'],
+                data['solve'],
+                data.get('solve_options', {}),
+                data['cases']
+            )
+    except FileNotFoundError as e:
+        msg = 'Caught error: {}. Did you install message_ix using `$ pip ' \
+              'install --editable`?' .format(str(e))
+        raise FileNotFoundError(msg)
 
 
 def make_db(path):
