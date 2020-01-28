@@ -304,11 +304,6 @@ class Scenario(ixmp.Scenario):
         >>> s.add_horizon({'year': [2010, 2020]}, 2020)
 
         """
-        # To check that there is not a previously defined horizon. If so,
-        # delete it
-        if self.set("year"):
-            self.remove_set("year")
-
         if isinstance(year, dict):
             if 'year' not in year:
                 raise ValueError('"year" must be a dict key, in temporal sets')
@@ -325,8 +320,8 @@ class Scenario(ixmp.Scenario):
             if firstmodelyear:
                 first = firstmodelyear
             else:
-                first = year['firstmodelyear'] if 'firstmodelyear' \
-                                            in year else horizon[0]
+                first = year['firstmodelyear'] if 'firstmodelyear' in year \
+                    else horizon[0]
 
             self.add_cat('year', 'firstmodelyear', first, is_unique=True)
         else:
