@@ -13,16 +13,17 @@ Filing issues for bugs and enhancements
 
 We use Github **issues** for several purposes:
 
-- Ask and answer questions about intended behaviour or issues running the framework or related models.
-- Report bugs, i.e. unintended or undocumented behaviour.
-- Request changes to behaviour.
-- Request specific enhancements and new features, both urgent and long-term/low-priority.
+- Ask and answer *questions* about intended behaviour or issues running the framework or related models.
+- Report *bugs*, i.e. unintended or undocumented behaviour.
+- Request *changes* to exiting behaviour.
+- Request specific *enhancements* and *new features*, both urgent and long-term/low-priority.
 - Discuss and design of other improvements.
 
-Please search through open *and* closed issues for *both* the `message_ix <https://github.com/iiasa/message_ix/issues?q=is:issue>`_ and `ixmp <https://github.com/iiasa/ixmp/issues?q=is:issue>`_ repositories.
+Please search through open *and* closed issues for *both* the `message_ix`__ and `ixmp <https://github.com/iiasa/ixmp/issues?q=is:issue>`_ repositories.
 Review any related issues.
 Then, if your issue is not found, `open a new one <https://github.com/iiasa/message_ix/issues/new>`_.
 
+__ https://github.com/iiasa/message_ix/issues?q=is:issue
 
 Contributing code via Github PRs
 --------------------------------
@@ -34,18 +35,20 @@ Register a Github account, if you do not already have one.
 1. Choose a repository
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Decide: to which part of the |MESSAGEix| software stack should your code be added?
+Decide which part of the |MESSAGEix| software stack is the appropriate location for your code:
 
-``ixmp``
+:mod:`ixmp`
    Contributions not specific to |MESSAGEix| model framework, e.g. that could be used for other, non-MESSAGE models.
-``message_ix``
+
+   :mod:`ixmp_source`
+      Java / JDBC backend for ``ixmp``.
+
+:mod:`message_ix`
    Contributions not specific to *any particular MESSAGEix* model instance.
    Additions to ``message_ix`` should be usable in any MESSAGE-scheme model.
-``message_data`` or ``message_doc``
+:mod:`message_data` or :mod:`message_doc`
    Contributions to the MESSAGE-GLOBIOM family of models, including the global
    model; and its documentation, respectively.
-``ixmp_source``
-   Java / JDBC backend for ``ixmp``.
 
 2. Fork, branch, and open a pull request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -57,8 +60,10 @@ Create a branch with an appropriate name:
 - ``issue/1234`` if you are addressing a specific issue.
 - ``feature/do-something`` if you are adding a new feature.
 
-Open a PR (e.g. on `message_ix <https://github.com/iiasa/message_ix/pulls>`_) to merge your code into the ``master`` branch.
+Open a PR (e.g. on `message_ix`__) to merge your code into the ``master`` branch.
 The ``message_ix`` and ``ixmp`` repositories each have a template for the text of the PR, including the minimum requirements:
+
+__ https://github.com/iiasa/message_ix/pulls
 
 - A title and one-sentence summary of the change.
   This is like the abstract of a publication: it should help a developer/reviewer/user quickly learn what the PR is about.
@@ -69,8 +74,10 @@ The ``message_ix`` and ``ixmp`` repositories each have a template for the text o
 Optionally:
 
 - Include a longer description of the design, or any changes whose purpose is not clear by inspecting code.
-- Put “WIP:” at the start of the PR title to indicate “work in progress” while you continue to add commits.
+- Put “WIP:” or the construction sign Unicode character (🚧) at the start of the PR title to indicate “work in progress” while you continue to add commits; or use GitHub's `'draft' pull requests`__.
   This is good development practice: it ensures the automatic checks pass as you add to the code on your branch.
+
+__ https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests#draft-pull-requests
 
 3. Ensure checks pass
 ~~~~~~~~~~~~~~~~~~~~~
@@ -125,7 +132,7 @@ Versions and releases
 ---------------------
 
 - We use `semantic versioning <https://semver.org>`_.
-- We keep at least two active milestones on each of the ``message_ix`` and ``ixmp`` repositories:
+- We keep at least two active milestones on each of the message_ix and ixmp repositories:
 
   - The next minor version. E.g. if the latest release was 3.5, the next minor release/milestone is 3.6.
   - The next major version. E.g. 4.0.
@@ -142,9 +149,9 @@ Contributing tutorials
 ----------------------
 
 Developers *and users* of the |MESSAGEix| framework are welcome to contribute **tutorials**, according to the following guidelines.
-Per the license and CLA, tutorials will become part of the ``message_ix`` test suite and will be publicly available.
+Per the license and CLA, tutorials will become part of the message_ix test suite and will be publicly available.
 
-Developers **must** ensure new features (including ``message_ix.tools`` submodules) are fully documented.
+Developers **must** ensure new features (including :mod:`message_ix.tools` submodules) are fully documented.
 This can be done via the API documentation (this site) and, optionally, a tutorial.
 These have complementary purposes:
 

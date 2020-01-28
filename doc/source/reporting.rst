@@ -3,9 +3,8 @@ Postprocessing and reporting
 
 .. warning::
 
-   :mod:`message_ix.reporting` is **experimental** in message_ix 1.2 and only
-   supports Python 3. The API and functionality may change without advance
-   notice or a deprecation period in subsequent releases.
+   :mod:`message_ix.reporting` is **experimental** in message_ix 2.0.
+   The API and functionality may change without advance notice or a deprecation period in subsequent releases.
 
 The |ixmp| provides powerful features to perform calculations and other postprocessing after a :class:`message_ix.Scenario` has been solved by the associated model. The |MESSAGEix| framework uses these features to provide zero-configuration reporting of models built on the framework.
 
@@ -305,7 +304,7 @@ controlled by:
 
    **Notes:**
 
-   A Key has the same hash, and compares equal to its :type:`str`.
+   A Key has the same hash, and compares equal to its :class:`str` representation.
    ``repr(key)`` prints the Key in angle brackets ('<>') to signify that it is a Key object.
 
    >>> str(k1)

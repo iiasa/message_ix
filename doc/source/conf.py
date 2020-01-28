@@ -65,8 +65,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'MESSAGEix'
-copyright = u'2018, IIASA, Energy Program'
-author = u'IIASA, Energy Program'
+copyright = u'2020, IIASA, Energy Program'
+author = u'MESSAGEix Developers'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

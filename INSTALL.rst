@@ -9,14 +9,20 @@ Install GAMS
 1. Download the latest version of `GAMS`_ for your operating system; run the
    installer.
 
+   .. note:: MESSAGE-MACRO requires GAMS 24.8.1 or later (see
+      :attr:`.MESSAGE_MACRO.GAMS_min_version`).
+
 2. Add GAMS to the ``PATH`` environment variable. This is **required** in order
-   for |MESSAGEix| to run the mathematical model core:
+   for |MESSAGEix| to run the mathematical model core.
 
    - on Windows, in the GAMS installer…
-      - Check the box labeled “Use advanced installation mode.”
-      - Check the box labeled “Add GAMS directory to PATH environment variable”
-        on the Advanced Options page.
-   - on macOS or Linux, add the following line to your ``.bash_profile`` (Mac) or ``.bashrc`` (Linux)::
+
+     - Check the box labeled “Use advanced installation mode.”
+     - Check the box labeled “Add GAMS directory to PATH environment variable”
+       on the Advanced Options page.
+
+   - on macOS or Linux, add the following line to your ``.bash_profile`` (macOS)
+     or ``.bashrc`` (Linux)::
 
           export PATH=$PATH:/path/to/gams-directory-with-gams-binary
 
@@ -37,7 +43,6 @@ from source code (next section).
 5. Install the ``message-ix`` package::
 
     $ conda install -c conda-forge message-ix
-
 
 Install |MESSAGEix| from source
 -------------------------------
@@ -66,9 +71,17 @@ Install |MESSAGEix| from source
     $ pip install --editable .[tests]
     $ py.test tests
 
+Common issues
+-------------
+
+No JVM shared library file (jvm.dll) found
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you get an error containing “No JVM shared library file (jvm.dll) found” when creating a :class:`Platform` object (e.g. ``mp = ix.Platform(driver='HSQLDB')``), it is likely that you need to set the ``JAVA_HOME`` environment variable (see for example `these instructions`_).
 
 .. _`GAMS`: http://www.gams.com
 .. _`Anaconda`: https://www.anaconda.com/distribution/#download-section
 .. _`ixmp`: https://github.com/iiasa/ixmp
 .. _`Github Desktop`: https://desktop.github.com
 .. _`README`: https://github.com/iiasa/message_ix#install-from-source-advanced-users
+.. _`these instructions`: https://javatutorial.net/set-java-home-windows-10

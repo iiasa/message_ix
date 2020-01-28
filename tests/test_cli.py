@@ -28,7 +28,15 @@ def test_copy_model(message_ix_cli, tmp_path, tmp_env):
     assert config.get('message model dir') == tmp_path
 
 
-@pytest.mark.parametrize('opts', ['', '--branch=master', '--tag=1.2.0'])
+@pytest.mark.parametrize('opts', [
+    # During release prep, 'dl' will try to download e.g. v2.0.0, which does
+    # not yet exist; so the test fails. Use this line:
+    pytest.param('', marks=pytest.mark.xfail),
+    # Otherwise (normal state on master), use this line:
+    # '',
+    '--branch=master',
+    '--tag=1.2.0',
+])
 def test_dl(message_ix_cli, opts, tmp_path):
     r = message_ix_cli('dl', opts, str(tmp_path))
     if r.exit_code != 0:

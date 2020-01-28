@@ -1,6 +1,3 @@
-# for Py2 compatibility - to be removed as part of release 2.0
-from __future__ import division
-
 from message_ix import Scenario
 import numpy.testing as npt
 
