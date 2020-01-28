@@ -143,6 +143,7 @@ def test_add_horizon(test_mp):
     exp = [2020]
     npt.assert_array_equal(obs, exp)
 
+
 def test_vintage_and_active_years(test_mp):
     scen = Scenario(test_mp, **SCENARIO['dantzig'], version='new')
 
