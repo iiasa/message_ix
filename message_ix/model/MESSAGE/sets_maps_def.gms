@@ -5,8 +5,11 @@
 * =============================
 *
 * This file contains the definition of all sets and mappings used in |MESSAGEix|.
+* The short mathematical notation in the **Notation** column of the tables below is used
+* in the mathematical description relative to the GAMS code.
 ***
 
+* IMPORTANT
 * indices to mapping sets will always be in the following order:
 * lvl_spatial, lvl_temporal,
 * node_location, tec, year_vintage, year_actual, mode, commodity, level, grade,
@@ -70,7 +73,7 @@ $ONEMPTY
 *      - Set of constraints on shares of technologies and commodities
 *    * - relation [#relations]_
 *      - :math:`r \in R`
-*      - Set of generic linear constraints
+*      - Set of generic relations (linear constraints)
 *    * - lvl_spatial
 *      -
 *      - Set of spatial hierarchy levels (global, region, country, grid cell)
@@ -79,7 +82,8 @@ $ONEMPTY
 *      - Set of temporal hierarchy levels (year, season, day, hour)
 *    * - rating
 *      - :math:`q \in Q`
-*      - Identifies the 'quality' of the renewable energy potential
+*      - Identifies the 'quality' of the renewable energy potential (rating of non-dispatchable
+*        technologies relative to aggregate commodity use)
 *
 * .. [#node] The set ``node`` includes spatial units across all levels of spatial disaggregation
 *    (global, regions, countries, basins, grid cells).
@@ -188,19 +192,19 @@ Alias(mode, mode2);
 *      - Category types for nodes
 *    * - cat_node (type_node,node)
 *      - :math:`n \in N(\widehat{n})`
-*      - Category mapping between node types and nodes
+*      - Category mapping between node types and nodes (all nodes that are subnodes of node :math:`\widehat{n}`)
 *    * - type_tec [#type_tec]_
 *      - :math:`\widehat{t} \in \widehat{T}`
 *      - Category types for technologies
 *    * - cat_tec (type_tec,tec) [#type_tec]_
 *      - :math:`t \in T(\widehat{t})`
-*      - Category mapping between tec types and technologies
+*      - Category mapping between tec types and technologies (all technologies mapped to the category ``type_tec`` :math:`\widehat{t}`)
 *    * - inv_tec (tec) [#inv_tec]_
 *      - :math:`t \in T^{INV} \subseteq T`
-*      - Specific subset of investment technologies
+*      - Specific subset of investment technologies (all technologies with investment decisions and capacity constraints)
 *    * - renewable_tec (tec) [#renewable_tec]_
 *      - :math:`t \in T^{REN} \subseteq T`
-*      - Specific subset of renewable-energy technologies
+*      - Specific subset of renewable-energy technologies (all technologies which draw their input from the renewable level)
 *    * - addon(tec)
 *      - 
 *      - Category mapping technologies that are an add-on to other (parent) technologies
@@ -211,17 +215,17 @@ Alias(mode, mode2);
 *      - 
 *      - Category mapping add-on technologies to respective add-on technology types
 *    * - type_year
-*      - 
+*      - :math:`\widehat{y} \in \widehat{Y}`
 *      - Category types for year aggregations
 *    * - cat_year(type_year,year_all)
-*      - 
-*      - Category mapping years to respective categories
+*      - :math:`y \in Y(\widehat{y})`
+*      - Category mapping years to respective categories (all years mapped to the category ``type_year`` :math:`\widehat{y}`)
 *    * - type_emission
 *      - :math:`\widehat{e} \in \widehat{E}`
 *      - Category types for emissions (greenhouse gases, pollutants, etc.)
 *    * - cat_emission (type_emission,emission)
 *      - :math:`e \in E(\widehat{e})`
-*      - Category mapping between emission types and emissions
+*      - Category mapping between emission types and emissions (all emissions mapped to the category ``type_emission`` :math:`\widehat{e}`)
 *    * - type_tec_land (type_tec) [#type_tec_land]_
 *      - :math:`\widehat{t} \in \widehat{T}^{LAND} \subseteq \widehat{T}`
 *      - Mapping set of technology types and land use

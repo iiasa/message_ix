@@ -11,45 +11,8 @@
 *
 * For the complete list of sets, mappings and parameters,
 * refer to the auto-documentation pages :ref:`sets_maps_def` and :ref:`parameter_def`.
-***
-
-*----------------------------------------------------------------------------------------------------------------------*
-* Notation declaration                                                                                                 *
-*----------------------------------------------------------------------------------------------------------------------*
-
-***
-* Notation declaration
-* --------------------
-* The following short notation is used in the mathematical description relative to the GAMS code:
-*
-* Mathematical notation of sets
-* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-* ================================== ===================================================================================
-* Math notation                      GAMS set & index notation
-* ================================== ===================================================================================
-* :math:`n \in N`                    Node (across spatial hierarchy levels)
-* :math:`y \in Y`                    Year (all periods including historical and model horizon)
-* :math:`y \in Y^M \subset Y`        Time periods included in model horizon
-* :math:`y \in Y^H \subset Y`        Historical time periods (prior to first model period)
-* :math:`c \in C`                    Vommodity
-* :math:`l \in L`                    Level
-* :math:`g \in G`                    Grade
-* :math:`t \in T`                    Technology (a.k.a tec)
-* :math:`h \in H`                    Time (subannual time periods)
-* :math:`m \in M`                    Mode
-* :math:`q \in Q`                    Rating of non-dispatchable technologies relative to aggregate commodity use
-* :math:`e \in E`                    Emission, pollutants
-* :math:`s \in S`                    Scenarios of land use (for land-use model emulator)
-* :math:`u \in U`                    Land-use types
-* :math:`r \in R`                    Set of generic relations (linear constraints)
-* :math:`t \in T^{INV} \subseteq T`  All technologies with investment decisions and capacity constraints
-* :math:`t \in T^{REN} \subseteq T`  All technologies which draw their input from the renewable level
-* :math:`n \in N(\widehat{n})`       All nodes that are subnodes of node :math:`\widehat{n}`
-* :math:`y \in Y(\widehat{y})`       All years mapped to the category ``type_year`` :math:`\widehat{y}`
-* :math:`t \in T(\widehat{t})`       All technologies mapped to the category ``type_tec`` :math:`\widehat{t}`
-* :math:`e \in E(\widehat{e})`       All emissions mapped to the category ``type_emission`` :math:`\widehat{e}`
-* ================================== ===================================================================================
-*
+* The mathematical notation that is used to represent sets and mappings in the equations below
+* can also be found in the tables in :ref:`sets_maps_def`.
 ***
 
 *----------------------------------------------------------------------------------------------------------------------*
