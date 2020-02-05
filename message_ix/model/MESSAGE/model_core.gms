@@ -115,15 +115,15 @@ Variables
 ***
 * Auxiliary variables
 * ^^^^^^^^^^^^^^^^^^^
-* ==================================================================== ========================================================================
+* ==================================================================== ======================================================================================================
 * Variable                                                             Explanatory text
-* ==================================================================== ========================================================================
+* ==================================================================== ======================================================================================================
 * :math:`DEMAND_{n,c,l,y,h} \in \mathbb{R}`                            Demand level (in equilibrium with MACRO integration)
-* :math:`PRICE\_COMMODITY_{n,c,l,y,h} \in \mathbb{R}`                  Commodity price (undiscounted marginals of the commodity balances)
-* :math:`PRICE\_EMISSION_{n,\widehat{e},\widehat{t},y} \in \mathbb{R}` Emission price (undiscounted marginals of EMISSION_BOUND constraint)
+* :math:`PRICE\_COMMODITY_{n,c,l,y,h} \in \mathbb{R}`                  Commodity price (undiscounted marginals of :ref:`commodity_balance_gt` and :ref:`commodity_balance_lt`)
+* :math:`PRICE\_EMISSION_{n,\widehat{e},\widehat{t},y} \in \mathbb{R}` Emission price (undiscounted marginals of :ref:`emission_constraint`)
 * :math:`COST\_NODAL\_NET_{n,y} \in \mathbb{R}`                        System costs at the node level net of energy trade revenues/cost
 * :math:`GDP_{n,y} \in \mathbb{R}`                                     Gross domestic product (GDP) in market exchange rates for MACRO reporting
-* ==================================================================== ========================================================================
+* ==================================================================== ======================================================================================================
 *
 ***
 
@@ -554,6 +554,8 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
     )$( map_commodity(node,commodity,level,year,time) AND NOT level_resource(level) AND NOT level_renewable(level) )
 
 ***
+* .. _commodity_balance_gt:
+*
 * Equation COMMODITY_BALANCE_GT
 * """""""""""""""""""""""""""""
 * This constraint ensures that supply is greater or equal than demand for every commodity-level combination.
@@ -1689,6 +1691,8 @@ EMISSION_EQUIVALENCE(node,emission,type_tec,year)..
 ***
 * Bound on emissions
 * ^^^^^^^^^^^^^^^^^^
+*
+* .. _emission_constraint:
 *
 * Equation EMISSION_CONSTRAINT
 * """"""""""""""""""""""""""""
