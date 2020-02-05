@@ -47,6 +47,7 @@
 * :math:`EMISS_{n,e,\widehat{t},y} \in \mathbb{R}`         Auxiliary variable for aggregate emissions by technology type
 * :math:`REL_{r,n,y} \in \mathbb{R}`                       Auxiliary variable for left-hand side of relations (linear constraints)
 * :math:`COMMODITY\_USE_{n,c,l,y} \in \mathbb{R}`          Auxiliary variable for amount of commodity used at specific level
+* :math:`COMMODITY\_BALANCE_{n,c,l,y,h} \in \mathbb{R}`    Auxiliary variable for right-hand side of :ref:`commodity_balance`
 * ======================================================== ====================================================================================
 *
 * The index :math:`y^V` is the year of construction (vintage) wherever it is necessary to
@@ -518,8 +519,8 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 *
 * Auxiliary COMMODITY_BALANCE
 * """""""""""""""""""""""""""
-* For the commodity balance constraints below, we introduce an auxiliary `COMMODITY_BALANCE`. This is implemented
-* as a GAMS `$macro` function.
+* For the commodity balance constraints below, we introduce an auxiliary variable called `COMMODITY_BALANCE`. This is implemented
+* as a GAMS ``$macro`` function.
 *
 *  .. math::
 *     \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} output_{n^L,t,y^V,y,m,n,c,l,h^A,h}
