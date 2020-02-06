@@ -307,7 +307,7 @@ Parameters
 *    * - initial_new_capacity_lo
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - growth_new_capacity_lo [#mpx]_
-*      - ``node_loc`` | ``tec_actual`` | ``year_vtg``
+*      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - soft_new_capacity_lo [#mpx]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - initial_activity_up [#mpa]_
