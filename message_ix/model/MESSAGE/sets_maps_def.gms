@@ -332,7 +332,7 @@ Sets
     map_resource(node,commodity,grade,year_all)  mapping of resources and grades to node over time
     map_ren_grade(node,commodity,grade,year_all) mapping of renewables and grades to node over time
     map_ren_com(node,tec,commodity,year_all)     mapping of technologies to renewable energy source as input
-    map_rating(node,tec,commodity,level,rating,year_all) mapping of technologues to ratings bin assignment
+    map_rating(node,tec,commodity,level,rating,year_all) mapping of technologies to ratings bin assignment
 
     map_commodity(node,commodity,level,year_all,time)    mapping of commodity-level to node and time
     map_stocks(node,commodity,level,year_all)    mapping of commodity-level to node and time
@@ -377,7 +377,7 @@ Sets
 *
 * .. note::
 *
-*    These sets are also **atuomatically generated**. To see the full list of mapping sets for bounds, please refere to the documentation
+*    These sets are also **automatically generated**. To see the full list of mapping sets for bounds, please refer to the documentation
 *    file found in ``message_ix\model\MESSAGE\sets_maps_def.gms``.
 ***
 
@@ -422,7 +422,7 @@ Sets
 *
 * .. note::
 *
-*    These sets are also **atuomatically generated**. To see the full list of mapping sets for fixed variables, please refere to the documentation
+*    These sets are also **automatically generated**. To see the full list of mapping sets for fixed variables, please refere to the documentation
 *    file found in ``message_ix\model\MESSAGE\sets_maps_def.gms``.
 ***
 
