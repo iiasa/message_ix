@@ -224,10 +224,10 @@ Equations
     COMMODITY_BALANCE_LT            commodity supply lower than or equal demand
     STOCKS_BALANCE                  commodity inter-temporal balance of stocks
     CAPACITY_CONSTRAINT             capacity constraint for technology (by sub-annual time slice)
-    CAPACITY_MAINTENANCE_HIST       constraint for capactiy maintainance  historical installation (built before start of model horizon)
-    CAPACITY_MAINTENANCE_NEW        constraint for capactiy maintainance of new capacity built in the current period (vintage == year)
-    CAPACITY_MAINTENANCE            constraint for capacity maintainance over the technical lifetime
-    OPERATION_CONSTRAINT            constraint on maximum yearly operation (scheduled down-time for maintainance)
+    CAPACITY_MAINTENANCE_HIST       constraint for capacity maintenance  historical installation (built before start of model horizon)
+    CAPACITY_MAINTENANCE_NEW        constraint for capacity maintenance of new capacity built in the current period (vintage == year)
+    CAPACITY_MAINTENANCE            constraint for capacity maintenance over the technical lifetime
+    OPERATION_CONSTRAINT            constraint on maximum yearly operation (scheduled down-time for maintenance)
     MIN_UTILIZATION_CONSTRAINT      constraint for minimum yearly operation (aggregated over the course of a year)
     RENEWABLES_POTENTIAL_CONSTRAINT constraint on renewable resource potential
     RENEWABLES_CAPACITY_REQUIREMENT lower bound on required overcapacity when using lower grade potentials
@@ -237,7 +237,7 @@ Equations
     COMMODITY_USE_LEVEL             aggregate use of commodity by level as defined by total input into technologies
     ACTIVITY_BY_RATING              constraint on auxiliary rating-specific activity variable by rating bin
     ACTIVITY_RATING_TOTAL           equivalence of auxiliary rating-specific activity variables to actual activity
-    FIRM_CAPACITY_PROVISION         contribution of dispatchable technologies to auxilary firm-capacity variable
+    FIRM_CAPACITY_PROVISION         contribution of dispatchable technologies to auxiliary firm-capacity variable
     SYSTEM_RELIABILITY_CONSTRAINT   constraint on total system reliability (firm capacity)
     SYSTEM_FLEXIBILITY_CONSTRAINT   constraint on total system flexibility
     NEW_CAPACITY_BOUND_UP           upper bound on technology capacity investment
@@ -342,7 +342,7 @@ OBJECTIVE..
 
 COST_ACCOUNTING_NODAL(node, year)..
     COST_NODAL(node, year) =E=
-* resource extration costs
+* resource extraction costs
     SUM((commodity,grade)$( map_resource(node,commodity,grade,year) ),
          resource_cost(node,commodity,grade,year) * EXT(node,commodity,grade,year) )
 * technology capacity investment, maintainance, operational cost
