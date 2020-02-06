@@ -822,12 +822,12 @@ RENEWABLES_CAPACITY_REQUIREMENT(node,inv_tec,commodity,year)$(
 * jointly with a parent technology (e.g., abatement option, SO2 scrubber, power plant cooling technology).
 *
 *   .. math::
-*      \sum_{\substack{t' \sim t^A, y^V \leq y}} ACT_{n,t',y^V,y,m,h}
+*      \sum_{\substack{t^a, y^V \leq y}} ACT_{n,t^a,y^V,y,m,h}
 *      \leq
 *      \sum_{\substack{t, y^V \leq y}}
-*          addon\_up_{n,t^a,y,m,h,t^A} \cdot
-*          addon\_conversion_{n,t',y^V,y,m,h} \cdot
-*          ACT_{n,t,y^V,y,m,h}
+*          & addon\_up_{n,t,y,m,h,\widehat{t^a}} \cdot
+*          addon\_conversion_{n,t,y^V,y,m,h,\widehat{t^a}} \\
+*          & \cdot ACT_{n,t,y^V,y,m,h} \quad \forall \ t^a \in T^{A}
 *
 ***
 ADDON_ACTIVITY_UP(node,type_addon,year,mode,time)..
@@ -855,16 +855,16 @@ ADDON_ACTIVITY_UP(node,type_addon,year,mode,time)..
 * This constraint provides a lower bound on the activity of an addon technology that has to be operated
 * jointly with a parent technology (e.g., power plant cooling technology). The parameter `addon_lo` allows to define
 * a minimum level of operation of addon technologies relative to the activity of the parent technology.
-* If `addon_minimum = 1`, this means that it is mandatory to operate the addon technology at the same level as the
+* If `addon_lo = 1`, this means that it is mandatory to operate the addon technology at the same level as the
 * parent technology (i.e., full mitigation).
 *
 *   .. math::
-*      \sum_{\substack{t' \sim t^A, y^V \leq y}} ACT_{n,t',y^V,y,m,h}
+*      \sum_{\substack{t^a, y^V \leq y}} ACT_{n,t^a,y^V,y,m,h}
 *      \geq
 *      \sum_{\substack{t, y^V \leq y}}
-*          addon\_lo_{n,t^a,y,m,h,t^A} \cdot
-*          addon\_conversion_{n,t',y^V,y,m,h} \cdot
-*          ACT_{n,t,y^V,y,m,h}
+*          & addon\_lo_{n,t,y,m,h,\widehat{t^a}} \cdot
+*          addon\_conversion_{n,t,y^V,y,m,h,\widehat{t^a}} \\
+*          & \cdot ACT_{n,t,y^V,y,m,h} \quad \forall \ t^a \in T^{A}
 *
 ***
 ADDON_ACTIVITY_LO(node,type_addon,year,mode,time)..

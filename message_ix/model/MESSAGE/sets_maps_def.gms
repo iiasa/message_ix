@@ -206,14 +206,14 @@ Alias(mode, mode2);
 *      - :math:`t \in T^{REN} \subseteq T`
 *      - Specific subset of renewable-energy technologies (all technologies which draw their input from the renewable level)
 *    * - addon(tec)
-*      -
-*      - Category mapping technologies that are an add-on to other (parent) technologies
+*      - :math:`t^a \in T^{A} \subseteq T`
+*      - Specific subset of technologies that are an add-on to other (parent) technologies
 *    * - type_addon
-*      -
+*      - :math:`\widehat{t^a} \in \widehat{T^A}`
 *      - Category types for add-on technologies (that can be applied mutually exclusive)
 *    * - cat_addon(type_addon,addon)
-*      -
-*      - Category mapping add-on technologies to respective add-on technology types
+*      - :math:`t^a \in T^A(\widehat{t^a})`
+*      - Category mapping add-on technologies to respective add-on technology types (all add-on technologies mapped to the category ``type_addon`` :math:`\widehat{t}`)
 *    * - type_year
 *      - :math:`\widehat{y} \in \widehat{Y}`
 *      - Category types for year aggregations
