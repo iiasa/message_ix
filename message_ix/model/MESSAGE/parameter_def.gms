@@ -192,11 +192,11 @@ Parameter
 *    * - min_utilization_factor [#tecvintage]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act``
 *    * - rating_bin [#rating]_
-*      - ``node`` | ``technology`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
+*      - ``node`` | ``tec`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
 *    * - reliability_factor [#peakload]_
-*      - ``node`` | ``technology`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
+*      - ``node`` | ``tec`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
 *    * - flexibility_factor [#flexfactor]_
-*      - ``node_loc`` | ``technology`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``commodity`` | ``level`` | ``time`` | ``rating``
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``commodity`` | ``level`` | ``time`` | ``rating``
 *    * - renewable_capacity_factor [#renewables]_
 *      - ``node_loc`` | ``commodity`` | ``grade`` | ``level`` | ``year``
 *    * - renewable_potential [#renewables]_
@@ -374,9 +374,9 @@ Parameters
 *    * - addon_conversion
 *      - ``node`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``time`` | ``type_addon``
 *    * - addon_up
-*      - ``node`` | ``tec`` | ``vintage`` | ``year`` | ``mode`` | ``time`` | ``type_addon``
+*      - ``node`` | ``tec`` | ``year_act`` | ``mode`` | ``time`` | ``type_addon``
 *    * - addon_lo
-*      - ``node`` | ``tec`` | ``vintage`` | ``year`` | ``mode`` | ``time`` | ``type_addon``
+*      - ``node`` | ``tec`` | ``year_act`` | ``mode`` | ``time`` | ``type_addon``
 *
 ***
 
@@ -477,15 +477,15 @@ Parameters
 *    * - Parameter name
 *      - Index names
 *    * - construction_time_factor
-*      - ``node`` | ``tec`` | ``year_all``
+*      - ``node`` | ``tec`` | ``year``
 *    * -  remaining_capacity
-*      - ``node`` | ``tec`` | ``year_all``
+*      - ``node`` | ``tec`` | ``year``
 *    * - end_of_horizon_factor
-*      - ``node`` | ``tec`` | ``year_all``
+*      - ``node`` | ``tec`` | ``year``
 *    * - beyond_horizon_lifetime
-*      - ``node`` | ``tec`` | ``year_all``
+*      - ``node`` | ``tec`` | ``year``
 *    * - beyond_horizon_factor
-*      - ``node`` | ``tec`` | ``year_all``
+*      - ``node`` | ``tec`` | ``year``
 *
 *
 ***
