@@ -206,13 +206,13 @@ Alias(mode, mode2);
 *      - :math:`t \in T^{REN} \subseteq T`
 *      - Specific subset of renewable-energy technologies (all technologies which draw their input from the renewable level)
 *    * - addon(tec)
-*      - 
+*      -
 *      - Category mapping technologies that are an add-on to other (parent) technologies
 *    * - type_addon
-*      - 
+*      -
 *      - Category types for add-on technologies (that can be applied mutually exclusive)
 *    * - cat_addon(type_addon,addon)
-*      - 
+*      -
 *      - Category mapping add-on technologies to respective add-on technology types
 *    * - type_year
 *      - :math:`\widehat{y} \in \widehat{Y}`
@@ -287,9 +287,13 @@ Alias(type_tec,type_tec_total);
 * Mappings sets
 * -------------
 *
-* These sets are generated automatically when exporting a ``MESSAGE``-scheme ``ixmp.Scenario`` to gdx using the API.
-* They are used in the GAMS model to reduce model size by excluding non-relevant variables and equations
-* (e.g., actitivity of a technology outside of its technical lifetime).
+* .. note::
+*
+*    These sets are **generated automatically** when exporting a ``MESSAGE``-scheme ``ixmp.Scenario`` to gdx using the API.
+*    They are used in the GAMS model to reduce model size by excluding non-relevant variables and equations
+*    (e.g., activity of a technology outside of its technical lifetime). These are **not** meant to be
+*    edited through the API when editing scenarios. Not all the ``Mapping sets`` are shown in the list below, to access
+*    the full list of mapping sets, please refer to the documentation file found in ``message_ix\model\MESSAGE\sets_maps_def.gms``.
 *
 * .. list-table::
 *    :widths: 40 60
@@ -319,11 +323,6 @@ Alias(type_tec,type_tec_total);
 *      - Mapping of technology to temporal dissagregation (time)
 *    * - map_tec_mode(node,tec,year_all,mode)
 *      - Mapping of technology to modes
-*
-* .. note::
-*
-*    To see the full list of mapping sets, please refere to the documentation
-*    file found in ``message_ix\model\MESSAGE\sets_maps_def.gms``.
 ***
 
 Sets
@@ -378,7 +377,7 @@ Sets
 *
 * .. note::
 *
-*    To see the full list of mapping sets for bounds, please refere to the documentation
+*    These sets are also **atuomatically generated**. To see the full list of mapping sets for bounds, please refere to the documentation
 *    file found in ``message_ix\model\MESSAGE\sets_maps_def.gms``.
 ***
 
@@ -423,7 +422,7 @@ Sets
 *
 * .. note::
 *
-*    To see the full list of mapping sets for fixed variables, please refere to the documentation
+*    These sets are also **atuomatically generated**. To see the full list of mapping sets for fixed variables, please refere to the documentation
 *    file found in ``message_ix\model\MESSAGE\sets_maps_def.gms``.
 ***
 
