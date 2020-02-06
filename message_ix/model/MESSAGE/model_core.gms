@@ -576,8 +576,8 @@ COMMODITY_BALANCE_GT(node,commodity,level,year,time)$( map_commodity(node,commod
 *
 * Equation COMMODITY_BALANCE_LT
 * """""""""""""""""""""""""""""
-* This constraint ensures the supply is smaller than or equal to the demand for all commodity-level combinatio
-* given in the :math:`balance\_equality_{c,l}`. In combination withe constraint above, it ensures that supply
+* This constraint ensures that the supply is smaller than or equal to the demand for all commodity-level combinations
+* given in the :math:`balance\_equality_{c,l}`. In combination with the constraint above, it ensures that supply
 * is (exactly) equal to demand.
 *
 *  .. math::
