@@ -990,10 +990,10 @@ ACTIVITY_RATING_TOTAL(node,tec,vintage,year,commodity,level,time)$(
 * Equation FIRM_CAPACITY_PROVISION
 * """"""""""""""""""""""""""""""""
 * Technologies where the reliability factor is defined with the rating `firm`
-* have an auxiliary variable :math:`CAP\_FIRM_{n,t,c,l,y,q}`, defined in terms of output.
+* have an auxiliary variable :math:`CAP\_FIRM_{n,t,c,l,y}`, defined in terms of output.
 *
 *   .. math::
-*      \sum_q CAP\_FIRM_{n,t,c,l,y,q}
+*      CAP\_FIRM_{n,t,c,l,y}
 *      = \sum_{y^V \leq y} & output_{n^L,t,y^V,y,m,n,c,l,h^A,h} \cdot duration\_time_h \\
 *        & \quad    \cdot capacity\_factor_{n,t,y^V,y,h} \cdot CAP_{n,t,y^Y,y}
 *      \quad \forall \ t \in T^{INV}
