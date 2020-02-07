@@ -1,5 +1,8 @@
-# Always track ixmp master
-git+git://github.com/iiasa/ixmp.git#egg=ixmp
+## Always track ixmp master
+#git+git://github.com/iiasa/ixmp.git@#egg=ixmp
+
+# Branch for https://github.com/iiasa/ixmp/pull/254
+git+git://github.com/khaeru/ixmp.git@post-2.0-cleanup#egg=ixmp
 
 # pyam-iamc
 # Temporary: see https://github.com/IAMconsortium/pyam/issues/259
