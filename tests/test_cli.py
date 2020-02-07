@@ -31,9 +31,9 @@ def test_copy_model(message_ix_cli, tmp_path, tmp_env):
 @pytest.mark.parametrize('opts', [
     # During release prep, 'dl' will try to download e.g. v2.0.0, which does
     # not yet exist; so the test fails. Use this line:
-    pytest.param('', marks=pytest.mark.xfail),
+    # pytest.param('', marks=pytest.mark.xfail),
     # Otherwise (normal state on master), use this line:
-    # '',
+    '',
     '--branch=master',
     '--tag=1.2.0',
 ])
