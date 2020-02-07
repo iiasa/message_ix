@@ -4,6 +4,8 @@ Next release
 All changes
 -----------
 
+- `#307 <https://github.com/iiasa/message_ix/pull/307>`_: adjust to deprecations in ixmp 2.0.
+
 
 v2.0.0 (2020-01-14)
 ===================
