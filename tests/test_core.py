@@ -2,9 +2,9 @@ import os
 
 import ixmp
 import numpy as np
-from numpy import testing as npt
+import numpy.testing as npt
 import pandas as pd
-import pandas.util.testing as pdt
+import pandas.testing as pdt
 import pytest
 
 from message_ix import Scenario
