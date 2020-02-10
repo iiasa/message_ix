@@ -90,16 +90,23 @@ PRODUCTS = (
         ('input', 'addon ACT')),
     ('addon out',
         ('output', 'addon ACT')),
+    ('addon pot',
+        ('addon up:n-tp-ya-m-h-t:full', 'addon ACT')),
 )
 
 #: Automatic quantities derived by other calculations.
 DERIVED = [
     ('tom:nl-t-yv-ya', (computations.add, 'fom:nl-t-yv-ya', 'vom:nl-t-yv-ya')),
     # addon_conversion broadcast across technology_addon
-    ('addon conversion:n-tp-yv-ya-m-h-t:full',
+    ('addon conversion:nl-tp-yv-ya-m-h-t:full',
         (partial(computations.broadcast_map,
                  rename={'t': 'tp', 'ta': 't', 'n': 'nl'}),
          'addon_conversion:n-t-yv-ya-m-h-type_addon',
+         'map_addon')),
+    ('addon up:nl-tp-ya-m-h-t:full',
+        (partial(computations.broadcast_map,
+                 rename={'t': 'tp', 'ta': 't', 'n': 'nl'}),
+         'addon_up:n-t-ya-m-h-type_addon',
          'map_addon')),
 ]
 
