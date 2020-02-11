@@ -1,5 +1,5 @@
 # Always track ixmp master
-git+git://github.com/iiasa/ixmp.git#egg=ixmp
+git+git://github.com/iiasa/ixmp.git@master#egg=ixmp
 
 # pyam-iamc
 # Temporary: see https://github.com/IAMconsortium/pyam/issues/259
