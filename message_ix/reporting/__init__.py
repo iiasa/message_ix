@@ -85,29 +85,31 @@ PRODUCTS = (
     ('land_emi',
         ('land_emission', 'LAND')),
     ('addon ACT',
-        ('addon conversion:n-tp-yv-ya-m-h-t:full', 'ACT')),
+        ('addon conversion:nl-t-yv-ya-m-h-type_addon:full', 'ACT')),
     ('addon in',
         ('input', 'addon ACT')),
     ('addon out',
         ('output', 'addon ACT')),
     ('addon pot',
-        ('addon up:n-tp-ya-m-h-t:full', 'addon ACT')),
+        ('addon up:nl-t-ya-m-h-type_addon:full', 'addon ACT')),
 )
 
 #: Automatic quantities derived by other calculations.
 DERIVED = [
     ('tom:nl-t-yv-ya', (computations.add, 'fom:nl-t-yv-ya', 'vom:nl-t-yv-ya')),
     # addon_conversion broadcast across technology_addon
-    ('addon conversion:nl-tp-yv-ya-m-h-t:full',
+    ('addon conversion:nl-t-yv-ya-m-h-type_addon:full',
         (partial(computations.broadcast_map,
-                 rename={'t': 'tp', 'ta': 't', 'n': 'nl'}),
+                 rename={'n': 'nl'}),
          'addon_conversion:n-t-yv-ya-m-h-type_addon',
          'map_addon')),
-    ('addon up:nl-tp-ya-m-h-t:full',
+    # here we need to read addon_up by parent technology and type_addon
+    ('addon up:nl-t-ya-m-h-type_addon:full',
         (partial(computations.broadcast_map,
-                 rename={'t': 'tp', 'ta': 't', 'n': 'nl'}),
+                 rename={'n': 'nl'}),
          'addon_up:n-t-ya-m-h-type_addon',
          'map_addon')),
+
 ]
 
 #: Quantities to automatically convert to IAMC format using
