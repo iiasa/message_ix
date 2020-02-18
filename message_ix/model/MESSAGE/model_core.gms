@@ -1994,5 +1994,5 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 Model MESSAGE_LP / all / ;
 
 MESSAGE_LP.holdfixed = 1 ;
-MESSAGE_LP.optfile = 2 ;
+MESSAGE_LP.optfile = 1 ;
 MESSAGE_LP.optcr = 0 ;
