@@ -373,7 +373,6 @@ Configuration
    ixmp.reporting.configure
    ixmp.reporting.utils.RENAME_DIMS
    ixmp.reporting.utils.REPLACE_UNITS
-   ixmp.reporting.utils.UNITS
 
 .. automethod:: ixmp.reporting.configure
 
@@ -393,7 +392,6 @@ Configuration
    variable.
 
 .. autodata:: REPLACE_UNITS
-.. autodata:: UNITS
 
 
 Utilities
@@ -403,7 +401,7 @@ Utilities
 
 .. automodule:: ixmp.reporting.utils
    :members:
-   :exclude-members: AttrSeries, RENAME_DIMS, REPLACE_UNITS, UNITS
+   :exclude-members: AttrSeries, RENAME_DIMS, REPLACE_UNITS
 
 .. automodule:: message_ix.reporting.pyam
    :members: collapse_message_cols
