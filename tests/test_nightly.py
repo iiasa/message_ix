@@ -41,8 +41,9 @@ def downloaded_scenarios(tmp_path_factory):
     yield dict(
         # TODO repack the archive without a 'db' directory, and remove from the
         #      path here
-        dbprops=path / 'db' / 'scenarios',
-        dbtype='HSQLDB',
+        backend='jdbc',
+        driver='hsqldb',
+        path=path / 'db' / 'scenarios',
     )
 
 
