@@ -38,6 +38,9 @@ class MESSAGE(GAMSModel):
             '--iter="{}"'.format(
                 _template('output', 'MsgIterationReport_{case}.gdx')),
             ],
+        # Disable the feature to put input/output GDX files, list files, etc.
+        # in a temporary directory
+        'use_temp_dir': False,
     }, GAMSModel.defaults)
 
     @classmethod
