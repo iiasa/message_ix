@@ -60,13 +60,13 @@ $env:PATH = $CR + ';' + $CR + '\Scripts;' + $CR + '\Library\bin;' + $env:PATH
 $env:RETICULATE_PYTHON = $CR + '\python.exe'
 
 Progress 'Update conda'
+# Search conda-forge in addition to the default channels, for e.g. JPype
+Exec { conda config --append channels conda-forge }
+
 # The installed conda on Appveyor workers is 4.5.x, while the latest is >4.7.
 # --quiet here and below suppresses progress bars, which show up as many lines
 # in the Appveyor build logs.
 Exec { conda update --yes --quiet conda pip }
-
-# Search conda-forge in addition to the default channels, for e.g. JPype
-Exec { conda config --append channels conda-forge }
 
 # NB at the corresponding location, travis-install.sh creates a new conda
 #    environment, and later activates it. This was attempted for Windows/
