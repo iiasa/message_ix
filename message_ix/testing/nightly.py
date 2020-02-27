@@ -95,7 +95,8 @@ def iter_scenarios():
 
 
 def make_db(path):
-    mp = ixmp.Platform(dbprops=path / 'scenarios', dbtype='HSQLDB')
+    mp = ixmp.Platform(backend='jdbc', driver='hsqldb',
+                       path=path / 'scenarios')
     for id, data in iter_scenarios():
         scen = message_ix.Scenario(mp, data['model'], data['scenario'],
                                    version='new')

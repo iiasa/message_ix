@@ -1,11 +1,10 @@
-import pytest
-import numpy as np
-from numpy import testing as npt
-import pandas.util.testing as pdt
-
 from ixmp import Platform
-from message_ix import Scenario
+from numpy import testing as npt
+import numpy as np
+import pandas.testing as pdt
+import pytest
 
+from message_ix import Scenario
 from message_ix.testing import (
     make_dantzig,
     models,

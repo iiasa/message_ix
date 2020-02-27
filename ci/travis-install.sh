@@ -13,8 +13,9 @@ which gams
 # -p: install prefix
 $CACHE/$CONDAFNAME -b -u -p $HOME/miniconda
 
-# Configure: give --yes for every command; search conda-forge in addition to
-# the default channels, for e.g. JPype
+# Configure:
+# - give --yes for every command
+# - search conda-forge in addition to the default channels, for e.g. JPype
 conda config --set always_yes true
 conda config --append channels conda-forge
 
