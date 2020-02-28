@@ -22,32 +22,33 @@ _idx_common = ['node', 'technology', 'level', 'year', 'time']
 
 # List of ixmp items for MESSAGE
 # NB only a partial list; see https://github.com/iiasa/message_ix/issues/254
-MESSAGE_ITEMS = (
+MESSAGE_ITEMS = {
     # Storage level
-    dict(ix_type='set', name='level_storage'),
+    'level_storage': dict(ix_type='set'),
     # Storage reservoir technology
-    dict(ix_type='set', name='storage_tec'),
+    'storage_tec': dict(ix_type='set'),
     # Mapping of storage reservoir to charger/discharger
-    dict(ix_type='set', name='map_tec_storage',
-         idx_sets=['technology', 'storage_tec']),
+    'map_tec_storage': dict(ix_type='set',
+                            idx_sets=['technology', 'storage_tec']),
     # Order of sub-annual time steps
-    dict(ix_type='par', name='time_seq', idx_sets=['lvl_temporal', 'time']),
+    'time_seq': dict(ix_type='par', idx_sets=['lvl_temporal', 'time']),
     # Relating content of storage in two different time steps (or
     # two diferent periods) together
-    dict(ix_type='par', name='relation_storage',
-         idx_sets=['node', 'technology', 'level', 'year', 'year', 'time',
-                   'time'],
-         idx_names=['node', 'technology', 'level', 'year_first', 'year_last',
-                    'time_first', 'time_last']),
+    'relation_storage': dict(
+        ix_type='par',
+        idx_sets=['node', 'technology', 'level', 'year', 'year', 'time',
+                  'time'],
+        idx_names=['node', 'technology', 'level', 'year_first', 'year_last',
+                   'time_first', 'time_last']),
     # Lower bound of storage reservoir
-    dict(ix_type='par', name='bound_storage_lo', idx_sets=_idx_common),
+    'bound_storage_lo': dict(ix_type='par', idx_sets=_idx_common),
     # Upper bound of storage reservoir
-    dict(ix_type='par', name='bound_storage_up', idx_sets=_idx_common),
+    'bound_storage_up': dict(ix_type='par', idx_sets=_idx_common),
     # Storage losses as a percentage of installed capacity
-    dict(ix_type='par', name='storage_loss', idx_sets=_idx_common),
+    'storage_loss': dict(ix_type='par', idx_sets=_idx_common),
     # Initial amount of storage
-    dict(ix_type='par', name='init_storage', idx_sets=_idx_common),
-)
+    'init_storage': dict(ix_type='par', idx_sets=_idx_common),
+}
 
 
 def _template(*parts):
@@ -97,21 +98,8 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
     @classmethod
     def initialize(cls, scenario):
         """Set up *scenario* with required sets and parameters for MESSAGE."""
-        # TODO move this code upstream into ixmp
-        for item_info in MESSAGE_ITEMS:
-            # Copy so that pop() below does not modify MESSAGE_ITEMS
-            item_info = item_info.copy()
-
-            # Get the appropriate method, e.g. init_set or init_par
-            ix_type = item_info.pop('ix_type')
-            init_method = getattr(scenario, 'init_{}'.format(ix_type))
-
-            try:
-                # Add the item
-                init_method(**item_info)
-            except ValueError:
-                # Item already exists
-                pass
+        # Initialize the ixmp items
+        cls.initialize_items(scenario, MESSAGE_ITEMS)
 
     def __init__(self, name=None, **model_options):
         # Update the default options with any user-provided options
