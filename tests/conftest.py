@@ -2,6 +2,7 @@ from pathlib import Path
 
 from click.testing import CliRunner
 import message_ix
+from message_ix.testing import make_dantzig
 import pytest
 
 
@@ -52,3 +53,10 @@ def message_ix_cli(tmp_env):
                                   env=tmp_env, **kwargs)
 
     yield Runner().invoke
+
+
+@pytest.fixture(scope='class')
+def message_test_mp(test_mp):
+    make_dantzig(test_mp)
+    make_dantzig(test_mp, multi_year=True)
+    yield test_mp
