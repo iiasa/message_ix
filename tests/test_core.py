@@ -8,11 +8,12 @@ import pandas.testing as pdt
 import pytest
 
 from message_ix import Scenario
-from message_ix.testing import make_dantzig
+from message_ix.testing import SCENARIO, make_dantzig
 
 
-msg_args = ('canning problem (MESSAGE scheme)', 'standard')
-msg_multiyear_args = ('canning problem (MESSAGE scheme)', 'multi-year')
+@pytest.fixture
+def dantzig_message_scenario(message_test_mp):
+    yield Scenario(message_test_mp, **SCENARIO['dantzig'])
 
 
 def test_year_int(test_mp):
@@ -27,7 +28,7 @@ def test_year_int(test_mp):
 
 
 def test_add_spatial_single(test_mp):
-    scen = Scenario(test_mp, *msg_args, version='new')
+    scen = Scenario(test_mp, **SCENARIO['dantzig'], version='new')
     data = {'country': 'Austria'}
     scen.add_spatial_sets(data)
 
@@ -45,7 +46,7 @@ def test_add_spatial_single(test_mp):
 
 
 def test_add_spatial_multiple(test_mp):
-    scen = Scenario(test_mp, *msg_args, version='new')
+    scen = Scenario(test_mp, **SCENARIO['dantzig'], version='new')
     data = {'country': ['Austria', 'Germany']}
     scen.add_spatial_sets(data)
 
@@ -63,7 +64,7 @@ def test_add_spatial_multiple(test_mp):
 
 
 def test_add_spatial_hierarchy(test_mp):
-    scen = Scenario(test_mp, *msg_args, version='new')
+    scen = Scenario(test_mp, **SCENARIO['dantzig'], version='new')
     data = {'country': {'Austria': {'state': ['Vienna', 'Lower Austria']}}}
     scen.add_spatial_sets(data)
 
@@ -85,7 +86,7 @@ def test_add_spatial_hierarchy(test_mp):
 
 
 def test_vintage_and_active_years(test_mp):
-    scen = Scenario(test_mp, *msg_args, version='new')
+    scen = Scenario(test_mp, **SCENARIO['dantzig'], version='new')
 
     years = [2000, 2010, 2020]
     scen.add_horizon({'year': years, 'firstmodelyear': 2010})
@@ -151,23 +152,23 @@ def test_vintage_and_active_years(test_mp):
         scen.vintage_and_active_years(ya_args=('foo', 'bar'))
 
 
-def test_cat_all(test_mp):
-    scen = Scenario(test_mp, *msg_args)
+def test_cat_all(dantzig_message_scenario):
+    scen = dantzig_message_scenario
     df = scen.cat('technology', 'all')
     npt.assert_array_equal(df, ['canning_plant', 'transport_from_seattle',
                                 'transport_from_san-diego'])
 
 
 def test_cat_list(test_mp):
-    scen = Scenario(test_mp, *msg_args, version='new')
+    scen = Scenario(test_mp, **SCENARIO['dantzig'], version='new')
 
     # cat_list() returns default 'year' categories in a new message_ix.Scenario
     exp = ['firstmodelyear', 'lastmodelyear', 'initializeyear_macro']
     assert all(exp == scen.cat_list('year'))
 
 
-def test_add_cat(test_mp):
-    scen = Scenario(test_mp, *msg_args)
+def test_add_cat(dantzig_message_scenario):
+    scen = dantzig_message_scenario
     scen2 = scen.clone(keep_solution=False)
     scen2.check_out()
     scen2.add_cat('technology', 'trade',
@@ -178,8 +179,8 @@ def test_add_cat(test_mp):
     scen2.discard_changes()
 
 
-def test_add_cat_unique(test_mp):
-    scen = Scenario(test_mp, *msg_multiyear_args)
+def test_add_cat_unique(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig multi-year'])
     scen2 = scen.clone(keep_solution=False)
     scen2.check_out()
     scen2.add_cat('year', 'firstmodelyear', 2020, True)
@@ -191,7 +192,7 @@ def test_add_cat_unique(test_mp):
 
 def test_years_active(test_mp):
     test_mp.add_unit('year')
-    scen = Scenario(test_mp, *msg_args, version='new')
+    scen = Scenario(test_mp, **SCENARIO['dantzig'], version='new')
     scen.add_set('node', 'foo')
     scen.add_set('technology', 'bar')
 
@@ -225,8 +226,8 @@ def test_years_active(test_mp):
     npt.assert_array_equal(result, years[1:-1])
 
 
-def test_years_active_extend(test_mp):
-    scen = Scenario(test_mp, *msg_multiyear_args)
+def test_years_active_extend(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig multi-year'])
 
     # Existing time horizon
     years = [2010, 2020, 2030]
@@ -249,8 +250,8 @@ def test_years_active_extend(test_mp):
     npt.assert_array_equal(result, years[1:-1])
 
 
-def test_new_timeseries_long_name64(test_mp):
-    scen = Scenario(test_mp, *msg_multiyear_args)
+def test_new_timeseries_long_name64(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig multi-year'])
     scen = scen.clone(keep_solution=False)
     scen.check_out(timeseries_only=True)
     df = pd.DataFrame({
@@ -264,8 +265,8 @@ def test_new_timeseries_long_name64(test_mp):
     scen.commit('importing a testing timeseries')
 
 
-def test_new_timeseries_long_name64plus(test_mp):
-    scen = Scenario(test_mp, *msg_multiyear_args)
+def test_new_timeseries_long_name64plus(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig multi-year'])
     scen = scen.clone(keep_solution=False)
     scen.check_out(timeseries_only=True)
     df = pd.DataFrame({
@@ -279,8 +280,8 @@ def test_new_timeseries_long_name64plus(test_mp):
     scen.commit('importing a testing timeseries')
 
 
-def test_rename_technology(test_mp):
-    scen = Scenario(test_mp, *msg_args)
+def test_rename_technology(dantzig_message_scenario):
+    scen = dantzig_message_scenario
     assert scen.par('output')['technology'].isin(['canning_plant']).any()
 
     clone = scen.clone('foo', 'bar')
@@ -291,8 +292,8 @@ def test_rename_technology(test_mp):
     assert np.isclose(clone.var('OBJ')['lvl'], 153.675)
 
 
-def test_rename_technology_no_rm(test_mp):
-    scen = Scenario(test_mp, *msg_args)
+def test_rename_technology_no_rm(dantzig_message_scenario):
+    scen = dantzig_message_scenario
     assert scen.par('output')['technology'].isin(['canning_plant']).any()
 
     clone = scen.clone('foo', 'bar')
@@ -304,13 +305,13 @@ def test_rename_technology_no_rm(test_mp):
     assert clone.par('output')['technology'].isin(['foo_bar']).any()
 
 
-def test_excel_read_write(test_mp):
+def test_excel_read_write(message_test_mp):
     fname = 'test_excel_read_write.xlsx'
 
-    scen1 = Scenario(test_mp, *msg_args)
+    scen1 = Scenario(message_test_mp, **SCENARIO['dantzig'])
     scen1.to_excel(fname)
 
-    scen2 = Scenario(test_mp, model='foo', scenario='bar', version='new')
+    scen2 = Scenario(message_test_mp, model='foo', scenario='bar', version='new')
     scen2.read_excel(fname)
 
     exp = scen1.par('input')
