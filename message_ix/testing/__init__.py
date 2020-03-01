@@ -7,10 +7,14 @@ from message_ix import Scenario
 from message_ix.utils import make_df
 
 
-models = {
+SCENARIO = {
     'dantzig': {
         'model': 'Canning problem (MESSAGE scheme)',
         'scenario': 'standard',
+    },
+    'dantzig multi-year': {
+        'model': 'Canning problem (MESSAGE scheme)',
+        'scenario': 'multi-year',
     },
     'westeros': {
         'model': 'Westeros Electrified',
@@ -21,14 +25,13 @@ models = {
 
 # Create and populate ixmp databases
 
-MODEL = models['dantzig']['model']
-SCENARIO = models['dantzig']['scenario']
+_ms = [SCENARIO['dantzig']['model'], SCENARIO['dantzig']['scenario']]
 HIST_DF = pd.DataFrame(
-    [[MODEL, SCENARIO, 'DantzigLand', 'GDP', 'USD', 850., 900., 950.], ],
+    [_ms + ['DantzigLand', 'GDP', 'USD', 850., 900., 950.], ],
     columns=IAMC_IDX + [1962, 1963, 1964],
 )
 INP_DF = pd.DataFrame(
-    [[MODEL, SCENARIO, 'DantzigLand', 'Demand', 'cases', 850., 900., 950.], ],
+    [_ms + ['DantzigLand', 'Demand', 'cases', 850., 900., 950.], ],
     columns=IAMC_IDX + [1962, 1963, 1964],
 )
 TS_DF = pd.concat([HIST_DF, INP_DF], sort=False)
@@ -61,9 +64,12 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
     mp.add_region('DantzigLand', 'country')
 
     # initialize a new (empty) instance of an `ixmp.Scenario`
-    anno = "Dantzig's canning problem as a MESSAGE-scheme Scenario"
-    args = models['dantzig'].copy()
-    scen = Scenario(mp, version='new', annotation=anno, **args)
+    scen = Scenario(
+        mp,
+        model=SCENARIO['dantzig']['model'],
+        scenario='multi-year' if multi_year else 'standard',
+        annotation="Dantzig's canning problem as a MESSAGE-scheme Scenario",
+        version='new')
 
     # Sets
     # NB commit() is refused if technology and year are not given
@@ -178,7 +184,7 @@ def make_westeros(mp, emissions=False, solve=False):
     solve : bool, optional
         If True, the scenario is solved.
     """
-    scen = Scenario(mp, version='new', **models['westeros'])
+    scen = Scenario(mp, version='new', **SCENARIO['westeros'])
 
     # Sets
 
