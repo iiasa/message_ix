@@ -6,11 +6,11 @@ import pytest
 
 from message_ix import Scenario
 from message_ix.testing import (
-    make_dantzig,
-    models,
-    TS_DF,
+    SCENARIO,
     TS_DF_CLEARED,
-    TS_DF_SHIFT
+    TS_DF_SHIFT,
+    TS_DF,
+    make_dantzig,
 )
 
 
@@ -112,7 +112,7 @@ def test_multi_db_run(tmpdir):
 
     # reopen the connection to the second platform and reload scenario
     _mp2 = Platform(driver='hsqldb', path=tmpdir / 'mp2')
-    scen2 = Scenario(_mp2, **models['dantzig'])
+    scen2 = Scenario(_mp2, **SCENARIO['dantzig'])
     assert_multi_db(mp1, _mp2)
 
     # check that sets, variables and parameter were copied correctly
