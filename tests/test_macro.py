@@ -1,12 +1,11 @@
 import numpy as np
 
 from message_ix import Scenario, macro
+from message_ix.testing import SCENARIO
 
-msg_args = ('canning problem (MESSAGE scheme)', 'standard')
 
-
-def test_init(test_mp):
-    scen = Scenario(test_mp, *msg_args)
+def test_init(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig'])
 
     scen = scen.clone('foo', 'bar')
     scen.check_out()
