@@ -31,14 +31,6 @@ def tutorial_path(request):
     return Path(__file__).parent / '..' / 'tutorial'
 
 
-@pytest.fixture(scope='function')
-def test_legacy_mp(request, tmp_env, test_data_path):
-    """Path to a database properties file referring to a test database."""
-    from ixmp.testing import create_test_mp
-
-    yield from create_test_mp(request, test_data_path, 'message_ix_legacy')
-
-
 @pytest.fixture(scope='session')
 def message_ix_cli(tmp_env):
     """A CliRunner object that invokes the message_ix command-line interface.

@@ -1,6 +1,0 @@
-config.name = message_ix_test_db@local
-
-jdbc.driver = org.hsqldb.jdbcDriver
-jdbc.url = jdbc:hsqldb:file:{here}/{db}
-jdbc.user = ixmp
-jdbc.pwd = ixmp

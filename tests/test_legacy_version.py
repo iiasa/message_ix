@@ -1,12 +1,15 @@
 import numpy as np
+
+from ixmp import Platform
 from message_ix import Scenario
-
-msg_args = ('canning problem (MESSAGE scheme)', 'standard')
-msg_multiyear_args = ('canning problem (MESSAGE scheme)', 'multi-year')
+from ixmp.testing import create_test_platform
 
 
-def test_solve_legacy_scenario(test_legacy_mp):
-    scen = Scenario(test_legacy_mp, *msg_args)
+def test_solve_legacy_scenario(tmp_path, test_data_path):
+    db_path = create_test_platform(tmp_path, test_data_path, 'legacy')
+    mp = Platform(backend='jdbc', driver='hsqldb', path=db_path)
+    scen = Scenario(mp, model='canning problem (MESSAGE scheme)',
+                    scenario='standard')
     exp = scen.var('OBJ')['lvl']
 
     # solve scenario, assert that the new objective value is close to previous
