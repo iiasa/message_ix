@@ -1,14 +1,11 @@
-import pytest
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
-
-try:
-    from pathlib import Path
-except ImportError:
-    from pathlib2 import Path
+import pytest
 
 from message_ix import Scenario, macro
+from message_ix.models import MACRO
 from message_ix.testing import make_westeros
 
 # tons of deprecation warnings come from reading excel (xlrd library), ignore
@@ -236,7 +233,7 @@ def test_init(test_mp):
 
     scen = scen.clone('foo', 'bar')
     scen.check_out()
-    macro.init(scen)
+    MACRO.initialize(scen)
     scen.commit('foo')
     scen.solve()
 
@@ -251,7 +248,7 @@ def test_add_model_data(westeros_solved):
     base = westeros_solved
     clone = base.clone('foo', 'bar', keep_solution=False)
     clone.check_out()
-    macro.init(clone)
+    MACRO.initialize(clone)
     macro.add_model_data(base, clone, W_DATA_PATH)
     clone.commit('finished adding macro')
     clone.solve()
@@ -265,7 +262,7 @@ def test_calibrate(westeros_solved):
     clone = base.clone(base.model, 'test macro calibration',
                        keep_solution=False)
     clone.check_out()
-    macro.init(clone)
+    MACRO.initialize(clone)
     macro.add_model_data(base, clone, W_DATA_PATH)
     clone.commit('finished adding macro')
 

@@ -15,108 +15,76 @@ from ixmp.utils import logger
 #    to support others
 #
 
-MACRO_INIT = {
-    'sets': {
-        'sector': None,
-        'mapping_macro_sector': ['sector', 'commodity', 'level', ],
-    },
-    'pars': {
-        'demand_MESSAGE': {
-            'idx': ['node', 'sector', 'year', ],
-            'unit': 'GWa',
-            'data_key': 'demand',
-        },
-        'price_MESSAGE': {
-            'idx': ['node', 'sector', 'year', ],
-            'unit': 'USD/kWa',
-            'data_key': 'price',
-        },
-        'cost_MESSAGE': {
-            'idx': ['node', 'year', ],
-            'unit': 'G$',
-            'data_key': 'total_cost',
-        },
-        'gdp_calibrate': {
-            'idx': ['node', 'year', ],
-            'unit': 'T$',
-        },
-        'historical_gdp': {
-            'idx': ['node', 'year', ],
-            'unit': 'T$',
-            'data_key': 'gdp0',
-        },
-        'MERtoPPP': {
-            'idx': ['node', 'year', ],
-            'unit': '-',
-        },
-        'kgdp': {
-            'idx': ['node', ],
-            'unit': '-',
-        },
-        'kpvs': {
-            'idx': ['node', ],
-            'unit': '-',
-        },
-        'depr': {
-            'idx': ['node', ],
-            'unit': '-',
-        },
-        'drate': {
-            'idx': ['node', ],
-            'unit': '-',
-        },
-        'esub': {
-            'idx': ['node', ],
-            'unit': '-',
-        },
-        'lotol': {
-            'idx': ['node', ],
-            'unit': '-',
-        },
-        'lakl': {
-            'idx': ['node', ],
-            'unit': '-',
-            'data_key': 'aconst',
-        },
-        'prfconst': {
-            'idx': ['node', 'sector', ],
-            'unit': '-',
-            'data_key': 'bconst',
-        },
-        'grow': {
-            'idx': ['node', 'year', ],
-            'unit': '-',
-            'data_key': 'growth',
-        },
-        'aeei': {
-            'idx': ['node', 'sector', 'year', ],
-            'unit': '-',
-        },
-    },
-    'vars': {
-        'DEMAND': ['node', 'commodity', 'level', 'year', 'time', ],
-        'PRICE': ['node', 'commodity', 'level', 'year', 'time', ],
-        'COST_NODAL': ['node', 'year', ],
-        'COST_NODAL_NET': ['node', 'year', ],
-        'GDP': ['node', 'year', ],
-        'I': ['node', 'year', ],
-        'C': ['node', 'year', ],
-        'K': ['node', 'year', ],
-        'KN': ['node', 'year', ],
-        'Y': ['node', 'year', ],
-        'YN': ['node', 'year', ],
-        'EC': ['node', 'year', ],
-        'UTILITY': None,
-        'PHYSENE': ['node', 'sector', 'year', ],
-        'PRODENE': ['node', 'sector', 'year', ],
-        'NEWENE': ['node', 'sector', 'year', ],
-        'grow_calibrate': ['node', 'year', ],
-        'aeei_calibrate': ['node', 'sector', 'year', ],
-    },
-    'equs': {
-        'COST_ACCOUNTING_NODAL': ['node', 'year', ],
-    },
-}
+DATA_KEY = dict(
+    cost_MESSAGE='total_cost',
+    demand_MESSAGE='demand',
+    grow='growth',
+    historical_gdp='gdp0',
+    lakl='aconst',
+    prfconst='bconst',
+    price_MESSAGE='price',
+)
+
+UNITS = dict(
+    cost_MESSAGE='G$',
+    demand_MESSAGE='GWa',
+    gdp_calibrate='T$',
+    historical_gdp='T$',
+    price_MESSAGE='USD/kWa',
+    # Used in calibrate()
+    aeei='-',
+    grow='-',
+)
+
+#: ixmp items (sets, parameters, variables, and equations) in MACRO.
+MACRO_ITEMS = dict(
+    sector=dict(ix_type='set'),
+    mapping_macro_sector=dict(ix_type='set',
+                              idx_sets=['sector', 'commodity', 'level']),
+
+    MERtoPPP=dict(ix_type='par', idx_sets=['node', 'year']),
+    aeei=dict(ix_type='par', idx_sets=['node', 'sector', 'year']),
+    cost_MESSAGE=dict(ix_type='par', idx_sets=['node', 'year']),
+    demand_MESSAGE=dict(ix_type='par', idx_sets=['node', 'sector', 'year']),
+    depr=dict(ix_type='par', idx_sets=['node']),
+    drate=dict(ix_type='par', idx_sets=['node']),
+    esub=dict(ix_type='par', idx_sets=['node']),
+    gdp_calibrate=dict(ix_type='par', idx_sets=['node', 'year']),
+    grow=dict(ix_type='par', idx_sets=['node', 'year']),
+    historical_gdp=dict(ix_type='par', idx_sets=['node', 'year']),
+    kgdp=dict(ix_type='par', idx_sets=['node']),
+    kpvs=dict(ix_type='par', idx_sets=['node']),
+    lakl=dict(ix_type='par', idx_sets=['node']),
+    lotol=dict(ix_type='par', idx_sets=['node']),
+    prfconst=dict(ix_type='par', idx_sets=['node', 'sector']),
+    price_MESSAGE=dict(ix_type='par', idx_sets=['node', 'sector', 'year']),
+
+    C=dict(ix_type='var', idx_sets=['node', 'year']),
+    COST_NODAL_NET=dict(ix_type='var', idx_sets=['node', 'year']),
+    COST_NODAL=dict(ix_type='var', idx_sets=['node', 'year']),
+    DEMAND=dict(ix_type='var',
+                idx_sets=['node', 'commodity', 'level', 'year', 'time']),
+    EC=dict(ix_type='var', idx_sets=['node', 'year']),
+    GDP=dict(ix_type='var', idx_sets=['node', 'year']),
+    I=dict(ix_type='var', idx_sets=['node', 'year']),  # noqa: E741
+    K=dict(ix_type='var', idx_sets=['node', 'year']),
+    KN=dict(ix_type='var', idx_sets=['node', 'year']),
+    MAX_ITER=dict(ix_type='var', idx_sets=None),
+    N_ITER=dict(ix_type='var', idx_sets=None),
+    NEWENE=dict(ix_type='var', idx_sets=['node', 'sector', 'year']),
+    PHYSENE=dict(ix_type='var', idx_sets=['node', 'sector', 'year']),
+    PRICE=dict(ix_type='var',
+               idx_sets=['node', 'commodity', 'level', 'year', 'time']),
+    PRODENE=dict(ix_type='var', idx_sets=['node', 'sector', 'year']),
+    UTILITY=dict(ix_type='var', idx_sets=None),
+    Y=dict(ix_type='var', idx_sets=['node', 'year']),
+    YN=dict(ix_type='var', idx_sets=['node', 'year']),
+    aeei_calibrate=dict(ix_type='var', idx_sets=['node', 'sector', 'year']),
+    grow_calibrate=dict(ix_type='var', idx_sets=['node', 'year']),
+
+    COST_ACCOUNTING_NODAL=dict(ix_type='equ', idx_sets=['node', 'year']),
+)
+
 
 MACRO_DATA_FOR_DERIVATION = {
     'cost_ref': ['node', ],
@@ -145,7 +113,7 @@ def _validate_data(name, df, nodes, sectors, years):
     if name in MACRO_DATA_FOR_DERIVATION:
         cols = MACRO_DATA_FOR_DERIVATION[name]
     else:
-        cols = MACRO_INIT['pars'][name]['idx']
+        cols = MACRO_ITEMS[name]['idx_sets']
     # TODO: cols += ['unit'] ?
     col_diff = set(cols) - set(df.columns)
     if col_diff:
@@ -373,43 +341,6 @@ class Calculate(object):
         return self.data['aconst']
 
 
-def init(s):
-    for key, values in MACRO_INIT['sets'].items():
-        try:
-            s.init_set(key, values)
-        except:  # noqa: ignore=E722
-            # TODO: what to do with scenarios that already have structure? It
-            # seems that some do and some dont.
-            pass
-    for key, values in MACRO_INIT['pars'].items():
-        try:
-            s.init_par(key, values['idx'])
-        except:  # noqa: ignore=E722
-            pass  # already exists in the model, known for 'historical_gdp'
-    for key, values in MACRO_INIT['vars'].items():
-        if not s.has_var(key):
-            try:
-                # TODO: this seems required because for some reason DEMAND (and
-                # perhaps others) seem to already be listed in the java code,
-                # but still needs to be initialized in the python code.
-                # However, you cannot init it with dimensions, only with the
-                # variable name.
-                s.init_var(key, values)
-            except:  # noqa: ignore=E722
-                s.init_var(key)
-    for key, values in MACRO_INIT['equs'].items():
-        try:
-            s.init_equ(key, values)
-        except:  # noqa: ignore=E722
-            # TODO: what to do with scenarios that already have structure? It
-            # seems that some do and some dont.
-            pass
-
-    # keep track of number of iterations
-    s.init_var('N_ITER', None)
-    s.init_var('MAX_ITER', None)
-
-
 def add_model_data(base, clone, data):
     c = Calculate(base, data)
     c.read_data()
@@ -433,11 +364,14 @@ def add_model_data(base, clone, data):
         clone.add_set("mapping_macro_sector", [s, s, "useful"])
 
     # add parameters
-    for name, values in MACRO_INIT['pars'].items():
+    for name, info in MACRO_ITEMS.items():
+        if info['ix_type'] != 'par':
+            continue
+
         try:
-            key = values.get('data_key', name)
+            key = DATA_KEY.get(name, name)
             data = c.data[key].reset_index()
-            data['unit'] = values['unit']
+            data['unit'] = UNITS.get(name, '-')
             # some data may have information prior to the MACRO initialization
             # year which we need to remove in order to add it to the scenario
             if 'year' in data:
@@ -459,16 +393,14 @@ def calibrate(s, check_convergence=True, **kwargs):
     logger().info(msg.format(n_iter, max_iter))
 
     # get out calibrated values
-    aeei = (s.var('aeei_calibrate')
-            .rename(columns={'lvl': 'value'})
-            .drop('mrg', axis=1)
-            )
-    aeei['unit'] = MACRO_INIT['pars']['aeei']['unit']
-    grow = (s.var('grow_calibrate')
-            .rename(columns={'lvl': 'value'})
-            .drop('mrg', axis=1)
-            )
-    grow['unit'] = MACRO_INIT['pars']['grow']['unit']
+    aeei = s.var('aeei_calibrate') \
+            .rename(columns={'lvl': 'value'}) \
+            .drop('mrg', axis=1) \
+            .assign(unit=UNITS['aeei'])
+    grow = s.var('grow_calibrate') \
+            .rename(columns={'lvl': 'value'}) \
+            .drop('mrg', axis=1) \
+            .assign(unit=UNITS['grow'])
 
     # update calibrated value parameters
     s.remove_solution()
