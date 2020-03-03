@@ -47,9 +47,6 @@ rmessageix/source/.Rhistory
 # testdb
 .cache/**
 tests/data/nightly
-tests/data/testdb/test.properties
-tests/data/testdb/ixmptest.properties
-tests/data/testdb/ixmptest.lck
 .Rproj.user
 
 # pytest and related
@@ -60,4 +57,3 @@ htmlcov
 
 # JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
 /**/.idea
-
