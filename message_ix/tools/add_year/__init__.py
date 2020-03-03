@@ -319,7 +319,7 @@ def add_year_par(sc_ref, sc_new, yrs_new, parname, reg_list, firstyear_new,
 
     """
     #  V.A) Initialization and checks
-    par_list_new = sc_new.par_list().tolist()
+    par_list_new = sc_new.par_list()
     idx_names = sc_ref.idx_names(parname)
     horizon = sorted([int(x) for x in list(set(sc_ref.set('year')))])
     node_col = [x for x in idx_names if x in ['node', 'node_loc', 'node_rel']]
