@@ -42,9 +42,6 @@ TS_DF_CLEARED = TS_DF.copy()
 TS_DF_CLEARED.loc[0, 1963] = np.nan
 TS_DF_CLEARED.loc[0, 1964] = np.nan
 
-TS_DF_SHIFT = TS_DF.copy()
-TS_DF_SHIFT.loc[0, 1964] = np.nan
-
 
 def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
     """Return an :class:`message_ix.Scenario` for Dantzig's canning problem.
