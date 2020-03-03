@@ -183,11 +183,8 @@ def test_add_cat_unique(message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO['dantzig multi-year'])
     scen2 = scen.clone(keep_solution=False)
     scen2.check_out()
-    scen2.add_cat('year', 'firstmodelyear', 2020, True)
-    df = scen2.cat('year', 'firstmodelyear')
-    npt.assert_array_equal(
-        df, ['2020'])
-    scen2.discard_changes()
+    scen2.add_cat('year', 'firstmodelyear', 1963, True)
+    assert [1963] == scen2.cat('year', 'firstmodelyear')
 
 
 def test_years_active(test_mp):
