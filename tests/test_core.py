@@ -227,23 +227,24 @@ def test_years_active_extend(message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO['dantzig multi-year'])
 
     # Existing time horizon
-    years = [2010, 2020, 2030]
+    years = [1963, 1964, 1965]
     result = scen.years_active('seattle', 'canning_plant', years[1])
     npt.assert_array_equal(result, years[1:])
 
     # Add years to the scenario
-    years.extend([2040, 2050])
+    years.extend([1993, 1995])
     scen.check_out()
     scen.add_set('year', years[-2:])
-    scen.add_par('duration_period', '2040', 10, 'y')
-    scen.add_par('duration_period', '2050', 10, 'y')
+    scen.add_par('duration_period', '1993', 28, 'y')
+    scen.add_par('duration_period', '1995', 2, 'y')
 
-    # technical_lifetime of seattle/canning_plant/2020 is 30 years.
-    # - constructed in 2011-01-01.
-    # - by 2020-12-31, has operated 10 years.
-    # - operates until 2040-12-31.
-    # - is NOT active within the period '2050' (2041-01-01 to 2050-12-31)
-    result = scen.years_active('seattle', 'canning_plant', '2020')
+    # technical_lifetime of seattle/canning_plant/1964 is 30 years.
+    # - constructed in 1964-01-01.
+    # - by 1964-12-31, has operated 1 year.
+    # - by 1965-12-31, has operated 2 years.
+    # - operates until 1993-12-31.
+    # - is NOT active within the period '1995' (1994-01-01 to 1995-12-31)
+    result = scen.years_active('seattle', 'canning_plant', 1964)
     npt.assert_array_equal(result, years[1:-1])
 
 
