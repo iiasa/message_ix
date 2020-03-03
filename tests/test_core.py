@@ -164,7 +164,7 @@ def test_cat_list(test_mp):
 
     # cat_list() returns default 'year' categories in a new message_ix.Scenario
     exp = ['firstmodelyear', 'lastmodelyear', 'initializeyear_macro']
-    assert all(exp == scen.cat_list('year'))
+    assert exp == scen.cat_list('year')
 
 
 def test_add_cat(dantzig_message_scenario):
