@@ -17,10 +17,8 @@ from message_ix.reporting import Reporter, configure, computations
 from message_ix.testing import SCENARIO, make_dantzig, make_westeros
 
 
-def test_reporter_no_solution(test_mp):
-    scen = Scenario(test_mp,
-                    'canning problem (MESSAGE scheme)',
-                    'standard')
+def test_reporter_no_solution(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig'])
 
     pytest.raises(RuntimeError, Reporter.from_scenario, scen)
 
