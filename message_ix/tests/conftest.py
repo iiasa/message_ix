@@ -6,10 +6,6 @@ from message_ix.testing import make_dantzig
 import pytest
 
 
-# Use the fixtures test_mp, test_mp_props, and tmp_env from ixmp.testing
-pytest_plugins = ['ixmp.testing']
-
-
 # Hooks
 
 def pytest_report_header(config, startdir):
@@ -28,7 +24,7 @@ def test_data_path(request):
 @pytest.fixture(scope='session')
 def tutorial_path(request):
     """Path to the directory containing the tutorials."""
-    return Path(__file__).parent / '..' / 'tutorial'
+    return Path(__file__).parents[2] / 'tutorial'
 
 
 @pytest.fixture(scope='session')
