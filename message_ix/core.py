@@ -191,9 +191,15 @@ class Scenario(ixmp.Scenario):
 
         Returns
         -------
-        list of str
+        list of str or list of int
+            :class:`int` is returned if *name* is 'year'.
         """
-        return self._backend('cat_get_elements', name, cat)
+        return list(
+            map(
+                int if name == 'year' else lambda v: v,
+                self._backend('cat_get_elements', name, cat)
+            )
+        )
 
     def add_spatial_sets(self, data):
         """Add sets related to spatial dimensions of the model.

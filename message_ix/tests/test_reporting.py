@@ -14,21 +14,17 @@ import xarray as xr
 
 from message_ix import Scenario
 from message_ix.reporting import Reporter, configure, computations
-from message_ix.testing import make_dantzig, make_westeros
+from message_ix.testing import SCENARIO, make_dantzig, make_westeros
 
 
-def test_reporter_no_solution(test_mp):
-    scen = Scenario(test_mp,
-                    'canning problem (MESSAGE scheme)',
-                    'standard')
+def test_reporter_no_solution(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig'])
 
     pytest.raises(RuntimeError, Reporter.from_scenario, scen)
 
 
-def test_reporter(test_mp):
-    scen = Scenario(test_mp,
-                    'canning problem (MESSAGE scheme)',
-                    'standard')
+def test_reporter(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig'])
 
     # Varies between local & CI contexts
     # DEBUG may be due to reuse of test_mp in a non-deterministic order
@@ -129,10 +125,8 @@ def test_reporter_from_westeros(test_mp):
     assert_allclose(obs, exp)
 
 
-def test_reporter_convert_pyam(test_mp, caplog, tmp_path):
-    scen = Scenario(test_mp,
-                    'canning problem (MESSAGE scheme)',
-                    'standard')
+def test_reporter_convert_pyam(message_test_mp, caplog, tmp_path):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig'])
     if not scen.has_solution():
         scen.solve()
     rep = Reporter.from_scenario(scen)

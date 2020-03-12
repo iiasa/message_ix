@@ -1,9 +1,0 @@
-Model,Scenario,Region,Variable,Unit,2010
-canning problem (MESSAGE scheme),standard,san-diego,Activity|canning_plant|production,,600.0
-canning problem (MESSAGE scheme),standard,san-diego,Activity|transport_from_san-diego|to_chicago,,0.0
-canning problem (MESSAGE scheme),standard,san-diego,Activity|transport_from_san-diego|to_new-york,,275.0
-canning problem (MESSAGE scheme),standard,san-diego,Activity|transport_from_san-diego|to_topeka,,275.0
-canning problem (MESSAGE scheme),standard,seattle,Activity|canning_plant|production,,350.0
-canning problem (MESSAGE scheme),standard,seattle,Activity|transport_from_seattle|to_chicago,,300.0
-canning problem (MESSAGE scheme),standard,seattle,Activity|transport_from_seattle|to_new-york,,50.0
-canning problem (MESSAGE scheme),standard,seattle,Activity|transport_from_seattle|to_topeka,,0.0

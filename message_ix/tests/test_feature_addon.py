@@ -2,14 +2,16 @@ import numpy as np
 import pandas as pd
 
 from message_ix import Scenario
+from message_ix.testing import SCENARIO
 
-msg_args = ('canning problem (MESSAGE scheme)', 'standard')
 
+# First model year of the Dantzig scenario
+_year = 1963
 
 addon_share = pd.DataFrame({
     'node': 'seattle',
     'technology': 'canning_plant',
-    'year_act': 2010,
+    'year_act': _year,
     'mode': 'production',
     'time': 'year',
     'type_addon': 'better_production',
@@ -29,8 +31,8 @@ def add_addon(s, costs=False, zero_output=False):
     s.add_set('map_tec_addon', ['canning_plant', 'better_production'])
     conversion_df = pd.DataFrame({'node': 'seattle',
                                   'technology': 'canning_plant',
-                                  'year_vtg': 2010,
-                                  'year_act': 2010,
+                                  'year_vtg': _year,
+                                  'year_act': _year,
                                   'mode': 'production',
                                   'time': 'year',
                                   'type_addon': 'better_production',
@@ -61,9 +63,9 @@ def add_addon(s, costs=False, zero_output=False):
 
 
 # reduce max activity from one canning plant, has to be compensated by addon
-def test_addon_tec(test_mp):
-    scen = Scenario(test_mp, *msg_args).clone(scenario='addon',
-                                              keep_solution=False)
+def test_addon_tec(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig']) \
+        .clone(scenario='addon', keep_solution=False)
 
     add_addon(scen, costs=-1)
 
@@ -81,9 +83,9 @@ def test_addon_tec(test_mp):
 
 
 # introduce addon technology with negatove costs, add maximum mitigation
-def test_addon_up(test_mp):
-    scen = Scenario(test_mp, *msg_args).clone(scenario='addon_up',
-                                              keep_solution=False)
+def test_addon_up(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig']) \
+        .clone(scenario='addon_up', keep_solution=False)
     add_addon(scen, costs=-1, zero_output=True)
 
     scen.check_out()
@@ -98,9 +100,9 @@ def test_addon_up(test_mp):
 
 
 # introduce addon technology with positive costs, add minimum mitigation
-def test_addon_lo(test_mp):
-    scen = Scenario(test_mp, *msg_args).clone(scenario='addon_lo',
-                                              keep_solution=False)
+def test_addon_lo(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig']) \
+        .clone(scenario='addon_lo', keep_solution=False)
     add_addon(scen, costs=1, zero_output=True)
 
     scen.check_out()

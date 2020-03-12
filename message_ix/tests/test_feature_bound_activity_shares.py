@@ -2,8 +2,11 @@ import numpy as np
 import pandas as pd
 
 from message_ix import Scenario
+from message_ix.testing import SCENARIO
 
-msg_args = ('canning problem (MESSAGE scheme)', 'standard')
+
+# First model year of the Dantzig scenario
+_year = 1963
 
 
 def calculate_activity(scen, tec='transport_from_seattle'):
@@ -16,8 +19,8 @@ def calculate_activity(scen, tec='transport_from_seattle'):
     )
 
 
-def test_add_bound_activity_up(test_mp):
-    scen = Scenario(test_mp, *msg_args).clone()
+def test_add_bound_activity_up(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig']).clone()
     scen.solve()
 
     # data for act bound
@@ -25,7 +28,7 @@ def test_add_bound_activity_up(test_mp):
     data = pd.DataFrame({
         'node_loc': 'seattle',
         'technology': 'transport_from_seattle',
-        'year_act': 2010,
+        'year_act': _year,
         'time': 'year',
         'unit': 'cases',
         'mode': 'to_chicago',
@@ -46,8 +49,8 @@ def test_add_bound_activity_up(test_mp):
     assert new_obj >= orig_obj
 
 
-def test_add_bound_activity_up_all_modes(test_mp):
-    scen = Scenario(test_mp, *msg_args).clone()
+def test_add_bound_activity_up_all_modes(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig']).clone()
     scen.solve()
 
     # data for act bound
@@ -55,7 +58,7 @@ def test_add_bound_activity_up_all_modes(test_mp):
     data = pd.DataFrame({
         'node_loc': 'seattle',
         'technology': 'transport_from_seattle',
-        'year_act': 2010,
+        'year_act': _year,
         'time': 'year',
         'unit': 'cases',
         'mode': 'all',
@@ -76,7 +79,7 @@ def test_add_bound_activity_up_all_modes(test_mp):
     assert new_obj >= orig_obj
 
 
-def test_commodity_share_up(test_mp):
+def test_commodity_share_up(message_test_mp):
     """Origial Solution
     ----------------
 
@@ -125,14 +128,14 @@ def test_commodity_share_up(test_mp):
                   pd.DataFrame({
                       'shares': 'test-share',
                       'node_share': 'seattle',
-                      'year_act': 2010,
+                      'year_act': _year,
                       'time': 'year',
                       'unit': '%',
                       'value': 0.5,
                   }, index=[0]))
 
     # initial data
-    scen = Scenario(test_mp, *msg_args).clone()
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig']).clone()
     scen.solve()
     exp = 0.5
 
@@ -194,8 +197,8 @@ def test_commodity_share_up(test_mp):
     assert new_obj >= orig_obj
 
 
-def test_share_commodity_lo(test_mp):
-    scen = Scenario(test_mp, *msg_args).clone()
+def test_share_commodity_lo(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig']).clone()
     scen.solve()
 
     # data for share bound
@@ -239,7 +242,7 @@ def test_share_commodity_lo(test_mp):
                   pd.DataFrame({
                       'shares': 'test-share',
                       'node_share': 'new-york',
-                      'year_act': 2010,
+                      'year_act': _year,
                       'time': 'year',
                       'unit': 'cases',
                       'value': exp,
@@ -254,8 +257,8 @@ def test_share_commodity_lo(test_mp):
     assert new_obj >= orig_obj
 
 
-def test_add_share_mode_up(test_mp):
-    scen = Scenario(test_mp, *msg_args).clone()
+def test_add_share_mode_up(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig']).clone()
     scen.solve()
 
     # data for share bound
@@ -277,7 +280,7 @@ def test_add_share_mode_up(test_mp):
                       'node_share': 'seattle',
                       'technology': 'transport_from_seattle',
                       'mode': 'to_chicago',
-                      'year_act': 2010,
+                      'year_act': _year,
                       'time': 'year',
                       'unit': 'cases',
                       'value': exp,
@@ -292,8 +295,8 @@ def test_add_share_mode_up(test_mp):
     assert new_obj >= orig_obj
 
 
-def test_add_share_mode_lo(test_mp):
-    scen = Scenario(test_mp, *msg_args).clone()
+def test_add_share_mode_lo(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig']).clone()
     scen.solve()
 
     # data for share bound
@@ -315,7 +318,7 @@ def test_add_share_mode_lo(test_mp):
                       'node_share': 'san-diego',
                       'technology': 'transport_from_san-diego',
                       'mode': 'to_new-york',
-                      'year_act': 2010,
+                      'year_act': _year,
                       'time': 'year',
                       'unit': 'cases',
                       'value': exp,

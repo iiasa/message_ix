@@ -2,11 +2,8 @@ from pathlib import Path
 
 from click.testing import CliRunner
 import message_ix
+from message_ix.testing import make_dantzig
 import pytest
-
-
-# Use the fixtures test_mp, test_mp_props, and tmp_env from ixmp.testing
-pytest_plugins = ['ixmp.testing']
 
 
 # Hooks
@@ -27,15 +24,7 @@ def test_data_path(request):
 @pytest.fixture(scope='session')
 def tutorial_path(request):
     """Path to the directory containing the tutorials."""
-    return Path(__file__).parent / '..' / 'tutorial'
-
-
-@pytest.fixture(scope='function')
-def test_legacy_mp(request, tmp_env, test_data_path):
-    """Path to a database properties file referring to a test database."""
-    from ixmp.testing import create_test_mp
-
-    yield from create_test_mp(request, test_data_path, 'message_ix_legacy')
+    return Path(__file__).parents[2] / 'tutorial'
 
 
 @pytest.fixture(scope='session')
@@ -52,3 +41,10 @@ def message_ix_cli(tmp_env):
                                   env=tmp_env, **kwargs)
 
     yield Runner().invoke
+
+
+@pytest.fixture(scope='class')
+def message_test_mp(test_mp):
+    make_dantzig(test_mp)
+    make_dantzig(test_mp, multi_year=True)
+    yield test_mp

@@ -42,7 +42,7 @@ install:
 script:
   - python -c "import os, sys; assert os.environ['PYVERSION'] == sys.version[0]"
   # Run tests
-  - pytest --verbose
+  - pytest --verbose message_ix
   # Test that documentation can be built
   - cd doc
   - pip install -r requirements.txt

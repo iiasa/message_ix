@@ -21,7 +21,7 @@ with open('README.md') as f:
 
 INSTALL_REQUIRES = [
     'click',
-    'ixmp>=0.2.0',
+    'ixmp>=2.0.0',
     'pandas',
     'xlrd',
     'XlsxWriter',

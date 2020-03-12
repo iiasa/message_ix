@@ -397,7 +397,7 @@ Configuration
 Utilities
 ---------
 
-.. autoclass:: ixmp.reporting.attrseries.AttrSeries
+.. autoclass:: ixmp.reporting.quantity.AttrSeries
 
 .. automodule:: ixmp.reporting.utils
    :members:
