@@ -2,7 +2,8 @@ asyncssh
 click
 codecov
 dask
-JPype1
+# Temporary: exclude JPype1 0.7.2, which causes segfaults on CI
+JPype1!=0.7.2
 jupyter
 jupyter_console>=6
 matplotlib
