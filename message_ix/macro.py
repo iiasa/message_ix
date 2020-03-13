@@ -137,8 +137,12 @@ def _validate_data(name, df, nodes, sectors, years):
 class Calculate:
     """Perform and store MACRO calibration calculations.
 
+    The :class:`.Scenario` *s* must:
+
+    - have a solution;
+    - have demand on the level 'useful'.
+
     s : .Scenario
-        *s* must have a solution.
     data : dict (str -> pd.DataFrame) or os.PathLike
         If :class:`.PathLike`, the path to an Excel file containing parameter
         data, one per sheet. If :class:`dict`, a dictionary mapping parameter

@@ -6,13 +6,12 @@ import pytest
 
 from message_ix import Scenario, macro
 from message_ix.models import MACRO
-from message_ix.testing import make_westeros
+from message_ix.testing import SCENARIO, make_westeros
 
 # tons of deprecation warnings come from reading excel (xlrd library), ignore
 # them for now
 pytestmark = pytest.mark.filterwarnings("ignore")
 
-MSG_ARGS = ('canning problem (MESSAGE scheme)', 'standard')
 
 W_DATA_PATH = Path(__file__).parent / 'data' / 'westeros_macro_input.xlsx'
 MR_DATA_PATH = Path(__file__).parent / 'data' / 'multiregion_macro_input.xlsx'
@@ -51,15 +50,14 @@ class MockScenario:
         return df
 
 
-# TODO: what scope should these be?
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='class')
 def westeros_solved(test_mp):
-    return make_westeros(test_mp, solve=True)
+    yield make_westeros(test_mp, solve=True)
 
 
-@pytest.fixture(scope='function')
-def westeros_not_solved(test_mp):
-    return make_westeros(test_mp, solve=False)
+@pytest.fixture(scope='class')
+def westeros_not_solved(westeros_solved):
+    yield westeros_solved.clone(keep_solution=False)
 
 
 def test_calc_valid_data_file(westeros_solved):
@@ -228,8 +226,8 @@ def test_calc_aconst(westeros_solved):
     assert np.isclose(obs, exp)
 
 
-def test_init(test_mp):
-    scen = Scenario(test_mp, *MSG_ARGS)
+def test_init(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig'])
 
     scen = scen.clone('foo', 'bar')
     scen.check_out()
