@@ -1,5 +1,6 @@
 import collections
 import os
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -133,23 +134,34 @@ def _validate_data(name, df, nodes, sectors, years):
     return cols
 
 
-class Calculate(object):
+class Calculate:
+    """Perform and store MACRO calibration calculations.
 
+    s : .Scenario
+        *s* must have a solution.
+    data : dict (str -> pd.DataFrame) or os.PathLike
+        If :class:`.PathLike`, the path to an Excel file containing parameter
+        data, one per sheet. If :class:`dict`, a dictionary mapping parameter
+        names to data frames.
+    """
+    # TODO add comments
+    # TODO add docstrings
     def __init__(self, s, data):
-        """
-        s : solved message scenario
-        data : dict of parameter names to dataframes
-        """
-        self.data = data
         self.s = s
 
-        good = isinstance(data, collections.Mapping) or os.path.exists(data)
-        if not good:
-            raise ValueError('Data argument is not a dictionary nor a file')
-        if not isinstance(data, collections.Mapping) and os.path.exists(data):
-            if not str(self.data).endswith('xlsx'):
-                raise ValueError('Must provide excel-based data file')
-            self.data = pd.read_excel(self.data, sheet_name=None)
+        if isinstance(data, collections.Mapping):
+            self.data = data
+        else:
+            # Handle a file path
+            try:
+                data_path = Path(data)
+            except ValueError:
+                raise ValueError(f'neither a dict nor a valid path: {data}')
+
+            if not data_path.exists() or data_path.suffix != '.xlsx':
+                raise ValueError(f'not an Excel data file: {data_path}')
+
+            self.data = pd.read_excel(data_path, sheet_name=None)
 
         if not s.has_solution():
             raise RuntimeError('Scenario must have a solution to add MACRO')
