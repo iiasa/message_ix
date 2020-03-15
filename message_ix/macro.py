@@ -1,19 +1,32 @@
 import collections
+from functools import lru_cache
+import logging
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from functools import lru_cache
 
-from ixmp.utils import logger
+log = logging.getLogger(__name__)
 
-#
-# TODOS:
-#
-# 1) all demands/prices assumed to be on USEFUL level, need to extend this
-#    to support others
-#
+
+EXPERIMENTAL = """
+======================= WARNING =======================
+
+You are using *experimental*, incomplete features from
+`message_ix.macro`—please exercise caution. Read more:
+- https://github.com/iiasa/message_ix/issues/315
+- https://github.com/iiasa/message_ix/issues/317
+- https://github.com/iiasa/message_ix/issues/318
+- https://github.com/iiasa/message_ix/issues/319
+- https://github.com/iiasa/message_ix/issues/320
+
+======================================================
+"""
+
+
+# TODO all demands and prices are assumed to be on USEFUL level, need to extend
+#      this to support others
 
 DATA_KEY = dict(
     cost_MESSAGE='total_cost',
@@ -405,7 +418,7 @@ def calibrate(s, check_convergence=True, **kwargs):
     n_iter = s.var('N_ITER')['lvl']
     max_iter = s.var('MAX_ITER')['lvl']
     msg = 'MACRO converged after {} of a maximum of {} iterations'
-    logger().info(msg.format(n_iter, max_iter))
+    log.info(msg.format(n_iter, max_iter))
 
     # get out calibrated values
     aeei = s.var('aeei_calibrate') \
