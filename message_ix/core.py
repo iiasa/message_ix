@@ -1,10 +1,19 @@
 import collections
 from functools import lru_cache
 from itertools import product
+import logging
 
 import ixmp
 from ixmp.utils import as_str_list, pd_read, pd_write, isscalar, logger
 import pandas as pd
+
+
+log = logging.getLogger(__name__)
+
+# Also print warnings to stderr
+_sh = logging.StreamHandler()
+_sh.setLevel(level=logging.WARNING)
+log.addHandler(_sh)
 
 
 class Scenario(ixmp.Scenario):
@@ -426,6 +435,26 @@ class Scenario(ixmp.Scenario):
             code; see :class:`.GAMSModel`.
         """
         super().solve(model=model, solve_options=solve_options, **kwargs)
+
+    def add_macro(self, data, scenario=None, check_convergence=True, **kwargs):
+        # TODO document
+        from .macro import EXPERIMENTAL, add_model_data, calibrate
+        from .models import MACRO
+
+        # Display a warning
+        log.warning(EXPERIMENTAL)
+
+        scenario = scenario or '_'.join([self.scenario, 'macro'])
+        clone = self.clone(self.model, scenario, keep_solution=False)
+        clone.check_out()
+
+        # Add ixmp items: sets, parameters, variables, and equations
+        MACRO.initialize(clone)
+
+        add_model_data(self, clone, data)
+        clone.commit('finished adding macro')
+        calibrate(clone, check_convergence=check_convergence, **kwargs)
+        return clone
 
     def rename(self, name, mapping, keep=False):
         """Rename an element in a set

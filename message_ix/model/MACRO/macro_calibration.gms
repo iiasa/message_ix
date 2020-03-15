@@ -15,6 +15,8 @@ Scalar
 Variables
          aeei_calibrate(node,sector,year_all)
          grow_calibrate(node,year_all)
+         N_ITER
+         MAX_ITER
 ;
 
 * ------------------------------------------------------------------------------
@@ -82,17 +84,21 @@ LOOP(year_all $( ORD(year_all) > sum(year_all2$( macro_initial_period(year_all2)
 * new labor supply
    newlab(node_macro, year_all) = SUM(year_all2$( seq_period(year_all2,year_all) ), (labor(node_macro, year_all) - labor(node_macro, year_all2)*(1 - depr(node_macro))**duration_period(year_all))$((labor(node_macro, year_all) - labor(node_macro, year_all2)*(1 - depr(node_macro))**duration_period(year_all)) > 0)) + epsilon ;
 * calculation of utility discount factor based on discount rate (drate)
-   udf(node_macro, year_all)    = SUM(year_all2$( seq_period(year_all2,year_all) ), udf(node_macro, year_all2) * (1 - (DRATE(node_macro) - grow(node_macro, year_all)))**duration_period(year_all)) ;
+   udf(node_macro, year_all)    = SUM(year_all2$( seq_period(year_all2,year_all) ), udf(node_macro, year_all2) * (1 - (drate(node_macro) - grow(node_macro, year_all)))**duration_period(year_all)) ;
 );
 
 * recalcualte finite time horizon correction of utility function
-finite_time_corr(node_macro, year) = abs(DRATE(node_macro) - grow(node_macro, year)) ;
+finite_time_corr(node_macro, year) = abs(drate(node_macro) - grow(node_macro, year)) ;
 
 ) ;
 
 * export calibration results as reporting variables to GDX
 aeei_calibrate.L(node_macro,sector,year) = aeei(node_macro,sector,year) ;
 grow_calibrate.L(node_macro,year) = grow(node_macro,year) ;
+
+* subtract one due to 1-based indexing
+N_ITER.L = ctr - 1;
+MAX_ITER.L = max_it ;
 
 * write solution statistics
 status('MESSAGE_MACRO','modelstat') = 1 ;
