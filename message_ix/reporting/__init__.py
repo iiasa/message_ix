@@ -85,30 +85,29 @@ PRODUCTS = (
     ('land_emi',
         ('land_emission', 'LAND')),
     ('addon ACT',
-        ('addon conversion:nl-t-yv-ya-m-h-type_addon:full', 'ACT')),
+        ('addon conversion', 'ACT')),
     ('addon in',
         ('input', 'addon ACT')),
     ('addon out',
         ('output', 'addon ACT')),
-    ('addon pot',
-        ('addon up:nl-t-ya-m-h-type_addon:full', 'addon ACT')),
+    ('addon potential',
+        ('addon up', 'addon ACT')),
 )
 
 #: Automatic quantities derived by other calculations.
 DERIVED = [
+    # Each entry is ('full key', (computation tuple,)). Full keys are not
+    # inferred and must be given explicitly.
     ('tom:nl-t-yv-ya', (computations.add, 'fom:nl-t-yv-ya', 'vom:nl-t-yv-ya')),
-    # addon_conversion broadcast across technology_addon
-    ('addon conversion:nl-t-yv-ya-m-h-type_addon:full',
-        (partial(computations.broadcast_map,
-                 rename={'n': 'nl'}),
-         'addon_conversion:n-t-yv-ya-m-h-type_addon',
-         'map_addon')),
-    # here we need to read addon_up by parent technology and type_addon
-    ('addon up:nl-t-ya-m-h-type_addon:full',
-        (partial(computations.broadcast_map,
-                 rename={'n': 'nl'}),
-         'addon_up:n-t-ya-m-h-type_addon',
-         'map_addon')),
+    # Broadcast from type_addon to technology_addon
+    ('addon conversion:nl-t-yv-ya-m-h-ta',
+     (partial(computations.broadcast_map, rename={'n': 'nl'}),
+      'addon_conversion:n-t-yv-ya-m-h-type_addon',
+      'map_addon')),
+    ('addon up:nl-t-ya-m-h-ta',
+     (partial(computations.broadcast_map, rename={'n': 'nl'}),
+      'addon_up:n-t-ya-m-h-type_addon',
+      'map_addon')),
 
 ]
 
