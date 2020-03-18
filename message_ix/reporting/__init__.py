@@ -64,6 +64,8 @@ configure(
 #: Automatic quantities that are the :meth:`~computations.product` of two
 #: others.
 PRODUCTS = (
+    # Each entry is ('output key', ('quantities', 'to', 'multiply')). Full keys
+    # are inferred automatically, by add_product().
     ('out',
         ('output', 'ACT')),
     ('in',
@@ -135,8 +137,14 @@ REPORTS = {
 }
 
 
-#: MESSAGE mapping sets, converted to quantities using
-#: :meth:`~computations.map_as_qty`.
+#: MESSAGE mapping sets, converted to reporting quantities via
+#: :meth:`~.map_as_qty`.
+#:
+#: For instance, the mapping set ``cat_addon`` is available at the reporting
+#: key ``map_addon``, which produces a :class:`.Quantity` with the two
+#: dimensions ``type_addon`` and ``ta`` (short form of ``technology_addon``).
+#: This Quantity contains the value 1 at every valid (type_addon, ta) location,
+#: and 0 elsewhere.
 MAPPING_SETS = [
     'addon',
     'emission',
