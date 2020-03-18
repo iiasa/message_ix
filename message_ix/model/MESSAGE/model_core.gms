@@ -1175,7 +1175,7 @@ TOTAL_CAPACITY_BOUND_LO(node,inv_tec,year)$( is_bound_total_capacity_lo(node,inv
 
 ***
 * .. _activity_bound_up:
-* 
+*
 * Equation ACTIVITY_BOUND_UP
 * """"""""""""""""""""""""""
 * This constraint provides upper bounds by mode of a technology activity, summed over all vintages.
@@ -1217,7 +1217,7 @@ ACTIVITY_BOUND_ALL_MODES_UP(node,tec,year,time)$( is_bound_activity_up(node,tec,
 
 ***
 * .. _acitvity_bound_lo:
-* 
+*
 * Equation ACTIVITY_BOUND_LO
 * """"""""""""""""""""""""""
 * This constraint provides lower bounds by mode of a technology activity, summed over
@@ -1263,7 +1263,7 @@ ACTIVITY_BOUND_ALL_MODES_LO(node,tec,year,time)$( bound_activity_lo(node,tec,yea
 *----------------------------------------------------------------------------------------------------------------------*
 ***
 * .. _share_constraints:
-* 
+*
 * Constraints on shares of technologies and commodities
 * -----------------------------------------------------
 * This section allows to include upper and lower bounds on the shares of modes used by a technology

@@ -64,6 +64,8 @@ configure(
 #: Automatic quantities that are the :meth:`~computations.product` of two
 #: others.
 PRODUCTS = (
+    # Each entry is ('output key', ('quantities', 'to', 'multiply')). Full keys
+    # are inferred automatically, by add_product().
     ('out',
         ('output', 'ACT')),
     ('in',
@@ -85,22 +87,30 @@ PRODUCTS = (
     ('land_emi',
         ('land_emission', 'LAND')),
     ('addon ACT',
-        ('addon conversion:n-tp-yv-ya-m-h-t:full', 'ACT')),
+        ('addon conversion', 'ACT')),
     ('addon in',
         ('input', 'addon ACT')),
     ('addon out',
         ('output', 'addon ACT')),
+    ('addon potential',
+        ('addon up', 'addon ACT')),
 )
 
 #: Automatic quantities derived by other calculations.
 DERIVED = [
+    # Each entry is ('full key', (computation tuple,)). Full keys are not
+    # inferred and must be given explicitly.
     ('tom:nl-t-yv-ya', (computations.add, 'fom:nl-t-yv-ya', 'vom:nl-t-yv-ya')),
-    # addon_conversion broadcast across technology_addon
-    ('addon conversion:n-tp-yv-ya-m-h-t:full',
-        (partial(computations.broadcast_map,
-                 rename={'t': 'tp', 'ta': 't', 'n': 'nl'}),
-         'addon_conversion:n-t-yv-ya-m-h-type_addon',
-         'map_addon')),
+    # Broadcast from type_addon to technology_addon
+    ('addon conversion:nl-t-yv-ya-m-h-ta',
+     (partial(computations.broadcast_map, rename={'n': 'nl'}),
+      'addon_conversion:n-t-yv-ya-m-h-type_addon',
+      'map_addon')),
+    ('addon up:nl-t-ya-m-h-ta',
+     (partial(computations.broadcast_map, rename={'n': 'nl'}),
+      'addon_up:n-t-ya-m-h-type_addon',
+      'map_addon')),
+
 ]
 
 #: Quantities to automatically convert to IAMC format using
@@ -127,8 +137,14 @@ REPORTS = {
 }
 
 
-#: MESSAGE mapping sets, converted to quantities using
-#: :meth:`~computations.map_as_qty`.
+#: MESSAGE mapping sets, converted to reporting quantities via
+#: :meth:`~.map_as_qty`.
+#:
+#: For instance, the mapping set ``cat_addon`` is available at the reporting
+#: key ``map_addon``, which produces a :class:`.Quantity` with the two
+#: dimensions ``type_addon`` and ``ta`` (short form of ``technology_addon``).
+#: This Quantity contains the value 1 at every valid (type_addon, ta) location,
+#: and 0 elsewhere.
 MAPPING_SETS = [
     'addon',
     'emission',

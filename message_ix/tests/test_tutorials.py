@@ -25,7 +25,7 @@ tutorials = [
     (('westeros', 'westeros_flexible_generation'), []),
     (('westeros', 'westeros_report'),
      # NB this is the same value as in test_reporter()
-     [('len-rep-graph', 16569)]),
+     [('len-rep-graph', 12537)]),
     ((AT, 'austria'), [('solve-objective-value', 133105.109375)]),
     ((AT, 'austria_single_policy'), [('solve-objective-value', 525474464.0)]),
     ((AT, 'austria_multiple_policies'), []),
