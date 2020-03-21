@@ -303,18 +303,38 @@ def test_rename_technology_no_rm(dantzig_message_scenario):
     assert clone.par('output')['technology'].isin(['foo_bar']).any()
 
 
-def test_excel_read_write(message_test_mp):
-    fname = 'test_excel_read_write.xlsx'
+def test_excel_read_write(message_test_mp, tmp_path):
+    # Path to temporary file
+    tmp_path /= 'excel_read_write.xlsx'
+    # Convert to string to ensure this can be handled
+    fname = str(tmp_path)
 
     scen1 = Scenario(message_test_mp, **SCENARIO['dantzig'])
+    scen1 = scen1.clone(keep_solution=False)
+    scen1.check_out()
+    scen1.init_set('new_set')
+    scen1.add_set('new_set', 'member')
+    scen1.init_par('new_par', idx_sets=['new_set'])
+    scen1.add_par('new_par', 'member', 2, '-')
+    scen1.commit('new set and parameter added.')
     scen1.to_excel(fname)
 
-    scen2 = Scenario(message_test_mp, model='foo', scenario='bar', version='new')
-    scen2.read_excel(fname)
+    scen2 = Scenario(message_test_mp, model='foo', scenario='bar',
+                     version='new')
+
+    # Fails without init_items=True
+    with pytest.raises(ValueError, match="no set 'new_set'"):
+        scen2.read_excel(fname)
+
+    # Succeeds with init_items=True
+    scen2.read_excel(fname, init_items=True, commit_steps=True)
 
     exp = scen1.par('input')
     obs = scen2.par('input')
     pdt.assert_frame_equal(exp, obs)
+
+    assert scen2.has_par('new_par')
+    assert float(scen2.par('new_par')['value']) == 2
 
     scen2.commit('foo')  # must be checked in
     scen2.solve()
