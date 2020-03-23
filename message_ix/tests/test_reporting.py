@@ -155,7 +155,7 @@ def test_reporter_convert_pyam(dantzig_reporter, caplog, tmp_path):
     assert idf1['variable'].unique() == 'ACT'
 
     # Warning was logged because of extra columns
-    w = "Extra columns ['h', 'm', 't'] when converting ['ACT'] to IAMC format"
+    w = "Extra columns ['h', 'm', 't'] when converting 'ACT' to IAMC format"
     assert ('message_ix.reporting.pyam', WARNING, w) in caplog.record_tuples
 
     # Repeat, using the message_ix.Reporter convenience function
