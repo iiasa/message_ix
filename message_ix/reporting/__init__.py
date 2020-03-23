@@ -243,7 +243,7 @@ class Reporter(IXMPReporter):
         return rep
 
     def convert_pyam(self, quantities, year_time_dim, tag='iamc', drop={},
-                     collapse=None):
+                     collapse=None, unit=None):
         """Add conversion of one or more **quantities** to IAMC format.
 
         Parameters
@@ -265,6 +265,8 @@ class Reporter(IXMPReporter):
             Callback to handle additional dimensions of the quantity. A
             :class:`pandas.DataFrame` is passed as the sole argument to
             `collapse`, which must return a modified dataframe.
+        unit : str or pint.Unit, optional
+            Convert values to these units.
 
         Returns
         -------
@@ -290,7 +292,8 @@ class Reporter(IXMPReporter):
             comp = partial(computations.as_pyam,
                            year_time_dim=year_time_dim,
                            drop=to_drop,
-                           collapse=collapse)
+                           collapse=collapse,
+                           unit=unit)
             self.add(new_key, (comp, 'scenario', qty))
             keys.append(new_key)
         return keys
