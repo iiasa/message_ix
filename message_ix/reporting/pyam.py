@@ -68,6 +68,10 @@ def as_pyam(scenario, quantity, year_time_dim, drop=[], collapse=None,
         df['value'] = q.magnitude
         df['unit'] = unit
 
+    if not isinstance(df.loc[0, 'unit'], str):
+        # Convert pint.Unit to string
+        df['unit'] = f"{df.loc[0, 'unit']:~}"
+
     # Warn about extra columns
     extra = sorted(set(df.columns) - set(IAMC_IDX + ['year', 'time', 'value']))
     if extra:
