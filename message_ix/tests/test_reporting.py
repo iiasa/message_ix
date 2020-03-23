@@ -204,19 +204,32 @@ def test_reporter_convert_pyam(dantzig_reporter, caplog, tmp_path):
     expected = Path(__file__).parent / 'data' / 'report-pyam-write.csv'
     assert path.read_text() == expected.read_text()
 
+    # Use a name map to replace variable names
+    rep.add('activity variables', {
+        'Activity|canning_plant|production': 'Foo'
+    })
+    key3 = rep.convert_pyam(ACT, 'ya', replace_vars='activity variables',
+                            collapse=add_tm).pop()
+    df3 = rep.get(key3).as_pandas()
+
+    # Values are the same; different names
+    exp = df2[df2.variable == 'Activity|canning_plant|production']['value'] \
+        .reset_index()
+    assert all(exp == df3[df3.variable == 'Foo']['value'].reset_index())
+
     # Now convert variable cost
     cb = partial(add_tm, name='Variable cost')
-    key3 = rep.convert_pyam('var_cost', 'ya', collapse=cb).pop()
-    df3 = rep.get(key3).as_pandas().drop(['model', 'scenario'], axis=1)
-
-    # Results have the expected units
-    assert all(df3['unit'] == 'USD / case')
-
-    # Also change units
-    key4 = rep.convert_pyam('var_cost', 'ya', collapse=cb,
-                            unit='centiUSD / case').pop()
+    key4 = rep.convert_pyam('var_cost', 'ya', collapse=cb).pop()
     df4 = rep.get(key4).as_pandas().drop(['model', 'scenario'], axis=1)
 
     # Results have the expected units
-    assert all(df4['unit'] == 'centiUSD / case')
-    assert_series_equal(df3['value'], df4['value'] / 100.)
+    assert all(df4['unit'] == 'USD / case')
+
+    # Also change units
+    key5 = rep.convert_pyam('var_cost', 'ya', collapse=cb,
+                            unit='centiUSD / case').pop()
+    df5 = rep.get(key5).as_pandas().drop(['model', 'scenario'], axis=1)
+
+    # Results have the expected units
+    assert all(df5['unit'] == 'centiUSD / case')
+    assert_series_equal(df4['value'], df5['value'] / 100.)
