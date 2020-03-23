@@ -243,7 +243,7 @@ class Reporter(IXMPReporter):
         return rep
 
     def convert_pyam(self, quantities, year_time_dim, tag='iamc', drop={},
-                     collapse=None, unit=None):
+                     collapse=None, unit=None, replace_vars=None):
         """Add conversion of one or more **quantities** to IAMC format.
 
         Parameters
@@ -267,6 +267,9 @@ class Reporter(IXMPReporter):
             `collapse`, which must return a modified dataframe.
         unit : str or pint.Unit, optional
             Convert values to these units.
+        replace_vars : str or Key
+            Other reporting key containing a :class:`dict` mapping variable
+            names to replace.
 
         Returns
         -------
@@ -284,18 +287,31 @@ class Reporter(IXMPReporter):
 
         keys = []
         for qty in quantities:
-            # Dimensions to drop automatically
+            # Key for the new quantity
             qty = Key.from_str_or_key(qty)
+            new_key = ':'.join([qty.name, tag])
+
+            # Dimensions to drop automatically
             to_drop = set(drop) | set(qty.dims) & (
                 {'h', 'y', 'ya', 'yr', 'yv'} - {year_time_dim})
-            new_key = ':'.join([qty.name, tag])
-            comp = partial(computations.as_pyam,
-                           year_time_dim=year_time_dim,
-                           drop=to_drop,
-                           collapse=collapse,
-                           unit=unit)
-            self.add(new_key, (comp, 'scenario', qty))
+
+            # Prepare the computation
+            comp = [
+                partial(computations.as_pyam,
+                        drop=to_drop,
+                        collapse=collapse,
+                        unit=unit),
+                'scenario',
+                qty,
+                year_time_dim,
+            ]
+            if replace_vars:
+                comp.append(replace_vars)
+
+            # Add and store
+            self.add(new_key, tuple(comp))
             keys.append(new_key)
+
         return keys
 
     def write(self, key, path):

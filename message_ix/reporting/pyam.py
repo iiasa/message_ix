@@ -11,8 +11,8 @@ from pyam import IAMC_IDX, IamDataFrame, concat as pyam_concat
 log = getLogger(__name__)
 
 
-def as_pyam(scenario, quantity, year_time_dim, drop=[], collapse=None,
-            unit=None):
+def as_pyam(scenario, quantity, year_time_dim, replace_vars=None,
+            drop=[], collapse=None, unit=None):
     """Return a :class:`pyam.IamDataFrame` containing *quantity*.
 
     Warnings are logged if the arguments result in additional, unhandled
@@ -40,6 +40,7 @@ def as_pyam(scenario, quantity, year_time_dim, drop=[], collapse=None,
     # - Rename one dimension to 'year' or 'time'
     # - Fill variable, unit, model, and scenario columns
     # - Apply the collapse callback, if given
+    # - Replace values in the variable column
     # - Drop any unwanted columns
     df = quantity.to_series() \
         .rename('value') \
@@ -51,6 +52,7 @@ def as_pyam(scenario, quantity, year_time_dim, drop=[], collapse=None,
             model=scenario.model,
             scenario=scenario.scenario) \
         .pipe(collapse or (lambda df: df)) \
+        .replace(dict(variable=replace_vars or dict())) \
         .drop(drop, axis=1)
 
     # Raise exception for non-unique data
@@ -84,7 +86,7 @@ def as_pyam(scenario, quantity, year_time_dim, drop=[], collapse=None,
 # Computations that operate on pyam.IamDataFrame inputs
 
 def concat(*args):
-    """Concatenate *args*, which must be :class:`pyam.IamDataFrame`."""
+    """Concatenate *args*, which must all be :class:`pyam.IamDataFrame`."""
     if isinstance(args[0], IamDataFrame):
         return pyam_concat(args)
     else:
