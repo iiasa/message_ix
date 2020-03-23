@@ -5,18 +5,19 @@ from ixmp.reporting.computations import (
     write_report as ixmp_write_report,
 )
 import pandas as pd
+import pint
 from pyam import IAMC_IDX, IamDataFrame, concat as pyam_concat
 
 
 log = getLogger(__name__)
 
 
-def as_pyam(scenario, quantities, year_time_dim, drop=[], collapse=None):
+def as_pyam(scenario, quantities, year_time_dim, drop=[], collapse=None,
+            unit=None):
     """Return a :class:`pyam.IamDataFrame` containing *quantities*.
 
     Warnings are logged if the arguments result in additional, unhandled
-    columns in the
-    resulting data frame that are not part of the IAMC spec.
+    columns in the resulting data frame that are not part of the IAMC spec.
 
     Raises
     ------
@@ -49,7 +50,7 @@ def as_pyam(scenario, quantities, year_time_dim, drop=[], collapse=None):
                 .reset_index() \
                 .rename(columns=IAMC_columns)
         df['variable'] = qty.name
-        df['unit'] = qty.attrs.get('unit', '')
+        df['unit'] = qty.attrs.get('_unit', '')
 
         dfs.append(df)
 
@@ -71,6 +72,15 @@ def as_pyam(scenario, quantities, year_time_dim, drop=[], collapse=None):
     if duplicates.any():
         raise ValueError('Duplicate IAMC indices cannot be converted:\n'
                          + str(df[duplicates]))
+
+    # Convert units
+    if unit:
+        from_unit = df['unit'].unique()
+        if len(from_unit) > 1:
+            raise ValueError(f"cannot convert non-unique units {from_unit!r}")
+        q = pint.Quantity(df['value'].values, from_unit[0]).to(unit)
+        df['value'] = q.magnitude
+        df['unit'] = unit
 
     # Warn about extra columns
     extra = sorted(set(df.columns) - set(IAMC_IDX + ['year', 'time', 'value']))
