@@ -57,7 +57,8 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
         scenario has the single year 1963.
     """
     # add custom units and region for timeseries data
-    mp.add_unit('USD_per_km')
+    mp.add_unit('USD/case')
+    mp.add_unit('case')
     mp.add_region('DantzigLand', 'country')
 
     # initialize a new (empty) instance of an `ixmp.Scenario`
@@ -91,13 +92,13 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
               'value': [325, 300, 275]}
     par['demand'] = make_df(
         pd.DataFrame.from_dict(demand), commodity='cases', level='consumption',
-        time='year', unit='cases', year=1963)
+        time='year', unit='case', year=1963)
 
     b_a_u = {'node_loc': ['seattle', 'san-diego'],
              'value': [350, 600]}
     par['bound_activity_up'] = make_df(
         pd.DataFrame.from_dict(b_a_u), mode='production',
-        technology='canning_plant', time='year', unit='cases', year_act=1963)
+        technology='canning_plant', time='year', unit='case', year_act=1963)
     par['ref_activity'] = par['bound_activity_up'].copy()
 
     input = pd.DataFrame([
@@ -110,7 +111,7 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
     ], columns=['mode', 'node_loc', 'node_origin', 'technology'])
     par['input'] = make_df(
         input, commodity='cases', level='supply', time='year',
-        time_origin='year', unit='%', value=1, year_act=1963,
+        time_origin='year', unit='case', value=1, year_act=1963,
         year_vtg=1963)
 
     output = pd.DataFrame([
@@ -124,9 +125,11 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
         ['consumption', 'to_topeka', 'topeka', 'san-diego', t[2]],
     ], columns=['level', 'mode', 'node_dest', 'node_loc', 'technology'])
     par['output'] = make_df(
-        output, commodity='cases', time='year', time_dest='year', unit='%',
+        output, commodity='cases', time='year', time_dest='year', unit='case',
         value=1, year_act=1963, year_vtg=1963)
 
+    # Variable cost: cost per kilometre × distance (neither parametrized
+    # explicitly)
     var_cost = pd.DataFrame([
         ['to_new-york', 'seattle', 'transport_from_seattle', 0.225],
         ['to_chicago', 'seattle', 'transport_from_seattle', 0.153],
@@ -136,7 +139,7 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
         ['to_topeka', 'san-diego', 'transport_from_san-diego', 0.126],
     ], columns=['mode', 'node_loc', 'technology', 'value'])
     par['var_cost'] = make_df(
-        var_cost, time='year', unit='USD', year_act=1963, year_vtg=1963)
+        var_cost, time='year', unit='USD/case', year_act=1963, year_vtg=1963)
 
     for name, value in par.items():
         scen.add_par(name, value)

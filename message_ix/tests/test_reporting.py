@@ -8,7 +8,7 @@ from ixmp.reporting import Reporter as ixmp_Reporter
 from ixmp.testing import assert_qty_equal
 from numpy.testing import assert_allclose
 import pandas as pd
-from pandas.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal, assert_series_equal
 import pyam
 import xarray as xr
 
@@ -125,11 +125,16 @@ def test_reporter_from_westeros(test_mp):
     assert_allclose(obs, exp)
 
 
-def test_reporter_convert_pyam(message_test_mp, caplog, tmp_path):
+@pytest.fixture
+def dantzig_reporter(message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO['dantzig'])
     if not scen.has_solution():
         scen.solve()
-    rep = Reporter.from_scenario(scen)
+    yield Reporter.from_scenario(scen)
+
+
+def test_reporter_convert_pyam(dantzig_reporter, caplog, tmp_path):
+    rep = dantzig_reporter
 
     # Key for 'ACT' variable at full resolution
     ACT = rep.full_key('ACT')
@@ -150,19 +155,17 @@ def test_reporter_convert_pyam(message_test_mp, caplog, tmp_path):
     assert idf1['variable'].unique() == 'ACT'
 
     # Warning was logged because of extra columns
-    w = "Extra columns ['h', 'm', 't'] when converting ['ACT'] to IAMC format"
+    w = "Extra columns ['h', 'm', 't'] when converting 'ACT' to IAMC format"
     assert ('message_ix.reporting.pyam', WARNING, w) in caplog.record_tuples
 
     # Repeat, using the message_ix.Reporter convenience function
-    def m_t(df):
+    def add_tm(df, name='Activity'):
         """Callback for collapsing ACT columns."""
-        # .pop() removes the named column from the returned row
-        df['variable'] = 'Activity|' + df['t'] + '|' + df['m']
-        df.drop(['t', 'm'], axis=1, inplace=True)
-        return df
+        df['variable'] = f'{name}|' + df['t'] + '|' + df['m']
+        return df.drop(['t', 'm'], axis=1)
 
     # Use the convenience function to add the node
-    keys = rep.convert_pyam(ACT, 'ya', collapse=m_t)
+    keys = rep.convert_pyam(ACT, 'ya', collapse=add_tm)
 
     # Keys of added node(s) are returned
     assert len(keys) == 1
@@ -200,3 +203,33 @@ def test_reporter_convert_pyam(message_test_mp, caplog, tmp_path):
     # File contents are as expected
     expected = Path(__file__).parent / 'data' / 'report-pyam-write.csv'
     assert path.read_text() == expected.read_text()
+
+    # Use a name map to replace variable names
+    rep.add('activity variables', {
+        'Activity|canning_plant|production': 'Foo'
+    })
+    key3 = rep.convert_pyam(ACT, 'ya', replace_vars='activity variables',
+                            collapse=add_tm).pop()
+    df3 = rep.get(key3).as_pandas()
+
+    # Values are the same; different names
+    exp = df2[df2.variable == 'Activity|canning_plant|production']['value'] \
+        .reset_index()
+    assert all(exp == df3[df3.variable == 'Foo']['value'].reset_index())
+
+    # Now convert variable cost
+    cb = partial(add_tm, name='Variable cost')
+    key4 = rep.convert_pyam('var_cost', 'ya', collapse=cb).pop()
+    df4 = rep.get(key4).as_pandas().drop(['model', 'scenario'], axis=1)
+
+    # Results have the expected units
+    assert all(df4['unit'] == 'USD / case')
+
+    # Also change units
+    key5 = rep.convert_pyam('var_cost', 'ya', collapse=cb,
+                            unit='centiUSD / case').pop()
+    df5 = rep.get(key5).as_pandas().drop(['model', 'scenario'], axis=1)
+
+    # Results have the expected units
+    assert all(df5['unit'] == 'centiUSD / case')
+    assert_series_equal(df4['value'], df5['value'] / 100.)

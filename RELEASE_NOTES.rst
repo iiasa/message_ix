@@ -4,6 +4,7 @@ Next release
 All changes
 -----------
 
+- `#323 <https://github.com/iiasa/message_ix/pull/323>`_: Add `units`, `replace_vars` arguments to :meth:`.Reporter.convert_pyam`.
 - `#308 <https://github.com/iiasa/message_ix/pull/308>`_: Expand automatic reporting of add-on technologies.
 - `#313 <https://github.com/iiasa/ixmp/pull/313>`_: Include all tests in the message_ix package.
 - `#307 <https://github.com/iiasa/message_ix/pull/307>`_: adjust to deprecations in ixmp 2.0.
