@@ -55,6 +55,10 @@ Support for R usage of the core classes is provided through the `reticulate`_ pa
    included here for convenience. :class:`message_ix.Scenario` defines
    additional methods specific to |MESSAGEix|:
 
+   .. versionchanged:: 3.0
+
+      :meth:`.read_excel` and :meth:`.to_excel` are now methods of :class:`ixmp.Scenario`, but continue to work with message_ix.Scenario.
+
    .. autosummary::
 
       add_cat
@@ -71,7 +75,6 @@ Support for R usage of the core classes is provided through the `reticulate`_ pa
       var
       vintage_and_active_years
       years_active
-
 
 
 Model classes
