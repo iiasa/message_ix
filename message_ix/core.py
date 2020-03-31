@@ -4,7 +4,7 @@ from itertools import product
 import logging
 
 import ixmp
-from ixmp.utils import as_str_list, pd_read, pd_write, isscalar, logger
+from ixmp.utils import as_str_list, isscalar, logger
 import pandas as pd
 
 
