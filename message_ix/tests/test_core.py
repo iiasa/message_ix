@@ -1,5 +1,3 @@
-import os
-
 import ixmp
 import numpy as np
 import numpy.testing as npt
@@ -345,8 +343,6 @@ def test_excel_read_write(message_test_mp, tmp_path):
     scen2.commit('foo')  # must be checked in
     scen2.solve()
     assert np.isclose(scen2.var('OBJ')['lvl'], scen1.var('OBJ')['lvl'])
-
-    os.remove(fname)
 
 
 def test_clone(tmpdir):
