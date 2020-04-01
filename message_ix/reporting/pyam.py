@@ -11,7 +11,7 @@ from pyam import IAMC_IDX, IamDataFrame, concat as pyam_concat
 log = getLogger(__name__)
 
 
-def as_pyam(scenario, quantity, year_time_dim, replace_vars=None,
+def as_pyam(scenario, quantity, replace_vars=None, year_time_dim=None,
             drop=[], collapse=None, unit=None):
     """Return a :class:`pyam.IamDataFrame` containing *quantity*.
 

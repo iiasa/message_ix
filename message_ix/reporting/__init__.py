@@ -298,12 +298,12 @@ class Reporter(IXMPReporter):
             # Prepare the computation
             comp = [
                 partial(computations.as_pyam,
+                        year_time_dim=year_time_dim,
                         drop=to_drop,
                         collapse=collapse,
                         unit=unit),
                 'scenario',
                 qty,
-                year_time_dim,
             ]
             if replace_vars:
                 comp.append(replace_vars)
