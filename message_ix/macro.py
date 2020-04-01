@@ -233,8 +233,6 @@ class Calculate:
             )
         # init year is most recent period PRIOR to the modeled period
         self.init_year = max(data_years_before_model)
-        # base year is first model period
-        self.base_year = min_year_model
 
     def _clean_model_data(self, data):
         if "node" in data:
@@ -396,8 +394,6 @@ def add_model_data(base, clone, data):
     # add temporal set structure
     clone.add_set("type_year", "initializeyear_macro")
     clone.add_set("cat_year", ["initializeyear_macro", c.init_year])
-    clone.add_set("type_year", "baseyear_macro")
-    clone.add_set("cat_year", ["baseyear_macro", c.base_year])
 
     # add nodal set structure
     clone.add_set("type_node", "economy")
