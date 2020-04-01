@@ -62,7 +62,7 @@ def as_pyam(scenario, quantity, replace_vars=None, year_time_dim=None,
                          + str(df[duplicates]))
 
     # Convert units
-    if unit:
+    if len(df) and unit:
         from_unit = df['unit'].unique()
         if len(from_unit) > 1:
             raise ValueError(f'cannot convert non-unique units {from_unit!r}')
@@ -70,7 +70,8 @@ def as_pyam(scenario, quantity, replace_vars=None, year_time_dim=None,
         df['value'] = q.magnitude
         df['unit'] = unit
 
-    if not isinstance(df.loc[0, 'unit'], str):
+    # Ensure units are a string, for pyam
+    if len(df) and not isinstance(df.loc[0, 'unit'], str):
         # Convert pint.Unit to string
         df['unit'] = f"{df.loc[0, 'unit']:~}"
 
