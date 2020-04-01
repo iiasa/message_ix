@@ -68,8 +68,8 @@ Install |MESSAGEix| from source
 7. (Optional) Run the built-in test suite to check that |MESSAGEix| functions
    correctly on your system::
 
-    $ pip install --editable .[tests]
-    $ py.test tests
+    $ pip install --editable .[tests,reporting]
+    $ py.test
 
 Common issues
 -------------
