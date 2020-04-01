@@ -146,11 +146,11 @@ REPORTS = {
 #: This Quantity contains the value 1 at every valid (type_addon, ta) location,
 #: and 0 elsewhere.
 MAPPING_SETS = [
-    'addon',
-    'emission',
+    ('addon', 't'),  # Mapping name, and full target set
+    ('emission', 'e'),
     # 'node',  # Automatic addition fails because 'map_node' is defined
-    'tec',
-    'year',
+    ('tec', 't'),
+    ('year', 'y'),
 ]
 
 
@@ -189,9 +189,10 @@ class Reporter(IXMPReporter):
                                 + list(args[1:])))
 
         # Quantities that represent mapping sets
-        for name in MAPPING_SETS:
+        for name, full_set in MAPPING_SETS:
             put(rep.add, f'map_{name}',
-                (computations.map_as_qty, f'cat_{name}'), strict=True)
+                (computations.map_as_qty, f'cat_{name}', full_set),
+                strict=True)
 
         # Product quantities
         for name, quantities in PRODUCTS:
