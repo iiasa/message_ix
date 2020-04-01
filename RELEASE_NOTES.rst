@@ -4,6 +4,7 @@ Next release
 All changes
 -----------
 
+- `#321 <https://github.com/iiasa/message_ix/pull/321>`_: Move :meth:`.Scenario.to_excel`, :meth:`.read_excel` to :class:`ixmp.Scenario`; they continue to work with message_ix.Scenario.
 - `#323 <https://github.com/iiasa/message_ix/pull/323>`_: Add `units`, `replace_vars` arguments to :meth:`.Reporter.convert_pyam`.
 - `#308 <https://github.com/iiasa/message_ix/pull/308>`_: Expand automatic reporting of add-on technologies.
 - `#313 <https://github.com/iiasa/ixmp/pull/313>`_: Include all tests in the message_ix package.
