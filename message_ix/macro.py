@@ -1,6 +1,7 @@
 import logging
 from functools import lru_cache
 from pathlib import Path
+from itertools import product
 from typing import Mapping
 
 import numpy as np
@@ -317,13 +318,17 @@ class Calculate:
         model_price = self._clean_model_data(
             self.s.var("PRICE_COMMODITY", filters={"level": "useful"})
         )
-        if np.isclose(model_price["lvl"], 0).any():  # pragma: no cover
-            # TODO this needs a test
-            raise RuntimeError("0-price found in MESSAGE variable PRICE_COMMODITY")
-        model_price.rename(
-            columns={"lvl": "value", "commodity": "sector"}, inplace=True
-        )
-        model_price = model_price[idx + ["value"]]
+        for node, com in product(self.nodes, self.sectors):
+            test_price = model_price.loc[(model_price['node']==node) & (
+                                         model_price['commodity']==com)]
+            if np.isclose(test_price['lvl'], 0
+                          ).any() or len(test_price['year']) < len(self.years):
+                msg = ('0-price found in MESSAGE variable PRICE_COMMODITY' +
+                       ' for commodity "{}" in node "{}".'.format(com, node))
+                raise RuntimeError(msg)
+        model_price.rename(columns={'lvl': 'value', 'commodity': 'sector'},
+                           inplace=True)
+        model_price = model_price[idx + ['value']]
 
         # get data provided in init year from data
         price_ref = self.data["price_ref"].reset_index()
