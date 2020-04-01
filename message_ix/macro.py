@@ -318,12 +318,12 @@ class Calculate:
             self.s.var("PRICE_COMMODITY", filters={"level": "useful"})
         )
         for node, com in product(self.nodes, self.sectors):
-            test_price = model_price.loc[(model_price['node']==node) & (
-                                         model_price['commodity']==com)]
+            test_price = model_price.loc[(model_price['node'] == node) & (
+                                         model_price['commodity'] == com)]
             if np.isclose(test_price['lvl'], 0
                           ).any() or len(test_price['year']) < len(self.years):
-                msg = ('0-price found in MESSAGE variable PRICE_COMMODITY' +
-                       ' for commodity "{}" in node "{}".'.format(com, node))
+                msg = ('0-price found in MESSAGE variable PRICE_COMMODITY'
+                       ' for commodity "{}" in node "{}".').format(com, node)
                 raise RuntimeError(msg)
         model_price.rename(columns={'lvl': 'value', 'commodity': 'sector'},
                            inplace=True)
