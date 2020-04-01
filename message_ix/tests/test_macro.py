@@ -219,16 +219,16 @@ def test_calc_price_zero(westeros_solved):
     clone.solve()
     price = clone.var('PRICE_COMMODITY')
     # Assert if there is no zero price (to make sure MACRO receives 0 price)
-    assert not (np.isclose(0, price['lvl']).any())
+    assert np.isclose(0, price['lvl']).any()
     c = macro.Calculate(clone, W_DATA_PATH)
     c.read_data()
     try:
         c._price()
-    except AssertionError as error:
+    except RuntimeError as err:
         # To make sure the right error message is raised in macro.py
-        assert ('0-price found in MESSAGE variable PRICE_COMMODITY' in error)
+        assert ('0-price found in MESSAGE variable PRICE_' in str(err))
     else:
-        raise Exception('No error raised in macro.py with zero price')
+        raise Exception('No error in macro.read_data() for zero price(s)')
 
 
 def test_calc_demand(westeros_solved):
