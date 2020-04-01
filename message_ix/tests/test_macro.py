@@ -204,7 +204,6 @@ def test_calc_price(westeros_solved):
 def test_calc_price_zero(westeros_solved):
     s = westeros_solved
     clone = s.clone(scenario='low_demand', keep_solution=False)
-    clone.remove_solution()
     clone.check_out()
     # Lowering demand in the first year
     clone.add_par('demand', ['Westeros', 'light', 'useful', 700, 'year'],
