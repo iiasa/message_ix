@@ -101,6 +101,7 @@ DERIVED = [
     # Each entry is ('full key', (computation tuple,)). Full keys are not
     # inferred and must be given explicitly.
     ('tom:nl-t-yv-ya', (computations.add, 'fom:nl-t-yv-ya', 'vom:nl-t-yv-ya')),
+
     # Broadcast from type_addon to technology_addon
     ('addon conversion:nl-t-yv-ya-m-h-ta',
      (partial(computations.broadcast_map, rename={'n': 'nl'}),
@@ -111,6 +112,13 @@ DERIVED = [
       'addon_up:n-t-ya-m-h-type_addon',
       'map_addon')),
 
+    # Double broadcast over type_emission, then type_tec, in a nested task
+    ('price emission:n-e-t-y',
+     (computations.broadcast_map,
+      (computations.broadcast_map,
+       'PRICE_EMISSION:n-type_emission-type_tec-y',
+       'map_emission'),
+      'map_tec')),
 ]
 
 #: Quantities to automatically convert to IAMC format using
