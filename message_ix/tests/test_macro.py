@@ -209,10 +209,11 @@ def test_calc_price_zero(westeros_solved):
     clone.add_par('demand', ['Westeros', 'light', 'useful', 700, 'year'],
                   10, 'GWa')
     # Making investment and var cost zero for delivering light
-    clone.add_par('inv_cost', ['Westeros', 'bulb', 700], 0, 'USD/kW')
+    # TODO: these units are based on testing.make_westeros: needs improvement
+    clone.add_par('inv_cost', ['Westeros', 'bulb', 700], 0, 'USD/GWa')
     for y in [690, 700]:
         clone.add_par('var_cost', ['Westeros', 'grid', y, 700, 'standard',
-                                   'year'], 0, 'USD/kWa')
+                                   'year'], 0, 'USD/GWa')
 
     clone.commit('demand reduced and zero cost for bulb')
     clone.solve()
