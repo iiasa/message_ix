@@ -93,7 +93,7 @@ Austrian energy system
 This tutorial demonstrates a stylized representation of a national electricity
 sector model, with several fossil and renewable power plant types.
 
-#. Prepare the base model version, in `Python <https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/austria.ipynb>`__ or in `R <https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/austria_reticulate.ipynb>`__.
-#. Plot results, in `Python <https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/austria_load_scenario.ipynb>`__ or in `R <https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/austria_load_scenario_R.ipynb>`__.
+#. Prepare the base model version, in `Python <https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/austria.ipynb>`__ or in `R <https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/R_austria.ipynb>`__.
+#. Plot results, in `Python <https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/austria_load_scenario.ipynb>`__ or in `R <https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/R_austria_load_scenario.ipynb>`__ (only loads scenarios).
 #. `Run a single policy scenario <https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/austria_single_policy.ipynb>`_.
 #. Run multiple policy scenarios. This tutorial has two notebooks: `an introduction with some exercises <https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/austria_multiple_policies.ipynb>`_ and `completed code for the exercises <https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/austria_multiple_policies-answers.ipynb>`_.
