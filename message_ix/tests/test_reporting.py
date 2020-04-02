@@ -133,8 +133,11 @@ def dantzig_reporter(message_test_mp):
     yield Reporter.from_scenario(scen)
 
 
-def test_as_pyam(dantzig_reporter):
-    rep = dantzig_reporter
+def test_as_pyam(message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO['dantzig'])
+    if not scen.has_solution():
+        scen.solve()
+    rep = Reporter.from_scenario(scen)
 
     # Quantities for 'ACT' variable at full resolution
     qty = rep.get(rep.full_key('ACT'))
