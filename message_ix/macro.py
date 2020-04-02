@@ -394,6 +394,11 @@ def add_model_data(base, clone, data):
     c.read_data()
     c.derive_data()
 
+    # removing old initializeyear_macro before adding new one
+    cat = clone.set("cat_year", {"type_year": "initializeyear_macro"})
+    if not cat.empty:
+        clone.remove_set("cat_year", cat)
+
     # add temporal set structure
     clone.add_set("type_year", "initializeyear_macro")
     clone.add_set("cat_year", ["initializeyear_macro", c.init_year])
