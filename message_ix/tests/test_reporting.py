@@ -133,6 +133,17 @@ def dantzig_reporter(message_test_mp):
     yield Reporter.from_scenario(scen)
 
 
+def test_as_pyam(dantzig_reporter):
+    rep = dantzig_reporter
+
+    # Quantities for 'ACT' variable at full resolution
+    qty = rep.get(rep.full_key('ACT'))
+
+    # Call as_pyam() with an empty quantity
+    p = computations.as_pyam(scen, qty[0:0], year_time_dim='ya')
+    assert isinstance(p, pyam.IamDataFrame)
+
+
 def test_reporter_convert_pyam(dantzig_reporter, caplog, tmp_path):
     rep = dantzig_reporter
 
