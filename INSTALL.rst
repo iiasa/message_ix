@@ -71,6 +71,11 @@ Install |MESSAGEix| from source
     $ pip install --editable .[tests,reporting]
     $ py.test
 
+8. **(Optional for R users)** Run the built-in test suite to check that |MESSAGEix| functions
+   correctly on your system, including use the ``rixmp`` package::
+
+    $ py.test --test-r
+
 Common issues
 -------------
 
