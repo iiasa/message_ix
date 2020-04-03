@@ -325,8 +325,8 @@ class Calculate:
         for node, com in product(self.nodes, self.sectors):
             test_price = model_price.loc[(model_price['node'] == node) & (
                                          model_price['commodity'] == com)]
-            if np.isclose(test_price['lvl'], 0
-                          ).any() or len(test_price['year']) < len(self.years):
+            missing = len(test_price['year']) < len(self.years)
+            if np.isclose(test_price['lvl'], 0).any() or missing:
                 msg = ('0-price found in MESSAGE variable PRICE_COMMODITY'
                        ' for commodity "{}" in node "{}".').format(com, node)
                 raise RuntimeError(msg)
