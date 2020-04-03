@@ -39,14 +39,10 @@ DATA_KEY = dict(
 )
 
 UNITS = dict(
-    cost_MESSAGE="G$",
-    demand_MESSAGE="GWa",
-    gdp_calibrate="T$",
-    historical_gdp="T$",
-    price_MESSAGE="USD/kWa",
-    # Used in calibrate()
-    aeei="-",
-    grow="-",
+    cost_MESSAGE='cost_ref',
+    demand_MESSAGE='demand_ref',
+    historical_gdp='gdp_calibrate',
+    price_MESSAGE='price_ref',
 )
 
 #: ixmp items (sets, parameters, variables, and equations) in MACRO.
@@ -138,8 +134,7 @@ def _validate_data(name, df, nodes, sectors, years):
     if name in MACRO_DATA_FOR_DERIVATION:
         cols = MACRO_DATA_FOR_DERIVATION[name]
     else:
-        cols = MACRO_ITEMS[name]["idx_sets"]
-    # TODO: cols += ['unit'] ?
+        cols = MACRO_ITEMS[name]['idx_sets']
     col_diff = set(cols) - set(df.columns)
     if col_diff:
         raise ValueError(f"Missing expected columns for {name}: {col_diff}")
@@ -176,6 +171,7 @@ class Calculate:
     # TODO add docstrings
     def __init__(self, s, data):
         self.s = s
+        self.units = {}
 
         if isinstance(data, Mapping):
             self.data = data
@@ -223,10 +219,10 @@ class Calculate:
             # no need to validate configuration, it was processed above
             if name == "config":
                 continue
-            idx = _validate_data(
-                name, self.data[name], self.nodes, self.sectors, self.years
-            )
-            self.data[name] = self.data[name].set_index(idx)["value"]
+            idx = _validate_data(name, self.data[name],
+                                 self.nodes, self.sectors, self.years)
+            self.units[name] =  self.data[name]['unit'].mode().any()
+            self.data[name] = self.data[name].set_index(idx)['value']
 
         # special check for gdp_calibrate - it must have at minimum two years
         # prior to the model horizon in order to compute growth rates in the
@@ -428,7 +424,10 @@ def add_model_data(base, clone, data):
         try:
             key = DATA_KEY.get(name, name)
             data = c.data[key].reset_index()
-            data["unit"] = UNITS.get(name, "-")
+            if name in UNITS.keys():
+                data['unit'] = c.units.get(UNITS.get(name))
+            else:
+                data['unit'] = c.units.get(name, '-')
             # some data may have information prior to the MACRO initialization
             # year which we need to remove in order to add it to the scenario
             if "year" in data:
@@ -449,18 +448,14 @@ def calibrate(s, check_convergence=True, **kwargs):
     log.info(msg.format(n_iter, max_iter))
 
     # get out calibrated values
-    aeei = (
-        s.var("aeei_calibrate")
-        .rename(columns={"lvl": "value"})
-        .drop("mrg", axis=1)
-        .assign(unit=UNITS["aeei"])
-    )
-    grow = (
-        s.var("grow_calibrate")
-        .rename(columns={"lvl": "value"})
-        .drop("mrg", axis=1)
-        .assign(unit=UNITS["grow"])
-    )
+    aeei = s.var('aeei_calibrate') \
+            .rename(columns={'lvl': 'value'}) \
+            .drop('mrg', axis=1) \
+            .assign(unit=s.par('grow')['unit'].mode().any())
+    grow = s.var('grow_calibrate') \
+            .rename(columns={'lvl': 'value'}) \
+            .drop('mrg', axis=1) \
+            .assign(unit=s.par('grow')['unit'].mode().any())
 
     # update calibrated value parameters
     s.remove_solution()
