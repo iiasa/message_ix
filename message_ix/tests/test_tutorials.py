@@ -59,6 +59,7 @@ def test_tutorial(nb_path, cell_values, tmp_path, tmp_env):
         # Cell identified by name or index has a particular value
         assert np.isclose(get_cell_output(nb, cell), value)
 
+
 # R tutorials, using rixmp
 R_tutorials = [
     ((AT, 'R_austria'), []),
@@ -68,7 +69,13 @@ R_tutorials = [
 # Short, readable IDs for the R tests
 R_ids = [arg[0][-1] for arg in R_tutorials]
 
-# Parametrize the first 3 arguments using the variables *R_tutorial* and *R_ids*.
+@pytest.fixture
+def nb_path(request, tutorial_path):
+    # Combine the filename parts with the tutorial_path fixture
+    yield Path(tutorial_path, *request.param).with_suffix('.ipynb')
+
+
+# Parametrize the first 3 arguments using variables *R_tutorial* and *R_ids*.
 # Argument 'nb_path' is indirect so that the above fixture can modify it.
 @pytest.mark.parametrize('nb_path,cell_values', R_tutorials, ids=R_ids,
                          indirect=['nb_path'])
