@@ -121,7 +121,7 @@ VERIFY_INPUT_DATA = [
 ]
 
 
-def _validate_data(name, df, nodes, sectors, years):
+def _validate_data(name, df, nodes, sectors, levels, years):
     def validate(kind, values, df):
         if kind not in df:
             return
@@ -141,9 +141,10 @@ def _validate_data(name, df, nodes, sectors, years):
 
     # check required column values
     checks = (
-        ("node", nodes),
-        ("sector", sectors),
-        ("year", years),
+        ('node', nodes),
+        ('sector', sectors),
+        ('year', years),
+        ('level', levels),
     )
 
     for kind, values in checks:
@@ -220,8 +221,8 @@ class Calculate:
             # no need to validate configuration, it was processed above
             if name == "config":
                 continue
-            idx = _validate_data(name, self.data[name],
-                                 self.nodes, self.sectors, self.years)
+            idx = _validate_data(name, self.data[name], self.nodes,
+                                 self.sectors, self.levels, self.years)
             self.units[name] = self.data[name]['unit'].mode().any()
             self.data[name] = self.data[name].set_index(idx)['value']
 
