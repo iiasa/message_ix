@@ -17,7 +17,7 @@
 * .. caution::
 *
 *    Parameters written in **bold** are auxiliary parameters
-*    that are either generated automatically when exporting a ``message_ix.Scenario`` to gdx
+*    that are either generated automatically when exporting a :class:`message_ix.Scenario` to gdx
 *    or that are computed during the *pre-processing* stage in GAMS (see the footnotes for more
 *    individual details). These are **not** meant to be edited through the API when editing scenarios.
 *
@@ -51,13 +51,13 @@
 *      - Discount factor of the last year in the period [#df_auto]_
 *
 * .. [#duration_time_year] The element 'year' in the set of subannual time slices ``time`` has the value of 1.
-*    This value is assigned by default when creating a new ``ixmp.Scenario`` based on the ``MESSAGE`` scheme.
+*    This value is assigned by default when creating a new :class:`ixmp.Scenario` based on the ``MESSAGE`` scheme.
 *
 * .. [#short_dur] The short-hand notation :math:`|y|` is used for the parameters :math:`duration\_period_y`
 *    in the mathematical model documentation for exponents.
 *
 * .. [#year_auto] The values for this parameter are computed automatically when exporting a ``MESSAGE``-scheme
-*    ``ixmp.Scenario`` to gdx.
+*    :class:`ixmp.Scenario` to gdx.
 *    Note that in |MESSAGEix|, the elements of the ``year`` set are understood to be the last year in a period,
 *    see :ref:`this footnote <period_year_footnote>`.
 *
