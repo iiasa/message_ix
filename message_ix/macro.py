@@ -195,7 +195,7 @@ class Calculate:
 
     def read_data(self):
         if 'config' in self.data:
-            # users define certain nodes and sectors for the MACRO set
+            # users define certain nodes, sectors and level for MACRO
             config = self.data['config']
             for key in ['node', 'sector', 'level']:
                 try:
@@ -205,7 +205,7 @@ class Calculate:
                 else:
                     if config[key].dropna().empty:
                         raise ValueError(
-                            'Config data for {} is emmpty'.format(key))
+                            'Config data for {} is empty'.format(key))
 
             self.nodes = set(config['node'].dropna())
             self.sectors = set(config['sector'].dropna())
@@ -428,7 +428,7 @@ def add_model_data(base, clone, data):
             key = DATA_KEY.get(name, name)
             data = c.data[key].reset_index()
             if name in UNITS.keys():
-                data['unit'] = c.units.get(UNITS.get(name))
+                data['unit'] = c.units.get(UNITS.get(name), '-')
             else:
                 data['unit'] = c.units.get(name, '-')
             # some data may have information prior to the MACRO initialization
