@@ -1191,7 +1191,7 @@ ACTIVITY_BOUND_ALL_MODES_UP(node,tec,year,time)$( is_bound_activity_up(node,tec,
 ;
 
 ***
-* .. _acitvity_bound_lo:
+* .. _activity_bound_lo:
 *
 * Equation ACTIVITY_BOUND_LO
 * """"""""""""""""""""""""""
