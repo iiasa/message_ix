@@ -158,7 +158,6 @@ class Calculate:
     The :class:`.Scenario` *s* must:
 
     - have a solution;
-    - have demand on the level 'useful'.
 
     s : .Scenario
     data : dict (str -> pd.DataFrame) or os.PathLike
@@ -190,26 +189,28 @@ class Calculate:
         if not s.has_solution():
             raise RuntimeError("Scenario must have a solution to add MACRO")
 
-        demand = s.var('DEMAND')
-        self.years = set(demand['year'].unique())
-
-    def read_data(self):
-        if 'config' in self.data:
-            # users define certain nodes, sectors and level for MACRO
+        if 'config' not in self.data:
+            raise KeyError('Missing config in input data')
+        else:
             config = self.data['config']
             for key in ['node', 'sector', 'level']:
                 try:
                     config[key]
                 except KeyError:
-                    raise KeyError('Missing config data for {}'.format(key))
+                    raise KeyError('Missing config data for "{}"'.format(key))
                 else:
                     if config[key].dropna().empty:
                         raise ValueError(
-                            'Config data for {} is empty'.format(key))
+                            'Config data for "{}" is empty'.format(key))
 
-            self.nodes = set(config['node'].dropna())
-            self.sectors = set(config['sector'].dropna())
-            self.levels = set(config['level'].dropna())
+        demand = s.var('DEMAND')
+        self.years = set(demand['year'].unique())
+
+    def read_data(self):
+        # users define certain nodes, sectors and level for MACRO
+        self.nodes = set(self.data['config']['node'].dropna())
+        self.sectors = set(self.data['config']['sector'].dropna())
+        self.levels = set(self.data['config']['level'].dropna())
 
         par_diff = set(VERIFY_INPUT_DATA) - set(self.data)
         if par_diff:
