@@ -308,7 +308,8 @@ class Calculate:
         cost_ref = self.data["cost_ref"].reset_index()
         cost_ref["year"] = self.init_year
         # combine into one value
-        total_cost = pd.concat([cost_ref, model_cost]).set_index(idx)["value"]
+        total_cost = pd.concat([cost_ref, model_cost],
+                               sort=True).set_index(idx)['value']
         if total_cost.isnull().any():
             raise RuntimeError("NaN values found in total_cost calculation")
         self.data["total_cost"] = total_cost
@@ -337,7 +338,8 @@ class Calculate:
         price_ref = self.data["price_ref"].reset_index()
         price_ref["year"] = self.init_year
         # combine into one value
-        price = pd.concat([price_ref, model_price]).set_index(idx)["value"]
+        price = pd.concat([price_ref, model_price],
+                          sort=True).set_index(idx)['value']
         if price.isnull().any():
             raise RuntimeError("NaN values found in price calculation")
         self.data["price"] = price
@@ -358,7 +360,8 @@ class Calculate:
         demand_ref = self.data["demand_ref"].reset_index()
         demand_ref["year"] = self.init_year
         # combine into one value
-        demand = pd.concat([demand_ref, model_demand]).set_index(idx)["value"]
+        demand = pd.concat([demand_ref, model_demand],
+                           sort=True).set_index(idx)['value']
         if demand.isnull().any():
             raise RuntimeError("NaN values found in demand calculation")
         self.data["demand"] = demand
