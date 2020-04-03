@@ -4,6 +4,13 @@ Next release
 All changes
 -----------
 
+- `#321 <https://github.com/iiasa/message_ix/pull/321>`_: Move :meth:`.Scenario.to_excel`, :meth:`.read_excel` to :class:`ixmp.Scenario`; they continue to work with message_ix.Scenario.
+- `#323 <https://github.com/iiasa/message_ix/pull/323>`_: Add `units`, `replace_vars` arguments to :meth:`.Reporter.convert_pyam`.
+- `#308 <https://github.com/iiasa/message_ix/pull/308>`_: Expand automatic reporting of add-on technologies.
+- `#313 <https://github.com/iiasa/ixmp/pull/313>`_: Include all tests in the message_ix package.
+- `#307 <https://github.com/iiasa/message_ix/pull/307>`_: adjust to deprecations in ixmp 2.0.
+- `#223 <https://github.com/iiasa/message_ix/pull/223>`_: Add methods for parametrization and calibration of MACRO based on an existing MESSAGE Scenario.
+
 
 v2.0.0 (2020-01-14)
 ===================

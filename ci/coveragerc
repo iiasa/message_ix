@@ -1,3 +1,5 @@
 [run]
 omit =
     message_ix/model/*
+    message_ix/tests/test_nightly.py
+    message_ix/testing/nightly.py

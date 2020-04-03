@@ -16,13 +16,13 @@ import yaml
 log = logging.getLogger(__name__)
 
 HERE = Path(__file__).resolve()
-DEFAULT_WORKDIR = HERE.parents[2] / 'tests' / 'data' / 'nightly'
+DEFAULT_WORKDIR = HERE.parents[1] / 'tests' / 'data' / 'nightly'
 DBFOLDER = os.path.join(HERE, 'db')
 DBPATH = os.path.join(DBFOLDER, 'scenarios')
 
 
 def _config():
-    with open(HERE.parents[2] / 'ci' / 'nightly.yaml') as f:
+    with open(HERE.parents[3] / 'ci' / 'nightly.yaml') as f:
         return yaml.safe_load(f)
 
 
@@ -74,8 +74,15 @@ def fetch_scenarios(path, dbprops):
 
 
 def iter_scenarios():
-    with open(HERE.parents[2] / 'tests' / 'data' / 'scenarios.yaml', 'r') as f:
-        scenarios = yaml.safe_load(f)
+    try:
+        with open(HERE.parents[1] / 'tests' / 'data' / 'scenarios.yaml',
+                  'r') as f:
+            scenarios = yaml.safe_load(f)
+
+    except FileNotFoundError as e:
+        msg = 'Caught error: {}. Did you install message_ix using `$ pip ' \
+              'install --editable`?' .format(str(e))
+        raise FileNotFoundError(msg)
 
     for id, data in scenarios.items():
         yield id, (
@@ -88,7 +95,8 @@ def iter_scenarios():
 
 
 def make_db(path):
-    mp = ixmp.Platform(dbprops=path / 'scenarios', dbtype='HSQLDB')
+    mp = ixmp.Platform(backend='jdbc', driver='hsqldb',
+                       path=path / 'scenarios')
     for id, data in iter_scenarios():
         scen = message_ix.Scenario(mp, data['model'], data['scenario'],
                                    version='new')

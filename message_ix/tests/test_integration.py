@@ -1,18 +1,20 @@
-import pytest
-import numpy as np
-from numpy import testing as npt
-import pandas.util.testing as pdt
-
 from ixmp import Platform
-from message_ix import Scenario
+from numpy import testing as npt
+import numpy as np
+from pandas.testing import assert_frame_equal
+import pytest
 
+from message_ix import Scenario
 from message_ix.testing import (
-    make_dantzig,
-    models,
-    TS_DF,
+    SCENARIO,
     TS_DF_CLEARED,
-    TS_DF_SHIFT
+    TS_DF,
+    make_dantzig,
 )
+
+
+pytestmark = pytest.mark.xfail(
+    reason='https://github.com/iiasa/message_ix/issues/322')
 
 
 def test_run_clone(tmpdir):
@@ -25,14 +27,14 @@ def test_run_clone(tmpdir):
     scen = make_dantzig(mp, solve=True)
     assert np.isclose(scen.var('OBJ')['lvl'], 153.675)
     assert scen.firstmodelyear == 1963
-    pdt.assert_frame_equal(scen.timeseries(iamc=True), TS_DF)
+    assert_frame_equal(scen.timeseries(iamc=True), TS_DF)
 
     # cloning with `keep_solution=True` keeps all timeseries and the solution
     # (same behaviour as `ixmp.Scenario`)
     scen2 = scen.clone(keep_solution=True)
     assert np.isclose(scen2.var('OBJ')['lvl'], 153.675)
     assert scen2.firstmodelyear == 1963
-    pdt.assert_frame_equal(scen2.timeseries(iamc=True), TS_DF)
+    assert_frame_equal(scen2.timeseries(iamc=True), TS_DF)
 
     # cloning with `keep_solution=False` drops the solution and only keeps
     # timeseries set as `meta=True` or prior to the first model year
@@ -40,7 +42,7 @@ def test_run_clone(tmpdir):
     scen3 = scen.clone(keep_solution=False)
     assert np.isnan(scen3.var('OBJ')['lvl'])
     assert scen3.firstmodelyear == 1963
-    pdt.assert_frame_equal(scen3.timeseries(iamc=True), TS_DF_CLEARED)
+    assert_frame_equal(scen3.timeseries(iamc=True), TS_DF_CLEARED)
 
 
 def test_run_remove_solution(test_mp):
@@ -59,7 +61,7 @@ def test_run_remove_solution(test_mp):
     # before first model year (DIFFERENT behaviour from `ixmp.Scenario`)
     scen.remove_solution()
     assert scen.firstmodelyear == 1963
-    pdt.assert_frame_equal(scen.timeseries(iamc=True), TS_DF_CLEARED)
+    assert_frame_equal(scen.timeseries(iamc=True), TS_DF_CLEARED)
 
 
 def test_shift_first_model_year(test_mp):
@@ -71,9 +73,13 @@ def test_shift_first_model_year(test_mp):
     # clone and shift first model year
     clone = scen.clone(shift_first_model_year=1964)
 
+    exp = TS_DF.copy()
+    exp.loc[0, 1964] = np.nan
+    exp['scenario'] = 'multi-year'
+
     # check that solution and timeseries in new model horizon have been removed
     assert np.isnan(clone.var('OBJ')['lvl'])
-    pdt.assert_frame_equal(clone.timeseries(iamc=True), TS_DF_SHIFT)
+    assert_frame_equal(exp, clone.timeseries(iamc=True))
     assert clone.firstmodelyear == 1964
     # check that the variable `ACT` is now the parameter `historical_activity`
     assert not clone.par('historical_activity').empty
@@ -84,7 +90,7 @@ def scenario_list(mp):
 
 
 def assert_multi_db(mp1, mp2):
-    pdt.assert_frame_equal(scenario_list(mp1), scenario_list(mp2))
+    assert_frame_equal(scenario_list(mp1), scenario_list(mp2))
 
 
 def test_multi_db_run(tmpdir):
@@ -113,15 +119,15 @@ def test_multi_db_run(tmpdir):
 
     # reopen the connection to the second platform and reload scenario
     _mp2 = Platform(driver='hsqldb', path=tmpdir / 'mp2')
-    scen2 = Scenario(_mp2, **models['dantzig'])
+    scen2 = Scenario(_mp2, **SCENARIO['dantzig'])
     assert_multi_db(mp1, _mp2)
 
     # check that sets, variables and parameter were copied correctly
     npt.assert_array_equal(scen1.set('node'), scen2.set('node'))
     scen2.firstmodelyear == 1963
-    pdt.assert_frame_equal(scen1.par('var_cost'), scen2.par('var_cost'))
+    assert_frame_equal(scen1.par('var_cost'), scen2.par('var_cost'))
     assert np.isclose(scen2.var('OBJ')['lvl'], 153.675)
-    pdt.assert_frame_equal(scen1.var('ACT'), scen2.var('ACT'))
+    assert_frame_equal(scen1.var('ACT'), scen2.var('ACT'))
 
     # check that custom unit, region and timeseries are migrated correctly
-    pdt.assert_frame_equal(scen2.timeseries(iamc=True), TS_DF)
+    assert_frame_equal(scen2.timeseries(iamc=True), TS_DF)

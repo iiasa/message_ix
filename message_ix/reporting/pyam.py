@@ -4,19 +4,19 @@ from ixmp.reporting.computations import (
     concat as ixmp_concat,
     write_report as ixmp_write_report,
 )
-import pandas as pd
+import pint
 from pyam import IAMC_IDX, IamDataFrame, concat as pyam_concat
 
 
 log = getLogger(__name__)
 
 
-def as_pyam(scenario, quantities, year_time_dim, drop=[], collapse=None):
-    """Return a :class:`pyam.IamDataFrame` containing *quantities*.
+def as_pyam(scenario, quantity, year_time_dim, replace_vars=None,
+            drop=[], collapse=None, unit=None):
+    """Return a :class:`pyam.IamDataFrame` containing *quantity*.
 
     Warnings are logged if the arguments result in additional, unhandled
-    columns in the
-    resulting data frame that are not part of the IAMC spec.
+    columns in the resulting data frame that are not part of the IAMC spec.
 
     Raises
     ------
@@ -28,43 +28,32 @@ def as_pyam(scenario, quantities, year_time_dim, drop=[], collapse=None):
     --------
     message_ix.reporting.Reporter.convert_pyam
     """
-    # TODO, this should check for any viable container
-    if not isinstance(quantities, list):
-        quantities = [quantities]
-
-    # If collapse is not provided, it is a pass-through
-    collapse = collapse or (lambda df: df)
-
-    # Renamed automatically
-    IAMC_columns = {
+    rename_cols = {
+        # Renamed automatically
         'n': 'region',
         'nl': 'region',
+        # Column to set as year or time dimension
+        year_time_dim: 'year' if year_time_dim.startswith('y') else 'time',
     }
 
-    # Convert each of *quantities* individually
-    dfs = []
-    for qty in quantities:
-        df = qty.to_series() \
-                .rename('value') \
-                .reset_index() \
-                .rename(columns=IAMC_columns)
-        df['variable'] = qty.name
-        df['unit'] = qty.attrs.get('unit', '')
-
-        dfs.append(df)
-
-    # Combine DataFrames
-    df = pd.concat(dfs)
-    # Set model and scenario columns
-    df['model'] = scenario.model
-    df['scenario'] = scenario.scenario
-
-    # Set one column as 'year' or 'time' (long IAMC format); drop any other
-    # columns
-    year_or_time = 'year' if year_time_dim.startswith('y') else 'time'
-    df = df.rename(columns={year_time_dim: year_or_time}) \
-           .pipe(collapse) \
-           .drop(drop, axis=1)
+    # - Convert to pd.DataFrame
+    # - Rename one dimension to 'year' or 'time'
+    # - Fill variable, unit, model, and scenario columns
+    # - Apply the collapse callback, if given
+    # - Replace values in the variable column
+    # - Drop any unwanted columns
+    df = quantity.to_series() \
+        .rename('value') \
+        .reset_index() \
+        .rename(columns=rename_cols) \
+        .assign(
+            variable=quantity.name,
+            unit=quantity.attrs.get('_unit', ''),
+            model=scenario.model,
+            scenario=scenario.scenario) \
+        .pipe(collapse or (lambda df: df)) \
+        .replace(dict(variable=replace_vars or dict())) \
+        .drop(drop, axis=1)
 
     # Raise exception for non-unique data
     duplicates = df.duplicated(subset=set(df.columns) - {'value'})
@@ -72,11 +61,24 @@ def as_pyam(scenario, quantities, year_time_dim, drop=[], collapse=None):
         raise ValueError('Duplicate IAMC indices cannot be converted:\n'
                          + str(df[duplicates]))
 
+    # Convert units
+    if unit:
+        from_unit = df['unit'].unique()
+        if len(from_unit) > 1:
+            raise ValueError(f'cannot convert non-unique units {from_unit!r}')
+        q = pint.Quantity(df['value'].values, from_unit[0]).to(unit)
+        df['value'] = q.magnitude
+        df['unit'] = unit
+
+    if not isinstance(df.loc[0, 'unit'], str):
+        # Convert pint.Unit to string
+        df['unit'] = f"{df.loc[0, 'unit']:~}"
+
     # Warn about extra columns
     extra = sorted(set(df.columns) - set(IAMC_IDX + ['year', 'time', 'value']))
     if extra:
-        log.warning('Extra columns {!r} when converting {} to IAMC format'
-                    .format(extra, [q.name for q in quantities]))
+        log.warning(f'Extra columns {extra!r} when converting '
+                    f'{quantity.name!r} to IAMC format')
 
     return IamDataFrame(df)
 
@@ -84,7 +86,7 @@ def as_pyam(scenario, quantities, year_time_dim, drop=[], collapse=None):
 # Computations that operate on pyam.IamDataFrame inputs
 
 def concat(*args):
-    """Concatenate *args*, which must be :class:`pyam.IamDataFrame`."""
+    """Concatenate *args*, which must all be :class:`pyam.IamDataFrame`."""
     if isinstance(args[0], IamDataFrame):
         return pyam_concat(args)
     else:

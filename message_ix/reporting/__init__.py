@@ -64,6 +64,8 @@ configure(
 #: Automatic quantities that are the :meth:`~computations.product` of two
 #: others.
 PRODUCTS = (
+    # Each entry is ('output key', ('quantities', 'to', 'multiply')). Full keys
+    # are inferred automatically, by add_product().
     ('out',
         ('output', 'ACT')),
     ('in',
@@ -85,22 +87,30 @@ PRODUCTS = (
     ('land_emi',
         ('land_emission', 'LAND')),
     ('addon ACT',
-        ('addon conversion:n-tp-yv-ya-m-h-t:full', 'ACT')),
+        ('addon conversion', 'ACT')),
     ('addon in',
         ('input', 'addon ACT')),
     ('addon out',
         ('output', 'addon ACT')),
+    ('addon potential',
+        ('addon up', 'addon ACT')),
 )
 
 #: Automatic quantities derived by other calculations.
 DERIVED = [
+    # Each entry is ('full key', (computation tuple,)). Full keys are not
+    # inferred and must be given explicitly.
     ('tom:nl-t-yv-ya', (computations.add, 'fom:nl-t-yv-ya', 'vom:nl-t-yv-ya')),
-    # addon_conversion broadcast across technology_addon
-    ('addon conversion:n-tp-yv-ya-m-h-t:full',
-        (partial(computations.broadcast_map,
-                 rename={'t': 'tp', 'ta': 't', 'n': 'nl'}),
-         'addon_conversion:n-t-yv-ya-m-h-type_addon',
-         'map_addon')),
+    # Broadcast from type_addon to technology_addon
+    ('addon conversion:nl-t-yv-ya-m-h-ta',
+     (partial(computations.broadcast_map, rename={'n': 'nl'}),
+      'addon_conversion:n-t-yv-ya-m-h-type_addon',
+      'map_addon')),
+    ('addon up:nl-t-ya-m-h-ta',
+     (partial(computations.broadcast_map, rename={'n': 'nl'}),
+      'addon_up:n-t-ya-m-h-type_addon',
+      'map_addon')),
+
 ]
 
 #: Quantities to automatically convert to IAMC format using
@@ -127,8 +137,14 @@ REPORTS = {
 }
 
 
-#: MESSAGE mapping sets, converted to quantities using
-#: :meth:`~computations.map_as_qty`.
+#: MESSAGE mapping sets, converted to reporting quantities via
+#: :meth:`~.map_as_qty`.
+#:
+#: For instance, the mapping set ``cat_addon`` is available at the reporting
+#: key ``map_addon``, which produces a :class:`.Quantity` with the two
+#: dimensions ``type_addon`` and ``ta`` (short form of ``technology_addon``).
+#: This Quantity contains the value 1 at every valid (type_addon, ta) location,
+#: and 0 elsewhere.
 MAPPING_SETS = [
     'addon',
     'emission',
@@ -227,7 +243,7 @@ class Reporter(IXMPReporter):
         return rep
 
     def convert_pyam(self, quantities, year_time_dim, tag='iamc', drop={},
-                     collapse=None):
+                     collapse=None, unit=None, replace_vars=None):
         """Add conversion of one or more **quantities** to IAMC format.
 
         Parameters
@@ -249,6 +265,11 @@ class Reporter(IXMPReporter):
             Callback to handle additional dimensions of the quantity. A
             :class:`pandas.DataFrame` is passed as the sole argument to
             `collapse`, which must return a modified dataframe.
+        unit : str or pint.Unit, optional
+            Convert values to these units.
+        replace_vars : str or Key
+            Other reporting key containing a :class:`dict` mapping variable
+            names to replace.
 
         Returns
         -------
@@ -266,17 +287,31 @@ class Reporter(IXMPReporter):
 
         keys = []
         for qty in quantities:
-            # Dimensions to drop automatically
+            # Key for the new quantity
             qty = Key.from_str_or_key(qty)
+            new_key = ':'.join([qty.name, tag])
+
+            # Dimensions to drop automatically
             to_drop = set(drop) | set(qty.dims) & (
                 {'h', 'y', 'ya', 'yr', 'yv'} - {year_time_dim})
-            new_key = ':'.join([qty.name, tag])
-            comp = partial(computations.as_pyam,
-                           year_time_dim=year_time_dim,
-                           drop=to_drop,
-                           collapse=collapse)
-            self.add(new_key, (comp, 'scenario', qty))
+
+            # Prepare the computation
+            comp = [
+                partial(computations.as_pyam,
+                        drop=to_drop,
+                        collapse=collapse,
+                        unit=unit),
+                'scenario',
+                qty,
+                year_time_dim,
+            ]
+            if replace_vars:
+                comp.append(replace_vars)
+
+            # Add and store
+            self.add(new_key, tuple(comp))
             keys.append(new_key)
+
         return keys
 
     def write(self, key, path):

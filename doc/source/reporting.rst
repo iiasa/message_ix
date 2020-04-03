@@ -107,18 +107,27 @@ These include:
 
 - ``out``: the product of ``output`` (output efficiency) and ``ACT``
   (activity).
-- ``out_hist``: ``output`` × ``ref_activity`` (historical reference activity),
-- ``in``:      ``input`` × ``ACT``,
-- ``in_hist``: ``input`` × ``ref_activity``,
-- ``emi``:      ``emission_factor`` × ``ACT``,
-- ``emi_hist``: ``emission_factor`` × ``ref_activity``,
-- ``inv``:      ``inv_cost`` × ``CAP_NEW``,
-- ``inv_hist``: ``inv_cost`` × ``ref_new_capacity``,
-- ``fom``:      ``fix_cost`` × ``CAP``,
-- ``fom_hist``: ``fix_cost`` × ``ref_capacity``,
-- ``vom``:      ``var_cost`` × ``ACT``, and
-- ``vom_hist``: ``var_cost`` × ``ref_activity``.
-- ``tom``: ``fom`` + ``vom``.
+- ``out_hist``     = ``output`` × ``ref_activity`` (historical reference activity),
+- ``in``           = ``input`` × ``ACT``,
+- ``in_hist``      = ``input`` × ``ref_activity``,
+- ``emi``          = ``emission_factor`` × ``ACT``,
+- ``emi_hist``     = ``emission_factor`` × ``ref_activity``,
+- ``inv``          = ``inv_cost`` × ``CAP_NEW``,
+- ``inv_hist``     = ``inv_cost`` × ``ref_new_capacity``,
+- ``fom``          = ``fix_cost`` × ``CAP``,
+- ``fom_hist``     = ``fix_cost`` × ``ref_capacity``,
+- ``vom``          = ``var_cost`` × ``ACT``, and
+- ``vom_hist``     = ``var_cost`` × ``ref_activity``.
+- ``tom``          = ``fom`` + ``vom``.
+- ``land_out``     = ``land_output`` × ``LAND``,
+- ``land_use_qty`` = ``land_use`` × ``LAND``,
+- ``land_emi``     = ``land_emission`` × ``LAND``,
+- ``addon conversion``, the model parameter ``addon_conversion`` (note space versus underscore), except broadcast across individual add-on technologies (``ta``) rather than add-on types (``type_addon``),
+- ``addon up``, which is ``addon_up`` similarly broadcast.,
+- ``addon ACT``    = ``addon conversion`` × ``ACT``,
+- ``addon in``     = ``input`` × ``addon ACT``,
+- ``addon out``    = ``output`` × ``addon ACT``, and
+- ``addon potential`` = ``addon up`` × ``addon ACT``, the maximum potential activity by add-on technology.
 
 .. tip:: Use :meth:`~.full_key` to retrieve the full-dimensionality
    :class:`Key` for any of these quantities.
@@ -132,12 +141,12 @@ Other added keys include:
 
   These keys return the values in the IAMC data format, as :mod:`pyam` objects.
 
+- ``map_<name>`` as 'indicator' quantities for the mapping sets ``cat_<name>``.
 - Standard reports ``message:system``, ``message_costs``, and
   ``message:emissions``.
 - The report ``message:default``, collecting all of the above reports.
 
-These automatic features of :class:`~message_ix.reporting.Reporter` are
-controlled by:
+These automatic features of :class:`~message_ix.reporting.Reporter` are controlled by:
 
 .. currentmodule:: message_ix.reporting
 
@@ -373,7 +382,6 @@ Configuration
    ixmp.reporting.configure
    ixmp.reporting.utils.RENAME_DIMS
    ixmp.reporting.utils.REPLACE_UNITS
-   ixmp.reporting.utils.UNITS
 
 .. automethod:: ixmp.reporting.configure
 
@@ -393,17 +401,16 @@ Configuration
    variable.
 
 .. autodata:: REPLACE_UNITS
-.. autodata:: UNITS
 
 
 Utilities
 ---------
 
-.. autoclass:: ixmp.reporting.attrseries.AttrSeries
+.. autoclass:: ixmp.reporting.quantity.AttrSeries
 
 .. automodule:: ixmp.reporting.utils
    :members:
-   :exclude-members: AttrSeries, RENAME_DIMS, REPLACE_UNITS, UNITS
+   :exclude-members: AttrSeries, RENAME_DIMS, REPLACE_UNITS
 
 .. automodule:: message_ix.reporting.pyam
    :members: collapse_message_cols

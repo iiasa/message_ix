@@ -1,10 +1,12 @@
 from collections import ChainMap
-from copy import copy
+from copy import copy, deepcopy
 from pathlib import Path
 import re
 
 from ixmp import config
-from ixmp.model.gams import GAMSModel
+import ixmp.model.gams
+
+from .macro import MACRO_ITEMS
 
 
 #: Solver options used by :meth:`message_ix.Scenario.solve`.
@@ -21,7 +23,8 @@ def _template(*parts):
     return str(Path('{model_dir}', *parts))
 
 
-class MESSAGE(GAMSModel):
+class GAMSModel(ixmp.model.gams.GAMSModel):
+    """Extended :class:`ixmp.model.gams.GAMSModel` for MESSAGE & MACRO."""
     name = 'MESSAGE'
 
     #: Default model options.
@@ -38,7 +41,10 @@ class MESSAGE(GAMSModel):
             '--iter="{}"'.format(
                 _template('output', 'MsgIterationReport_{case}.gdx')),
             ],
-    }, GAMSModel.defaults)
+        # Disable the feature to put input/output GDX files, list files, etc.
+        # in a temporary directory
+        'use_temp_dir': False,
+    }, ixmp.model.gams.GAMSModel.defaults)
 
     @classmethod
     def read_version(cls):
@@ -67,9 +73,9 @@ class MESSAGE(GAMSModel):
     def run(self, scenario):
         """Execute the model.
 
-        :class:`MESSAGE` creates a file named ``cplex.opt`` in the model
-        directory, containing the options in :obj:`DEFAULT_CPLEX_OPTIONS`,
-        or any overrides passed to :meth:`~message_ix.Scenario.solve`.
+        GAMSModel creates a file named ``cplex.opt`` in the model directory
+        containing the options in :obj:`DEFAULT_CPLEX_OPTIONS`, or any
+        overrides passed to :meth:`~message_ix.Scenario.solve`.
         """
         # This is not safe against race conditions; if two runs are kicked off
         # simulatenously with the same dp.model_path, then they will try to
@@ -94,11 +100,15 @@ class MESSAGE(GAMSModel):
         return result
 
 
-class MESSAGE_MACRO(MESSAGE):
-    name = 'MESSAGE-MACRO'
+class MESSAGE(GAMSModel):
+    name = 'MESSAGE'
 
-    #: MESSAGE-MACRO uses the GAMS ``break;`` statement, and thus requires GAMS
-    #: 24.8.1 or later.
+
+class MACRO(GAMSModel):
+    name = 'MACRO'
+
+    #: MACRO uses the GAMS ``break;`` statement, and thus requires GAMS 24.8.1
+    #: or later.
     GAMS_min_version = '24.8.1'
 
     def __init__(self, *args, **kwargs):
@@ -109,6 +119,26 @@ class MESSAGE_MACRO(MESSAGE):
             raise RuntimeError(message)
 
         super().__init__(*args, **kwargs)
+
+    @classmethod
+    def initialize(cls, scenario, with_data=False):
+        """Initialize the model structure."""
+        # NB some scenarios already have these items. This method simply adds
+        #    any missing items.
+
+        # FIXME the Java code under the JDBCBackend (ixmp_source) refuses to
+        #       initialize these items with specified idx_sets—even if the
+        #       sets are correct.
+        items = deepcopy(MACRO_ITEMS)
+        for name in 'C', 'COST_NODAL', 'COST_NODAL_NET', 'DEMAND', 'GDP', 'I':
+            items[name].pop('idx_sets')
+
+        # Initialize the ixmp items
+        cls.initialize_items(scenario, items)
+
+
+class MESSAGE_MACRO(MACRO):
+    name = 'MESSAGE-MACRO'
 
 
 def gams_release():

@@ -8,7 +8,7 @@ import message_ix
 
 
 def check_local_model(model, notebook, shell=False):
-    mp = ixmp.Platform(dbtype='HSQLDB')
+    mp = ixmp.Platform()
     if model in mp.scenario_list().model.unique():
         mp.close_db()
         return
@@ -41,7 +41,7 @@ def make_scenario(platform, country, name, base_scen, scen):
     by = "by 'tutorial/utils/run_scenarios.py:make_scenario()'"
     ds = base_ds.clone(
         name, scen, "scenario generated {}, {} - {}".format(by, name, scen),
-        keep_sol=False)
+        keep_solution=False)
     ds.check_out()
 
     yield ds

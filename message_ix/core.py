@@ -1,10 +1,19 @@
 import collections
 from functools import lru_cache
 from itertools import product
+import logging
 
 import ixmp
-from ixmp.utils import as_str_list, pd_read, pd_write, isscalar, logger
+from ixmp.utils import as_str_list, isscalar
 import pandas as pd
+
+
+log = logging.getLogger(__name__)
+
+# Also print warnings to stderr
+_sh = logging.StreamHandler()
+_sh.setLevel(level=logging.WARNING)
+log.addHandler(_sh)
 
 
 class Scenario(ixmp.Scenario):
@@ -191,9 +200,15 @@ class Scenario(ixmp.Scenario):
 
         Returns
         -------
-        list of str
+        list of str or list of int
+            :class:`int` is returned if *name* is 'year'.
         """
-        return self._backend('cat_get_elements', name, cat)
+        return list(
+            map(
+                int if name == 'year' else lambda v: v,
+                self._backend('cat_get_elements', name, cat)
+            )
+        )
 
     def add_spatial_sets(self, data):
         """Add sets related to spatial dimensions of the model.
@@ -421,6 +436,26 @@ class Scenario(ixmp.Scenario):
         """
         super().solve(model=model, solve_options=solve_options, **kwargs)
 
+    def add_macro(self, data, scenario=None, check_convergence=True, **kwargs):
+        # TODO document
+        from .macro import EXPERIMENTAL, add_model_data, calibrate
+        from .models import MACRO
+
+        # Display a warning
+        log.warning(EXPERIMENTAL)
+
+        scenario = scenario or '_'.join([self.scenario, 'macro'])
+        clone = self.clone(self.model, scenario, keep_solution=False)
+        clone.check_out()
+
+        # Add ixmp items: sets, parameters, variables, and equations
+        MACRO.initialize(clone)
+
+        add_model_data(self, clone, data)
+        clone.commit('finished adding macro')
+        calibrate(clone, check_convergence=check_convergence, **kwargs)
+        return clone
+
     def rename(self, name, mapping, keep=False):
         """Rename an element in a set
 
@@ -473,98 +508,3 @@ class Scenario(ixmp.Scenario):
         # commit
         if commit:
             self.commit('Renamed {} using mapping {}'.format(name, mapping))
-
-    def to_excel(self, fname):
-        """Save a scenario as an Excel file. NOTE: Cannot export
-        solution currently (only model data) due to limitations in excel sheet
-        names (cannot have multiple sheet names which are identical except for
-        upper/lower case).
-
-        Parameters
-        ----------
-        fname : string
-            path to file
-        """
-        funcs = {
-            'set': (self.set_list, self.set),
-            'par': (self.par_list, self.par),
-        }
-        ix_name_map = {}
-        dfs = {}
-        for ix_type, (list_func, get_func) in funcs.items():
-            for item in list_func():
-                df = get_func(item)
-                df = pd.Series(df) if isinstance(df, dict) else df
-                if not df.empty:
-                    dfs[item] = df
-                    ix_name_map[item] = ix_type
-
-        # map names to ix types
-        df = pd.Series(ix_name_map).to_frame(name='ix_type')
-        df.index.name = 'item'
-        df = df.reset_index()
-        dfs['ix_type_mapping'] = df
-
-        pd_write(dfs, fname, index=False)
-
-    def read_excel(self, fname, add_units=False, commit_steps=False):
-        """Read Excel file data and load into the scenario.
-
-        Parameters
-        ----------
-        fname : string
-            path to file
-        add_units : bool
-            add missing units, if any,  to the platform instance.
-            default: False
-        commit_steps : bool
-            commit changes after every data addition.
-            default: False
-        """
-        funcs = {
-            'set': self.add_set,
-            'par': self.add_par,
-        }
-
-        logger().info('Reading data from {}'.format(fname))
-        dfs = pd_read(fname, sheet_name=None)
-
-        # get item-type mapping
-        df = dfs['ix_type_mapping']
-        ix_types = dict(zip(df['item'], df['ix_type']))
-
-        # fill in necessary items first (only sets for now)
-        col = 0  # special case for prefill set Series
-
-        def is_prefill(x):
-            return dfs[x].columns[0] == col and len(dfs[x].columns) == 1
-
-        prefill = [x for x in dfs if is_prefill(x)]
-        for name in prefill:
-            data = list(dfs[name][col])
-            if len(data) > 0:
-                ix_type = ix_types[name]
-                logger().info('Loading data for {}'.format(name))
-                funcs[ix_type](name, data)
-        if commit_steps:
-            self.commit('Loaded initial data from {}'.format(fname))
-            self.check_out()
-
-        # fill all other pars and sets, skipping those already done
-        skip_sheets = ['ix_type_mapping'] + prefill
-        for sheet_name, df in dfs.items():
-            if sheet_name not in skip_sheets and not df.empty:
-                logger().info('Loading data for {}'.format(sheet_name))
-                if add_units and 'unit' in df.columns:
-                    # add missing units
-                    units = set(self.platform.units())
-                    missing = set(df['unit'].unique()) - units
-                    for unit in missing:
-                        logger().info('Adding missing unit: {}'.format(unit))
-                        self.platform.add_unit(unit)
-                # load data
-                ix_type = ix_types[sheet_name]
-                funcs[ix_type](sheet_name, df)
-                if commit_steps:
-                    self.commit('Loaded {} from {}'.format(sheet_name, fname))
-                    self.check_out()

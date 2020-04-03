@@ -17,10 +17,10 @@ pytestmark = pytest.mark.skipif(
     or os.environ.get('TRAVIS_OS_NAME', '') == 'osx',
     reason="Nightly scenario tests only run on Travis 'cron' events.")
 
-# For development/debugging, uncomment the following
+# # For development/debugging, uncomment the following
 # pytestmark = pytest.mark.skipif(
-#     'TRAVIS_EVENT_TYPE' not in os.environ
-#     or os.environ.get('TRAVIS_OS_NAME', '') == 'osx',
+#     'TRAVIS_EVENT_TYPE' not in os.environ or
+#     os.environ.get('TRAVIS_OS_NAME', '') == 'osx',
 #     reason='Run on all Travis jobs, for debugging.')
 
 
@@ -41,8 +41,9 @@ def downloaded_scenarios(tmp_path_factory):
     yield dict(
         # TODO repack the archive without a 'db' directory, and remove from the
         #      path here
-        dbprops=path / 'db' / 'scenarios',
-        dbtype='HSQLDB',
+        backend='jdbc',
+        driver='hsqldb',
+        path=path / 'db' / 'scenarios',
     )
 
 

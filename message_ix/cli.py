@@ -5,7 +5,7 @@ import tempfile
 import zipfile
 
 import click
-from ixmp import config
+import ixmp
 from ixmp.cli import main
 import message_ix
 import message_ix.tools.add_year.cli
@@ -19,6 +19,9 @@ main.help == \
     To view/run the 'nightly' commands, you need the testing dependencies.
     Run `pip install [--editable] .[tests]`.
     """
+
+# Override the class used by the ixmp CLI to load Scenario objects
+ixmp.cli.ScenarioClass = message_ix.Scenario
 
 
 @main.command('copy-model')
@@ -67,8 +70,8 @@ def copy_model(path, overwrite, set_default):
         copyfile(src, dst)
 
     if set_default:
-        config.set('message model dir', path)
-        config.save()
+        ixmp.config.set('message model dir', path)
+        ixmp.config.save()
 
 
 @main.command()
