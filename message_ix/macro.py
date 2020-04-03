@@ -194,18 +194,26 @@ class Calculate:
         if not s.has_solution():
             raise RuntimeError("Scenario must have a solution to add MACRO")
 
-        demand = s.var("DEMAND", filters={"level": "useful"})
-        self.nodes = set(demand["node"].unique())
-        self.sectors = set(demand["commodity"].unique())
-        self.years = set(demand["year"].unique())
+        demand = s.var('DEMAND', filters={'level': 'useful'})
+        self.years = set(demand['year'].unique())
 
     def read_data(self):
-        if "config" in self.data:
-            # users may remove certain nodes and sectors from the MACRO set
-            # definitions
-            config = self.data["config"]
-            self.nodes -= set(config.get("ignore_nodes", []))
-            self.sectors -= set(config.get("ignore_sectors", []))
+        if 'config' in self.data:
+            # users define certain nodes and sectors for the MACRO set
+            config = self.data['config']
+            for key in ['node', 'sector', 'level']:
+                try:
+                    config[key]
+                except KeyError:
+                    raise KeyError('Missing config data for {}'.format(key))
+                else:
+                    if config[key].dropna().empty:
+                        raise ValueError(
+                            'Config data for {} is emmpty'.format(key))
+
+            self.nodes = set(config['node'].dropna())
+            self.sectors = set(config['sector'].dropna())
+            self.levels = set(config['level'].dropna())
 
         par_diff = set(VERIFY_INPUT_DATA) - set(self.data)
         if par_diff:
@@ -235,12 +243,14 @@ class Calculate:
         self.init_year = max(data_years_before_model)
 
     def _clean_model_data(self, data):
-        if "node" in data:
-            data = data[data["node"].isin(self.nodes)]
-        if "commodity" in data:
-            data = data[data["commodity"].isin(self.sectors)]
-        if "year" in data:
-            data = data[data["year"].isin(self.years)]
+        if 'node' in data:
+            data = data[data['node'].isin(self.nodes)]
+        if 'commodity' in data:
+            data = data[data['commodity'].isin(self.sectors)]
+        if 'year' in data:
+            data = data[data['year'].isin(self.years)]
+        if 'level' in data:
+            data = data[data['level'].isin(self.levels)]
         return data
 
     def derive_data(self):
