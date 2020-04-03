@@ -221,7 +221,7 @@ class Calculate:
                 continue
             idx = _validate_data(name, self.data[name],
                                  self.nodes, self.sectors, self.years)
-            self.units[name] =  self.data[name]['unit'].mode().any()
+            self.units[name] = self.data[name]['unit'].mode().any()
             self.data[name] = self.data[name].set_index(idx)['value']
 
         # special check for gdp_calibrate - it must have at minimum two years
