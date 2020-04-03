@@ -69,24 +69,25 @@ R_tutorials = [
 # Short, readable IDs for the R tests
 R_ids = [arg[0][-1] for arg in R_tutorials]
 
+
 @pytest.fixture
-def nb_path(request, tutorial_path):
+def nb_R_path(request, tutorial_path):
     # Combine the filename parts with the tutorial_path fixture
     yield Path(tutorial_path, *request.param).with_suffix('.ipynb')
 
 
 # Parametrize the first 3 arguments using variables *R_tutorial* and *R_ids*.
-# Argument 'nb_path' is indirect so that the above fixture can modify it.
-@pytest.mark.parametrize('nb_path,cell_values', R_tutorials, ids=R_ids,
-                         indirect=['nb_path'])
+# Argument 'nb_R_path' is indirect so that the above fixture can modify it.
+@pytest.mark.parametrize('nb_R_path,cell_values', R_tutorials, ids=R_ids,
+                         indirect=['nb_R_path'])
 @pytest.mark.rixmp
-def test_R_tutorial(nb_path, cell_values, tmp_path, tmp_env):
+def test_R_tutorial(nb_R_path, cell_values, tmp_path, tmp_env):
     """Test tutorial in the IPython notebook at *fname*.
 
     If *cell_values* are given, values in the specified cells are tested.
     """
     # The notebook can be run without errors
-    nb, errors = run_notebook(nb_path, tmp_path, tmp_env, kernel='IR')
+    nb, errors = run_notebook(nb_R_path, tmp_path, tmp_env, kernel='IR')
     assert errors == []
 
     for cell, value in cell_values:
