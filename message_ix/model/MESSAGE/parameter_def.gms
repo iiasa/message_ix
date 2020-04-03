@@ -8,15 +8,18 @@
 *
 * In |MESSAGEix|, all parameters are understood as yearly values, not as per (multi-year) period.
 * This provides flexibility when changing the resolution of the model horizon (i.e., the set ``year``).
-*
-* Parameters written in *italics* are auxiliary parameters
-* that are either generated automatically when exporting a ``message_ix.Scenario`` to gdx
-* or that are computed during the pre-processing stage in GAMS.
 ***
 
 ***
 * General parameters of the |MESSAGEix| implementation
 * ----------------------------------------------------
+*
+* .. caution::
+*
+*    Parameters written in **bold** are auxiliary parameters
+*    that are either generated automatically when exporting a :class:`message_ix.Scenario` to gdx
+*    or that are computed during the *pre-processing* stage in GAMS (see the footnotes for more
+*    individual details). These are **not** meant to be edited through the API when editing scenarios.
 *
 * .. list-table::
 *    :widths: 25 20 55
@@ -25,46 +28,49 @@
 *    * - Parameter name
 *      - Index dimensions
 *      - Explanatory comments
-*    * - *duration_period* (:math:`|y|`) [#short_dur]_
-*      - ``year``
-*      - duration of multi-year period (in number of years) [#year_auto]_
-*    * - duration_time
-*      - ``time``
-*      - duration of sub-annual time slices (relative to 1) [#duration_time_year]_
-*    * - *duration_time_rel*
-*      - ``time`` | ``time``
-*      - relative duration between sub-annual time slices [#df_auto]_
 *    * - interestrate
 *      - ``year``
-*      - economy-wide interest rate or social discount rate
-*    * - *df_period*
+*      - Economy-wide interest rate or social discount rate
+*    * - duration_time
+*      - ``time``
+*      - Duration of sub-annual time slices (relative to 1) [#duration_time_year]_
+*    * - **duration_period** (:math:`|y|`) [#short_dur]_
 *      - ``year``
-*      -  cumulative discount factor over period duration [#df_auto]_
-*    * - *df_year*
+*      - Duration of multi-year period (in number of years) [#year_auto]_
+*    * - **duration_period_sum**
+*      - ``year`` | ``year``
+*      - Number of years between two periods [#df_auto]_
+*    * - **duration_time_rel**
+*      - ``time`` | ``time``
+*      - Relative duration between sub-annual time slices [#df_auto]_
+*    * - **df_period**
 *      - ``year``
-*      -  discount factor of the last year in the period [#df_auto]_
+*      - Cumulative discount factor over period duration [#df_auto]_
+*    * - **df_year**
+*      - ``year``
+*      - Discount factor of the last year in the period [#df_auto]_
+*
+* .. [#duration_time_year] The element 'year' in the set of subannual time slices ``time`` has the value of 1.
+*    This value is assigned by default when creating a new :class:`ixmp.Scenario` based on the ``MESSAGE`` scheme.
 *
 * .. [#short_dur] The short-hand notation :math:`|y|` is used for the parameters :math:`duration\_period_y`
 *    in the mathematical model documentation for exponents.
 *
 * .. [#year_auto] The values for this parameter are computed automatically when exporting a ``MESSAGE``-scheme
-*    ``ixmp``.Scenario to gdx.
+*    :class:`ixmp.Scenario` to gdx.
 *    Note that in |MESSAGEix|, the elements of the ``year`` set are understood to be the last year in a period,
 *    see :ref:`this footnote <period_year_footnote>`.
-*
-* .. [#duration_time_year] The element 'year' in the set of subannual time slices ``time`` has the value of 1.
-*    This value is assigned by default when creating a new ``ixmp``.Scenario based on the ``MESSAGE`` scheme.
 *
 * .. [#df_auto] These parameters are computed during the GAMS execution.
 ***
 
 Parameters
 * general parameters
-    duration_period(year_all)      duration of one multi-year period (in years)
+    interestrate(year_all)         interest rate (to compute discount factor)
     duration_time(time)            duration of one time slice (relative to 1)
+    duration_period(year_all)      duration of one multi-year period (in years)
     duration_period_sum(year_all,year_all2)  number of years between two periods ('year_all' must precede 'year_all2')
     duration_time_rel(time,time2)  relative duration of subannual time period ('time2' relative to parent 'time')
-    interestrate(year_all)         interest rate (to compute discount factor)
     df_period(year_all)            cumulative discount factor over period duration
     df_year(year_all)              discount factor of the last year in the period
 ;
@@ -131,7 +137,7 @@ Parameter
 *    * - peak_load_factor [#peakload]_
 *      - ``node`` | ``commodity`` | ``year``
 *
-* .. [#demand] The parameter ``demand`` in a ``MESSAGE``-scheme ``ixmp``.Scenario is translated
+* .. [#demand] The parameter ``demand`` in a ``MESSAGE``-scheme ``ixmp.Scenario`` is translated
 *    to the parameter ``demand_fixed`` in the |MESSAGEix| implementation in GAMS. The variable ``DEMAND`` is introduced
 *    as an auxiliary reporting variable; it equals ``demand_fixed`` in a `MESSAGE`-standalone run and reports
 *    the final demand including the price response in an iterative `MESSAGE-MACRO` solution.
@@ -187,11 +193,11 @@ Parameter
 *    * - min_utilization_factor [#tecvintage]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act``
 *    * - rating_bin [#rating]_
-*      - ``node`` | ``technology`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
+*      - ``node`` | ``tec`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
 *    * - reliability_factor [#peakload]_
-*      - ``node`` | ``technology`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
+*      - ``node`` | ``tec`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
 *    * - flexibility_factor [#flexfactor]_
-*      - ``node_loc`` | ``technology`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``commodity`` | ``level`` | ``time`` | ``rating``
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``commodity`` | ``level`` | ``time`` | ``rating``
 *    * - renewable_capacity_factor [#renewables]_
 *      - ``node_loc`` | ``commodity`` | ``grade`` | ``level`` | ``year``
 *    * - renewable_potential [#renewables]_
@@ -234,12 +240,12 @@ Parameters
     capacity_factor(node,tec,vintage,year_all,time)         capacity factor by subannual time slice
     operation_factor(node,tec,vintage,year_all)             yearly total operation factor
     min_utilization_factor(node,tec,vintage,year_all)       yearly minimum utilization factor
-    emission_factor(node,tec,year_all,year_all,mode,emission) emission intensity of activity
     rating_bin(node,tec,year_all,commodity,level,time,rating) maximum share of technology in commodity use per rating
     reliability_factor(node,tec,year_all,commodity,level,time,rating) reliability of a technology (per rating)
     flexibility_factor(node,tec,vintage,year_all,mode,commodity,level,time,rating) contribution of technologies towards operation flexibility constraint
     renewable_capacity_factor(node,commodity,grade,level,year_all) quality of renewable potential grade (>= 1)
     renewable_potential(node,commodity,grade,level,year_all) size of renewable potential per grade
+    emission_factor(node,tec,year_all,year_all,mode,emission) emission intensity of activity
 ;
 
 ***
@@ -247,7 +253,7 @@ Parameters
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
 * The following parameters specify upper and lower bounds on new capacity, total installed capacity, and activity. The bounds
-* on activity are implemented as the aggregate over all vintages in a specific period (:ref:`activity_bound_up` and :ref:`acitvity_bound_lo`).
+* on activity are implemented as the aggregate over all vintages in a specific period (:ref:`activity_bound_up` and :ref:`activity_bound_lo`).
 *
 * .. list-table::
 *    :widths: 25 60
@@ -302,7 +308,7 @@ Parameters
 *    * - initial_new_capacity_lo
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - growth_new_capacity_lo [#mpx]_
-*      - ``node_loc`` | ``tec_actual`` | ``year_vtg``
+*      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - soft_new_capacity_lo [#mpx]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - initial_activity_up [#mpa]_
@@ -369,9 +375,9 @@ Parameters
 *    * - addon_conversion
 *      - ``node`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``time`` | ``type_addon``
 *    * - addon_up
-*      - ``node`` | ``tec`` | ``vintage`` | ``year`` | ``mode`` | ``time`` | ``type_addon``
+*      - ``node`` | ``tec`` | ``year_act`` | ``mode`` | ``time`` | ``type_addon``
 *    * - addon_lo
-*      - ``node`` | ``tec`` | ``vintage`` | ``year`` | ``mode`` | ``time`` | ``type_addon``
+*      - ``node`` | ``tec`` | ``year_act`` | ``mode`` | ``time`` | ``type_addon``
 *
 ***
 
@@ -472,15 +478,15 @@ Parameters
 *    * - Parameter name
 *      - Index names
 *    * - construction_time_factor
-*      - ``node`` | ``tec`` | ``year_all``
+*      - ``node`` | ``tec`` | ``year``
 *    * -  remaining_capacity
-*      - ``node`` | ``tec`` | ``year_all``
+*      - ``node`` | ``tec`` | ``year``
 *    * - end_of_horizon_factor
-*      - ``node`` | ``tec`` | ``year_all``
+*      - ``node`` | ``tec`` | ``year``
 *    * - beyond_horizon_lifetime
-*      - ``node`` | ``tec`` | ``year_all``
+*      - ``node`` | ``tec`` | ``year``
 *    * - beyond_horizon_factor
-*      - ``node`` | ``tec`` | ``year_all``
+*      - ``node`` | ``tec`` | ``year``
 *
 *
 ***
@@ -731,6 +737,32 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 * Auxiliary reporting parameters                                                                                       *
 *----------------------------------------------------------------------------------------------------------------------*
+
+***
+* Auxiliary reporting parameters
+* ------------------------------
+*
+* The following parameters are used for reporting (post-processing) solved models. They assign monetary value to
+* the `net` total system costs from trading and emission taxes (``total_cost``). Morevoer, they also assign a value
+* to the `total` trade of commodities (the difference between the revenues from exports and the costs of imports,
+* ``trade_cost``) and to the costs from importing (``import_cost``) and the revenues from exporting (``export_cost``)
+* in each node and year.
+*
+* .. list-table::
+*    :widths: 25 75
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index dimensions
+*    * - total_cost
+*      - ``node`` | ``year``
+*    * - trade_cost
+*      - ``node`` | ``year``
+*    * - import_cost
+*      - ``node`` | ``commodity`` | ``year``
+*    * - export_cost
+*      - ``node`` | ``commodity`` | ``year``
+***
 
 Parameters
     trade_cost(node, year_all)              net of commodity import costs and commodity export revenues by node and year

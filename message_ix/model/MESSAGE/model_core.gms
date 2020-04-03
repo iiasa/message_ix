@@ -11,45 +11,8 @@
 *
 * For the complete list of sets, mappings and parameters,
 * refer to the auto-documentation pages :ref:`sets_maps_def` and :ref:`parameter_def`.
-***
-
-*----------------------------------------------------------------------------------------------------------------------*
-* Notation declaration                                                                                                 *
-*----------------------------------------------------------------------------------------------------------------------*
-
-***
-* Notation declaration
-* --------------------
-* The following short notation is used in the mathematical description relative to the GAMS code:
-*
-* Mathematical notation of sets
-* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-* ================================== ===================================================================================
-* Math notation                      GAMS set & index notation
-* ================================== ===================================================================================
-* :math:`n \in N`                    node (across spatial hierarchy levels)
-* :math:`y \in Y`                    year (all periods including historical and model horizon)
-* :math:`y \in Y^M \subset Y`        time periods included in model horizon
-* :math:`y \in Y^H \subset Y`        historical time periods (prior to first model period)
-* :math:`c \in C`                    commodity
-* :math:`l \in L`                    level
-* :math:`g \in G`                    grade
-* :math:`t \in T`                    technology (a.k.a tec)
-* :math:`h \in H`                    time (subannual time periods)
-* :math:`m \in M`                    mode
-* :math:`q \in Q`                    rating of non-dispatchable technologies relative to aggregate commodity use
-* :math:`e \in E`                    emission, pollutants
-* :math:`s \in S`                    scenarios of land use (for land-use model emulator)
-* :math:`u \in U`                    land-use types
-* :math:`r \in R`                    set of generic relations (linear constraints)
-* :math:`t \in T^{INV} \subseteq T`  all technologies with investment decisions and capacity constraints
-* :math:`t \in T^{REN} \subseteq T`  all technologies which draw their input from the renewable level
-* :math:`n \in N(\widehat{n})`       all nodes that are subnodes of node :math:`\widehat{n}`
-* :math:`y \in Y(\widehat{y})`       all years mapped to the category ``type_year`` :math:`\widehat{y}`
-* :math:`t \in T(\widehat{t})`       all technologies mapped to the category ``type_tec`` :math:`\widehat{t}`
-* :math:`e \in E(\widehat{e})`       all emissions mapped to the category ``type_emission`` :math:`\widehat{e}`
-* ================================== ===================================================================================
-*
+* The mathematical notation that is used to represent sets and mappings in the equations below
+* can also be found in the tables in :ref:`sets_maps_def`.
 ***
 
 *----------------------------------------------------------------------------------------------------------------------*
@@ -57,30 +20,35 @@
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
+* Variable definitions
+* --------------------
+*
 * Decision variables
 * ^^^^^^^^^^^^^^^^^^
-* ============================================= ========================================================================
-* Variable                                      Explanatory text
-* ============================================= ========================================================================
-* :math:`OBJ \in \mathbb{R}`                    Objective value of the optimization program
-* :math:`EXT_{n,c,g,y} \in \mathbb{R}_+`        Extraction of non-renewable/exhaustible resources from reserves
-* :math:`STOCK_{n,c,l,y} \in \mathbb{R}_+`      Quantity in stock (storage) at start of period :math:`y`
-* :math:`STOCK\_CHG_{n,c,l,y,h} \in \mathbb{R}` Input or output quantity into intertemporal commodity stock (storage)
-* :math:`REN_{n,t,c,g,y,h}`                     Activity of renewable technologies per grade
-* :math:`CAP\_NEW_{n,t,y} \in \mathbb{R}_+`     Newly installed capacity (yearly average over period duration)
-* :math:`CAP_{n,t,y^V,y} \in \mathbb{R}_+`      Maintained capacity in year :math:`y` of vintage :math:`y^V`
-* :math:`CAP\_FIRM_{n,t,c,l,y,q}`               Capacity counting towards firm (dispatchable)
-* :math:`ACT_{n,t,y^V,y,m,h} \in \mathbb{R}`    Activity of a technology (by vintage, mode, subannual time)
-* :math:`ACT\_RATING_{n,t,y^V,y,c,l,h,q}`       Activity attributed to a particular rating bin [#ACT_RATING]_
-* :math:`CAP\_NEW\_UP_{n,t,y} \in \mathbb{R}_+` Relaxation of upper dynamic constraint on new capacity
-* :math:`CAP\_NEW\_LO_{n,t,y} \in \mathbb{R}_+` Relaxation of lower dynamic constraint on new capacity
-* :math:`ACT\_UP_{n,t,y,h} \in \mathbb{R}_+`    Relaxation of upper dynamic constraint on activity [#ACT_BD]_
-* :math:`ACT\_LO_{n,t,y,h} \in \mathbb{R}_+`    Relaxation of lower dynamic constraint on activity [#ACT_BD]_
-* :math:`LAND_{n,s,y} \in [0,1]`                Relative share of land-use scenario (for land-use model emulator)
-* :math:`EMISS_{n,e,\widehat{t},y}`             Auxiliary variable for aggregate emissions by technology type
-* :math:`REL_{r,n,y} \in \mathbb{R}`            Auxiliary variable for left-hand side of relations (linear constraints)
-* :math:`COMMODITY\_USE_{n,c,l,y}`              Auxiliary variable for amount of commodity used at specific level
-* ============================================= ========================================================================
+* ======================================================== ====================================================================================
+* Variable                                                 Explanatory text
+* ======================================================== ====================================================================================
+* :math:`OBJ \in \mathbb{R}`                               Objective value of the optimization program
+* :math:`EXT_{n,c,g,y} \in \mathbb{R}_+`                   Extraction of non-renewable/exhaustible resources from reserves
+* :math:`STOCK_{n,c,l,y} \in \mathbb{R}_+`                 Quantity in stock (storage) at start of period :math:`y`
+* :math:`STOCK\_CHG_{n,c,l,y,h} \in \mathbb{R}`            Input or output quantity into intertemporal commodity stock (storage)
+* :math:`COST\_NODAL_{n,y} \in \mathbb{R}`                 System costs at the node level over time
+* :math:`REN_{n,t,c,g,y,h} \in \mathbb{R}_+`               Activity of renewable technologies per grade
+* :math:`CAP\_NEW_{n,t,y} \in \mathbb{R}_+`                Newly installed capacity (yearly average over period duration)
+* :math:`CAP_{n,t,y^V,y} \in \mathbb{R}_+`                 Maintained capacity in year :math:`y` of vintage :math:`y^V`
+* :math:`CAP\_FIRM_{n,t,c,l,y,q} \in \mathbb{R}_+`         Capacity counting towards firm (dispatchable)
+* :math:`ACT_{n,t,y^V,y,m,h} \in \mathbb{R}`               Activity of a technology (by vintage, mode, subannual time)
+* :math:`ACT\_RATING_{n,t,y^V,y,c,l,h,q} \in \mathbb{R}_+` Auxiliary variable for activity attributed to a particular rating bin [#ACT_RATING]_
+* :math:`CAP\_NEW\_UP_{n,t,y} \in \mathbb{R}_+`            Relaxation of upper dynamic constraint on new capacity
+* :math:`CAP\_NEW\_LO_{n,t,y} \in \mathbb{R}_+`            Relaxation of lower dynamic constraint on new capacity
+* :math:`ACT\_UP_{n,t,y,h} \in \mathbb{R}_+`               Relaxation of upper dynamic constraint on activity [#ACT_BD]_
+* :math:`ACT\_LO_{n,t,y,h} \in \mathbb{R}_+`               Relaxation of lower dynamic constraint on activity [#ACT_BD]_
+* :math:`LAND_{n,s,y} \in [0,1]`                           Relative share of land-use scenario (for land-use model emulator)
+* :math:`EMISS_{n,e,\widehat{t},y} \in \mathbb{R}`         Auxiliary variable for aggregate emissions by technology type
+* :math:`REL_{r,n,y} \in \mathbb{R}`                       Auxiliary variable for left-hand side of relations (linear constraints)
+* :math:`COMMODITY\_USE_{n,c,l,y} \in \mathbb{R}`          Auxiliary variable for amount of commodity used at specific level
+* :math:`COMMODITY\_BALANCE_{n,c,l,y,h} \in \mathbb{R}`    Auxiliary variable for right-hand side of :ref:`commodity_balance`
+* ======================================================== ====================================================================================
 *
 * The index :math:`y^V` is the year of construction (vintage) wherever it is necessary to
 * clearly distinguish between year of construction and the year of operation.
@@ -140,22 +108,20 @@ Variables
     EMISS(node,emission,type_tec,year_all)       aggregate emissions by technology type and land-use model emulator
 * auxiliary variable for left-hand side of relations (linear constraints)
     REL(relation,node,year_all)                  auxiliary variable for left-hand side of user-defined relations
-* auxiliary variable for left-hand side of commodity balance
-    COMM(node,commodity,level,year_all,time)         auxiliary variable for left-hand side of commodity balance
 ;
 
 ***
 * Auxiliary variables
 * ^^^^^^^^^^^^^^^^^^^
-* ============================================= ========================================================================
-* Variable                                      Explanatory text
-* ============================================= ========================================================================
-* :math:`DEMAND_{n,c,l,y,h} \in \mathbb{R}`     Demand level (in equilibrium with MACRO integration)
-* :math:`PRICE\_COMMODITY_{n,c,l,y,h}`          Commodity price (undiscounted marginals of the commodity balances)
-* :math:`PRICE\_EMISSION_{n,e,\widehat{t},y}`   Emission price (undiscounted marginals of EMISSION_BOUND constraint)
-* :math:`COST\_NODAL\_NET_{n,y} \in \mathbb{R}` System costs at the node level net of energy trade revenues/cost
-* :math:`GDP_{n,y} \in \mathbb{R}`              gross domestic product (GDP) in market exchange rates for MACRO reporting
-* ============================================= ========================================================================
+* ==================================================================== ======================================================================================================
+* Variable                                                             Explanatory text
+* ==================================================================== ======================================================================================================
+* :math:`DEMAND_{n,c,l,y,h} \in \mathbb{R}`                            Demand level (in equilibrium with MACRO integration)
+* :math:`PRICE\_COMMODITY_{n,c,l,y,h} \in \mathbb{R}`                  Commodity price (undiscounted marginals of :ref:`commodity_balance_gt` and :ref:`commodity_balance_lt`)
+* :math:`PRICE\_EMISSION_{n,\widehat{e},\widehat{t},y} \in \mathbb{R}` Emission price (undiscounted marginals of :ref:`emission_constraint`)
+* :math:`COST\_NODAL\_NET_{n,y} \in \mathbb{R}`                        System costs at the node level net of energy trade revenues/cost
+* :math:`GDP_{n,y} \in \mathbb{R}`                                     Gross domestic product (GDP) in market exchange rates for MACRO reporting
+* ==================================================================== ======================================================================================================
 *
 ***
 
@@ -256,10 +222,10 @@ Equations
     COMMODITY_BALANCE_LT            commodity supply lower than or equal demand
     STOCKS_BALANCE                  commodity inter-temporal balance of stocks
     CAPACITY_CONSTRAINT             capacity constraint for technology (by sub-annual time slice)
-    CAPACITY_MAINTENANCE_HIST       constraint for capactiy maintainance  historical installation (built before start of model horizon)
-    CAPACITY_MAINTENANCE_NEW        constraint for capactiy maintainance of new capacity built in the current period (vintage == year)
-    CAPACITY_MAINTENANCE            constraint for capacity maintainance over the technical lifetime
-    OPERATION_CONSTRAINT            constraint on maximum yearly operation (scheduled down-time for maintainance)
+    CAPACITY_MAINTENANCE_HIST       constraint for capacity maintenance  historical installation (built before start of model horizon)
+    CAPACITY_MAINTENANCE_NEW        constraint for capacity maintenance of new capacity built in the current period (vintage == year)
+    CAPACITY_MAINTENANCE            constraint for capacity maintenance over the technical lifetime
+    OPERATION_CONSTRAINT            constraint on maximum yearly operation (scheduled down-time for maintenance)
     MIN_UTILIZATION_CONSTRAINT      constraint for minimum yearly operation (aggregated over the course of a year)
     RENEWABLES_POTENTIAL_CONSTRAINT constraint on renewable resource potential
     RENEWABLES_CAPACITY_REQUIREMENT lower bound on required overcapacity when using lower grade potentials
@@ -269,7 +235,7 @@ Equations
     COMMODITY_USE_LEVEL             aggregate use of commodity by level as defined by total input into technologies
     ACTIVITY_BY_RATING              constraint on auxiliary rating-specific activity variable by rating bin
     ACTIVITY_RATING_TOTAL           equivalence of auxiliary rating-specific activity variables to actual activity
-    FIRM_CAPACITY_PROVISION         contribution of dispatchable technologies to auxilary firm-capacity variable
+    FIRM_CAPACITY_PROVISION         contribution of dispatchable technologies to auxiliary firm-capacity variable
     SYSTEM_RELIABILITY_CONSTRAINT   constraint on total system reliability (firm capacity)
     SYSTEM_FLEXIBILITY_CONSTRAINT   constraint on total system flexibility
     NEW_CAPACITY_BOUND_UP           upper bound on technology capacity investment
@@ -374,7 +340,7 @@ OBJECTIVE..
 
 COST_ACCOUNTING_NODAL(node, year)..
     COST_NODAL(node, year) =E=
-* resource extration costs
+* resource extraction costs
     SUM((commodity,grade)$( map_resource(node,commodity,grade,year) ),
          resource_cost(node,commodity,grade,year) * EXT(node,commodity,grade,year) )
 * technology capacity investment, maintainance, operational cost
@@ -469,6 +435,8 @@ COST_ACCOUNTING_NODAL(node, year)..
 * Constraints on resource extraction
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
+* .. _extraction_equivalence:
+*
 * Equation EXTRACTION_EQUIVALENCE
 * """""""""""""""""""""""""""""""
 *
@@ -545,20 +513,21 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 * Constraints on commodities and stocks
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
+* .. _commodity_balance:
+*
 * Auxiliary COMMODITY_BALANCE
 * """""""""""""""""""""""""""
-* For the commodity balance constraints below, we introduce an auxiliary `COMMODITY_BALANCE`. This is implemented
-* as a GAMS `$macro` function.
+* For the commodity balance constraints below, we introduce an auxiliary variable called `COMMODITY_BALANCE`. This is implemented
+* as a GAMS ``$macro`` function.
 *
 *  .. math::
 *     \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} output_{n^L,t,y^V,y,m,n,c,l,h^A,h}
-*         \cdot duration\_time\_rel_{h,h^A} \cdot & ACT_{n^L,t,y^V,y,m,h^A} \\
+*         \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,y^V,y,m,h^A} & \\
 *     - \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} input_{n^L,t,y^V,y,m,n,c,l,h^A,h}
-*         \cdot duration\_time\_rel_{h,h^A} \cdot & ACT_{n^L,t,m,y,h^A} \\
-*     + \ STOCK\_CHG_{n,c,l,y,h} & \\[4pt]
-*     + \ \sum_s \Big( land\_output_{n,s,y,c,l,h} - land\_input_{n,s,y,c,l,h} \Big) \cdot & LAND_{n,s,y} \\[4pt]
+*         \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,m,y,h^A} & \\
+*     + \ STOCK\_CHG_{n,c,l,y,h} + \ \sum_s \Big( land\_output_{n,s,y,c,l,h} - land\_input_{n,s,y,c,l,h} \Big) \cdot & LAND_{n,s,y} \\[4pt]
 *     - \ demand\_fixed_{n,c,l,y,h}
-*     & = COMMODITY\_BALANCE{n,c,l,y,h} \quad \forall \ l \notin (L^{RES}, l^{REN} \subseteq L
+*     = COMMODITY\_BALANCE_{n,c,l,y,h} \quad \forall \ l \notin (L^{RES}, & l^{REN} \subseteq L)
 *
 * The commodity balance constraint at the resource level is included in the `Equation RESOURCE_CONSTRAINT`_,
 * while at the renewable level, it is included in the `Equation RENEWABLES_EQUIVALENCE`_.
@@ -583,6 +552,8 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
     )$( map_commodity(node,commodity,level,year,time) AND NOT level_resource(level) AND NOT level_renewable(level) )
 
 ***
+* .. _commodity_balance_gt:
+*
 * Equation COMMODITY_BALANCE_GT
 * """""""""""""""""""""""""""""
 * This constraint ensures that supply is greater or equal than demand for every commodity-level combination.
@@ -599,10 +570,12 @@ COMMODITY_BALANCE_GT(node,commodity,level,year,time)$( map_commodity(node,commod
      =G= 0 ;
 
 ***
+* .. _commodity_balance_lt:
+*
 * Equation COMMODITY_BALANCE_LT
 * """""""""""""""""""""""""""""
-* This constraint ensures the supply is smaller than or equal to the demand for all commodity-level combinatio
-* given in the :math:`balance\_equality_{c,l}`. In combination withe constraint above, it ensures that supply
+* This constraint ensures that the supply is smaller than or equal to the demand for all commodity-level combinations
+* given in the :math:`balance\_equality_{c,l}`. In combination with the constraint above, it ensures that supply
 * is (exactly) equal to demand.
 *
 *  .. math::
@@ -699,7 +672,7 @@ CAPACITY_MAINTENANCE_HIST(node,inv_tec,vintage,first_period)$( map_tec_lifetime(
 *      CAP_{n,t,y^V,y^V} =
 *          remaining\_capacity_{n,t,y^V,y^V} \cdot
 *          duration\_period_{y^V} \cdot
-*          CAP\_NEW{n,t,y^V}
+*          CAP\_NEW_{n,t,y^V}
 *      \quad \forall \ t \in T^{INV}
 *
 * The current formulation does not account for construction time in the constraints, but only adds a mark-up
@@ -847,12 +820,12 @@ RENEWABLES_CAPACITY_REQUIREMENT(node,inv_tec,commodity,year)$(
 * jointly with a parent technology (e.g., abatement option, SO2 scrubber, power plant cooling technology).
 *
 *   .. math::
-*      \sum_{\substack{t' \sim t^A, y^V \leq y}} ACT_{n,t',y^V,y,m,h}
+*      \sum_{\substack{t^a, y^V \leq y}} ACT_{n,t^a,y^V,y,m,h}
 *      \leq
 *      \sum_{\substack{t, y^V \leq y}}
-*          addon\_up_{n,t^a,y,m,h,t^A} \cdot
-*          addon\_conversion_{n,t',y^V,y,m,h} \cdot
-*          ACT_{n,t,y^V,y,m,h}
+*          & addon\_up_{n,t,y,m,h,\widehat{t^a}} \cdot
+*          addon\_conversion_{n,t,y^V,y,m,h,\widehat{t^a}} \\
+*          & \cdot ACT_{n,t,y^V,y,m,h} \quad \forall \ t^a \in T^{A}
 *
 ***
 ADDON_ACTIVITY_UP(node,type_addon,year,mode,time)..
@@ -880,16 +853,16 @@ ADDON_ACTIVITY_UP(node,type_addon,year,mode,time)..
 * This constraint provides a lower bound on the activity of an addon technology that has to be operated
 * jointly with a parent technology (e.g., power plant cooling technology). The parameter `addon_lo` allows to define
 * a minimum level of operation of addon technologies relative to the activity of the parent technology.
-* If `addon_minimum = 1`, this means that it is mandatory to operate the addon technology at the same level as the
+* If `addon_lo = 1`, this means that it is mandatory to operate the addon technology at the same level as the
 * parent technology (i.e., full mitigation).
 *
 *   .. math::
-*      \sum_{\substack{t' \sim t^A, y^V \leq y}} ACT_{n,t',y^V,y,m,h}
+*      \sum_{\substack{t^a, y^V \leq y}} ACT_{n,t^a,y^V,y,m,h}
 *      \geq
 *      \sum_{\substack{t, y^V \leq y}}
-*          addon\_lo_{n,t^a,y,m,h,t^A} \cdot
-*          addon\_conversion_{n,t',y^V,y,m,h} \cdot
-*          ACT_{n,t,y^V,y,m,h}
+*          & addon\_lo_{n,t,y,m,h,\widehat{t^a}} \cdot
+*          addon\_conversion_{n,t,y^V,y,m,h,\widehat{t^a}} \\
+*          & \cdot ACT_{n,t,y^V,y,m,h} \quad \forall \ t^a \in T^{A}
 *
 ***
 ADDON_ACTIVITY_LO(node,type_addon,year,mode,time)..
@@ -1015,10 +988,10 @@ ACTIVITY_RATING_TOTAL(node,tec,vintage,year,commodity,level,time)$(
 * Equation FIRM_CAPACITY_PROVISION
 * """"""""""""""""""""""""""""""""
 * Technologies where the reliability factor is defined with the rating `firm`
-* have an auxiliary variable :math:`CAP\_FIRM_{n,t,c,l,y,q}`, defined in terms of output.
+* have an auxiliary variable :math:`CAP\_FIRM_{n,t,c,l,y}`, defined in terms of output.
 *
 *   .. math::
-*      \sum_q CAP\_FIRM_{n,t,c,l,y,q}
+*      CAP\_FIRM_{n,t,c,l,y}
 *      = \sum_{y^V \leq y} & output_{n^L,t,y^V,y,m,n,c,l,h^A,h} \cdot duration\_time_h \\
 *        & \quad    \cdot capacity\_factor_{n,t,y^V,y,h} \cdot CAP_{n,t,y^Y,y}
 *      \quad \forall \ t \in T^{INV}
@@ -1216,7 +1189,7 @@ ACTIVITY_BOUND_ALL_MODES_UP(node,tec,year,time)$( is_bound_activity_up(node,tec,
 ;
 
 ***
-* .. _acitvity_bound_lo:
+* .. _activity_bound_lo:
 *
 * Equation ACTIVITY_BOUND_LO
 * """"""""""""""""""""""""""
@@ -1279,8 +1252,8 @@ ACTIVITY_BOUND_ALL_MODES_LO(node,tec,year,time)$( bound_activity_lo(node,tec,yea
 *
 *   .. math::
 *     ACT_{n^L,t,y^V,y,m,h^A}
-*     \leq share\_mode\_up_{s,n,y,m,h} \cdot
-*     \sum_{m\prime} ACT_{n^L,t,y^V,y,m\prime,h^A}
+*     \leq share\_mode\_up_{p,n,t,y,m,h} \cdot
+*     \sum_{m'} ACT_{n^L,t,y^V,y,m',h^A}
 *
 ***
 SHARE_CONSTRAINT_MODE_UP(shares,node,tec,mode,year,time)$(
@@ -1307,8 +1280,8 @@ SHARE_CONSTRAINT_MODE_UP(shares,node,tec,mode,year,time)$(
 *
 *   .. math::
 *     ACT_{n^L,t,y^V,y,m,h^A}
-*     \geq share\_mode\_lo_{s,n,y,m,h} \cdot
-*     \sum_{m\prime} ACT_{n^L,t,y^V,y,m\prime,h^A}
+*     \geq share\_mode\_lo_{p,n,t,y,m,h} \cdot
+*     \sum_{m'} ACT_{n^L,t,y^V,y,m',h^A}
 *
 ***
 SHARE_CONSTRAINT_MODE_LO(shares,node,tec,mode,year,time)$(
@@ -1337,23 +1310,23 @@ SHARE_CONSTRAINT_MODE_LO(shares,node,tec,mode,year,time)$(
 * The implementation is generic and flexible, so that any combination of commodities, levels, technologies and nodes
 * can be put in relation to any other combination.
 *
-* The notation :math:`S^{share}` represents the mapping set `map_shares_commodity_share` denoting all technology types,
-* nodes, commodities and levels to be included in the numerator, and :math:`S^{total}` is
+* The notation :math:`P^{share}` represents the mapping set `map_shares_commodity_share` denoting all technology types,
+* nodes, commodities and levels to be included in the numerator, and :math:`P^{total}` is
 * the equivalent mapping set `map_shares_commodity_total` for the denominator.
 *
 * Equation SHARE_CONSTRAINT_COMMODITY_UP
 * """"""""""""""""""""""""""""""""""""""
 *   .. math::
-*      & \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim S^{share}}}
+*      & \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim P^{share}}}
 *         ( output_{n^L,t,y^V,y,m,n,c,l,h^A,h} + input_{n^L,t,y^V,y,m,n,c,l,h^A,h} ) \\
 *      & \quad \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,y^V,y,m,h^A} \\
 *      & \geq
-*        share\_commodity\_up_{s,n,y,h} \cdot
-*        \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim S^{total}}}
+*        share\_commodity\_up_{p,n,y,h} \cdot
+*        \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim P^{total}}}
 *            ( output_{n^L,t,y^V,y,m,n,c,l,h^A,h} + input_{n^L,t,y^V,y,m,n,c,l,h^A,h} ) \\
 *      & \quad \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,y^V,y,m,h^A}
 *
-* This constraint is only active if :math:`share\_commodity\_up_{s,n,y,h}` is defined.
+* This constraint is only active if :math:`share\_commodity\_up_{p,n,y,h}` is defined.
 ***
 SHARE_CONSTRAINT_COMMODITY_UP(shares,node_share,year,time)$( share_commodity_up(shares,node_share,year,time) )..
 * activity by type_tec_share technologies with map_shares_generic_share entries and a specific mode
@@ -1393,16 +1366,16 @@ SHARE_CONSTRAINT_COMMODITY_UP(shares,node_share,year,time)$( share_commodity_up(
 * Equation SHARE_CONSTRAINT_COMMODITY_LO
 * """"""""""""""""""""""""""""""""""""""
 *   .. math::
-*      & \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim S^{share}}}
+*      & \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim P^{share}}}
 *         ( output_{n^L,t,y^V,y,m,n,c,l,h^A,h} + input_{n^L,t,y^V,y,m,n,c,l,h^A,h} ) \\
 *      & \quad \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,y^V,y,m,h^A} \\
 *      & \leq
-*        share\_commodity\_lo_{s,n,y,h} \cdot
-*        \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim S^{total}}}
+*        share\_commodity\_lo_{p,n,y,h} \cdot
+*        \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim P^{total}}}
 *            ( output_{n^L,t,y^V,y,m,n,c,l,h^A,h} + input_{n^L,t,y^V,y,m,n,c,l,h^A,h} ) \\
 *      & \quad \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,y^V,y,m,h^A}
 *
-* This constraint is only active if :math:`share\_commodity\_lo_{s,n,y,h}` is defined.
+* This constraint is only active if :math:`share\_commodity\_lo_{p,n,y,h}` is defined.
 ***
 SHARE_CONSTRAINT_COMMODITY_LO(shares,node_share,year,time)$( share_commodity_lo(shares,node_share,year,time) )..
 * total input and output by `type_tec_share` technologies mapped to respective commodity, level and node
@@ -1716,6 +1689,8 @@ EMISSION_EQUIVALENCE(node,emission,type_tec,year)..
 ***
 * Bound on emissions
 * ^^^^^^^^^^^^^^^^^^
+*
+* .. _emission_constraint:
 *
 * Equation EMISSION_CONSTRAINT
 * """"""""""""""""""""""""""""
