@@ -86,7 +86,7 @@ def test_config(westeros_solved):
 
     # removing a column from config and testing
     data = c.data.copy()
-    data['config'] =  c.data['config'][['node', 'sector']]
+    data['config'] = c.data['config'][['node', 'sector']]
     try:
         macro.Calculate(s, data)
     except KeyError as error:
