@@ -15,6 +15,7 @@
 * ----------------------------------------------------
 *
 * .. caution::
+*
 *    Parameters written in **bold** are auxiliary parameters
 *    that are either generated automatically when exporting a ``message_ix.Scenario`` to gdx
 *    or that are computed during the *pre-processing* stage in GAMS (see the footnotes for more
