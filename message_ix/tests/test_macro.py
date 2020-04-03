@@ -81,11 +81,24 @@ def test_calc_no_solution(westeros_not_solved):
 def test_config(westeros_solved):
     s = westeros_solved
     c = macro.Calculate(s, W_DATA_PATH)
-    c.nodes = set(list(c.nodes) + ["foo"])
-    c.sectors = set(list(c.sectors) + ["bar"])
+    assert 'config' in c.data
+    assert 'sector' in c.data['config']
 
-    assert c.nodes == set(["Westeros", "foo"])
-    assert c.sectors == set(["light", "bar"])
+    # removing a column from config and testing
+    data = c.data.copy()
+    data['config'] =  c.data['config'][['node', 'sector']]
+    try:
+        macro.Calculate(s, data)
+    except KeyError as error:
+        assert ('Missing config data for "level"' in str(error))
+
+    # removing config completely and testing
+    data.pop('config')
+    try:
+        macro.Calculate(s, data)
+    except KeyError as error:
+        assert ('Missing config in input data' in str(error))
+
     c.read_data()
     assert c.nodes == set(["Westeros"])
     assert c.sectors == set(["light"])
