@@ -252,7 +252,7 @@ Parameters
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
 * The following parameters specify upper and lower bounds on new capacity, total installed capacity, and activity. The bounds
-* on activity are implemented as the aggregate over all vintages in a specific period (:ref:`activity_bound_up` and :ref:`acitvity_bound_lo`).
+* on activity are implemented as the aggregate over all vintages in a specific period (:ref:`activity_bound_up` and :ref:`activity_bound_lo`).
 *
 * .. list-table::
 *    :widths: 25 60
