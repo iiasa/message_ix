@@ -162,7 +162,7 @@ These automatic features of :class:`~message_ix.reporting.Reporter` are controll
 .. autoclass:: Reporter
    :show-inheritance:
    :members: write
-   :exclude-members: as_pyam
+   :exclude-members: add_as_pyam
 
    .. automethod:: convert_pyam
 

@@ -164,6 +164,10 @@ MAPPING_SETS = [
 
 class Reporter(IXMPReporter):
     """MESSAGEix Reporter."""
+    # Module containing predefined computations, including those defined in
+    # message_ix.reporting.computations
+    _computations = computations
+
     @classmethod
     def from_scenario(cls, scenario, **kwargs):
         """Create a Reporter by introspecting *scenario*.
@@ -179,75 +183,50 @@ class Reporter(IXMPReporter):
         # Invoke the ixmp method
         rep = super().from_scenario(scenario, **kwargs)
 
-        # Use a queue pattern. This is more forgiving; e.g. 'addon ACT' from
-        # PRODUCTS depends on 'addon conversion::full'; but the latter is added
-        # to the queue later (from DERIVED). Using strict=True below means that
-        # this will raise an exception; so the failed item is re-appended to
-        # the queue and tried 1 more time later.
+        # Use a queue pattern via Reporter.add_queue(). This is more forgiving;
+        # e.g. 'addon ACT' from PRODUCTS depends on 'addon conversion::full';
+        # but the latter is added to the queue later (from DERIVED). Using
+        # strict=True below means that this will raise an exception; so the
+        # failed item is re-appended to the queue and tried 1 more time later.
 
-        # Queue of items to add. Each element is a tuple:
-        # - The first element is the count of attempts to add the item;
-        # - the second element is the method to call;
-        # - the remainder are positional arguments.
+        # Assemble queue of items to add. Each element is a 2-tuple:
+        # - Positional arguments for Reporter.add();
+        # - Keyword arguments
         to_add = []
 
         def put(*args, **kwargs):
             """Helper to add elements to the queue."""
-            to_add.append(tuple([0, partial(args[0], **kwargs)]
-                                + list(args[1:])))
+            to_add.append((args, kwargs))
 
         # Quantities that represent mapping sets
         for name, full_set in MAPPING_SETS:
-            put(rep.add, f'map_{name}',
-                (computations.map_as_qty, f'cat_{name}', full_set),
+            put('map_as_qty', f'map_{name}', f'cat_{name}', full_set,
                 strict=True)
 
         # Product quantities
         for name, quantities in PRODUCTS:
-            put(rep.add_product, name, *quantities)
+            put('product', name, *quantities)
 
         # Derived quantities
         for key, args in DERIVED:
-            put(rep.add, key, args, strict=True, index=True, sums=True)
+            put(key, *args, strict=True, index=True, sums=True)
 
         # Conversions to IAMC format/pyam objects
         for qty, year_dim, collapse_kw in PYAM_CONVERT:
             collapse_cb = partial(collapse_message_cols, **collapse_kw)
-            put(rep.convert_pyam, qty, year_dim, 'pyam', collapse=collapse_cb)
+            put('as_pyam', qty, year_dim, 'pyam', collapse=collapse_cb)
 
         # Standard reports
         for group, pyam_keys in REPORTS.items():
-            put(rep.add, group, tuple([computations.concat] + pyam_keys),
-                strict=True)
+            put(group, computations.concat, *pyam_keys, strict=True)
 
         # Add all standard reporting to the default message node
-        put(rep.add, 'message:default',
-            tuple([computations.concat] + list(REPORTS.keys())),
+        put('message:default', computations.concat, *REPORTS.keys(),
             strict=True)
 
-        # Process the queue until empty
-        while len(to_add):
-            # Next call
-            count, method, *args = to_add.pop(0)
-
-            try:
-                # Call the method to add quantities
-                method(*args)
-            except KeyError as e:
-                # Adding failed
-
-                # Information for debugging
-                info = [repr(e), str(method), str(args)]
-
-                if count == 0:
-                    # First failure: this may only be due to items being out of
-                    # order, so retry silently
-                    to_add.append(tuple([count + 1, method] + args))
-
-                    log.debug('\n  '.join(['Will retry adding:'] + info))
-                elif count == 1:
-                    # Second failure: something is genuinely missing, discard
-                    log.info('\n  '.join(['Failed to add:'] + info))
+        # Use ixmp.Reporter.add_queue() to process the entries. Retry at most
+        # once; raise an exception if adding fails after that.
+        rep.add_queue(to_add, max_tries=1, fail='raise')
 
         return rep
 
@@ -322,6 +301,9 @@ class Reporter(IXMPReporter):
             keys.append(new_key)
 
         return keys
+
+    # Use convert_pyam as a helper for computations.as_pyam
+    add_as_pyam = convert_pyam
 
     def write(self, key, path):
         """Compute *key* and write its value to the file at *path*.
