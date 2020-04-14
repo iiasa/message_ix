@@ -42,12 +42,11 @@ install:
 script:
   - python -c "import os, sys; assert os.environ['PYVERSION'] == sys.version[0]"
   # Run tests
-  - pytest --verbose message_ix
+  - pytest --verbose message_ix --cov-report=xml
   # Test that documentation can be built
   - cd doc
   - pip install -r requirements.txt
   - make html
 
 after_success:
-  - coverage combine
   - codecov
