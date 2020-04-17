@@ -15,14 +15,12 @@ import yaml
 
 log = logging.getLogger(__name__)
 
-HERE = Path(__file__).resolve()
-DEFAULT_WORKDIR = HERE.parents[1] / 'tests' / 'data' / 'nightly'
-DBFOLDER = os.path.join(HERE, 'db')
-DBPATH = os.path.join(DBFOLDER, 'scenarios')
+HERE = Path(__file__).parent.resolve()
+DEFAULT_WORKDIR = HERE.parent / 'tests' / 'data' / 'nightly'
 
 
 def _config():
-    with open(HERE.parents[3] / 'ci' / 'nightly.yaml') as f:
+    with open(HERE.parents[1] / 'ci' / 'nightly.yaml') as f:
         return yaml.safe_load(f)
 
 
@@ -75,7 +73,7 @@ def fetch_scenarios(path, dbprops):
 
 def iter_scenarios():
     try:
-        with open(HERE.parents[1] / 'tests' / 'data' / 'scenarios.yaml',
+        with open(HERE.parent / 'tests' / 'data' / 'scenarios.yaml',
                   'r') as f:
             scenarios = yaml.safe_load(f)
 
