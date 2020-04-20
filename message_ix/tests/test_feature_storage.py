@@ -20,11 +20,11 @@ def model_setup(scen, years):
     scen.add_set('level', 'level')
     scen.add_set('year', years)
     scen.add_set('type_year', years)
-    scen.add_set('technology', ['tec1', 'tec2'])
+    scen.add_set('technology', ['wind_ppl', 'gas_ppl'])
     scen.add_set('mode', 'mode')
     output_specs = ['node', 'electr', 'level', 'year', 'year']
     # Two technologies, one cheaper than the other
-    var_cost = {'tec1': 1, 'tec2': 2}
+    var_cost = {'wind_ppl': 0, 'gas_ppl': 2}
     for year, (tec, cost) in product(years, var_cost.items()):
         scen.add_par('demand', ['node', 'electr', 'level', year, 'year'],
                      1, 'GWa')
@@ -140,11 +140,11 @@ def storage_setup(test_mp, time_duration, comment):
     scen.check_out()
     for h in time_duration.keys():
         scen.add_par('bound_activity_up',
-                     ['node', 'tec1', 2020, 'mode', h], 0.25, 'GWa')
+                     ['node', 'wind_ppl', 2020, 'mode', h], 0.25, 'GWa')
     scen.commit('activity bounded')
     scen.solve(case='no_storage_bounded' + comment)
     cost_no_storage = scen.var('OBJ')['lvl']
-    act_no = scen.var('ACT', {'technology': 'tec2'})['lvl'].sum()
+    act_no = scen.var('ACT', {'technology': 'gas_ppl'})['lvl'].sum()
 
     # Third, adding storage technologies and their parameters
     scen.remove_solution()
@@ -154,7 +154,7 @@ def storage_setup(test_mp, time_duration, comment):
     scen.commit('storage added')
     scen.solve(case='with_storage' + comment)
     cost_with_storage = scen.var('OBJ')['lvl']
-    act_with = scen.var('ACT', {'technology': 'tec2'})['lvl'].sum()
+    act_with = scen.var('ACT', {'technology': 'gas_ppl'})['lvl'].sum()
 
     # Forth. Tests for the functionality of storage
     # 1. Check the contribution of storage to the system
