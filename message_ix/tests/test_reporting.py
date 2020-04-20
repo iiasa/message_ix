@@ -59,11 +59,11 @@ def test_reporter(message_test_mp):
     assert_qty_equal(obs.sort_index(), demand, check_attrs=False)
 
     # ixmp.Reporter pre-populated with only model quantities and aggregates
-    assert len(rep_ix.graph) == 5349
+    assert len(rep_ix.graph) == 5351
 
     # message_ix.Reporter pre-populated with additional, derived quantities
     # This is the same value as in test_tutorials.py
-    assert len(rep.graph) == 12553
+    assert len(rep.graph) == 12816
 
     # Derived quantities have expected dimensions
     vom_key = rep.full_key('vom')
