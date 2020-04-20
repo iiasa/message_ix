@@ -94,8 +94,12 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
             result = super().run(scenario)
         finally:
             # Remove the optfile regardless of whether the run completed
-            # without error
-            optfile.unlink()
+            # without error. The file may have been removed already by another
+            # run (in a separate process) that completed before this one.
+            # py37 compat: check for existence instead of using
+            # unlink(missing_ok=True)
+            if optfile.exists():
+                optfile.unlink()
 
         return result
 
