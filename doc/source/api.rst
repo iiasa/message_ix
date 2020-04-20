@@ -131,6 +131,11 @@ Model classes
 
    .. autoattribute:: name
 
+.. autoclass:: GAMSModel
+   :members:
+   :exclude-members: defaults
+   :show-inheritance:
+
 
 .. _utils:
 

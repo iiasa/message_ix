@@ -4,6 +4,7 @@ Next release
 All changes
 -----------
 
+- `#340 <https://github.com/iiasa/message_ix/pull/340>`_: Allow cplex.opt to be used by message_ix from multiple processes.
 - `#328 <https://github.com/iiasa/message_ix/pull/328>`_: Expand automatic reporting of emissions prices and mapping sets; improve robustness of :meth:`Reporter.convert_pyam`.
 - `#321 <https://github.com/iiasa/message_ix/pull/321>`_: Move :meth:`.Scenario.to_excel`, :meth:`.read_excel` to :class:`ixmp.Scenario`; they continue to work with message_ix.Scenario.
 - `#323 <https://github.com/iiasa/message_ix/pull/323>`_: Add `units`, `replace_vars` arguments to :meth:`.Reporter.convert_pyam`.
