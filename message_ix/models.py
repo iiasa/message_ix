@@ -76,14 +76,18 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         GAMSModel creates a file named ``cplex.opt`` in the model directory
         containing the options in :obj:`DEFAULT_CPLEX_OPTIONS`, or any
         overrides passed to :meth:`~message_ix.Scenario.solve`.
+
+        .. warning:: GAMSModel can solve Scenarios in two or more Python
+           processes simultaneously; but using *different* CPLEX options in
+           each process may produced unexpected results.
         """
-        # This is not safe against race conditions; if two runs are kicked off
-        # simulatenously with the same dp.model_path, then they will try to
-        # write/unlink the same optfile.
+        # If two runs are kicked off simulatenously with the same
+        # self.model_dir, then they will try to write the same optfile, and may
+        # write different contents.
         #
-        # TODO enhance GAMSModel (in ixmp) to run GAMS in a temporary
-        #      directory, copying source and GDX files if needed. Then the
-        #      cplex.opt file will be specific to that directory.
+        # TODO Re-enable the 'use_temp_dir' feature from ixmp.GAMSModel
+        #      (disabled above). Then cplex.opt will be specific to that
+        #      directory.
 
         # Write CPLEX options into an options file
         optfile = self.model_dir / 'cplex.opt'
