@@ -111,8 +111,6 @@ Variables
     EMISS(node,emission,type_tec,year_all)       aggregate emissions by technology type and land-use model emulator
 * auxiliary variable for left-hand side of relations (linear constraints)
     REL(relation,node,year_all)                  auxiliary variable for left-hand side of user-defined relations
-* auxiliary variable for left-hand side of commodity balance
-    COMM(node,commodity,level,year_all,time)         auxiliary variable for left-hand side of commodity balance
 * change in the content of storage device
     STORAGE_CHG(node,tec,level,year_all,time)   change in the content of storage (positive or negative)
 ;

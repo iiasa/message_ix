@@ -16,14 +16,6 @@ _sh.setLevel(level=logging.WARNING)
 log.addHandler(_sh)
 
 
-DEFAULT_SOLVE_OPTIONS = {
-    'advind': 0,
-    'lpmethod': 2,
-    'threads': 4,
-    'epopt': 1e-6,
-}
-
-
 class Scenario(ixmp.Scenario):
     """|MESSAGEix| Scenario.
 
