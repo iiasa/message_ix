@@ -33,9 +33,17 @@ class Scenario(ixmp.Scenario):
     'MESSAGE'.
     """
     def __init__(self, mp, model, scenario=None, version=None, annotation=None,
-                 cache=False):
+                 cache=False, **kwargs):
+        # Handle keyword arguments
+        if not set(kwargs) <= {'scheme'}:
+            msg = f'Unrecognized keyword arguments: {kwargs}'
+            raise ValueError(msg) from None
+
         # If not a new scenario, use the scheme stored in the Backend
-        scheme = 'MESSAGE' if version == 'new' else None
+        scheme = kwargs.get('scheme', 'MESSAGE' if version == 'new' else None)
+        if scheme not in ('MESSAGE', None):
+            msg = f'Instantiate {self.__class__.__name__} with scheme {scheme}'
+            raise ValueError(msg)
 
         # `ixmp.Scenario` verifies that MESSAGE-scheme scenarios are
         # initialized as `message_ix.Scenario` for correct API
