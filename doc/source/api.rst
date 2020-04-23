@@ -129,6 +129,19 @@ Model classes
    :members:
    :show-inheritance:
 
+   MESSAGE_MACRO solves the MESSAGE and MACRO models iteratively, connecting changes in technology activity and resource demands (from MESSAGE) to changes in final demands and prices (from MACRO).
+   This iteration continues until the solution *converges*; i.e. the two models reach a stable point for the values of these parameters.
+
+   MESSAGE_MACRO accepts three additional *model_options* that control the behaviour of this iteration algorithm:
+
+   - **max_adjustment** (:class:`float`, default 0.2): the maximum absolute relative change in final demands between iterations.
+     If MACRO returns demands that have changed by more than a factor outside the range (1 - `max_adjustment`, 1 + `max_adjustment`) since the previous iteration, then the change is confined to the limits of that range for the next run of MESSAGE.
+   - **convergence_criterion** (:class:`float`, default 0.01): threshold for model convergence.
+     This option applies to the same value as `max_adjustment`: the relative change in final demands between two iterations.
+     If the absolute relative change is less than `convergence_criterion`, the linked model run is complete.
+   - **max_iteration** (:class:`int`, default 50): the maximum number of iterations between the two models.
+     If the solution does not converge after this many iterations, the linked model run fails and no valid result is produced.
+
    .. autoattribute:: name
 
 .. autoclass:: GAMSModel
