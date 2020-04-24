@@ -37,7 +37,7 @@ MESSAGE_ITEMS = {
     # two diferent periods) together
     'relation_storage': dict(
         ix_type='par',
-        idx_sets=['node', 'technology', 'level', 'commodity','year', 'year',
+        idx_sets=['node', 'technology', 'level', 'commodity', 'year', 'year',
                   'time', 'time'],
         idx_names=['node', 'technology', 'level', 'commodity', 'year_first',
                    'year_last', 'time_first', 'time_last']),
