@@ -64,7 +64,7 @@ def add_storage_data(scen, time_order):
     scen.add_set('technology', ['dam', 'pump', 'turbine'])
 
     # Adding a storage commodity
-    scen.add_set('commodity', 'stored_com')
+    scen.add_set('commodity', 'water')
 
     # Specifying storage reservoir technology
     scen.add_set('storage_tec', 'dam')
@@ -74,21 +74,22 @@ def add_storage_data(scen, time_order):
 
     # Adding mapping for storage and charger/discharger technologies
     for tec in ['pump', 'turbine']:
-        scen.add_set('map_tec_storage', ['node', tec, 'dam', 'storage'])
+        scen.add_set('map_tec_storage', ['node', tec, 'dam', 'storage',
+                                         'water'])
 
     # Adding time sequence
     for h in time_order.keys():
         scen.add_par('time_seq', ['season', h], time_order[h], '-')
 
     # Adding input, output, and capacity factor for storage technologies
-    output_spec = {'dam': ['node', 'stored_com', 'storage'],
-                   'pump': ['node', 'stored_com', 'storage'],
+    output_spec = {'dam': ['node', 'water', 'storage'],
+                   'pump': ['node', 'water', 'storage'],
                    'turbine': ['node', 'electr', 'level'],
                    }
 
-    input_spec = {'dam': ['node', 'stored_com', 'storage'],
+    input_spec = {'dam': ['node', 'water', 'storage'],
                   'pump': ['node', 'electr', 'level'],
-                  'turbine': ['node', 'stored_com', 'storage'],
+                  'turbine': ['node', 'water', 'storage'],
                   }
 
     var_cost = {'dam': 0, 'pump': 0.2, 'turbine': 0.3}
@@ -100,20 +101,20 @@ def add_storage_data(scen, time_order):
         scen.add_par('input', tec_sp + input_spec[tec] + [h, h], 1, 'GWa')
         scen.add_par('var_cost', tec_sp + [h], var_cost[tec], 'USD/GWa')
 
-    # Adding minimum and maximum bound, and losses for storage (percentage)
+    # Adding storage self-discharge (as %) and initial content
     for year, h in product(set(scen.set('year')), time_order.keys()):
-        storage_spec = ['node', 'dam', 'storage', year, h]
+        storage_spec = ['node', 'dam', 'storage', 'water', year, h]
         scen.add_par('storage_loss', storage_spec, 0.05, '%')
 
-    # Adding initial content of storage (optional)
-    storage_spec = ['node', 'dam', 'storage', year, 'a']
-    scen.add_par('init_storage', storage_spec, 0.08, 'GWa')
+        # Adding initial content of storage (optional)
+        storage_spec = ['node', 'dam', 'storage', 'water', year, 'a']
+        scen.add_par('init_storage', storage_spec, 0.08, 'GWa')
 
     # Adding a relation between storage content of two time steps (optional)
     yr_first = yr_last = scen.set('year').tolist()[0]
     time_first = 'a'
     time_last = 'd'
-    scen.add_par('relation_storage', ['node', 'dam', 'storage',
+    scen.add_par('relation_storage', ['node', 'dam', 'storage', 'water',
                                       yr_first, yr_last,
                                       time_last, time_first], 0.5, '%')
 
@@ -166,15 +167,15 @@ def storage_setup(test_mp, time_duration, comment):
     initial_content = float(scen.par('init_storage')['value'])
     assert act_turb.sum() <= act_pump.sum() + initial_content
 
-    # 3. Max activity of charger <= storage capacity
+    # 3. Max activity of charger <= storage
     max_pump = max(act_pump)
-    cap_storage = float(scen.var('CAP', {'technology': 'dam'})['lvl'])
-    assert max_pump <= cap_storage
+    act_storage = max(scen.var('ACT', {'technology': 'dam'})['lvl'])
+    assert max_pump <= act_storage
 
     # 4. Max activity of discharger <= storage capacity - losses
     max_turb = max(act_turb)
     loss = scen.par('storage_loss')['value'][0]
-    assert max_turb <= cap_storage * (1 - loss)
+    assert max_turb <= act_storage * (1 - loss)
 
     # Fifth, testing equations of storage (when added to ixmp variables)
     if scen.has_var('STORAGE'):
@@ -184,7 +185,7 @@ def storage_setup(test_mp, time_duration, comment):
         assert storage_first == storage_last
 
         # 2. Storage content should never exceed storage capacity
-        assert max(scen.var('STORAGE')['lvl']) <= cap_storage
+        assert max(scen.var('STORAGE')['lvl']) <= act_storage
 
         # 3. Commodity balance: charge - discharge - losses = 0
         change = scen.var('STORAGE_CHG').set_index(['year_act', 'time'])['lvl']

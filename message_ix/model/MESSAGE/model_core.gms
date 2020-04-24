@@ -95,7 +95,7 @@ Positive Variables
 * land-use model emulator
     LAND(node,land_scenario,year_all) relative share of land-use scenario
 * content of storage
-    STORAGE(node,tec,level,year_all,time)       state of charge (SoC) of storage at each sub-annual time step (positive)
+    STORAGE(node,tec,level,commodity,year_all,time)       state of charge (SoC) of storage at each sub-annual time step (positive)
 ;
 
 Variables
@@ -112,7 +112,7 @@ Variables
 * auxiliary variable for left-hand side of relations (linear constraints)
     REL(relation,node,year_all)                  auxiliary variable for left-hand side of user-defined relations
 * change in the content of storage device
-    STORAGE_CHG(node,tec,level,year_all,time)    change in the state of charge of storage (positive for charge or negative for discharge)
+    STORAGE_CHG(node,tec,level,commodity,year_all,time)    change in the state of charge of storage (positive for charge or negative for discharge)
 ;
 
 ***
@@ -2009,19 +2009,19 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 *          - \sum_{\substack{n^L,m,c,h^A \\ y^V \leq y, (n,t^D,t^S,l,y) \sim S^{storage}}} input_{n^L,t^D,y^V,y,m,n,c,l,h^A,h}
 *             \cdot & ACT_{n^L,t^D,y^V,y,m,h^A} \\
 ***
-STORAGE_CHANGE(node,storage_tec,level_storage,year,time) ..
+STORAGE_CHANGE(node,storage_tec,level_storage,commodity,year,time) ..
 * change in the content of storage in the examined timestep
-    STORAGE_CHG(node,storage_tec,level_storage,year,time) =E=
+    STORAGE_CHG(node,storage_tec,level_storage,commodity,year,time) =E=
 * increase in the content of storage due to the activity of charging technologies
-        SUM( (location,vintage,mode,tec,commodity,time2)$(
+        SUM( (location,vintage,mode,tec,time2)$(
         map_tec_lifetime(node,tec,vintage,year)
-        AND map_tec_storage(node,tec,storage_tec,level_storage) ),
+        AND map_tec_storage(node,tec,storage_tec,level_storage,commodity) ),
             output(location,tec,vintage,year,mode,node,commodity,level_storage,time2,time)
             * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time) )
 * decrease in the content of storage due to the activity of discharging technologies
-        - SUM( (location,vintage,mode,tec,commodity,time2)$(
+        - SUM( (location,vintage,mode,tec,time2)$(
         map_tec_lifetime(node,tec,vintage,year)
-        AND map_tec_storage(node,tec,storage_tec,level_storage) ),
+        AND map_tec_storage(node,tec,storage_tec,level_storage,commodity) ),
             input(location,tec,vintage,year,mode,node,commodity,level_storage,time2,time)
             * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time) );
 
@@ -2038,29 +2038,35 @@ STORAGE_CHANGE(node,storage_tec,level_storage,year,time) ..
 *      STORAGE_{n,t^S,l,y,h} \ = init\_storage_{n,t^S,l,y,h} + STORAGE\_CHG_{n,t^S,l,y,h} + \\
 *      STORAGE_{n,t^S,l,y,h^A} \cdot & (1 - storage\_loss_{n,t^S,l,y,h^A}) \\
 ***
-STORAGE_BALANCE(node,storage_tec,level,year,time2)$ (
-    SUM(tec, map_tec_storage(node,tec,storage_tec,level) )
-    AND NOT init_storage(node,storage_tec,level,year,time2) )..
+STORAGE_BALANCE(node,storage_tec,level,commodity,year,time2)$ (
+    SUM(tec, map_tec_storage(node,tec,storage_tec,level,commodity) )
+    AND NOT init_storage(node,storage_tec,level,commodity,year,time2) )..
 * Showing the the state of charge of storage at each timestep
-    STORAGE(node,storage_tec,level,year,time2) =E=
+    STORAGE(node,storage_tec,level,commodity,year,time2) =E=
 * change in the content of storage in the examined timestep
-    + STORAGE_CHG(node,storage_tec,level,year,time2)
+    + STORAGE_CHG(node,storage_tec,level,commodity,year,time2)
 * storage content in the previous subannual timestep
     + SUM((lvl_temporal,time)$map_time_period(year,lvl_temporal,time,time2),
-        STORAGE(node,storage_tec,level,year,time)
+        STORAGE(node,storage_tec,level,commodity,year,time)
 * considering storage losses due to keeping the storage media between two subannual timesteps
-        * (1 - storage_loss(node,storage_tec,level,year,time) ) ) ;
+        * (1 - storage_loss(node,storage_tec,level,commodity,year,time) ) ) ;
 
-STORAGE_BALANCE_INIT(node,storage_tec,level,year,time)$ (
-    SUM(tec, map_tec_storage(node,tec,storage_tec,level) )
-    AND init_storage(node,storage_tec,level,year,time) )..
+STORAGE_BALANCE_INIT(node,storage_tec,level,commodity,year,time)$ (
+    SUM(tec, map_tec_storage(node,tec,storage_tec,level,commodity) )
+    AND init_storage(node,storage_tec,level,commodity,year,time) )..
 * Showing the state of charge of storage at a timestep with an initial storage content
-    STORAGE(node,storage_tec,level,year,time) =E=
+    STORAGE(node,storage_tec,level,commodity,year,time) =E=
 * initial content of storage and change in the content of storage in the examined timestep
 * (here the content from the previous time step is not carried over)
-    init_storage(node,storage_tec,level,year,time)
-    + STORAGE_CHG(node,storage_tec,level,year,time) ;
+    init_storage(node,storage_tec,level,commodity,year,time)
+    + STORAGE_CHG(node,storage_tec,level,commodity,year,time) ;
 
+STORAGE_EQUIVALENCE(node,storage_tec,level_storage,commodity,year,time )$ SUM( tec,
+    map_tec_storage(node,tec,storage_tec,level_storage,commodity) )..
+    STORAGE(node,storage_tec,level_storage,commodity,year,time) =E=
+        SUM( (location,vintage,mode,time2)$(map_tec_lifetime(node,storage_tec,vintage,year) ),
+            input(location,storage_tec,vintage,year,mode,node,commodity,level_storage,time2,time)
+            * duration_time_rel(time,time2) * ACT(location,storage_tec,vintage,year,mode,time) );
 ***
 * Equation STORAGE_RELATION
 * """""""""""""""""""""""""""""""

@@ -784,10 +784,8 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 Parameters
-    init_storage(node,tec,level,year_all,time)                          initial content of storage
+    init_storage(node,tec,level,commodity,year_all,time)                          initial content of storage
     storage_loss(node,tec,level,commodity,year_all,time)                          self-discharge (loss) of storage as % of storage level in previous timestep
     relation_storage(node,tec,level,commodity,year_all,year_all,time,time)        relation between the content of storage in two time steps (and two periods)
-    storage_loss(node,tec,level,year_all,time)                          storage loss per timestep (percentage of capacity)
-    relation_storage(node,tec,level,year_all,year_all,time,time)        relation between the content of storage in two time steps (and two periods)
     time_seq(lvl_temporal,time)                                         sequence of subannual timesteps
 ;

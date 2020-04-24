@@ -18,7 +18,7 @@ DEFAULT_CPLEX_OPTIONS = {
 }
 
 # Common indices for some parameters in MESSAGE_ITEMS
-_idx_common = ['node', 'technology', 'level', 'year', 'time']
+_idx_common = ['node', 'technology', 'level', 'commodity', 'year', 'time']
 
 # List of ixmp items for MESSAGE
 # NB only a partial list; see https://github.com/iiasa/message_ix/issues/254
@@ -30,17 +30,17 @@ MESSAGE_ITEMS = {
     # Mapping of storage reservoir to charger/discharger
     'map_tec_storage': dict(ix_type='set',
                             idx_sets=['node', 'technology', 'storage_tec',
-                                      'level']),
+                                      'level', 'commodity']),
     # Order of sub-annual time steps
     'time_seq': dict(ix_type='par', idx_sets=['lvl_temporal', 'time']),
     # Relating content of storage in two different time steps (or
     # two diferent periods) together
     'relation_storage': dict(
         ix_type='par',
-        idx_sets=['node', 'technology', 'level', 'year', 'year', 'time',
-                  'time'],
-        idx_names=['node', 'technology', 'level', 'year_first', 'year_last',
-                   'time_first', 'time_last']),
+        idx_sets=['node', 'technology', 'level', 'commodity','year', 'year',
+                  'time', 'time'],
+        idx_names=['node', 'technology', 'level', 'commodity', 'year_first',
+                   'year_last', 'time_first', 'time_last']),
     # Storage losses as a percentage of installed capacity
     'storage_loss': dict(ix_type='par', idx_sets=_idx_common),
     # Initial amount of storage
