@@ -441,13 +441,8 @@ Sets
 *----------------------------------------------------------------------------------------------------------------------*
 
 Sets
-    level_storage(level)                                               levels of storage
-    map_tec_charge(node,tec,mode,commodity,level,year_all,time)        mapping of charging technologies (for storage) to their commodities
-    map_tec_discharge(node,tec,mode,commodity,level,year_all,time)     mapping of discharging technologies (for storage) to their commodities
-    map_tec_storage(tec,tec2)                                          mapping of charge and discharging technologies (for storage) to their respective storage container
-    map_tec_storage_level(node,tec,tec2,level,year_all,time)           mapping of storage container to its level and charge-discharge technologies
-    storage_tec(tec)                                                   storage container technologies
-    charge_tec(tec)                                                    charging technologies (for storage)
-    discharge_tec(tec)                                                 discharging technologies (for storage)
-
+    level_storage(level)                                        levels of storage
+    map_tec_storage(node,tec,tec2,level)                        mapping of charge and discharging technologies to their respective storage technology and level
+    storage_tec(tec)                                            storage container technologies
+    map_time_period(year_all,lvl_temporal,time,time2)           mapping of the sequence of sub-annual timesteps (used in storage equations)
 ;

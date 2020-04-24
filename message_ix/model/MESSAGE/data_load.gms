@@ -161,28 +161,6 @@ addon_up(node,tec,year_all,mode,time,type_addon)$(
 emission_scaling(type_emission,emission)$( cat_emission(type_emission,emission)
         and not emission_scaling(type_emission,emission) ) = 1 ;
 
-* mapping of charging technologies to their level and commodity
-map_tec_charge(node,tec,mode,commodity,level_storage,year_all,time)$( Not storage_tec(tec) AND
-    SUM((node2,year_all2,time_act),
-        output(node2,tec,year_all,year_all2,mode,node,commodity,level_storage,time_act,time) ) ) = yes;
-
-charge_tec(tec)$(
-     SUM((node,mode,commodity,level_storage,year_all,time), map_tec_charge(node,tec,mode,commodity,level_storage,year_all,time) ) ) = yes;
-
-* mapping of discharge technologies to their level and commodity
-map_tec_discharge(node,tec,mode,commodity,level_storage,year_all,time)$( Not storage_tec(tec) AND
-    SUM((node2,year_all2,time_act),
-        input(node2,tec,year_all,year_all2,mode,node,commodity,level_storage,time_act,time) ) ) = yes;
-discharge_tec(tec)$(
-     SUM((node,mode,commodity,level_storage,year_all,time), map_tec_discharge(node,tec,mode,commodity,level_storage,year_all,time) ) ) = yes;
-
-* mapping of storage reservoir technologies to their levels and charge/discharge technologies
-map_tec_storage_level(node,tec,storage_tec,level_storage,year_all,time)$(map_tec_storage(tec, storage_tec) AND
-     ( SUM((node2,year_all2,mode,commodity,time_act),
-        input(node2,tec,year_all,year_all2,mode,node,commodity,level_storage,time_act,time) ) OR
-     SUM((node2,year_all2,mode,commodity,time_act),
-        output(node2,tec,year_all,year_all2,mode,node,commodity,level_storage,time_act,time) ) ) ) = yes;
-
 *----------------------------------------------------------------------------------------------------------------------*
 * sanity checks on the data set                                                                                        *
 *----------------------------------------------------------------------------------------------------------------------*

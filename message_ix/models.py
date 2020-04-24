@@ -29,7 +29,8 @@ MESSAGE_ITEMS = {
     'storage_tec': dict(ix_type='set'),
     # Mapping of storage reservoir to charger/discharger
     'map_tec_storage': dict(ix_type='set',
-                            idx_sets=['technology', 'storage_tec']),
+                            idx_sets=['node', 'technology', 'storage_tec',
+                                      'level']),
     # Order of sub-annual time steps
     'time_seq': dict(ix_type='par', idx_sets=['lvl_temporal', 'time']),
     # Relating content of storage in two different time steps (or

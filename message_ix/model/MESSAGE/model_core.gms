@@ -2010,23 +2010,20 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 *          - \sum_{\substack{n^L,m,c,h^A \\ y^V \leq y, (n,t^D,t^S,l,y) \sim S^{storage}}} input_{n^L,t^D,y^V,y,m,n,c,l,h^A,h}
 *             \cdot & ACT_{n^L,t^D,y^V,y,m,h^A} \\
 ***
-STORAGE_CHANGE(node,storage_tec,level,year,time)$( SUM( (mode,tec,commodity),
-    map_tec_storage_level(node,tec,storage_tec,level,year,time) AND
-    (map_tec_charge(node,tec,mode,commodity,level,year,time) OR
-    map_tec_discharge(node,tec,mode,commodity,level,year,time) ) ) )..
+STORAGE_CHANGE(node,storage_tec,level_storage,year,time) ..
 * change in the content of storage in the examined timestep
-    STORAGE_CHG(node,storage_tec,level,year,time) =E=
+    STORAGE_CHG(node,storage_tec,level_storage,year,time) =E=
 * increase in the content of storage due to the activity of charging technologies
         SUM( (location,vintage,mode,tec,commodity,time2)$(
-        map_tec_lifetime(node,tec,vintage,year) AND charge_tec(tec)
-        AND map_tec_storage_level(node,tec,storage_tec,level,year,time) ),
-            output(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+        map_tec_lifetime(node,tec,vintage,year)
+        AND map_tec_storage(node,tec,storage_tec,level_storage) ),
+            output(location,tec,vintage,year,mode,node,commodity,level_storage,time2,time)
             * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time) )
 * decrease in the content of storage due to the activity of discharging technologies
         - SUM( (location,vintage,mode,tec,commodity,time2)$(
-        map_tec_lifetime(node,tec,vintage,year) AND discharge_tec(tec)
-        AND map_tec_storage_level(node,tec,storage_tec,level,year,time) ),
-            input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+        map_tec_lifetime(node,tec,vintage,year)
+        AND map_tec_storage(node,tec,storage_tec,level_storage) ),
+            input(location,tec,vintage,year,mode,node,commodity,level_storage,time2,time)
             * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time) );
 
 ***

@@ -74,7 +74,7 @@ def add_storage_data(scen, time_order):
 
     # Adding mapping for storage and charger/discharger technologies
     for tec in ['pump', 'turbine']:
-        scen.add_set('map_tec_storage', [tec, 'dam'])
+        scen.add_set('map_tec_storage', ['node', tec, 'dam', 'storage'])
 
     # Adding time sequence
     for h in time_order.keys():
