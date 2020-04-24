@@ -2038,12 +2038,11 @@ STORAGE_CHANGE(node,storage_tec,level_storage,year,time) ..
 *      STORAGE_{n,t^S,l,y,h^A} \cdot & (1 - storage\_loss_{n,t^S,l,y,h^A}) \\
 ***
 STORAGE_BALANCE(node,storage_tec,level,year,time2)$ (
-    SUM(tec, map_tec_storage_level(node,tec,storage_tec,level,year,time2) )
-    AND NOT (SUM(lvl_temporal,time_seq(lvl_temporal,time2) ) = 1 ) )..
+    SUM(tec, map_tec_storage(node,tec,storage_tec,level) )
+    AND NOT init_storage(node,storage_tec,level,year,time2) )..
 * Showing the content of storage at each timestep
     STORAGE(node,storage_tec,level,year,time2) =E=
 * initial content of storage and change in the content of storage in the examined timestep
-    init_storage(node,storage_tec,level,year,time2)
     + STORAGE_CHG(node,storage_tec,level,year,time2)
 * storage content in the previous subannual timestep
     + SUM((lvl_temporal,time)$map_time_period(year,lvl_temporal,time,time2),
@@ -2052,8 +2051,8 @@ STORAGE_BALANCE(node,storage_tec,level,year,time2)$ (
         * (1 - storage_loss(node,storage_tec,level,year,time) ) ) ;
 
 STORAGE_BALANCE_INIT(node,storage_tec,level,year,time)$ (
-    SUM(tec, map_tec_storage_level(node,tec,storage_tec,level,year,time) )
-    AND (SUM(lvl_temporal,time_seq(lvl_temporal,time) ) = 1 ) )..
+    SUM(tec, map_tec_storage(node,tec,storage_tec,level) )
+    AND init_storage(node,storage_tec,level,year,time) )..
 * Showing the content of storage at the first timestep
     STORAGE(node,storage_tec,level,year,time) =E=
 * initial content of storage and change in the content of storage in the examined timestep
