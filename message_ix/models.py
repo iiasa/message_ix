@@ -41,10 +41,6 @@ MESSAGE_ITEMS = {
                   'time'],
         idx_names=['node', 'technology', 'level', 'year_first', 'year_last',
                    'time_first', 'time_last']),
-    # Lower bound of storage reservoir
-    'bound_storage_lo': dict(ix_type='par', idx_sets=_idx_common),
-    # Upper bound of storage reservoir
-    'bound_storage_up': dict(ix_type='par', idx_sets=_idx_common),
     # Storage losses as a percentage of installed capacity
     'storage_loss': dict(ix_type='par', idx_sets=_idx_common),
     # Initial amount of storage

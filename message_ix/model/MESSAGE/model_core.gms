@@ -277,8 +277,7 @@ Equations
     STORAGE_BALANCE                 balance of the state of charge of storage
     STORAGE_BALANCE_INIT            balance of the state of charge of storage at sub-annual time steps with initial storage content
     STORAGE_REL                     relation between the state of charge of storage in two different time steps (content in time_first * value greater-equal than content in time_last)
-    STORAGE_BOUND_LO                lower bound for the state of charge of storage
-    STORAGE_BOUND_UP                upper bound for the state of charge of storage
+    STORAGE_EQUIVALENCE             mapping state of storage as activity of storage technologies
 ;
 *----------------------------------------------------------------------------------------------------------------------*
 * equation statements                                                                                                  *
@@ -2072,45 +2071,11 @@ STORAGE_BALANCE_INIT(node,storage_tec,level,year,time)$ (
 *   .. math::
 *      STORAGE_{n,t^S,l,y^f,h^f} \leq relation\_storage_{n,t^S,l,y^f,y^l,h^f,h^l} \cdot & STORAGE_{n,t^S,l,y^l,h^l} \\
 ***
-STORAGE_REL(node,storage_tec,level_storage,year,year2,time,time2)$(
-    relation_storage(node,storage_tec,level_storage,year,year2,time,time2) )..
-        STORAGE(node,storage_tec,level_storage,year,time) =G=
-        relation_storage(node,storage_tec,level_storage,year,year2,time,time2)
-        * STORAGE(node,storage_tec,level_storage,year2,time2);
-
-***
-* Equation STORAGE_BOUND_UP
-* """""""""""""""""""""""""""""""
-*
-* The upper bound on the content of storage can be defined as the percentage of installed
-* capacity of storage device.
-*   .. math::
-*      STORAGE_{n,t^S,l,y,h} \leq bound\_storage\_up_{n,t^S,l,y,h} \cdot & \\
-*      \sum_{\substack{y^V \leq y}} capacity\_factor_{n,t^S,y^V,y,h} \cdot CAP_{n,t^S,y^V,y}  \\
-***
-STORAGE_BOUND_UP(node,storage_tec,level,year,time)$(
-    bound_storage_up(node,storage_tec,level,year,time) )..
-        STORAGE(node,storage_tec,level,year,time) =L=
-        bound_storage_up(node,storage_tec,level,year,time)
-        * SUM(vintage, capacity_factor(node,storage_tec,vintage,year,time)
-            * CAP(node,storage_tec,vintage,year) ) ;
-
-***
-* Equation STORAGE_BOUND_LO
-* """""""""""""""""""""""""""""""
-*
-* The lower bound on the content of storage as the percentage of
-* installed capacity of storage device.
-*   .. math::
-*      STORAGE_{n,t^S,l,y,h} \geq bound\_storage\_lo_{n,t^S,l,y,h} \cdot & \\
-*      \sum_{\substack{y^V \leq y}} capacity\_factor_{n,t^S,y^V,y,h} \cdot CAP_{n,t^S,y^V,y}   \\
-***
-STORAGE_BOUND_LO(node,storage_tec,level,year,time)$(
-    bound_storage_lo(node,storage_tec,level,year,time) )..
-        STORAGE(node,storage_tec,level,year,time) =G=
-        bound_storage_lo(node,storage_tec,level,year,time)
-        * SUM(vintage, capacity_factor(node,storage_tec,vintage,year,time)
-            * CAP(node,storage_tec,vintage,year) ) ;
+STORAGE_REL(node,storage_tec,level_storage,commodity,year,year2,time,time2)$(
+    relation_storage(node,storage_tec,level_storage,commodity,year,year2,time,time2) )..
+        STORAGE(node,storage_tec,level_storage,commodity,year,time) =G=
+        relation_storage(node,storage_tec,level_storage,commodity,year,year2,time,time2)
+        * STORAGE(node,storage_tec,level_storage,commodity,year2,time2);
 
 *----------------------------------------------------------------------------------------------------------------------*
 * model statements                                                                                                     *

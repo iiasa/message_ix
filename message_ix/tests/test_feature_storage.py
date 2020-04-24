@@ -103,8 +103,6 @@ def add_storage_data(scen, time_order):
     # Adding minimum and maximum bound, and losses for storage (percentage)
     for year, h in product(set(scen.set('year')), time_order.keys()):
         storage_spec = ['node', 'dam', 'storage', year, h]
-        scen.add_par('bound_storage_lo', storage_spec, 0.0, '%')
-        scen.add_par('bound_storage_up', storage_spec, 1.0, '%')
         scen.add_par('storage_loss', storage_spec, 0.05, '%')
 
     # Adding initial content of storage (optional)
