@@ -161,6 +161,12 @@ addon_up(node,tec,year_all,mode,time,type_addon)$(
 emission_scaling(type_emission,emission)$( cat_emission(type_emission,emission)
         and not emission_scaling(type_emission,emission) ) = 1 ;
 
+* mapping of sequence of sub-annual time steps in a period and temporal level
+map_time_period(year_all,lvl_temporal,time,time2)$( time_seq(lvl_temporal,time) AND
+     time_seq(lvl_temporal,time) + 1 = time_seq(lvl_temporal,time2) ) = yes;
+
+map_time_period(year_all,lvl_temporal,time,time2)$( time_seq(lvl_temporal,time) AND
+     time_seq(lvl_temporal,time) = SMAX(time3,time_seq(lvl_temporal,time3) ) AND time_seq(lvl_temporal,time2) = 1 ) = yes;
 *----------------------------------------------------------------------------------------------------------------------*
 * sanity checks on the data set                                                                                        *
 *----------------------------------------------------------------------------------------------------------------------*
