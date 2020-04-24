@@ -95,7 +95,7 @@ Positive Variables
 * land-use model emulator
     LAND(node,land_scenario,year_all) relative share of land-use scenario
 * content of storage
-    STORAGE(node,tec,level,year_all,time)       content of storage at each sub-annual time step (positive)
+    STORAGE(node,tec,level,year_all,time)       state of charge (SoC) of storage at each sub-annual time step (positive)
 ;
 
 Variables
@@ -112,7 +112,7 @@ Variables
 * auxiliary variable for left-hand side of relations (linear constraints)
     REL(relation,node,year_all)                  auxiliary variable for left-hand side of user-defined relations
 * change in the content of storage device
-    STORAGE_CHG(node,tec,level,year_all,time)   change in the content of storage (positive or negative)
+    STORAGE_CHG(node,tec,level,year_all,time)    change in the state of charge of storage (positive for charge or negative for discharge)
 ;
 
 ***
@@ -273,12 +273,12 @@ Equations
     RELATION_EQUIVALENCE            auxiliary equation to simplify the implementation of relations
     RELATION_CONSTRAINT_UP          upper bound of relations (linear constraints)
     RELATION_CONSTRAINT_LO          lower bound of relations (linear constraints)
-    STORAGE_CHANGE                  change in the content of storage
-    STORAGE_BALANCE                 balance of the content of storage
-    STORAGE_BALANCE_INIT            balance of the content of storage at the first time step
-    STORAGE_REL                     relation between the content of storage in two different time steps (content in time_first * value = content in time_last)
-    STORAGE_BOUND_LO                lower bound of the content of storage
-    STORAGE_BOUND_UP                upper bound of the content of storage
+    STORAGE_CHANGE                  change in the state of charge of storage
+    STORAGE_BALANCE                 balance of the state of charge of storage
+    STORAGE_BALANCE_INIT            balance of the state of charge of storage at sub-annual time steps with initial storage content
+    STORAGE_REL                     relation between the state of charge of storage in two different time steps (content in time_first * value greater-equal than content in time_last)
+    STORAGE_BOUND_LO                lower bound for the state of charge of storage
+    STORAGE_BOUND_UP                upper bound for the state of charge of storage
 ;
 *----------------------------------------------------------------------------------------------------------------------*
 * equation statements                                                                                                  *
@@ -2032,6 +2032,8 @@ STORAGE_CHANGE(node,storage_tec,level_storage,year,time) ..
 *
 * This equation ensures the commodity balance of storage technologies,
 * where the commodity is shifted between sub-annual time steps within a model period.
+* If the state of charge of storage is set exogenously in one time step through `init_storage` parameter,
+* the content from the previous timestep won't be carried over to this timestep.
 * Here, :math:`h^{A}` is the time step prior to :math:`h`.
 *   .. math::
 *      STORAGE_{n,t^S,l,y,h} \ = init\_storage_{n,t^S,l,y,h} + STORAGE\_CHG_{n,t^S,l,y,h} + \\
@@ -2040,9 +2042,9 @@ STORAGE_CHANGE(node,storage_tec,level_storage,year,time) ..
 STORAGE_BALANCE(node,storage_tec,level,year,time2)$ (
     SUM(tec, map_tec_storage(node,tec,storage_tec,level) )
     AND NOT init_storage(node,storage_tec,level,year,time2) )..
-* Showing the content of storage at each timestep
+* Showing the the state of charge of storage at each timestep
     STORAGE(node,storage_tec,level,year,time2) =E=
-* initial content of storage and change in the content of storage in the examined timestep
+* change in the content of storage in the examined timestep
     + STORAGE_CHG(node,storage_tec,level,year,time2)
 * storage content in the previous subannual timestep
     + SUM((lvl_temporal,time)$map_time_period(year,lvl_temporal,time,time2),
@@ -2053,9 +2055,10 @@ STORAGE_BALANCE(node,storage_tec,level,year,time2)$ (
 STORAGE_BALANCE_INIT(node,storage_tec,level,year,time)$ (
     SUM(tec, map_tec_storage(node,tec,storage_tec,level) )
     AND init_storage(node,storage_tec,level,year,time) )..
-* Showing the content of storage at the first timestep
+* Showing the state of charge of storage at a timestep with an initial storage content
     STORAGE(node,storage_tec,level,year,time) =E=
 * initial content of storage and change in the content of storage in the examined timestep
+* (here the content from the previous time step is not carried over)
     init_storage(node,storage_tec,level,year,time)
     + STORAGE_CHG(node,storage_tec,level,year,time) ;
 
@@ -2071,7 +2074,7 @@ STORAGE_BALANCE_INIT(node,storage_tec,level,year,time)$ (
 ***
 STORAGE_REL(node,storage_tec,level_storage,year,year2,time,time2)$(
     relation_storage(node,storage_tec,level_storage,year,year2,time,time2) )..
-        STORAGE(node,storage_tec,level_storage,year,time) =L=
+        STORAGE(node,storage_tec,level_storage,year,time) =G=
         relation_storage(node,storage_tec,level_storage,year,year2,time,time2)
         * STORAGE(node,storage_tec,level_storage,year2,time2);
 
