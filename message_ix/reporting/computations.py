@@ -1,8 +1,7 @@
 # Import other comps so they can be imported from this module
-from ixmp.reporting import RENAME_DIMS
+from ixmp.reporting import RENAME_DIMS, Quantity
 from ixmp.reporting.computations import *        # noqa: F401, F403
 from ixmp.reporting.computations import product
-from ixmp.reporting.quantity import as_quantity
 import pandas as pd
 
 from .pyam import as_pyam, concat, write_report  # noqa: F401
@@ -46,7 +45,7 @@ def map_as_qty(set_df, full_set):
 
     return set_df.set_index([set_from, set_to])['value'] \
                  .rename_axis(index=names) \
-                 .pipe(as_quantity)
+                 .pipe(Quantity)
 
 
 def broadcast_map(quantity, map, rename={}):

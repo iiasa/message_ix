@@ -4,7 +4,7 @@ from functools import partial
 from logging import WARNING
 from pathlib import Path
 
-from ixmp.reporting import Reporter as ixmp_Reporter, as_quantity
+from ixmp.reporting import Reporter as ixmp_Reporter, Quantity
 from ixmp.testing import assert_qty_equal
 from numpy.testing import assert_allclose
 import pandas as pd
@@ -48,7 +48,7 @@ def test_reporter(message_test_mp):
 
     # Quantities contain expected data
     dims = dict(coords=['chicago new-york topeka'.split()], dims=['n'])
-    demand = as_quantity(xr.DataArray([300, 325, 275], **dims), name='demand')
+    demand = Quantity(xr.DataArray([300, 325, 275], **dims), name='demand')
 
     # NB the call to squeeze() drops the length-1 dimensions c-l-y-h
     obs = rep.get('demand:n-c-l-y-h').squeeze(drop=True)
