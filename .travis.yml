@@ -37,16 +37,14 @@ install:
   # Install GAMS, conda, and Python dependencies needed for testing
   - . ci/travis-install.sh
   # Install the Python package
-  - pip install --editable .[reporting,tests,tutorial]
+  - pip install --editable .[docs,reporting,tests,tutorial]
 
 script:
   - python -c "import os, sys; assert os.environ['PYVERSION'] == sys.version[0]"
   # Run tests
   - pytest --verbose message_ix --cov-report=xml
   # Test that documentation can be built
-  - cd doc
-  - pip install -r requirements.txt
-  - make html
+  - cd doc && make html
 
 after_success:
   - codecov

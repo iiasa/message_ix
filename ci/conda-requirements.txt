@@ -2,10 +2,12 @@ asyncssh
 click
 codecov
 dask
+
 # Temporary exclusions: see iiasa/ixmp#279
 JPype1 != 0.7.2, != 0.7.3
+
 jupyter
-jupyter_console>=6
+jupyter_console >= 6
 matplotlib
 numpy
 numpydoc
@@ -13,11 +15,11 @@ pandas
 pint
 plotnine
 pytest-cov
-pytest>=3.9
+pytest >= 3.9
 scipy
 seaborn
+sphinx >= 2.3
 sphinx_rtd_theme
-sphinx>=1.8
 sphinxcontrib-bibtex
 statsmodels
 xarray

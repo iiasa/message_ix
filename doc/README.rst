@@ -7,10 +7,9 @@ The documentation of the MESSAGEix framework is generated from rst files include
 Dependencies
 ------------
 
-1. Sphinx_ v1.8 or higher
-2. `sphinx_rtd_theme`
-3. `sphinxcontrib.bibtex`
-4. `numpydoc`
+Install with the package. From the parent directory::
+
+    $ pip install .[docs]
 
 
 Writing in Restructured Text

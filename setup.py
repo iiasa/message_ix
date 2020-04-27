@@ -29,7 +29,7 @@ INSTALL_REQUIRES = [
 
 EXTRAS_REQUIRE = {
     'tests': ['asyncssh', 'pytest>=4.0'],
-    'docs': ['numpydoc', 'sphinx', 'sphinx_rtd_theme',
+    'docs': ['numpydoc', 'sphinx>=2.3', 'sphinx_rtd_theme',
              'sphinxcontrib-bibtex'],
     'reporting': ['pyam-iamc'],
     'tutorial': ['jupyter', 'matplotlib', 'plotnine'],
