@@ -158,6 +158,7 @@ Alias(time,time3);
 Alias(time,time_act);
 Alias(time,time_od);
 Alias(mode, mode2);
+Alias(commodity, commodity2);
 
 *----------------------------------------------------------------------------------------------------------------------*
 * Category types and mappings                                                                                                       *
@@ -442,7 +443,8 @@ Sets
 
 Sets
     level_storage(level)                                        level of storage technologies (excluded from commodity balance)
-    map_tec_storage(node,tec,tec2,level,commodity)                        mapping of charge-discharging technologies to their respective storage technology and level
+    map_tec_storage(node,tec,tec2,level,commodity)              mapping of charge-discharging technologies to their respective storage technology and level
     storage_tec(tec)                                            storage technologies (only container of storage media)
     map_time_period(year_all,lvl_temporal,time,time2)           mapping of the sequence of sub-annual timesteps (used in storage equations)
+    map_time_commodity_storage(node,tec,level,commodity,mode,year_all,time)              mapping of charge-discharging technologies to their respective storage technology and level
 ;

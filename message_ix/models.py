@@ -32,7 +32,7 @@ MESSAGE_ITEMS = {
                             idx_sets=['node', 'technology', 'storage_tec',
                                       'level', 'commodity']),
     # Order of sub-annual time steps
-    'time_seq': dict(ix_type='par', idx_sets=['lvl_temporal', 'time']),
+    'time_order': dict(ix_type='par', idx_sets=['lvl_temporal', 'time']),
     # Relating content of storage in two different time steps (or
     # two diferent periods) together
     'relation_storage': dict(
@@ -42,9 +42,9 @@ MESSAGE_ITEMS = {
         idx_names=['node', 'technology', 'level', 'commodity', 'year_first',
                    'year_last', 'time_first', 'time_last']),
     # Storage losses as a percentage of installed capacity
-    'storage_loss': dict(ix_type='par', idx_sets=_idx_common),
+    'storage_self_discharge': dict(ix_type='par', idx_sets=_idx_common),
     # Initial amount of storage
-    'init_storage': dict(ix_type='par', idx_sets=_idx_common),
+    'storage_initial': dict(ix_type='par', idx_sets=_idx_common),
 }
 
 
