@@ -1,6 +1,9 @@
-build:
-  image: latest
+version: 2
 
 python:
-  version: 3.6
-  setup_py_install: true
+  install:
+  # ixmp master must be installed first
+  - requirements: ci/pip-requirements.txt
+  - path: .
+    extra_requirements:
+    - docs

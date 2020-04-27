@@ -21,7 +21,7 @@ install:
   # Install GAMS, update conda, and install Python and R dependencies
   - ps: . .\ci\appveyor-install.ps1
   # Install the Python package
-  - pip install --editable .[reporting,tests,tutorial]
+  - pip install --editable .[docs,reporting,tests,tutorial]
 
 build: false
 
