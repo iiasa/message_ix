@@ -26,15 +26,28 @@ For the scientific reference of the framework, see Huppmann et al. (2019) :cite:
 The formulation of |MESSAGEix| is a re-implementation and extension of `'MESSAGE V'` (Messner and Strubegger, 1995 :cite:`messner_users_1995`), the Integrated Assessment model developed at the International Institute for Applied Systems Analysis (IIASA) since the 1980s.
 For an overview of the |MESSAGEix| model used at the IIASA Energy Program and a list of recent publications, please refer to the `MESSAGE-GLOBIOM documentation website`_.
 
-
 Getting Started
 ---------------
 
-.. toctree::
-   :maxdepth: 2
+.. NB this ReST pattern is repeated throughout this file:
 
+   1. List of :doc:`...` links, followed by
+   2. .. toctree:: directive with :hidden:, containing the same links.
+
+   This overcomes limitations of toctree, allowing introductory paragraphs, and different titles in this page than in the sidebar.
+
+- :doc:`framework`
+- :doc:`getting_started`
+- :doc:`tutorials`
+
+.. toctree::
+   :hidden:
+   :caption: Getting Started
+
+   framework
    getting_started
    tutorials
+
 
 .. _help:
 
@@ -43,16 +56,60 @@ Have a question? First, check the :doc:`faq`, then try the community Google grou
 - on the Web at https://groups.google.com/d/forum/message_ix, or
 - via e-mail at <message_ix@googlegroups.com>.
 
-Detailed documentation
-----------------------
+
+.. _guide:
+
+Developing |MESSAGEix| models
+-----------------------------
+
+Developing a valid, scientific |MESSAGEix| model requires careful use of the framework features.
+This section provides guidelines for how to make some common model design choices.
+
+- :doc:`efficiency`
+- :doc:`tools/add_year`
+- :doc:`reporting`
+- :doc:`debugging`
+- :doc:`macro`
 
 .. toctree::
-   :maxdepth: 3
+   :hidden:
+   :caption: Developing MESSAGEix models
+   :glob:
 
-   framework
-   api
-   core
-   guide
+   efficiency
+   tools/*
+   reporting
+   debugging
+   macro
+
+
+.. _core:
+
+Mathematical Specification
+--------------------------
+
+These pages provide comprehensive description of the variables and equations in
+the core MESSAGEix mathematical implementation.
+
+- :doc:`model/MESSAGE/sets_maps_def`
+- :doc:`model/MESSAGE/parameter_def`
+- :doc:`model/MESSAGE/model_core`
+- :doc:`model/MESSAGE/model_solve`
+- :doc:`model/MESSAGE/reporting`
+- :doc:`model/MESSAGE/scaling_investment_costs`
+- :doc:`model/MACRO/macro_core`
+
+.. toctree::
+   :hidden:
+   :caption: Mathematical Specification
+
+   model/MESSAGE/sets_maps_def
+   model/MESSAGE/parameter_def
+   model/MESSAGE/model_core
+   model/MESSAGE/model_solve
+   model/MESSAGE/reporting
+   model/MESSAGE/scaling_investment_costs
+   model/MACRO/macro_core
 
 
 Using and contributing to |MESSAGEix|
@@ -62,22 +119,24 @@ Using and contributing to |MESSAGEix|
 
 Anyone is encouraged to use the framework to develop energy system and integrated assessment models! Please see the :doc:`notice` for using the framework in scientific research. Contributions to the framework itself, which enable new features across all models, are also welcome.
 
-.. toctree::
-   :maxdepth: 1
-
-   whatsnew
-   notice
-   contributing
+- :doc:`api`
+- :doc:`whatsnew`
+- :doc:`notice`
+- :doc:`contributing`
+- :doc:`faq`
+- :doc:`bibliography`
 
 .. toctree::
    :hidden:
+   :caption: Help & reference
 
+   api
+   whatsnew
+   notice
+   contributing
    faq
-
-.. toctree::
-   :maxdepth: 2
-
    bibliography
+
 
 .. _`GAMS`: http://www.gams.com
 .. _`MESSAGE-GLOBIOM documentation website`: http://data.ene.iiasa.ac.at/message-globiom/
