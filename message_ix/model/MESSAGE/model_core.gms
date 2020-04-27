@@ -1,6 +1,6 @@
 ***
-* Mathematical formulation (core model)
-* =====================================
+* MESSAGE core formulation
+* ========================
 *
 * The |MESSAGEix| systems-optimization model minimizes total costs
 * while satisfying given demand levels for commodities/services

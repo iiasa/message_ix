@@ -307,7 +307,8 @@ texinfo_documents = [
 
 intersphinx_mapping = {
     'dask': ('http://docs.dask.org/en/stable/', None),
-    'ixmp': ('https://message.iiasa.ac.at/projects/ixmp/en/latest/', None),
+    # Temporary: use HTTP, not HTTPS, due to RTD.com certificate errors
+    'ixmp': ('http://message.iiasa.ac.at/projects/ixmp/en/latest/', None),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
     'pint': ('https://pint.readthedocs.io/en/stable/', None),
     'pyam': ('https://pyam-iamc.readthedocs.io/en/stable/', None),
@@ -316,7 +317,7 @@ intersphinx_mapping = {
 
 
 # prolog for all rst files
-rst_prolog = """
+rst_prolog = r"""
 .. |MESSAGEix| replace:: MESSAGE\ :emphasis:`ix`
 
 .. |ixmp| replace:: :emphasis:`ix modeling platform`

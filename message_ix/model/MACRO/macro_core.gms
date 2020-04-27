@@ -1,6 +1,6 @@
 ***
-* MACRO - Mathematical formulation
-* ================================
+* MACRO core formulation
+* ======================
 *
 * MACRO is a macroeconomic model maximizing the intertemporal utility function of a single representative producer-consumer
 * in each node (or macro-economic region). The optimization result is a sequence of optimal savings, investment, and consumption decisions.
