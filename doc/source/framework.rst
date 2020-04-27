@@ -35,6 +35,8 @@ The framework allows direct and explicit representation of:
   (Keppo and Strubegger, 2010 :cite:`keppo_short_2010`).
 - **Perfect-foresight** and **dynamic-recursive** (myopic) solution algorithms.
 
+.. _running:
+
 Running a model
 ---------------
 
