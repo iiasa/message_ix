@@ -425,14 +425,15 @@ class Scenario(ixmp.Scenario):
 
         Parameters
         ----------
-        model : str, optional
-            Type of model to solve, e.g. 'MESSAGE' or 'MESSAGE-MACRO'.
+        model : 'MESSAGE' or 'MACRO' or 'MESSAGE-MACRO', optional
+            Model to solve.
         solve_options : dict (str -> str), optional
             Name to value mapping to use for GAMS CPLEX solver options file.
-            See :class:`.MESSAGE` and :obj:`.DEFAULT_CPLEX_OPTIONS`.
+            See the :class:`.MESSAGE` class and :obj:`.DEFAULT_CPLEX_OPTIONS`.
         kwargs
             Many other options control the execution of the underlying GAMS
-            code; see :class:`.GAMSModel`.
+            code; see the :class:`.MESSAGE_MACRO` class and
+            :class:`.GAMSModel`.
         """
         super().solve(model=model, solve_options=solve_options, **kwargs)
 

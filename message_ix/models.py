@@ -25,13 +25,12 @@ def _template(*parts):
 
 class GAMSModel(ixmp.model.gams.GAMSModel):
     """Extended :class:`ixmp.model.gams.GAMSModel` for MESSAGE & MACRO."""
-    name = 'MESSAGE'
-
     #: Default model options.
     defaults = ChainMap({
-        # New keys for MESSAGE
+        # New keys for MESSAGE & MACRO
         'model_dir': Path(__file__).parent / 'model',
-        # Update keys from GAMSModel
+
+        # Override keys from GAMSModel
         'model_file': _template('{model_name}_run.gms'),
         'in_file': _template('data', 'MsgData_{case}.gdx'),
         'out_file': _template('output', 'MsgOutput_{case}.gdx'),
@@ -41,6 +40,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
             '--iter="{}"'.format(
                 _template('output', 'MsgIterationReport_{case}.gdx')),
             ],
+
         # Disable the feature to put input/output GDX files, list files, etc.
         # in a temporary directory
         'use_temp_dir': False,
@@ -147,6 +147,22 @@ class MACRO(GAMSModel):
 
 class MESSAGE_MACRO(MACRO):
     name = 'MESSAGE-MACRO'
+
+    def __init__(self, *args, **kwargs):
+        # Remove M-M iteration options from kwargs and convert to GAMS
+        # command-line options
+        mm_iter_args = []
+        for name in 'convergence_criterion', 'max_adjustment', 'max_iteration':
+            try:
+                mm_iter_args.append(f'--{name.upper()}={kwargs.pop(name)}')
+            except KeyError:
+                continue
+
+        # Let the parent constructor handle other solve_args
+        super().__init__(*args, **kwargs)
+
+        # Append to the prepared solve_args
+        self.solve_args.extend(mm_iter_args)
 
 
 def gams_release():

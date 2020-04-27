@@ -75,25 +75,30 @@ $INCLUDE MACRO/macro_core.gms
 * initialize sets, parameters and counters for the iteration between MESSAGEix and MACRO                               *
 *----------------------------------------------------------------------------------------------------------------------*
 
-* set default maximum iteration count and
-$IF NOT set MAX_ITERATION            $SETGLOBAL MAX_ITERATION "50"
-$IF NOT set MAX_ADJUSTMENT           $SETGLOBAL MAX_ADJUSTMENT "0.2"
+* command-line parameters for convergence and oscillation detection
 $IF NOT set CONVERGENCE_CRITERION    $SETGLOBAL CONVERGENCE_CRITERION "0.01"
+$IF NOT set MAX_ADJUSTMENT           $SETGLOBAL MAX_ADJUSTMENT "0.2"
+$IF NOT set MAX_ITERATION            $SETGLOBAL MAX_ITERATION "50"
+DISPLAY "%CONVERGENCE_CRITERION%", "%MAX_ADJUSTMENT%", "%MAX_ITERATION%";
 
 Set
-    iteration / 1*%MAX_ITERATION% /
+    iteration          allowable iterations                                         / 1*%MAX_ITERATION% /
 ;
 
+* NB MAX_ADJUSTMENT and max_adjustment have different meanings:
+* - MAX_ADJUSTMENT is a fixed threshold used to truncate the relative demand change produced by MACRO.
+* - max_adjustment is the amount of that change, after any truncation.
 Scalar
-    max_adjustment_pre maximum adjustment in previous iteration / 0 /
+    max_adjustment_pre maximum adjustment in previous iteration                     / 0 /
     max_adjustment_pos maximum positive adjustment in current iteration
     max_adjustment_neg maximum negative adjustment in current iteration
     max_adjustment     maximum adjustment in current iteration
-    convergence_status status of convergence (1 if successful) / 0 /
+    convergence_status status of convergence (1 if successful)                      / 0 /
     scaling            scaling factor to adjust step size when iteration oscillates / 1 /
-    max_it /%MAX_ITERATION%/
-    ctr /0/
+    max_it             maximum number of iterations                                 / %MAX_ITERATION% /
+    ctr                iteration counter                                            /0/
 ;
+
 
 * declarations moved from solve files to avoid inclusion in loop
 Parameters
