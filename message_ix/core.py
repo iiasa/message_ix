@@ -20,29 +20,31 @@ class Scenario(ixmp.Scenario):
     """|MESSAGEix| Scenario.
 
     See :class:`ixmp.TimeSeries` for the meaning of arguments `mp`, `model`,
-    `scenario`, `version`, and `annotation`; :class:`ixmp.Scenario` for the
-    meaning of `cache`. The `scheme` of a newly-created Scenario is always
-    'MESSAGE'.
+    `scenario`, `version`, and `annotation`. The `scheme` of a newly-created
+    Scenario is always 'MESSAGE'.
     """
     def __init__(self, mp, model, scenario=None, version=None, annotation=None,
-                 cache=False, **kwargs):
-        # Handle keyword arguments
-        if not set(kwargs) <= {'scheme'}:
-            msg = f'Unrecognized keyword arguments: {kwargs}'
-            raise ValueError(msg) from None
-
+                 scheme=None, **kwargs):
         # If not a new scenario, use the scheme stored in the Backend
-        scheme = kwargs.get('scheme', 'MESSAGE' if version == 'new' else None)
+        if version == 'new':
+            scheme = scheme or 'MESSAGE'
+
         if scheme not in ('MESSAGE', None):
-            msg = f'Instantiate {self.__class__.__name__} with scheme {scheme}'
+            msg = f'Instantiate message_ix.Scenario with scheme {scheme}'
             raise ValueError(msg)
 
-        # `ixmp.Scenario` verifies that MESSAGE-scheme scenarios are
-        # initialized as `message_ix.Scenario` for correct API
-        self.is_message_scheme = True
+        super().__init__(
+            mp=mp,
+            model=model,
+            scenario=scenario,
+            version=version,
+            annotation=annotation,
+            scheme=scheme,
+            **kwargs
+        )
 
-        super().__init__(mp, model, scenario, version, scheme, annotation,
-                         cache)
+        # Scheme returned by database
+        assert self.scheme == 'MESSAGE', self.scheme
 
     # Utility methods used by .equ(), .par(), .set(), and .var()
 
