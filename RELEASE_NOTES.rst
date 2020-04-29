@@ -4,7 +4,7 @@ Next release
 All changes
 -----------
 
-- :pull:`343`: Accept :class:`.MESSAGE_MACRO` iteration control parameters through :meth:`.solve`; document how to tune these to avoid numerical issues.
+- :pull:`343`, :pull:`345`: Accept :class:`.MESSAGE_MACRO` iteration control parameters through :meth:`.solve`; document how to tune these to avoid numerical issues.
 - :pull:`340`: Allow cplex.opt to be used by message_ix from multiple processes.
 - :pull:`328`: Expand automatic reporting of emissions prices and mapping sets; improve robustness of :meth:`Reporter.convert_pyam`.
 - :pull:`321`: Move :meth:`.Scenario.to_excel`, :meth:`.read_excel` to :class:`ixmp.Scenario`; they continue to work with message_ix.Scenario.
