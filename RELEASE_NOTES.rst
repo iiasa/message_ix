@@ -4,15 +4,15 @@ Next release
 All changes
 -----------
 
-- `#343 <https://github.com/iiasa/message_ix/pull/343>`_: Accept :class:`.MESSAGE_MACRO` iteration control parameters through :meth:`.solve`.
-- `#340 <https://github.com/iiasa/message_ix/pull/340>`_: Allow cplex.opt to be used by message_ix from multiple processes.
-- `#328 <https://github.com/iiasa/message_ix/pull/328>`_: Expand automatic reporting of emissions prices and mapping sets; improve robustness of :meth:`Reporter.convert_pyam`.
-- `#321 <https://github.com/iiasa/message_ix/pull/321>`_: Move :meth:`.Scenario.to_excel`, :meth:`.read_excel` to :class:`ixmp.Scenario`; they continue to work with message_ix.Scenario.
-- `#323 <https://github.com/iiasa/message_ix/pull/323>`_: Add `units`, `replace_vars` arguments to :meth:`.Reporter.convert_pyam`.
-- `#308 <https://github.com/iiasa/message_ix/pull/308>`_: Expand automatic reporting of add-on technologies.
-- `#313 <https://github.com/iiasa/ixmp/pull/313>`_: Include all tests in the message_ix package.
-- `#307 <https://github.com/iiasa/message_ix/pull/307>`_: adjust to deprecations in ixmp 2.0.
-- `#223 <https://github.com/iiasa/message_ix/pull/223>`_: Add methods for parametrization and calibration of MACRO based on an existing MESSAGE Scenario.
+- :pull:`343`: Accept :class:`.MESSAGE_MACRO` iteration control parameters through :meth:`.solve`; document how to tune these to avoid numerical issues.
+- :pull:`340`: Allow cplex.opt to be used by message_ix from multiple processes.
+- :pull:`328`: Expand automatic reporting of emissions prices and mapping sets; improve robustness of :meth:`Reporter.convert_pyam`.
+- :pull:`321`: Move :meth:`.Scenario.to_excel`, :meth:`.read_excel` to :class:`ixmp.Scenario`; they continue to work with message_ix.Scenario.
+- :pull:`323`: Add `units`, `replace_vars` arguments to :meth:`.Reporter.convert_pyam`.
+- :pull:`308`: Expand automatic reporting of add-on technologies.
+- :pull:`313`: Include all tests in the message_ix package.
+- :pull:`307`: Adjust to deprecations in ixmp 2.0.
+- :pull:`223`: Add methods for parametrization and calibration of MACRO based on an existing MESSAGE Scenario.
 
 
 v2.0.0 (2020-01-14)
@@ -39,20 +39,17 @@ See the :doc:`ixmp release notes <ixmp:whatsnew>` for migration notes.
 All changes
 -----------
 
-- `#285 <https://github.com/iiasa/message_ix/pull/285>`_: Drop support for Python 2.
-- `#284 <https://github.com/iiasa/message_ix/pull/284>`_: Add a suggested sequence/structure to how to run the Westeros tutorials.
-- `#281 <https://github.com/iiasa/message_ix/pull/281>`_: Test and improve logic of :meth:`.years_active` and :meth:`.vintage_and_active_years`.
-- `#269 <https://github.com/iiasa/message_ix/pull/269>`_: Enforce ``year``-indexed columns as integers.
-- `#256 <https://github.com/iiasa/message_ix/pull/256>`_: Update to use :obj:`ixmp.config` and improve CLI.
-- `#255 <https://github.com/iiasa/message_ix/pull/249>`_: Add :mod:`message_ix.testing.nightly` and ``message-ix nightly`` CLI command group for slow-running tests.
-- `#249 <https://github.com/iiasa/message_ix/pull/249>`_,
-  `#259 <https://github.com/iiasa/message_ix/pull/259>`_: Build MESSAGE and MESSAGE_MACRO classes on ixmp model API; adjust Scenario.
-- `#235 <https://github.com/iiasa/message_ix/pull/236>`_: Add a reporting tutorial.
-- `#236 <https://github.com/iiasa/message_ix/pull/236>`_,
-  `#242 <https://github.com/iiasa/message_ix/pull/242>`_,
-  `#263 <https://github.com/iiasa/message_ix/pull/263>`_: Enhance reporting.
-- `#232 <https://github.com/iiasa/message_ix/pull/232>`_: Add Westeros tutorial for modelling seasonality, update existing tutorials.
-- `#276 <https://github.com/iiasa/message_ix/pull/276>`_: Improve add_year for bounds and code cleanup
+- :pull:`285`: Drop support for Python 2.
+- :pull:`284`: Add a suggested sequence/structure to how to run the Westeros tutorials.
+- :pull:`281`: Test and improve logic of :meth:`.years_active` and :meth:`.vintage_and_active_years`.
+- :pull:`269`: Enforce ``year``-indexed columns as integers.
+- :pull:`256`: Update to use :obj:`ixmp.config` and improve CLI.
+- :pull:`255`: Add :mod:`message_ix.testing.nightly` and ``message-ix nightly`` CLI command group for slow-running tests.
+- :pull:`249`, :pull:`259`: Build MESSAGE and MESSAGE_MACRO classes on ixmp model API; adjust Scenario.
+- :pull:`235`: Add a reporting tutorial.
+- :pull:`236`, :pull:`242`, :pull:`263`: Enhance reporting.
+- :pull:`232`: Add Westeros tutorial for modelling seasonality, update existing tutorials.
+- :pull:`276`: Improve add_year for bounds and code cleanup
 
 
 v1.2.0 (2019-06-25)
@@ -75,18 +72,18 @@ other improvements. See the ixmp release notes for further details.
 All changes
 -----------
 
-- `#161 <https://github.com/iiasa/message_ix/pull/161>`_: A feature for adding new periods to a scenario.
-- `#205 <https://github.com/iiasa/message_ix/pull/205>`_: Implement required changes related to timeseries-support and cloning across platforms (see `ixmp#142 <https://github.com/iiasa/ixmp/pull/142>`_).
-- `#196 <https://github.com/iiasa/message_ix/pull/196>`_: Improve testing by re-using :mod:`ixmp` apparatus.
-- `#187 <https://github.com/iiasa/message_ix/pull/187>`_: Test for cumulative bound on emissions.
-- `#182 <https://github.com/iiasa/message_ix/pull/182>`_: Fix cross-platform cloning.
-- `#178 <https://github.com/iiasa/message_ix/pull/178>`_: Bugfix of the ``PRICE_EMISSION`` variable in models with non-equidistant period durations.
-- `#176 <https://github.com/iiasa/message_ix/pull/176>`_: Add :mod:`message_ix.reporting` module.
-- `#173 <https://github.com/iiasa/message_ix/pull/173>`_: The meth:`~.Scenario.solve` command now takes additional arguments when solving with CPLEX. The cplex.opt file is now generated on the fly during the solve command and removed after successfully solving.
-- `#172 <https://github.com/iiasa/message_ix/pull/172>`_: Add option to set ``COMMODITY_BALANCE`` to equality.
-- `#154 <https://github.com/iiasa/message_ix/pull/154>`_: Enable documentation build on ReadTheDocs.
-- `#138 <https://github.com/iiasa/message_ix/pull/138>`_: Update documentation and tutorials.
-- `#131 <https://github.com/iiasa/message_ix/pull/131>`_: Update clone function argument `scen` to `scenario` with planned deprecation of the former.
+- :pull:`161`: A feature for adding new periods to a scenario.
+- :pull:`205`: Implement required changes related to timeseries-support and cloning across platforms (see `ixmp#142 <https://github.com/iiasa/ixmp/pull/142>`_).
+- :pull:`196`: Improve testing by re-using :mod:`ixmp` apparatus.
+- :pull:`187`: Test for cumulative bound on emissions.
+- :pull:`182`: Fix cross-platform cloning.
+- :pull:`178`: Bugfix of the ``PRICE_EMISSION`` variable in models with non-equidistant period durations.
+- :pull:`176`: Add :mod:`message_ix.reporting` module.
+- :pull:`173`: The meth:`~.Scenario.solve` command now takes additional arguments when solving with CPLEX. The cplex.opt file is now generated on the fly during the solve command and removed after successfully solving.
+- :pull:`172`: Add option to set ``COMMODITY_BALANCE`` to equality.
+- :pull:`154`: Enable documentation build on ReadTheDocs.
+- :pull:`138`: Update documentation and tutorials.
+- :pull:`131`: Update clone function argument `scen` to `scenario` with planned deprecation of the former.
 
 
 v1.1.0 (2018-11-21)
@@ -180,20 +177,20 @@ The new file should look like::
 All changes
 -----------
 
-- `#202 <https://github.com/iiasa/message_ix/pull/202>`_: Added the "Development rule of thumb" section from the wiki and the Tutorial style guide to the Contributor guidelines. Tweaked some formatting to improve readibility.
-- `#113 <https://github.com/iiasa/message_ix/pull/113>`_: Upgrading to MESSAGEix 1.1: improved representation of renewables, share constraints, etc.
-- `#109 <https://github.com/iiasa/message_ix/pull/109>`_: MACRO module added for initializing models to be solved with MACRO. Added scenario-based CI on circleci.
-- `#99 <https://github.com/iiasa/message_ix/pull/99>`_: Fixing an error in the compuation of the auxiliary GAMS reporting variable ``PRICE_EMISSION``.
-- `#89 <https://github.com/iiasa/message_ix/pull/89>`_: Fully implementing system reliability and flexibity considerations (cf. Sullivan).
-- `#88 <https://github.com/iiasa/message_ix/pull/88>`_: Reformulated capacity maintainance constraint to ensure that newly installed capacity cannot be decommissioned within the same model period as it is built in.
-- `#84 <https://github.com/iiasa/message_ix/pull/84>`_: ``message_ix.Scenario.vintage_active_years()`` now limits active years to those after the first model year or the years of a certain technology vintage.
-- `#82 <https://github.com/iiasa/message_ix/pull/82>`_: Introducing "add-on technologies" for mitigation options, etc.
-- `#81 <https://github.com/iiasa/message_ix/pull/81>`_: Share constraints by mode added.
-- `#80 <https://github.com/iiasa/message_ix/pull/80>`_: Share constraints by commodity/level added.
-- `#78 <https://github.com/iiasa/message_ix/pull/78>`_: Bugfix: ``message_ix.Scenario.solve()`` uses 'MESSAGE' by default, but can be provided other model names.
-- `#77 <https://github.com/iiasa/message_ix/pull/77>`_: ``rename()`` function can optionally keep old values in the model (i.e., copy vs. copy-with-replace).
-- `#74 <https://github.com/iiasa/message_ix/pull/74>`_: Activity upper and lower bounds can now be applied to all modes of a technology.
-- `#67 <https://github.com/iiasa/message_ix/pull/67>`_: Use of advanced basis in cplex.opt turned off by default to avoid conflicts with barrier method.
-- `#65 <https://github.com/iiasa/message_ix/pull/65>`_: Bugfix for downloading tutorials. Now downloads current installed version by default.
-- `#60 <https://github.com/iiasa/message_ix/pull/60>`_: Add basic ability to write and read model input to/from Excel.
-- `#59 <https://github.com/iiasa/message_ix/pull/59>`_: Added MacOSX CI support.
+- :pull:`202`: Added the "Development rule of thumb" section from the wiki and the Tutorial style guide to the Contributor guidelines. Tweaked some formatting to improve readibility.
+- :pull:`113`: Upgrading to MESSAGEix 1.1: improved representation of renewables, share constraints, etc.
+- :pull:`109`: MACRO module added for initializing models to be solved with MACRO. Added scenario-based CI on circleci.
+- :pull:`99`: Fixing an error in the compuation of the auxiliary GAMS reporting variable ``PRICE_EMISSION``.
+- :pull:`89`: Fully implementing system reliability and flexibity considerations (cf. Sullivan).
+- :pull:`88`: Reformulated capacity maintainance constraint to ensure that newly installed capacity cannot be decommissioned within the same model period as it is built in.
+- :pull:`84`: ``message_ix.Scenario.vintage_active_years()`` now limits active years to those after the first model year or the years of a certain technology vintage.
+- :pull:`82`: Introducing "add-on technologies" for mitigation options, etc.
+- :pull:`81`: Share constraints by mode added.
+- :pull:`80`: Share constraints by commodity/level added.
+- :pull:`78`: Bugfix: ``message_ix.Scenario.solve()`` uses 'MESSAGE' by default, but can be provided other model names.
+- :pull:`77`: ``rename()`` function can optionally keep old values in the model (i.e., copy vs. copy-with-replace).
+- :pull:`74`: Activity upper and lower bounds can now be applied to all modes of a technology.
+- :pull:`67`: Use of advanced basis in cplex.opt turned off by default to avoid conflicts with barrier method.
+- :pull:`65`: Bugfix for downloading tutorials. Now downloads current installed version by default.
+- :pull:`60`: Add basic ability to write and read model input to/from Excel.
+- :pull:`59`: Added MacOSX CI support.
