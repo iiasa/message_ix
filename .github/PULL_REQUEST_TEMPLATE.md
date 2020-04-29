@@ -15,7 +15,7 @@ to ensure that the PR does what it intends.
 <!-- For example:
 
 - Run a specific code snippet or command and check the output.
-- Build the documentation and look at a certain.
+- Build the documentation and look at a certain page.
 - Simply view changes and note that the CI checks all pass.
 - Ensure that changes/additions are self-documenting, i.e. that another
   developer like the reviewer will be able to understand what the code does
@@ -36,9 +36,8 @@ In ambiguous cases, strike them out and add a short explanation, e.g.
 - [ ] Tests added.
 - [ ] Documentation added.
 - [ ] Release notes updated.
-  <!-- To update `RELEASE_NOTES.rst`, add a single line under the section
-  “Next release” similar to:
+  <!-- Add a single line at the top of the “Next release” section of
+       RELEASE_NOTES.rst, where '999' is the GitHub pull request number:
 
-  - `#999 <https://github.com/iiasa/message_ix/pull/999>`_: Title or single-
-    sentence description from above.
+    - :pull:`999`: Title or single-sentence description from above.
   -->

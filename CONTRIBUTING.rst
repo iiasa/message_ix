@@ -165,7 +165,7 @@ Coding & writing style
 - Tutorials are formatted as Jupyter notebooks in Python or R.
 - Commit 'bare' notebooks in git, i.e. without cell output.
   Notebooks will be run and rendered when the documentation is generated.
-- Add a line to ``tests/test_tutorials.py``, so that the parametrized test function runs the tutorial (as noted at `#196 <https://github.com/iiasa/message_ix/pull/196>`_).
+- Add a line to ``tests/test_tutorials.py``, so that the parametrized test function runs the tutorial (as noted at :pull:`196`).
 - Optionally, use Jupyter notebook slide-show features so that the tutorial can be viewed as a presentation.
 - When relevant, provide links to publications or sources that provide greater detail for the methodology, data, or other packages used.
 - Providing the mathematical formulation in the tutorial itself is optional.
