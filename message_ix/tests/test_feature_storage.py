@@ -111,14 +111,6 @@ def add_storage_data(scen, time_order):
         storage_spec = ['node', 'dam', 'storage', 'water', year, 'a']
         scen.add_par('storage_initial', storage_spec, 0.08, 'GWa')
 
-    # Adding a relation between storage content of two time steps (optional)
-    yr_first = yr_last = scen.set('year').tolist()[0]
-    time_first = 'a'
-    time_last = 'd'
-    scen.add_par('relation_storage', ['node', 'dam', 'storage', 'water',
-                                      yr_first, yr_last,
-                                      time_last, time_first], 0.5, '%')
-
 
 # Main function for building a model with storage and testing the functionality
 def storage_setup(test_mp, time_duration, comment):

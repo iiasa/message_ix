@@ -48,6 +48,8 @@
 * :math:`REL_{r,n,y} \in \mathbb{R}`                       Auxiliary variable for left-hand side of relations (linear constraints)
 * :math:`COMMODITY\_USE_{n,c,l,y} \in \mathbb{R}`          Auxiliary variable for amount of commodity used at specific level
 * :math:`COMMODITY\_BALANCE_{n,c,l,y,h} \in \mathbb{R}`    Auxiliary variable for right-hand side of :ref:`commodity_balance`
+* :math:`STORAGE_{n,t,l,c,y,h} \in \mathbb{R}`             State of charge (SoC) of storage at each sub-annual timestep
+* :math:`STORAGE\_CHARGE_{n,t,l,c,y,h} \in \mathbb{R}`     Charging of storage in each sub-annual timestep (negative for discharging)
 * ======================================================== ====================================================================================
 *
 * The index :math:`y^V` is the year of construction (vintage) wherever it is necessary to
@@ -95,7 +97,7 @@ Positive Variables
 * land-use model emulator
     LAND(node,land_scenario,year_all) relative share of land-use scenario
 * content of storage
-    STORAGE(node,tec,level,commodity,year_all,time)       state of charge (SoC) of storage at each sub-annual time step (positive)
+    STORAGE(node,tec,level,commodity,year_all,time)       state of charge (SoC) of storage at each sub-annual timestep (positive)
 ;
 
 Variables
@@ -276,7 +278,6 @@ Equations
     STORAGE_CHANGE                  change in the state of charge of storage
     STORAGE_BALANCE                 balance of the state of charge of storage
     STORAGE_BALANCE_INIT            balance of the state of charge of storage at sub-annual time steps with initial storage content
-    STORAGE_REL                     relation between the state of charge of storage in two different time steps (content in time_first * value greater-equal than content in time_last)
     STORAGE_EQUIVALENCE             mapping state of storage as activity of storage technologies
 ;
 *----------------------------------------------------------------------------------------------------------------------*
@@ -2004,9 +2005,9 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 * storage level. Thus, :math:`t^{C}` is a charging technology and :math:`t^{D}` is the corresponding discharger.
 *
 *   .. math::
-*      STORAGE\_CHG_{n,t^S,l,y,h} =
-*          \sum_{\substack{n^L,m,c,h^A \\ y^V \leq y, (n,t^C,t^S,l,y) \sim S^{storage}}} output_{n^L,t^C,y^V,y,m,n,c,l,h^A,h}
-*              \cdot & ACT_{n^L,t^C,y^V,y,m,h^A} \\
+*      STORAGE\_CHARGE_{n,t^S,l,c,y,h} =
+*          \sum_{\substack{n^L,m,h^A \\ y^V \leq y, (n,t^C,t^S,l,y) \sim S^{storage}}} output_{n^L,t^C,y^V,y,m,n,c,l,h^A,h}
+*             \cdot & ACT_{n^L,t^C,y^V,y,m,h^A} \\
 *          - \sum_{\substack{n^L,m,c,h^A \\ y^V \leq y, (n,t^D,t^S,l,y) \sim S^{storage}}} input_{n^L,t^D,y^V,y,m,n,c,l,h^A,h}
 *              \cdot & ACT_{n^L,t^D,y^V,y,m,h^A} \\
 ***
@@ -2037,7 +2038,7 @@ STORAGE_CHANGE(node,storage_tec,level_storage,commodity,year,time) ..
 * Here, :math:`h^{A}` is the time step prior to :math:`h`.
 *
 *   .. math::
-*      STORAGE_{n,t^S,l,y,h} \ = init\_storage_{n,t^S,l,y,h} + STORAGE\_CHG_{n,t^S,l,y,h} + \\
+*      STORAGE_{n,t^S,l,y,h} \ = init\_storage_{n,t^S,l,y,h} + STORAGE\_CHARGE_{n,t^S,l,y,h} + \\
 *      STORAGE_{n,t^S,l,y,h^A} \cdot & (1 - storage\_loss_{n,t^S,l,y,h^A}) \\
 ***
 STORAGE_BALANCE(node,storage_tec,level,commodity,year,time2)$ (
@@ -2063,6 +2064,7 @@ STORAGE_BALANCE_INIT(node,storage_tec,level,commodity,year,time)$ (
     storage_initial(node,storage_tec,level,commodity,year,time)
     + STORAGE_CHARGE(node,storage_tec,level,commodity,year,time) ;
 
+* Connecting an input commodity to maintain the operation of storage container over time (optional)
 STORAGE_EQUIVALENCE(node,storage_tec,level,commodity,level_storage,commodity2,mode,year,time)$
     ( map_time_commodity_storage(node,storage_tec,level,commodity,mode,year,time) AND
       SUM( tec, map_tec_storage(node,tec,storage_tec,level_storage,commodity2) ) )..
@@ -2071,22 +2073,6 @@ STORAGE_EQUIVALENCE(node,storage_tec,level,commodity,level_storage,commodity2,mo
         SUM( (location,vintage,time2)$(map_tec_lifetime(node,storage_tec,vintage,year)$(
               input(location,storage_tec,vintage,year,mode,node,commodity,level,time2,time) ) ),
               duration_time_rel(time,time2) * ACT(location,storage_tec,vintage,year,mode,time) );
-***
-* Equation STORAGE_RELATION
-* """""""""""""""""""""""""
-*
-* The content of storage in two sub-annual time steps, either in one period or in
-* two different periods, can be related together. This equation will be only active
-* if the input parameter `relation_storage` is defined by the user.
-*
-*   .. math::
-*      STORAGE_{n,t^S,l,y^f,h^f} \leq relation\_storage_{n,t^S,l,y^f,y^l,h^f,h^l} \cdot & STORAGE_{n,t^S,l,y^l,h^l} \\
-***
-STORAGE_REL(node,storage_tec,level_storage,commodity,year,year2,time,time2)$(
-    relation_storage(node,storage_tec,level_storage,commodity,year,year2,time,time2) )..
-        STORAGE(node,storage_tec,level_storage,commodity,year,time) =G=
-        relation_storage(node,storage_tec,level_storage,commodity,year,year2,time,time2)
-        * STORAGE(node,storage_tec,level_storage,commodity,year2,time2);
 
 *----------------------------------------------------------------------------------------------------------------------*
 * model statements                                                                                                     *

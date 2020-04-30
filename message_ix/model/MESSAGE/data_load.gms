@@ -71,7 +71,7 @@ demand_fixed=demand
 is_fixed_extraction, is_fixed_stock, is_fixed_new_capacity, is_fixed_capacity, is_fixed_activity, is_fixed_land
 fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activity, fixed_land
 * storage parameters
-storage_initial, storage_self_discharge, relation_storage, time_order
+storage_initial, storage_self_discharge, time_order
 ;
 
 
