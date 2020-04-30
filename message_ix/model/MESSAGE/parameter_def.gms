@@ -392,13 +392,18 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
-* Parameters for the storage technologies
+* Parameters for representing storage solutions
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
-* The implementation of |MESSAGEix| includes the functionality to introduce "storage technologies".
-* This feature can be used to model... [...]
-* The parameter ``time_order`` imposes the order of sub-annual time steps, ``storage_initial`` sets the initial amount of storage and 
-* ``storage_self_discharge`` represents the self-discharge (loss) of storage as % of storage level in previous timestep. 
+* The |MESSAGEix| formulation includes "storage" solutions to model sub-annual, inter-temporal storage of commodities in each period.
+* This feature can be used to model electricity storage (pumped hydro, batteries, compressed air energy storage, etc.), thermal energy storage,
+* demand side management, and in general any technology for storing commodities (gas, hydrogen, water, etc.) over sub-annual timesteps.
+* The user defines the chronological order of sub-annual time steps by assigning a number to them in parameter ``time_order``.
+* This order is used by storage equations to shift the stored commodity in a correct timeline, e.g., from Jan through to Dec, and not vice versa.
+* The last sub-annual timestep is linked to the first one to close the loop of the year. Parameter ``storage_initial`` is to set an initial amount
+* for the content of storage in any desirable timestep (optionally). This initial value is a cost-free stored media that storage can discharge
+* in the same or following timesteps. ``storage_self_discharge`` represents the self-discharge (loss) of storage as % of the level of stored media
+* in each timestep. This allows to model time-related losses in storage separately, in addition to charging and discharging losses.
 *
 * .. list-table::
 *    :widths: 20 80
@@ -417,7 +422,7 @@ Parameters
 
 Parameters
     storage_initial(node,tec,level,commodity,year_all,time)                       initial content of storage
-    storage_self_discharge(node,tec,level,commodity,year_all,time)                self-discharge (loss) of storage as % of storage level in previous timestep
+    storage_self_discharge(node,tec,level,commodity,year_all,time)                self-discharge (loss) of storage as % of storage level in each timestep
     time_order(lvl_temporal,time)                                                 sequence of subannual timesteps
 ;
 

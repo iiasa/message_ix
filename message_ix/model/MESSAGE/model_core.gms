@@ -48,7 +48,7 @@
 * :math:`REL_{r,n,y} \in \mathbb{R}`                       Auxiliary variable for left-hand side of relations (linear constraints)
 * :math:`COMMODITY\_USE_{n,c,l,y} \in \mathbb{R}`          Auxiliary variable for amount of commodity used at specific level
 * :math:`COMMODITY\_BALANCE_{n,c,l,y,h} \in \mathbb{R}`    Auxiliary variable for right-hand side of :ref:`commodity_balance`
-* :math:`STORAGE_{n,t,l,c,y,h} \in \mathbb{R}`             State of charge (SoC) of storage at each sub-annual timestep
+* :math:`STORAGE_{n,t,l,c,y,h} \in \mathbb{R}`             State of charge or content of storage at each sub-annual timestep
 * :math:`STORAGE\_CHARGE_{n,t,l,c,y,h} \in \mathbb{R}`     Charging of storage in each sub-annual timestep (negative for discharging)
 * ======================================================== ====================================================================================
 *
@@ -1998,12 +1998,12 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 * Equation STORAGE_CHANGE
 * """""""""""""""""""""""
 * This equation shows the change in the content of the storage container in each
-* sub-annual time step. This change is based on the activity of charger and discharger
+* sub-annual timestep. This change is based on the activity of charger and discharger
 * technologies connected to that storage container. The notation :math:`S^{storage}`
 * represents the mapping set `map_tec_storage` denoting charger-discharger
 * technologies connected to a specific storage container in a specific node and
 * storage level. Where:
-* 
+*
 * - :math:`t^{C}` is a charging technology and :math:`t^{D}` is the corresponding discharger.
 * - :math:`h-1` is the time step prior to :math:`h`.
 *
@@ -2035,13 +2035,13 @@ STORAGE_CHANGE(node,storage_tec,level_storage,commodity,year,time) ..
 * """"""""""""""""""""""""
 *
 * This equation ensures the commodity balance of storage technologies,
-* where the commodity is shifted between sub-annual time steps within a model period.
-* If the state of charge of storage is set exogenously in one time step through :math:`init\_storage_{n,t,l,y,h}` parameter,
-* the content from the previous timestep won't be carried over to this timestep.
+* where the commodity is shifted between sub-annual timesteps within a model period.
+* If the state of charge of storage is set exogenously in one timestep through :math:`storage\_initial_{n,t,l,y,h}` parameter,
+* the content from the previous timestep is not carried over to this timestep.
 *
 *   .. math::
-*      STORAGE_{n,t,l,y,h} \ = init\_storage_{n,t,l,y,h} + STORAGE\_CHARGE_{n,t,l,y,h} + \\
-*      STORAGE_{n,t,l,y,h-1} \cdot (1 - storage\_loss_{n,t,l,y,h-1}) \quad \forall \ t \in T^{STOR}, & \forall \ l \in L^{STOR}
+*      STORAGE_{n,t,l,y,h} \ = storage\_initial_{n,t,l,y,h} + STORAGE\_CHARGE_{n,t,l,y,h} + \\
+*      STORAGE_{n,t,l,y,h-1} \cdot (1 - storage\_self\_discharge_{n,t,l,y,h-1}) \quad \forall \ t \in T^{STOR}, & \forall \ l \in L^{STOR}
 ***
 STORAGE_BALANCE(node,storage_tec,level,commodity,year,time2)$ (
     SUM(tec, map_tec_storage(node,tec,storage_tec,level,commodity) )
