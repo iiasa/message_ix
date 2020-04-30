@@ -38,7 +38,7 @@ def test_reporter(message_test_mp):
     rep = Reporter.from_scenario(scen)
 
     # Number of quantities available in a rudimentary MESSAGEix Scenario
-    assert len(rep.graph['all']) == 124
+    assert len(rep.graph['all']) == 123
 
     # Quantities have short dimension names
     assert 'demand:n-c-l-y-h' in rep.graph
@@ -63,7 +63,7 @@ def test_reporter(message_test_mp):
 
     # message_ix.Reporter pre-populated with additional, derived quantities
     # This is the same value as in test_tutorials.py
-    assert len(rep.graph) == 12944
+    assert len(rep.graph) == 12688
 
     # Derived quantities have expected dimensions
     vom_key = rep.full_key('vom')
