@@ -234,6 +234,12 @@ Alias(commodity, commodity2);
 *    * - balance_equality (commodity,level)
 *      - :math:`c \in C, l \in L`
 *      - Commodities and level related to :ref:`commodity_balance_lt`
+*    * - level_storage(level)
+*      - :math:`l \in L^{STOR} \subseteq L`
+*      - Levels related to `storage` representation (excluded from :ref:`commodity_balance_lt`)
+*    * - storage_tec(tec)
+*      - :math:`t \in T^{STOR} \subseteq T`
+*      - Set of `storage` container technologies (reservoir)
 *
 * .. [#level_res] The constraint :ref:`extraction_equivalence` is active only for the levels included in this set,
 *    and the constraint :ref:`commodity_balance` is deactivated for these levels.
@@ -276,6 +282,7 @@ Sets
     cat_emission(type_emission,emission)    mapping of emissions to respective categories
     type_tec_land(type_tec)                 dynamic set whether emissions from land use are included in type_tec
     balance_equality(commodity,level)       mapping of commodities-level where the supply-demand balance must be maintained with equality
+* storage_tec and level_storage are defined at the bottom of this file. 
 ;
 
 Alias(type_tec,type_tec_share);
@@ -307,6 +314,8 @@ Alias(type_tec,type_tec_total);
 *      - Mapping of nodes across hierarchy levels (location is in node)
 *    * - map_time(time,time2)
 *      - Mapping of time periods across hierarchy levels (time2 is in time)
+*    * - map_time_period(year_all,lvl_temporal,time,time2)
+*      - Mapping of the sequence of sub-annual timesteps (used in `storage` equations)
 *    * - map_resource(node,commodity,grade,year_all)
 *      - Mapping of resources and grades to node over time
 *    * - map_ren_grade(node,commodity,grade,year_all)
@@ -325,11 +334,14 @@ Alias(type_tec,type_tec_total);
 *      - Mapping of technology to temporal dissagregation (time)
 *    * - map_tec_mode(node,tec,year_all,mode)
 *      - Mapping of technology to modes
+*    * - map_tec_storage(node,tec,tec2,level,commodity)
+*      - Mapping of `storage` technologies to their respective storage container ``tec`` and ``level-commodity``
 ***
 
 Sets
     map_node(node,location)                     mapping of nodes across hierarchy levels (location is in node)
     map_time(time,time2)                        mapping of time periods across hierarchy levels (time2 is in time)
+* map_time_period and map_tec_storage are defined at the bottom of this file. 
 
     map_resource(node,commodity,grade,year_all)  mapping of resources and grades to node over time
     map_ren_grade(node,commodity,grade,year_all) mapping of renewables and grades to node over time
