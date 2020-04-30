@@ -1,16 +1,25 @@
 Next release
 ============
 
+Migration notes
+---------------
+
+The :ref:`generic storage formulation <gams-storage>` introduces **new ixmp items** (sets, parameters, variables, and equations) to the MESSAGE model scheme.
+When loading a Scenario created with a version of `message_ix` older than x.x.x, these items will be initialized (and left empty), using at most one call to :meth:`~message_ix.Scenario.commit`.
+See :meth:`.MESSAGE.initialize`.
+
+
 All changes
 -----------
 
+- :pull:`190`: Add generic mathematical formulation of :ref:`technologies that store commodities <gams-storage>`, such as water and energy.
 - :pull:`343`, :pull:`345`: Accept :class:`.MESSAGE_MACRO` iteration control parameters through :meth:`.solve`; document how to tune these to avoid numerical issues.
-- :pull:`340`: Allow cplex.opt to be used by message_ix from multiple processes.
+- :pull:`340`: Allow cplex.opt to be used by `message_ix` from multiple processes.
 - :pull:`328`: Expand automatic reporting of emissions prices and mapping sets; improve robustness of :meth:`Reporter.convert_pyam`.
-- :pull:`321`: Move :meth:`.Scenario.to_excel`, :meth:`.read_excel` to :class:`ixmp.Scenario`; they continue to work with message_ix.Scenario.
+- :pull:`321`: Move :meth:`.Scenario.to_excel`, :meth:`.read_excel` to :class:`ixmp.Scenario`; they continue to work with :class:`message_ix.Scenario`.
 - :pull:`323`: Add `units`, `replace_vars` arguments to :meth:`.Reporter.convert_pyam`.
 - :pull:`308`: Expand automatic reporting of add-on technologies.
-- :pull:`313`: Include all tests in the message_ix package.
+- :pull:`313`: Include all tests in the `message_ix` package.
 - :pull:`307`: Adjust to deprecations in ixmp 2.0.
 - :pull:`223`: Add methods for parametrization and calibration of MACRO based on an existing MESSAGE Scenario.
 
@@ -18,14 +27,14 @@ All changes
 v2.0.0 (2020-01-14)
 ===================
 
-message_ix v2.0.0 coincides with ixmp v2.0.0.
+`message_ix` v2.0.0 coincides with `ixmp` v2.0.0.
 
 Migration notes
 ---------------
 
 Support for **Python 2.7 is dropped** as it has reached end-of-life, meaning no further releases will be made even to fix bugs.
 See `PEP-0373 <https://www.python.org/dev/peps/pep-0373/>`_ and https://python3statement.org.
-``message_ix`` users must upgrade to Python 3.
+`message_ix` users must upgrade to Python 3.
 
 **Command-line interface (CLI).** Use ``message-ix`` as the program for all command-line operations:
 

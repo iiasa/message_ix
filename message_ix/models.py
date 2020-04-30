@@ -17,6 +17,32 @@ DEFAULT_CPLEX_OPTIONS = {
     'epopt': 1e-6,
 }
 
+# Common indices for some parameters in MESSAGE_ITEMS
+_idx_common = ['node', 'technology', 'level', 'commodity', 'year', 'time']
+
+# NB only a partial list; see https://github.com/iiasa/message_ix/issues/254
+#: List of ixmp items for MESSAGE.
+MESSAGE_ITEMS = {
+    # Index sets
+    # Storage level
+    'level_storage': dict(ix_type='set'),
+    # Storage reservoir technology
+    'storage_tec': dict(ix_type='set'),
+
+    # Mapping set: mapping of storage reservoir to charger/discharger
+    'map_tec_storage': dict(ix_type='set',
+                            idx_sets=['node', 'technology', 'storage_tec',
+                                      'level', 'commodity']),
+
+    # Parameters
+    # Order of sub-annual time steps
+    'time_order': dict(ix_type='par', idx_sets=['lvl_temporal', 'time']),
+    # Initial amount of storage
+    'storage_initial': dict(ix_type='par', idx_sets=_idx_common),
+    # Storage losses as a percentage of installed capacity
+    'storage_self_discharge': dict(ix_type='par', idx_sets=_idx_common),
+}
+
 
 def _template(*parts):
     """Helper to make a template string relative to model_dir."""
@@ -61,6 +87,17 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
             re.search('VERSION_MINOR "(.+?)"', s).group(1),
             re.search('VERSION_PATCH "(.+?)"', s).group(1),
         )
+
+    @classmethod
+    def initialize(cls, scenario):
+        """Set up *scenario* with required sets and parameters for MESSAGE.
+
+        See Also
+        --------
+        :data:`MESSAGE_ITEMS`
+        """
+        # Initialize the ixmp items
+        cls.initialize_items(scenario, MESSAGE_ITEMS)
 
     def __init__(self, name=None, **model_options):
         # Update the default options with any user-provided options
@@ -109,10 +146,12 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
 
 
 class MESSAGE(GAMSModel):
+    """Model class for MESSAGE."""
     name = 'MESSAGE'
 
 
 class MACRO(GAMSModel):
+    """Model class for MACRO."""
     name = 'MACRO'
 
     #: MACRO uses the GAMS ``break;`` statement, and thus requires GAMS 24.8.1
@@ -146,6 +185,7 @@ class MACRO(GAMSModel):
 
 
 class MESSAGE_MACRO(MACRO):
+    """Model class for MESSAGE_MACRO."""
     name = 'MESSAGE-MACRO'
 
     def __init__(self, *args, **kwargs):

@@ -48,6 +48,8 @@
 * :math:`REL_{r,n,y} \in \mathbb{R}`                       Auxiliary variable for left-hand side of relations (linear constraints)
 * :math:`COMMODITY\_USE_{n,c,l,y} \in \mathbb{R}`          Auxiliary variable for amount of commodity used at specific level
 * :math:`COMMODITY\_BALANCE_{n,c,l,y,h} \in \mathbb{R}`    Auxiliary variable for right-hand side of :ref:`commodity_balance`
+* :math:`STORAGE_{n,t,l,c,y,h} \in \mathbb{R}`             State of charge or content of storage at each sub-annual timestep
+* :math:`STORAGE\_CHARGE_{n,t,l,c,y,h} \in \mathbb{R}`     Charging of storage in each sub-annual timestep (negative for discharging)
 * ======================================================== ====================================================================================
 *
 * The index :math:`y^V` is the year of construction (vintage) wherever it is necessary to
@@ -94,6 +96,9 @@ Positive Variables
     ACT_LO(node,tec,year_all,time)   relaxation variable for dynamic constraints on activity (downwards)
 * land-use model emulator
     LAND(node,land_scenario,year_all) relative share of land-use scenario
+* content of storage
+    STORAGE(node,tec,level,commodity,year_all,time)       state of charge (SoC) of storage at each sub-annual timestep (positive)
+;
 
 Variables
 * intertemporal stock variables (input or output quantity into the stock)
@@ -108,6 +113,8 @@ Variables
     EMISS(node,emission,type_tec,year_all)       aggregate emissions by technology type and land-use model emulator
 * auxiliary variable for left-hand side of relations (linear constraints)
     REL(relation,node,year_all)                  auxiliary variable for left-hand side of user-defined relations
+* change in the content of storage device
+    STORAGE_CHARGE(node,tec,level,commodity,year_all,time)    charging of storage in each timestep (negative for discharge)
 ;
 
 ***
@@ -268,8 +275,11 @@ Equations
     RELATION_EQUIVALENCE            auxiliary equation to simplify the implementation of relations
     RELATION_CONSTRAINT_UP          upper bound of relations (linear constraints)
     RELATION_CONSTRAINT_LO          lower bound of relations (linear constraints)
+    STORAGE_CHANGE                  change in the state of charge of storage
+    STORAGE_BALANCE                 balance of the state of charge of storage
+    STORAGE_BALANCE_INIT            balance of the state of charge of storage at sub-annual time steps with initial storage content
+    STORAGE_EQUIVALENCE             mapping state of storage as activity of storage technologies
 ;
-
 *----------------------------------------------------------------------------------------------------------------------*
 * equation statements                                                                                                  *
 *----------------------------------------------------------------------------------------------------------------------*
@@ -517,7 +527,7 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 *
 * Auxiliary COMMODITY_BALANCE
 * """""""""""""""""""""""""""
-* For the commodity balance constraints below, we introduce an auxiliary variable called `COMMODITY_BALANCE`. This is implemented
+* For the commodity balance constraints below, we introduce an auxiliary variable called :math:`COMMODITY\_BALANCE`. This is implemented
 * as a GAMS ``$macro`` function.
 *
 *  .. math::
@@ -527,10 +537,11 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 *         \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,m,y,h^A} & \\
 *     + \ STOCK\_CHG_{n,c,l,y,h} + \ \sum_s \Big( land\_output_{n,s,y,c,l,h} - land\_input_{n,s,y,c,l,h} \Big) \cdot & LAND_{n,s,y} \\[4pt]
 *     - \ demand\_fixed_{n,c,l,y,h}
-*     = COMMODITY\_BALANCE_{n,c,l,y,h} \quad \forall \ l \notin (L^{RES}, & l^{REN} \subseteq L)
+*     = COMMODITY\_BALANCE_{n,c,l,y,h} \quad \forall \ l \notin (L^{RES}, & L^{REN}, L^{STOR} \subseteq L)
 *
 * The commodity balance constraint at the resource level is included in the `Equation RESOURCE_CONSTRAINT`_,
-* while at the renewable level, it is included in the `Equation RENEWABLES_EQUIVALENCE`_.
+* while at the renewable level, it is included in the `Equation RENEWABLES_EQUIVALENCE`_,
+* and at the storage level, it is included in the `Equation STORAGE_BALANCE`_.
 ***
 $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                                                             \
     SUM( (location,tec,vintage,mode,time2)$( map_tec_act(location,tec,year,mode,time2)                                 \
@@ -563,7 +574,7 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
 *
 ***
 COMMODITY_BALANCE_GT(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
-        AND NOT level_resource(level) AND NOT level_renewable(level) )..
+        AND NOT level_resource(level) AND NOT level_renewable(level) AND NOT level_storage(level) )..
     COMMODITY_BALANCE(node,commodity,level,year,time)
 * relaxation of constraints for debugging
 %SLACK_COMMODITY_EQUIVALENCE% + SLACK_COMMODITY_EQUIVALENCE_UP(node,commodity,level,year,time)
@@ -583,7 +594,7 @@ COMMODITY_BALANCE_GT(node,commodity,level,year,time)$( map_commodity(node,commod
 *
 ***
 COMMODITY_BALANCE_LT(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
-        AND NOT level_resource(level) AND NOT level_renewable(level)
+        AND NOT level_resource(level) AND NOT level_renewable(level) AND NOT level_storage(level)
         AND balance_equality(commodity,level) )..
     COMMODITY_BALANCE(node,commodity,level,year,time)
 * relaxation of constraints for debugging
@@ -1961,6 +1972,109 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
     REL(relation,node,year)
 %SLACK_RELATION_BOUND_LO% + SLACK_RELATION_BOUND_LO(relation,node,year)
     =G= relation_lower(relation,node,year) ;
+
+*----------------------------------------------------------------------------------------------------------------------*
+***
+* .. _gams-storage:
+*
+* Storage section
+* ---------------
+*
+* Storage technologies can be used to store a commodity (e.g., water, heat, electricity, etc.)
+* and shift it over sub-annual time slices. The storage solution presented here has three
+* distinctive parts: (i) Charger: a technology for charging a commodity to the storage container,
+* for example, a pump in a pumped hydropower storage (PHS) plant. (ii) Discharger: a technology
+* to convert the stored commodity to the output commodity, e.g., a turbine in PHS.
+* (iii) Storage container: a device for storing a commodity over time, such as a water reservoir in PHS.
+*
+* .. figure:: ../../_static/storage.png
+*
+* Storage equations
+* ^^^^^^^^^^^^^^^^^
+* The content of storage device depends on three factors: charge or discharge in
+* one time step (represented by `Equation STORAGE_CHANGE`_), the state of charge in the previous
+* time step, and storage losses between two consecutive time steps.
+*
+* Equation STORAGE_CHANGE
+* """""""""""""""""""""""
+* This equation shows the change in the content of the storage container in each
+* sub-annual timestep. This change is based on the activity of charger and discharger
+* technologies connected to that storage container. The notation :math:`S^{storage}`
+* represents the mapping set `map_tec_storage` denoting charger-discharger
+* technologies connected to a specific storage container in a specific node and
+* storage level. Where:
+*
+* - :math:`t^{C}` is a charging technology and :math:`t^{D}` is the corresponding discharger.
+* - :math:`h-1` is the time step prior to :math:`h`.
+*
+*   .. math::
+*      STORAGE\_CHARGE_{n,t,l,c,y,h} =
+*          \sum_{\substack{n^L,m,h-1 \\ y^V \leq y, (n,t^C,t,l,y) \sim S^{storage}}} output_{n^L,t^C,y^V,y,m,n,c,l,h-1,h}
+*             \cdot & ACT_{n^L,t^C,y^V,y,m,h-1} \\
+*          - \sum_{\substack{n^L,m,c,h-1 \\ y^V \leq y, (n,t^D,t,l,y) \sim S^{storage}}} input_{n^L,t^D,y^V,y,m,n,c,l,h-1,h}
+*              \cdot ACT_{n^L,t^D,y^V,y,m,h-1} \quad \forall \ t \in T^{STOR}, & \forall \ l \in L^{STOR}
+***
+STORAGE_CHANGE(node,storage_tec,level_storage,commodity,year,time) ..
+* change in the content of storage in the examined timestep
+    STORAGE_CHARGE(node,storage_tec,level_storage,commodity,year,time) =E=
+* increase in the content of storage due to the activity of charging technologies
+        SUM( (location,vintage,mode,tec,time2)$(
+        map_tec_lifetime(node,tec,vintage,year)
+        AND map_tec_storage(node,tec,storage_tec,level_storage,commodity) ),
+            output(location,tec,vintage,year,mode,node,commodity,level_storage,time2,time)
+            * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time) )
+* decrease in the content of storage due to the activity of discharging technologies
+        - SUM( (location,vintage,mode,tec,time2)$(
+        map_tec_lifetime(node,tec,vintage,year)
+        AND map_tec_storage(node,tec,storage_tec,level_storage,commodity) ),
+            input(location,tec,vintage,year,mode,node,commodity,level_storage,time2,time)
+            * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time) );
+
+***
+* Equation STORAGE_BALANCE
+* """"""""""""""""""""""""
+*
+* This equation ensures the commodity balance of storage technologies,
+* where the commodity is shifted between sub-annual timesteps within a model period.
+* If the state of charge of storage is set exogenously in one timestep through :math:`storage\_initial_{n,t,l,y,h}` parameter,
+* the content from the previous timestep is not carried over to this timestep.
+*
+*   .. math::
+*      STORAGE_{n,t,l,y,h} \ = storage\_initial_{n,t,l,y,h} + STORAGE\_CHARGE_{n,t,l,y,h} + \\
+*      STORAGE_{n,t,l,y,h-1} \cdot (1 - storage\_self\_discharge_{n,t,l,y,h-1}) \quad \forall \ t \in T^{STOR}, & \forall \ l \in L^{STOR}
+***
+STORAGE_BALANCE(node,storage_tec,level,commodity,year,time2)$ (
+    SUM(tec, map_tec_storage(node,tec,storage_tec,level,commodity) )
+    AND NOT storage_initial(node,storage_tec,level,commodity,year,time2) )..
+* Showing the the state of charge of storage at each timestep
+    STORAGE(node,storage_tec,level,commodity,year,time2) =E=
+* change in the content of storage in the examined timestep
+    + STORAGE_CHARGE(node,storage_tec,level,commodity,year,time2)
+* storage content in the previous subannual timestep
+    + SUM((lvl_temporal,time)$map_time_period(year,lvl_temporal,time,time2),
+        STORAGE(node,storage_tec,level,commodity,year,time)
+* considering storage self-discharge losses due to keeping the storage media between two subannual timesteps
+        * (1 - storage_self_discharge(node,storage_tec,level,commodity,year,time) ) ) ;
+
+STORAGE_BALANCE_INIT(node,storage_tec,level,commodity,year,time)$ (
+    SUM(tec, map_tec_storage(node,tec,storage_tec,level,commodity) )
+    AND storage_initial(node,storage_tec,level,commodity,year,time) )..
+* Showing the state of charge of storage at a timestep with an initial storage content
+    STORAGE(node,storage_tec,level,commodity,year,time) =E=
+* initial content of storage and change in the content of storage in the examined timestep
+* (here the content from the previous time step is not carried over)
+    storage_initial(node,storage_tec,level,commodity,year,time)
+    + STORAGE_CHARGE(node,storage_tec,level,commodity,year,time) ;
+
+* Connecting an input commodity to maintain the operation of storage container over time (optional)
+STORAGE_EQUIVALENCE(node,storage_tec,level,commodity,level_storage,commodity2,mode,year,time)$
+    ( map_time_commodity_storage(node,storage_tec,level,commodity,mode,year,time) AND
+      SUM( tec, map_tec_storage(node,tec,storage_tec,level_storage,commodity2) ) )..
+
+         STORAGE(node,storage_tec,level_storage,commodity2,year,time) =E=
+        SUM( (location,vintage,time2)$(map_tec_lifetime(node,storage_tec,vintage,year)$(
+              input(location,storage_tec,vintage,year,mode,node,commodity,level,time2,time) ) ),
+              duration_time_rel(time,time2) * ACT(location,storage_tec,vintage,year,mode,time) );
 
 *----------------------------------------------------------------------------------------------------------------------*
 * model statements                                                                                                     *
