@@ -388,6 +388,40 @@ Parameters
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
+* Storage parameters
+*----------------------------------------------------------------------------------------------------------------------*
+
+***
+* Parameters for the storage technologies
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*
+* The implementation of |MESSAGEix| includes the functionality to introduce "storage technologies".
+* This feature can be used to model... [...]
+* The parameter ``time_order`` imposes the order of sub-annual time steps, ``storage_initial`` sets the initial amount of storage and 
+* ``storage_self_discharge`` represents the self-discharge (loss) of storage as % of storage level in previous timestep. 
+*
+* .. list-table::
+*    :widths: 20 80
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index names
+*    * - storage_initial
+*      - ``node`` | ``tec`` | ``level`` | ``commodity`` | ``year_act`` | ``time``
+*    * - storage_self_discharge
+*      - ``node`` | ``tec`` | ``level`` | ``commodity`` | ``year_act`` | ``time``
+*    * - time_order
+*      - ``lvl_temporal`` | ``time``
+*
+***
+
+Parameters
+    storage_initial(node,tec,level,commodity,year_all,time)                       initial content of storage
+    storage_self_discharge(node,tec,level,commodity,year_all,time)                self-discharge (loss) of storage as % of storage level in previous timestep
+    time_order(lvl_temporal,time)                                                 sequence of subannual timesteps
+;
+
+*----------------------------------------------------------------------------------------------------------------------*
 * Soft relaxations of dynamic constraints                                                                              *
 *----------------------------------------------------------------------------------------------------------------------*
 
@@ -779,12 +813,3 @@ Parameters
     status(*,*)       model solution status parameter for log writing
 ;
 
-*----------------------------------------------------------------------------------------------------------------------*
-* Storage parameters
-*----------------------------------------------------------------------------------------------------------------------*
-
-Parameters
-    storage_initial(node,tec,level,commodity,year_all,time)                       initial content of storage
-    storage_self_discharge(node,tec,level,commodity,year_all,time)                self-discharge (loss) of storage as % of storage level in previous timestep
-    time_order(lvl_temporal,time)                                                 sequence of subannual timesteps
-;
