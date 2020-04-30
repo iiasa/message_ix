@@ -1974,10 +1974,10 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 
 *----------------------------------------------------------------------------------------------------------------------*
 ***
-* .. _Storage section:
+* .. _gams-storage:
 *
 * Storage section
-* -------------------------------------------------
+* ---------------
 *
 * Storage technologies can be used to store a commodity (e.g., water, heat, electricity, etc.)
 * and shift it over sub-annual time slices. The storage solution presented here has three
@@ -1986,28 +1986,29 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 * to convert the stored commodity to the output commodity, e.g., a turbine in PHS.
 * (iii) Storage container: a device for storing a commodity over time, such as a water reservoir in PHS.
 *
-* .. figure:: /_static/storage.png
+* .. figure:: ../../_static/storage.png
 *
 * Storage equations
-* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* ^^^^^^^^^^^^^^^^^
 * The content of storage device depends on three factors: charge or discharge in
 * one time step (represented as STORAGE_CHANGE), the state of charge in the previous
 * time step, and storage losses between two consecutive time steps.
 *
 * Equation STORAGE_CHANGE
-* """""""""""""""""""""""""""""""
+* """""""""""""""""""""""
 * This equation shows the change in the content of the storage container in each
 * sub-annual time step. This change is based on the activity of charger and discharge
 * technologies connected to that storage container. The notation :math:`S^{storage}`
 * represents the mapping set `map_tec_storage_level` denoting charger-discharger
 * technologies connected to a specific storage container in a specific node and
 * storage level. Thus, :math:`t^{C}` is a charging technology and :math:`t^{D}` is the corresponding discharger.
+*
 *   .. math::
 *      STORAGE\_CHG_{n,t^S,l,y,h} =
 *          \sum_{\substack{n^L,m,c,h^A \\ y^V \leq y, (n,t^C,t^S,l,y) \sim S^{storage}}} output_{n^L,t^C,y^V,y,m,n,c,l,h^A,h}
-*             \cdot & ACT_{n^L,t^C,y^V,y,m,h^A} \\
+*              \cdot & ACT_{n^L,t^C,y^V,y,m,h^A} \\
 *          - \sum_{\substack{n^L,m,c,h^A \\ y^V \leq y, (n,t^D,t^S,l,y) \sim S^{storage}}} input_{n^L,t^D,y^V,y,m,n,c,l,h^A,h}
-*             \cdot & ACT_{n^L,t^D,y^V,y,m,h^A} \\
+*              \cdot & ACT_{n^L,t^D,y^V,y,m,h^A} \\
 ***
 STORAGE_CHANGE(node,storage_tec,level_storage,commodity,year,time) ..
 * change in the content of storage in the examined timestep
@@ -2027,13 +2028,14 @@ STORAGE_CHANGE(node,storage_tec,level_storage,commodity,year,time) ..
 
 ***
 * Equation STORAGE_BALANCE
-* """""""""""""""""""""""""""""""
+* """"""""""""""""""""""""
 *
 * This equation ensures the commodity balance of storage technologies,
 * where the commodity is shifted between sub-annual time steps within a model period.
 * If the state of charge of storage is set exogenously in one time step through `init_storage` parameter,
 * the content from the previous timestep won't be carried over to this timestep.
 * Here, :math:`h^{A}` is the time step prior to :math:`h`.
+*
 *   .. math::
 *      STORAGE_{n,t^S,l,y,h} \ = init\_storage_{n,t^S,l,y,h} + STORAGE\_CHG_{n,t^S,l,y,h} + \\
 *      STORAGE_{n,t^S,l,y,h^A} \cdot & (1 - storage\_loss_{n,t^S,l,y,h^A}) \\
@@ -2071,11 +2073,12 @@ STORAGE_EQUIVALENCE(node,storage_tec,level,commodity,level_storage,commodity2,mo
               duration_time_rel(time,time2) * ACT(location,storage_tec,vintage,year,mode,time) );
 ***
 * Equation STORAGE_RELATION
-* """""""""""""""""""""""""""""""
+* """""""""""""""""""""""""
 *
 * The content of storage in two sub-annual time steps, either in one period or in
 * two different periods, can be related together. This equation will be only active
 * if the input parameter `relation_storage` is defined by the user.
+*
 *   .. math::
 *      STORAGE_{n,t^S,l,y^f,h^f} \leq relation\_storage_{n,t^S,l,y^f,y^l,h^f,h^l} \cdot & STORAGE_{n,t^S,l,y^l,h^l} \\
 ***
