@@ -117,13 +117,22 @@ Other tips
 Code style
 ----------
 
-- Python: follow `PEP 8 <https://www.python.org/dev/peps/pep-0008/>`_.
-- R: follow the style of the existing code base.
-- Jupyter notebooks (``.ipynb``): see below, under `Contributing tutorials`_.
-- Documentation (``.rst``, ``.md``):
+- **Python:**
+
+   - Follow `PEP 8 <https://www.python.org/dev/peps/pep-0008/>`_.
+   - Docstrings are in the `numpydoc format <https://numpydoc.readthedocs.io/en/latest/format.html>`_.
+
+- **R:** follow the style of the existing code base.
+- Jupyter notebooks (:file:`.ipynb`): see below, under `Contributing tutorials`_.
+- **Documentation** for ReStructuredText in :file:`.rst` files, and inline in :file:`.gms` files:
 
   - Do not hard-wrap lines.
   - Start each sentence on a new line.
+  - Ensure Sphinx does not give warnings about ReST syntax for new or modified documentation.
+
+- GAMS:
+
+  - Wrap lines at 121 characters, except for inline documentation (see above).
 
 - Other (file names, CLI, etc.): follow the style of the existing code base.
 
