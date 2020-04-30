@@ -90,7 +90,7 @@ Model classes
    These configure the GAMS CPLEX solver (or another solver, if selected); see `the solver documentation <https://www.gams.com/latest/docs/S_CPLEX.html>`_ for possible values.
 
 .. autoclass:: MESSAGE
-   :members:
+   :members: initialize
    :exclude-members: defaults
    :show-inheritance:
 
@@ -148,6 +148,13 @@ Model classes
    :members:
    :exclude-members: defaults
    :show-inheritance:
+
+.. autodata:: MESSAGE_ITEMS
+
+   Currently, these only include items required for :ref:`storage <gams-storage>`, in order to ensure that all scenarios are compatible with the MESSAGE GAMS implementation.
+
+   .. seealso:: :meth:`.MESSAGE.initialize`
+
 
 
 .. _utils:

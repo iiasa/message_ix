@@ -20,17 +20,21 @@ DEFAULT_CPLEX_OPTIONS = {
 # Common indices for some parameters in MESSAGE_ITEMS
 _idx_common = ['node', 'technology', 'level', 'commodity', 'year', 'time']
 
-# List of ixmp items for MESSAGE
 # NB only a partial list; see https://github.com/iiasa/message_ix/issues/254
+#: List of ixmp items for MESSAGE.
 MESSAGE_ITEMS = {
+    # Index sets
     # Storage level
     'level_storage': dict(ix_type='set'),
     # Storage reservoir technology
     'storage_tec': dict(ix_type='set'),
-    # Mapping of storage reservoir to charger/discharger
+
+    # Mapping set: mapping of storage reservoir to charger/discharger
     'map_tec_storage': dict(ix_type='set',
                             idx_sets=['node', 'technology', 'storage_tec',
                                       'level', 'commodity']),
+
+    # Parameters
     # Order of sub-annual time steps
     'time_order': dict(ix_type='par', idx_sets=['lvl_temporal', 'time']),
     # Relating content of storage in two different time steps (or
@@ -41,10 +45,10 @@ MESSAGE_ITEMS = {
                   'time', 'time'],
         idx_names=['node', 'technology', 'level', 'commodity', 'year_first',
                    'year_last', 'time_first', 'time_last']),
-    # Storage losses as a percentage of installed capacity
-    'storage_self_discharge': dict(ix_type='par', idx_sets=_idx_common),
     # Initial amount of storage
     'storage_initial': dict(ix_type='par', idx_sets=_idx_common),
+    # Storage losses as a percentage of installed capacity
+    'storage_self_discharge': dict(ix_type='par', idx_sets=_idx_common),
 }
 
 
@@ -94,7 +98,12 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
 
     @classmethod
     def initialize(cls, scenario):
-        """Set up *scenario* with required sets and parameters for MESSAGE."""
+        """Set up *scenario* with required sets and parameters for MESSAGE.
+
+        See Also
+        --------
+        :data:`MESSAGE_ITEMS`
+        """
         # Initialize the ixmp items
         cls.initialize_items(scenario, MESSAGE_ITEMS)
 
