@@ -82,8 +82,14 @@ Model classes
 
 .. currentmodule:: message_ix.models
 
-.. automodule:: message_ix.models
-   :exclude-members: MESSAGE, MESSAGE_MACRO
+.. autosummary::
+
+   MESSAGE
+   MACRO
+   MESSAGE_MACRO
+   GAMSModel
+   DEFAULT_CPLEX_OPTIONS
+   MESSAGE_ITEMS
 
 .. autodata:: DEFAULT_CPLEX_OPTIONS
 
@@ -124,6 +130,8 @@ Model classes
       **equ_list**       :obj:`None`
       **var_list**       :obj:`None`
       ================== ===
+
+.. autoclass:: MACRO
 
 .. autoclass:: MESSAGE_MACRO
    :members:

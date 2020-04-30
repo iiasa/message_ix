@@ -154,10 +154,12 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
 
 
 class MESSAGE(GAMSModel):
+    """Model class for MESSAGE."""
     name = 'MESSAGE'
 
 
 class MACRO(GAMSModel):
+    """Model class for MACRO."""
     name = 'MACRO'
 
     #: MACRO uses the GAMS ``break;`` statement, and thus requires GAMS 24.8.1
@@ -191,6 +193,7 @@ class MACRO(GAMSModel):
 
 
 class MESSAGE_MACRO(MACRO):
+    """Model class for MESSAGE_MACRO."""
     name = 'MESSAGE-MACRO'
 
     def __init__(self, *args, **kwargs):
