@@ -393,7 +393,7 @@ Parameters
 
 ***
 * Parameters for the storage technologies
-* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
 * The implementation of |MESSAGEix| includes the functionality to introduce "storage technologies".
 * This feature can be used to model... [...]
