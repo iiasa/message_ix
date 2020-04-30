@@ -393,7 +393,7 @@ Parameters
 
 ***
 * Parameters for representing storage solutions
-* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
 * The |MESSAGEix| formulation includes "storage" solutions to model sub-annual, inter-temporal storage of commodities in each period.
 * This feature can be used to model electricity storage (pumped hydro, batteries, compressed air energy storage, etc.), thermal energy storage,
@@ -817,4 +817,3 @@ Parameters
     ctr               counter parameter for loops
     status(*,*)       model solution status parameter for log writing
 ;
-
