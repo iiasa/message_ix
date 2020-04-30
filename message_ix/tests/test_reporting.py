@@ -59,7 +59,7 @@ def test_reporter(message_test_mp):
     assert_qty_equal(obs.sort_index(), demand, check_attrs=False)
 
     # ixmp.Reporter pre-populated with only model quantities and aggregates
-    assert len(rep_ix.graph) == 5332
+    assert len(rep_ix.graph) == 5223
 
     # message_ix.Reporter pre-populated with additional, derived quantities
     # This is the same value as in test_tutorials.py
