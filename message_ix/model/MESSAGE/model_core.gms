@@ -1992,24 +1992,27 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 * Storage equations
 * ^^^^^^^^^^^^^^^^^
 * The content of storage device depends on three factors: charge or discharge in
-* one time step (represented as STORAGE_CHANGE), the state of charge in the previous
+* one time step (represented by `Equation STORAGE_CHANGE`_), the state of charge in the previous
 * time step, and storage losses between two consecutive time steps.
 *
 * Equation STORAGE_CHANGE
 * """""""""""""""""""""""
 * This equation shows the change in the content of the storage container in each
-* sub-annual time step. This change is based on the activity of charger and discharge
+* sub-annual time step. This change is based on the activity of charger and discharger
 * technologies connected to that storage container. The notation :math:`S^{storage}`
-* represents the mapping set `map_tec_storage_level` denoting charger-discharger
+* represents the mapping set `map_tec_storage` denoting charger-discharger
 * technologies connected to a specific storage container in a specific node and
-* storage level. Thus, :math:`t^{C}` is a charging technology and :math:`t^{D}` is the corresponding discharger.
+* storage level. Where:
+* 
+* - :math:`t^{C}` is a charging technology and :math:`t^{D}` is the corresponding discharger.
+* - :math:`h-1` is the time step prior to :math:`h`.
 *
 *   .. math::
-*      STORAGE\_CHARGE_{n,t^S,l,c,y,h} =
-*          \sum_{\substack{n^L,m,h^A \\ y^V \leq y, (n,t^C,t^S,l,y) \sim S^{storage}}} output_{n^L,t^C,y^V,y,m,n,c,l,h^A,h}
-*             \cdot & ACT_{n^L,t^C,y^V,y,m,h^A} \\
-*          - \sum_{\substack{n^L,m,c,h^A \\ y^V \leq y, (n,t^D,t^S,l,y) \sim S^{storage}}} input_{n^L,t^D,y^V,y,m,n,c,l,h^A,h}
-*              \cdot & ACT_{n^L,t^D,y^V,y,m,h^A} \\
+*      STORAGE\_CHARGE_{n,t,l,c,y,h} =
+*          \sum_{\substack{n^L,m,h-1 \\ y^V \leq y, (n,t^C,t,l,y) \sim S^{storage}}} output_{n^L,t^C,y^V,y,m,n,c,l,h-1,h}
+*             \cdot & ACT_{n^L,t^C,y^V,y,m,h-1} \\
+*          - \sum_{\substack{n^L,m,c,h-1 \\ y^V \leq y, (n,t^D,t,l,y) \sim S^{storage}}} input_{n^L,t^D,y^V,y,m,n,c,l,h-1,h}
+*              \cdot ACT_{n^L,t^D,y^V,y,m,h-1} \quad \forall \ t \in T^{STOR}, & \forall \ l \in L^{STOR}
 ***
 STORAGE_CHANGE(node,storage_tec,level_storage,commodity,year,time) ..
 * change in the content of storage in the examined timestep
@@ -2033,13 +2036,12 @@ STORAGE_CHANGE(node,storage_tec,level_storage,commodity,year,time) ..
 *
 * This equation ensures the commodity balance of storage technologies,
 * where the commodity is shifted between sub-annual time steps within a model period.
-* If the state of charge of storage is set exogenously in one time step through `init_storage` parameter,
+* If the state of charge of storage is set exogenously in one time step through :math:`init\_storage_{n,t,l,y,h}` parameter,
 * the content from the previous timestep won't be carried over to this timestep.
-* Here, :math:`h^{A}` is the time step prior to :math:`h`.
 *
 *   .. math::
-*      STORAGE_{n,t^S,l,y,h} \ = init\_storage_{n,t^S,l,y,h} + STORAGE\_CHARGE_{n,t^S,l,y,h} + \\
-*      STORAGE_{n,t^S,l,y,h^A} \cdot & (1 - storage\_loss_{n,t^S,l,y,h^A}) \\
+*      STORAGE_{n,t,l,y,h} \ = init\_storage_{n,t,l,y,h} + STORAGE\_CHARGE_{n,t,l,y,h} + \\
+*      STORAGE_{n,t,l,y,h-1} \cdot (1 - storage\_loss_{n,t,l,y,h-1}) \quad \forall \ t \in T^{STOR}, & \forall \ l \in L^{STOR}
 ***
 STORAGE_BALANCE(node,storage_tec,level,commodity,year,time2)$ (
     SUM(tec, map_tec_storage(node,tec,storage_tec,level,commodity) )
