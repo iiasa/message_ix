@@ -13,10 +13,6 @@ from message_ix.testing import (
 )
 
 
-pytestmark = pytest.mark.xfail(
-    reason='https://github.com/iiasa/message_ix/issues/322')
-
-
 def test_run_clone(tmpdir):
     # this test is designed to cover the full functionality of the GAMS API
     # - initialize a new ixmp platform instance
