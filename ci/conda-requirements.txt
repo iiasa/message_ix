@@ -2,10 +2,7 @@ asyncssh
 click
 codecov
 dask
-
-# Temporary exclusions: see iiasa/ixmp#279
-JPype1 != 0.7.2, != 0.7.3, != 0.7.4
-
+JPype1
 jupyter
 jupyter_console >= 6
 matplotlib
