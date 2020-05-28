@@ -1,7 +1,6 @@
+from contextlib import contextmanager
 import subprocess
 import sys
-
-from contextlib import contextmanager
 
 import ixmp
 import message_ix
@@ -15,9 +14,14 @@ def check_local_model(model, notebook, shell=False):
 
     mp.close_db()
     pyversion = sys.version_info[0]
-    cmd = "jupyter nbconvert {} --ExecutePreprocessor.kernel_name='python{}' --execute"
-    cmd = cmd.format(notebook, pyversion)
-    subprocess.check_call(cmd.split(), shell=shell)
+    cmd = [
+        "jupyter",
+        "nbconvert",
+        notebook,
+        f"--ExecutePreprocessor.kernel_name='python{pyversion}'",
+        "--execute",
+    ]
+    subprocess.check_call(cmd, shell=shell)
 
 
 @contextmanager

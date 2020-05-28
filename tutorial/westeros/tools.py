@@ -1,9 +1,6 @@
+from pathlib import Path
 import sys
-import os
 
-here = os.path.dirname(os.path.abspath(os.path.realpath(__file__)))
+sys.path.append(str(Path(__file__).parents[1] / "utils"))
 
-path = os.path.join(here, '..', 'utils')
-sys.path.append(path)
-
-from plotting import *
+from plotting import Plots  # noqa: E402, F401

@@ -482,7 +482,7 @@ class Scenario(ixmp.Scenario):
         try:
             self.check_out()
             commit = True
-        except:
+        except RuntimeError:
             commit = False
         keys = list(mapping.keys())
 
