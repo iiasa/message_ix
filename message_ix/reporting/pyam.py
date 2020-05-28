@@ -65,7 +65,9 @@ def as_pyam(scenario, quantity, replace_vars=None, year_time_dim=None,
     if len(df) and unit:
         from_unit = df['unit'].unique()
         if len(from_unit) > 1:
-            raise ValueError(f'cannot convert non-unique units {from_unit!r}')
+            raise ValueError(
+                f'cannot convert non-unique units {repr(from_unit)}'
+            )
         q = pint.Quantity(df['value'].values, from_unit[0]).to(unit)
         df['value'] = q.magnitude
         df['unit'] = unit
@@ -78,8 +80,10 @@ def as_pyam(scenario, quantity, replace_vars=None, year_time_dim=None,
     # Warn about extra columns
     extra = sorted(set(df.columns) - set(IAMC_IDX + ['year', 'time', 'value']))
     if extra:
-        log.warning(f'Extra columns {extra!r} when converting '
-                    f'{quantity.name!r} to IAMC format')
+        log.warning(
+            f'Extra columns {repr(extra)} when converting '
+            f'{repr(quantity.name)} to IAMC format'
+        )
 
     return IamDataFrame(df)
 
