@@ -73,22 +73,6 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
     }, ixmp.model.gams.GAMSModel.defaults)
 
     @classmethod
-    def read_version(cls):
-        """Retrieve MESSAGE version string from version.gms."""
-        version_file = Path(config.get('message model dir'), 'version.gms')
-        if not version_file.exists():
-            # Only exists here on install
-            version_file = Path(__file__).parent / 'model' / 'version.gms'
-
-        s = version_file.read_text()
-
-        return '{}.{}.{}'.format(
-            re.search('VERSION_MAJOR "(.+?)"', s).group(1),
-            re.search('VERSION_MINOR "(.+?)"', s).group(1),
-            re.search('VERSION_PATCH "(.+?)"', s).group(1),
-        )
-
-    @classmethod
     def initialize(cls, scenario):
         """Set up *scenario* with required sets and parameters for MESSAGE.
 
