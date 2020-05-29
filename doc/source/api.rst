@@ -47,6 +47,7 @@ Support for R usage of the core classes is provided through the `reticulate`_ pa
 
 .. autoclass:: message_ix.Scenario
    :members:
+   :exclude-members: add_macro
    :show-inheritance:
    :inherited-members:
 
@@ -63,6 +64,7 @@ Support for R usage of the core classes is provided through the `reticulate`_ pa
 
       add_cat
       add_horizon
+      add_macro
       add_spatial_sets
       cat
       cat_list
@@ -75,6 +77,11 @@ Support for R usage of the core classes is provided through the `reticulate`_ pa
       var
       vintage_and_active_years
       years_active
+
+   .. automethod:: add_macro
+
+      .. warning:: MACRO support via :meth:`add_macro` is **experimental** in message_ix 3.0 and may not function as expected on all possible |MESSAGEix| models.
+         See `a list of known and pending issues <https://github.com/iiasa/message_ix/issues?q=is%3Aissue+is%3Aopen+label%3Amacro>`_ on GitHub.
 
 
 Model classes
@@ -131,7 +138,13 @@ Model classes
       **var_list**       :obj:`None`
       ================== ===
 
+
 .. autoclass:: MACRO
+   :members:
+   :show-inheritance:
+
+   .. autoattribute:: name
+
 
 .. autoclass:: MESSAGE_MACRO
    :members:
@@ -149,6 +162,8 @@ Model classes
      If the absolute relative change is less than `convergence_criterion`, the linked model run is complete.
    - **max_iteration** (:class:`int`, default 50): the maximum number of iterations between the two models.
      If the solution does not converge after this many iterations, the linked model run fails and no valid result is produced.
+
+   .. seealso:: :meth:`.Scenario.add_macro`
 
    .. autoattribute:: name
 
