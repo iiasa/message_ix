@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from shutil import copyfile
 from urllib.request import urlretrieve
@@ -78,29 +79,54 @@ def copy_model(path, overwrite, set_default):
 @click.option('--branch',
               help='Repository branch to download from (e.g., master).')
 @click.option('--tag',
-              help='Repository tag to download from (e.g., 1.0.0).')
+              help='Repository tag to download from (e.g., v1.0.0).')
 @click.argument('path', type=click.Path())
 def dl(branch, tag, path):
     if tag and branch:
         raise click.BadOptionUsage('Can only provide one of `tag` or `branch`')
-    elif tag is None and branch is None:
-        tag = '{}'.format(message_ix.__version__)
-        print(tag)
 
-    zipname = '{}.zip'.format(branch or 'v' + tag)
-    url = 'https://github.com/iiasa/message_ix/archive/{}'.format(zipname)
+    if tag or branch is None:
+        # Get tag information using GitHub API
+        url = "https://api.github.com/repos/iiasa/message_ix/tags"
+        with open(urlretrieve(url)[0]) as f:
+            tags_info = json.load(f)
+
+        if tag is None:
+            tag = tags_info[0]["name"]
+            print(f"Default: latest release {tag}")
+
+        url = None
+        for info in tags_info:
+            if info["name"] == tag:
+                url = info["zipball_url"]
+                break
+
+        if url is None:
+            raise ValueError(f"tag {repr(tag)} does not exist")
+
+        zipname = f"{tag}.zip"
+    else:
+        # Construct URL and filename from branch
+        zipname = f"{branch}.zip"
+        url = f"https://github.com/iiasa/message_ix/archive/{zipname}"
+
     path = Path(path)
 
     with tempfile.TemporaryDirectory() as td:
-        print('Retrieving {}'.format(url))
+        print(f"Retrieving {url}")
         zippath = Path(td) / zipname
         urlretrieve(url, zippath)
 
         archive = zipfile.ZipFile(zippath)
 
-        print('Unzipping {} to {}'.format(zippath, path))
+        print(f"Unzipping {zippath} to {path}")
         path.mkdir(parents=True, exist_ok=True)
-        archive.extractall(path)
+
+        # Extract only tutorial files
+        archive.extractall(
+            path,
+            members=filter(lambda n: "/tutorial/" in n, archive.namelist())
+        )
 
         # Close *zipfile* so it can be deleted with *td*
         archive.close()
