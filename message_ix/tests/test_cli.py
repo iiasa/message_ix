@@ -42,6 +42,7 @@ def test_dl(message_ix_cli, opts, tmp_path):
         # Debugging information
         print(r.exception, r.output)
         assert False
+    print(r.exception, r.output)
 
     if opts == "":
         assert "Default: latest release v2.0.0" in r.output

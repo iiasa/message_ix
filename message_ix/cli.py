@@ -1,7 +1,9 @@
+from base64 import b64encode
 import json
+import os
 from pathlib import Path
 from shutil import copyfile
-from urllib.request import urlretrieve
+from urllib.request import Request, urlopen
 import tempfile
 import zipfile
 
@@ -84,17 +86,39 @@ def copy_model(path, overwrite, set_default):
 def dl(branch, tag, path):
     if tag and branch:
         raise click.BadOptionUsage('Can only provide one of `tag` or `branch`')
-
-    if tag or branch is None:
+    elif branch:
+        # Construct URL and filename from branch
+        zipname = f"{branch}.zip"
+        url = f"https://github.com/iiasa/message_ix/archive/{zipname}"
+    else:
         # Get tag information using GitHub API
-        url = "https://api.github.com/repos/iiasa/message_ix/tags"
-        with open(urlretrieve(url)[0]) as f:
-            tags_info = json.load(f)
+        args = dict(
+            url="https://api.github.com/repos/iiasa/message_ix/tags",
+            headers=dict(),
+        )
+        try:
+            # Only for Travis/macOS: GitHub rate limits unathenticated API
+            # requests by IP address. Because the build worker shares an IP,
+            # the limit is exceeded and the request fails. Use HTTP Basic Auth
+            # with an encrypted username and  password from .travis.yml for a
+            # higher rate limit.
+            auth_bytes = b64encode(
+                "{MESSAGE_IX_GH_USER}:{MESSAGE_IX_GH_PW}"
+                .format(**os.environ)
+                .encode()
+            )
+            args["headers"]["Authorization"] = f"Basic {auth_bytes.decode()}"
+        except KeyError:
+            pass
+
+        with urlopen(Request(**args)) as response:
+            tags_info = json.load(response)
 
         if tag is None:
             tag = tags_info[0]["name"]
             print(f"Default: latest release {tag}")
 
+        # Get the zipball URL for the matching tag
         url = None
         for info in tags_info:
             if info["name"] == tag:
@@ -105,31 +129,28 @@ def dl(branch, tag, path):
             raise ValueError(f"tag {repr(tag)} does not exist")
 
         zipname = f"{tag}.zip"
-    else:
-        # Construct URL and filename from branch
-        zipname = f"{branch}.zip"
-        url = f"https://github.com/iiasa/message_ix/archive/{zipname}"
 
-    path = Path(path)
-
+    # Context manager to remove the TemporaryDirectory when complete
     with tempfile.TemporaryDirectory() as td:
-        print(f"Retrieving {url}")
+        # Path for zip file
         zippath = Path(td) / zipname
-        urlretrieve(url, zippath)
 
-        archive = zipfile.ZipFile(zippath)
+        print(f"Retrieving {url}")
+        with urlopen(url) as response:  # Unauthenticated request
+            zippath.write_bytes(response.read())
 
+        # Context manager to close the ZipFile when done, so it can be removed
         print(f"Unzipping {zippath} to {path}")
-        path.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(zippath) as archive:
+            # Zip archive successfully opened; create the output path
+            path = Path(path)
+            path.mkdir(parents=True, exist_ok=True)
 
-        # Extract only tutorial files
-        archive.extractall(
-            path,
-            members=filter(lambda n: "/tutorial/" in n, archive.namelist())
-        )
-
-        # Close *zipfile* so it can be deleted with *td*
-        archive.close()
+            # Extract only tutorial files
+            archive.extractall(
+                path,
+                members=filter(lambda n: "/tutorial/" in n, archive.namelist())
+            )
 
 
 # Add subcommands
