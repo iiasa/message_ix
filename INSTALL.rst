@@ -49,12 +49,11 @@ Install |MESSAGEix| from source
 
 3. Install :doc:`ixmp <ixmp:install>` from source.
 
-4. (Optional) If you intend to contribute changes to |MESSAGEix|, first register
-   a Github account, and fork the `message_ix repository <https://github.com/iiasa/message_ix>`_. This will create a new repository ``<user>/message_ix``.
+4. (Optional) If you intend to contribute changes to |MESSAGEix|, first register a Github account, and fork the `message_ix repository <https://github.com/iiasa/message_ix>`_.
+   This will create a new repository ``<user>/message_ix``.
    (Please also see :doc:`contributing`.)
 
-5. Clone either the main repository, or your fork; using the `Github Desktop`_
-   client, or the command line::
+5. Clone either the main repository, or your fork; using the `Github Desktop`_ client, or the command line::
 
     $ git clone git@github.com:iiasa/message_ix.git
 
@@ -63,13 +62,23 @@ Install |MESSAGEix| from source
 
 6. Open a command prompt in the ``message_ix`` directory and type::
 
-    $ pip install --editable .
+    $ pip install --editable .[docs,reporting,tests,tutorial]
 
-7. (Optional) Run the built-in test suite to check that |MESSAGEix| functions
-   correctly on your system::
+   The ``--editable`` flag ensures that changes to the source code are picked up every time ``import message_ix`` is used in Python code.
+   The ``[docs,reporting,tests,tutorial]`` extra dependencies ensure additional dependencies are installed.
 
-    $ pip install --editable .[tests]
-    $ py.test tests
+7. (Optional) If you will be using :file:`MESSAGE_master.gms` outside of Python :mod:`message_ix` to run |MESSAGEix|, you will likely modify this file, but will not want to commit these changes to Git.
+   Set the Git “assume unchanged” bit for this file::
+
+     $ git update-index --assume-unchanged message_ix/model/MESSAGE_master.gms
+
+   To unset the bit, use ``--no-assume-unchanged``.
+   See the `Git documentation <https://www.git-scm.com/docs/git-update-index#_using_assume_unchanged_bit>`_ for more details.
+
+8. (Optional) Run the built-in test suite to check that |MESSAGEix| functions correctly on your system::
+
+    $ pytest
+
 
 Common issues
 -------------
