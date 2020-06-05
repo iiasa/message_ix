@@ -6,4 +6,4 @@ JPype1 >= 0.7.5
 
 # pyam-iamc
 # Temporary: see https://github.com/IAMconsortium/pyam/issues/259
-git+git://github.com/IAMconsortium/pyam.git#egg=pyam-iamc
+git+git://github.com/IAMconsortium/pyam.git@v0.6.0#egg=pyam-iamc
