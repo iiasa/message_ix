@@ -1,5 +1,11 @@
-# Continuous integration procedure for AppVeyor
-# Based on https://github.com/rmcgibbo/python-appveyor-conda-example
+# Continuous integration configuration for AppVeyor
+
+branches:
+  # Do not build PR branches in the main repo; only maintenance branches and
+  # the merge results of PRs
+  only:
+  - master
+  - 2.0.x
 
 environment:
   matrix:

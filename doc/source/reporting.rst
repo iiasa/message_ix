@@ -237,7 +237,6 @@ These automatic features of :class:`~message_ix.reporting.Reporter` are controll
       full_key
       get
       keys
-      read_config
       set_filters
       visualize
       write

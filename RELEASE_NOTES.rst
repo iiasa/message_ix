@@ -1,5 +1,7 @@
-Next release
-============
+v3.0.0 (2020-06-07)
+===================
+
+:mod:`message_ix` v3.0.0 coincides with :mod:`ixmp` v3.0.0.
 
 Migration notes
 ---------------
@@ -7,6 +9,10 @@ Migration notes
 The :ref:`generic storage formulation <gams-storage>` introduces **new ixmp items** (sets, parameters, variables, and equations) to the MESSAGE model scheme.
 When loading a Scenario created with a version of `message_ix` older than x.x.x, these items will be initialized (and left empty), using at most one call to :meth:`~message_ix.Scenario.commit`.
 See :meth:`.MESSAGE.initialize`.
+
+See also the `migration notes for ixmp 3.0.0`_.
+
+.. _migration notes for ixmp 3.0.0: https://message.iiasa.ac.at/projects/ixmp/en/latest/whatsnew.html#v3-0-0-2020-06-05
 
 
 All changes
@@ -27,7 +33,7 @@ All changes
 v2.0.0 (2020-01-14)
 ===================
 
-`message_ix` v2.0.0 coincides with `ixmp` v2.0.0.
+:mod:`message_ix` v2.0.0 coincides with :mod:`ixmp` v2.0.0.
 
 Migration notes
 ---------------

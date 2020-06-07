@@ -448,6 +448,7 @@ class Scenario(ixmp.Scenario):
         super().solve(model=model, solve_options=solve_options, **kwargs)
 
     def add_macro(self, data, scenario=None, check_convergence=True, **kwargs):
+        """Add MACRO parametrization to the Scenario and calibrate."""
         # TODO document
         from .macro import EXPERIMENTAL, add_model_data, calibrate
         from .models import MACRO
@@ -482,7 +483,7 @@ class Scenario(ixmp.Scenario):
         try:
             self.check_out()
             commit = True
-        except:
+        except RuntimeError:
             commit = False
         keys = list(mapping.keys())
 

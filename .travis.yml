@@ -1,10 +1,21 @@
+# Continuous integration configuration for Travis
+# NB use https://config.travis-ci.com/explore to validate changes
+
+branches:
+  # Do not build PR branches in the main repo; only maintenance branches and
+  # the merge results of PRs
+  only:
+  - master
+  - 2.0.x
+
 language: minimal
 
 env:
   global:
   - PYENV=py37
-  # Encrypted values for MESSAGE_IX_CI_USER, MESSAGE_IX_CI_PW
-  - secure: "YlqCqO3t4XZbSjP7FseXGU0PWKxCTD+1kBwgRsA829yphaK0UEgDoCHVn0JvE1VDtb4E58eO0Ulnpc0MWhUDGe9dX7o5lpSufKGD+GLl/X00hYpahu17krxphAnqIyATQnY1RzQaqPGThkcx5SVJal1LAqNy5TzsLkYoCq7p1H0G4QlK9WeItlF/FLhrN27Zbi6/d1XYxgEataSHLfm7fb/uQJPj35r/DRwdyhmoDEOmtvbOL4+OQdLfdB56d1YLs5AIK2mMt/DhAoZvrwqWiway+87vxUuY/YIRVtgeukxxEhlp982YC6IFZdz149TS5107fAJpiTEUX2mdjNuzOcBGh6MTMwGVRsBSBfFPsmt9QF5Smwq6KVf9uxm0Sgwz5ih828Tg18YH5iYJ84Y1jF8l7kJw7N1nFKBYoTVB5un9z0iY3Dnw6LQDzJCvNGmdd4Ct38/vTj73Ltcr5hSzcDeE9VQs99z8gM1FCb45MbSYjg00YgfCzypuG5LibTmay89YcTRMIQ9OliQRCJyOB8l19Z1HYMn33nX8BN6IocWKSkeJexV1iNSPt0GZEnBRAccb7iJd/KD/tUeQvVtFbwJ/qSiQOduUb/GMEvcldXQeqsAQRSMvCdadlU2aQGjQF2XQJGlPhQf744RnevrTPm4HeIpvqLTeVvgJiF3h7Pw="
+  # Encrypted values for MESSAGE_IX_CI_USER, MESSAGE_IX_CI_PW,
+  # MESSAGE_IX_GH_USER, MESSAGE_IX_GH_PW
+  - secure: "IiNG8HMAFIrkeXnVMocSbAtXKgJ7SrZ9VduuAtdftImyBovbs2whtII5rL7qBg47mibREvY0ylUglmc5eLweEbZJO1zOVvNb8urk+cN4aljw9OubAlkpines9R0alhE1M2cOx94JYrNLPJyvMC8s40dVgCJzOM2kyP+cuf8Sr0vCgCAmbtsHSp7f3pkbvR+U7nSrPSHa/LHGtbQ2XJnhd8vvGeAn0oiP2c/Y6yCRhwI+EZYvh0uFSTf4XH6v/vs1zS+2qmWDMe5CUxXgXPtkPQqBhTmQDlbZXcnyoBIWtrpNAP8lXYv6piddizCg+HGpGkmef2pAnFwekQ6tCuQGyyamLlj6nFkljXHn1lbMoFPbRuH4N1vgh8h95r3HUo/Nfxdsza/PEs5HCOA03dU7rE6+ZrV5o0NRGf6cw0lR2evAmPBvkR66soWf3798T5JuUZib3fJ7XlBnhYisKw4Kr+IA6CJTlLVGZ1yd8YcW0bgUt881/kzC5lLjZEN3Is6PL5pkQO9H8tBLKuT0E+X5k6rJlxmuCtQawrpz+0LkoRjXWczH3SY4X7QU1N1Z7SGybNgsJCtwxYinq6QV1vHy2yhJjZtfn3iXtdU7mVyfGtOa3ZVkTO0MDWeDS2FiELz1hMV3zUC5rTZTkV4wLA88Cdijx9fiaW6tirVKhvMSwnI="
 
 os:
 - linux

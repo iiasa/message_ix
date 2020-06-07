@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 
 
 class Plots(object):
-
     def __init__(self, ds, country, firstyear=2010, input_costs='$/GWa'):
         self.ds = ds
         self.country = country
@@ -54,11 +53,11 @@ class Plots(object):
 
     def plot_demand(self, light_demand, elec_demand):
         fig, ax = plt.subplots()
-        l = light_demand['value']
-        l.plot(ax=ax, label='light')
+        light = light_demand['value']
+        light.plot(ax=ax, label='light')
         e = elec_demand['value']
         e.plot(ax=ax, label='elec')
-        (l + e).plot(ax=ax, label='total')
+        (light + e).plot(ax=ax, label='total')
         plt.ylabel('GWa')
         plt.xlabel('Year')
         plt.legend(loc='best')
