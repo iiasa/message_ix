@@ -1,3 +1,13 @@
+# Continuous integration configuration for Travis
+# NB use https://config.travis-ci.com/explore to validate changes
+
+branches:
+  # Do not build PR branches in the main repo; only maintenance branches and
+  # the merge results of PRs
+  only:
+  - master
+  - 2.0.x
+
 language: minimal
 
 env:
