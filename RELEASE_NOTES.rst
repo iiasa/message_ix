@@ -7,8 +7,7 @@ Migration notes
 ---------------
 
 The :ref:`generic storage formulation <gams-storage>` introduces **new ixmp items** (sets, parameters, variables, and equations) to the MESSAGE model scheme.
-When loading a Scenario created with a version of `message_ix` older than x.x.x, these items will be initialized (and left empty), using at most one call to :meth:`~message_ix.Scenario.commit`.
-See :meth:`.MESSAGE.initialize`.
+When loading a Scenario created with a version of `message_ix` older than 3.0.0, :meth:`.MESSAGE.initialize` will initialized these items (and leave them empty), using at most one call to :meth:`~message_ix.Scenario.commit`.
 
 See also the `migration notes for ixmp 3.0.0`_.
 
