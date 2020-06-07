@@ -90,6 +90,11 @@ html_logo = '_static/logo_white.png'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+# -- Options for LaTeX output -------------------------------------------------
+
+# The LaTeX engine to build the docs.
+latex_engine = 'lualatex'
+
 
 # -- Options for sphinx.ext.extlinks ------------------------------------------
 
@@ -103,6 +108,9 @@ extlinks = {
 intersphinx_mapping = {
     'dask': ('https://docs.dask.org/en/stable/', None),
     'ixmp': ('https://message.iiasa.ac.at/projects/ixmp/en/latest/', None),
+    # For a local build, uncomment and use the following line with a path to
+    # the directory containing built HTML documentation for ixmp:
+    # 'ixmp': ('/home/user/path-to-ixmp/doc/build/html', None),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
     'pint': ('https://pint.readthedocs.io/en/stable/', None),
     'pyam': ('https://pyam-iamc.readthedocs.io/en/stable/', None),
