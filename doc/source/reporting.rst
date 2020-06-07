@@ -1,11 +1,6 @@
 Postprocessing and reporting
 ============================
 
-.. warning::
-
-   :mod:`message_ix.reporting` is **experimental** in message_ix 2.0.
-   The API and functionality may change without advance notice or a deprecation period in subsequent releases.
-
 The |ixmp| provides powerful features to perform calculations and other postprocessing after a :class:`message_ix.Scenario` has been solved by the associated model. The |MESSAGEix| framework uses these features to provide zero-configuration reporting of models built on the framework.
 
 These features are accessible through :class:`Reporter <message_ix.reporting.Reporter>`, which can produce multiple **reports** from one or more Scenarios. A report is identified by a **key** (usually a string), and may…
@@ -95,6 +90,10 @@ small, indivisible) computations.
 Reporters
 ---------
 
+.. currentmodule:: message_ix.reporting
+
+.. automodule:: message_ix.reporting
+
 .. autosummary::
 
    message_ix.reporting.Reporter
@@ -148,8 +147,6 @@ Other added keys include:
 - The report ``message:default``, collecting all of the above reports.
 
 These automatic features of :class:`~message_ix.reporting.Reporter` are controlled by:
-
-.. currentmodule:: message_ix.reporting
 
 .. autosummary::
 
