@@ -22,6 +22,7 @@
 *#
 .
 *.Rproj
+*.eggs
 
 # MESSAGEix specifics
 message_ix/model/MESSAGE_master.gms
