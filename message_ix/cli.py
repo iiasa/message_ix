@@ -84,6 +84,10 @@ def copy_model(path, overwrite, set_default):
               help='Repository tag to download from (e.g., v1.0.0).')
 @click.argument('path', type=click.Path())
 def dl(branch, tag, path):
+    """Download MESSAGEix tutorial notebooks and extract to PATH.
+
+    PATH is a local directory where to store the tutorial notebooks.
+    """
     if tag and branch:
         raise click.BadOptionUsage('Can only provide one of `tag` or `branch`')
     elif branch:
