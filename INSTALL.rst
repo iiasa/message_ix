@@ -158,7 +158,8 @@ JPype1 segfautls
 ----------------
 The symptom: crashes or segfaults when the JVM is started:
 
-.. code-block::
+.. code-block:: RST
+
     >           self.jindex[ts].readSolutionFromGDX(*args)
     E           TypeError: Ambiguous overloads found for at.ac.iiasa.ixmp.objects.MsgScenario.readSolutionFromGDX(str,str,str,java.util.LinkedList,java.util.LinkedList,bool) between:
     E           	public void at.ac.iiasa.ixmp.objects.MsgScenario.readSolutionFromGDX(java.lang.String,java.lang.String,java.lang.String,java.util.List,java.util.List,boolean) throws at.ac.iiasa.ixmp.exceptions.IxException
@@ -177,7 +178,7 @@ b. Run in the command line of the “Anaconda Prompt”::
 
     $ ixmp --platform default list
 
-If the (error snippet) appears, user should run these two extra commands::
+If the error in the code block above appears, user should run these two extra commands::
 
     # To see (a) whether conda openjdk is installed, and (b) whether it comes from conda-forge:
     $ conda list openjdk
