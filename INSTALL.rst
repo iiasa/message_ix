@@ -57,11 +57,12 @@ After installing GAMS, we recommend that new users install Anaconda, and then us
 Advanced users may choose to install |MESSAGEix| from source code (next section).
 
 4. Install Python via `Anaconda`_.
-   We recommend the latest version; currently Python 3.8.
+
+   - We recommend the latest version; currently Python 3.8.
 
 5. Open a command prompt.
-   We recommend **Windows users to use the “Anaconda Prompt”** to avoid permissions issues when installing and using |MESSAGEix|.
-   This program is available in the Windows Start menu after installing Anaconda.
+
+   - We recommend **Windows users to use the “Anaconda Prompt”** to avoid permissions issues when installing and using |MESSAGEix|. This program is available in the Windows Start menu after installing Anaconda.
 
 6. Install the ``message-ix`` package::
 
@@ -85,7 +86,7 @@ Check if the installation was successful
 
     $ message-ix show-versions
 
-8. The above command will work **as of** ``message-ix`` 3.0 and in all subsequent versions. If an error prompts, it means that an older versions has been installed and ``message-ix`` should be updated. To check the current version::
+8. The above command will work **as of** ``message-ix`` 3.0 and in all subsequent versions. If an error prompts, it means that an older versions has been installed and that ``message-ix`` should be updated. To check the current version::
 
     # If installation was through conda:
     $ conda list message-ix
