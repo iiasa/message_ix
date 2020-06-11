@@ -55,7 +55,7 @@ See `doc/README.md` for further details.
 
 ### Installation
 
-See [‘Installation’ in the documentation](https://message.iiasa.ac.at/en/1.2.x/getting_started.html) or the file `INSTALL.rst`.
+See [‘Installation’ in the documentation](https://docs.messageix.org/en/master/install.html) or the file `INSTALL.rst`.
 
 
 ### Tutorials
