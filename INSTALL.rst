@@ -1,5 +1,5 @@
-Installation
-************
+Getting Started
+***************
 
 .. contents::
    :local:
@@ -12,7 +12,7 @@ GAMS (required)
 
 |MESSAGEix| requires `GAMS`_.
 
-1. Download GAMS for your operating system; either the `latest version`_ or `version 29`_ (see note below).
+1. Download GAMS for your operating system; we encourage new users not familiar with GAMS licensing to install `version 29`_ and **not** the latest one (see note below).
 
 2. Run the installer.
 
@@ -60,16 +60,44 @@ Advanced users may choose to install |MESSAGEix| from source code (next section)
    We recommend the latest version; currently Python 3.8.
 
 5. Open a command prompt.
-   We recommend Windows users use the “Anaconda Prompt” to avoid permissions issues when installing and using |MESSAGEix|.
+   We recommend **Windows users to use the “Anaconda Prompt”** to avoid permissions issues when installing and using |MESSAGEix|.
    This program is available in the Windows Start menu after installing Anaconda.
 
 6. Install the ``message-ix`` package::
 
     $ conda install -c conda-forge message-ix
 
+Alternatively to *Steps 5. and 6.*, ``message-ix`` can also be installed using the **“Anaconda Navigator”** (see instructions `here`_)
 
-Install |MESSAGEix| from source
-===============================
+
+Install |MESSAGEix| via pip
+===========================
+
+6. As an alternative to *Step 6.* above, ``message-ix`` and its dependencies can also be installed using `pip`_::
+
+    $ pip install message-ix
+
+
+Check if the installation was successful
+========================================
+
+7. Run the command and verify that the version shown corresponds to |MESSAGEix| `latest release`_::
+
+    $ message-ix show-versions
+
+8. The above command will work **as of** ``message-ix`` 3.0 and in all subsequent versions. If an error prompts, it means that an older versions has been installed and ``message-ix`` should be updated. To check the current version::
+
+    # If installation was through conda:
+    $ conda list message-ix
+
+    # or if you used pip for installing:
+    $ pip show message-ix
+
+.. note:: If further errors appear, please check the section `Common issues`_ below.
+
+
+Install |MESSAGEix| from source (advanced users)
+================================================
 
 4. Install :doc:`ixmp <ixmp:install>` from source.
 
@@ -112,8 +140,10 @@ No JVM shared library file (jvm.dll) found
 
 If you get an error containing “No JVM shared library file (jvm.dll) found” when creating a :class:`Platform` object (e.g. ``mp = ix.Platform(driver='HSQLDB')``), it is likely that you need to set the ``JAVA_HOME`` environment variable (see for example `these instructions`_).
 
+.. _`here`: https://docs.anaconda.com/anaconda/navigator/
+.. _`pip`: https://pip.pypa.io/en/stable/user_guide/#installing-packages
+.. _`latest release`: https://docs.messageix.org/en/master/whatsnew.html#what-s-new
 .. _`GAMS`: http://www.gams.com
-.. _`latest version`: https://www.gams.com/download/
 .. _`version 29`: https://www.gams.com/29/
 .. _`Graphviz`: https://www.graphviz.org/
 .. _`its conda-forge package`: https://anaconda.org/conda-forge/graphviz
@@ -123,3 +153,35 @@ If you get an error containing “No JVM shared library file (jvm.dll) found” 
 .. _`Github Desktop`: https://desktop.github.com
 .. _`README`: https://github.com/iiasa/message_ix#install-from-source-advanced-users
 .. _`these instructions`: https://javatutorial.net/set-java-home-windows-10
+
+JPype1 segfautls
+----------------
+The symptom: crashes or segfaults when the JVM is started:
+
+.. code-block::
+    >           self.jindex[ts].readSolutionFromGDX(*args)
+    E           TypeError: Ambiguous overloads found for at.ac.iiasa.ixmp.objects.MsgScenario.readSolutionFromGDX(str,str,str,java.util.LinkedList,java.util.LinkedList,bool) between:
+    E           	public void at.ac.iiasa.ixmp.objects.MsgScenario.readSolutionFromGDX(java.lang.String,java.lang.String,java.lang.String,java.util.List,java.util.List,boolean) throws at.ac.iiasa.ixmp.exceptions.IxException
+    E           	public void at.ac.iiasa.ixmp.objects.Scenario.readSolutionFromGDX(java.lang.String,java.lang.String,java.lang.String,java.util.LinkedList,java.util.LinkedList,boolean) throws at.ac.iiasa.ixmp.exceptions.IxException
+
+    ../../../miniconda/envs/testing/lib/python3.8/site-packages/ixmp/backend/jdbc.py:346: TypeError
+
+There are two ways of checking this error:
+
+a. Run a Python script (.py) containing::
+
+    $ import ixmp
+    $ ixmp.Platform()
+
+b. Run in the command line of the “Anaconda Prompt”::
+
+    $ ixmp --platform default list
+
+If the (error snippet) appears, user should run these two extra commands::
+
+    # To see (a) whether conda openjdk is installed, and (b) whether it comes from conda-forge:
+    $ conda list openjdk
+
+    # To force installation of the version from conda-forge:
+    $ conda install -c conda-forge --override-channels openjdk
+
