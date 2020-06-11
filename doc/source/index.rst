@@ -37,7 +37,7 @@ Getting Started
    This overcomes limitations of toctree, allowing introductory paragraphs, and different titles in this page than in the sidebar.
 
 - :doc:`framework`
-- :doc:`getting_started`
+- :doc:`install`
 - :doc:`tutorials`
 
 .. toctree::
@@ -45,7 +45,7 @@ Getting Started
    :caption: Getting Started
 
    framework
-   getting_started
+   install
    tutorials
 
 

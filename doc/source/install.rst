@@ -21,3 +21,4 @@ You can also set the ``message model dir`` configuration key so that this copy o
 …or do both in one step::
 
     $ message-ix copy-model --set-default /path/for/model/files
+
