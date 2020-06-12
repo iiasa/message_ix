@@ -3,11 +3,12 @@
 name: miniconda
 
 on:
-  push:
-    branches: [conda-check]
   # 05:00 UTC = 06:00 CET = 07:00 CEST
-  # schedule:
-  # - cron: "0 5 * * *"
+  schedule:
+  - cron: "0 5 * * *"
+  # Uncomment to debug
+  # pull_request:
+  #   branches: [ master]
 
 jobs:
   miniconda:
