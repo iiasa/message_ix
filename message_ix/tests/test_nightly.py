@@ -1,6 +1,5 @@
 """Slow-running tests for nightly continuous integration."""
 from functools import partial  # noqa: F401
-import os
 
 import ixmp
 import message_ix
@@ -12,16 +11,9 @@ import numpy as np  # noqa: F401
 import pytest
 
 
-pytestmark = pytest.mark.skipif(
-    os.environ.get('TRAVIS_EVENT_TYPE', '') != 'cron'
-    or os.environ.get('TRAVIS_OS_NAME', '') == 'osx',
-    reason="Nightly scenario tests only run on Travis 'cron' events.")
-
-# # For development/debugging, uncomment the following
-# pytestmark = pytest.mark.skipif(
-#     'TRAVIS_EVENT_TYPE' not in os.environ or
-#     os.environ.get('TRAVIS_OS_NAME', '') == 'osx',
-#     reason='Run on all Travis jobs, for debugging.')
+# In setup.cfg, the pytest argument -m "not nightly" is given by default.
+# To force running these tests only, give -m nightly or comment this line.
+pytestmark = pytest.mark.nightly
 
 
 # Information about nightly scenarios to run

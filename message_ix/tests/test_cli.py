@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 import re
 
@@ -30,16 +29,6 @@ def test_copy_model(message_ix_cli, tmp_path, tmp_env):
     assert config.get('message model dir') == tmp_path
 
 
-@pytest.mark.skipif(
-    condition=(
-        os.environ.get("APPVEYOR", "") == "True" or  # noqa: W504
-        os.environ.get("TRAVIS_PULL_REQUEST_SLUG", "") != "iiasa/message_ix"
-    ),
-    reason=(
-        "Cannot use encrypted MESSAGE_IX_GH_PW to avoid GitHub API rate limits"
-        " for PR on AppVeyor, or on Travis from fork"
-    )
-)
 @pytest.mark.parametrize('opts', [
     '',
     '--branch=master',
