@@ -64,9 +64,9 @@ jobs:
       with:
         path: |
           gams
-          $HOME/.cache/pip
-          $HOME/Library/Caches/pip
-          $HOME/appdata/local/pip/cache
+          ~/.cache/pip
+          ~/Library/Caches/pip
+          ~/appdata/local/pip/cache
           ${{ env.R_LIBS_USER }}
         key: ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-py${{ matrix.python-version }}
         restore-keys: |
