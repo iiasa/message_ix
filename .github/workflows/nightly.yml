@@ -4,8 +4,8 @@ name: nightly
 
 on:
   # Uncomment for debugging
-  pull_request:
-    branches: [ master ]
+  # pull_request:
+  #   branches: [ master ]
   # 05:00 UTC = 06:00 CET = 07:00 CEST
   schedule:
   - cron: "0 5 * * *"
@@ -54,9 +54,6 @@ jobs:
       env:
         CI_OS: ubuntu
       run: ixmp/ci/install-gams.sh
-
-    - name: Check GAMS
-      run: gams
 
     - name: Install Python packages and dependencies
       run: |
