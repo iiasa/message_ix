@@ -1,0 +1,76 @@
+name: lint
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  # For setuptools-scm. With fetch --tags below, this ensures that
+  # enough history is fetched to contain the latest tag, so that
+  # setuptools-scm can generate the version number. Update:
+  # - See https://github.com/iiasa/ixmp/releases, at "NN commits to
+  #   master since this release". The value should be at least equal to
+  #   NN + the number of commits on any PR branch.
+  # - Reset to a lower value, e.g. 100, after a new release.
+  depth: 100
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    continue-on-error: true
+
+    steps:
+    - name: Check out ixmp
+      uses: actions/checkout@v2
+      with:
+        repository: iiasa/ixmp
+        path: ixmp
+        fetch-depth: ${{ env.depth }}
+
+    - name: Check out message_ix
+      uses: actions/checkout@v2
+      with:
+        path: message_ix
+        fetch-depth: ${{ env.depth }}
+
+    - name: Fetch tags (for setuptools-scm)
+      run: |
+        (cd ixmp; git fetch --tags --depth=${{ env.depth }})
+        (cd message_ix; git fetch --tags --depth=${{ env.depth }})
+      shell: bash
+
+    - uses: actions/setup-python@v2
+
+    - name: Cache Python packages
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cache/pip
+          ~/Library/Caches/pip
+          ~/appdata/local/pip/cache
+        key: lint-${{ runner.os }}
+
+    - name: Upgrade pip, wheel
+      run: python -m pip install --upgrade pip wheel
+
+    - name: Lint with flake8
+      working-directory: message_ix
+      run: |
+        pip install flake8
+        flake8 --count --max-complexity=38 --show-source --statistics
+
+    - name: Test package build
+      working-directory: message_ix
+      run: |
+        pip install twine wheel
+        python3 setup.py bdist_wheel sdist
+        twine check dist/*
+
+    - name: Test documentation build
+      run: |
+        pip install ./ixmp[doc,tests,tutorial]
+        pip install ./message_ix[docs,reporting,tests,tutorial]
+        make --directory=message_ix/doc html
