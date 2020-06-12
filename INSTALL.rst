@@ -25,7 +25,7 @@ GAMS (required)
 
    - on other platforms (macOS or Linux), add the following line to a file such as :file:`~/.bash_profile` (macOS), :file:`~/.bashrc`, or :file:`~/.profile`::
 
-       export PATH=$PATH:/path/to/gams-directory-with-gams-binary
+       $ export PATH=$PATH:/path/to/gams-directory-with-gams-binary
 
 .. note::
    MESSAGE-MACRO and MACRO require GAMS 24.8.1 or later (see :attr:`.MACRO.GAMS_min_version`)
@@ -56,16 +56,40 @@ Install |MESSAGEix| via Anaconda
 After installing GAMS, we recommend that new users install Anaconda, and then use it to install |MESSAGEix|.
 Advanced users may choose to install |MESSAGEix| from source code (next section).
 
-4. Install Python via `Anaconda`_.
-   We recommend the latest version; currently Python 3.8.
+4. Install Python via either `Miniconda`_ or `Anaconda`_. [1]_
+   We recommend the latest version; currently Python 3.7.
 
 5. Open a command prompt.
-   We recommend Windows users use the “Anaconda Prompt” to avoid permissions issues when installing and using |MESSAGEix|.
+   Windows users should use the “Anaconda Prompt” to avoid issues with permissions and environment variables when installing and using |MESSAGEix|.
    This program is available in the Windows Start menu after installing Anaconda.
 
-6. Install the ``message-ix`` package::
+6. Configure conda to install :mod:`message_ix` from the conda-forge channel [2]_::
 
-    $ conda install -c conda-forge message-ix
+    $ conda config --prepend channels conda-forge
+
+7. Create a new conda enviroment.
+   This step is **required** if using Anaconda, and *optional* if using Miniconda.
+   This example uses the name ``message``, but you can use any name of your choice::
+
+    $ conda create --name message
+    $ conda activate message
+
+8. Install the ``message-ix`` package into the current environment (either ``base``, or another name from step 7, e.g. ``message``) [3]_::
+
+    $ conda install message-ix
+
+Check your install by running some commands from the command-line interface::
+
+    # Show versions of message_ix, ixmp, and key dependencies
+    $ message-ix show-versions
+
+    # Show the contents of the default local Platform (empty on install)
+    $ message-ix --platform=default list
+
+.. [1] See the `conda glossary`_ for the differences between Anaconda and Miniconda, and the definitions of the terms ‘channel’ and ‘environment’ here.
+.. [2] The ‘$’ character at the start of these lines indicates that the command text should be entered in the terminal or prompt, depending on the operating system.
+       Do not retype the ‘$’ character itself.
+.. [3] Notice that conda uses the hyphen (‘-’) in package names, different from the underscore (‘_’) used in Python when importing the package.
 
 
 Install |MESSAGEix| from source
@@ -88,8 +112,8 @@ Install |MESSAGEix| from source
 
     $ pip install --editable .[docs,reporting,tests,tutorial]
 
-   The ``--editable`` flag ensures that changes to the source code are picked up every time ``import message_ix`` is used in Python code.
-   The ``[docs,reporting,tests,tutorial]`` extra dependencies ensure additional dependencies are installed.
+   The ``--editable`` flag ensures that changes to the source code are picked up every time :code:`import message_ix` is used in Python code.
+   The ``[docs,reporting,tests,tutorial]`` extra requirements ensure additional dependencies are installed.
 
 8. (Optional) If you will be using :file:`MESSAGE_master.gms` outside of Python :mod:`message_ix` to run |MESSAGEix|, you will likely modify this file, but will not want to commit these changes to Git.
    Set the Git “assume unchanged” bit for this file::
@@ -107,10 +131,20 @@ Install |MESSAGEix| from source
 Common issues
 =============
 
-No JVM shared library file (jvm.dll) found
-------------------------------------------
+“No JVM shared library file (jvm.dll) found”
+--------------------------------------------
 
-If you get an error containing “No JVM shared library file (jvm.dll) found” when creating a :class:`Platform` object (e.g. ``mp = ix.Platform(driver='HSQLDB')``), it is likely that you need to set the ``JAVA_HOME`` environment variable (see for example `these instructions`_).
+Error messages like this when running ``message-ix --platform=default list`` or when creating a :class:`Platform` object (e.g. :code:`ixmp.Platform()` in Python) indicate that :mod:`message_ix` (via :mod:`ixmp` and JPype) cannot find Java on your machine, in particular the Java Virtual Machine (JVM).
+There are multiple ways to resolve this issue:
+
+1. If you have installed Java manually, ensure that the ``JAVA_HOME`` environment variable is set system-wide; see for example `these instructions`_ for Windows users.
+2. If using Anaconda, install the ``openjdk`` package in the same environment as the ``message-ix`` package.
+   When the Windows Anaconda Prompt is opened, ``conda activate`` then ensures the ``JAVA_HOME`` variable is correctly set.
+
+To check which JVM will be used by ixmp, run the following in any prompt or terminal::
+
+    $ python -c "import jpype; print(jpype.getDefaultJVMPath())"
+
 
 .. _`GAMS`: http://www.gams.com
 .. _`latest version`: https://www.gams.com/download/
@@ -118,7 +152,9 @@ If you get an error containing “No JVM shared library file (jvm.dll) found” 
 .. _`Graphviz`: https://www.graphviz.org/
 .. _`its conda-forge package`: https://anaconda.org/conda-forge/graphviz
 .. _`Graphviz download page`: https://www.graphviz.org/download/
-.. _`Anaconda`: https://www.anaconda.com/distribution/#download-section
+.. _`Miniconda`: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
+.. _`Anaconda`: https://docs.continuum.io/anaconda/install/
+.. _`conda glossary`: https://docs.conda.io/projects/conda/en/latest/glossary.html
 .. _`ixmp`: https://github.com/iiasa/ixmp
 .. _`Github Desktop`: https://desktop.github.com
 .. _`README`: https://github.com/iiasa/message_ix#install-from-source-advanced-users
