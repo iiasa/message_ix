@@ -1,9 +1,0 @@
-# Always track ixmp master
-git+git://github.com/iiasa/ixmp.git@master#egg=ixmp
-
-# Temporary, while conda-forge lacks this version. See iiasa/ixmp#279.
-JPype1 >= 0.7.5
-
-# pyam-iamc
-# Temporary: see https://github.com/IAMconsortium/pyam/issues/259
-git+git://github.com/IAMconsortium/pyam.git@v0.6.0#egg=pyam-iamc
