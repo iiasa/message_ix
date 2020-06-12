@@ -105,6 +105,9 @@ __ https://help.github.com/en/github/collaborating-with-issues-and-pull-requests
      They download a particular package of full-scale, MESSAGEix-GLOBIOM global model scenarios from IIASA servers.
      Each scenario's outputs are compared to an expected value.
 
+  anaconda, miniconda
+     These workflows check that the package can be installed from conda-forge using Anaconda and Miniconda, respectively, on Windows only.
+
 Resolve any non-passing checks—seeking help if needed.
 
 If your PR updates the documentation, the ``lint`` check will confirm that it can be built.

@@ -1,6 +1,6 @@
 # Verify that installation from conda-forge works as intended
 
-name: conda
+name: anaconda
 
 on:
   # 05:00 UTC = 06:00 CET = 07:00 CEST
@@ -15,7 +15,7 @@ env:
   CONDA_ENV: testenv
 
 jobs:
-  conda:
+  anaconda:
     runs-on: windows-latest
 
     steps:
