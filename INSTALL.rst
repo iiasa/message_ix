@@ -83,7 +83,7 @@ Alternatively to *Steps 5. and 6.*, :mod:`message_ix` can also be installed usin
 Install |MESSAGEix| via pip
 ===========================
 
-As an alternative to *Steps 6., 7. and 8.* above, ``message-ix`` and its dependencies can also be installed using `pip`_::
+As an alternative to *Steps 6., 7. and 8.* above, the ``message-ix`` package and its dependencies can also be installed using `pip`_::
 
     $ pip install message-ix
 
