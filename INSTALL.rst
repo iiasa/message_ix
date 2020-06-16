@@ -67,7 +67,7 @@ Advanced users may choose to install |MESSAGEix| from source code (next section)
 
     $ conda config --prepend channels conda-forge
 
-Alternatively to *Steps 5. and 6.*, ``message-ix`` can also be installed using the **“Anaconda Navigator”** (see instructions `here`_)
+Alternatively to *Steps 5. and 6.*, :mod:`message_ix` can also be installed using the **“Anaconda Navigator”** (see instructions `here`_)
 
 7. Create a new conda environment.
    This step is **required** if using Anaconda, and *optional* if using Miniconda.
