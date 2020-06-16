@@ -157,7 +157,7 @@ Common issues
 “No JVM shared library file (jvm.dll) found”
 --------------------------------------------
 
-Error messages like this when running ``message-ix --platform=default list`` or when creating a :class:`Platform` object (e.g. :code:`ixmp.Platform()` in Python) indicate that :mod:`message_ix` (via :mod:`ixmp` and JPype) cannot find Java on your machine, in particular the Java Virtual Machine (JVM).
+Error messages like this when running ``message-ix --platform=default list`` or when creating a :class:`ixmp.Platform` object (e.g. :code:`ixmp.Platform()` in Python) indicate that :mod:`message_ix` (via :mod:`ixmp` and JPype) cannot find Java on your machine, in particular the Java Virtual Machine (JVM).
 There are multiple ways to resolve this issue:
 
 1. If you have installed Java manually, ensure that the ``JAVA_HOME`` environment variable is set system-wide; see for example `these instructions`_ for Windows users.
