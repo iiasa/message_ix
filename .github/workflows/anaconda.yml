@@ -1,0 +1,57 @@
+# Verify that installation from conda-forge works as intended
+
+name: anaconda
+
+on:
+  # 05:00 UTC = 06:00 CET = 07:00 CEST
+  schedule:
+  - cron: "0 5 * * *"
+  # Uncomment to debug
+  # pull_request:
+  #   branches: [ master]
+
+env:
+  # Name of the test environment to create
+  CONDA_ENV: testenv
+
+jobs:
+  anaconda:
+    runs-on: windows-latest
+
+    steps:
+    - name: Cache Anaconda installer, conda packages
+      uses: actions/cache@v2
+      with:
+        path: |
+          $CONDA/pkgs
+          ~/.conda/pkgs
+          ~/anaconda3/pkgs
+          ~/appdata/local/conda/conda/pkgs
+          ${{ github.workspace }}/Anaconda*.exe
+        key: windows-latest
+
+    - name: Download and install Anaconda; add to PATH
+      working-directory: ${{ github.workspace }}
+      run: |
+        curl -O https://repo.anaconda.com/archive/Anaconda3-2020.02-Windows-x86_64.exe
+        Start-Process "Anaconda3-2020.02-Windows-x86_64.exe" "/S", "/D=${env:GITHUB_WORKSPACE}\anaconda3" -Wait
+        Write-Output "::add-path::${env:GITHUB_WORKSPACE}/anaconda3/Scripts"
+
+    - name: Configure PowerShell for "conda activate"
+      run: conda init powershell
+
+    - name: Install message-ix
+      run: |
+        conda config --prepend channels conda-forge
+        conda create --name ${{ env.CONDA_ENV }} --quiet message-ix
+
+    - name: Check
+      run: |
+        conda activate ${{ env.CONDA_ENV }}
+
+        conda info
+
+        message-ix show-versions
+        ixmp --platform default list
+
+        conda list

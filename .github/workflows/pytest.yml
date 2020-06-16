@@ -1,0 +1,143 @@
+name: pytest
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  GAMS_VERSION: 25.1.1
+  # See description in lint.yml
+  depth: 100
+
+jobs:
+  pytest:
+    strategy:
+      matrix:
+        os:
+        - macos-latest
+        - ubuntu-latest
+        - windows-latest
+        python-version:
+        - '3.6' # Earliest supported by ixmp
+        - '3.8' # Latest available
+
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} py${{ matrix.python-version }}
+
+    steps:
+    - name: Check out ixmp
+      uses: actions/checkout@v2
+      with:
+        repository: iiasa/ixmp
+        path: ixmp
+        fetch-depth: ${{ env.depth }}
+
+    - name: Check out message_ix
+      uses: actions/checkout@v2
+      with:
+        path: message_ix
+        fetch-depth: ${{ env.depth }}
+
+    - name: Fetch tags (for setuptools-scm)
+      run: |
+        (cd ixmp; git fetch --tags --depth=${{ env.depth }})
+        (cd message_ix; git fetch --tags --depth=${{ env.depth }})
+      shell: bash
+
+    - uses: actions/setup-python@v2
+    - uses: r-lib/actions/setup-r@master
+
+    - name: Use OpenJDK 14 (macOS only)
+      # Using the default OpenJDK 1.8 on the macos-latest runner produces
+      # "Abort trap: 6" when JPype1 starts the JVM
+      if: ${{ startsWith(matrix.os, 'macos') }}
+      uses: actions/setup-java@v1
+      with:
+        java-version: '14'
+
+    - name: Cache GAMS installer, Python packages, and R packages
+      uses: actions/cache@v2
+      with:
+        path: |
+          gams
+          ~/.cache/pip
+          ~/Library/Caches/pip
+          ~/appdata/local/pip/cache
+          ${{ env.R_LIBS_USER }}
+        key: ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-py${{ matrix.python-version }}
+        restore-keys: |
+          ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-
+          ${{ matrix.os }}-
+
+    - name: Install GAMS and Graphviz
+      # Use the scripts from the checked-out ixmp repo
+      env:
+        CI_OS: ${{ matrix.os }}
+      run: |
+        ixmp/ci/install-gams.sh
+        ixmp/ci/install-graphviz.sh
+      shell: bash
+
+    - name: Check GAMS
+      run: gams
+      shell: bash
+
+    - name: Upgrade pip, wheel, setuptools-scm
+      run: python -m pip install --upgrade pip wheel setuptools-scm
+
+    - name: Install ixmp and dependencies
+      working-directory: ixmp
+      run: pip install .
+
+    - name: Install Python package and dependencies
+      working-directory: message_ix
+      run: pip install .[docs,reporting,tests,tutorial]
+
+    - name: Install system R dependencies (Linux only)
+      # This is faster than allowing remotes::install_deps() to do the
+      # installation, below. However, not all packages are available in 18.04.
+      # TODO install more of the Linux dependencies in this way to speed up.
+      if: ${{ contains(matrix.os, 'ubuntu') }}
+      run: sudo apt install -q libcurl4-openssl-dev r-cran-devtools
+
+    - name: Set RETICULATE_PYTHON (Windows only)
+      # Without this, reticulate tries to use Python 2.7 in the next step
+      if: ${{ contains(matrix.os, 'windows') }}
+      run: |
+        Write-Host "::set-env name=RETICULATE_PYTHON::${{ env.PYTHONLOCATION }}\python.exe"
+
+    - name: Install Rixmp and dependencies
+      # To debug, add lines line:
+      # print(reticulate::py_config())
+      # reticulate::py_run_string("import os; print(os.environ)")
+      working-directory: ixmp
+      run: |
+        install.packages(c("devtools", "remotes", "IRkernel"))
+        remotes::install_cran("rcmdcheck")
+        remotes::install_deps("rixmp", dependencies = TRUE)
+
+        # Set up R Jupyter kernel for tutorial notebooks
+        IRkernel::installspec()
+
+        # --no-multiarch avoids building arch=i386 on Windows, which is not
+        # needed and causes errors
+        devtools::install("rixmp", args = "--no-multiarch")
+      shell: Rscript {0}
+
+    - name: Run test suite using pytest
+      env:
+        # MESSAGE_IX_CI_USER: ${{ secret. }}
+        # MESSAGE_IX_CI_PW: ${{ secret. }}
+        MESSAGE_IX_GH_USER: ${{ secrets.GH_API_USER }}
+        MESSAGE_IX_GH_PW: ${{ secrets.GH_API_PASS }}
+      working-directory: message_ix
+      run: pytest message_ix --verbose --cov-report=xml
+
+    - name: Upload test coverage to Codecov.io
+      uses: codecov/codecov-action@v1
+      with:
+        file: message_ix/coverage.xml

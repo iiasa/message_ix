@@ -2,8 +2,6 @@ version: 2
 
 python:
   install:
-  # ixmp master must be installed first
-  - requirements: ci/pip-requirements.txt
-  - path: .
-    extra_requirements:
-    - docs
+  - method: pip
+    path: .
+    extra_requirements: [docs]
