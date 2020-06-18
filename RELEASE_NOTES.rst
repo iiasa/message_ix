@@ -13,6 +13,7 @@ See the updated page for :doc:`rmessageix`, and the updated instructions on how 
 All changes
 -----------
 
+- :pull:`368`: Update the Westeros :doc:`tutorial <tutorials>` on firm capacity.
 - :pull:`473`: Remove ``rmessageix``.
 - Expand documentation of :ref:`commodity storage <gams-storage>` sets, parameters, and equations.
 - :pull:`450`: Add two new Westeros :doc:`tutorial <tutorials>` on creating scenarios from Excel files.
@@ -66,6 +67,7 @@ All changes
 - :pull:`286`, :pull:`381`, :pull:`389`: Improve :meth:`.add_horizon` to also set ``duration_period``; add documentation of :doc:`time`.
 - :pull:`377`: Improve the :doc:`rmessageix <rmessageix>` R package, tutorials, and expand documentation and installation instructions.
 - :pull:`382`: Update discount factor from ``df_year`` to ``df_period`` in documentation of the objective function to match the GAMS formulation.
+
 
 v3.0.0 (2020-06-07)
 ===================
