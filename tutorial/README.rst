@@ -88,6 +88,8 @@ uses it to illustrate a range of framework features.
       wind *requires* and coal *supplies* flexibility.
    #. Variablity in energy supply and demand by adding sub-annual time steps,
       e.g. winter and summer (`westeros_seasonality.ipynb`_).
+   #. Using share constraints to depict policies, e.g. requiring renewables to make a 
+      a certain share of total electricity generation (`westeros_share_constraint.ipynb`_).
 
 #. After the MESSAGE model has solved, use the :mod:`.message_ix.reporting`
    module to ‘report’ results, e.g. do post-processing, plotting, and other
@@ -99,6 +101,7 @@ uses it to illustrate a range of framework features.
 .. _westeros_firm_capacity.ipynb:       https://github.com/iiasa/message_ix/blob/v3.0.0/tutorial/westeros/westeros_firm_capacity.ipynb
 .. _westeros_flexible_generation.ipynb: https://github.com/iiasa/message_ix/blob/v3.0.0/tutorial/westeros/westeros_flexible_generation.ipynb
 .. _westeros_seasonality.ipynb:         https://github.com/iiasa/message_ix/blob/v3.0.0/tutorial/westeros/westeros_seasonality.ipynb
+.. _westeros_share_constraint.ipynb:    https://github.com/iiasa/message_ix/blob/v3.0.0/tutorial/westeros/westeros_share_constraint.ipynb
 .. _westeros_report.ipynb:              https://github.com/iiasa/message_ix/blob/v3.0.0/tutorial/westeros/westeros_report.ipynb
 
 
