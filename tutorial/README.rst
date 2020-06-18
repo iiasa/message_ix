@@ -94,14 +94,16 @@ uses it to illustrate a range of framework features.
 
    #. Renewables
 
-      #. Represent both coal and wind electricity using a “firm capacity”
+      #. Represent both coal and wind electricity using a ï¿½firm capacityï¿½
          formulation (:tut:`westeros/westeros_firm_capacity.ipynb`): each
          generation technology can supply some firm capacity, but the variable,
          renewable technology (wind) supplies less than coal.
-      #. Represent coal and wind electricity using a different, “flexibility
-         requirement” formulation
+      #. Represent coal and wind electricity using a different, ï¿½flexibility
+         requirementï¿½ formulation
          (:tut:`westeros/westeros_flexible_generation.ipynb`), wherein wind
          *requires* and coal *supplies* flexibility.
+      #. Add a renewable-resource supply curve for the wind power plant,
+         (:tut:`westeros_renewable_resource.ipynb`).
 
    #. Variablity in energy supply and demand by adding sub-annual time steps,
       e.g. winter and summer (:tut:`westeros/westeros_seasonality.ipynb`).
@@ -115,12 +117,12 @@ uses it to illustrate a range of framework features.
       (:tut:`westeros/westeros_addon_technologies.ipynb`).
    #. Build the baseline scenario using data stored in xlsx files to populate sets and
       parameters.
-      
+
       #. Export data to and Excel file and import the data to create a new scenario
          (:tut:`westeros/westeros_baseline_using_xlsx_import_part1.ipynb`).
       #. Import data from multiple excel files to create a new scenario
          (:tut:`westeros/westeros_baseline_using_xlsx_import_part2.ipynb`).
-               
+
 #. After the MESSAGE model has solved, use the :mod:`.message_ix.reporting`
    module to â€˜reportâ€™ results, e.g. do post-processing, plotting, and other
    calculations (:tut:`westeros/westeros_report.ipynb`).
