@@ -89,7 +89,7 @@ uses it to illustrate a range of framework features.
    #. Variablity in energy supply and demand by adding sub-annual time steps,
       e.g. winter and summer (`westeros_seasonality.ipynb`_).
    #. Add a fossil-resource supply curve for the coal power plant,
-      e.g. winter and summer (`westeros_fossil_resource.ipynb`_).
+      (`westeros_fossil_resource.ipynb`_).
 
 #. After the MESSAGE model has solved, use the :mod:`.message_ix.reporting`
    module to ‘report’ results, e.g. do post-processing, plotting, and other
