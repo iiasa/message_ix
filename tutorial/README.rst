@@ -107,9 +107,13 @@ uses it to illustrate a range of framework features.
       (:tut:`westeros/westeros_share_constraint.ipynb`).
    #. Add a fossil-resource supply curve for the coal power plant,
       (:tut:`westeros/westeros_fossil_resource.ipynb`).
-   #. After the MESSAGE model has solved, use the :mod:`.message_ix.reporting`
-      module to ‘report’ results, e.g. do post-processing, plotting, and other
-      calculations (:tut:`westeros/westeros_report.ipynb`).
+   #. Add-on technologies: Add the possibility of co-generation for the coal
+      power plant, by allowing it to produce heat via a passout-turbine
+      (:tut:`westeros/westeros_addon_technologies.ipynb`).
+
+#. After the MESSAGE model has solved, use the :mod:`.message_ix.reporting`
+   module to ‘report’ results, e.g. do post-processing, plotting, and other
+   calculations (:tut:`westeros/westeros_report.ipynb`).
 
 
 .. _austria-tutorials:
