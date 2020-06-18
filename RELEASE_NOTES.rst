@@ -1,3 +1,8 @@
+All changes
+-----------
+
+- :pull:`367`: Add new westeros tutorial on share constraints.
+
 v3.0.0 (2020-06-07)
 ===================
 
