@@ -13,6 +13,7 @@ See the updated page for :doc:`rmessageix`, and the updated instructions on how 
 All changes
 -----------
 
+- :pull:`369`: Updates the westeros tutorial on flexibile generation.
 - :pull:`368`: Update the Westeros :doc:`tutorial <tutorials>` on firm capacity.
 - :pull:`473`: Remove ``rmessageix``.
 - Expand documentation of :ref:`commodity storage <gams-storage>` sets, parameters, and equations.
