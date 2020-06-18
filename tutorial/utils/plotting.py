@@ -114,3 +114,26 @@ class Plots(object):
         plt.ylabel('cents/kWhr')
         plt.xlabel('Year')
         plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+
+    def plot_extraction(self, baseyear=False, subset=None, bygrade=True):
+        df = self.ds.var('EXT')
+        if not baseyear:
+            df = df[df['year'] > self.firstyear]
+        if subset is not None:
+            df = df[df['commodity'].isin(subset)]
+        if bygrade:
+            df['commodity'] = df['commodity'] + '_grade-' + df['grade']
+        idx = ['year', 'commodity']
+        df = (df[idx + ['lvl']]
+              .groupby(idx)
+              .sum().
+              reset_index()
+              .pivot(index='year', columns='commodity',
+                     values='lvl')
+              .rename(columns={'lvl': 'value'})
+              )
+        df.plot.bar(stacked=True)
+        plt.title('{} Energy System Extraction'.format(self.country.title()))
+        plt.ylabel('GWa')
+        plt.xlabel('Year')
+        plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
