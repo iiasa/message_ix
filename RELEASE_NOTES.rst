@@ -1,3 +1,7 @@
+All changes
+-----------
+- :pull:`366`: Add new westeros tutorial on modeling fossil resource supply curves.
+
 v3.0.0 (2020-06-07)
 ===================
 
