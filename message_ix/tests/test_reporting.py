@@ -52,11 +52,8 @@ def test_reporter(message_test_mp):
 
     # NB the call to squeeze() drops the length-1 dimensions c-l-y-h
     obs = rep.get('demand:n-c-l-y-h').squeeze(drop=True)
-    # TODO: Squeeze on AttrSeries still returns full index, whereas xarray
-    # drops everything except node
-    obs = obs.reset_index(['c', 'l', 'y', 'h'], drop=True)
     # check_attrs False because we don't get the unit addition in bare xarray
-    assert_qty_equal(obs.sort_index(), demand, check_attrs=False)
+    assert_qty_equal(obs, demand, check_attrs=False)
 
     # ixmp.Reporter pre-populated with only model quantities and aggregates
     assert len(rep_ix.graph) == 5223
@@ -71,11 +68,11 @@ def test_reporter(message_test_mp):
     assert vom_key == 'vom:nl-t-yv-ya-m-h'
 
     # …and expected values
-    vom = (
-        rep.get(rep.full_key('ACT')) * rep.get(rep.full_key('var_cost'))
-    ).dropna()
+    var_cost = rep.get(rep.full_key('var_cost'))
+    ACT = rep.get(rep.full_key('ACT'))
+    vom = computations.product(var_cost, ACT)
     # check_attrs false because `vom` multiply above does not add units
-    assert_qty_equal(vom, rep.get(vom_key), check_attrs=False)
+    assert_qty_equal(vom, rep.get(vom_key))
 
 
 def test_reporter_from_dantzig(test_mp):
