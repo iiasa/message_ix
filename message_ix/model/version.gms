@@ -19,5 +19,5 @@
 * ixmp (Python); see https://github.com/iiasa/message_ix/issues/254. At that
 * point, both this file and MESSAGE/version_check.gms can be removed.
 
-$SETGLOBAL VERSION_MAJOR "2"
+$SETGLOBAL VERSION_MAJOR "3"
 $SETGLOBAL VERSION_MINOR "0"
