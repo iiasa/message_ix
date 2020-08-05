@@ -5,7 +5,7 @@
 #' @name rmessageix
 NULL
 
-#' @import rixmp
+#' @import reticulate
 NULL
 
 .onAttach = function(libname, pkgname){
@@ -14,9 +14,9 @@ NULL
             utils::packageDescription(pkgname)$Version) )
 }
 
-message_ix <- NULL
-
 .onLoad <- function(libname, pkgname) {
-  # Set message_ix in the global namespace
-  message_ix <<- reticulate::import("message_ix", delay_load = TRUE)
+  # Make ixmp and message_ix available in the global namespace
+  assign("ixmp", reticulate::import("ixmp", delay_load = TRUE), .GlobalEnv)
+  assign("message_ix", reticulate::import("message_ix", delay_load = TRUE),
+         .GlobalEnv)
 }
