@@ -137,6 +137,16 @@ jobs:
       working-directory: message_ix
       run: pytest message_ix --verbose --cov-report=xml
 
+    - name: Run R CMD check
+      run: |
+        rcmdcheck::rcmdcheck(
+            "rmessageix",
+            args = c("--no-manual", "--as-cran", "--no-multiarch"),
+            error_on = "warning",
+            check_dir = "check"
+        )
+      shell: Rscript {0}
+
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v1
       with:
