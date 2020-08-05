@@ -39,7 +39,7 @@ message_ix/model/MESSAGE_master.gms
 /build
 /dist
 
-# rixmp build folder and rhistory
+# rmessageix build folder and rhistory
 rmessageix/rmessageix*.zip
 rmessageix/source/inst/docum/*.html
 rmessageix/source/.Rhistory

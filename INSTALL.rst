@@ -128,10 +128,23 @@ Install |MESSAGEix| from source
     $ pytest
 
 
-8. **(Optional for R users)** Run the built-in test suite to check that |MESSAGEix| functions
-   correctly on your system, including use the ``rixmp`` package::
+Install ``rmessageix``
+======================
 
-    $ py.test --test-r
+``rmessageix`` is the R interface to |MESSAGEix|.
+Install |MESSAGEix| from source, per the previous section.
+Then:
+
+10. Open a command prompt in the :file:`message_ix/rmessageix` directory and type the following commands to build, then install, ``rmessageix``::
+
+    $ R CMD build rmessageix
+    $ R CMD INSTALL rmessageix_*.zip
+
+11. (Optional) Install `IRkernel <https://irkernel.github.io/installation/>`_, which allows running R code in Jupyter notebooks (see the link for instructions).
+   Check that the R interface works by using the built-in test suite to check that the R tutorial notebooks can be run:
+
+    $ pytest -m rmessageix
+
 
 Common issues
 =============

@@ -118,12 +118,10 @@ jobs:
 
     - name: Run test suite using pytest
       env:
-        # MESSAGE_IX_CI_USER: ${{ secret. }}
-        # MESSAGE_IX_CI_PW: ${{ secret. }}
         MESSAGE_IX_GH_USER: ${{ secrets.GH_API_USER }}
         MESSAGE_IX_GH_PW: ${{ secrets.GH_API_PASS }}
       working-directory: message_ix
-      run: pytest message_ix --verbose --cov-report=xml
+      run: pytest message_ix -m "not nightly" --verbose --cov-report=xml --color=yes
 
     - name: Run R CMD check
       run: |
