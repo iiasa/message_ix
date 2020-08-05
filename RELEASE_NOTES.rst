@@ -1,3 +1,12 @@
+Next release
+============
+
+All changes
+-----------
+
+- :pull:`377`: Improve the :doc:`rmessageix <rmessageix>` R package, tutorials, and expand documentation and installation instructions.
+
+
 v3.0.0 (2020-06-07)
 ===================
 

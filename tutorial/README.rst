@@ -102,6 +102,8 @@ uses it to illustrate a range of framework features.
 .. _westeros_report.ipynb:              https://github.com/iiasa/message_ix/blob/v3.0.0/tutorial/westeros/westeros_report.ipynb
 
 
+.. _austria-tutorials:
+
 Austrian energy system
 ----------------------
 
