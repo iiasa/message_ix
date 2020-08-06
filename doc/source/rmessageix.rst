@@ -37,10 +37,10 @@ Some tips:
 
      # ...store parameter data using year_act = ya1, ya2, or ya3
 
-  …use ``as.integer()``, ``seq.int()``, and similar methods that return integers:
+  …use ``as.integer()`` to convert:
 
   .. code-block:: R
 
      ya1 = as.integer(2010)
      ya2 = sapply(c(2020, 2030, 2040), as.integer)
-     ya3 = seq.int(2050, 2100, 10)
+     ya3 = as.integer(seq(2050, 2100, 10))
