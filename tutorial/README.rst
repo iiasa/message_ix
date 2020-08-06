@@ -102,6 +102,8 @@ uses it to illustrate a range of framework features.
 .. _westeros_report.ipynb:              https://github.com/iiasa/message_ix/blob/v3.0.0/tutorial/westeros/westeros_report.ipynb
 
 
+.. _austria-tutorials:
+
 Austrian energy system
 ----------------------
 
@@ -109,9 +111,9 @@ This tutorial demonstrates a stylized representation of a national electricity
 sector model, with several fossil and renewable power plant types.
 
 #. Prepare the base model version, in Python (`austria.ipynb`_) or in R
-   (`austria_reticulate.ipynb`_).
+   (`R_austria.ipynb`_).
 #. Plot results, in Python (`austria_load_scenario.ipynb`_) or in R
-   (`austria_load_scenario_R.ipynb`_).
+   (`R_austria_load_scenario.ipynb`_).
 #. Run a single policy scenario (`austria_single_policy.ipynb`_).
 #. Run multiple policy scenarios. This tutorial has two notebooks: an
    introduction with some exercises (`austria_multiple_policies.ipynb`_) and
@@ -119,9 +121,9 @@ sector model, with several fossil and renewable power plant types.
    (`austria_multiple_policies-answers.ipynb`_).
 
 .. _austria.ipynb:                           https://github.com/iiasa/message_ix/blob/v3.0.0/tutorial/Austrian_energy_system/austria.ipynb
-.. _austria_reticulate.ipynb:                https://github.com/iiasa/message_ix/blob/v3.0.0/tutorial/Austrian_energy_system/austria_reticulate.ipynb
+.. _R_austria.ipynb:                         https://github.com/iiasa/message_ix/blob/v3.0.0/tutorial/Austrian_energy_system/R_austria.ipynb
 .. _austria_load_scenario.ipynb:             https://github.com/iiasa/message_ix/blob/v3.0.0/tutorial/Austrian_energy_system/austria_load_scenario.ipynb
-.. _austria_load_scenario_R.ipynb:           https://github.com/iiasa/message_ix/blob/v3.0.0/tutorial/Austrian_energy_system/austria_load_scenario_R.ipynb
+.. _R_austria_load_scenario.ipynb:           https://github.com/iiasa/message_ix/blob/v3.0.0/tutorial/Austrian_energy_system/R_austria_load_scenario_R.ipynb
 .. _austria_single_policy.ipynb:             https://github.com/iiasa/message_ix/blob/v3.0.0/tutorial/Austrian_energy_system/austria_single_policy.ipynb
 .. _austria_multiple_policies.ipynb:         https://github.com/iiasa/message_ix/blob/v3.0.0/tutorial/Austrian_energy_system/austria_multiple_policies.ipynb
 .. _austria_multiple_policies-answers.ipynb: https://github.com/iiasa/message_ix/blob/v3.0.0/tutorial/Austrian_energy_system/austria_multiple_policies-answers.ipynb

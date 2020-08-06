@@ -30,12 +30,12 @@ the user behaviour, e.g. new features or fixes to existing behaviour. They are
 
 In ambiguous cases, strike them out and add a short explanation, e.g.
 
-- [x] ~Tests added.~ No change in behaviour, simply refactoring.
+- ~Add or expand tests.~ No change in behaviour, simply refactoring.
 -->
 
-- [ ] Tests added.
-- [ ] Documentation added.
-- [ ] Release notes updated.
+- [ ] Add or expand tests.
+- [ ] Add, expand, or update documentation.
+- [ ] Update release notes.
   <!-- Add a single line at the top of the “Next release” section of
        RELEASE_NOTES.rst, where '999' is the GitHub pull request number:
 
