@@ -2,7 +2,7 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/message_ix.svg)](https://pypi.python.org/pypi/message_ix/)
 [![Anaconda version](https://img.shields.io/conda/vn/conda-forge/message-ix)](https://anaconda.org/conda-forge/message-ix)
-[![Documentation build](https://readthedocs.com/projects/iiasa-energy-program-message-ix/badge/?version=master)](https://message.iiasa.ac.at/en/master/)
+[![Documentation build](https://readthedocs.com/projects/iiasa-energy-program-message-ix/badge/?version=master)](https://docs.messageix.org/en/master/)
 [![Build status](https://github.com/iiasa/message_ix/workflows/pytest/badge.svg)](https://github.com/iiasa/message_ix/actions?query=workflow:pytest)
 [![Test coverage](https://codecov.io/gh/iiasa/message_ix/branch/master/graph/badge.svg)](https://codecov.io/gh/iiasa/message_ix)
 
@@ -43,7 +43,7 @@ Please refer to the [NOTICE](NOTICE.rst) for details and user guidelines.
 
 ### Documentation
 
-[Documentation of the MESSAGEix framework](https://message.iiasa.ac.at/),
+[Documentation of the MESSAGEix framework](https://docs.messageix.org/),
 including the complete mathematical formulation and associated files, is
 automatically created from mark-up comments in the GAMS, Python, and R code.
 The online documentation is synchronized with the contents of the master branch
@@ -55,13 +55,13 @@ See `doc/README.md` for further details.
 
 ### Installation
 
-See [‘Installation’ in the documentation](https://message.iiasa.ac.at/en/stable/getting_started.html) or the file `INSTALL.rst`.
+See [‘Installation’ in the documentation](https://docs.messageix.org/en/stable/getting_started.html) or the file `INSTALL.rst`.
 
 
 ### Tutorials
 
 Several introductory tutorials are provided.
-See [‘Tutorials’ in the documentation](https://message.iiasa.ac.at/en/stable/tutorials.html) or the file
+See [‘Tutorials’ in the documentation](https://docs.messageix.org/en/stable/tutorials.html) or the file
 `tutorial/README.rst`.
 
 
