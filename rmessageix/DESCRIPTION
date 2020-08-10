@@ -23,7 +23,6 @@ Depends:
     R (>= 3.3.0),
     reticulate
 Suggests:
-    rixmp,
     testthat
 License: Apache License 2.0
 URL: https://github.com/iiasa/message_ix/
