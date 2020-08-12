@@ -107,6 +107,16 @@ def test_add_spatial_hierarchy(test_mp):
             "dp": [10, 10, 10, 20],
         },
     ),
+    # Years out of order
+    (
+        ([2030, 2010, 2020],),
+        dict(),
+        {
+            "year": [2010, 2020, 2030],
+            "fmy": [2010],
+            "dp": [10, 10, 10],
+        },
+    ),
     # Deprecated usage with a dict as the first positional argument
     (
         (dict(year=[2010, 2020]),),
@@ -118,18 +128,58 @@ def test_add_spatial_hierarchy(test_mp):
         dict(),
         {"year": [2010, 2020], "fmy": [2020], "dp": [10, 10]},
     ),
-    # TODO test ValueErrors
+    # Deprecated usage with user errors
+    pytest.param(
+        (dict(firstmodelyear=2010),),
+        dict(),
+        None,
+        marks=pytest.mark.xfail(raises=ValueError)
+    ),
+    pytest.param(
+        (dict(year=[2010, 2020], firstmodelyear=2010),),
+        dict(firstmodelyear=2020),
+        None,
+        marks=pytest.mark.xfail(raises=ValueError)
+    ),
+    pytest.param(
+        (dict(year=[2010, 2020], foo="bar"),),
+        dict(),
+        None,
+        marks=pytest.mark.xfail(raises=ValueError)
+    ),
 ])
 def test_add_horizon(test_mp, args, kwargs, exp):
     scen = Scenario(test_mp, **SCENARIO['dantzig'], version='new')
 
     # Call completes successfully
-    scen.add_horizon(*args, **kwargs)
+    if isinstance(args[0], dict):
+        with pytest.warns(
+            DeprecationWarning,
+            match=r"add_horizon\(\) with a dict\(\) argument",
+        ):
+            scen.add_horizon(*args, **kwargs)
+    else:
+        scen.add_horizon(*args, **kwargs)
 
     # Sets and parameters have the expected contents
     npt.assert_array_equal(exp["year"], scen.set("year"))
     npt.assert_array_equal(exp["fmy"], scen.cat("year", "firstmodelyear"))
     npt.assert_array_equal(exp["dp"], scen.par("duration_period")["value"])
+
+
+def test_add_horizon_repeat(test_mp, caplog):
+    """add_horizon() does not handle scenarios with existing years."""
+    scen = Scenario(test_mp, **SCENARIO['dantzig'], version='new')
+
+    # Create a base scenario
+    scen.add_horizon([2010, 2020, 2030])
+    npt.assert_array_equal([10, 10, 10], scen.par("duration_period")["value"])
+
+    with pytest.raises(
+        ValueError,
+        match=r"Scenario has year=\[2010, 2020, 2030\] and related values",
+    ):
+        scen.add_horizon([2015, 2020, 2025], firstmodelyear=2010)
 
 
 def test_vintage_and_active_years(test_mp):
