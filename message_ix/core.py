@@ -286,7 +286,7 @@ class Scenario(ixmp.Scenario):
         - The `firstmodelyear` argument can be used to set the first period
           handled by the MESSAGE optimization; this is equivalent to::
 
-          scenario.add_cat("year", "firstmodelyear", ..., is_unique=True)
+            scenario.add_cat("year", "firstmodelyear", ..., is_unique=True)
 
         - The parameter ``duration_period`` is assigned based on `year`.
           Where possible, the duration of the first period is inferred from
