@@ -292,7 +292,7 @@ class Scenario(ixmp.Scenario):
         - Parameter ``duration_period`` is assigned values based on `year`:
           The duration of periods is calculated as the interval between
           successive `year` elements, and the duration of the first period is
-          inferred from the others.
+          set to value that appears most frequently.
 
         See :doc:`time` for a detailed terminology of years and periods in
         :mod:`message_ix`.
@@ -385,7 +385,10 @@ class Scenario(ixmp.Scenario):
             # More than one period duration. Use the mode, i.e. the most common
             # duration, for the first period
             duration_first = max(set(duration), key=duration.count)
-            log.info("Using {} as duration of the first period")
+            log.info(
+                f"Using {duration_first} from {set(duration)} as duration of "
+                f"first period {year[0]}"
+            )
 
         # Add the duration_period elements for the first and subsequent periods
         # NB "y" is automatically defined by ixmp's JDBCBackend
