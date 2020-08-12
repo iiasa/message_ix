@@ -121,6 +121,7 @@ Anyone is encouraged to use the framework to develop energy system and integrate
 
 - :doc:`api`
 - :doc:`rmessageix`
+- :doc:`time`
 - :doc:`whatsnew`
 - :doc:`notice`
 - :doc:`contributing`
@@ -133,6 +134,7 @@ Anyone is encouraged to use the framework to develop energy system and integrate
 
    api
    rmessageix
+   time
    whatsnew
    notice
    contributing
