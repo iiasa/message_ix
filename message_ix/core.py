@@ -2,6 +2,7 @@ import collections
 from functools import lru_cache
 from itertools import product
 import logging
+from warnings import warn
 
 import ixmp
 from ixmp.utils import as_str_list, isscalar
@@ -319,12 +320,13 @@ class Scenario(ixmp.Scenario):
         """
         # Check arguments
         if isinstance(year, dict):
-            raise DeprecationWarning(
-                "add_horizon(year=dict(...)) is deprecated"
-            )
+            warn("add_horizon() with a dict() argument", DeprecationWarning)
 
             args = year.copy()
-            year = args.pop("year")
+            try:
+                year = args.pop("year")
+            except KeyError:
+                raise ValueError(f'"year" missing from {args}')
 
             if "firstmodelyear" in args:
                 if firstmodelyear:
@@ -334,9 +336,6 @@ class Scenario(ixmp.Scenario):
 
             if len(args):
                 raise ValueError(f"Unknown keys: {sorted(args.keys())}")
-
-            if 'year' not in year:
-                raise ValueError('"year" must be a dict key, in temporal sets')
 
         # Add the year set and category elements
         self.add_set("year", year)
@@ -361,7 +360,7 @@ class Scenario(ixmp.Scenario):
         self.add_par("duration_period", pd.DataFrame({
             "year": year,
             "value": [duration_first] + duration,
-            "unit": "year",
+            "unit": "y",
         }))
 
     def vintage_and_active_years(self, ya_args=None, in_horizon=True):

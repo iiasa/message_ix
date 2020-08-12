@@ -83,65 +83,53 @@ def test_add_spatial_hierarchy(test_mp):
     npt.assert_array_equal(obs, exp)
 
 
-def test_add_horizon(test_mp):
-    scen = Scenario(test_mp, *msg_args, version='new')
-    scen.add_horizon({'year': [2010, 2020]})
-    obs = scen.par('year')
-    exp = [2010, 2020]
-    npt.assert_array_equal(obs, exp)
+@pytest.mark.parametrize("args, kwargs, exp", [
+    # Two periods of duration 20, 1 each of duration 10 and 15
+    (
+        ([2020, 2030, 2050, 2070, 2085],),
+        dict(),
+        {
+            "year": [2020, 2030, 2050, 2070, 2085],
+            "fmy": [2020],
+            # 20 is chosen for the first period
+            "dp": [20, 10, 20, 20, 15],
+        },
+    ),
+    # Mix of positional and keyword arguments; firstmodelyear given
+    (
+        ([2020, 2030, 2040, 2060],),
+        dict(firstmodelyear=2030),
+        {
+            "year": [2020, 2030, 2040, 2060],
+            # firstmodelyear as selected
+            "fmy": [2030],
+            # 10 is chosen for the first period
+            "dp": [10, 10, 10, 20],
+        },
+    ),
+    # Deprecated usage with a dict as the first positional argument
+    (
+        (dict(year=[2010, 2020]),),
+        dict(),
+        {"year": [2010, 2020], "fmy": [2010], "dp": [10, 10]},
+    ),
+    (
+        (dict(year=[2010, 2020], firstmodelyear=2020),),
+        dict(),
+        {"year": [2010, 2020], "fmy": [2020], "dp": [10, 10]},
+    ),
+    # TODO test ValueErrors
+])
+def test_add_horizon(test_mp, args, kwargs, exp):
+    scen = Scenario(test_mp, **SCENARIO['dantzig'], version='new')
 
-    obs = scen.cat('year', 'firstmodelyear')
-    exp = [2010]
-    npt.assert_array_equal(obs, exp)
+    # Call completes successfully
+    scen.add_horizon(*args, **kwargs)
 
-    obs = scen.par('duration_period').value
-    exp = [10, 10]
-    npt.assert_array_equal(obs, exp)
-
-    scen.add_horizon({'year': [2010, 2020], 'firstmodelyear': 2020})
-    obs = scen.cat('year', 'firstmodelyear')
-    exp = [2020]
-    npt.assert_array_equal(obs, exp)
-
-    scen.add_horizon([2020, 2030, 2050, 2070, 2085])
-    obs = scen.par('year')
-    exp = [2020, 2030, 2050, 2070, 2085]
-    npt.assert_array_equal(obs, exp)
-
-    obs = scen.cat('year', 'firstmodelyear')
-    exp = [2020]
-    npt.assert_array_equal(obs, exp)
-
-    obs = scen.par('duration_period').value
-    exp = [20, 10, 20, 20, 15]
-    npt.assert_array_equal(obs, exp)
-
-    scen.add_horizon(year=[2020, 2030, 2040, 2060], firstmodelyear=2030)
-    obs = scen.par('year')
-    exp = [2020, 2030, 2040, 2060]
-    npt.assert_array_equal(obs, exp)
-
-    obs = scen.cat('year', 'firstmodelyear')
-    exp = [2030]
-    npt.assert_array_equal(obs, exp)
-
-    obs = scen.par('duration_period').value
-    exp = [10, 10, 10, 20]
-    npt.assert_array_equal(obs, exp)
-
-    scen.add_horizon([2020, 2030, 2040], 2030)
-    obs = scen.cat('year', 'firstmodelyear')
-    exp = [2030]
-    npt.assert_array_equal(obs, exp)
-
-    scen.add_horizon({'year': [2010, 2020, 2030, 2050]}, 2020)
-    obs = scen.par('year')
-    exp = [2010, 2020, 2030, 2050]
-    npt.assert_array_equal(obs, exp)
-
-    obs = scen.cat('year', 'firstmodelyear')
-    exp = [2020]
-    npt.assert_array_equal(obs, exp)
+    # Sets and parameters have the expected contents
+    npt.assert_array_equal(exp["year"], scen.set("year"))
+    npt.assert_array_equal(exp["fmy"], scen.cat("year", "firstmodelyear"))
+    npt.assert_array_equal(exp["dp"], scen.par("duration_period")["value"])
 
 
 def test_vintage_and_active_years(test_mp):
