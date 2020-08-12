@@ -278,20 +278,33 @@ class Scenario(ixmp.Scenario):
         self.add_set("map_spatial_hierarchy", hierarchy)
 
     def add_horizon(self, year=[], firstmodelyear=None):
-        """Add sets related to temporal dimensions of the model.
+        """Set the scenario time horizon via ``year`` and related categories.
 
-        Also, automatically adds the parameter 'duration_period'
-        representing the duration of each time step given plus
-        an inferred duration for the first element of the full horizon.
+        :meth:`add_horizon` acts like ``add_set("year", ...)``, except with
+        additional conveniences:
+
+        - The `firstmodelyear` argument can be used to set the first period
+          handled by the MESSAGE optimization; this is equivalent to::
+
+          scenario.add_cat("year", "firstmodelyear", ..., is_unique=True)
+
+        - The parameter ``duration_period`` is assigned based on `year`.
+          Where possible, the duration of the first period is inferred from
+          the others. See :doc:`time` for a more detailed explanation.
 
         Parameters
         ----------
-        year : either list or dict
-            Year sets.
-                If dict: "year" is a required key. "firstmodelyear" is
-                optional; if not provided, the first element of "year" is used.
+        year : list of int
+            The set of periods.
+
+            .. deprecated:: 3.1
+
+               `year` may be a :class:`dict`, wherein the "year" key must store
+               a :class:`list` of :class:`int`. A "firstmodelyear" key is
+               optional and is used for the `firstmodelyear` argument.
         firstmodelyear : int, optional
-            First time step of the model horizon.
+            First period for the model solution. If not given, the first entry
+            of `year` is used.
 
         Examples
         --------
@@ -304,52 +317,51 @@ class Scenario(ixmp.Scenario):
         >>> s.add_horizon({'year': [2010, 2020]}, 2020)
 
         """
+        # Check arguments
         if isinstance(year, dict):
+            raise DeprecationWarning(
+                "add_horizon(year=dict(...)) is deprecated"
+            )
+
+            args = year.copy()
+            year = args.pop("year")
+
+            if "firstmodelyear" in args:
+                if firstmodelyear:
+                    raise ValueError("firstmodelyear given twice")
+                else:
+                    firstmodelyear = args.pop("firstmodelyear", None)
+
+            if len(args):
+                raise ValueError(f"Unknown keys: {sorted(args.keys())}")
+
             if 'year' not in year:
                 raise ValueError('"year" must be a dict key, in temporal sets')
 
-            # Warning about using the old signature
-            # raise Warning('Using a *dict* as argument for add_horizon() is \
-            #               deprecated')
+        # Add the year set and category elements
+        self.add_set("year", year)
+        self.add_cat(
+            "year", "firstmodelyear", firstmodelyear or year[0], is_unique=True
+        )
 
-            # Define the model horizon
-            horizon = year['year']
-            self.add_set("year", horizon)
+        # Calculate the duration of all periods after the first
+        duration = [year[i] - year[i-1] for i in range(1, len(year))]
 
-            # Assign a value to the fist time step of the model horizon
-            if firstmodelyear:
-                first = firstmodelyear
-            else:
-                first = year['firstmodelyear'] if 'firstmodelyear' in year \
-                    else horizon[0]
-
-            self.add_cat('year', 'firstmodelyear', first, is_unique=True)
+        # Determine the duration of the first period
+        if len(set(duration)) == 1:
+            # All periods have the same duration; use this for the duration of
+            # the first period
+            duration_first = duration[0]
         else:
-            horizon = year
-            self.add_set("year", horizon)
-            first = firstmodelyear if firstmodelyear else horizon[0]
-            self.add_cat('year', 'firstmodelyear', first, is_unique=True)
+            # Use the mode, i.e. the most common duration
+            duration_first = max(set(duration), key=duration.count)
+            log.info("Using {} as duration of the first period")
 
-        # Automatically adding the *duration_period* parameter based on
-        # the 'year' entry.
-
-        # Calculate the duration of the different time steps in *horizon*.
-        duration = []
-        i = 1
-        while i < len(horizon):
-            duration.append(horizon[i] - horizon[i - 1])
-            i += 1
-
-        # Infer the duration of the **first** time step of *horizon* based on
-        # the most repeated time interval in *horizon*
-        def most_common(lst):
-            return max(set(lst), key=lst.count)
-        duration.insert(0, most_common(duration))
-
-        self.add_par('duration_period', pd.DataFrame({
-            'unit': 'y',
-            'value': duration,
-            'year': horizon
+        # Add the duration_period elements
+        self.add_par("duration_period", pd.DataFrame({
+            "year": year,
+            "value": [duration_first] + duration,
+            "unit": "year",
         }))
 
     def vintage_and_active_years(self, ya_args=None, in_horizon=True):
