@@ -278,7 +278,7 @@ class Scenario(ixmp.Scenario):
         self.add_set("lvl_spatial", levels)
         self.add_set("map_spatial_hierarchy", hierarchy)
 
-    def add_horizon(self, data=None, /, year=[], firstmodelyear=None):
+    def add_horizon(self, year=[], firstmodelyear=None, data=None):
         """Set the scenario time horizon via ``year`` and related categories.
 
         :meth:`add_horizon` acts like ``add_set("year", ...)``, except with
@@ -332,11 +332,20 @@ class Scenario(ixmp.Scenario):
         >>> s.add_horizon([2020, 2030, 2040])
         """
         # Check arguments
-        # NB once the deprecated signature is removed, this entire block can be
-        #    deleted, and the signature changed to:
-        #    def add_horizon(self, year=[], firstmodelyear=None):
-        if isinstance(data, dict):
-            warn("add_horizon() with a dict() argument", DeprecationWarning)
+        # NB once the deprecated signature is removed, these two 'if' blocks
+        #    and the data= argument can be deleted.
+        if isinstance(year, dict):
+            # Move a dict argument to `data` to trigger the next block
+            if data:
+                raise ValueError("both year= and data= arguments")
+            data = year
+
+        if data:
+            warn(
+                "dict() argument to add_horizon(); use year= and "
+                "firstmodelyear=",
+                DeprecationWarning
+            )
 
             try:
                 year = data.pop("year")
@@ -350,11 +359,7 @@ class Scenario(ixmp.Scenario):
                     firstmodelyear = data.pop("firstmodelyear", None)
 
             if len(data):
-                raise ValueError(f"Unknown keys: {sorted(data.keys())}")
-        elif isinstance(data, list):
-            # Copy the `data` positional argument to `year`
-            assert len(year) == 0, "both data= and year= supplied"
-            year = data
+                raise ValueError(f"unknown keys: {sorted(data.keys())}")
 
         # Check for existing years
         existing = self.set("year").tolist()
