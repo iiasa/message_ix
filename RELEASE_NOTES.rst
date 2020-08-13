@@ -6,7 +6,7 @@ All changes
 
 - :pull:`286`: Set ``duration_period`` in :meth:`.add_horizon`; add documentation of :doc:`time`.
 - :pull:`377`: Improve the :doc:`rmessageix <rmessageix>` R package, tutorials, and expand documentation and installation instructions.
-
+- :pull:`382`: Update discountfactor from `df-year` to `df-period` in the documentation of the objective function to match the function.
 
 v3.0.0 (2020-06-07)
 ===================
