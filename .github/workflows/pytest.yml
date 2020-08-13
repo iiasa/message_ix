@@ -30,6 +30,11 @@ jobs:
         #      availalable.
         # - '3.9.0-rc.1' # Development version
 
+        exclude:
+        # See https://github.com/iiasa/ixmp/issues/360
+        - os: windows-latest
+          python-version: '3.6'
+
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
