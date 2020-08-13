@@ -298,7 +298,7 @@ Equations
 * relaxations of dynamic constraints
 *
 * .. math::
-*    OBJ = \sum_{n,y \in Y^{M}} df\_year_{y} \cdot COST\_NODAL_{n,y}
+*    OBJ = \sum_{n,y \in Y^{M}} df\_period_{y} \cdot COST\_NODAL_{n,y}
 *
 ***
 OBJECTIVE..
