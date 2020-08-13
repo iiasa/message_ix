@@ -20,8 +20,15 @@ jobs:
         - ubuntu-latest
         - windows-latest
         python-version:
-        - '3.6' # Earliest supported by ixmp
-        - '3.8' # Latest available
+        - '3.6'        # Earliest supported by message_ix
+        - '3.8'        # Latest release
+        # Currently disabled: compiled binary packages are not available for
+        # some dependencies, e.g. llvmlite, numpy, pandas. Compiling these on
+        # the job runner requires a more elaborate build environment, currently
+        # out of scope.
+        # TODO enable once Python 3.9 is released and binary packages are
+        #      availalable.
+        # - '3.9.0-rc.1' # Development version
 
       fail-fast: false
 
@@ -129,10 +136,10 @@ jobs:
     - name: Run R CMD check
       run: |
         rcmdcheck::rcmdcheck(
-            "rmessageix",
-            args = c("--no-manual", "--as-cran", "--no-multiarch"),
-            error_on = "warning",
-            check_dir = "check"
+          "rmessageix",
+          args = c("--no-manual", "--as-cran", "--no-multiarch"),
+          error_on = "warning",
+          check_dir = "check"
         )
       working-directory: message_ix
       shell: Rscript {0}
