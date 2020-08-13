@@ -120,6 +120,8 @@ Using and contributing to |MESSAGEix|
 Anyone is encouraged to use the framework to develop energy system and integrated assessment models! Please see the :doc:`notice` for using the framework in scientific research. Contributions to the framework itself, which enable new features across all models, are also welcome.
 
 - :doc:`api`
+- :doc:`rmessageix`
+- :doc:`time`
 - :doc:`whatsnew`
 - :doc:`notice`
 - :doc:`contributing`
@@ -131,6 +133,8 @@ Anyone is encouraged to use the framework to develop energy system and integrate
    :caption: Help & reference
 
    api
+   rmessageix
+   time
    whatsnew
    notice
    contributing

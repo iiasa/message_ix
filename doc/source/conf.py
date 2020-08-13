@@ -107,7 +107,7 @@ extlinks = {
 
 intersphinx_mapping = {
     'dask': ('https://docs.dask.org/en/stable/', None),
-    'ixmp': ('https://message.iiasa.ac.at/projects/ixmp/en/latest/', None),
+    'ixmp': ('https://docs.messageix.org/projects/ixmp/en/latest/', None),
     # For a local build, uncomment and use the following line with a path to
     # the directory containing built HTML documentation for ixmp:
     # 'ixmp': ('/home/user/path-to-ixmp/doc/build/html', None),

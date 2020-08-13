@@ -1,20 +1,11 @@
-Python & R API
-==============
+Python API
+==========
 
-The application programming interface (API) for |MESSAGEix| model developers is implemented in Python:
+The application programming interface (API) for |MESSAGEix| model developers is implemented in Python.
+The full API is also available from R; see :doc:`rmessageix`.
 
 .. contents::
    :local:
-
-Support for R usage of the core classes is provided through the `reticulate`_ package. For instance::
-
-    > library(reticulate)
-    > ixmp <- import('ixmp')
-    > message_ix <- import('message_ix')
-    > mp <- ixmp$Platform(...)
-    > scen <- message_ix$Scenario(mp, ...)
-
-.. _`reticulate`: https://rstudio.github.io/reticulate/
 
 
 ``ixmp`` package

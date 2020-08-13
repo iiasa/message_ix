@@ -1,7 +1,13 @@
+=======
+Next release
+============
+
 All changes
 -----------
 
 - :pull:`367`: Add new westeros tutorial on share constraints.
+- :pull:`286`: Set ``duration_period`` in :meth:`.add_horizon`; add documentation of :doc:`time`.
+- :pull:`377`: Improve the :doc:`rmessageix <rmessageix>` R package, tutorials, and expand documentation and installation instructions.
 
 v3.0.0 (2020-06-07)
 ===================
@@ -16,7 +22,7 @@ When loading a Scenario created with a version of `message_ix` older than 3.0.0,
 
 See also the `migration notes for ixmp 3.0.0`_.
 
-.. _migration notes for ixmp 3.0.0: https://message.iiasa.ac.at/projects/ixmp/en/latest/whatsnew.html#v3-0-0-2020-06-05
+.. _migration notes for ixmp 3.0.0: https://docs.messageix.org/projects/ixmp/en/latest/whatsnew.html#v3-0-0-2020-06-05
 
 
 All changes

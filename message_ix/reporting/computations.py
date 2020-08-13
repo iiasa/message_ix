@@ -1,16 +1,24 @@
 # Import other comps so they can be imported from this module
-from ixmp.reporting import RENAME_DIMS
-from ixmp.reporting.computations import *        # noqa: F401, F403
-from ixmp.reporting.computations import product
-from ixmp.reporting.quantity import as_quantity
+from ixmp.reporting import RENAME_DIMS, Quantity
+from ixmp.reporting.computations import *  # noqa: F401, F403
+from ixmp.reporting.computations import add, product
 import pandas as pd
 
 from .pyam import as_pyam, concat, write_report  # noqa: F401
 
 
-def add(a, b, fill_value=0.0):
-    """Sum of *a* and *b*."""
-    return a.add(b, fill_value=fill_value).dropna()
+__all__ = [
+    # Defined here
+    "broadcast_map",
+    "map_as_qty",
+    # In .pyam
+    "as_pyam",
+    "concat",
+    "write_report",
+    # in ixmp
+    "add",
+    "product",
+]
 
 
 def map_as_qty(set_df, full_set):
@@ -46,7 +54,7 @@ def map_as_qty(set_df, full_set):
 
     return set_df.set_index([set_from, set_to])['value'] \
                  .rename_axis(index=names) \
-                 .pipe(as_quantity)
+                 .pipe(Quantity)
 
 
 def broadcast_map(quantity, map, rename={}):
