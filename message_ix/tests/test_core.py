@@ -147,6 +147,12 @@ def test_add_spatial_hierarchy(test_mp):
         None,
         marks=pytest.mark.xfail(raises=ValueError)
     ),
+    pytest.param(
+        (dict(year=[2010, 2020]),),
+        dict(data=dict(year=[2010, 2020])),
+        None,
+        marks=pytest.mark.xfail(raises=ValueError)
+    ),
 ])
 def test_add_horizon(test_mp, args, kwargs, exp):
     scen = Scenario(test_mp, **SCENARIO['dantzig'], version='new')
@@ -155,7 +161,10 @@ def test_add_horizon(test_mp, args, kwargs, exp):
     if isinstance(args[0], dict):
         with pytest.warns(
             DeprecationWarning,
-            match=r"add_horizon\(\) with a dict\(\) argument",
+            match=(
+                r"dict\(\) argument to add_horizon\(\); use year= and "
+                "firstmodelyear="
+            )
         ):
             scen.add_horizon(*args, **kwargs)
     else:

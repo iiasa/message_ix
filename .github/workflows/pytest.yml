@@ -20,8 +20,20 @@ jobs:
         - ubuntu-latest
         - windows-latest
         python-version:
-        - '3.6' # Earliest supported by ixmp
-        - '3.8' # Latest available
+        - '3.6'        # Earliest supported by message_ix
+        - '3.8'        # Latest release
+        # Currently disabled: compiled binary packages are not available for
+        # some dependencies, e.g. llvmlite, numpy, pandas. Compiling these on
+        # the job runner requires a more elaborate build environment, currently
+        # out of scope.
+        # TODO enable once Python 3.9 is released and binary packages are
+        #      availalable.
+        # - '3.9.0-rc.1' # Development version
+
+        exclude:
+        # See https://github.com/iiasa/ixmp/issues/360
+        - os: windows-latest
+          python-version: '3.6'
 
       fail-fast: false
 
@@ -49,6 +61,9 @@ jobs:
       shell: bash
 
     - uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
     - uses: r-lib/actions/setup-r@master
 
     - name: Use OpenJDK 14 (macOS only)
@@ -126,15 +141,27 @@ jobs:
     - name: Run R CMD check
       run: |
         rcmdcheck::rcmdcheck(
-            "rmessageix",
-            args = c("--no-manual", "--as-cran", "--no-multiarch"),
-            error_on = "warning",
-            check_dir = "check"
+          "rmessageix",
+          args = c("--no-manual", "--as-cran", "--no-multiarch"),
+          error_on = "warning",
+          check_dir = "check"
         )
       working-directory: message_ix
       shell: Rscript {0}
 
     - name: Upload test coverage to Codecov.io
-      uses: codecov/codecov-action@v1
-      with:
-        file: message_ix/coverage.xml
+
+      # NB would prefer to use Codecov's Action here, but it does not support
+      #    checkouts where 'path:' is used. See
+      #    https://github.com/codecov/codecov-action/pull/110
+      # uses: codecov/codecov-action@v1
+      # with:
+      #   working-directory: message_ix
+
+      # Manually download and run the codecov script in the message_ix directory
+      run: |
+        curl -o codecov.sh https://codecov.io/bash
+        chmod +x codecov.sh
+        ./codecov.sh
+      working-directory: message_ix
+      shell: bash
