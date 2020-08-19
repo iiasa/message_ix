@@ -782,8 +782,8 @@ RENEWABLES_EQUIVALENCE(node,renewable_tec,commodity,year,time)$(
 * This constraint sets the potential potential by grade as the upper bound for the auxiliary variable :math:`REN`.
 *
 *  .. math::
-*     \sum_{\substack{t,h \\ \ t \in T^{R} \subseteq t }} REN_{n,t,c,g,y,h}
-*         \leq \sum_{\substack{l \\ l \in L^{R} \subseteq L }} renewable\_potential_{n,c,g,l,y}
+*     \sum_{\substack{t,h \\ \ t \in T^{REN} \subseteq t }} REN_{n,t,c,g,y,h}
+*         \leq \sum_{\substack{l \\ l \in L^{REN} \subseteq L }} renewable\_potential_{n,c,g,l,y}
 *
 ***
 RENEWABLES_POTENTIAL_CONSTRAINT(node,commodity,grade,year)$( map_ren_grade(node,commodity,grade,year) )..
