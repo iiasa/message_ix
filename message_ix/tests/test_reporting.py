@@ -244,3 +244,17 @@ def test_reporter_convert_pyam(dantzig_reporter, caplog, tmp_path):
     # Results have the expected units
     assert all(df5['unit'] == 'centiUSD / case')
     assert_series_equal(df4['value'], df5['value'] / 100.)
+
+
+def test_concat(dantzig_reporter):
+    """pyam.concat() correctly passes through to ixmp…concat()."""
+    rep = dantzig_reporter
+
+    key = rep.add(
+        "test",
+        computations.concat,
+        "fom:nl-t-ya",
+        "vom:nl-t-ya",
+        "tom:nl-t-ya",
+    )
+    rep.get(key)
