@@ -83,7 +83,7 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
     for name, values in sets.items():
         scen.add_set(name, values)
 
-    scen.add_horizon({'year': [1962, 1963], 'firstmodelyear': 1963})
+    scen.add_horizon(year=[1962, 1963], firstmodelyear=1963)
 
     # Parameters
     par = {}
@@ -190,8 +190,10 @@ def make_westeros(mp, emissions=False, solve=False):
 
     history = [690]
     model_horizon = [700, 710, 720]
-    scen.add_horizon({'year': history + model_horizon,
-                      'firstmodelyear': model_horizon[0]})
+    scen.add_horizon(
+        year=history + model_horizon,
+        firstmodelyear=model_horizon[0]
+    )
 
     country = 'Westeros'
     scen.add_spatial_sets({'country': country})
