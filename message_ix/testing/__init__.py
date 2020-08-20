@@ -190,8 +190,10 @@ def make_westeros(mp, emissions=False, solve=False):
 
     history = [690]
     model_horizon = [700, 710, 720]
-    scen.add_horizon({'year': history + model_horizon,
-                      'firstmodelyear': model_horizon[0]})
+    scen.add_horizon(
+        year=history + model_horizon,
+        firstmodelyear=model_horizon[0]
+    )
 
     country = 'Westeros'
     scen.add_spatial_sets({'country': country})

@@ -8,8 +8,10 @@ This tool adds new modeling years to an existing :class:`message_ix.Scenario` (h
 
     history = [690]
     model_horizon = [700, 710, 720]
-    sc_ref.add_horizon({'year': history + model_horizon,
-                          'firstmodelyear': model_horizon[0]})
+    sc_ref.add_horizon(
+        year=history + model_horizon,
+        firstmodelyear=model_horizon[0]
+    )
 
 …additional years can be added after importing the add_year function::
 

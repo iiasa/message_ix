@@ -195,7 +195,7 @@ def test_vintage_and_active_years(test_mp):
     scen = Scenario(test_mp, **SCENARIO['dantzig'], version='new')
 
     years = [2000, 2010, 2020]
-    scen.add_horizon({'year': years, 'firstmodelyear': 2010})
+    scen.add_horizon(year=years, firstmodelyear=2010)
     obs = scen.vintage_and_active_years()
     exp = pd.DataFrame({'year_vtg': (2000, 2000, 2010, 2010, 2020),
                         'year_act': (2010, 2020, 2010, 2020, 2020)})
@@ -304,7 +304,7 @@ def test_years_active(test_mp):
 
     # First period length is immaterial
     duration = [1900, 5, 5, 5, 5, 10, 10]
-    scen.add_horizon({'year': years, 'firstmodelyear': years[-1]})
+    scen.add_horizon(year=years, firstmodelyear=years[-1])
     scen.add_par('duration_period',
                  pd.DataFrame(zip(years, duration), columns=['year', 'value']))
 
@@ -462,7 +462,7 @@ def test_clone(tmpdir):
     scen1 = Scenario(mp1, model='model', scenario='scenario', version='new')
     scen1.add_spatial_sets({'country': 'Austria'})
     scen1.add_set('technology', 'bar')
-    scen1.add_horizon({'year': [2010, 2020]})
+    scen1.add_horizon(year=[2010, 2020])
     scen1.commit('add minimal sets for testing')
 
     assert len(mp1.scenario_list(default=False)) == 1
