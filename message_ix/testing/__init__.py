@@ -83,7 +83,7 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
     for name, values in sets.items():
         scen.add_set(name, values)
 
-    scen.add_horizon({'year': [1962, 1963], 'firstmodelyear': 1963})
+    scen.add_horizon(year=[1962, 1963], firstmodelyear=1963)
 
     # Parameters
     par = {}
