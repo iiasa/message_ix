@@ -448,7 +448,6 @@ def test_excel_read_write(message_test_mp, tmp_path):
     assert scen2.has_par('new_par')
     assert float(scen2.par('new_par')['value']) == 2
 
-    scen2.commit('foo')  # must be checked in
     scen2.solve()
     assert np.isclose(scen2.var('OBJ')['lvl'], scen1.var('OBJ')['lvl'])
 
