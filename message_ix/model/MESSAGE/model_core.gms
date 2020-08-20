@@ -432,7 +432,6 @@ COST_ACCOUNTING_NODAL(node, year)..
 ;
 
 ***
-* Here, :math:`n^L \in N(n)` are all nodes :math:`n^L` that are sub-nodes of node :math:`n`.
 * The subset of technologies :math:`t \in T(\widehat{t})` are all tecs that belong to category :math:`\widehat{t}`,
 * and similar notation is used for emissions :math:`e \in E`.
 ***
@@ -459,6 +458,7 @@ COST_ACCOUNTING_NODAL(node, year)..
 *     \sum_{\substack{n^L,t,m,h,h^{OD} \\ y^V \leq y  \\ \ l \in L^{RES} \subseteq L }}
 *         input_{n^L,t,y^V,y,m,n,c,l,h,h^{OD}} \cdot ACT_{n^L,t,m,y,h}
 *
+* Here, :math:`n^L \in N(n)` are all nodes :math:`n^L` that are sub-nodes of node :math:`n`.
 * The set :math:`L^{RES} \subseteq L` denotes all levels for which the detailed representation of resources applies.
 ***
 EXTRACTION_EQUIVALENCE(node,commodity,year)..
