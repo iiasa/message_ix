@@ -4,7 +4,8 @@ Next release
 All changes
 -----------
 
-- :pull:`286`, :pull:`381`: Set ``duration_period`` in :meth:`.add_horizon`; add documentation of :doc:`time`.
+- :pull:`389`: Fix a bug in :func:`.pyam.concat` using *non*-pyam objects.
+- :pull:`286`, :pull:`381`, :pull:`389`: Set ``duration_period`` in :meth:`.add_horizon`; add documentation of :doc:`time`.
 - :pull:`377`: Improve the :doc:`rmessageix <rmessageix>` R package, tutorials, and expand documentation and installation instructions.
 - :pull:`382`: Update discount factor from ``df_year`` to ``df_period`` in documentation of the objective function to match the GAMS formulation.
 
