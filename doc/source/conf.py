@@ -64,7 +64,7 @@ exclude_patterns = ['_themes/*']
 rst_prolog = r"""
 .. |MESSAGEix| replace:: MESSAGE\ :emphasis:`ix`
 
-.. |ixmp| replace:: :emphasis:`ix modeling platform`
+.. |ixmp| replace:: :emphasis:`ix` modeling platform
 
 .. |IIASA| raw:: html
 
@@ -74,7 +74,7 @@ rst_prolog = r"""
 
 .. role:: underline
 
-"""
+"""  # noqa: E501
 
 # -- Options for HTML output ----------------------------------------------
 
