@@ -5,7 +5,7 @@ The |MESSAGEix| framework
    :width: 320px
    :align: right
 
-   The |ixmp| (source: :cite:`huppmann_messageix_2018`)
+   The |ixmp| (:cite:`huppmann_messageix_2018`)
 
 Overview and scope
 ------------------
@@ -36,17 +36,18 @@ Getting Started
 
    This overcomes limitations of toctree, allowing introductory paragraphs, and different titles in this page than in the sidebar.
 
+- :doc:`prereqs`
 - :doc:`framework`
-- :doc:`getting_started`
+- :doc:`install`
 - :doc:`tutorials`
 
 .. toctree::
    :hidden:
-   :caption: Getting Started
+   :caption: Getting started
 
-   framework
    prereqs
-   getting_started
+   framework
+   install
    tutorials
 
 

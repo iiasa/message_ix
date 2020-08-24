@@ -65,14 +65,14 @@ Scientific computing skills
 6. Understand or learn the basic functionality of Python data science packages, including pandas.
 7. Use a Jupyter notebook to run Python or R code, including: start the notebook server; open, restart, and close notebooks; create and edit cells.
 
-Resources
+Resources:
+
 - `Dive Into Python <https://diveinto.org/python3/table-of-contents.html>`_.
--
 
 
 Advanced usage
 ==============
-You should be able to:
+Depending on the specific use case, you should be able to:
 
 Domain knowledge
 ----------------
@@ -93,5 +93,5 @@ Scientific computing skills
    - Find and read the list of issues for a repository.
    - Search within one repository or across all of GitHub.
    - Use GitHub's formatting to produce legible descriptions of code and code errors.
-
 4. Provide a complete and explicit description of a software error message and how to reproduce it.
+5. Read and understand GAMS code.

@@ -1,5 +1,5 @@
-|MESSAGEix| framework overview
-==============================
+|MESSAGEix| model & framework
+=============================
 
 |MESSAGEix| is a *framework* that can be used to develop and run many different
 *models*, each describing a different energy system. Models in the |MESSAGEix|
