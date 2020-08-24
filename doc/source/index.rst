@@ -45,6 +45,7 @@ Getting Started
    :caption: Getting Started
 
    framework
+   prereqs
    getting_started
    tutorials
 
