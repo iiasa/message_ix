@@ -66,6 +66,10 @@ rst_prolog = r"""
 
 .. |ixmp| replace:: :emphasis:`ix modeling platform`
 
+.. |IIASA| raw:: html
+
+   <abbr title="International Institute for Applied Systems Analysis">IIASA</abbr>
+
 .. role:: strike
 
 .. role:: underline

@@ -1,4 +1,4 @@
-Prerequisite skills & knowledge
+Prerequisite knowledge & skills
 *******************************
 
 Energy systems modeling using |MESSAGEix| requires domain knowledge, understanding of certain research methods, and scientific computing skills.
