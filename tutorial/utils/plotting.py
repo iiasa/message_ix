@@ -137,3 +137,37 @@ class Plots(object):
         plt.ylabel('GWa')
         plt.xlabel('Year')
         plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+
+    def plot_fossil_supply_curve(self):
+        import matplotlib.patches as patches
+        df_cost = self.ds.par('resource_cost')
+        df_resv = self.ds.par('resource_volume').set_index('grade')
+
+        df = df_cost.groupby(['grade']).mean().drop('year', axis=1)
+        df['volume'] = df_resv['value']
+        df = df.reset_index()\
+               .pivot_table(values='value', index='volume')\
+               .reset_index()
+        ax = df.plot.scatter('volume', 'value', c='white')
+        for i in df.index:
+            tmp = df.iloc[i]
+            if i == 0:
+                # Create a Rectangle patch
+                rect = patches.Rectangle((0, 0), tmp['volume'],
+                                         tmp['value'], linewidth=.5,
+                                         edgecolor='black',
+                                         facecolor='#1f77b4')
+            else:
+                tmp2 = df.iloc[i-1]
+                # Create a Rectangle patch
+                rect = patches.Rectangle((tmp2['volume'], 0),
+                                         tmp['volume'], tmp['value'],
+                                         linewidth=.5, edgecolor='black',
+                                         facecolor='#ff7f0e')
+            # Add the patch to the Axes
+            ax.add_patch(rect)
+        ax.set_title('{} Energy System Fossil Resource Volume'.format(
+            self.country.title()))
+        ax.set_ylabel('Cost $/kWa')
+        ax.set_xlabel('Resource Volume in GWa')
+        ax.set_xlim([0, df['volume'].sum()])
