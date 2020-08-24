@@ -25,6 +25,18 @@ If you installed |MESSAGEix| using Anaconda, download the notebooks using the
 
 .. note::
 
+   If you installed :mod:`message_ix` into a specific conda environment, that
+   environment must be active in order for your system to find the
+   ``message-ix`` command-line program, and also to run the Jupyter notebooks.
+   Activate the environment `as described`_ in the conda documentation; for
+   instance, if you used the name ``message_env``::
+
+     $ conda activate message_env
+
+.. _as described: https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#activating-an-environment
+
+.. note::
+
    By default, the tutorials for your installed version of |MESSAGEix| are
    downloaded. To download a different version, add e.g. ``--tag v1.2.0`` to
    the above command. To download the tutorials from the development version,

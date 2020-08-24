@@ -5,7 +5,7 @@ Support for :mod:`message_ix` and :mod:`ixmp` in R are provided through `reticul
 
 .. _`reticulate`: https://rstudio.github.io/reticulate/
 
-See :doc:`getting_started` for instructions on installing the ``rmessageix`` R package.
+See :doc:`install` for instructions on installing the ``rmessageix`` R package.
 Once installed, load the package:
 
 .. code-block:: R
