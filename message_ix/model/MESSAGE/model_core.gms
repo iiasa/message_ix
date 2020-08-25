@@ -555,6 +555,18 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 *         \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,y^V,y,m,h^A} & \\
 *     - \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} input_{n^L,t,y^V,y,m,n,c,l,h^A,h}
 *         \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,m,y,h^A} & \\
+*     + \sum_{\substack{n^L,t}} output\_cap\_new_{n^L,t,y,n,c,l,h}
+*         \cdot CAP\_NEW_{n^L,t,y} & \\
+*     - \sum_{\substack{n^L,t}} input\_cap\_new_{n^L,t,y,n,c,l,h}
+*         \cdot CAP\_NEW_{n^L,t,y} & \\
+*     + \sum_{\substack{n^L,t \\ y^V \leq y}} output\_cap\_ret_{n^L,t,y^V,n,c,l,h}
+*         \cdot ( CAP_{n^L,t,y^V,y-1} - CAP_{n^L,t,y^V,y} ) \cdot \frac{duration\_period_y}{duration\_period_CAP_y^V} & \\
+*     - \sum_{\substack{n^L,t \\ y^V \leq y}} input\_cap\_ret_{n^L,t,y^V,n,c,l,h}
+*         \cdot ( CAP_{n^L,t,y^V,y-1} - CAP_{n^L,t,y^V,y} ) \cdot \frac{duration\_period_y}{duration\_period_CAP_y^V} & \\
+*     + \sum_{\substack{n^L,t \\ y^V \leq y}} output\_cap_{n^L,t,y^V,y,n,c,l,h}
+*         \cdot CAP_{n^L,t,y^V,y} & \\
+*     - \sum_{\substack{n^L,t \\ y^V \leq y}} input\_cap_{n^L,t,y^V,y,n,c,l,h}
+*         \cdot CAP_{n^L,t,y^V,y} & \\
 *     + \ STOCK\_CHG_{n,c,l,y,h} + \ \sum_s \Big( land\_output_{n,s,y,c,l,h} - land\_input_{n,s,y,c,l,h} \Big) \cdot & LAND_{n,s,y} \\[4pt]
 *     - \ demand\_fixed_{n,c,l,y,h}
 *     = COMMODITY\_BALANCE_{n,c,l,y,h} \quad \forall \ l \notin (L^{RES}, & L^{REN}, L^{STOR} \subseteq L)
