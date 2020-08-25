@@ -83,11 +83,119 @@ def test_add_spatial_hierarchy(test_mp):
     npt.assert_array_equal(obs, exp)
 
 
+@pytest.mark.parametrize("args, kwargs, exp", [
+    # Two periods of duration 20, 1 each of duration 10 and 15
+    (
+        ([2020, 2030, 2050, 2070, 2085],),
+        dict(),
+        {
+            "year": [2020, 2030, 2050, 2070, 2085],
+            "fmy": [2020],
+            # 20 is chosen for the first period
+            "dp": [20, 10, 20, 20, 15],
+        },
+    ),
+    # Mix of positional and keyword arguments; firstmodelyear given
+    (
+        ([2020, 2030, 2040, 2060],),
+        dict(firstmodelyear=2030),
+        {
+            "year": [2020, 2030, 2040, 2060],
+            # firstmodelyear as selected
+            "fmy": [2030],
+            # 10 is chosen for the first period
+            "dp": [10, 10, 10, 20],
+        },
+    ),
+    # Years out of order
+    (
+        ([2030, 2010, 2020],),
+        dict(),
+        {
+            "year": [2010, 2020, 2030],
+            "fmy": [2010],
+            "dp": [10, 10, 10],
+        },
+    ),
+    # Deprecated usage with a dict as the first positional argument
+    (
+        (dict(year=[2010, 2020]),),
+        dict(),
+        {"year": [2010, 2020], "fmy": [2010], "dp": [10, 10]},
+    ),
+    (
+        (dict(year=[2010, 2020], firstmodelyear=2020),),
+        dict(),
+        {"year": [2010, 2020], "fmy": [2020], "dp": [10, 10]},
+    ),
+    # Deprecated usage with user errors
+    pytest.param(
+        (dict(firstmodelyear=2010),),
+        dict(),
+        None,
+        marks=pytest.mark.xfail(raises=ValueError)
+    ),
+    pytest.param(
+        (dict(year=[2010, 2020], firstmodelyear=2010),),
+        dict(firstmodelyear=2020),
+        None,
+        marks=pytest.mark.xfail(raises=ValueError)
+    ),
+    pytest.param(
+        (dict(year=[2010, 2020], foo="bar"),),
+        dict(),
+        None,
+        marks=pytest.mark.xfail(raises=ValueError)
+    ),
+    pytest.param(
+        (dict(year=[2010, 2020]),),
+        dict(data=dict(year=[2010, 2020])),
+        None,
+        marks=pytest.mark.xfail(raises=ValueError)
+    ),
+])
+def test_add_horizon(test_mp, args, kwargs, exp):
+    scen = Scenario(test_mp, **SCENARIO['dantzig'], version='new')
+
+    # Call completes successfully
+    if isinstance(args[0], dict):
+        with pytest.warns(
+            DeprecationWarning,
+            match=(
+                r"dict\(\) argument to add_horizon\(\); use year= and "
+                "firstmodelyear="
+            )
+        ):
+            scen.add_horizon(*args, **kwargs)
+    else:
+        scen.add_horizon(*args, **kwargs)
+
+    # Sets and parameters have the expected contents
+    npt.assert_array_equal(exp["year"], scen.set("year"))
+    npt.assert_array_equal(exp["fmy"], scen.cat("year", "firstmodelyear"))
+    npt.assert_array_equal(exp["dp"], scen.par("duration_period")["value"])
+
+
+def test_add_horizon_repeat(test_mp, caplog):
+    """add_horizon() does not handle scenarios with existing years."""
+    scen = Scenario(test_mp, **SCENARIO['dantzig'], version='new')
+
+    # Create a base scenario
+    scen.add_horizon([2010, 2020, 2030])
+    npt.assert_array_equal([10, 10, 10], scen.par("duration_period")["value"])
+
+    with pytest.raises(
+        ValueError,
+        match=r"Scenario has year=\[2010, 2020, 2030\] and related values",
+    ):
+        scen.add_horizon([2015, 2020, 2025], firstmodelyear=2010)
+
+
 def test_vintage_and_active_years(test_mp):
     scen = Scenario(test_mp, **SCENARIO['dantzig'], version='new')
 
     years = [2000, 2010, 2020]
-    scen.add_horizon({'year': years, 'firstmodelyear': 2010})
+    scen.add_horizon(year=years, firstmodelyear=2010)
     obs = scen.vintage_and_active_years()
     exp = pd.DataFrame({'year_vtg': (2000, 2000, 2010, 2010, 2020),
                         'year_act': (2010, 2020, 2010, 2020, 2020)})
@@ -196,7 +304,7 @@ def test_years_active(test_mp):
 
     # First period length is immaterial
     duration = [1900, 5, 5, 5, 5, 10, 10]
-    scen.add_horizon({'year': years, 'firstmodelyear': years[-1]})
+    scen.add_horizon(year=years, firstmodelyear=years[-1])
     scen.add_par('duration_period',
                  pd.DataFrame(zip(years, duration), columns=['year', 'value']))
 
@@ -340,7 +448,6 @@ def test_excel_read_write(message_test_mp, tmp_path):
     assert scen2.has_par('new_par')
     assert float(scen2.par('new_par')['value']) == 2
 
-    scen2.commit('foo')  # must be checked in
     scen2.solve()
     assert np.isclose(scen2.var('OBJ')['lvl'], scen1.var('OBJ')['lvl'])
 
@@ -354,7 +461,7 @@ def test_clone(tmpdir):
     scen1 = Scenario(mp1, model='model', scenario='scenario', version='new')
     scen1.add_spatial_sets({'country': 'Austria'})
     scen1.add_set('technology', 'bar')
-    scen1.add_horizon({'year': [2010, 2020]})
+    scen1.add_horizon(year=[2010, 2020])
     scen1.commit('add minimal sets for testing')
 
     assert len(mp1.scenario_list(default=False)) == 1

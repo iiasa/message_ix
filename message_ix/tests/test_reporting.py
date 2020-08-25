@@ -4,7 +4,7 @@ from functools import partial
 from logging import WARNING
 from pathlib import Path
 
-from ixmp.reporting import Reporter as ixmp_Reporter, as_quantity
+from ixmp.reporting import Reporter as ixmp_Reporter, Quantity
 from ixmp.testing import assert_qty_equal
 from numpy.testing import assert_allclose
 import pandas as pd
@@ -48,15 +48,12 @@ def test_reporter(message_test_mp):
 
     # Quantities contain expected data
     dims = dict(coords=['chicago new-york topeka'.split()], dims=['n'])
-    demand = as_quantity(xr.DataArray([300, 325, 275], **dims), name='demand')
+    demand = Quantity(xr.DataArray([300, 325, 275], **dims), name='demand')
 
     # NB the call to squeeze() drops the length-1 dimensions c-l-y-h
     obs = rep.get('demand:n-c-l-y-h').squeeze(drop=True)
-    # TODO: Squeeze on AttrSeries still returns full index, whereas xarray
-    # drops everything except node
-    obs = obs.reset_index(['c', 'l', 'y', 'h'], drop=True)
     # check_attrs False because we don't get the unit addition in bare xarray
-    assert_qty_equal(obs.sort_index(), demand, check_attrs=False)
+    assert_qty_equal(obs, demand, check_attrs=False)
 
     # ixmp.Reporter pre-populated with only model quantities and aggregates
     assert len(rep_ix.graph) == 5223
@@ -71,11 +68,11 @@ def test_reporter(message_test_mp):
     assert vom_key == 'vom:nl-t-yv-ya-m-h'
 
     # …and expected values
-    vom = (
-        rep.get(rep.full_key('ACT')) * rep.get(rep.full_key('var_cost'))
-    ).dropna()
+    var_cost = rep.get(rep.full_key('var_cost'))
+    ACT = rep.get(rep.full_key('ACT'))
+    vom = computations.product(var_cost, ACT)
     # check_attrs false because `vom` multiply above does not add units
-    assert_qty_equal(vom, rep.get(vom_key), check_attrs=False)
+    assert_qty_equal(vom, rep.get(vom_key))
 
 
 def test_reporter_from_dantzig(test_mp):
@@ -247,3 +244,17 @@ def test_reporter_convert_pyam(dantzig_reporter, caplog, tmp_path):
     # Results have the expected units
     assert all(df5['unit'] == 'centiUSD / case')
     assert_series_equal(df4['value'], df5['value'] / 100.)
+
+
+def test_concat(dantzig_reporter):
+    """pyam.concat() correctly passes through to ixmp…concat()."""
+    rep = dantzig_reporter
+
+    key = rep.add(
+        "test",
+        computations.concat,
+        "fom:nl-t-ya",
+        "vom:nl-t-ya",
+        "tom:nl-t-ya",
+    )
+    rep.get(key)

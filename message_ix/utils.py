@@ -1,4 +1,4 @@
-import collections
+from collections.abc import Mapping
 import copy
 
 import pandas as pd
@@ -33,10 +33,10 @@ def make_df(base, **kwargs):
     2	bar	44
 
     """
-    if not isinstance(base, (collections.Mapping, pd.Series, pd.DataFrame)):
+    if not isinstance(base, (Mapping, pd.Series, pd.DataFrame)):
         raise ValueError('base argument must be a dictionary or Pandas object')
     base = copy.deepcopy(base)
-    if not isinstance(base, collections.Mapping):
+    if not isinstance(base, Mapping):
         base = base.to_dict()
     base.update(**kwargs)
     return pd.DataFrame(base)

@@ -20,8 +20,20 @@ jobs:
         - ubuntu-latest
         - windows-latest
         python-version:
-        - '3.6' # Earliest supported by ixmp
-        - '3.8' # Latest available
+        - '3.6'        # Earliest supported by message_ix
+        - '3.8'        # Latest release
+        # Currently disabled: compiled binary packages are not available for
+        # some dependencies, e.g. llvmlite, numpy, pandas. Compiling these on
+        # the job runner requires a more elaborate build environment, currently
+        # out of scope.
+        # TODO enable once Python 3.9 is released and binary packages are
+        #      availalable.
+        # - '3.9.0-rc.1' # Development version
+
+        exclude:
+        # See https://github.com/iiasa/ixmp/issues/360
+        - os: windows-latest
+          python-version: '3.6'
 
       fail-fast: false
 
@@ -49,6 +61,9 @@ jobs:
       shell: bash
 
     - uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
     - uses: r-lib/actions/setup-r@master
 
     - name: Use OpenJDK 14 (macOS only)
@@ -97,47 +112,56 @@ jobs:
       working-directory: message_ix
       run: pip install .[docs,reporting,tests,tutorial]
 
-    - name: Install system R dependencies (Linux only)
-      # This is faster than allowing remotes::install_deps() to do the
-      # installation, below. However, not all packages are available in 18.04.
-      # TODO install more of the Linux dependencies in this way to speed up.
-      if: ${{ contains(matrix.os, 'ubuntu') }}
-      run: sudo apt install -q libcurl4-openssl-dev r-cran-devtools
-
     - name: Set RETICULATE_PYTHON (Windows only)
       # Without this, reticulate tries to use Python 2.7 in the next step
       if: ${{ contains(matrix.os, 'windows') }}
       run: |
         Write-Host "::set-env name=RETICULATE_PYTHON::${{ env.PYTHONLOCATION }}\python.exe"
 
-    - name: Install Rixmp and dependencies
-      # To debug, add lines line:
-      # print(reticulate::py_config())
-      # reticulate::py_run_string("import os; print(os.environ)")
-      working-directory: ixmp
+    - name: Install R package, dependencies, and tutorial requirements
       run: |
-        install.packages(c("devtools", "remotes", "IRkernel"))
-        remotes::install_cran("rcmdcheck")
-        remotes::install_deps("rixmp", dependencies = TRUE)
+        install.packages("remotes")
+        remotes::install_cran(c("rcmdcheck", "dplyr", "IRkernel"))
+        remotes::install_deps("rmessageix", dependencies = TRUE)
 
-        # Set up R Jupyter kernel for tutorial notebooks
+        # For R tutorial notebooks, run via the pytest suite: set up R kernel;
+        # actually install the R package
         IRkernel::installspec()
-
-        # --no-multiarch avoids building arch=i386 on Windows, which is not
-        # needed and causes errors
-        devtools::install("rixmp", args = "--no-multiarch")
+        remotes::install_local("rmessageix")
+      working-directory: message_ix
       shell: Rscript {0}
 
     - name: Run test suite using pytest
       env:
-        # MESSAGE_IX_CI_USER: ${{ secret. }}
-        # MESSAGE_IX_CI_PW: ${{ secret. }}
         MESSAGE_IX_GH_USER: ${{ secrets.GH_API_USER }}
         MESSAGE_IX_GH_PW: ${{ secrets.GH_API_PASS }}
       working-directory: message_ix
-      run: pytest message_ix --verbose --cov-report=xml
+      run: pytest message_ix -m "not nightly" --verbose --cov-report=xml --color=yes
+
+    - name: Run R CMD check
+      run: |
+        rcmdcheck::rcmdcheck(
+          "rmessageix",
+          args = c("--no-manual", "--as-cran", "--no-multiarch"),
+          error_on = "warning",
+          check_dir = "check"
+        )
+      working-directory: message_ix
+      shell: Rscript {0}
 
     - name: Upload test coverage to Codecov.io
-      uses: codecov/codecov-action@v1
-      with:
-        file: message_ix/coverage.xml
+
+      # NB would prefer to use Codecov's Action here, but it does not support
+      #    checkouts where 'path:' is used. See
+      #    https://github.com/codecov/codecov-action/pull/110
+      # uses: codecov/codecov-action@v1
+      # with:
+      #   working-directory: message_ix
+
+      # Manually download and run the codecov script in the message_ix directory
+      run: |
+        curl -o codecov.sh https://codecov.io/bash
+        chmod +x codecov.sh
+        ./codecov.sh
+      working-directory: message_ix
+      shell: bash

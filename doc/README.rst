@@ -21,13 +21,9 @@ There are a number of guides out there, e.g. on docutils_.
 Building the docs on your local machine
 ---------------------------------------
 
-On *nix, from the command line, run::
+From the command line, run::
 
     make html
-
-On Windows, from the command line, run::
-
-    ./make.bat
 
 You can then view the site by::
 

@@ -90,12 +90,15 @@ def as_pyam(scenario, quantity, replace_vars=None, year_time_dim=None,
 
 # Computations that operate on pyam.IamDataFrame inputs
 
-def concat(*args):
+def concat(*args, **kwargs):
     """Concatenate *args*, which must all be :class:`pyam.IamDataFrame`."""
     if isinstance(args[0], IamDataFrame):
-        return pyam_concat(args)
+        # pyam.concat() takes an iterable of args
+        return pyam_concat(args, **kwargs)
     else:
-        return ixmp_concat(args)
+        # ixmp.reporting.computations.concat() takes a variable number of
+        # positional arguments
+        return ixmp_concat(*args, **kwargs)
 
 
 def write_report(quantity, path):
