@@ -573,7 +573,6 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
         - input(location,tec,vintage,year,mode,node,commodity,level,time2,time)                                        \
         * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2) )                                  \
 * +++++
-* variant 1: commodity input and output associated with construction and retirement of capacity
 * commodity input and output associated with construction of new technology capacity (during vintage period)
   + SUM( (location,tec)$( inv_tec(tec) AND map_tec(location,tec,year) ),                                               \
 * output by all new capacity of technologies located at 'location' sending to 'node' and 'time'
@@ -601,7 +600,7 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
 * input by all new capacity of technologies located at 'location' taking from 'node' and 'time'
         - input_cap_ret(location,tec,vintage,node,commodity,level,time)                                                \
         * ( CAP(location,tec,vintage,seq_period(year2,year)) - CAP(location,tec,vintage,year) )                        \
-* variant 2: commodity input and output associated with operation of capacity at any period
+* commodity input and output associated with operation of capacity at any period
   + SUM( (location,tec,vintage)$( inv_tec(tec) AND map_tec_lifetime(location,tec,vintage,year) )                       \
 * output by all new capacity of technologies located at 'location' sending to 'node', 'year' and 'time'
         output_cap(location,tec,vintage,year,node,commodity,level,time)                                                \
@@ -609,17 +608,6 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
 * input by all new capacity of technologies located at 'location' taking from 'node', 'year' and 'time'
         - input_cap(location,tec,vintage,year,node,commodity,level,time)                                               \
         * CAP(location,tec,vintage,year) )                                                                             \
-* special treatment of commodity in-/output prior to or after end of lifetime (which is independent of retirement)
-* ATTENTION: commodity flows will only be triggered once the technical lifetime is reached, independent of the actual retirement
-  + SUM( (location,tec,vintage)$( inv_tec(tec) AND map_tec(node,tec,vintage)
-           AND ( duration_period_sum(vintage,year) > technical_lifetime(node,tec,vintage) OR
-                  ORD(year) < ORD(vintage) )),                                                                         \
-* output by all new capacity of technologies located at 'location' sending to 'node', 'year' and 'time'
-        output_cap(location,tec,vintage,year,node,commodity,level,time)                                                \
-        * CAP_NEW(location,tec,vintage)                                                                                \
-* input by all new capacity of technologies located at 'location' taking from 'node', 'year' and 'time'
-        - input_cap(location,tec,vintage,year,node,commodity,level,time)                                               \
-        * CAP_NEW(location,tec,vintage) )                                                                              \
 * +++++
 * quantity taken out from ( >0 ) or put into ( <0 ) inter-period stock (storage)
     + STOCK_CHG(node,commodity,level,year,time)$( map_stocks(node,commodity,level,year) )                              \

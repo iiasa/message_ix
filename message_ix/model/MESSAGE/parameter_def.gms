@@ -236,12 +236,13 @@ Parameters
     input(node,tec,vintage,year_all,mode,node,commodity,level,time,time)  relative share of input per unit of activity
     output(node,tec,vintage,year_all,mode,node,commodity,level,time,time) relative share of output per unit of activity
 * +++++
-* variant 1: commodity input and output associated with construction and retirement of capacity
+* commodity input and output associated with construction of capacity
     input_cap_new(node,tec,vintage,node,commodity,level,time)  relative share of input per unit of new capacity built
     output_cap_new(node,tec,vintage,node,commodity,level,time) relative share of output per unit of new capacity built
+* commodity input and output associated with retirement of capacity
     input_cap_ret(node,tec,vintage,node,commodity,level,time)  relative share of input per unit of capacity retired
     output_cap_ret(node,tec,vintage,node,commodity,level,time) relative share of output per unit of capacity retired
-* variant 2: commodity input and output associated with operation of capacity at any period
+* commodity input and output associated with operation of capacity at any period
     input_cap(node,tec,vintage,year_all,node,commodity,level,time)  relative share of input per unit of capacity
     output_cap(node,tec,vintage,year_all,node,commodity,level,time) relative share of output per unit of capacity
 * +++++
