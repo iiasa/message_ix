@@ -28,6 +28,8 @@ tutorials = [
     (('westeros', 'westeros_emissions_taxes'), [], {}),
     (('westeros', 'westeros_firm_capacity'), [], {}),
     (('westeros', 'westeros_flexible_generation'), [], {}),
+    (('westeros', 'westeros_fossil_resource'), [], {}),
+    (('westeros', 'westeros_share_constraint'), [], {}),
     # NB this is the same value as in test_reporter()
     (('westeros', 'westeros_report'), [('len-rep-graph', 12688)], {}),
     ((AT, 'austria'), [('solve-objective-value', 133105.109375)], {}),
