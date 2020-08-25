@@ -139,7 +139,11 @@ Variables
 * :math:`\text{PRICE_EMISSION}_{n,\widehat{e},\widehat{t},y} \in \mathbb{R}`  Emission price (undiscounted marginals of :ref:`emission_equivalence`)
 * :math:`\text{COST_NODAL_NET}_{n,y} \in \mathbb{R}`                          System costs at the node level net of energy trade revenues/cost
 * :math:`\text{GDP}_{n,y} \in \mathbb{R}`                                     Gross domestic product (GDP) in market exchange rates for MACRO reporting
-* =========================================================================== =======================================================================================================
+* =========================================================================== ======================================================================================================
+*
+* .. warning::
+*    Please be aware that transitioning from one period length to another for consecutive periods may result in false values of :math:`\text{PRICE_EMISSION}`.
+*    Please see `this issue <https://github.com/iiasa/message_ix/issues/723>`_ for further information. We are currently working on a fix.
 ***
 
 Variables
@@ -555,13 +559,25 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 * as a GAMS ``$macro`` function.
 *
 *  .. math::
-*     \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} \text{output}_{n^L,t,y^V,y,m,n,c,l,h^A,h}
-*         \cdot \text{duration_time_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,y^V,y,m,h^A} & \\
-*     - \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} \text{input}_{n^L,t,y^V,y,m,n,c,l,h^A,h}
-*         \cdot \text{duration_time_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,m,y,h^A} & \\
-*     + \ \text{STOCK_CHG}_{n,c,l,y,h} + \ \sum_s \Big( \text{land_output}_{n,s,y,c,l,h} - \text{land_input}_{n,s,y,c,l,h} \Big) \cdot & \text{LAND}_{n,s,y} \\[4pt]
-*     - \ \text{demand_fixed}_{n,c,l,y,h}
-*     = \text{COMMODITY_BALANCE}_{n,c,l,y,h} \quad \forall \ l \notin (L^{\text{RES}}, & L^{\text{REN}}, L^{\text{STOR}} \subseteq L)
+*     \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} output_{n^L,t,y^V,y,m,n,c,l,h^A,h}
+*         \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,y^V,y,m,h^A} & \\
+*     - \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} input_{n^L,t,y^V,y,m,n,c,l,h^A,h}
+*         \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,m,y,h^A} & \\
+*     + \sum_{\substack{n^L,t}} output\_cap\_new_{n^L,t,y,n,c,l,h}
+*         \cdot CAP\_NEW_{n^L,t,y} & \\
+*     - \sum_{\substack{n^L,t}} input\_cap\_new_{n^L,t,y,n,c,l,h}
+*         \cdot CAP\_NEW_{n^L,t,y} & \\
+*     + \sum_{\substack{n^L,t \\ y^V \leq y}} output\_cap\_ret_{n^L,t,y^V,n,c,l,h}
+*         \cdot ( CAP_{n^L,t,y^V,y-1} - CAP_{n^L,t,y^V,y} ) \cdot \frac{duration\_period_y}{duration\_period_CAP_y^V} & \\
+*     - \sum_{\substack{n^L,t \\ y^V \leq y}} input\_cap\_ret_{n^L,t,y^V,n,c,l,h}
+*         \cdot ( CAP_{n^L,t,y^V,y-1} - CAP_{n^L,t,y^V,y} ) \cdot \frac{duration\_period_y}{duration\_period_CAP_y^V} & \\
+*     + \sum_{\substack{n^L,t \\ y^V \leq y}} output\_cap_{n^L,t,y^V,y,n,c,l,h}
+*         \cdot CAP_{n^L,t,y^V,y} & \\
+*     - \sum_{\substack{n^L,t \\ y^V \leq y}} input\_cap_{n^L,t,y^V,y,n,c,l,h}
+*         \cdot CAP_{n^L,t,y^V,y} & \\
+*     + \ STOCK\_CHG_{n,c,l,y,h} + \ \sum_s \Big( land\_output_{n,s,y,c,l,h} - land\_input_{n,s,y,c,l,h} \Big) \cdot & LAND_{n,s,y} \\[4pt]
+*     - \ demand\_fixed_{n,c,l,y,h}
+*     = COMMODITY\_BALANCE_{n,c,l,y,h} \quad \forall \ l \notin (L^{RES}, & L^{REN}, L^{STOR} \subseteq L)
 *
 * The commodity balance constraint at the resource level is included in the `Equation RESOURCE_CONSTRAINT`_,
 * while at the renewable level, it is included in the `Equation RENEWABLES_EQUIVALENCE`_,
