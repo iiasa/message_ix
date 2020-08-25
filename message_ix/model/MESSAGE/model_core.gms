@@ -584,7 +584,18 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
 * ... and equivalent for retirement
 
 * variant 2: commodity input and output associated with operation of capacity at any period
-  + SUM( (location,tec,vintage)$ map_tec_lifetime(location,tec,vintage,year),                                                                                               \
+  + SUM( (location,tec,vintage)$( inv_tec(tec) AND map_tec_lifetime(location,tec,vintage,year) )                       \
+* output by all new capacity of technologies located at 'location' sending to 'node', 'year' and 'time'
+        output_cap(location,tec,vintage,year,node,commodity,level,time)                                                \
+        * CAP(location,tec,vintage,year)                                                                               \
+* input by all new capacity of technologies located at 'location' taking from 'node', 'year' and 'time'
+        - input_cap(location,tec,vintage,year,node,commodity,level,time)                                               \
+        * CAP(location,tec,vintage,year) )                                                                             \
+* special treatment of commodity in-/output prior to or after end of lifetime (which is independent of retirement)
+* ATTENTION: commodity flows will only be triggered once the technical lifetime is reached, independent of the actual retirement
+  + SUM( (location,tec,vintage)$( inv_tec(tec) AND map_tec(node,tec,vintage)
+           AND ( duration_period_sum(vintage,year) > technical_lifetime(node,tec,vintage) OR
+                  ORD(year) < ORD(vintage) )),                                                                         \
 * output by all new capacity of technologies located at 'location' sending to 'node', 'year' and 'time'
         output_cap(location,tec,vintage,year,node,commodity,level,time)                                                \
         * CAP_NEW(location,tec,vintage)                                                                                \
