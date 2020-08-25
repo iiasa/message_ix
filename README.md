@@ -2,7 +2,7 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/message_ix.svg)](https://pypi.python.org/pypi/message_ix/)
 [![Anaconda version](https://img.shields.io/conda/vn/conda-forge/message-ix)](https://anaconda.org/conda-forge/message-ix)
-[![Documentation build](https://readthedocs.com/projects/iiasa-energy-program-message-ix/badge/?version=master)](https://message.iiasa.ac.at/en/master/)
+[![Documentation build](https://readthedocs.com/projects/iiasa-energy-program-message-ix/badge/?version=master)](https://docs.messageix.org/en/master/)
 [![Build status](https://github.com/iiasa/message_ix/workflows/pytest/badge.svg)](https://github.com/iiasa/message_ix/actions?query=workflow:pytest)
 [![Test coverage](https://codecov.io/gh/iiasa/message_ix/branch/master/graph/badge.svg)](https://codecov.io/gh/iiasa/message_ix)
 
@@ -43,26 +43,28 @@ Please refer to the [NOTICE](NOTICE.rst) for details and user guidelines.
 
 ### Documentation
 
-[Documentation of the MESSAGEix framework](https://message.iiasa.ac.at/),
+[Documentation of the MESSAGEix framework](https://docs.messageix.org/),
 including the complete mathematical formulation and associated files, is
 automatically created from mark-up comments in the GAMS, Python, and R code.
-The online documentation is synchronized with the contents of the master branch
-of the [message_ix Github repository](https://github.com/iiasa/message_ix).
 
-For offline use, the documentation can be built from the source code.
-See `doc/README.md` for further details.
-
+- The documentation for the ‘latest’ or the ‘stable’ release is displayed by
+  default.
+- Use the chooser to reach the [docs for the ``master`` branch](https://docs.messageix.org/en/master) of the
+  GitHub repository, including latest development code.
+- For offline use, the documentation can be built from the source code.
+  See `doc/README.rst` for details.
 
 ### Installation
 
-See [‘Installation’ in the documentation](https://message.iiasa.ac.at/en/stable/getting_started.html) or the file `INSTALL.rst`.
+See [the online documentation](https://docs.messageix.org/en/stable/#getting-started) or the file `INSTALL.rst`.
 
 
 ### Tutorials
 
-Several introductory tutorials are provided.
-See [‘Tutorials’ in the documentation](https://message.iiasa.ac.at/en/stable/tutorials.html) or the file
-`tutorial/README.rst`.
+For formal and self-guided learning, introductory tutorials are provided that
+illustrate the basic features of the modelling framework.
+See [‘Tutorials’ in the documentation](https://docs.messageix.org/en/stable/tutorials.html)
+or the file `tutorial/README.rst`.
 
 
 ## Scientific reference

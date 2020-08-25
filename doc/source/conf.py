@@ -64,13 +64,17 @@ exclude_patterns = ['_themes/*']
 rst_prolog = r"""
 .. |MESSAGEix| replace:: MESSAGE\ :emphasis:`ix`
 
-.. |ixmp| replace:: :emphasis:`ix modeling platform`
+.. |ixmp| replace:: :emphasis:`ix` modeling platform
+
+.. |IIASA| raw:: html
+
+   <abbr title="International Institute for Applied Systems Analysis">IIASA</abbr>
 
 .. role:: strike
 
 .. role:: underline
 
-"""
+"""  # noqa: E501
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -107,7 +111,7 @@ extlinks = {
 
 intersphinx_mapping = {
     'dask': ('https://docs.dask.org/en/stable/', None),
-    'ixmp': ('https://message.iiasa.ac.at/projects/ixmp/en/latest/', None),
+    'ixmp': ('https://docs.messageix.org/projects/ixmp/en/latest/', None),
     # For a local build, uncomment and use the following line with a path to
     # the directory containing built HTML documentation for ixmp:
     # 'ixmp': ('/home/user/path-to-ixmp/doc/build/html', None),

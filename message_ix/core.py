@@ -2,6 +2,7 @@ import collections
 from functools import lru_cache
 from itertools import product
 import logging
+from warnings import warn
 
 import ixmp
 from ixmp.utils import as_str_list, isscalar
@@ -277,30 +278,130 @@ class Scenario(ixmp.Scenario):
         self.add_set("lvl_spatial", levels)
         self.add_set("map_spatial_hierarchy", hierarchy)
 
-    def add_horizon(self, data):
-        """Add sets related to temporal dimensions of the model.
+    def add_horizon(self, year=[], firstmodelyear=None, data=None):
+        """Set the scenario time horizon via ``year`` and related categories.
+
+        :meth:`add_horizon` acts like ``add_set("year", ...)``, except with
+        additional conveniences:
+
+        - The `firstmodelyear` argument can be used to set the first period
+          handled by the MESSAGE optimization. This is equivalent to::
+
+            scenario.add_cat("year", "firstmodelyear", ..., is_unique=True)
+
+        - Parameter ``duration_period`` is assigned values based on `year`:
+          The duration of periods is calculated as the interval between
+          successive `year` elements, and the duration of the first period is
+          set to value that appears most frequently.
+
+        See :doc:`time` for a detailed terminology of years and periods in
+        :mod:`message_ix`.
 
         Parameters
         ----------
-        data : dict-like
-            Year sets. "year" is a required key. "firstmodelyear" is optional;
-            if not provided, the first element of "year" is used.
+        year : list of int
+            The set of periods.
+
+        firstmodelyear : int, optional
+            First period for the model solution. If not given, the first entry
+            of `year` is used.
+
+        Other parameters
+        ----------------
+        data : dict
+            .. deprecated:: 3.1
+
+               The "year" key corresponds to `year` and is required.
+               A "firstmodelyear" key corresponds to `firstmodelyear` and is
+               optional.
+
+        Raises
+        ------
+        ValueError
+            If the ``year`` set of the Scenario is already populated. Changing
+            the time periods of an existing Scenario can entail complex
+            adjustments to data. For this purpose, adjust each set and
+            parameter individually, or see :mod:`.tools.add_year`.
 
         Examples
         --------
         >>> s = message_ix.Scenario()
-        >>> s.add_horizon({'year': [2010, 2020]})
-        >>> s.add_horizon({'year': [2010, 2020], 'firstmodelyear': 2020})
-
+        # The following are equivalent
+        >>> s.add_horizon(year=[2020, 2030, 2040], firstmodelyear=2020)
+        >>> s.add_horizon([2020, 2030, 2040], 2020)
+        >>> s.add_horizon([2020, 2030, 2040])
         """
-        if 'year' not in data:
-            raise ValueError('"year" must be in temporal sets')
-        horizon = data['year']
-        self.add_set("year", horizon)
+        # Check arguments
+        # NB once the deprecated signature is removed, these two 'if' blocks
+        #    and the data= argument can be deleted.
+        if isinstance(year, dict):
+            # Move a dict argument to `data` to trigger the next block
+            if data:
+                raise ValueError("both year= and data= arguments")
+            data = year
 
-        first = data['firstmodelyear'] if 'firstmodelyear'\
-            in data else horizon[0]
-        self.add_cat('year', 'firstmodelyear', first, is_unique=True)
+        if data:
+            warn(
+                "dict() argument to add_horizon(); use year= and "
+                "firstmodelyear=",
+                DeprecationWarning
+            )
+
+            try:
+                year = data.pop("year")
+            except KeyError:
+                raise ValueError(f'"year" missing from {data}')
+
+            if "firstmodelyear" in data:
+                if firstmodelyear:
+                    raise ValueError("firstmodelyear given twice")
+                else:
+                    firstmodelyear = data.pop("firstmodelyear", None)
+
+            if len(data):
+                raise ValueError(f"unknown keys: {sorted(data.keys())}")
+
+        # Check for existing years
+        existing = self.set("year").tolist()
+        if len(existing):
+            raise ValueError(
+                f"Scenario has year={existing} and related values"
+            )
+
+        # Add the year set elements and first model year
+        year = sorted(year)
+        self.add_set("year", year)
+        self.add_cat(
+            "year", "firstmodelyear", firstmodelyear or year[0], is_unique=True
+        )
+
+        # Calculate the duration of all periods
+        duration = [year[i] - year[i-1] for i in range(1, len(year))]
+
+        # Determine the duration of the first period
+        if len(duration) == 0:
+            # Cannot infer any durations with only 1 period
+            return
+        elif len(set(duration)) == 1:
+            # All periods have the same duration; use this for the duration of
+            # the first period
+            duration_first = duration[0]
+        else:
+            # More than one period duration. Use the mode, i.e. the most common
+            # duration, for the first period
+            duration_first = max(set(duration), key=duration.count)
+            log.info(
+                f"Using {duration_first} from {set(duration)} as duration of "
+                f"first period {year[0]}"
+            )
+
+        # Add the duration_period elements for the first and subsequent periods
+        # NB "y" is automatically defined by ixmp's JDBCBackend
+        self.add_par("duration_period", pd.DataFrame({
+            "year": year,
+            "value": [duration_first] + duration,
+            "unit": "y",
+        }))
 
     def vintage_and_active_years(self, ya_args=None, in_horizon=True):
         """Return sets of vintage and active years for use in data input.

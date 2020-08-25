@@ -1,5 +1,5 @@
 Postprocessing and reporting
-============================
+****************************
 
 The |ixmp| provides powerful features to perform calculations and other postprocessing after a :class:`message_ix.Scenario` has been solved by the associated model. The |MESSAGEix| framework uses these features to provide zero-configuration reporting of models built on the framework.
 
@@ -18,8 +18,9 @@ Contents:
    :local:
    :depth: 3
 
+
 Terminology
------------
+===========
 
 :mod:`ixmp.reporting` handles numerical **quantities**, which are scalar (0-dimensional) or array (1 or more dimensions) data with optional associated units.
 *ixmp* parameters, scalars, equations, and time-series data all become quantities for the purpose of reporting.
@@ -30,10 +31,11 @@ Non-model [1]_ quantities and reports are produced by **computations**, which ar
 
 .. [1] i.e. quantities that do not exist within the mathematical formulation of the model itself, and do not affect its solution.
 
-Basic usage
------------
 
-A basic reporting workflow has the following steps:
+Basic usage
+===========
+
+A reporting workflow has the following steps:
 
 1. Obtain a :class:`message_ix.Scenario` object from an :class:`ixmp.Platform`.
 2. Use :meth:`from_scenario() <message_ix.reporting.Reporter.from_scenario>` to
@@ -61,7 +63,7 @@ A basic reporting workflow has the following steps:
 
 
 Customization
--------------
+=============
 
 A Reporter prepared with :meth:`from_scenario()
 <message_ix.reporting.Reporter.from_scenario>` always contains a key
@@ -87,8 +89,8 @@ Reporter, however, such calculations can be instead composed from atomic (i.e.
 small, indivisible) computations.
 
 
-Reporters
----------
+Reporter, Key, and Quantity classes
+===================================
 
 .. currentmodule:: message_ix.reporting
 
@@ -99,6 +101,7 @@ Reporters
    message_ix.reporting.Reporter
    ixmp.reporting.Reporter
    ixmp.reporting.Key
+   ixmp.reporting.Quantity
 
 The :meth:`ixmp.Reporter <ixmp.reporting.Reporter.from_scenario>` automatically adds keys based on the contents of the :class:`ixmp.Scenario` argument.
 The :class:`message_ix.reporting.Reporter` adds additional keys for **derived quantities** specific to the MESSAGEix model framework.
@@ -330,16 +333,34 @@ These automatic features of :class:`~message_ix.reporting.Reporter` are controll
    <foo:a-b-c>
 
 
+.. autodata:: ixmp.reporting.Quantity(data, *args, **kwargs)
+   :annotation:
+
+The :data:`.Quantity` constructor converts its arguments to an internal, :class:`xarray.DataArray`-like data format:
+
+.. code-block:: python
+
+   # Existing data
+   data = pd.Series(...)
+
+   # Convert to a Quantity for use in reporting calculations
+   qty = Quantity(data, name="Quantity name", units="kg")
+   rep.add("new_qty", qty)
+
+
 Computations
-------------
+============
+
+Defined by :mod:`message_ix`
+----------------------------
 
 .. currentmodule:: message_ix.reporting
 
 .. automodule:: message_ix.reporting.computations
-   :members: add, as_pyam, broadcast_map, concat, map_as_qty, write_report
+   :members: as_pyam, broadcast_map, concat, map_as_qty, write_report
 
-Computations from ixmp
-~~~~~~~~~~~~~~~~~~~~~~
+Inherited from ixmp
+-------------------
 
 .. currentmodule:: ixmp.reporting
 
@@ -353,10 +374,13 @@ Computations from ixmp
    Calculations:
 
    .. autosummary::
+      add
       aggregate
+      apply_units
       disaggregate_shares
       product
       ratio
+      select
       sum
 
    Input and output:
@@ -372,7 +396,7 @@ Computations from ixmp
 
 
 Configuration
--------------
+=============
 
 .. autosummary::
 
@@ -401,13 +425,17 @@ Configuration
 
 
 Utilities
----------
+=========
 
-.. autoclass:: ixmp.reporting.quantity.AttrSeries
+.. currentmodule:: ixmp.reporting.quantity
+
+.. automodule:: ixmp.reporting.quantity
+   :members: assert_quantity
+
 
 .. automodule:: ixmp.reporting.utils
    :members:
-   :exclude-members: AttrSeries, RENAME_DIMS, REPLACE_UNITS
+   :exclude-members: RENAME_DIMS, REPLACE_UNITS
 
 .. automodule:: message_ix.reporting.pyam
    :members: collapse_message_cols
