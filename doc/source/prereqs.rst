@@ -36,7 +36,7 @@ This page currently distinguishes between “basic” and “advanced”:
    * - Use the mathematical formulation as-is.
      - Modify the MESSAGE equations.
    * - Use the :mod:`message_ix` Python/R code.
-     - Contribute or request new features.
+     - :doc:`Contribute or request new features <contributing>`.
 
 Basic usage
 ===========
@@ -58,8 +58,11 @@ Scientific computing skills
 You should be able to:
 
 1. Install and uninstall software on your operating system (OS): one of Linux, Windows, or macOS.
+
 2. Use a command line on your OS to navigate directories and files, run commands, and view their output.
+
 3. Modify environment variables on your OS.
+
 4. Write simple programs in Python or R, including:
 
    - Understand concepts including: variables, functions, and arguments.
@@ -70,12 +73,18 @@ You should be able to:
    For Python, `Dive Into Python <https://diveinto.org/python3/table-of-contents.html>`_ is one beginner resource.
    Many free and paid online courses are available.
 
-5. Use the `Anaconda Navigator <https://docs.anaconda.com/anaconda/navigator/>`_ graphical interface or the ``conda`` command-line interface (`documentation <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-pkgs.html#installing-packages>`__) to install, uninstall, upgrade, and check the versions of Python packages.
+5. Understand the concept of a software package, software release, version number (in particular the concept of `semantic versioning <https://semver.org>`_), deprecation.
+
+   See :ref:`releases` for specific practices used for :mod:`message_ix`.
+
+6. Use the `Anaconda Navigator <https://docs.anaconda.com/anaconda/navigator/>`_ graphical interface or the ``conda`` command-line interface (`documentation <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-pkgs.html#installing-packages>`__) to install, uninstall, upgrade, and check the versions of Python packages.
    Understand the concept of `conda environments <https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/environments.html>`_; create, activate, switch, and remove environments.
-6. Understand or learn the basic functionality of Python data science packages, including pandas.
+
+7. Understand or learn the basic functionality of Python data science packages, including pandas.
 
    - `Introductory tutorials <https://pandas.pydata.org/docs/getting_started/index.html#intro-to-pandas>`__ for pandas.
-7. Use a Jupyter notebook to run Python or R code, including: start the notebook server; open, restart, and close notebooks; create and edit cells.
+
+8. Use a Jupyter notebook to run Python or R code, including: start the notebook server; open, restart, and close notebooks; create and edit cells.
 
    - `Jupyter notebook <https://jupyter-notebook.readthedocs.io/en/stable/notebook.html>`_ official documentation.
    - Video introductions to the notebook.
@@ -104,18 +113,33 @@ Scientific computing skills
 You should be able to:
 
 1. Interact with a server or ‘headless’ computer, i.e. one without a graphical interface, over the command line, using SSH.
+
 2. Use the ``pip`` command-line interface (`documentation <https://pip.pypa.io/en/stable/user_guide/#installing-packages>`__) to install, uninstall, upgrade, and check the versions of Python packages.
-3. Use the Git version control system and the ``git`` command-line tool to clone repositories, pull, fetch, create branches, and push.
+
+3. Use the **Git version control system** and the ``git`` command-line tool to clone repositories, pull, fetch, create branches, and push.
+   For :doc:`contributing to development <contributing>`, you should know how to:
+
+   - `git merge <https://git-scm.com/docs/git-merge>`_, i.e. bring all updates from the ``master`` branch into your PR branch, giving you a chance to fix conflicts and make a new commit.
+   - `git rebase <https://git-scm.com/docs/git-rebase>`_, i.e. replay your PR branch commits one-by-one, starting from the tip of the ``master`` branch (rather than the original starting commit).
+
    Optionally, do these things via a graphical program such as GitHub Desktop.
 
    - The free `Pro Git book <https://git-scm.com/book/en/v2>`_.
    - Interactive learning tools on `try.github.io <http://try.github.io/>`_.
-4. Understand and interact with repositories and issues on GitHub, including:
+
+4. Understand and interact with repositories and issues on **GitHub**, including:
 
    - Find and read the list of issues for a repository.
    - Search within one repository or across all of GitHub.
    - Use GitHub's formatting to produce legible descriptions of code and code errors.
+   - Understand concepts including: pull request, merge, merge conflict, assign, review.
 
-   See the `documentation for the GitHub website <https://docs.github.com/en/github>`_ and the `Learning Lab <https://lab.github.com/>`_.
+   See:
+
+   - `Documentation for the GitHub website <https://docs.github.com/en/github>`_
+   - `Short introduction to the Github 'flow' <https://guides.github.com/introduction/flow/>`_, which describes a **pull request** and how it is used.
+   - Interactive tools in the `Learning Lab <https://lab.github.com/>`_.
+
 5. Provide a complete and explicit description of a software error message and how to reproduce it.
+
 6. Read and understand GAMS code.
