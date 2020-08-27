@@ -1581,7 +1581,12 @@ NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 *
 ***
 NEW_CAPACITY_SOFT_CONSTRAINT_UP(node,inv_tec,year)$( soft_new_capacity_up(node,inv_tec,year) )..
-    CAP_NEW_UP(node,inv_tec,year) =L= CAP_NEW(node,inv_tec,year) ;
+    CAP_NEW_UP(node,inv_tec,year) =L=
+        SUM(year2$( seq_period(year2,year) ) 
+            CAP_NEW(node,inv_tec,year2)) $ (NOT first_period(year))
+      + SUM(year_all2$( seq_period(year_all2,year) ) 
+            historical_new_capacity(node,inv_tec,year_all2)) $ first_period(year)
+;
 
 ***
 * .. _equation_new_capacity_constraint_lo:
@@ -1638,7 +1643,12 @@ NEW_CAPACITY_CONSTRAINT_LO(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 *
 ***
 NEW_CAPACITY_SOFT_CONSTRAINT_LO(node,inv_tec,year)$( soft_new_capacity_lo(node,inv_tec,year) )..
-    CAP_NEW_LO(node,inv_tec,year) =L= CAP_NEW(node,inv_tec,year) ;
+    CAP_NEW_LO(node,inv_tec,year) =L=
+        SUM(year2$( seq_period(year2,year) ) 
+            CAP_NEW(node,inv_tec,year2) ) $ (NOT first_period(year))
+      + SUM(year_all2$( seq_period(year_all2,year) ) 
+            historical_new_capacity(node,inv_tec,year_all2) ) $ first_period(year)
+;
 
 ***
 * .. _equation_activity_constraint_up:
@@ -1700,8 +1710,12 @@ ACTIVITY_CONSTRAINT_UP(node,tec,year,time)$( map_tec_time(node,tec,year,time)
 ***
 ACTIVITY_SOFT_CONSTRAINT_UP(node,tec,year,time)$( soft_activity_up(node,tec,year,time) )..
     ACT_UP(node,tec,year,time) =L=
-        SUM((vintage,mode)$( map_tec_lifetime(node,tec,vintage,year) AND map_tec_act(node,tec,year,mode,time) ),
-            ACT(node,tec,vintage,year,mode,time) ) ;
+        SUM((vintage,mode,year2)$( map_tec_lifetime(node,tec,vintage,year) AND map_tec_act(node,tec,year,mode,time)
+                                   AND seq_period(year2,year) ),
+            ACT(node,tec,vintage,year2,mode,time) ) $ (NOT first_period(year))
+      + SUM((mode,year_all2)$( seq_period(year_all2,year) ),
+            historical_activity(node,tec,year_all2,mode,time) ) $ first_period(year)
+;
 
 ***
 * Equation ACTIVITY_CONSTRAINT_LO
@@ -1761,8 +1775,12 @@ ACTIVITY_CONSTRAINT_LO(node,tec,year,time)$( map_tec_time(node,tec,year,time)
 ***
 ACTIVITY_SOFT_CONSTRAINT_LO(node,tec,year,time)$( soft_activity_lo(node,tec,year,time) )..
     ACT_LO(node,tec,year,time) =L=
-        SUM((vintage,mode)$( map_tec_lifetime(node,tec,vintage,year) AND map_tec_act(node,tec,year,mode,time) ),
-            ACT(node,tec,vintage,year,mode,time) ) ;
+        SUM((vintage,mode,year2)$( map_tec_lifetime(node,tec,vintage,year) AND map_tec_act(node,tec,year,mode,time)
+                                   AND seq_period(year2,year) ),
+            ACT(node,tec,vintage,year2,mode,time) ) $ (NOT first_period(year))
+      + SUM((mode,year_all2)$( seq_period(year_all2,year) ),
+            historical_activity(node,tec,year_all2,mode,time) ) $ first_period(year)
+;
 
 *----------------------------------------------------------------------------------------------------------------------*
 ***
