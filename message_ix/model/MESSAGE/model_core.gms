@@ -1582,9 +1582,9 @@ NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 ***
 NEW_CAPACITY_SOFT_CONSTRAINT_UP(node,inv_tec,year)$( soft_new_capacity_up(node,inv_tec,year) )..
     CAP_NEW_UP(node,inv_tec,year) =L=
-        SUM(year2$( seq_period(year2,year) ) 
+        SUM(year2$( seq_period(year2,year) ), 
             CAP_NEW(node,inv_tec,year2)) $ (NOT first_period(year))
-      + SUM(year_all2$( seq_period(year_all2,year) ) 
+      + SUM(year_all2$( seq_period(year_all2,year) ),
             historical_new_capacity(node,inv_tec,year_all2)) $ first_period(year)
 ;
 
@@ -1644,9 +1644,9 @@ NEW_CAPACITY_CONSTRAINT_LO(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 ***
 NEW_CAPACITY_SOFT_CONSTRAINT_LO(node,inv_tec,year)$( soft_new_capacity_lo(node,inv_tec,year) )..
     CAP_NEW_LO(node,inv_tec,year) =L=
-        SUM(year2$( seq_period(year2,year) ) 
+        SUM(year2$( seq_period(year2,year) ),
             CAP_NEW(node,inv_tec,year2) ) $ (NOT first_period(year))
-      + SUM(year_all2$( seq_period(year_all2,year) ) 
+      + SUM(year_all2$( seq_period(year_all2,year) ), 
             historical_new_capacity(node,inv_tec,year_all2) ) $ first_period(year)
 ;
 
