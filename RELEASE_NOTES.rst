@@ -1,5 +1,7 @@
-Next release
-============
+v3.1.0 (2020-08-28)
+===================
+
+:mod:`message_ix` v3.1.0 coincides with :mod:`ixmp` v3.1.0.
 
 All changes
 -----------
