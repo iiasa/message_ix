@@ -268,3 +268,13 @@ Manage issues and pull requests
 
   - Ask (in a new comment, on Slack, in person) the assignee or last commenter what the status is.
   - Close or re-assign, with a comment that describes your reasoning.
+
+Record video documentation
+==========================
+
+See :doc:`video/recording`.
+
+.. toctree::
+   :hidden:
+
+   video/recording

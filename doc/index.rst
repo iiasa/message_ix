@@ -32,6 +32,7 @@ Then, continue with the:
 - :doc:`install` of the software and essential dependencies.
 - :doc:`tutorials` for new users that demonstrate the basic features of the framework.
 - :doc:`Usage <usage>` of |MESSAGEix| in academic publications, research projects, and derived tools.
+- :doc:`Videos <video/index>` versions of parts of this documentation.
 
 .. toctree::
    :hidden:
@@ -42,12 +43,15 @@ Then, continue with the:
    install
    tutorials
    Publications, Projects, and Tools <usage>
+   video/index
 
 .. figure:: _static/ix_features.svg
    :width: 360px
    :align: center
 
    Features of ``ixmp``, ``message_ix``, and related packages :cite:`huppmann_messageix_2018`
+
+
 
 
 .. _core:
