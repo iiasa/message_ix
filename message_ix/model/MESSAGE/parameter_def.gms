@@ -11,6 +11,8 @@
 ***
 
 ***
+* .. _section_parameter_general:
+*
 * General parameters of the |MESSAGEix| implementation
 * ----------------------------------------------------
 *
@@ -76,6 +78,8 @@ Parameters
 ;
 
 ***
+* .. _section_parameter_resources:
+*
 * Parameters of the `Resources` section
 * -------------------------------------
 *
@@ -123,6 +127,8 @@ Parameter
 ;
 
 ***
+* .. _section_parameter_demand:
+*
 * Parameters of the `Demand` section
 * ----------------------------------
 *
@@ -249,6 +255,8 @@ Parameters
 ;
 
 ***
+* .. _section_parameter_bounds:
+*
 * Bounds on capacity and activity
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
@@ -286,6 +294,8 @@ Parameters
 ;
 
 ***
+* .. _section_parameter_dynamic_constraints:
+*
 * Dynamic constraints on capacity and activity
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
@@ -354,6 +364,8 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
+* .. _section_parameter_addon:
+*
 * Parameters for the add-on technologies
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
@@ -392,6 +404,8 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
+* .. _section_parameter_storage:
+*
 * Parameters for representing storage solutions
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
@@ -431,6 +445,8 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
+* .. _section_parameter_soft_constraints:
+*
 * Cost parameters for 'soft' relaxations of dynamic constraints
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
@@ -477,6 +493,8 @@ Parameters
 ;
 
 ***
+* .. _section_parameter_historical:
+*
 * Historical capacity and activity values
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
@@ -503,6 +521,8 @@ Parameters
 ;
 
 ***
+* .. _section_parameter_investment:
+*
 * Auxiliary investment cost parameters and multipliers
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
@@ -543,6 +563,8 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
+* .. _section_parameter_emissions:
+*
 * Parameters of the `Emission` section
 * ------------------------------------
 *
@@ -582,6 +604,8 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
+* .. _section_parameter_landuse_emulator:
+*
 * Parameters of the `Land-Use model emulator` section
 * ---------------------------------------------------
 *
@@ -654,6 +678,8 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
+* .. _section_parameter_share_constraints:
+*
 * Parameters of the `Share Constraints` section
 * ---------------------------------------------
 *
@@ -689,6 +715,8 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
+* .. _section_parameter_generic_relations:
+*
 * Parameters of the `Relations` section
 * -------------------------------------
 *
@@ -731,6 +759,8 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
+* .. _section_parameter_fixed:
+*
 * Fixed variable values
 * ---------------------
 *
@@ -778,6 +808,8 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
+* .. _section_parameter_auxiliary_reporting:
+*
 * Auxiliary reporting parameters
 * ------------------------------
 *
