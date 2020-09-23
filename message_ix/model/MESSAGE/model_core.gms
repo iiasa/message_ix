@@ -822,6 +822,8 @@ RENEWABLES_CAPACITY_REQUIREMENT(node,inv_tec,commodity,year)$(
 
 *----------------------------------------------------------------------------------------------------------------------*
 ***
+* .. _addon:
+*
 * Constraints for addon technologies
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
