@@ -17,10 +17,11 @@ def _com_collapse_callback(df):
 
 
 class Plots(object):
-    def __init__(self, scenario, input_costs='$/GWa'):
+    def __init__(self, scenario, region, input_costs='$/GWa'):
         self.rep = Reporter.from_scenario(scenario)
         self.model_name = scenario.model
         self.scen_name = scenario.scenario
+        self.region = region
 
         if input_costs == "$/MWa":
             self.cost_unit_conv = 1e3
@@ -39,16 +40,13 @@ class Plots(object):
             year_time_dim='ya',
             collapse=_tec_collapse_callback)
         df = self.rep.get(new_key[0])
-        model = df.data.model.unique()[0]
-        scenario = df.data.scenario.unique()[0]
-        region = df.data.region.unique()[0]
         ax = df.filter(
-            model=model,
-            scenario=scenario,
-            region=region,
+            model=self.model_name,
+            scenario=self.scen_name,
+            region=self.region,
             variable=tecs).bar_plot(stacked=True)
         ax.set_ylabel('GWa')
-        ax.set_title('Westeros System Activity')
+        ax.set_title('{} System Activity'.format(self.region))
 
     def plot_capacity(self, tecs):
         if type(tecs) != list:
@@ -59,16 +57,13 @@ class Plots(object):
             year_time_dim='ya',
             collapse=_tec_collapse_callback)
         df = self.rep.get(new_key[0])
-        model = df.data.model.unique()[0]
-        scenario = df.data.scenario.unique()[0]
-        region = df.data.region.unique()[0]
         ax = df.filter(
-            model=model,
-            scenario=scenario,
-            region=region,
+            model=self.model_name,
+            scenario=self.scen_name,
+            region=self.region,
             variable=tecs).bar_plot(stacked=True)
         ax.set_ylabel('GW')
-        ax.set_title('Westeros System Capacity')
+        ax.set_title('{} System Capacity'.format(self.region))
 
     def plot_prices(self, tecs):
         if type(tecs) != list:
@@ -79,16 +74,13 @@ class Plots(object):
             year_time_dim='y',
             collapse=_com_collapse_callback)
         df = self.rep.get(new_key[0])
-        model = df.data.model.unique()[0]
-        scenario = df.data.scenario.unique()[0]
-        region = df.data.region.unique()[0]
         df = df.filter(
-            model=model,
-            scenario=scenario,
-            region=region,
+            model=self.model_name,
+            scenario=self.scen_name,
+            region=self.region,
             variable=tecs)
         df = df.convert_unit('', 'cents/kWhr',
                              1/8760*100*self.cost_unit_conv)
         ax = df.bar_plot(stacked=True)
         ax.set_ylabel('cents/kWhr')
-        ax.set_title('Westeros System Prices')
+        ax.set_title('{} System Prices'.format(self.region))
