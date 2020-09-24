@@ -33,13 +33,12 @@ class Plots(object):
     def plot_output(self, tecs):
         if type(tecs) != list:
             tecs = [tecs]
-        df = self.rep.full_key('out')
-        new_key = self.rep.convert_pyam(
-            quantities=df.drop('h', 'hd', 'm', 'nd',
-                               'yv', 'c', 'l'),
-            year_time_dim='ya',
-            collapse=_tec_collapse_callback)
-        df = self.rep.get(new_key[0])
+        df = self.rep.get('out:pyam')
+        df.rename(variable={i: i.split('|')[3] for i
+                            in df.variables()},
+                  region={i: i.split('|')[0] for i
+                          in df.regions()},
+                  inplace=True)
         ax = df.filter(
             model=self.model_name,
             scenario=self.scen_name,
@@ -51,12 +50,12 @@ class Plots(object):
     def plot_capacity(self, tecs):
         if type(tecs) != list:
             tecs = [tecs]
-        df = self.rep.full_key('CAP')
-        new_key = self.rep.convert_pyam(
-            quantities=df.drop('yv'),
-            year_time_dim='ya',
-            collapse=_tec_collapse_callback)
-        df = self.rep.get(new_key[0])
+        df = self.rep.get('CAP:pyam')
+        df.rename(variable={i: i.split('|')[1] for i
+                            in df.variables()},
+                  region={i: i.split('|')[0] for i
+                          in df.regions()},
+                  inplace=True)
         ax = df.filter(
             model=self.model_name,
             scenario=self.scen_name,
