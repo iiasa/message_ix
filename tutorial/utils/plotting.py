@@ -1,12 +1,26 @@
-import matplotlib.pyplot as plt
-import pandas as pd
+from message_ix.reporting import Reporter
+from ixmp.reporting import configure
+
+configure(units={'replace': {'-': ''}})
+
+
+def _tec_collapse_callback(df):
+    """Callback function to populate the IAMC 'variable' column."""
+    df['variable'] = df['t']
+    return df.drop(['t'], axis=1)
+
+
+def _com_collapse_callback(df):
+    """Callback function to populate the IAMC 'variable' column."""
+    df['variable'] = df['c']
+    return df.drop(['c'], axis=1)
 
 
 class Plots(object):
-    def __init__(self, ds, country, firstyear=2010, input_costs="$/GWa"):
-        self.ds = ds
-        self.country = country
-        self.firstyear = firstyear
+    def __init__(self, scenario, input_costs='$/GWa'):
+        self.rep = Reporter.from_scenario(scenario)
+        self.model_name = scenario.model
+        self.scen_name = scenario.scenario
 
         if input_costs == "$/MWa":
             self.cost_unit_conv = 1e3
@@ -15,162 +29,66 @@ class Plots(object):
         else:
             self.cost_unit_conv = 1
 
-    def historic_data(self, par, year_col, subset=None):
-        df = self.ds.par(par)
-        if subset is not None:
-            df = df[df["technology"].isin(subset)]
-        idx = [year_col, "technology"]
-        df = df[idx + ["value"]].groupby(idx).sum().reset_index()
-        df = df.pivot(index=year_col, columns="technology", values="value")
-        return df
+    def plot_output(self, tecs):
+        if type(tecs) != list:
+            tecs = [tecs]
+        df = self.rep.full_key('out')
+        new_key = self.rep.convert_pyam(
+            quantities=df.drop('h', 'hd', 'm', 'nd',
+                               'yv', 'c', 'l'),
+            year_time_dim='ya',
+            collapse=_tec_collapse_callback)
+        df = self.rep.get(new_key[0])
+        model = df.data.model.unique()[0]
+        scenario = df.data.scenario.unique()[0]
+        region = df.data.region.unique()[0]
+        ax = df.filter(
+            model=model,
+            scenario=scenario,
+            region=region,
+            variable=tecs).bar_plot(stacked=True)
+        ax.set_ylabel('GWa')
+        ax.set_title('Westeros System Activity')
 
-    def model_data(self, var, year_col="year_act", baseyear=False, subset=None):
-        df = self.ds.var(var)
-        if subset is not None:
-            df = df[df["technology"].isin(subset)]
-        idx = [year_col, "technology"]
-        df = (
-            df[idx + ["lvl"]]
-            .groupby(idx)
-            .sum()
-            .reset_index()
-            .pivot(index=year_col, columns="technology", values="lvl")
-            .rename(columns={"lvl": "value"})
-        )
-        df = df[df.index >= self.firstyear]
-        return df
+    def plot_capacity(self, tecs):
+        if type(tecs) != list:
+            tecs = [tecs]
+        df = self.rep.full_key('CAP')
+        new_key = self.rep.convert_pyam(
+            quantities=df.drop('yv'),
+            year_time_dim='ya',
+            collapse=_tec_collapse_callback)
+        df = self.rep.get(new_key[0])
+        model = df.data.model.unique()[0]
+        scenario = df.data.scenario.unique()[0]
+        region = df.data.region.unique()[0]
+        ax = df.filter(
+            model=model,
+            scenario=scenario,
+            region=region,
+            variable=tecs).bar_plot(stacked=True)
+        ax.set_ylabel('GW')
+        ax.set_title('Westeros System Capacity')
 
-    def equ_data(self, equ, value, baseyear=False, subset=None):
-        df = self.ds.equ(equ)
-        if not baseyear:
-            df = df[df["year"] > self.firstyear]
-        if subset is not None:
-            df = df[df["commodity"].isin(subset)]
-        df = df.pivot(index="year", columns="commodity", values=value)
-        return df
-
-    def plot_demand(self, light_demand, elec_demand):
-        fig, ax = plt.subplots()
-        light = light_demand["value"]
-        light.plot(ax=ax, label="light")
-        e = elec_demand["value"]
-        e.plot(ax=ax, label="elec")
-        (light + e).plot(ax=ax, label="total")
-        plt.ylabel("GWa")
-        plt.xlabel("Year")
-        plt.legend(loc="best")
-
-    def plot_activity(self, baseyear=False, subset=None):
-        h = self.historic_data("historical_activity", "year_act", subset=subset)
-        m = self.model_data("ACT", baseyear=baseyear, subset=subset)
-        df = pd.concat([h, m]) if not h.empty else m
-        df.plot.bar(stacked=True)
-        plt.title("{} Energy System Activity".format(self.country.title()))
-        plt.ylabel("GWa")
-        plt.xlabel("Year")
-        plt.legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
-
-    def plot_capacity(self, baseyear=False, subset=None):
-        df = self.model_data("CAP", baseyear=baseyear, subset=subset)
-        df.plot.bar(stacked=True)
-        plt.title("{} Energy System Capacity".format(self.country.title()))
-        plt.ylabel("GW")
-        plt.xlabel("Year")
-        plt.legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
-
-    def plot_new_capacity(self, baseyear=False, subset=None):
-        h = self.historic_data("historical_new_capacity", "year_vtg", subset=subset)
-        m = self.model_data("CAP_NEW", "year_vtg", baseyear=baseyear, subset=subset)
-        df = pd.concat([h, m]) if not h.empty else m
-        df.plot.bar(stacked=True)
-        plt.title("{} Energy System New Capcity".format(self.country.title()))
-        plt.ylabel("GW")
-        plt.xlabel("Year")
-        plt.legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
-
-    def plot_prices(self, baseyear=False, subset=None):
-        df = self.ds.var("PRICE_COMMODITY")
-        if not baseyear:
-            df = df[df["year"] > self.firstyear]
-        if subset is not None:
-            df = df[df["commodity"].isin(subset)]
-        idx = ["year", "commodity"]
-        df = (
-            df[idx + ["lvl"]]
-            .groupby(idx)
-            .sum()
-            .reset_index()
-            .pivot(index="year", columns="commodity", values="lvl")
-            .rename(columns={"lvl": "value"})
-        )
-        df = df / 8760 * 100 * self.cost_unit_conv
-        df.plot.bar(stacked=False)
-        plt.title("{} Energy System Prices".format(self.country.title()))
-        plt.ylabel("cents/kWhr")
-        plt.xlabel("Year")
-        plt.legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
-
-    def plot_extraction(self, baseyear=False, subset=None, bygrade=True):
-        df = self.ds.var("EXT")
-        if not baseyear:
-            df = df[df["year"] > self.firstyear]
-        if subset is not None:
-            df = df[df["commodity"].isin(subset)]
-        if bygrade:
-            df["commodity"] = df["commodity"] + "_grade-" + df["grade"]
-        idx = ["year", "commodity"]
-        df = (
-            df[idx + ["lvl"]]
-            .groupby(idx)
-            .sum()
-            .reset_index()
-            .pivot(index="year", columns="commodity", values="lvl")
-            .rename(columns={"lvl": "value"})
-        )
-        df.plot.bar(stacked=True)
-        plt.title("{} Energy System Extraction".format(self.country.title()))
-        plt.ylabel("GWa")
-        plt.xlabel("Year")
-        plt.legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
-
-    def plot_fossil_supply_curve(self):
-        import matplotlib.patches as patches
-
-        df_cost = self.ds.par("resource_cost")
-        df_resv = self.ds.par("resource_volume").set_index("grade")
-
-        df = df_cost.groupby(["grade"]).mean().drop("year", axis=1)
-        df["volume"] = df_resv["value"]
-        df = df.reset_index().pivot_table(values="value", index="volume").reset_index()
-        ax = df.plot.scatter("volume", "value", c="white")
-        for i in df.index:
-            tmp = df.iloc[i]
-            if i == 0:
-                # Create a Rectangle patch
-                rect = patches.Rectangle(
-                    (0, 0),
-                    tmp["volume"],
-                    tmp["value"],
-                    linewidth=0.5,
-                    edgecolor="black",
-                    facecolor="#1f77b4",
-                )
-            else:
-                tmp2 = df.iloc[i - 1]
-                # Create a Rectangle patch
-                rect = patches.Rectangle(
-                    (tmp2["volume"], 0),
-                    tmp["volume"],
-                    tmp["value"],
-                    linewidth=0.5,
-                    edgecolor="black",
-                    facecolor="#ff7f0e",
-                )
-            # Add the patch to the Axes
-            ax.add_patch(rect)
-        ax.set_title(
-            "{} Energy System Fossil Resource Volume".format(self.country.title())
-        )
-        ax.set_ylabel("Cost $/kWa")
-        ax.set_xlabel("Resource Volume in GWa")
-        ax.set_xlim([0, df["volume"].sum()])
+    def plot_prices(self, tecs):
+        if type(tecs) != list:
+            tecs = [tecs]
+        df = self.rep.full_key('PRICE_COMMODITY')
+        new_key = self.rep.convert_pyam(
+            quantities=df.drop('l'),
+            year_time_dim='y',
+            collapse=_com_collapse_callback)
+        df = self.rep.get(new_key[0])
+        model = df.data.model.unique()[0]
+        scenario = df.data.scenario.unique()[0]
+        region = df.data.region.unique()[0]
+        df = df.filter(
+            model=model,
+            scenario=scenario,
+            region=region,
+            variable=tecs)
+        df = df.convert_unit('', 'cents/kWhr',
+                             1/8760*100*self.cost_unit_conv)
+        ax = df.bar_plot(stacked=True)
+        ax.set_ylabel('cents/kWhr')
+        ax.set_title('Westeros System Prices')
