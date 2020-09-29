@@ -19,8 +19,6 @@ def _com_collapse_callback(df):
 class Plots(object):
     def __init__(self, scenario, region, input_costs='$/GWa'):
         self.rep = Reporter.from_scenario(scenario)
-        self.model_name = scenario.model
-        self.scen_name = scenario.scenario
         self.region = region
 
         if input_costs == "$/MWa":
@@ -39,11 +37,7 @@ class Plots(object):
                   region={i: i.split('|')[0] for i
                           in df.regions()},
                   inplace=True)
-        ax = df.filter(
-            model=self.model_name,
-            scenario=self.scen_name,
-            region=self.region,
-            variable=tecs).bar_plot(stacked=True)
+        ax = df.filter(variable=tecs).bar_plot(stacked=True)
         ax.set_ylabel('GWa')
         ax.set_title('{} System Activity'.format(self.region))
 
@@ -56,11 +50,7 @@ class Plots(object):
                   region={i: i.split('|')[0] for i
                           in df.regions()},
                   inplace=True)
-        ax = df.filter(
-            model=self.model_name,
-            scenario=self.scen_name,
-            region=self.region,
-            variable=tecs).bar_plot(stacked=True)
+        ax = df.filter(variable=tecs).bar_plot(stacked=True)
         ax.set_ylabel('GW')
         ax.set_title('{} System Capacity'.format(self.region))
 
@@ -73,11 +63,7 @@ class Plots(object):
             year_time_dim='y',
             collapse=_com_collapse_callback)
         df = self.rep.get(new_key[0])
-        df = df.filter(
-            model=self.model_name,
-            scenario=self.scen_name,
-            region=self.region,
-            variable=tecs)
+        df = df.filter(variable=tecs)
         df = df.convert_unit('', 'cents/kWhr',
                              1/8760*100*self.cost_unit_conv)
         ax = df.bar_plot(stacked=True)
