@@ -20,15 +20,20 @@ jobs:
         - ubuntu-latest
         - windows-latest
         python-version:
-        - '3.6'        # Earliest supported by message_ix
-        - '3.8'        # Latest release
-        # Currently disabled: compiled binary packages are not available for
-        # some dependencies, e.g. llvmlite, numpy, pandas. Compiling these on
-        # the job runner requires a more elaborate build environment, currently
-        # out of scope.
-        # TODO enable once Python 3.9 is released and binary packages are
-        #      availalable.
-        # - '3.9.0-rc.1' # Development version
+        - "3.6"  # Earliest version supported by ixmp
+        - "3.8"  # Latest version testable on GitHub Actions
+
+        # Commented: binary wheels also not available (as of 2020-10-22) for
+        # recently-released Python 3.9.
+        # TODO monitor https://pypi.org/project/[PKG]/#files for the packages
+        #      mentioned below; enable once wheels for "cp39" are available.
+        # - "3.9"  # Latest version / latest supported by ixmp
+
+        # For development versions of Python, compiled binary wheels are not
+        # available for some dependencies, e.g. llvmlite, numba, numpy, and/or
+        # pandas. Compiling these on the job runner requires a more elaborate
+        # build environment, currently out of scope for the ixmp project.
+        # - "3.10.0-alpha.1"  # Development version
 
         exclude:
         # See https://github.com/iiasa/ixmp/issues/360
@@ -38,7 +43,7 @@ jobs:
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }} py${{ matrix.python-version }}
+    name: ${{ matrix.os }}-py${{ matrix.python-version }}
 
     steps:
     - name: Check out ixmp
@@ -63,6 +68,11 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
+    - name: Set RETICULATE_PYTHON
+      # Use the environment variable set by the setup-python action, above.
+      run: echo "RETICULATE_PYTHON=$pythonLocation" >> $GITHUB_ENV
+      shell: bash
 
     - uses: r-lib/actions/setup-r@master
 
@@ -111,12 +121,6 @@ jobs:
     - name: Install Python package and dependencies
       working-directory: message_ix
       run: pip install .[docs,reporting,tests,tutorial]
-
-    - name: Set RETICULATE_PYTHON (Windows only)
-      # Without this, reticulate tries to use Python 2.7 in the next step
-      if: ${{ contains(matrix.os, 'windows') }}
-      run: |
-        Write-Host "::set-env name=RETICULATE_PYTHON::${{ env.PYTHONLOCATION }}\python.exe"
 
     - name: Install R package, dependencies, and tutorial requirements
       run: |
