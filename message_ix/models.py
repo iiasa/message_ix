@@ -44,7 +44,7 @@ _ABBREV = {
 }
 
 
-@lru_cache
+@lru_cache()
 def item(ix_type, expr):
     """Return a dict with idx_sets and idx_names, given a string `expr`.
 
