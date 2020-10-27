@@ -4,8 +4,7 @@ import numpy as np
 import pandas as pd
 from ixmp import IAMC_IDX
 
-from message_ix import Scenario
-from message_ix.utils import make_df
+from message_ix import Scenario, make_df
 
 SCENARIO = {
     "dantzig": {"model": "Canning problem (MESSAGE scheme)", "scenario": "standard"},
@@ -86,24 +85,33 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
     # Parameters
     par = {}
 
-    demand = {"node": "new-york chicago topeka".split(), "value": [325, 300, 275]}
-    par["demand"] = make_df(
-        pd.DataFrame.from_dict(demand),
+    # Common values
+    common = dict(
         commodity="cases",
-        level="consumption",
-        time="year",
-        unit="case",
         year=1963,
+        year_vtg=1963,
+        year_act=1963,
+        time="year",
+        time_dest="year",
+        time_origin="year",
     )
 
-    b_a_u = {"node_loc": ["seattle", "san-diego"], "value": [350, 600]}
+    par["demand"] = make_df(
+        "demand",
+        **common,
+        node=["new-york", "chicago", "topeka"],
+        level="consumption",
+        value=[325, 300, 275],
+        unit="case",
+    )
     par["bound_activity_up"] = make_df(
-        pd.DataFrame.from_dict(b_a_u),
+        "bound_activity_up",
+        **common,
+        node_loc=["seattle", "san-diego"],
         mode="production",
         technology="canning_plant",
-        time="year",
+        value=[350, 600],
         unit="case",
-        year_act=1963,
     )
     par["ref_activity"] = par["bound_activity_up"].copy()
 
@@ -119,15 +127,12 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
         columns=["mode", "node_loc", "node_origin", "technology"],
     )
     par["input"] = make_df(
-        input,
-        commodity="cases",
+        "input",
+        **input,
+        **common,
         level="supply",
-        time="year",
-        time_origin="year",
-        unit="case",
         value=1,
-        year_act=1963,
-        year_vtg=1963,
+        unit="case",
     )
 
     output = pd.DataFrame(
@@ -143,16 +148,7 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
         ],
         columns=["level", "mode", "node_dest", "node_loc", "technology"],
     )
-    par["output"] = make_df(
-        output,
-        commodity="cases",
-        time="year",
-        time_dest="year",
-        unit="case",
-        value=1,
-        year_act=1963,
-        year_vtg=1963,
-    )
+    par["output"] = make_df("output", **output, **common, value=1, unit="case")
 
     # Variable cost: cost per kilometre × distance (neither parametrized
     # explicitly)
@@ -167,9 +163,7 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
         ],
         columns=["mode", "node_loc", "technology", "value"],
     )
-    par["var_cost"] = make_df(
-        var_cost, time="year", unit="USD/case", year_act=1963, year_vtg=1963
-    )
+    par["var_cost"] = make_df("var_cost", **var_cost, **common, unit="USD/case")
 
     for name, value in par.items():
         scen.add_par(name, value)
