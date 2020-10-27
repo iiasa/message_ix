@@ -62,12 +62,11 @@ def item(ix_type, expr):
     sets, names = zip(*[_ABBREV.get(dim, (dim, dim)) for dim in expr.split()])
 
     # Assemble the result
-    # TODO adjust ixmp.Model.initialize_items() to allow tuples
-    result = dict(ix_type=ix_type, idx_sets=list(sets))
+    result = dict(ix_type=ix_type, idx_sets=sets)
 
     if names != sets:
         # Index names are distinct from index sets; also return these
-        result["idx_names"] = list(names)
+        result["idx_names"] = names
 
     return result
 
