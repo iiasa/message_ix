@@ -1,21 +1,46 @@
+import numpy.testing as npt
 import pandas as pd
 import pandas.testing as pdt
 import pytest
 
 import message_ix.testing
 import message_ix.utils
-from message_ix import Scenario
+from message_ix import Scenario, make_df
 
 
 def test_make_df():
+    # DataFrame prepared for the message_ix parameter 'input' has the correct
+    # shape
+    result = make_df("input")
+    assert result.shape == (1, 12)
+
+    # …and column name(s)
+    assert result.columns[0] == "node_loc"
+    npt.assert_array_equal(result.columns[-2:], ("value", "unit"))
+
+    # Check correct behaviour when adding key-worded args:
+    defaults = dict(mode="all", time="year", time_origin="year", time_dest="year")
+    result = make_df("output", **defaults)
+    pdt.assert_series_equal(result["mode"], pd.Series("all", name="mode"))
+    pdt.assert_series_equal(result["time"], pd.Series("year", name="time"))
+    pdt.assert_series_equal(result["time_dest"], pd.Series("year", name="time_dest"))
+
+
+def test_make_df_deprecated():
     base = {"foo": "bar"}
-    exp = pd.DataFrame({"foo": "bar", "baz": [42, 42]})
-    obs = message_ix.utils.make_df(base, baz=[42, 42])
+    exp = pd.DataFrame({"foo": "bar", "baz": [42, 43]})
+
+    # Deprecated signature raises a warning
+    with pytest.warns(DeprecationWarning, match="with a mapping or pandas object"):
+        obs = make_df(base, baz=[42, 43])
     pdt.assert_frame_equal(obs, exp)
 
+    with pytest.raises(ValueError):
+        make_df(42, baz=[42, 42])
 
-def test_make_df_raises():
-    pytest.raises(ValueError, message_ix.utils.make_df, 42, baz=[42, 42])
+    # Equivalent
+    base.update(baz=[42, 43])
+    pdt.assert_frame_equal(pd.DataFrame.from_dict(base), exp)
 
 
 def test_testing_make_scenario(test_mp):

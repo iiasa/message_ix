@@ -1,11 +1,100 @@
 import copy
+import warnings
+from collections import ChainMap, defaultdict
 from collections.abc import Mapping
 
 import pandas as pd
+from pandas.api.types import is_scalar
+
+from message_ix.macro import MACRO_ITEMS
+from message_ix.models import MESSAGE_ITEMS
 
 
-def make_df(base, **kwargs):
+def make_df(name, **data):
+    """Return a data frame for parameter `name` filled with `data`.
+
+    :func:`make_df` always returns a data frame with the columns required by
+    :meth:`.add_par`: the dimensions of the parameter `name`, plus 'value' and
+    'unit'. Columns not listed in `data` are left empty.
+
+    Examples
+    --------
+    >>> make_df(
+    ...    "demand", node=["foo", "bar"], commodity="baz", value=[1.2, 3.4]
+    ... )
+      node commodity level  year  time  value  unit
+    0  foo       baz  None  None  None    1.2  None
+    1  bar       baz  None  None  None    3.4  None
+
+    Parameters
+    ----------
+    name : str
+        Name of a parameter listed in :data:`MESSAGE_ITEMS` or
+        :data:`MACRO_ITEMS`.
+    data : optional
+        Contents for dimensions of the parameter, its 'value', or 'unit'.
+        Additional keys are ignored.
+
+    Returns
+    -------
+    pandas.DataFrame
+
+    Raises
+    ------
+    ValueError
+        if `name` is not the name of a MESSAGE or MACRO parameter; if arrays in
+        `data` have uneven lengths.
+    """
+    if isinstance(name, (Mapping, pd.Series, pd.DataFrame)):
+        return _deprecated_make_df(name, **data)
+
+    # Get parameter information
+    try:
+        info = ChainMap(MESSAGE_ITEMS, MACRO_ITEMS)[name]
+    except KeyError:
+        raise ValueError("{repr(name)} is not a MESSAGE or MACRO parameter")
+
+    if info["ix_type"] != "par":
+        raise ValueError("{repr(name)} is {info['ix_type']}, not par")
+
+    # Index names, if not given explicitly, are the same as the index sets
+    idx_names = info.get("idx_names", info["idx_sets"])
+
+    # Columns for the resulting data frame
+    columns = list(idx_names) + ["value", "unit"]
+
+    # Default values for every column
+    data = ChainMap(data, defaultdict(lambda: None))
+
+    # Arguments for pd.DataFrame constructor
+    args = dict(data={})
+
+    # Flag if all values in `data` are scalars
+    all_scalar = True
+
+    for column in columns:
+        # Update flag
+        all_scalar &= is_scalar(data[column])
+        # Store data
+        args["data"][column] = data[column]
+
+    if all_scalar:
+        # All values are scalars, so the constructor requires an index to be
+        # passed explicitly.
+        args["index"] = [0]
+
+    return pd.DataFrame(**args)
+
+
+def _deprecated_make_df(base, **kwargs):
     """Extend or overwrite *base* with new values from *kwargs*.
+
+    .. deprecated:: 3.2
+
+       - For MESSAGE and MACRO parameters, use :meth:`make_df`.
+       - To manipulate other dictionaries, use :meth:`dict.update`.
+       - To add or overwrite columns in a data frame, use
+         :meth:`pandas.DataFrame.assign`.
 
     Parameters
     ----------
@@ -16,7 +105,7 @@ def make_df(base, **kwargs):
 
     Returns
     -------
-    :class:`pandas.DataFrame`
+    pandas.DataFrame
         *base* modified with *kwargs*.
 
     Examples
@@ -31,10 +120,13 @@ def make_df(base, **kwargs):
     0  bar  42
     1  bar  43
     2  bar  44
-
     """
-    if not isinstance(base, (Mapping, pd.Series, pd.DataFrame)):
-        raise ValueError("base argument must be a dictionary or Pandas object")
+    warnings.warn(
+        "make_df() with a mapping or pandas object. Use make_df(), "
+        "DataFrame.from_dict(), and/or DataFrame.assign().",
+        DeprecationWarning,
+    )
+
     base = copy.deepcopy(base)
     if not isinstance(base, Mapping):
         base = base.to_dict()
