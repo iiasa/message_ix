@@ -389,7 +389,7 @@ class MACRO(GAMSModel):
     GAMS_min_version = "24.8.1"
 
     def __init__(self, *args, **kwargs):
-        version = gams_release()
+        version = ixmp.model.gams.gams_version()
         if version < self.GAMS_min_version:
             message = (
                 "{0.name} requires GAMS >= {0.GAMS_min_version}; " "found {1}"
@@ -435,37 +435,3 @@ class MESSAGE_MACRO(MACRO):
 
         # Append to the prepared solve_args
         self.solve_args.extend(mm_iter_args)
-
-
-def gams_release():
-    """Return the GAMS release as a string, e.g. '24.7.4'."""
-    # TODO move this upstream to ixmp.model.gams
-    # NB check_output(['gams'], ...) does not work, because GAMS writes
-    #    directly to the console instead of to stdout.
-    #    check_output(['gams', '-LogOption=3'], ...) does not work, because
-    #    GAMS does not accept options without an input file to execute.
-    import os
-    from subprocess import check_output
-    from tempfile import mkdtemp
-
-    # Create a temporary GAMS program that does nothing
-    tmp_dir = Path(mkdtemp())
-    gms = tmp_dir / "null.gms"
-    gms.write_text("$exit;")
-
-    # Execute, capturing stdout
-    output = check_output(
-        ["gams", "null", "-LogOption=3"],
-        shell=os.name == "nt",
-        cwd=tmp_dir,
-        universal_newlines=True,
-    )
-
-    # Clean up
-    gms.unlink()
-    gms.with_suffix(".lst").unlink()
-    tmp_dir.rmdir()
-
-    # Find and return the version string
-    pattern = r"^GAMS ([\d\.]+)\s*Copyright"
-    return re.search(pattern, output, re.MULTILINE).groups()[0]
