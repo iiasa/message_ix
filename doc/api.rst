@@ -164,8 +164,10 @@ Model classes
    :show-inheritance:
 
 .. autodata:: MESSAGE_ITEMS
+   :annotation: = dict(…)
 
-   Currently, these only include items required for :ref:`storage <gams-storage>`, in order to ensure that all scenarios are compatible with the MESSAGE GAMS implementation.
+   Keys are the names of items (sets, parameters, variables, and equations); values are :class:`dict` specifying their type and dimensionality, with keys 'ix_type', 'idx_sets', and in some cases 'idx_names'.
+   These include all items listed in the MESSAGE mathematical specification, i.e. :ref:`sets_maps_def` and :ref:`parameter_def`.
 
    .. seealso:: :meth:`.MESSAGE.initialize`
 

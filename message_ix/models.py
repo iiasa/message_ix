@@ -71,8 +71,8 @@ def item(ix_type, expr):
     return result
 
 
-#: List of ixmp items for MESSAGE.
 # NB order by ix_type (set, par, var, equ), then alphabetically.
+#: List of ixmp items for MESSAGE.
 MESSAGE_ITEMS = {
     # Index sets
     "commodity": dict(ix_type="set"),
@@ -102,7 +102,8 @@ MESSAGE_ITEMS = {
     #
     # Indexed sets
     "addon": dict(ix_type="set", idx_sets=["technology"]),
-    # commented: ixmp_source complains that the item already exists
+    # commented: in test_solve_legacy_scenario(), ixmp_source complains that
+    # the item already exists
     # "balance_equality": item("set", "c l"),
     "cat_addon": dict(
         ix_type="set",

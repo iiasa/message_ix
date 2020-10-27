@@ -1,6 +1,30 @@
+from collections import defaultdict
+
 import pytest
 
-from message_ix.models import MESSAGE_MACRO
+from message_ix.models import MESSAGE, MESSAGE_ITEMS, MESSAGE_MACRO
+import ixmp
+
+
+def test_initialize(test_mp):
+    # Expected numbers of items by type
+    exp = defaultdict(list)
+    for name, spec in MESSAGE_ITEMS.items():
+        exp[spec["ix_type"]].append(name)
+
+    # Use ixmp.Scenario to avoid invoking ixmp_source/Java code that
+    # automatically populates empty scenarios
+    s = ixmp.Scenario(
+        test_mp, "test_initialize", "test_initialize", version="new"
+    )
+
+    # Initialization succeeds on a totally empty scenario
+    MESSAGE.initialize(s)
+
+    # The expected items exist
+    for ix_type, exp_names in exp.items():
+        obs_names = getattr(s, f"{ix_type}_list")()
+        assert sorted(obs_names) == sorted(exp_names)
 
 
 def test_message_macro():
