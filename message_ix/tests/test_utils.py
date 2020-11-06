@@ -3,9 +3,8 @@ import pandas as pd
 import pandas.testing as pdt
 import pytest
 
-import message_ix.testing
-import message_ix.utils
 from message_ix import Scenario, make_df
+from message_ix.testing import make_dantzig, make_westeros
 
 
 def test_make_df():
@@ -45,15 +44,14 @@ def test_make_df_deprecated():
 
 def test_testing_make_scenario(test_mp):
     """Check the model creation functions in message_ix.testing."""
-
     # MESSAGE-scheme Dantzig problem can be created
-    scen = message_ix.testing.make_dantzig(test_mp, True)
+    scen = make_dantzig(test_mp, True)
     assert isinstance(scen, Scenario)
 
     # Multi-year variant can be created
-    scen = message_ix.testing.make_dantzig(test_mp, solve=True, multi_year=True)
+    scen = make_dantzig(test_mp, solve=True, multi_year=True)
     assert isinstance(scen, Scenario)
 
     # Westeros model can be created
-    scen = message_ix.testing.make_westeros(test_mp, True)
+    scen = make_westeros(test_mp, True)
     assert isinstance(scen, Scenario)
