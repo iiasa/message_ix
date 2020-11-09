@@ -40,20 +40,20 @@ $OFFTEXT
 ***
 * Run script for |MESSAGEix| and MACRO
 * ====================================
-* This page is generated from the auto-documentation in ``model/MESSAGE-MACRO_run.gms``.
 *
 * This is |MESSAGEix|-MACRO version |version|. The version number must match the version number
 * of the ``ixmp`` ``MESSAGE``-scheme specifications used for exporting data and importing results.
 *
 * This file contains the workflow of a |MESSAGEix|-MACRO run. It can be called:
-*  - Via the scientific programming API's using the packages/libraries ``ixmp`` and ``message_ix``,
-*    calling the method ``solve()`` of the ``message_ix.Scenario`` class (see the tutorials).
-*  - using the file ``MESSAGE_master.gms`` with the option ``$SETGLOBAL macromode "linked"``,
-*    where the input data file name and other options are stated explicitly, or
-*  - directly from the command line, with the input data file name
-*    and other options specific as command line parameters, e.g.
 *
-*    ``gams MESSAGE-MACRO_run.gms --in="<data-file>" [--out="<output-file>"]``
+* - Via the scientific programming API's using the packages/libraries ``ixmp`` and ``message_ix``,
+*   calling the method ``solve()`` of the ``message_ix.Scenario`` class (see the tutorials).
+* - using the file ``MESSAGE_master.gms`` with the option ``$SETGLOBAL macromode "linked"``,
+*   where the input data file name and other options are stated explicitly, or
+* - directly from the command line, with the input data file name
+*   and other options specific as command line parameters, e.g.::
+*
+*   ``gams MESSAGE-MACRO_run.gms --in="<data-file>" [--out="<output-file>"]``
 *
 * By default, the data file (in gdx format) should be located in the ``model/data`` folder
 * and be named in the format ``MsgData_<name>.gdx``. Upon completion of the GAMS execution,
@@ -76,23 +76,30 @@ $INCLUDE MACRO/macro_core.gms
 * initialize sets, parameters and counters for the iteration between MESSAGEix and MACRO                               *
 *----------------------------------------------------------------------------------------------------------------------*
 
-* set default maximum iteration count and
-$IF NOT set MAX_ITERATION            $SETGLOBAL MAX_ITERATION "50"
-$IF NOT set MAX_ADJUSTMENT           $SETGLOBAL MAX_ADJUSTMENT "0.2"
+* command-line parameters for convergence and oscillation detection
 $IF NOT set CONVERGENCE_CRITERION    $SETGLOBAL CONVERGENCE_CRITERION "0.01"
+$IF NOT set MAX_ADJUSTMENT           $SETGLOBAL MAX_ADJUSTMENT "0.2"
+$IF NOT set MAX_ITERATION            $SETGLOBAL MAX_ITERATION "50"
+DISPLAY "%CONVERGENCE_CRITERION%", "%MAX_ADJUSTMENT%", "%MAX_ITERATION%";
 
 Set
-    iteration / 1*%MAX_ITERATION% /
+    iteration          allowable iterations                                         / 1*%MAX_ITERATION% /
 ;
 
+* NB MAX_ADJUSTMENT and max_adjustment have different meanings:
+* - MAX_ADJUSTMENT is a fixed threshold used to truncate the relative demand change produced by MACRO.
+* - max_adjustment is the amount of that change, after any truncation.
 Scalar
-    max_adjustment_pre maximum adjustment in previous iteration / 0 /
+    max_adjustment_pre maximum adjustment in previous iteration                     / 0 /
     max_adjustment_pos maximum positive adjustment in current iteration
     max_adjustment_neg maximum negative adjustment in current iteration
     max_adjustment     maximum adjustment in current iteration
-    convergence_status status of convergence (1 if successful) / 0 /
+    convergence_status status of convergence (1 if successful)                      / 0 /
     scaling            scaling factor to adjust step size when iteration oscillates / 1 /
+    max_it             maximum number of iterations                                 / %MAX_ITERATION% /
+    ctr                iteration counter                                            /0/
 ;
+
 
 * declarations moved from solve files to avoid inclusion in loop
 Parameters
@@ -108,6 +115,13 @@ Parameters
 
     report_iteration(iteration,*)
 ;
+
+* variables to report back to user if needed
+Variables
+    N_ITER
+    MAX_ITER
+;
+
 
 price_init(node,sector,year_all) = 0 ;
 
@@ -134,6 +148,8 @@ if (check,
 LOOP(iteration,
 
 put_utility 'log' /"+++ Starting iteration ", ORD(iteration):0:0, " of MESSAGEix-MACRO... +++ " ;
+
+ctr = ctr + 1 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
 * solve MESSAGE model                                                                                                  *
@@ -176,39 +192,6 @@ price_diff_rel(iteration,node_macro,sector,year)$( price_init(node_macro,sector,
 
 price_init(node_macro,sector,year) = SUM((commodity, level, time) $ mapping_macro_sector(sector, commodity, level),
                                         PRICE_COMMODITY.l(node_macro,commodity,level,year,time) ) ;
-
-* calculation of commodity import costs by node, commodity and year
-import_cost(node2, commodity, year) =
-          SUM( (node,tec,vintage,mode,level,time,time2)$( (NOT sameas(node,node2)) AND map_tec_act(node2,tec,year,mode,time2)
-            AND map_tec_lifetime(node2,tec,vintage,year) AND map_commodity(node,commodity,level,year,time) ),
-* import into node2 from other nodes
-          input(node2,tec,vintage,year,mode,node,commodity,level,time2,time)
-        * duration_time_rel(time,time2) * ACT.L(node2,tec,vintage,year,mode,time2)
-        * COMMODITY_BALANCE.M(node,commodity,level,year,time) / discountfactor(year) )
-;
-
-* calculation of commodity export costs by node, commodity and year
-export_cost(node2, commodity, year) =
-          SUM( (node,tec,vintage,mode,level,time,time2)$( (NOT sameas(node,node2)) AND map_tec_act(node2,tec,year,mode,time2)
-            AND map_tec_lifetime(node2,tec,vintage,year) AND map_commodity(node,commodity,level,year,time) ),
-* export from node2 to other market
-          output(node2,tec,vintage,year,mode,node,commodity,level,time2,time)
-        * duration_time_rel(time,time2) * ACT.L(node2,tec,vintage,year,mode,time2)
-        * COMMODITY_BALANCE.M(node,commodity,level,year,time) / discountfactor(year) )
-;
-
-* net commodity trade costs by node and year
-trade_cost(node2, year) = SUM(commodity, import_cost(node2, commodity, year) - export_cost(node2, commodity, year)) ;
-
-* total energy system costs excluidng taxes by node and time (CAVEAT: lacking regional corrections due to emission trading)
-total_cost(node_macro, year)$(NOT macro_base_period(year)) = (
-    COST_NODAL.L(node_macro, year) + trade_cost(node_macro, year)
-* subtract emission taxes applied at any higher nodal level (via map_node set)
-    - sum((type_emission,emission,type_tec,type_year,node)$( emission_scaling(type_emission,emission)
-            AND map_node(node,node_macro) AND cat_year(type_year,year) ),
-        emission_scaling(type_emission,emission) * tax_emission(node,type_emission,type_tec,type_year)
-        * EMISS.L(node_macro,emission,type_tec,year) )
-) / 1000 ;
 
 DISPLAY enestart, eneprice, total_cost ;
 
@@ -308,6 +291,10 @@ $INCLUDE includes/aux_computation_time.gms
 * post-processing and export to gdx                                                                                    *
 *----------------------------------------------------------------------------------------------------------------------*
 
+N_ITER.L = ctr ;
+MAX_ITER.L = max_it ;
+
+
 $INCLUDE MESSAGE/reporting.gms
 
 * dump all input data, processed data and results to a gdx file (with additional comment as name extension if provided)
@@ -324,4 +311,3 @@ put_utility 'log' /"+++ End of MESSAGEix-MACRO run - have a nice day! +++ " ;
 *----------------------------------------------------------------------------------------------------------------------*
 * end of file - have a nice day!                                                                                       *
 *----------------------------------------------------------------------------------------------------------------------*
-

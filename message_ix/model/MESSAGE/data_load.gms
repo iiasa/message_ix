@@ -15,8 +15,10 @@ $LOAD map_node, map_time, map_commodity, map_resource, map_stocks, map_tec, map_
 $LOAD map_land, map_relation
 $LOAD type_tec, cat_tec, type_year, cat_year, type_emission, cat_emission, type_tec_land
 $LOAD inv_tec, renewable_tec
+$LOAD balance_equality
 $LOAD shares
 $LOAD addon, type_addon, cat_addon, map_tec_addon
+$LOAD storage_tec, level_storage, map_tec_storage
 $GDXIN
 
 Execute_load '%in%'
@@ -68,7 +70,16 @@ demand_fixed=demand
 * fixing variables to pre-specified values
 is_fixed_extraction, is_fixed_stock, is_fixed_new_capacity, is_fixed_capacity, is_fixed_activity, is_fixed_land
 fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activity, fixed_land
+* storage parameters
+storage_initial, storage_self_discharge, time_order
 ;
+
+
+*----------------------------------------------------------------------------------------------------------------------*
+* ensure that each node is mapped to itself                                                                            *
+*----------------------------------------------------------------------------------------------------------------------*
+
+map_node(node,node) = yes ;
 
 *----------------------------------------------------------------------------------------------------------------------*
 * auxiliary mappings for the implementation of bounds over all modes and system reliability/flexibility constraints    *
@@ -150,6 +161,17 @@ addon_up(node,tec,year_all,mode,time,type_addon)$(
 emission_scaling(type_emission,emission)$( cat_emission(type_emission,emission)
         and not emission_scaling(type_emission,emission) ) = 1 ;
 
+* mapping of storage technologies to their level and commodity (can be different from level and commodity of storage media)
+map_time_commodity_storage(node,tec,level,commodity,mode,year_all,time)$( storage_tec(tec) AND
+    SUM( (node2,year_all2,time_act), input(node2,tec,year_all,year_all2,mode,node,commodity,level,time_act,time) ) ) = yes;
+
+* mapping of sequence of sub-annual timesteps in a period and temporal level
+map_time_period(year_all,lvl_temporal,time,time2)$( time_order(lvl_temporal,time) AND
+     time_order(lvl_temporal,time) + 1 = time_order(lvl_temporal,time2) ) = yes;
+
+* mapping of sequence of the last sub-annual timestep to the first to create a close the order of timesteps
+map_time_period(year_all,lvl_temporal,time,time2)$( time_order(lvl_temporal,time) AND
+     time_order(lvl_temporal,time) = SMAX(time3,time_order(lvl_temporal,time3) ) AND time_order(lvl_temporal,time2) = 1 ) = yes;
 *----------------------------------------------------------------------------------------------------------------------*
 * sanity checks on the data set                                                                                        *
 *----------------------------------------------------------------------------------------------------------------------*

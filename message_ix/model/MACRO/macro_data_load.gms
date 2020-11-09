@@ -102,7 +102,8 @@ Parameters
 * parameters for spatially and temporally flexible formulation, and for myopic/rolling-horizon optimization
     duration_period_sum(year_all,year_all2)   number of years between two periods ('year_all' must precede 'year_all2')
     interestrate(year_all)         interest rate (to compute discount factor)
-    discountfactor(*)              cumulative discount facor
+    df_period(year_all)            cumulative discount factor over period duration
+    df_year(year_all)              discount factor of the last year in the period
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
@@ -153,7 +154,7 @@ DISPLAY node_macro ;
 $INCLUDE includes/period_parameter_assignment.gms
 
 year(year_all) = no ;
-year(year_all)$( ORD(year_all) >= sum(year_all2$cat_year("baseyear_macro",year_all2), ORD(year_all2) ) ) = yes ;
+year(year_all)$( ORD(year_all) >= sum(year_all2$cat_year("initializeyear_macro",year_all2), ORD(year_all2) ) ) = yes ;
 
 DISPLAY cat_year, macro_base_period, first_period, last_period, macro_horizon, year ;
 
@@ -230,7 +231,7 @@ LOOP(year_all $( ORD(year_all) > sum(year_all2$( macro_initial_period(year_all2)
 * new labor supply
    newlab(node_macro, year_all) = SUM(year_all2$( seq_period(year_all2,year_all) ), (labor(node_macro, year_all) - labor(node_macro, year_all2)*(1 - depr(node_macro))**duration_period(year_all))$((labor(node_macro, year_all) - labor(node_macro, year_all2)*(1 - depr(node_macro))**duration_period(year_all)) > 0)) + epsilon ;
 * calculation of utility discount factor based on discount rate (drate)
-   udf(node_macro, year_all)    = SUM(year_all2$( seq_period(year_all2,year_all) ), udf(node_macro, year_all2) * (1 - (DRATE(node_macro) - grow(node_macro, year_all)))**duration_period(year_all)) ;
+   udf(node_macro, year_all)    = SUM(year_all2$( seq_period(year_all2,year_all) ), udf(node_macro, year_all2) * (1 - (drate(node_macro) - grow(node_macro, year_all)))**duration_period(year_all)) ;
 );
 
 DISPLAY labor, newlab, udf;
@@ -262,4 +263,4 @@ DISPLAY ecst0, k0, i0, c0, y0 ;
 * simply taken.
 * ------------------------------------------------------------------------------
 
-finite_time_corr(node_macro, year) = abs(DRATE(node_macro) - grow(node_macro, year)) ;
+finite_time_corr(node_macro, year) = abs(drate(node_macro) - grow(node_macro, year)) ;

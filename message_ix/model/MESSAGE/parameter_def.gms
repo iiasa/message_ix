@@ -3,21 +3,25 @@
 *
 * Parameter definition
 * ====================
-* This page is generated from the auto-documentation in ``MESSAGE/parameter_def.gms``.
 *
 * This file contains the definition of all parameters used in |MESSAGEix|.
 *
 * In |MESSAGEix|, all parameters are understood as yearly values, not as per (multi-year) period.
 * This provides flexibility when changing the resolution of the model horizon (i.e., the set ``year``).
-*
-* Parameters written in *italics* are auxiliary parameters
-* that are either generated automatically when exporting a ``message_ix.Scenario`` to gdx
-* or that are computed during the pre-processing stage in GAMS.
 ***
 
 ***
+* .. _section_parameter_general:
+*
 * General parameters of the |MESSAGEix| implementation
 * ----------------------------------------------------
+*
+* .. caution::
+*
+*    Parameters written in **bold** are auxiliary parameters
+*    that are either generated automatically when exporting a :class:`message_ix.Scenario` to gdx
+*    or that are computed during the *pre-processing* stage in GAMS (see the footnotes for more
+*    individual details). These are **not** meant to be edited through the API when editing scenarios.
 *
 * .. list-table::
 *    :widths: 25 20 55
@@ -26,49 +30,64 @@
 *    * - Parameter name
 *      - Index dimensions
 *      - Explanatory comments
-*    * - *duration_period* (:math:`|y|`) [#short_dur]_
-*      - ``year``
-*      - duration of multi-year period (in number of years) [#year_auto]_
-*    * - duration_time
-*      - ``time``
-*      - duration of sub-annual time slices (relative to 1) [#duration_time_year]_
-*    * - *duration_time_rel*
-*      - ``time`` | ``time``
-*      - relative duration between sub-annual time slices [#df_auto]_
 *    * - interestrate
 *      - ``year``
-*      - economy-wide interest rate or social discount rate
-*    * - *discountfactor*
+*      - Economy-wide interest rate or social discount rate
+*    * - duration_time
+*      - ``time``
+*      - Duration of sub-annual time slices (relative to 1) [#duration_time_year]_
+*    * - **duration_period** (:math:`|y|`) [#short_dur]_
 *      - ``year``
-*      -  cumulative discount factor over period duration [#df_auto]_
+*      - Duration of multi-year period (in number of years) [#year_auto]_
+*    * - **duration_period_sum**
+*      - ``year`` | ``year``
+*      - Number of years between two periods [#df_auto]_
+*    * - **duration_time_rel**
+*      - ``time`` | ``time``
+*      - Relative duration between sub-annual time slices [#df_auto]_
+*    * - **df_period**
+*      - ``year``
+*      - Cumulative discount factor over period duration [#df_auto]_
+*    * - **df_year**
+*      - ``year``
+*      - Discount factor of the last year in the period [#df_auto]_
+*
+* .. [#duration_time_year] The element 'year' in the set of subannual time slices ``time`` has the value of 1.
+*    This value is assigned by default when creating a new :class:`ixmp.Scenario` based on the ``MESSAGE`` scheme.
 *
 * .. [#short_dur] The short-hand notation :math:`|y|` is used for the parameters :math:`duration\_period_y`
 *    in the mathematical model documentation for exponents.
 *
 * .. [#year_auto] The values for this parameter are computed automatically when exporting a ``MESSAGE``-scheme
-*    ``ixmp``.Scenario to gdx.
+*    :class:`ixmp.Scenario` to gdx.
 *    Note that in |MESSAGEix|, the elements of the ``year`` set are understood to be the last year in a period,
 *    see :ref:`this footnote <period_year_footnote>`.
 *
-* .. [#duration_time_year] The element 'year' in the set of subannual time slices ``time`` has the value of 1.
-*    This value is assigned by default when creating a new ``ixmp``.Scenario based on the ``MESSAGE`` scheme.
-*
-* .. [#df_auto] This parameter is computed during the GAMS execution.
+* .. [#df_auto] These parameters are computed during the GAMS execution.
 ***
 
 Parameters
 * general parameters
-    duration_period(year_all)      duration of one multi-year period (in years)
+    interestrate(year_all)         interest rate (to compute discount factor)
     duration_time(time)            duration of one time slice (relative to 1)
+    duration_period(year_all)      duration of one multi-year period (in years)
     duration_period_sum(year_all,year_all2)  number of years between two periods ('year_all' must precede 'year_all2')
     duration_time_rel(time,time2)  relative duration of subannual time period ('time2' relative to parent 'time')
-    interestrate(year_all)         interest rate (to compute discount factor)
-    discountfactor(*)              cumulative discount facor
+    df_period(year_all)            cumulative discount factor over period duration
+    df_year(year_all)              discount factor of the last year in the period
 ;
 
 ***
+* .. _section_parameter_resources:
+*
 * Parameters of the `Resources` section
 * -------------------------------------
+*
+* In |MESSAGEix|, the volume of resources at the start of the model horizon is defined by ``resource_volume``. The quantity of the
+* resources that are extracted per year is dependent on two parameters. The first is ``bound_extraction_up``, which constraints
+* the maximum extraction of the resources (by grade) in a year. The second is ``resource_remaining``, which is the maximum
+* extraction of the remaining resources in a certain year, as a percentage. Extraction costs for resources are represented by
+* ``resource_cost`` parameter.
 *
 * .. list-table::
 *    :widths: 25 75
@@ -89,8 +108,8 @@ Parameters
 *    * - historical_extraction [#hist]_
 *      - ``node`` | ``commodity`` | ``grade`` | ``year``
 *
-* .. [#stock] This parameter allows (exogenous) additions to the commodity stock over the model horizon,
-*    e.g., precipitation that replenishes the water table.
+* .. [#stock] Commodity stock refers to an exogenous (initial) quantity of commodity in stock. This parameter allows
+*    (exogenous) additions to the commodity stock over the model horizon, e.g., precipitation that replenishes the water table.
 *
 * .. [#hist] Historical values of new capacity and activity can be used for parametrising the vintage structure
 *    of existing capacity and implement dynamic constraints in the first model period.
@@ -108,6 +127,8 @@ Parameter
 ;
 
 ***
+* .. _section_parameter_demand:
+*
 * Parameters of the `Demand` section
 * ----------------------------------
 *
@@ -122,13 +143,14 @@ Parameter
 *    * - peak_load_factor [#peakload]_
 *      - ``node`` | ``commodity`` | ``year``
 *
-* .. [#demand] The parameter ``demand`` in a ``MESSAGE``-scheme ``ixmp``.Scenario is translated
-*    to the parameter ``demand_fixed`` in the MESSAGE implementation in GAMS. The variable ``DEMAND`` is introduced
+* .. [#demand] The parameter ``demand`` in a ``MESSAGE``-scheme ``ixmp.Scenario`` is translated
+*    to the parameter ``demand_fixed`` in the |MESSAGEix| implementation in GAMS. The variable ``DEMAND`` is introduced
 *    as an auxiliary reporting variable; it equals ``demand_fixed`` in a `MESSAGE`-standalone run and reports
 *    the final demand including the price response in an iterative `MESSAGE-MACRO` solution.
 *
-* .. [#peakload] The parameters ``peak_load_factor`` and ``reliability_factor`` are based on the formulation proposed
-*    by Sullivan et al., 2013 :cite:`sullivan_VRE_2013`. It is used in :ref:`reliability_constraint`.
+* .. [#peakload] The parameters ``peak_load_factor`` (maximum peak load factor for reliability constraint of firm capacity) and
+*    ``reliability_factor`` (reliability of a technology (per rating)) are based on the formulation proposed by Sullivan et al., 2013 :cite:`sullivan_VRE_2013`.
+*    It is used in :ref:`reliability_constraint`.
 *
 ***
 
@@ -138,6 +160,8 @@ Parameter
 ;
 
 ***
+* .. _params-tech:
+*
 * Parameters of the `Technology` section
 * --------------------------------------
 *
@@ -145,11 +169,11 @@ Parameter
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
 * .. list-table::
-*    :widths: 25 75
+*    :widths: 25 60
 *    :header-rows: 1
 *
 *    * - Parameter name
-*      - Index names
+*      - Index dimensions
 *    * - input [#tecvintage]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` |
 *        ``node_origin`` | ``commodity`` | ``level`` | ``time`` | ``time_origin``
@@ -164,7 +188,7 @@ Parameter
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``time``
 *    * - levelized_cost [#levelizedcost]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``time``
-*    * - construction_time
+*    * - construction_time [#construction]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - technical_lifetime
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
@@ -175,14 +199,14 @@ Parameter
 *    * - min_utilization_factor [#tecvintage]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act``
 *    * - rating_bin [#rating]_
-*      - ``node`` | ``technology`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
+*      - ``node`` | ``tec`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
 *    * - reliability_factor [#peakload]_
-*      - ``node`` | ``technology`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
-*    * - flexibility_factor
-*      - ``node_loc`` | ``technology`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``commodity`` | ``level`` | ``time`` | ``rating``
-*    * - renewable_capacity_factor
+*      - ``node`` | ``tec`` | ``year_act`` | ``commodity`` | ``level`` | ``time`` | ``rating``
+*    * - flexibility_factor [#flexfactor]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``commodity`` | ``level`` | ``time`` | ``rating``
+*    * - renewable_capacity_factor [#renewables]_
 *      - ``node_loc`` | ``commodity`` | ``grade`` | ``level`` | ``year``
-*    * - renewable_potential
+*    * - renewable_potential [#renewables]_
 *      - ``node`` | ``commodity`` | ``grade`` | ``level`` | ``year``
 *    * - emission_factor
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``emission``
@@ -197,9 +221,14 @@ Parameter
 * .. [#construction] The construction time only has an effect on the investment costs; in |MESSAGEix|,
 *    each unit of new-built capacity is available instantaneously at the beginning of the model period.
 *
-* .. [#rating] The upper bound of a contribution by any technology to the constraints on system reliability
-*    (:ref:`reliability_constraint`) and flexibility (:ref:`flexibility_constraint`) can depend on the share
-*    of the technology output in the total commodity use at a specific level.
+* .. [#rating] Maximum share of technology in commodity use per rating. The upper bound of a contribution by any technology to the constraints on system reliability
+*    (:ref:`reliability_constraint`) and flexibility (:ref:`flexibility_constraint`) can depend on the share of the technology output in the total commodity use at
+*    a specific level.
+*
+* .. [#flexfactor] Contribution of technologies towards operation flexibility constraint. It is used in :ref:`flexibility_constraint`.
+*
+* .. [#renewables] ``renewable_capacity_factor`` refers to the quality of renewable potential by grade and ``renewable_potential`` refers to the size of the renewable potential per grade.
+*
 ***
 
 Parameters
@@ -217,22 +246,25 @@ Parameters
     capacity_factor(node,tec,vintage,year_all,time)         capacity factor by subannual time slice
     operation_factor(node,tec,vintage,year_all)             yearly total operation factor
     min_utilization_factor(node,tec,vintage,year_all)       yearly minimum utilization factor
-    emission_factor(node,tec,year_all,year_all,mode,emission) emission intensity of activity
     rating_bin(node,tec,year_all,commodity,level,time,rating) maximum share of technology in commodity use per rating
     reliability_factor(node,tec,year_all,commodity,level,time,rating) reliability of a technology (per rating)
     flexibility_factor(node,tec,vintage,year_all,mode,commodity,level,time,rating) contribution of technologies towards operation flexibility constraint
     renewable_capacity_factor(node,commodity,grade,level,year_all) quality of renewable potential grade (>= 1)
     renewable_potential(node,commodity,grade,level,year_all) size of renewable potential per grade
+    emission_factor(node,tec,year_all,year_all,mode,emission) emission intensity of activity
 ;
 
 ***
+* .. _section_parameter_bounds:
+*
 * Bounds on capacity and activity
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
-* The following parameters specify upper and lower bounds on new capacity, total installed capacity, and activity.
+* The following parameters specify upper and lower bounds on new capacity, total installed capacity, and activity. The bounds
+* on activity are implemented as the aggregate over all vintages in a specific period (:ref:`activity_bound_up` and :ref:`activity_bound_lo`).
 *
 * .. list-table::
-*    :widths: 20 80
+*    :widths: 25 60
 *    :header-rows: 1
 *
 *    * - Parameter name
@@ -250,8 +282,6 @@ Parameters
 *    * - bound_activity_lo
 *      - ``node_loc`` | ``tec`` | ``year_act`` | ``mode`` | ``time``
 *
-* The bounds on activity are implemented as the aggregate over all vintages in a specific period
-* (cf. Equation ``ACTIVITY_BOUND_UP`` and ``ACTIVITY_BOUND_LO``).
 ***
 
 Parameters
@@ -264,10 +294,14 @@ Parameters
 ;
 
 ***
+* .. _section_parameter_dynamic_constraints:
+*
 * Dynamic constraints on capacity and activity
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
-* The following parameters specify constraints on the growth of new capacity and activity, i.e., market penetration.
+* The following parameters specify constraints on the growth of new capacity and activity, i.e., market penetration. The implementation of |MESSAGEix|
+* includes the functionality for 'soft' relaxations of dynamic constraints on new-built capacity and activity (see Keppo and Strubegger, 2010
+* :cite:`keppo_short_2010`). For more information, please refer to the equations in section :ref:`dynamic_constraints` of the mathematical formulation.
 *
 * .. list-table::
 *    :widths: 30 70
@@ -284,7 +318,7 @@ Parameters
 *    * - initial_new_capacity_lo
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - growth_new_capacity_lo [#mpx]_
-*      - ``node_loc`` | ``tec_actual`` | ``year_vtg``
+*      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - soft_new_capacity_lo [#mpx]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - initial_activity_up [#mpa]_
@@ -330,13 +364,19 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
+* .. _section_parameter_addon:
+*
 * Parameters for the add-on technologies
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
 * The implementation of |MESSAGEix| includes the functionality to introduce "add-on technologies" that are specifically
-* linked to parent technologies. This feature can be used to model mitigation options (scrubber, cooling).
-* Note, that no default addon_conversion is set, to avoid default conversion factors of 1 being set for technologies
-* with mutiple modes, of which only a single mode should be linked to the add-on technology.
+* linked to parent technologies. This feature can be used to model mitigation options (scrubber, cooling). Upper and
+* lower bounds of add-on technologies are defined relative to the parent: ``addon_up`` and ``addon_lo``, respectively.
+*
+* .. note::
+*    No default ``addon_conversion`` factor (conversion factor between add-on and parent technology activity) is set.
+*    This is to avoid default conversion factors of 1 being set for technologies with multiple modes, of which only a
+*    single mode should be linked to the add-on technology.
 *
 * .. list-table::
 *    :widths: 20 80
@@ -347,11 +387,10 @@ Parameters
 *    * - addon_conversion
 *      - ``node`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``time`` | ``type_addon``
 *    * - addon_up
-*      - ``node`` | ``tec`` | ``vintage`` | ``year`` | ``mode`` | ``time`` | ``type_addon``
+*      - ``node`` | ``tec`` | ``year_act`` | ``mode`` | ``time`` | ``type_addon``
 *    * - addon_lo
-*      - ``node`` | ``tec`` | ``vintage`` | ``year`` | ``mode`` | ``time`` | ``type_addon``
+*      - ``node`` | ``tec`` | ``year_act`` | ``mode`` | ``time`` | ``type_addon``
 *
-* The upper bound of
 ***
 
 Parameters
@@ -361,16 +400,60 @@ Parameters
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
+* Storage parameters
+*----------------------------------------------------------------------------------------------------------------------*
+
+***
+* .. _section_parameter_storage:
+*
+* Parameters for representing storage solutions
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*
+* The |MESSAGEix| formulation includes "storage" solutions to model sub-annual, inter-temporal storage of commodities in each period.
+* This feature can be used to model electricity storage (pumped hydro, batteries, compressed air energy storage, etc.), thermal energy storage,
+* demand side management, and in general any technology for storing commodities (gas, hydrogen, water, etc.) over sub-annual timesteps.
+* The user defines the chronological order of sub-annual time steps by assigning a number to them in parameter ``time_order``.
+* This order is used by storage equations to shift the stored commodity in a correct timeline, e.g., from Jan through to Dec, and not vice versa.
+* The last sub-annual timestep is linked to the first one to close the loop of the year. Parameter ``storage_initial`` is to set an initial amount
+* for the content of storage in any desirable timestep (optionally). This initial value is a cost-free stored media that storage can discharge
+* in the same or following timesteps. ``storage_self_discharge`` represents the self-discharge (loss) of storage as % of the level of stored media
+* in each timestep. This allows to model time-related losses in storage separately, in addition to charging and discharging losses.
+*
+* .. list-table::
+*    :widths: 20 80
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index names
+*    * - storage_initial
+*      - ``node`` | ``tec`` | ``level`` | ``commodity`` | ``year_act`` | ``time``
+*    * - storage_self_discharge
+*      - ``node`` | ``tec`` | ``level`` | ``commodity`` | ``year_act`` | ``time``
+*    * - time_order
+*      - ``lvl_temporal`` | ``time``
+*
+***
+
+Parameters
+    storage_initial(node,tec,level,commodity,year_all,time)                       initial content of storage
+    storage_self_discharge(node,tec,level,commodity,year_all,time)                self-discharge (loss) of storage as % of storage level in each timestep
+    time_order(lvl_temporal,time)                                                 sequence of subannual timesteps
+;
+
+*----------------------------------------------------------------------------------------------------------------------*
 * Soft relaxations of dynamic constraints                                                                              *
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
+* .. _section_parameter_soft_constraints:
+*
 * Cost parameters for 'soft' relaxations of dynamic constraints
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
 * The implementation of |MESSAGEix| includes the functionality for 'soft' relaxations of dynamic constraints on
 * new-built capacity and activity (see Keppo and Strubegger, 2010 :cite:`keppo_short_2010`).
-* Refer to the section :ref:`dynamic_constraints`.
+* Refer to the section :ref:`dynamic_constraints`. Absolute cost and levelized cost multipliers are used
+* for the relaxation of upper and lower bounds.
 *
 * .. list-table::
 *    :widths: 20 80
@@ -410,6 +493,8 @@ Parameters
 ;
 
 ***
+* .. _section_parameter_historical:
+*
 * Historical capacity and activity values
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
@@ -432,13 +517,37 @@ Parameters
 
 Parameters
     historical_new_capacity(node,tec,year_all)           historical new capacity
-    historical_activity(node,tec,year_all,mode,time)     historical acitivity
+    historical_activity(node,tec,year_all,mode,time)     historical activity
 ;
 
 ***
+* .. _section_parameter_investment:
+*
 * Auxiliary investment cost parameters and multipliers
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-* Documentation not yet included.
+*
+* Auxiliary investment cost parameters include the remaining technical lifetime at the end of model horizon (``beyond_horizon_lifetime``) in addition to the
+* different scaling factors and multipliers as listed below. These factors account for remaining capacity (``remaining_capacity``) or construction time of new capacity (``construction_time_factor``),
+* the value of investment at the end of model horizon (``end_of_horizon_factor``) or the discount factor of remaining lifetime beyond model horizon (``beyond_horizon_factor``).
+*
+* .. list-table::
+*    :widths: 35 50
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index names
+*    * - construction_time_factor
+*      - ``node`` | ``tec`` | ``year``
+*    * -  remaining_capacity
+*      - ``node`` | ``tec`` | ``year``
+*    * - end_of_horizon_factor
+*      - ``node`` | ``tec`` | ``year``
+*    * - beyond_horizon_lifetime
+*      - ``node`` | ``tec`` | ``year``
+*    * - beyond_horizon_factor
+*      - ``node`` | ``tec`` | ``year``
+*
+*
 ***
 
 Parameters
@@ -454,12 +563,14 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
+* .. _section_parameter_emissions:
+*
 * Parameters of the `Emission` section
 * ------------------------------------
 *
 * The implementation of |MESSAGEix| includes a flexible and versatile accounting of emissions across different
 * categories and species, with the option to define upper bounds and taxes on various (aggregates of) emissions
-* and pollutants), (sets of) technologies, and (sets of) years.
+* and pollutants, (sets of) technologies, and (sets of) years.
 *
 * .. list-table::
 *    :widths: 25 75
@@ -476,13 +587,14 @@ Parameters
 *    * - tax_emission
 *      - ``node`` | ``type_emission`` | ``type_tec`` | ``type_year``
 *
-* .. [#em_scaling] The parameters ``emission_scaling`` allows to efficiently aggregate different emissions/pollutants
-*    and set bounds or taxes on various categories.
+* .. [#em_scaling] The parameter ``emission_scaling`` is the scaling factor to harmonize bounds or taxes across types of
+*    emissions. It allows to efficiently aggregate different emissions/pollutants and set bounds or taxes on various categories.
+*
 ***
 
 Parameters
     historical_emission(node,emission,type_tec,year_all)    historical emissions by technology type (including land)
-    emission_scaling(type_emission,emission)                scaling factor to harmonize bounds or taxes across tpes
+    emission_scaling(type_emission,emission)                scaling factor to harmonize bounds or taxes across types
     bound_emission(node,type_emission,type_tec,type_year)   upper bound on emissions
     tax_emission(node,type_emission,type_tec,type_year)     emission tax
 ;
@@ -492,12 +604,14 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
+* .. _section_parameter_landuse_emulator:
+*
 * Parameters of the `Land-Use model emulator` section
 * ---------------------------------------------------
 *
 * The implementation of |MESSAGEix| includes a land-use model emulator, which draws on exogenous land-use scenarios
 * (provided by another model) to derive supply of commodities (e.g., biomass) and emissions
-* from agriculture and forestry.
+* from agriculture and forestry. The parameters listed below refer to the assigned land scenario.
 *
 * .. list-table::
 *    :widths: 25 75
@@ -564,10 +678,13 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
+* .. _section_parameter_share_constraints:
+*
 * Parameters of the `Share Constraints` section
 * ---------------------------------------------
 *
-* Share constraints define the share of a given commodity to be active on a certain level
+* Share constraints define the share of a given commodity/mode to be active on a certain level. For the mathematical
+* formulation, refer to :ref:`share_constraints`.
 *
 * .. list-table::
 *    :widths: 25 75
@@ -598,12 +715,14 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
+* .. _section_parameter_generic_relations:
+*
 * Parameters of the `Relations` section
 * -------------------------------------
 *
-* Generic linear relations are implemented in |MESSAGEix|.
-* This feature is intended for development and testing only - all new features should be implemented
-* as specific new mathematical formulations and associated sets & parameters.
+* Generic linear relations are implemented in |MESSAGEix|. This feature is intended for development and testing only - all new features
+* should be implemented as specific new mathematical formulations and associated *sets* & *parameters*. For the formulation of the relations,
+* refer to :ref:`section_of_generic_relations`.
 *
 * .. list-table::
 *    :widths: 25 75
@@ -640,12 +759,14 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 ***
+* .. _section_parameter_fixed:
+*
 * Fixed variable values
 * ---------------------
 *
 * The following parameters allow to set variable values to a specific value.
 * The value is usually taken from a solution of another model instance
-* (e.g., scenarios where a shock sets in later to mimick imperfect foresight).
+* (e.g., scenarios where a shock sets in later to mimic imperfect foresight).
 *
 * The fixed values do not override any upper or lower bounds that may be defined,
 * so fixing variables to values outside of that range will yield an infeasible model.
@@ -685,6 +806,34 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 * Auxiliary reporting parameters                                                                                       *
 *----------------------------------------------------------------------------------------------------------------------*
+
+***
+* .. _section_parameter_auxiliary_reporting:
+*
+* Auxiliary reporting parameters
+* ------------------------------
+*
+* The following parameters are used for reporting (post-processing) solved models. They assign monetary value to
+* the `net` total system costs from trading and emission taxes (``total_cost``). Morevoer, they also assign a value
+* to the `total` trade of commodities (the difference between the revenues from exports and the costs of imports,
+* ``trade_cost``) and to the costs from importing (``import_cost``) and the revenues from exporting (``export_cost``)
+* in each node and year.
+*
+* .. list-table::
+*    :widths: 25 75
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index dimensions
+*    * - total_cost
+*      - ``node`` | ``year``
+*    * - trade_cost
+*      - ``node`` | ``year``
+*    * - import_cost
+*      - ``node`` | ``commodity`` | ``year``
+*    * - export_cost
+*      - ``node`` | ``commodity`` | ``year``
+***
 
 Parameters
     trade_cost(node, year_all)              net of commodity import costs and commodity export revenues by node and year

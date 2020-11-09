@@ -1,120 +1,145 @@
-The |MESSAGEix| framework 
-=========================
+The |MESSAGEix| framework
+*************************
 
 .. figure:: _static/ix_features.png
    :width: 320px
    :align: right
-   
-   The |ixmp| (source: :cite:`huppmann_messageix_2018`)
 
-Overview and scope
-------------------
+   The |ixmp| (:cite:`huppmann_messageix_2018`)
 
-|MESSAGEix| is a versatile, open-source, dynamic systems-optimization modelling framework.
-It was developed for strategic energy planning and integrated assessment of
-energy-engineering-economy-environment systems (E4).
-The framework can be applied to analyse scenarios of the energy system transformation
-under technical-engineering constraints and political-societal considerations.
-The optimization model can be linked to the general-economy MACRO model
-to incorporate feedback between prices and demand levels for energy and commodities.
-The equations are implemented in the mathematical programming system `GAMS`_
-for numerical solution of a model instance.
+|MESSAGEix| is a versatile, dynamic systems-optimization modelling framework developed by the |IIASA| Energy Program since the 1980s.
 
-The |MESSAGEix| framework is fully integrated with IIASA's |ixmp| (ixmp),
-a data warehouse for high-powered numerical scenario analysis.
-The platform supports an efficient workflow between original input data sources,
-the implementation of the mathematical model formulation, 
-and the analysis of numerical results.
-The platform can be accessed via a web-based user interface
-and application programming interfaces (API)
-to the scientific programming languages Python and R.
-The platform also includes a generic data exchange API
-to `GAMS`_ for numerical computation.
+This is the documentation for :mod:`message_ix`, a Python package that ties together all components of the framework.
+:mod:`message_ix` and :mod:`ixmp` are free and open source, licensed under the `APACHE 2.0 open-source license`_.
 
-This documentation provides an introduction and the mathematical formulation 
-of the |MESSAGEix| equations and auxiliary functions.
-For the scientific reference of the framework, 
-see Huppmann et al. (2019) :cite:`huppmann_messageix_2018`.
-The formulation of |MESSAGEix| is a re-implementation and extension of `'MESSAGE V'`
-(Messner and Strubegger, 1995 :cite:`messner_users_1995`),
-the Integrated Assessment model developed at IIASA since the 1980s.
-For an overview of the |MESSAGEix| model used at the IIASA Energy Program
-and a list of recent publications, please refer to the `MESSAGE-GLOBIOM documentation website`_.
+- For the scientific reference of the framework, see Huppmann et al. (2019) :cite:`huppmann_messageix_2018`.
+- For an overview and recent publications related to the specific |MESSAGEix|-GLOBIOM global model instance used at the IIASA Energy Program, see the `MESSAGEix-GLOBIOM documentation`_.
 
-.. _`GAMS` : http://www.gams.com
 
-.. _`MESSAGE-GLOBIOM documentation website` : http://data.ene.iiasa.ac.at/message-globiom/
+.. _getting-started:
 
-Getting Started
----------------
+Getting started
+===============
+
+.. NB this ReST pattern is repeated throughout this file:
+
+   1. List of :doc:`...` links, followed by
+   2. .. toctree:: directive with :hidden:, containing the same links.
+
+   This overcomes limitations of toctree, allowing introductory paragraphs, and different titles in this page than in the sidebar.
+
+Modeling using |MESSAGEix| requires domain knowledge, understanding of certain research methods, and scientific computing skills.
+
+- :doc:`prereqs` gives a list of these items for formal and self-guided learning.
+
+Then, continue with the:
+
+- :doc:`framework` detailed description and feature list.
+- :doc:`install` of the software and essential dependencies.
+- :doc:`tutorials` for new users that demonstrate the basic features of the framework.
 
 .. toctree::
-   :maxdepth: 1
+   :hidden:
+   :caption: Getting started
 
-   getting_started
-
-
-Have a Question?
-----------------
-
-First, check out our FAQ:
-
-.. toctree::
-   :maxdepth: 1
-   
-   faq
+   prereqs
+   framework
+   install
+   tutorials
 
 
-Next, try the community mailing list hosted using Google groups:
-`groups.google.com/d/forum/message_ix`_ .
 
-.. _`groups.google.com/d/forum/message_ix` : https://groups.google.com/d/forum/message_ix
 
-The |MESSAGEix| Model
----------------------
+.. _core:
 
-.. toctree::
-   :maxdepth: 1
-   
-   model
+Mathematical specification
+==========================
 
-API Documentation
------------------
+These pages provide comprehensive description of the variables and equations in
+the core MESSAGEix mathematical implementation.
+
+- :doc:`model/MESSAGE/sets_maps_def`
+- :doc:`time`
+- :doc:`model/MESSAGE/parameter_def`
+- :doc:`model/MESSAGE/model_core`
+- :doc:`model/MESSAGE/model_solve`
+- :doc:`model/MESSAGE/reporting`
+- :doc:`model/MESSAGE/scaling_investment_costs`
+- :doc:`model/MACRO/macro_core`
 
 .. toctree::
-   :maxdepth: 1
-   
-   api/ixmp
-   api/message_ix
+   :hidden:
+   :caption: Mathematical Specification
 
-Using |MESSAGEix|
------------------
+   model/MESSAGE/sets_maps_def
+   time
+   model/MESSAGE/parameter_def
+   model/MESSAGE/model_core
+   model/MESSAGE/model_solve
+   model/MESSAGE/reporting
+   model/MESSAGE/scaling_investment_costs
+   model/MACRO/macro_core
 
-|MESSAGEix| and the |ixmp| are licensed under an `APACHE 2.0 open-source license`_. 
-See the `LICENSE`_ file for the full text.
 
-.. _`APACHE 2.0 open-source license`: http://www.apache.org/licenses/LICENSE-2.0
+.. _guide:
 
-.. _`LICENSE`: https://github.com/iiasa/message_ix/blob/master/LICENSE
+Developing |MESSAGEix| models
+=============================
 
-Please read the `NOTICE`_ included in this repository and other documents referenced below
-for the user guidelines and further information.
+Developing a valid, scientific |MESSAGEix| model requires careful use of the framework features.
+This section provides guidelines for how to make some common model design choices.
 
+- :doc:`efficiency`
+- :doc:`tools/add_year`
+- :doc:`reporting`
+- :doc:`debugging`
+- :doc:`macro`
 
 .. toctree::
-   :maxdepth: 1
+   :hidden:
+   :caption: Developing MESSAGEix models
+   :glob:
 
+   efficiency
+   tools/*
+   reporting
+   debugging
+   macro
+
+
+Using, getting help, and contributing
+=====================================
+
+Everyone is encouraged to use the framework to develop energy system and integrated assessment models!
+
+- :doc:`api`
+- :doc:`rmessageix`
+- :doc:`whatsnew` —release history and migration/upgrade notes.
+- :doc:`notice` —including how to properly cite the framework and software in scientific research.
+- :doc:`contributing` —we welcome enhancements to the framework itself that enable new features across all models.
+- :doc:`faq`
+- :doc:`bibliography`
+
+.. toctree::
+   :hidden:
+   :caption: Help & reference
+
+   api
+   rmessageix
+   whatsnew
    notice
    contributing
-   contributor_license
+   faq
+   bibliography
 
-.. _`NOTICE`: notice.html
+.. _help:
+
+Have a question?
+
+- Check the :doc:`faq`.
+- Search current and older `issues on GitHub <https://github.com/iiasa/message_ix/issues?q=is:issue>`_, or open a new one with your question.
+- Consult the community Google group on the web at https://groups.google.com/d/forum/message_ix, or via e-mail at <message_ix@googlegroups.com>.
 
 
-Bibliography
-------------
-
-.. toctree::
-   :maxdepth: 2
-   
-   bibliography   
+.. _`MESSAGEix-GLOBIOM documentation`: http://data.ene.iiasa.ac.at/message-globiom/
+.. _`APACHE 2.0 open-source license`: https://github.com/iiasa/message_ix/blob/master/LICENSE

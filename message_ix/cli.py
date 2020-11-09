@@ -1,129 +1,169 @@
-import argparse
+from base64 import b64encode
 import json
-import message_ix
 import os
-import shutil
+from pathlib import Path
+from shutil import copyfile
+from urllib.request import Request, urlopen
 import tempfile
 import zipfile
 
+import click
+import ixmp
+from ixmp.cli import main
+import message_ix
+import message_ix.tools.add_year.cli
 
-from six.moves.urllib.request import urlretrieve
 
-from message_ix.default_path_constants import CONFIG_PATH, DEFAULT_MODEL_PATH
-from message_ix.utils import logger
+# Override the docstring of the ixmp CLI so that it masquerades as the
+# message_ix CLI
+main.help == \
+    """MESSAGEix command-line interface
+
+    To view/run the 'nightly' commands, you need the testing dependencies.
+    Run `pip install [--editable] .[tests]`.
+    """
+
+# Override the class used by the ixmp CLI to load Scenario objects
+ixmp.cli.ScenarioClass = message_ix.Scenario
 
 
-def recursive_copy(src, dst, overwrite=False):
-    """Copy src to dst recursively"""
-    for root, dirs, files in os.walk(src):
-        for f in files:
-            rel_path = root.replace(src, '').lstrip(os.sep)
-            dst_path = os.path.join(dst, rel_path)
+@main.command('copy-model')
+@click.option('--set-default', is_flag=True,
+              help='Set the copy to be the default used when running MESSAGE.')
+@click.option('--overwrite', is_flag=True,
+              help='Overwrite existing files.')
+@click.argument('path', type=click.Path(file_okay=False))
+def copy_model(path, overwrite, set_default):
+    """Copy the MESSAGE GAMS files to a new PATH.
 
-            if not os.path.isdir(dst_path):
-                os.makedirs(dst_path)
+    To use an existing set of GAMS files, you can also call:
 
-            fromf = os.path.join(root, f)
-            tof = os.path.join(dst_path, f)
-            exists = os.path.exists(tof)
-            if exists and not overwrite:
-                logger().info('{} exists, will not overwrite'.format(tof))
+        $ message-ix config set "message model dir" PATH
+    """
+    path = Path(path).resolve()
+
+    src_dir = Path(__file__).parent / 'model'
+    for src in src_dir.rglob('*'):
+        # Skip certain files
+        if src.suffix in ('.gdx', '.log', '.lst'):
+            continue
+
+        # Destination path
+        dst = path / src.relative_to(src_dir)
+
+        # Create parent directory
+        dst.parent.mkdir(parents=True, exist_ok=True)
+
+        if dst.is_dir():
+            # No further action for directories
+            continue
+
+        # Display output
+        if dst.exists:
+            if not overwrite:
+                print('{} exists, will not overwrite'.format(dst))
+
+                # Skip copyfile() below
+                continue
             else:
-                logger().info('Writing to {} (overwrite is {})'.format(
-                    tof, 'ON' if overwrite else 'OFF'))
-                shutil.copyfile(fromf, tof)
+                print('Overwriting {}'.format(dst))
+        else:
+            print('Copying to {}'.format(dst))
+
+        copyfile(src, dst)
+
+    if set_default:
+        ixmp.config.set('message model dir', path)
+        ixmp.config.save()
 
 
-def do_config(model_path=None, overwrite=False):
-    config = {}
+@main.command()
+@click.option('--branch',
+              help='Repository branch to download from (e.g., master).')
+@click.option('--tag',
+              help='Repository tag to download from (e.g., v1.0.0).')
+@click.argument('path', type=click.Path())
+def dl(branch, tag, path):
+    """Download MESSAGEix tutorial notebooks and extract to PATH.
 
-    # make directory for config if doesn't exist
-    dirname = os.path.dirname(CONFIG_PATH)
-    if not os.path.exists(dirname):
-        os.makedirs(dirname)
+    PATH is a local directory where to store the tutorial notebooks.
+    """
+    if tag and branch:
+        raise click.BadOptionUsage('Can only provide one of `tag` or `branch`')
+    elif branch:
+        # Construct URL and filename from branch
+        zipname = f"{branch}.zip"
+        url = f"https://github.com/iiasa/message_ix/archive/{zipname}"
+    else:
+        # Get tag information using GitHub API
+        args = dict(
+            url="https://api.github.com/repos/iiasa/message_ix/tags",
+            headers=dict(),
+        )
+        try:
+            # Only for Travis/macOS: GitHub rate limits unathenticated API
+            # requests by IP address. Because the build worker shares an IP,
+            # the limit is exceeded and the request fails. Use HTTP Basic Auth
+            # with an encrypted username and  password from .travis.yml for a
+            # higher rate limit.
+            auth_bytes = b64encode(
+                "{MESSAGE_IX_GH_USER}:{MESSAGE_IX_GH_PW}"
+                .format(**os.environ)
+                .encode()
+            )
+            args["headers"]["Authorization"] = f"Basic {auth_bytes.decode()}"
+        except KeyError:
+            pass
 
-    # update default path to model directory
-    if model_path:
-        model_path = os.path.abspath(os.path.expanduser(model_path))
-        if not os.path.exists(model_path):
-            logger().info('Creating model directory: {}'.format(model_path))
-            os.makedirs(model_path)
-        recursive_copy(DEFAULT_MODEL_PATH, model_path, overwrite=overwrite)
-        config['MODEL_PATH'] = model_path
+        with urlopen(Request(**args)) as response:
+            tags_info = json.load(response)
 
-    # overwrite config if already exists
-    if os.path.exists(CONFIG_PATH):
-        with open(CONFIG_PATH, mode='r') as f:
-            data = json.load(f)
-        data.update(config)
-        config = data
+        if tag is None:
+            tag = tags_info[0]["name"]
+            print(f"Default: latest release {tag}")
 
-    # write new config
-    if config:
-        with open(CONFIG_PATH, mode='w') as f:
-            logger().info('Updating configuration file: {}'.format(CONFIG_PATH))
-            json.dump(config, f)
+        # Get the zipball URL for the matching tag
+        url = None
+        for info in tags_info:
+            if info["name"] == tag:
+                url = info["zipball_url"]
+                break
 
+        if url is None:
+            raise ValueError(f"tag {repr(tag)} does not exist")
 
-def config():
-    parser = argparse.ArgumentParser()
-    model_path = 'Copy model files to a new path and configure MESSAGEix to use those files.'
-    parser.add_argument('--model_path', help=model_path, default=None)
-    overwrite = 'Overwrite existing files.'
-    parser.add_argument('--overwrite', help=overwrite, action='store_true')
-    args = parser.parse_args()
-    do_config(model_path=args.model_path, overwrite=args.overwrite)
+        zipname = f"{tag}.zip"
 
+    # Context manager to remove the TemporaryDirectory when complete
+    with tempfile.TemporaryDirectory() as td:
+        # Path for zip file
+        zippath = Path(td) / zipname
 
-def tempdir_name():
-    return os.path.join(tempfile._get_default_tempdir(),
-                        next(tempfile._get_candidate_names()))
+        print(f"Retrieving {url}")
+        with urlopen(url) as response:  # Unauthenticated request
+            zippath.write_bytes(response.read())
 
+        # Context manager to close the ZipFile when done, so it can be removed
+        print(f"Unzipping {zippath} to {path}")
+        with zipfile.ZipFile(zippath) as archive:
+            # Zip archive successfully opened; create the output path
+            path = Path(path)
+            path.mkdir(parents=True, exist_ok=True)
 
-def do_dl(tag=None, branch=None, repo_path=None, local_path='.'):
-    if tag is not None and branch is not None:
-        raise ValueError('Can only provide one of `tag` and `branch`')
-    if tag is None and branch is None:
-        tag = '{}'.format(message_ix.__version__)
-
-    zipname = '{}.zip'.format(branch or 'v' + tag)
-    url = 'https://github.com/iiasa/message_ix/archive/{}'.format(zipname)
-
-    tmp = tempdir_name()
-    os.makedirs(tmp)
-    try:
-        logger().info('Retrieving {}'.format(url))
-        dst = os.path.join(tmp, zipname)
-        urlretrieve(url, dst)
-
-        archive = zipfile.ZipFile(dst)
-        logger().info('Unzipping {} to {}'.format(dst, tmp))
-        archive.extractall(tmp)
-
-        if not os.path.exists(local_path):
-            os.makedirs(local_path)
-
-        cpfrom = '{}/message_ix-{}/{}'.format(tmp, branch or tag, repo_path)
-        cpto = '{}/{}'.format(local_path, repo_path)
-        logger().info('Copying {} to {}'.format(cpfrom, cpto))
-        recursive_copy(cpfrom, cpto, overwrite=True)
-
-        shutil.rmtree(tmp)
-
-    except Exception as e:
-        logger().info("Could not delete {} because {}".format(tmp, e))
+            # Extract only tutorial files
+            archive.extractall(
+                path,
+                members=filter(lambda n: "/tutorial/" in n, archive.namelist())
+            )
 
 
-def dl():
-    parser = argparse.ArgumentParser()
-    repo_path = 'Path to files to download from repository (e.g., tutorial).'
-    parser.add_argument('--repo_path', help=repo_path, default='tutorial')
-    local_path = 'Path on place files on local machine.'
-    parser.add_argument('--local_path', help=local_path, default='.')
-    tag = 'Repository tag to download from (e.g., 1.0.0).'
-    parser.add_argument('--tag', help=tag, default=None)
-    branch = 'Repository branch to download from (e.g., master).'
-    parser.add_argument('--branch', help=branch, default=None)
-    args = parser.parse_args()
-    do_dl(tag=args.tag, branch=args.branch, repo_path=args.repo_path,
-          local_path=args.local_path)
+# Add subcommands
+main.add_command(message_ix.tools.add_year.cli.main)
+
+try:
+    import message_ix.testing.nightly
+except ImportError:
+    # Dependencies of testing.nightly are missing; don't show the command
+    pass
+else:
+    main.add_command(message_ix.testing.nightly.cli)

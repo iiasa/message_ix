@@ -1,147 +1,258 @@
 import collections
+from functools import lru_cache
+from itertools import product
+import logging
+from warnings import warn
+
 import ixmp
-import itertools
-import warnings
-
+from ixmp.utils import as_str_list, isscalar
 import pandas as pd
-import numpy as np
-
-from ixmp.utils import pd_read, pd_write
-from message_ix.utils import isscalar, logger
 
 
-def _init_scenario(s, commit=False):
-    """Initialize a MESSAGEix Scenario object with default values"""
-    inits = (
-        # {
-        #  'test': False  # some test,
-        #  'exec': [(pass, {'args': ()}), ],
-        # },
-    )
+log = logging.getLogger(__name__)
 
-    pass_idx = [i for i, init in enumerate(inits) if init['test']]
-    if len(pass_idx) == 0:
-        return  # leave early, all init tests pass
-
-    if commit:
-        s.check_out()
-    for idx in pass_idx:
-        for exec_info in inits[idx]['exec']:
-            func = exec_info[0]
-            args = exec_info[1].pop('args', tuple())
-            kwargs = exec_info[1].pop('kwargs', dict())
-            func(*args, **kwargs)
-    if commit:
-        s.commit('Initialized wtih standard sets and params')
+# Also print warnings to stderr
+_sh = logging.StreamHandler()
+_sh.setLevel(level=logging.WARNING)
+log.addHandler(_sh)
 
 
 class Scenario(ixmp.Scenario):
+    """|MESSAGEix| Scenario.
 
+    See :class:`ixmp.TimeSeries` for the meaning of arguments `mp`, `model`,
+    `scenario`, `version`, and `annotation`. The `scheme` of a newly-created
+    Scenario is always 'MESSAGE'.
+    """
     def __init__(self, mp, model, scenario=None, version=None, annotation=None,
-                 cache=False, clone=None, **kwargs):
-        """Initialize a new message_ix.Scenario (structured input data and solution)
-        or get an existing scenario from the ixmp database instance
+                 scheme=None, **kwargs):
+        # If not a new scenario, use the scheme stored in the Backend
+        if version == 'new':
+            scheme = scheme or 'MESSAGE'
+
+        if scheme not in ('MESSAGE', None):
+            msg = f'Instantiate message_ix.Scenario with scheme {scheme}'
+            raise ValueError(msg)
+
+        super().__init__(
+            mp=mp,
+            model=model,
+            scenario=scenario,
+            version=version,
+            annotation=annotation,
+            scheme=scheme,
+            **kwargs
+        )
+
+        # Scheme returned by database
+        assert self.scheme == 'MESSAGE', self.scheme
+
+    # Utility methods used by .equ(), .par(), .set(), and .var()
+
+    @lru_cache()
+    def _year_idx(self, name):
+        """Return a sequence of (idx_set, idx_name) for 'year'-indexed dims.
+
+        Since item dimensionality does not change, the the return value is
+        lru_cache()'d for performance.
+        """
+        # filter() returns a 1-time generator, so convert to a fixed tuple()
+        return tuple(
+            # Keep only tuples where the idx_set is 'year'
+            filter(lambda e: e[0] == 'year',
+                   # Generate 2-tuples of (idx_set, idx_name)
+                   zip(self.idx_sets(name), self.idx_names(name))))
+
+    def _year_as_int(self, name, df):
+        """Convert 'year'-indexed columns of *df* to :obj:`int` dtypes.
+
+        :meth:`_year_idx` is used to retrieve a sequence of (idx_set, idx_name)
+        for *only* the 'year'-indexed dimensions of item *name*.
+
+        If at least one dimension is indexed by 'year', all such dimensions are
+        converted to :obj:`int`. Otherwise, *df* is returned unmodified.
+        """
+        year_idx = self._year_idx(name)
+
+        if len(year_idx):
+            return df.astype({col_name: 'int' for _, col_name in year_idx})
+        elif name == 'year':
+            # The 'year' set itself
+            return df.astype(int)
+        else:
+            return df
+
+    # Override ixmp methods to convert 'year'-indexed columns to int
+
+    def equ(self, name, filters=None):
+        """Return equation data.
+
+        Same as :meth:`ixmp.Scenario.equ`, except columns indexed by the
+        |MESSAGEix| set ``year`` are returned with :obj:`int` dtype.
 
         Parameters
         ----------
-        mp : ixmp.Platform
-        model : string
-            model name
-        scenario : string
-            scenario name
-        version : string or integer
-            initialize a new scenario (if version == 'new'), or
-            load a specific version from the database (if version is integer)
-        annotation : string
-            a short annotation/comment (when initializing a new scenario)
-        cache : boolean
-            keep all dataframes in memory after first query (default: False)
-        clone : Scenario, optional
-            make a clone of an existing scenario
+        name : str
+            Name of the equation.
+        filters : dict (str -> list of str), optional
+            Filters for the dimensions of the equation.
+
+        Returns
+        -------
+        pd.DataFrame
+            Filtered elements of the equation.
         """
-        if 'scen' in kwargs:
-            warnings.warn(
-                '`scen` is deprecated and will be removed in the next' +
-                ' release, please use `scenario`')
-            scenario = kwargs.pop('scen')
+        # Call ixmp.Scenario.equ(), then convert 'year'-indexed columns to ints
+        return self._year_as_int(name, super().equ(name, filters))
 
-        if version is not None and clone is not None:
-            raise ValueError(
-                'Can not provide both version and clone as arguments')
-        if clone is not None:
-            jscen = clone._jobj.clone(model, scenario, annotation,
-                                      clone._keep_sol, clone._first_model_year)
-        elif version == 'new':
-            scheme = 'MESSAGE'
-            jscen = mp._jobj.newScenario(model, scenario, scheme, annotation)
-        elif isinstance(version, int):
-            jscen = mp._jobj.getScenario(model, scenario, version)
-        else:
-            jscen = mp._jobj.getScenario(model, scenario)
+    def par(self, name, filters=None):
+        """Return parameter data.
 
-        self.is_message_scheme = True
+        Same as :meth:`ixmp.Scenario.par`, except columns indexed by the
+        |MESSAGEix| set ``year`` are returned with :obj:`int` dtype.
 
-        super(Scenario, self).__init__(mp, model, scenario, jscen, cache=cache)
+        Parameters
+        ----------
+        name : str
+            Name of the parameter.
+        filters : dict (str -> list of str), optional
+            Filters for the dimensions of the parameter.
 
-        if not self.has_solution():
-            _init_scenario(self, commit=version != 'new')
+        Returns
+        -------
+        pd.DataFrame
+            Filtered elements of the parameter.
+        """
+        return self._year_as_int(name, super().par(name, filters))
+
+    def set(self, name, filters=None):
+        """Return elements of a set.
+
+        Same as :meth:`ixmp.Scenario.set`, except columns for multi-dimensional
+        sets indexed by the |MESSAGEix| set ``year`` are returned with
+        :obj:`int` dtype.
+
+        Parameters
+        ----------
+        name : str
+            Name of the set.
+        filters : dict (str -> list of str), optional
+            Mapping of `dimension_name` → `elements`, where `dimension_name`
+            is one of the `idx_names` given when the set was initialized (see
+            :meth:`init_set`), and `elements` is an iterable of labels to
+            include in the return value.
+
+        Returns
+        -------
+        pd.Series
+            If *name* is an index set.
+        pd.DataFrame
+            If *name* is a set defined over one or more other, index sets.
+        """
+        return self._year_as_int(name, super().set(name, filters))
+
+    def var(self, name, filters=None):
+        """Return variable data.
+
+        Same as :meth:`ixmp.Scenario.var`, except columns indexed by the
+        |MESSAGEix| set ``year`` are returned with :obj:`int` dtype.
+
+        Parameters
+        ----------
+        name : str
+            Name of the variable.
+        filters : dict (str -> list of str), optional
+            Filters for the dimensions of the variable.
+
+        Returns
+        -------
+        pd.DataFrame
+            Filtered elements of the variable.
+        """
+        return self._year_as_int(name, super().var(name, filters))
 
     def cat_list(self, name):
-        """return a list of all categories for a set
+        """Return a list of all categories for a mapping set.
 
         Parameters
         ----------
-        name : string
-            name of the set
+        name : str
+            Name of the set.
         """
-        return ixmp.to_pylist(self._jobj.getTypeList(name))
+        return self._backend('cat_list', name)
 
     def add_cat(self, name, cat, keys, is_unique=False):
-        """add a set element key to the respective category mapping
+        """Map elements from *keys* to category *cat* within set *name*.
 
         Parameters
         ----------
-        name : string
-            name of the set
-        cat : string
-            name of the category
-        keys : list of strings
-            element keys to be added to the category mapping
+        name : str
+            Name of the set.
+        cat : str
+            Name of the category.
+        keys : str or list of str
+            Element keys to be added to the category mapping.
+        is_unique: bool, optional
+            If `True`, then *cat* must have only one element. An exception is
+            raised if *cat* already has an element, or if ``len(keys) > 1``.
         """
-        self._jobj.addCatEle(name, str(cat), ixmp.to_jlist(keys), is_unique)
+        self._backend('cat_set_elements', name, str(cat), as_str_list(keys),
+                      is_unique)
 
     def cat(self, name, cat):
-        """return a list of all set elements mapped to a category
+        """Return a list of all set elements mapped to a category.
 
         Parameters
         ----------
-        name : string
-            name of the set
-        cat : string
-            name of the category
-        """
-        return ixmp.to_pylist(self._jobj.getCatEle(name, cat))
+        name : str
+            Name of the set.
+        cat : str
+            Name of the category.
 
-    def has_solution(self):
-        """Returns True if scenario currently has a solution"""
-        try:
-            return not np.isnan(self.var('OBJ')['lvl'])
-        except Exception:
-            return False
+        Returns
+        -------
+        list of str or list of int
+            :class:`int` is returned if *name* is 'year'.
+        """
+        return list(
+            map(
+                int if name == 'year' else lambda v: v,
+                self._backend('cat_get_elements', name, cat)
+            )
+        )
 
     def add_spatial_sets(self, data):
-        """Add sets related to spatial dimensions of the model
+        """Add sets related to spatial dimensions of the model.
 
         Parameters
         ----------
-        data : dict or other
+        data : dict
+            Mapping of `level` → `member`. Each member may be:
+
+            - A single label for elements.
+            - An iterable of labels for elements.
+            - A recursive :class:`dict` following the same convention, defining
+              sub-levels and their members.
 
         Examples
         --------
-        data = {'country': 'Austria'}
-        data = {'country': ['Austria', 'Germany']}
-        data = {'country': {'Austria': {'state': ['Vienna', 'Lower Austria']}}}
+        >>> s = message_ix.Scenario()
+        >>> s.add_spatial_sets({'country': 'Austria'})
+        >>> s.add_spatial_sets({'country': ['Austria', 'Germany']})
+        >>> s.add_spatial_sets({'country': {
+        ...     'Austria': {'state': ['Vienna', 'Lower Austria']}}})
+
         """
+        # TODO test whether unbalanced data or multiply-defined levels are
+        # handled correctly. How to define 'Germany' as a country *only* but
+        # two states within 'Austria'?
+        # >>> s.add_spatial_sets({'country': {
+        # ...     'Austria': {'country': 'Vienna'}}})
+        # >>> s.add_spatial_sets({'country': {
+        # ...     'Austria': {'state': 'Vienna'},
+        # ...     'Canada': {'province': 'Ontario'},
+        # ...     }})
+
         nodes = []
         levels = []
         hierarchy = []
@@ -157,6 +268,7 @@ class Scenario(ixmp.Scenario):
             for child in children:
                 hierarchy.append([level, child, parent])
                 nodes.append(child)
+
             levels.append(level)
 
         for k, v in data.items():
@@ -166,114 +278,296 @@ class Scenario(ixmp.Scenario):
         self.add_set("lvl_spatial", levels)
         self.add_set("map_spatial_hierarchy", hierarchy)
 
-    def add_horizon(scenario, data):
-        """Add sets related to temporal dimensions of the model
+    def add_horizon(self, year=[], firstmodelyear=None, data=None):
+        """Set the scenario time horizon via ``year`` and related categories.
+
+        :meth:`add_horizon` acts like ``add_set("year", ...)``, except with
+        additional conveniences:
+
+        - The `firstmodelyear` argument can be used to set the first period
+          handled by the MESSAGE optimization. This is equivalent to::
+
+            scenario.add_cat("year", "firstmodelyear", ..., is_unique=True)
+
+        - Parameter ``duration_period`` is assigned values based on `year`:
+          The duration of periods is calculated as the interval between
+          successive `year` elements, and the duration of the first period is
+          set to value that appears most frequently.
+
+        See :doc:`time` for a detailed terminology of years and periods in
+        :mod:`message_ix`.
 
         Parameters
         ----------
-        scenario : ixmp.Scenario
-        data : dict or other
+        year : list of int
+            The set of periods.
+
+        firstmodelyear : int, optional
+            First period for the model solution. If not given, the first entry
+            of `year` is used.
+
+        Other parameters
+        ----------------
+        data : dict
+            .. deprecated:: 3.1
+
+               The "year" key corresponds to `year` and is required.
+               A "firstmodelyear" key corresponds to `firstmodelyear` and is
+               optional.
+
+        Raises
+        ------
+        ValueError
+            If the ``year`` set of the Scenario is already populated. Changing
+            the time periods of an existing Scenario can entail complex
+            adjustments to data. For this purpose, adjust each set and
+            parameter individually, or see :mod:`.tools.add_year`.
 
         Examples
         --------
-        data = {'year': [2010, 2020]}
-        data = {'year': [2010, 2020], 'firstmodelyear': 2020}
+        >>> s = message_ix.Scenario()
+        # The following are equivalent
+        >>> s.add_horizon(year=[2020, 2030, 2040], firstmodelyear=2020)
+        >>> s.add_horizon([2020, 2030, 2040], 2020)
+        >>> s.add_horizon([2020, 2030, 2040])
         """
-        if 'year' not in data:
-            raise ValueError('"year" must be in temporal sets')
-        horizon = data['year']
-        scenario.add_set("year", horizon)
+        # Check arguments
+        # NB once the deprecated signature is removed, these two 'if' blocks
+        #    and the data= argument can be deleted.
+        if isinstance(year, dict):
+            # Move a dict argument to `data` to trigger the next block
+            if data:
+                raise ValueError("both year= and data= arguments")
+            data = year
 
-        first = data['firstmodelyear'] if 'firstmodelyear'\
-            in data else horizon[0]
-        scenario.add_cat("year", "firstmodelyear", first, is_unique=True)
+        if data:
+            warn(
+                "dict() argument to add_horizon(); use year= and "
+                "firstmodelyear=",
+                DeprecationWarning
+            )
+
+            try:
+                year = data.pop("year")
+            except KeyError:
+                raise ValueError(f'"year" missing from {data}')
+
+            if "firstmodelyear" in data:
+                if firstmodelyear:
+                    raise ValueError("firstmodelyear given twice")
+                else:
+                    firstmodelyear = data.pop("firstmodelyear", None)
+
+            if len(data):
+                raise ValueError(f"unknown keys: {sorted(data.keys())}")
+
+        # Check for existing years
+        existing = self.set("year").tolist()
+        if len(existing):
+            raise ValueError(
+                f"Scenario has year={existing} and related values"
+            )
+
+        # Add the year set elements and first model year
+        year = sorted(year)
+        self.add_set("year", year)
+        self.add_cat(
+            "year", "firstmodelyear", firstmodelyear or year[0], is_unique=True
+        )
+
+        # Calculate the duration of all periods
+        duration = [year[i] - year[i-1] for i in range(1, len(year))]
+
+        # Determine the duration of the first period
+        if len(duration) == 0:
+            # Cannot infer any durations with only 1 period
+            return
+        elif len(set(duration)) == 1:
+            # All periods have the same duration; use this for the duration of
+            # the first period
+            duration_first = duration[0]
+        else:
+            # More than one period duration. Use the mode, i.e. the most common
+            # duration, for the first period
+            duration_first = max(set(duration), key=duration.count)
+            log.info(
+                f"Using {duration_first} from {set(duration)} as duration of "
+                f"first period {year[0]}"
+            )
+
+        # Add the duration_period elements for the first and subsequent periods
+        # NB "y" is automatically defined by ixmp's JDBCBackend
+        self.add_par("duration_period", pd.DataFrame({
+            "year": year,
+            "value": [duration_first] + duration,
+            "unit": "y",
+        }))
 
     def vintage_and_active_years(self, ya_args=None, in_horizon=True):
-        """Return a 2-tuple of valid pairs of vintage years and active years
-        for use with data input. A valid year-vintage, year-active pair is
-        one in which:
+        """Return sets of vintage and active years for use in data input.
 
-        - year-vintage <= year-active
-        - both within the model's 'year' set
-        - year-active >= the model's first year *or* within
-          ixmp.Scenario.years_active() for a given node, technology and vintage
-          (optional)
+        For a valid pair `(year_vtg, year_act)`, the following conditions are
+        satisfied:
+
+        1. Both the vintage year (`year_vtg`) and active year (`year_act`) are
+           in the model's ``year`` set.
+        2. `year_vtg` <= `year_act`.
+        3. `year_act` <= the model's first year **or** `year_act` is in the
+           smaller subset :meth:`ixmp.Scenario.years_active` for the given
+           `ya_args`.
 
         Parameters
         ----------
-        ya_args : arguments to ixmp.Scenario.years_active(), optional
-        in_horizon : restrict years returned to be within the current model
-                     horizon, optional, default: True
-        """
-        horizon = self.set('year')
-        first = self.cat('year', 'firstmodelyear')[0] or horizon[0]
+        ya_args : tuple of (node, tec, yr_vtg), optional
+            Arguments to :meth:`years_active`.
+        in_horizon : bool, optional
+            Only return years within the model horizon
+            (:obj:`firstmodelyear` or later).
 
+        Returns
+        -------
+        pandas.DataFrame
+            with columns 'year_vtg' and 'year_act', in which each row is a
+            valid pair.
+        """
+        first = self.firstmodelyear
+
+        # Prepare lists of vintage (yv) and active (ya) years
         if ya_args:
             if len(ya_args) != 3:
                 raise ValueError('3 arguments are required if using `ya_args`')
-            years_active = self.years_active(*ya_args)
-            combos = itertools.product([ya_args[2]], years_active)
+            ya = self.years_active(*ya_args)
+            yv = ya[0:1]  # Just the first element, as a list
         else:
-            combos = itertools.product(horizon, horizon)
+            # Product of all years
+            yv = ya = self.set('year')
 
-        # TODO: casting to int here is probably bad, but necessary for now
-        first = int(first)
-        combos = [(int(y1), int(y2)) for y1, y2 in combos]
+        # Predicate for filtering years
+        def _valid(elem):
+            yv, ya = elem
+            return (yv <= ya) and (not in_horizon or (first <= ya))
 
-        def valid(y_v, y_a):
-            # TODO: casting to int here is probably bad
-            ret = y_v <= y_a
-            if in_horizon:
-                ret &= y_a >= first
-            return ret
+        # - Cartesian product of all yv and ya.
+        # - Filter only valid years.
+        # - Convert to data frame.
+        return pd.DataFrame(
+            filter(_valid, product(yv, ya)),
+            columns=['year_vtg', 'year_act'])
 
-        year_pairs = [(y_v, y_a) for y_v, y_a in combos if valid(y_v, y_a)]
-        v_years, a_years = zip(*year_pairs)
-        return pd.DataFrame({'year_vtg': v_years, 'year_act': a_years})
+    def years_active(self, node, tec, yr_vtg):
+        """Return years in which *tec* of *yr_vtg* can be active in *node*.
 
-    def solve(self, model='MESSAGE', **kwargs):
-        """Solve a MESSAGE Scenario. See ixmp.Scenario.solve() for arguments.
-        The default model is 'MESSAGE', but can be overwritten with, e.g.,
-        `message_ix.Scenario.solve(model='MESSAGE-MACRO')`.
-        """
-        return super(Scenario, self).solve(model=model, **kwargs)
-
-    def clone(self, model=None, scenario=None, annotation=None,
-              keep_solution=True, first_model_year=None, **kwargs):
-        """clone the current scenario and return the new scenario
+        The :ref:`parameters <params-tech>` ``duration_period`` and
+        ``technical_lifetime`` are used to determine which periods are partly
+        or fully within the lifetime of the technology.
 
         Parameters
         ----------
-        model : string
-            new model name
-        scenario : string
-            new scenario name
-        annotation : string
-            explanatory comment (optional)
-        keep_solution : boolean, default, True
-            indicator whether to include an existing solution
-            in the cloned scenario
-        first_model_year: int, default None
-            new first model year in cloned scenario
-            ('slicing', only available for MESSAGE-scheme scenarios)
-        """
-        if 'keep_sol' in kwargs:
-            warnings.warn(
-                '`keep_sol` is deprecated and will be removed in the next' +
-                ' release, please use `keep_solution`')
-            keep_solution = kwargs.pop('keep_sol')
-        if 'scen' in kwargs:
-            warnings.warn(
-                '`scen` is deprecated and will be removed in the next' +
-                ' release, please use `scenario`')
-            scenario = kwargs.pop('scen')
+        node : str
+            Node name.
+        tec : str
+            Technology name.
+        yr_vtg : int or str
+            Vintage year.
 
-        self._keep_sol = keep_solution
-        self._first_model_year = first_model_year or 0
-        model = self.model if not model else model
-        scenario = self.scenario if not scenario else scenario
-        return Scenario(self.platform, model, scenario, annotation=annotation,
-                        cache=self._cache, clone=self)
+        Returns
+        -------
+        list of int
+        """
+        # Handle arguments
+        filters = dict(node_loc=[node], technology=[tec])
+        yv = int(yr_vtg)
+
+        # Lifetime of the technology at the node
+        lt = self.par('technical_lifetime', filters=filters).at[0, 'value']
+
+        # Duration of periods
+        data = self.par('duration_period')
+        # Cumulative sum for periods including the vintage period
+        data['age'] = data.where(data.year >= yv, 0)['value'].cumsum()
+
+        # Return periods:
+        # - the tec's age at the end of the *prior* period is less than or
+        #   equal to its lifetime, and
+        # - at or later than the vintage year.
+        return data.where(data.age.shift(1, fill_value=0) < lt) \
+                   .where(data.year >= yv)['year'] \
+                   .dropna().astype(int).tolist()
+
+    @property
+    def firstmodelyear(self):
+        """The first model year of the scenario.
+
+        Returns
+        -------
+        int
+        """
+        return int(self.cat('year', 'firstmodelyear')[0])
+
+    def clone(self, *args, **kwargs):
+        """Clone the current scenario and return the clone.
+
+        See :meth:`ixmp.Scenario.clone` for other parameters.
+
+        Parameters
+        ----------
+        keep_solution : bool, optional
+            If :py:const:`True`, include all timeseries data and the solution
+            (vars and equs) from the source Scenario in the clone.
+            Otherwise, only timeseries data marked as `meta=True` (see
+            :meth:`TimeSeries.add_timeseries`) or prior to `first_model_year`
+            (see :meth:`TimeSeries.add_timeseries`) are cloned.
+        shift_first_model_year: int, optional
+            If given, the values of the solution are transfered to parameters
+            `historical_*`, parameter `resource_volume` is updated, and the
+            `first_model_year` is shifted. The solution is then discarded,
+            see :meth:`TimeSeries.remove_solution`.
+        """
+        # Call the parent method
+        return super().clone(*args, **kwargs)
+
+    def solve(self, model='MESSAGE', solve_options={}, **kwargs):
+        """Solve MESSAGE or MESSAGE-MACRO for the Scenario.
+
+        By default, :meth:`ixmp.Scenario.solve` is called with 'MESSAGE' as the
+        *model* argument. *model* may also be overwritten, e.g.:
+
+        >>> s.solve(model='MESSAGE-MACRO')
+
+        Parameters
+        ----------
+        model : 'MESSAGE' or 'MACRO' or 'MESSAGE-MACRO', optional
+            Model to solve.
+        solve_options : dict (str -> str), optional
+            Name to value mapping to use for GAMS CPLEX solver options file.
+            See the :class:`.MESSAGE` class and :obj:`.DEFAULT_CPLEX_OPTIONS`.
+        kwargs
+            Many other options control the execution of the underlying GAMS
+            code; see the :class:`.MESSAGE_MACRO` class and
+            :class:`.GAMSModel`.
+        """
+        super().solve(model=model, solve_options=solve_options, **kwargs)
+
+    def add_macro(self, data, scenario=None, check_convergence=True, **kwargs):
+        """Add MACRO parametrization to the Scenario and calibrate."""
+        # TODO document
+        from .macro import EXPERIMENTAL, add_model_data, calibrate
+        from .models import MACRO
+
+        # Display a warning
+        log.warning(EXPERIMENTAL)
+
+        scenario = scenario or '_'.join([self.scenario, 'macro'])
+        clone = self.clone(self.model, scenario, keep_solution=False)
+        clone.check_out()
+
+        # Add ixmp items: sets, parameters, variables, and equations
+        MACRO.initialize(clone)
+
+        add_model_data(self, clone, data)
+        clone.commit('finished adding macro')
+        calibrate(clone, check_convergence=check_convergence, **kwargs)
+        return clone
 
     def rename(self, name, mapping, keep=False):
         """Rename an element in a set
@@ -290,10 +584,9 @@ class Scenario(ixmp.Scenario):
         try:
             self.check_out()
             commit = True
-        except:
+        except RuntimeError:
             commit = False
         keys = list(mapping.keys())
-        values = list(mapping.values())
 
         # search for from_tech in sets and replace
         for item in self.set_list():
@@ -328,98 +621,3 @@ class Scenario(ixmp.Scenario):
         # commit
         if commit:
             self.commit('Renamed {} using mapping {}'.format(name, mapping))
-
-    def to_excel(self, fname):
-        """Save a scenario as an Excel file. NOTE: Cannot export
-        solution currently (only model data) due to limitations in excel sheet
-        names (cannot have multiple sheet names which are identical except for
-        upper/lower case).
-
-        Parameters
-        ----------
-        fname : string
-            path to file
-        """
-        funcs = {
-            'set': (self.set_list, self.set),
-            'par': (self.par_list, self.par),
-        }
-        ix_name_map = {}
-        dfs = {}
-        for ix_type, (list_func, get_func) in funcs.items():
-            for item in list_func():
-                df = get_func(item)
-                df = pd.Series(df) if isinstance(df, dict) else df
-                if not df.empty:
-                    dfs[item] = df
-                    ix_name_map[item] = ix_type
-
-        # map names to ix types
-        df = pd.Series(ix_name_map).to_frame(name='ix_type')
-        df.index.name = 'item'
-        df = df.reset_index()
-        dfs['ix_type_mapping'] = df
-
-        pd_write(dfs, fname, index=False)
-
-    def read_excel(self, fname, add_units=False, commit_steps=False):
-        """Read Excel file data and load into the scenario.
-
-        Parameters
-        ----------
-        fname : string
-            path to file
-        add_units : bool
-            add missing units, if any,  to the platform instance.
-            default: False
-        commit_steps : bool
-            commit changes after every data addition.
-            default: False
-        """
-        funcs = {
-            'set': self.add_set,
-            'par': self.add_par,
-        }
-
-        logger().info('Reading data from {}'.format(fname))
-        dfs = pd_read(fname, sheet_name=None)
-
-        # get item-type mapping
-        df = dfs['ix_type_mapping']
-        ix_types = dict(zip(df['item'], df['ix_type']))
-
-        # fill in necessary items first (only sets for now)
-        col = 0  # special case for prefill set Series
-
-        def is_prefill(x):
-            return dfs[x].columns[0] == col and len(dfs[x].columns) == 1
-
-        prefill = [x for x in dfs if is_prefill(x)]
-        for name in prefill:
-            data = list(dfs[name][col])
-            if len(data) > 0:
-                ix_type = ix_types[name]
-                logger().info('Loading data for {}'.format(name))
-                funcs[ix_type](name, data)
-        if commit_steps:
-            self.commit('Loaded initial data from {}'.format(fname))
-            self.check_out()
-
-        # fill all other pars and sets, skipping those already done
-        skip_sheets = ['ix_type_mapping'] + prefill
-        for sheet_name, df in dfs.items():
-            if sheet_name not in skip_sheets and not df.empty:
-                logger().info('Loading data for {}'.format(sheet_name))
-                if add_units and 'unit' in df.columns:
-                    # add missing units
-                    units = set(self.platform.units())
-                    missing = set(df['unit'].unique()) - units
-                    for unit in missing:
-                        logger().info('Adding missing unit: {}'.format(unit))
-                        self.platform.add_unit(unit)
-                # load data
-                ix_type = ix_types[sheet_name]
-                funcs[ix_type](sheet_name, df)
-                if commit_steps:
-                    self.commit('Loaded {} from {}'.format(sheet_name, fname))
-                    self.check_out()

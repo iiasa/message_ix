@@ -22,6 +22,7 @@
 *#
 .
 *.Rproj
+*.eggs
 
 # MESSAGEix specifics
 message_ix/model/MESSAGE_master.gms
@@ -29,27 +30,31 @@ message_ix/model/MESSAGE_master.gms
 # Apple file system
 .DS_Store
 
-# local version of auto-documentation features
-/doc/build/**
-/doc/source/model/**
+# sphinx
+/doc/build
+/doc/source/_build
+/doc/source/model
 
-# files generated during install
-ixmp/default_paths.py
-build
+# setuptools
+/build
+/dist
 
-# rixmp build folder and rhistory
+# rmessageix build folder and rhistory
 rmessageix/rmessageix*.zip
 rmessageix/source/inst/docum/*.html
 rmessageix/source/.Rhistory
 !rmessageix/source/*.Rproj
 
-# credentials
-ixmp/*.properties
-config/*.properties
-
 # testdb
 .cache/**
-tests/testdb/test.properties
-tests/testdb/ixmptest.properties
-tests/testdb/ixmptest.lck
+tests/data/nightly
 .Rproj.user
+
+# pytest and related
+.coverage*
+.pytest_cache
+coverage.xml
+htmlcov
+
+# JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
+/**/.idea
