@@ -90,8 +90,8 @@ loop(year_all$( ORD(year_all) > 1 ),
 df_period(year_all) =
     df_year(year_all) * (
 * multiply the per-year discount factor by the geometric series of over the duration of the period
-        ( ( 1 - POWER( 1 / ( 1 + interestrate(year_all) ), duration_period(year_all) ) )
-      / ( 1 - 1 / ( 1 + interestrate(year_all) ) ) )$( interestrate(year_all) )
+        ( ( POWER( 1 + interestrate(year_all) , duration_period(year_all) ) - 1 )
+	/ interestrate(year_all) )$( interestrate(year_all) )
 * if interest rate = 0, multiply by the number of years in that period
         + ( duration_period(year_all) )$( interestrate(year_all) eq 0 ) )
 ;

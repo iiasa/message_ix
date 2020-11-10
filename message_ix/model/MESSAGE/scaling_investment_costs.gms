@@ -133,7 +133,7 @@ construction_time_factor(node,inv_tec,year)$( map_tec(node,inv_tec,year) AND con
 beyond_horizon_factor(node,inv_tec,vintage)$( beyond_horizon_lifetime(node,inv_tec,vintage) )
     = sum(last_period,
 * compute the discount factor of the very last year (not period) in the model horizon
-        df_year(last_period) * POWER( 1 / ( 1 + interestrate(last_period) ), duration_period(last_period) ) * (
+        df_year(last_period) * (
 * multiply this by the geometric series of remaining technical lifetime if interestrate of last model period > 0
             (
                 ( 1 - POWER( 1 / ( 1 + interestrate(last_period) ), beyond_horizon_lifetime(node,inv_tec,vintage) ) )
