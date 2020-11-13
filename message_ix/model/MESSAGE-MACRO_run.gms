@@ -116,10 +116,15 @@ Parameters
     report_iteration(iteration,*)
 ;
 
+Parameters
+    trade_cost_detail(node, commodity, year_all)              'net of commodity import costs and commodity export revenues by commodity, node and year'
+;
+
 * variables to report back to user if needed
 Variables
     N_ITER
     MAX_ITER
+    GDP_corr(node,year_all)               (corrected) gross domestic product (GDP) in market exchange rates for MACRO reporting
 ;
 
 
@@ -140,6 +145,11 @@ loop((node_macro,macro_base_period),
 if (check,
     abort "There is a problem with the parameter 'historical_gdp'!" ;
 ) ;
+
+
+* quick and dirty reduction of trade cost
+*var_cost(node,'certificate_buy',year,year,'M1','year') = 0.1 ;
+*var_cost(node,'certificate_sell',year,year,'M1','year') = 0.1 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
 * solve statements (including the loop for myopic or rolling-horizon optimization)                                     *
@@ -199,6 +209,10 @@ DISPLAY enestart, eneprice, total_cost ;
 * solve MACRO model                                                                                                    *
 *----------------------------------------------------------------------------------------------------------------------*
 
+* update total energy system costs by node and time with information from latest MESSAGE run
+total_cost(node_macro, year) = COST_NODAL.L(node_macro, year) / 1000 ;
+trade_cost_detail(node, commodity, year) = import_cost(node, commodity, year) - export_cost(node, commodity, year) ;
+
 $INCLUDE MACRO/macro_solve.gms
 
 *----------------------------------------------------------------------------------------------------------------------*
@@ -235,6 +249,7 @@ COST_NODAL_NET.L(node_macro,year) =
 ;
 
 GDP.L(node_macro,year) = (I.L(node_macro,year) + C.L(node_macro,year) + EC.L(node_macro,year)) * 1000 ;
+GDP_corr.L(node_macro,year) = (I.L(node_macro,year) + C.L(node_macro,year) + EC.L(node_macro,year) - ( trade_cost(node_macro, year) * 1E-6 ))*1000;
 
 * calculate convergence level (maximum absolute scaling factor minus 1 across all regions, sectors, and years)
 max_adjustment_pos = smax((node_macro,sector,year)$( NOT macro_base_period(year) AND demand_scale(node_macro,sector,year) > 1),
