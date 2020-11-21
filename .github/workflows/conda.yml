@@ -38,8 +38,8 @@ jobs:
       if: ${{ matrix.conda == 'anaconda' }}
       working-directory: ${{ github.workspace }}
       run: |
-        curl -O https://repo.anaconda.com/archive/Anaconda3-2020.02-Windows-x86_64.exe
-        Start-Process "Anaconda3-2020.02-Windows-x86_64.exe" "/S", "/D=${env:GITHUB_WORKSPACE}\anaconda3" -Wait
+        curl -O https://repo.anaconda.com/archive/Anaconda3-2020.11-Windows-x86_64.exe
+        Start-Process "Anaconda3-2020.11-Windows-x86_64.exe" "/S", "/D=${env:GITHUB_WORKSPACE}\anaconda3" -Wait
         "${env:GITHUB_WORKSPACE}/anaconda3/Scripts" | Out-File -FilePath $env:GITHUB_PATH -Append
 
     - name: Add build runner's pre-installed Miniconda to PATH
