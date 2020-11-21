@@ -15,12 +15,14 @@ env:
   CONDA_ENV: testenv
 
 jobs:
-  anaconda:
+  conda:
     runs-on: windows-latest
 
     strategy:
       matrix:
-        conda: [anaconda, miniconda]
+        conda_type: [anaconda, miniconda]
+
+    name: ${{ matrix.conda_type }}
 
     steps:
     - name: Cache Anaconda installer, conda packages
@@ -32,10 +34,10 @@ jobs:
           ~/anaconda3/pkgs
           ~/appdata/local/conda/conda/pkgs
           ${{ github.workspace }}/Anaconda*.exe
-        key: windows-latest-${{ matrix.conda }}
+        key: windows-latest-${{ matrix.conda_type }}
 
     - name: Download and install Anaconda; add to PATH
-      if: ${{ matrix.conda == 'anaconda' }}
+      if: ${{ matrix.conda_type == 'anaconda' }}
       working-directory: ${{ github.workspace }}
       run: |
         curl -O https://repo.anaconda.com/archive/Anaconda3-2020.11-Windows-x86_64.exe
@@ -43,7 +45,7 @@ jobs:
         "${env:GITHUB_WORKSPACE}/anaconda3/Scripts" | Out-File -FilePath $env:GITHUB_PATH -Append
 
     - name: Add build runner's pre-installed Miniconda to PATH
-      if: ${{ matrix.conda == 'miniconda' }}
+      if: ${{ matrix.conda_type == 'miniconda' }}
       run: |
         "${env:CONDA}/Scripts" | Out-File -FilePath $env:GITHUB_PATH -Append
 
