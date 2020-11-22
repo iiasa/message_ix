@@ -39,11 +39,7 @@ def test_copy_model(message_ix_cli, tmp_path, tmp_env):
 def test_dl(message_ix_cli, opts, tmp_path):
     r = message_ix_cli('dl', opts, str(tmp_path))
 
-    if r.exit_code != 0:
-        # Debugging information
-        print(r.exception, r.output)
-        assert False
-    print(r.exception, r.output)
+    assert r.exit_code == 0, (r.exception, r.output)
 
     if opts == "":
         # Guess what the latest release will be from GitHub, using __version__.

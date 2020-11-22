@@ -136,9 +136,6 @@ jobs:
       shell: Rscript {0}
 
     - name: Run test suite using pytest
-      env:
-        MESSAGE_IX_GH_USER: ${{ secrets.GH_API_USER }}
-        MESSAGE_IX_GH_PW: ${{ secrets.GH_API_PASS }}
       working-directory: message_ix
       run: pytest message_ix -m "not nightly" --verbose --cov-report=xml --color=yes
 
