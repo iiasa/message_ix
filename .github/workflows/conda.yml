@@ -1,6 +1,6 @@
 # Verify that installation from conda-forge works as intended
 
-name: anaconda
+name: Install from conda-forge
 
 on:
   # 05:00 UTC = 06:00 CET = 07:00 CEST
@@ -15,8 +15,14 @@ env:
   CONDA_ENV: testenv
 
 jobs:
-  anaconda:
+  conda:
     runs-on: windows-latest
+
+    strategy:
+      matrix:
+        conda_type: [anaconda, miniconda]
+
+    name: ${{ matrix.conda_type }}
 
     steps:
     - name: Cache Anaconda installer, conda packages
@@ -28,14 +34,20 @@ jobs:
           ~/anaconda3/pkgs
           ~/appdata/local/conda/conda/pkgs
           ${{ github.workspace }}/Anaconda*.exe
-        key: windows-latest
+        key: windows-latest-${{ matrix.conda_type }}
 
     - name: Download and install Anaconda; add to PATH
+      if: ${{ matrix.conda_type == 'anaconda' }}
       working-directory: ${{ github.workspace }}
       run: |
-        curl -O https://repo.anaconda.com/archive/Anaconda3-2020.02-Windows-x86_64.exe
-        Start-Process "Anaconda3-2020.02-Windows-x86_64.exe" "/S", "/D=${env:GITHUB_WORKSPACE}\anaconda3" -Wait
-        Write-Output "::add-path::${env:GITHUB_WORKSPACE}/anaconda3/Scripts"
+        curl -O https://repo.anaconda.com/archive/Anaconda3-2020.11-Windows-x86_64.exe
+        Start-Process "Anaconda3-2020.11-Windows-x86_64.exe" "/S", "/D=${env:GITHUB_WORKSPACE}\anaconda3" -Wait
+        "${env:GITHUB_WORKSPACE}/anaconda3/Scripts" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+    - name: Add build runner's pre-installed Miniconda to PATH
+      if: ${{ matrix.conda_type == 'miniconda' }}
+      run: |
+        "${env:CONDA}/Scripts" | Out-File -FilePath $env:GITHUB_PATH -Append
 
     - name: Configure PowerShell for "conda activate"
       run: conda init powershell

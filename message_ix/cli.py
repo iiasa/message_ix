@@ -100,12 +100,13 @@ def dl(branch, tag, path):
             url="https://api.github.com/repos/iiasa/message_ix/tags",
             headers=dict(),
         )
+        # GitHub's API rate limits unathenticated requests by IP address. On
+        # some CI services (e.g. Travis macOS), the build worker/runner re-uses
+        # an address, so the limit can sometimes be exceeded and the request
+        # fails. This (unadvertised) code uses HTTP Basic Auth with an
+        # encrypted username and password from environment variables to avoid
+        # the rate limit.
         try:
-            # Only for Travis/macOS: GitHub rate limits unathenticated API
-            # requests by IP address. Because the build worker shares an IP,
-            # the limit is exceeded and the request fails. Use HTTP Basic Auth
-            # with an encrypted username and  password from .travis.yml for a
-            # higher rate limit.
             auth_bytes = b64encode(
                 "{MESSAGE_IX_GH_USER}:{MESSAGE_IX_GH_PW}"
                 .format(**os.environ)
@@ -113,7 +114,7 @@ def dl(branch, tag, path):
             )
             args["headers"]["Authorization"] = f"Basic {auth_bytes.decode()}"
         except KeyError:
-            pass
+            pass  # Variables not set
 
         with urlopen(Request(**args)) as response:
             tags_info = json.load(response)
