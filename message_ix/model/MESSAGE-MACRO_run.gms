@@ -151,6 +151,12 @@ if (check,
 *var_cost(node,'certificate_buy',year,year,'M1','year') = 0.1 ;
 *var_cost(node,'certificate_sell',year,year,'M1','year') = 0.1 ;
 
+* quick and dirty limitation of trade
+*bound_activity_up(node,'certificate_buy',year,'M1','year') = 0 ;
+*bound_activity_up(node,'certificate_sell',year,'M1','year') = 0 ;
+*is_bound_activity_up(node,'certificate_buy',year,'M1','year') = YES ;
+*is_bound_activity_up(node,'certificate_sell',year,'M1','year') = YES ;
+
 *----------------------------------------------------------------------------------------------------------------------*
 * solve statements (including the loop for myopic or rolling-horizon optimization)                                     *
 *----------------------------------------------------------------------------------------------------------------------*

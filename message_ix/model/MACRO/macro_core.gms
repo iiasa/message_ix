@@ -170,7 +170,7 @@ SUM(node_active,
 
 CAPITAL_CONSTRAINT(node_active, year)..
 Y(node_active, year) =E=
-C(node_active, year) + I(node_active, year) + EC(node_active, year) - ( trade_cost(node_active, year) * 1E-6 )
+C(node_active, year) + I(node_active, year) + EC(node_active, year)
 ;
 
 ***

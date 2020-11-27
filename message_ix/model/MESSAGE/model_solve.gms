@@ -161,8 +161,7 @@ trade_cost(node2, year) = SUM(commodity, import_cost(node2, commodity, year) - e
 
 * total energy system costs excluding taxes by node and time (CAVEAT: lacking regional corrections due to emission trading)
 COST_NODAL_NET.L(node, year)$(NOT macro_base_period(year)) = (
-    COST_NODAL.L(node, year)
-* remove trade cost correction + trade_cost(node, year)
+    COST_NODAL.L(node, year) + trade_cost(node, year)
 * subtract emission taxes applied at any higher nodal level (via map_node set)
     - sum((type_emission,emission,type_tec,type_year,node2)$( emission_scaling(type_emission,emission)
             AND map_node(node2,node) AND cat_year(type_year,year) ),
