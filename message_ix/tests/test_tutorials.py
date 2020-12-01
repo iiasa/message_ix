@@ -21,7 +21,7 @@ tutorials = [
     # IPython kernel
     (
         ('westeros', 'westeros_baseline'),
-        [('solve-objective-value', 238193.291167)],
+        [('solve-objective-value', 369297.75)],
         {},
     ),
     (('westeros', 'westeros_emissions_bounds'), [], {}),
@@ -30,10 +30,10 @@ tutorials = [
     (('westeros', 'westeros_flexible_generation'), [], {}),
     # NB this is the same value as in test_reporter()
     (('westeros', 'westeros_report'), [('len-rep-graph', 12688)], {}),
-    ((AT, 'austria'), [('solve-objective-value', 133105.109375)], {}),
+    ((AT, 'austria'), [('solve-objective-value', 206321.90625)], {}),
     (
         (AT, 'austria_single_policy'),
-        [('solve-objective-value', 525474464.0)],
+        [('solve-objective-value', 815183232.0)],
         {},
     ),
     ((AT, 'austria_multiple_policies'), [], {}),

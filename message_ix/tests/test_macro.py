@@ -175,7 +175,7 @@ def test_calc_total_cost(westeros_solved):
     # 4 values, 3 in model period, one in history
     assert len(obs) == 4
     obs = obs.values
-    exp = np.array([15, 17.477751, 22.143633, 28.189798]) / 1e3
+    exp = np.array([15, 17.477751, 22.143634, 28.114812]) / 1e3
     assert np.isclose(obs, exp).all()
 
 
@@ -187,7 +187,7 @@ def test_calc_price(westeros_solved):
     # 4 values, 3 in model period, one in history
     assert len(obs) == 4
     obs = obs.values
-    exp = np.array([195, 183.094376, 161.645111, 161.645111])
+    exp = np.array([195, 182.852229, 162.039539, 161.002627])
     assert np.isclose(obs, exp).all()
 
 
@@ -286,11 +286,11 @@ def test_calibrate_roundtrip(westeros_solved):
         W_DATA_PATH, check_convergence=True)
     aeei = with_macro.par('aeei')['value'].values
     assert len(aeei) == 4
-    exp = [0.02, 0.07173523, 0.03741514, 0.01990172]
+    exp = np.array([20, 71.759022, 37.424904, 19.936694]) / 1e3
     assert np.allclose(aeei, exp)
     grow = with_macro.par('grow')['value'].values
     assert len(grow) == 4
-    exp = [0.02658363, 0.06910296, 0.07952086, 0.02452946]
+    exp = np.array([26.583631, 69.101286, 79.520269, 24.529274]) / 1e3
     assert np.allclose(grow, exp)
 
 #

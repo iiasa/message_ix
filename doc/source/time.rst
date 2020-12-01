@@ -52,3 +52,20 @@ Example 4
    - The ``year`` element ``2002`` refers to the period from 2001-01-01 to 2002-12-31 inclusive, which has a ``duration_period`` of 2 years.
    - The ``time`` element 'summer', **used alone**, refers to a portion of any year.
    - In a |MESSAGEix| parameter indexed by (``year``, ``time``, …), values with the key (``2002``, 'summer', ...) refer to the 'summer' portion of the final year (2002-01-01 to 2002-12-31) within the entire period (2001-01-01 to 2002-12-31) denoted by ``2002``.
+
+
+Discounting
+===========
+
+The ``interest_rate`` in |MESSAGEix| is defined for a period of one year, therefore, for periods of more than a year, the discounting is performed in a cumulative manner. 
+
+Example 5
+   Using the same setup as Example 2:
+   
+   - Discounting for the element ``1010`` involves discounting for years ``1001``, ``1002``, ... , ``1010``.
+   - Using the standard PV formula, we have that, for the year ``1001`` the discount factor would be :math:`(1 + interest_rate)^(1000 - 1001)`, for the year  ``1002`` the discount factor would be :math:`(1 + interest_rate)^(1000 - 1002)`, and so on.
+   - Therefore, the period discount factor for the element ``1010`` is :math:`df_1010 = (1 + interest_rate)^(1000 - 1001) + (1 + interest_rate)^(1000 - 1002) + ... + (1 + interest_rate)^(1000 - 1010)`
+   - Analogously, the period discount factor for the element ``1020`` is :math:`df_1020 = (1 + interest_rate)^(1000 - 1011) + (1 + interest_rate)^(1000 - 1012) + ... + (1 + interest_rate)^(1000 - 1020)`
+   - So, if we have a cost of ``K_1010`` for the element ``1010``, its discounted value would be ``df_1010 * K_1010``, which means, all the years in  element ``1010`` have a representative cost of ``K_1010`` that is discounted up to the initial ``year`` of the setup, namely, the year ``1000``.
+  
+In practice, since the representative year of a period is always its final year, the actual calculation of the period discount factor within the model is performed backwards, i.e., starting from the final year of the period until the initial year. 
