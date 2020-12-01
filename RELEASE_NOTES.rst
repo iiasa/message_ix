@@ -4,6 +4,8 @@ Next release
 All changes
 -----------
 
+- :pull:`421`: Fix discounting from forward-looking to backward-looking and provide an explanation of the period structure and discounting in documentation of :doc:`time`.
+
 
 v3.1.0 (2020-08-28)
 ===================
