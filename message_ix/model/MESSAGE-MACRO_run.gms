@@ -167,7 +167,7 @@ MESSAGE_LP.solvelink = 1 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
 * update total energy system costs by node and time with information from latest MESSAGE run
-total_cost(node_macro, year) = COST_NODAL.L(node_macro, year) / 1000 ;
+total_cost(node_macro, year) = COST_NODAL_NET.L(node_macro, year) / 1000 ;
 trade_cost_detail(node, commodity, year) = import_cost(node, commodity, year) - export_cost(node, commodity, year) ;
 
 $INCLUDE MESSAGE/model_solve.gms
