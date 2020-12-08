@@ -161,8 +161,17 @@ SUM(node_active,
 * Equation CAPITAL_CONSTRAINT
 * ---------------------------------
 * The following equation specifies the allocation of total production among current consumption :math:`{C}_{n, y}`, investment into building up capital stock excluding
-* the sectors represented in MESSAGE :math:`{I}_{n, y}` and the MESSAGE system costs :math:`{EC}_{n, y}` which are derived from a previous MESSAGE model run. As described in :cite:`manne_buying_1992`, the first-order
-* optimality conditions lead to the Ramsey rule for the optimal allocation of savings, investment and consumption over time.
+* the sectors represented in MESSAGE :math:`{I}_{n, y}` and the MESSAGE system costs :math:`{EC}_{n, y}` which are derived from a previous MESSAGE model run. MESSAGE system
+* costs are all the energy system costs for a certain region including the trade balance from fuel and emissions certificate trade. Therefore, the constraint assures that the net
+* expenditures and savings cannot exceed the total income in a region. As described in :cite:`manne_buying_1992`, the first-order optimality conditions lead to the Ramsey rule for
+* the optimal allocation of savings, investment and consumption over time.
+
+* Since MACRO does not include the trade of normal goods, there is not an explicit component in the equation which takes the trade revenues into account. The trade of energy goods and
+* emission certificates is accounted within :math:`{EC}_{n, y}` and not added as a seperate component as well. The reason for that is, the NEW PRODUCTION equation in MACRO
+* only accounts for non-energy producing part of the economy and the energy system is modeled seperately in MESSAGE. However, the revenues from energy goods and emission allowances
+* would increase the domestic income and therefore should be accounted in the GDP definition. This is achieved via deducting the trade costs of MESSAGE from :math:`{Y}_{n, y}`in GDP
+* reporting. Positive contribution of EC to GDP would be counter balanced by the decrease of consumption :math:`{C}_{n, y}` and investment :math:`{I}_{n, y}` in the certain year as well
+* as by the reduction in capacity to invest and grow the economy for later years. 
 *
 * .. math:: Y_{n, y} = C_{n, y} + I_{r, y} + {EC}_{n, y} \qquad \forall{n, y}
 *
