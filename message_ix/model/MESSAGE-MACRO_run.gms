@@ -119,6 +119,7 @@ Parameters
     price_diff_rel(*,node,sector,year_all)
 
     report_iteration(iteration,*)
+    trade_cost_detail(node, commodity, year_all)              'net of commodity import costs and commodity export revenues by commodity, node and year'
 ;
 
 * variables to report back to user if needed
@@ -163,6 +164,11 @@ ctr = ctr + 1 ;
 
 * to keep the model in memory between runs, this will speed up computation
 MESSAGE_LP.solvelink = 1 ;
+
+*----------------------------------------------------------------------------------------------------------------------*
+* update total energy system costs by node and time with information from latest MESSAGE run
+total_cost(node_macro, year) = COST_NODAL.L(node_macro, year) / 1000 ;
+trade_cost_detail(node, commodity, year) = import_cost(node, commodity, year) - export_cost(node, commodity, year) ;
 
 $INCLUDE MESSAGE/model_solve.gms
 
