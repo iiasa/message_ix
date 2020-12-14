@@ -108,7 +108,9 @@ __ https://help.github.com/en/github/collaborating-with-issues-and-pull-requests
   nightly
      These tests run daily at 05:00 UTC.
      They download a particular package of full-scale, MESSAGEix-GLOBIOM global model scenarios from IIASA servers.
-     Each scenario's outputs are compared to an expected value.
+     Each scenario's outputs are compared to an expected value listed in :file:`message_ix/tests/data/scenarios.yaml`.
+     PRs that touch the GAMS code may cause the these objective function values to change; the values **must** be updated as part of such PRs.
+     See the comments in the file for how to temporarily enable these checks for every commit on a PR branch.
 
   anaconda, miniconda
      These workflows check that the package can be installed from conda-forge using Anaconda and Miniconda, respectively, on Windows only.
