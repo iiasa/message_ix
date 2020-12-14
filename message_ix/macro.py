@@ -177,7 +177,9 @@ class Calculate:
             if not data_path.exists() or data_path.suffix != '.xlsx':
                 raise ValueError(f'not an Excel data file: {data_path}')
 
-            self.data = pd.read_excel(data_path, sheet_name=None)
+            self.data = pd.read_excel(
+                data_path, sheet_name=None, engine="openpyxl"
+            )
 
         if not s.has_solution():
             raise RuntimeError('Scenario must have a solution to add MACRO')
