@@ -150,6 +150,11 @@ jobs:
       working-directory: message_ix
       shell: Rscript {0}
 
+    - name: Test documentation build using Sphinx
+      if: ${{ startsWith(matrix.os, 'ubuntu') }}
+      working-directory: message_ix
+      run: make --directory=doc html
+
     - name: Upload test coverage to Codecov.io
 
       # NB would prefer to use Codecov's Action here, but it does not support

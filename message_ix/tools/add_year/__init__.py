@@ -558,6 +558,8 @@ def interpolate_1d(df, yrs_new, horizon, year_col, value_col='value',
 
 
 # %% VI.B) Interpolating parameters with two dimensions related to time
+# TODO this is the most complex piece of code in the message_ix, at a McCabe
+#      complexity of 38 (next nearest: 18). Simplify.
 def interpolate_2d(df, yrs_new, horizon, year_ref, year_col, tec_list, par_tec,
                    value_col='value', extrapolate=False, extrapol_neg=None,
                    year_diff=None, bound_extend=True):
