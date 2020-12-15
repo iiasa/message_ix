@@ -1,8 +1,9 @@
-from contextlib import contextmanager
 import subprocess
 import sys
+from contextlib import contextmanager
 
 import ixmp
+
 import message_ix
 
 
@@ -44,14 +45,17 @@ def make_scenario(platform, country, name, base_scen, scen):
 
     by = "by 'tutorial/utils/run_scenarios.py:make_scenario()'"
     ds = base_ds.clone(
-        name, scen, "scenario generated {}, {} - {}".format(by, name, scen),
-        keep_solution=False)
+        name,
+        scen,
+        "scenario generated {}, {} - {}".format(by, name, scen),
+        keep_solution=False,
+    )
     ds.check_out()
 
     yield ds
 
     ds.commit("changes committed {}, {} - {}".format(by, name, scen))
     ds.set_as_default()
-    ds.solve('MESSAGE')
+    ds.solve("MESSAGE")
 
     mp.close_db()

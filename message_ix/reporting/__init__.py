@@ -1,20 +1,17 @@
-from functools import partial
 import logging
+from functools import partial
 
-from ixmp.reporting import (
-    Key,
-    Reporter as IXMPReporter,
-    configure,
-)
+from ixmp.reporting import Key
+from ixmp.reporting import Reporter as IXMPReporter
+from ixmp.reporting import configure
 
 from . import computations
 from .pyam import collapse_message_cols
 
-
 __all__ = [
-    'Key',
-    'Reporter',
-    'configure',
+    "Key",
+    "Reporter",
+    "configure",
 ]
 
 log = logging.getLogger(__name__)
@@ -24,41 +21,39 @@ log = logging.getLogger(__name__)
 configure(
     # Units appearing in MESSAGEix test data
     units={
-        'define': 'y = year',
+        "define": "y = year",
     },
     # Short names for dimensions
     rename_dims={
         # As defined in the documentation
-        'commodity': 'c',
-        'emission': 'e',
-        'grade': 'g',
-        'land_scenario': 's',
-        'land_type': 'u',
-        'level': 'l',
-        'mode': 'm',
-        'node': 'n',
-        'rating': 'q',
-        'relation': 'r',
-        'technology': 't',
-        'time': 'h',
-        'year': 'y',
-
+        "commodity": "c",
+        "emission": "e",
+        "grade": "g",
+        "land_scenario": "s",
+        "land_type": "u",
+        "level": "l",
+        "mode": "m",
+        "node": "n",
+        "rating": "q",
+        "relation": "r",
+        "technology": "t",
+        "time": "h",
+        "year": "y",
         # Aliases
-        'node_dest': 'nd',
-        'node_loc': 'nl',
-        'node_origin': 'no',
-        'node_rel': 'nr',
-        'node_share': 'ns',
-        'time_dest': 'hd',
-        'time_origin': 'ho',
-        'year_act': 'ya',
-        'year_vtg': 'yv',
-        'year_rel': 'yr',
-
+        "node_dest": "nd",
+        "node_loc": "nl",
+        "node_origin": "no",
+        "node_rel": "nr",
+        "node_share": "ns",
+        "time_dest": "hd",
+        "time_origin": "ho",
+        "year_act": "ya",
+        "year_vtg": "yv",
+        "year_rel": "yr",
         # Created by reporting
-        'technology_addon': 'ta',
-        'technology_primary': 'tp',
-    }
+        "technology_addon": "ta",
+        "technology_primary": "tp",
+    },
 )
 
 #: Automatic quantities that are the :meth:`~computations.product` of two
@@ -66,82 +61,80 @@ configure(
 PRODUCTS = (
     # Each entry is ('output key', ('quantities', 'to', 'multiply')). Full keys
     # are inferred automatically, by add_product().
-    ('out',
-        ('output', 'ACT')),
-    ('in',
-        ('input', 'ACT')),
-    ('rel',
-        ('relation_activity', 'ACT')),
-    ('emi',
-        ('emission_factor', 'ACT')),
-    ('inv',
-        ('inv_cost', 'CAP_NEW')),
-    ('fom',
-        ('fix_cost', 'CAP')),
-    ('vom',
-        ('var_cost', 'ACT')),
-    ('land_out',
-        ('land_output', 'LAND')),
-    ('land_use_qty',  # TODO: better name!
-        ('land_use', 'LAND')),
-    ('land_emi',
-        ('land_emission', 'LAND')),
-    ('addon ACT',
-        ('addon conversion', 'ACT')),
-    ('addon in',
-        ('input', 'addon ACT')),
-    ('addon out',
-        ('output', 'addon ACT')),
-    ('addon potential',
-        ('addon up', 'addon ACT')),
+    ("out", ("output", "ACT")),
+    ("in", ("input", "ACT")),
+    ("rel", ("relation_activity", "ACT")),
+    ("emi", ("emission_factor", "ACT")),
+    ("inv", ("inv_cost", "CAP_NEW")),
+    ("fom", ("fix_cost", "CAP")),
+    ("vom", ("var_cost", "ACT")),
+    ("land_out", ("land_output", "LAND")),
+    ("land_use_qty", ("land_use", "LAND")),  # TODO: better name!
+    ("land_emi", ("land_emission", "LAND")),
+    ("addon ACT", ("addon conversion", "ACT")),
+    ("addon in", ("input", "addon ACT")),
+    ("addon out", ("output", "addon ACT")),
+    ("addon potential", ("addon up", "addon ACT")),
 )
 
 #: Automatic quantities derived by other calculations.
 DERIVED = [
     # Each entry is ('full key', (computation tuple,)). Full keys are not
     # inferred and must be given explicitly.
-    ('tom:nl-t-yv-ya', (computations.add, 'fom:nl-t-yv-ya', 'vom:nl-t-yv-ya')),
-
+    ("tom:nl-t-yv-ya", (computations.add, "fom:nl-t-yv-ya", "vom:nl-t-yv-ya")),
     # Broadcast from type_addon to technology_addon
-    ('addon conversion:nl-t-yv-ya-m-h-ta',
-     (partial(computations.broadcast_map, rename={'n': 'nl'}),
-      'addon_conversion:n-t-yv-ya-m-h-type_addon',
-      'map_addon')),
-    ('addon up:nl-t-ya-m-h-ta',
-     (partial(computations.broadcast_map, rename={'n': 'nl'}),
-      'addon_up:n-t-ya-m-h-type_addon',
-      'map_addon')),
-
+    (
+        "addon conversion:nl-t-yv-ya-m-h-ta",
+        (
+            partial(computations.broadcast_map, rename={"n": "nl"}),
+            "addon_conversion:n-t-yv-ya-m-h-type_addon",
+            "map_addon",
+        ),
+    ),
+    (
+        "addon up:nl-t-ya-m-h-ta",
+        (
+            partial(computations.broadcast_map, rename={"n": "nl"}),
+            "addon_up:n-t-ya-m-h-type_addon",
+            "map_addon",
+        ),
+    ),
     # Double broadcast over type_emission, then type_tec, in a nested task
-    ('price emission:n-e-t-y',
-     (computations.broadcast_map,
-      (computations.broadcast_map,
-       'PRICE_EMISSION:n-type_emission-type_tec-y',
-       'map_emission'),
-      'map_tec')),
+    (
+        "price emission:n-e-t-y",
+        (
+            computations.broadcast_map,
+            (
+                computations.broadcast_map,
+                "PRICE_EMISSION:n-type_emission-type_tec-y",
+                "map_emission",
+            ),
+            "map_tec",
+        ),
+    ),
 ]
 
 #: Quantities to automatically convert to IAMC format using
 #: :meth:`~computations.as_pyam`.
 PYAM_CONVERT = [
-    ('out:nl-t-ya-m-nd-c-l', 'ya', dict(kind='ene', var='out')),
-    ('in:nl-t-ya-m-no-c-l', 'ya', dict(kind='ene', var='in')),
-    ('CAP:nl-t-ya', 'ya', dict(var='capacity')),
-    ('CAP_NEW:nl-t-yv', 'yv', dict(var='new capacity')),
-    ('inv:nl-t-yv', 'yv', dict(var='inv cost')),
-    ('fom:nl-t-ya', 'ya', dict(var='fom cost')),
-    ('vom:nl-t-ya', 'ya', dict(var='vom cost')),
-    ('tom:nl-t-ya', 'ya', dict(var='total om cost')),
-    ('emi:nl-t-ya-m-e', 'ya', dict(kind='emi', var='emis')),
+    ("out:nl-t-ya-m-nd-c-l", "ya", dict(kind="ene", var="out")),
+    ("in:nl-t-ya-m-no-c-l", "ya", dict(kind="ene", var="in")),
+    ("CAP:nl-t-ya", "ya", dict(var="capacity")),
+    ("CAP_NEW:nl-t-yv", "yv", dict(var="new capacity")),
+    ("inv:nl-t-yv", "yv", dict(var="inv cost")),
+    ("fom:nl-t-ya", "ya", dict(var="fom cost")),
+    ("vom:nl-t-ya", "ya", dict(var="vom cost")),
+    ("tom:nl-t-ya", "ya", dict(var="total om cost")),
+    ("emi:nl-t-ya-m-e", "ya", dict(kind="emi", var="emis")),
 ]
 
 
 #: Automatic reports that :meth:`~computations.concat` quantities converted to
 #: IAMC format.
 REPORTS = {
-    'message:system': ['out:pyam', 'in:pyam', 'CAP:pyam', 'CAP_NEW:pyam'],
-    'message:costs': ['inv:pyam', 'fom:pyam', 'vom:pyam', 'tom:pyam'],
-    'message:emissions': ['emi:pyam'],
+    "message:system": ["out:pyam", "in:pyam", "CAP:pyam", "CAP_NEW:pyam"],
+    "message:costs": ["inv:pyam", "fom:pyam", "vom:pyam", "tom:pyam"],
+    "message:emissions": ["emi:pyam"],
 }
 
 
@@ -154,16 +147,17 @@ REPORTS = {
 #: This Quantity contains the value 1 at every valid (type_addon, ta) location,
 #: and 0 elsewhere.
 MAPPING_SETS = [
-    ('addon', 't'),  # Mapping name, and full target set
-    ('emission', 'e'),
+    ("addon", "t"),  # Mapping name, and full target set
+    ("emission", "e"),
     # 'node',  # Automatic addition fails because 'map_node' is defined
-    ('tec', 't'),
-    ('year', 'y'),
+    ("tec", "t"),
+    ("year", "y"),
 ]
 
 
 class Reporter(IXMPReporter):
     """MESSAGEix Reporter."""
+
     # Module containing predefined computations, including those defined in
     # message_ix.reporting.computations
     _computations = computations
@@ -178,7 +172,7 @@ class Reporter(IXMPReporter):
             A reporter for *scenario*.
         """
         if not scenario.has_solution():
-            raise RuntimeError('Scenario must have a solution to be reported')
+            raise RuntimeError("Scenario must have a solution to be reported")
 
         # Invoke the ixmp method
         rep = super().from_scenario(scenario, **kwargs)
@@ -200,12 +194,11 @@ class Reporter(IXMPReporter):
 
         # Quantities that represent mapping sets
         for name, full_set in MAPPING_SETS:
-            put('map_as_qty', f'map_{name}', f'cat_{name}', full_set,
-                strict=True)
+            put("map_as_qty", f"map_{name}", f"cat_{name}", full_set, strict=True)
 
         # Product quantities
         for name, quantities in PRODUCTS:
-            put('product', name, *quantities)
+            put("product", name, *quantities)
 
         # Derived quantities
         for key, args in DERIVED:
@@ -214,24 +207,31 @@ class Reporter(IXMPReporter):
         # Conversions to IAMC format/pyam objects
         for qty, year_dim, collapse_kw in PYAM_CONVERT:
             collapse_cb = partial(collapse_message_cols, **collapse_kw)
-            put('as_pyam', qty, year_dim, 'pyam', collapse=collapse_cb)
+            put("as_pyam", qty, year_dim, "pyam", collapse=collapse_cb)
 
         # Standard reports
         for group, pyam_keys in REPORTS.items():
             put(group, computations.concat, *pyam_keys, strict=True)
 
         # Add all standard reporting to the default message node
-        put('message:default', computations.concat, *REPORTS.keys(),
-            strict=True)
+        put("message:default", computations.concat, *REPORTS.keys(), strict=True)
 
         # Use ixmp.Reporter.add_queue() to process the entries. Retry at most
         # once; raise an exception if adding fails after that.
-        rep.add_queue(to_add, max_tries=2, fail='raise')
+        rep.add_queue(to_add, max_tries=2, fail="raise")
 
         return rep
 
-    def convert_pyam(self, quantities, year_time_dim, tag='iamc', drop={},
-                     collapse=None, unit=None, replace_vars=None):
+    def convert_pyam(
+        self,
+        quantities,
+        year_time_dim,
+        tag="iamc",
+        drop={},
+        collapse=None,
+        unit=None,
+        replace_vars=None,
+    ):
         """Add conversion of one or more **quantities** to IAMC format.
 
         Parameters
@@ -277,20 +277,23 @@ class Reporter(IXMPReporter):
         for qty in quantities:
             # Key for the new quantity
             qty = Key.from_str_or_key(qty)
-            new_key = ':'.join([qty.name, tag])
+            new_key = ":".join([qty.name, tag])
 
             # Dimensions to drop automatically
             to_drop = set(drop) | set(qty.dims) & (
-                {'h', 'y', 'ya', 'yr', 'yv'} - {year_time_dim})
+                {"h", "y", "ya", "yr", "yv"} - {year_time_dim}
+            )
 
             # Prepare the computation
             comp = [
-                partial(computations.as_pyam,
-                        year_time_dim=year_time_dim,
-                        drop=to_drop,
-                        collapse=collapse,
-                        unit=unit),
-                'scenario',
+                partial(
+                    computations.as_pyam,
+                    year_time_dim=year_time_dim,
+                    drop=to_drop,
+                    collapse=collapse,
+                    unit=unit,
+                ),
+                "scenario",
                 qty,
             ]
             if replace_vars:

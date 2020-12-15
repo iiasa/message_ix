@@ -1,11 +1,10 @@
 import sys
 
-from ixmp.testing import run_notebook, get_cell_output
 import numpy as np
 import pytest
+from ixmp.testing import get_cell_output, run_notebook
 
-
-AT = 'Austrian_energy_system'
+AT = "Austrian_energy_system"
 
 # Argument values to parametrize test_tutorial
 #
@@ -20,29 +19,28 @@ AT = 'Austrian_energy_system'
 tutorials = [
     # IPython kernel
     (
-        ('westeros', 'westeros_baseline'),
-        [('solve-objective-value', 369297.75)],
+        ("westeros", "westeros_baseline"),
+        [("solve-objective-value", 369297.75)],
         {},
     ),
-    (('westeros', 'westeros_emissions_bounds'), [], {}),
-    (('westeros', 'westeros_emissions_taxes'), [], {}),
-    (('westeros', 'westeros_firm_capacity'), [], {}),
-    (('westeros', 'westeros_flexible_generation'), [], {}),
+    (("westeros", "westeros_emissions_bounds"), [], {}),
+    (("westeros", "westeros_emissions_taxes"), [], {}),
+    (("westeros", "westeros_firm_capacity"), [], {}),
+    (("westeros", "westeros_flexible_generation"), [], {}),
     # NB this is the same value as in test_reporter()
-    (('westeros', 'westeros_report'), [('len-rep-graph', 12688)], {}),
-    ((AT, 'austria'), [('solve-objective-value', 206321.90625)], {}),
+    (("westeros", "westeros_report"), [("len-rep-graph", 12688)], {}),
+    ((AT, "austria"), [("solve-objective-value", 206321.90625)], {}),
     (
-        (AT, 'austria_single_policy'),
-        [('solve-objective-value', 815183232.0)],
+        (AT, "austria_single_policy"),
+        [("solve-objective-value", 815183232.0)],
         {},
     ),
-    ((AT, 'austria_multiple_policies'), [], {}),
-    ((AT, 'austria_multiple_policies-answers'), [], {}),
-    ((AT, 'austria_load_scenario'), [], {}),
-
+    ((AT, "austria_multiple_policies"), [], {}),
+    ((AT, "austria_multiple_policies-answers"), [], {}),
+    ((AT, "austria_load_scenario"), [], {}),
     # R tutorials / IR kernel
-    ((AT, 'R_austria'), [], dict(kernel="IR")),
-    ((AT, 'R_austria_load_scenario'), [], dict(kernel="IR")),
+    ((AT, "R_austria"), [], dict(kernel="IR")),
+    ((AT, "R_austria_load_scenario"), [], dict(kernel="IR")),
 ]
 
 # Short, readable IDs for the tests
@@ -53,7 +51,7 @@ ids = [arg[0][-1] for arg in tutorials]
 def nb_path(request, tutorial_path):
     """Prepare the `nb_path` fixture to `test_tutorial`."""
     # Combine the filename parts with the tutorial_path fixture
-    yield tutorial_path.joinpath(*request.param).with_suffix('.ipynb')
+    yield tutorial_path.joinpath(*request.param).with_suffix(".ipynb")
 
 
 # Parametrize the first 3 arguments using the variables *tutorial* and *ids*.
@@ -71,9 +69,9 @@ def test_tutorial(nb_path, cell_values, run_args, tmp_path, tmp_env):
     # the notebook, ie. under `tutorial_path`.
     # TODO remove the reliance on this 'hidden' code
     path_sep = ";" if sys.platform.startswith("win") else ":"
-    tmp_env["PYTHONPATH"] = path_sep.join([
-        str(nb_path.parent), tmp_env.get("PYTHONPATH", "")
-    ])
+    tmp_env["PYTHONPATH"] = path_sep.join(
+        [str(nb_path.parent), tmp_env.get("PYTHONPATH", "")]
+    )
 
     # The notebook can be run without errors
     nb, errors = run_notebook(nb_path, tmp_path, tmp_env, **run_args)

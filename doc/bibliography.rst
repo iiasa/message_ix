@@ -1,6 +1,6 @@
 References
 ==========
 
-.. bibliography:: /bibs/main.bib
+.. bibliography:: references.bib
    :style: plain
    :all:

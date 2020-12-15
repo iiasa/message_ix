@@ -1,5 +1,5 @@
-from collections.abc import Mapping
 import copy
+from collections.abc import Mapping
 
 import pandas as pd
 
@@ -27,14 +27,14 @@ def make_df(base, **kwargs):
 
     >>> base = {'foo': 'bar'}
     >>> make_df(base, baz=[42, 43, 44])
-        foo	baz
-    0	bar	42
-    1	bar	43
-    2	bar	44
+       foo  baz
+    0  bar  42
+    1  bar  43
+    2  bar  44
 
     """
     if not isinstance(base, (Mapping, pd.Series, pd.DataFrame)):
-        raise ValueError('base argument must be a dictionary or Pandas object')
+        raise ValueError("base argument must be a dictionary or Pandas object")
     base = copy.deepcopy(base)
     if not isinstance(base, Mapping):
         base = base.to_dict()

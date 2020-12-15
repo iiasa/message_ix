@@ -26,6 +26,7 @@ from timeit import default_timer as timer
 
 import click
 import ixmp
+
 import message_ix
 
 from . import add_year
@@ -41,70 +42,128 @@ def split_value(ctx, param, value, type=str):
     """
     try:
         if value is None:
-            value = ''
+            value = ""
 
-        if value == 'all':
+        if value == "all":
             return value
         else:
-            return list(map(type, value.strip('[]').split(',')))
+            return list(map(type, value.strip("[]").split(",")))
     except ValueError:
         raise click.BadParameter(param.human_readable_name, value)
 
 
-@click.command('add-years', help=__doc__)
-@click.option('--model_new', help='new model name', default=None)
-@click.option('--scen_new', help='new scenario name', default=None)
-@click.option('--create_new', help='create new scenario', type=bool,
-              default=True, show_default=True)
-@click.option('--years_new', help='new years to be added',
-              callback=partial(split_value, type=int))
-@click.option('--firstyear_new', help='new first model year', type=int,
-              default=None)
-@click.option('--lastyear_new', help='new last model year', type=int,
-              default=None)
-@click.option('--macro', help='also add years to MACRO parameters', type=bool,
-              default=False, show_default=True)
-@click.option('--baseyear_macro', help='new base year for MACRO', type=int,
-              default=None)
-@click.option('--parameter', help='names of parameters to add years',
-              callback=split_value, default='all', show_default=True)
-@click.option('--region', help='names of regions to add years',
-              callback=split_value, default='all', show_default=True)
-@click.option('--rewrite', help='rewrite parameters in the new scenario',
-              type=bool, default=True, show_default=True)
-@click.option('--unit_check', help='check units before adding new years',
-              type=bool, default=False, show_default=True)
-@click.option('--extrapol_neg', help='handle negative extrapolated values',
-              type=float, default=0.5, show_default=True)
-@click.option('--bound_extend', help='copy data from previous timestep',
-              type=bool, default=True, show_default=True)
-@click.option('--dry-run', help='Only parse arguments & exit.', is_flag=True)
+@click.command("add-years", help=__doc__)
+@click.option("--model_new", help="new model name", default=None)
+@click.option("--scen_new", help="new scenario name", default=None)
+@click.option(
+    "--create_new",
+    help="create new scenario",
+    type=bool,
+    default=True,
+    show_default=True,
+)
+@click.option(
+    "--years_new", help="new years to be added", callback=partial(split_value, type=int)
+)
+@click.option("--firstyear_new", help="new first model year", type=int, default=None)
+@click.option("--lastyear_new", help="new last model year", type=int, default=None)
+@click.option(
+    "--macro",
+    help="also add years to MACRO parameters",
+    type=bool,
+    default=False,
+    show_default=True,
+)
+@click.option(
+    "--baseyear_macro", help="new base year for MACRO", type=int, default=None
+)
+@click.option(
+    "--parameter",
+    help="names of parameters to add years",
+    callback=split_value,
+    default="all",
+    show_default=True,
+)
+@click.option(
+    "--region",
+    help="names of regions to add years",
+    callback=split_value,
+    default="all",
+    show_default=True,
+)
+@click.option(
+    "--rewrite",
+    help="rewrite parameters in the new scenario",
+    type=bool,
+    default=True,
+    show_default=True,
+)
+@click.option(
+    "--unit_check",
+    help="check units before adding new years",
+    type=bool,
+    default=False,
+    show_default=True,
+)
+@click.option(
+    "--extrapol_neg",
+    help="handle negative extrapolated values",
+    type=float,
+    default=0.5,
+    show_default=True,
+)
+@click.option(
+    "--bound_extend",
+    help="copy data from previous timestep",
+    type=bool,
+    default=True,
+    show_default=True,
+)
+@click.option("--dry-run", help="Only parse arguments & exit.", is_flag=True)
 @click.pass_obj
-def main(context, model_new, scen_new, create_new, years_new, firstyear_new,
-         lastyear_new, macro, baseyear_macro, parameter, region, rewrite,
-         unit_check, extrapol_neg, bound_extend, dry_run):
+def main(
+    context,
+    model_new,
+    scen_new,
+    create_new,
+    years_new,
+    firstyear_new,
+    lastyear_new,
+    macro,
+    baseyear_macro,
+    parameter,
+    region,
+    rewrite,
+    unit_check,
+    extrapol_neg,
+    bound_extend,
+    dry_run,
+):
     # The reference scenario is loaded according to the options given to
     # the top-level message-ix (=ixmp) CLI
     try:
         # AttributeError if context is None
-        sc_ref = context.get('scen', None)
+        sc_ref = context.get("scen", None)
         if not issubclass(type(sc_ref), ixmp.Scenario):
             raise AttributeError
     except AttributeError:
-        raise click.UsageError('add-years requires a base scenario; use'
-                               '--url or --platform, --model, --scenario, and '
-                               'optionally --version')
+        raise click.UsageError(
+            "add-years requires a base scenario; use"
+            "--url or --platform, --model, --scenario, and "
+            "optionally --version"
+        )
     else:
         # the ixmp CLI pre-loads sc_ref as an ixmp.Scenario;
         # convert to a message_ix.Scenario
         sc_ref = message_ix.Scenario(
-            mp=context['mp'],
+            mp=context["mp"],
             model=sc_ref.model,
             scenario=sc_ref.scenario,
-            version=sc_ref.version)
+            version=sc_ref.version,
+        )
 
     start = timer()
-    print('>> message_ix.tools.add_year...')
+    print(">> message_ix.tools.add_year...")
 
     # Handle default arguments
     if model_new is None:
@@ -112,14 +171,16 @@ def main(context, model_new, scen_new, create_new, years_new, firstyear_new,
 
     if scen_new is None:
         # FIXME is this a good default?
-        scen_new = sc_ref.scenario + '_5y'
+        scen_new = sc_ref.scenario + "_5y"
 
     new_kw = dict(model=model_new, scenario=scen_new)
     if create_new:
-        new_kw.update(dict(
-            version='new',
-            annotation='5 year modelling',
-        ))
+        new_kw.update(
+            dict(
+                version="new",
+                annotation="5 year modelling",
+            )
+        )
 
     # Output for debugging
     print(years_new)
@@ -127,19 +188,33 @@ def main(context, model_new, scen_new, create_new, years_new, firstyear_new,
     if dry_run:
         # Print arguments debugging and return
         print(
-            'sc_ref:', (sc_ref.model, sc_ref.scenario, sc_ref.version),
-            'sc_new:', new_kw,
-            'years_new:', years_new,
-            'firstyear_new:', firstyear_new,
-            'lastyear_new:', lastyear_new,
-            'macro:', macro,
-            'baseyear_macro:', baseyear_macro,
-            'parameter:', parameter,
-            'region:', region,
-            'rewrite:', rewrite,
-            'unit_check:', unit_check,
-            'extrapol_neg:', extrapol_neg,
-            'bound_extend:', bound_extend)
+            "sc_ref:",
+            (sc_ref.model, sc_ref.scenario, sc_ref.version),
+            "sc_new:",
+            new_kw,
+            "years_new:",
+            years_new,
+            "firstyear_new:",
+            firstyear_new,
+            "lastyear_new:",
+            lastyear_new,
+            "macro:",
+            macro,
+            "baseyear_macro:",
+            baseyear_macro,
+            "parameter:",
+            parameter,
+            "region:",
+            region,
+            "rewrite:",
+            rewrite,
+            "unit_check:",
+            unit_check,
+            "extrapol_neg:",
+            extrapol_neg,
+            "bound_extend:",
+            bound_extend,
+        )
         return
 
     # Retrieve the Platform that sc_ref is stored on
@@ -168,15 +243,24 @@ def main(context, model_new, scen_new, create_new, years_new, firstyear_new,
         rewrite=rewrite,
         unit_check=unit_check,
         extrapol_neg=extrapol_neg,
-        bound_extend=bound_extend)
+        bound_extend=bound_extend,
+    )
 
     end = timer()
 
     mp.close_db()
 
-    print('> Elapsed time for adding new years:', round((end - start) / 60),
-          'min and', round((end - start) % 60, 1), 'sec.')
+    print(
+        "> Elapsed time for adding new years:",
+        round((end - start) / 60),
+        "min and",
+        round((end - start) % 60, 1),
+        "sec.",
+    )
 
-    print('> New scenario with additional years is:\n'
-          '  ixmp://{}/{}/{}#{}'.format(sc_new.platform.name, sc_new.model,
-                                        sc_new.scenario, sc_new.version))
+    print(
+        "> New scenario with additional years is:\n"
+        "  ixmp://{}/{}/{}#{}".format(
+            sc_new.platform.name, sc_new.model, sc_new.scenario, sc_new.version
+        )
+    )

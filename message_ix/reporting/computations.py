@@ -1,11 +1,10 @@
 # Import other comps so they can be imported from this module
+import pandas as pd
 from ixmp.reporting import RENAME_DIMS, Quantity
 from ixmp.reporting.computations import *  # noqa: F401, F403
 from ixmp.reporting.computations import add, product
-import pandas as pd
 
 from .pyam import as_pyam, concat, write_report  # noqa: F401
-
 
 __all__ = [
     # Defined here
@@ -44,17 +43,21 @@ def map_as_qty(set_df, full_set):
     names = [RENAME_DIMS.get(c, c) for c in set_df.columns]
 
     # Add an 'all' mapping
-    set_df = pd.concat([
-        set_df,
-        pd.DataFrame([('all', e) for e in full_set], columns=set_df.columns),
-    ])
+    set_df = pd.concat(
+        [
+            set_df,
+            pd.DataFrame([("all", e) for e in full_set], columns=set_df.columns),
+        ]
+    )
 
     # Add a value column
-    set_df['value'] = 1
+    set_df["value"] = 1
 
-    return set_df.set_index([set_from, set_to])['value'] \
-                 .rename_axis(index=names) \
-                 .pipe(Quantity)
+    return (
+        set_df.set_index([set_from, set_to])["value"]
+        .rename_axis(index=names)
+        .pipe(Quantity)
+    )
 
 
 def broadcast_map(quantity, map, rename={}):
@@ -72,5 +75,4 @@ def broadcast_map(quantity, map, rename={}):
     rename : dict (str -> str), optional
         Dimensions to rename on the result.
     """
-    return product(quantity, map).drop(map.dims[0]) \
-                                 .rename(rename)
+    return product(quantity, map).drop(map.dims[0]).rename(rename)

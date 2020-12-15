@@ -2,14 +2,14 @@ import pandas as pd
 import pandas.testing as pdt
 import pytest
 
-from message_ix import Scenario
-import message_ix.utils
 import message_ix.testing
+import message_ix.utils
+from message_ix import Scenario
 
 
 def test_make_df():
-    base = {'foo': 'bar'}
-    exp = pd.DataFrame({'foo': 'bar', 'baz': [42, 42]})
+    base = {"foo": "bar"}
+    exp = pd.DataFrame({"foo": "bar", "baz": [42, 42]})
     obs = message_ix.utils.make_df(base, baz=[42, 42])
     pdt.assert_frame_equal(obs, exp)
 
@@ -26,8 +26,7 @@ def test_testing_make_scenario(test_mp):
     assert isinstance(scen, Scenario)
 
     # Multi-year variant can be created
-    scen = message_ix.testing.make_dantzig(test_mp, solve=True,
-                                           multi_year=True)
+    scen = message_ix.testing.make_dantzig(test_mp, solve=True, multi_year=True)
     assert isinstance(scen, Scenario)
 
     # Westeros model can be created
