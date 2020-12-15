@@ -56,7 +56,7 @@ def transcribe_docs(infp, outfp, source_filename):
     return on is not None
 
 
-def main(app, config):
+def main(app, config):  # pragma: no cover
     """Generate a mirrored tree of extracted documentation.
 
     Read all GAMS source files in *gams_source_dir*, and generate a mirrored
@@ -99,39 +99,7 @@ def main(app, config):
             outf.unlink()
 
 
-def test():
-    """Full unit tests are a bit much for the nonce.."""
-    lines = [
-        " ** foo bar\n",
-        "  ***\n",
-        "   * bz baz2\n",
-        "   * bz * baz2\n",
-        "   *** bz baz3\n",
-        "***fig newton\n",
-    ]
-
-    # FIXME this is outdated; should use StringIO or similar
-    obs = transcribe_docs(lines)
-    exp = [
-        "bz baz2\n",
-        "bz * baz2\n",
-        "\n",
-    ]
-
-    try:
-        assert obs == exp
-    except AssertionError:
-        print("Assert failed")
-        print(exp)
-        print(obs)
-
-
-if __name__ == "__main__":
-    # Run tests
-    test()
-
-
-def setup(app):
+def setup(app):  # pragma: no cover
     """Sphinx extension configuration."""
     # Identify a variable to be set in the Sphinx conf.py
     app.add_config_value("gams_source_dir", Path("."), "env", (PathLike, str))
