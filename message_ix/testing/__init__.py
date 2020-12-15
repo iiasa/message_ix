@@ -1,3 +1,5 @@
+from typing import List, Union
+
 import numpy as np
 import pandas as pd
 from ixmp import IAMC_IDX
@@ -17,7 +19,10 @@ SCENARIO = {
 
 # Create and populate ixmp databases
 
-_ms = [SCENARIO["dantzig"]["model"], SCENARIO["dantzig"]["scenario"]]
+_ms: List[Union[str, float]] = [
+    SCENARIO["dantzig"]["model"],
+    SCENARIO["dantzig"]["scenario"],
+]
 HIST_DF = pd.DataFrame(
     [_ms + ["DantzigLand", "GDP", "USD", 850.0, 900.0, 950.0]],
     columns=IAMC_IDX + [1962, 1963, 1964],
