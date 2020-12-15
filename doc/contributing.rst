@@ -163,20 +163,31 @@ Code style
 ==========
 
 - Follow the `seven rules of a great Git commit message <https://chris.beams.io/posts/git-commit/#seven-rules>`_ for commit messages and PR titles.
-- **Python:**
+- Apply the following to new or modified **Python** code::
 
-   - Follow `PEP 8 <https://www.python.org/dev/peps/pep-0008/>`_.
-   - Docstrings are in the `numpydoc format <https://numpydoc.readthedocs.io/en/latest/format.html>`_.
+    isort -rc . && black . && mypy . && flake8
 
-- **R:** follow the style of the existing code base.
-- Jupyter notebooks (:file:`.ipynb`): see below, under `Contribute tutorials`_.
-- **Documentation** for ReStructuredText in :file:`.rst` files, and inline in :file:`.gms` files:
+  Links to the documentation for these tools:
 
-  - Do not hard-wrap lines.
+  - `isort <https://pypi.org/project/isort/>`_: sorts import lines at the top of code files in a consistent way.
+  - `black <https://black.readthedocs.io>`_: applies consistent code style & formatting.
+    Plugins are available for popular code editors.
+  - `mypy <https://mypy.readthedocs.io>`_: checks typing for inconsistencies.
+  - `flake8 <https://flake8.pycqa.org>`_: check code style against `PEP 8 <https://www.python.org/dev/peps/pep-0008>`_.
+
+  The ``lint`` continuous integration workflow runs these on every pull request.
+  PRs that fail the checks must be corrected before they can be merged.
+
+- Write docstrings in the `numpydoc <https://numpydoc.readthedocs.io/en/latest/format.html>`_ style.
+- For new or modified **R** code, follow the style of the existing code base.
+- For Jupyter notebooks (:file:`.ipynb`): see below, under `Contribute tutorials`_.
+- For **documentation** in ReStructuredText formats, in :file:`doc/*.rst` and inline in :file:`message_ix/model/*.gms` files:
+
   - Start each sentence on a new line.
+  - Do not hard-wrap sentences.
   - Ensure Sphinx does not give warnings about ReST syntax for new or modified documentation.
 
-- GAMS:
+- **GAMS** code:
 
   - Wrap lines at 121 characters, except for inline documentation (see above).
 
