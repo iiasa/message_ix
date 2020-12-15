@@ -75,8 +75,9 @@ jobs:
 
     - name: Check typing with mypy
       working-directory: message_ix
+      # Also install sphinx for checking message_ix.util.sphinx_gams
       run: |
-        pip install mypy
+        pip install mypy sphinx
         mypy .
 
     - name: Test package build

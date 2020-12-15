@@ -1,5 +1,4 @@
-"""Sphinx extension for documentation in GAMS code."""
-# TODO move to something like message_ix.util.sphinx_gams
+"""Sphinx extension for extracting inline documentation from GAMS source files."""
 
 from os import PathLike
 from pathlib import Path
@@ -128,8 +127,8 @@ def test():
 
 
 if __name__ == "__main__":
+    # Run tests
     test()
-    main()
 
 
 def setup(app):

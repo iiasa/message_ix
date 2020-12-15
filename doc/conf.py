@@ -43,7 +43,7 @@ extensions = [
     "sphinxcontrib.bibtex",
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
-    "grab_gams_doc",
+    "message_ix.util.sphinx_gams",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -128,7 +128,7 @@ todo_include_todos = True
 bibtex_bibfiles = ["references.bib"]
 
 
-# -- Options for grab_gams_doc ------------------------------------------------
+# -- Options for message_ix.util.sphinx_gams -------------------------------------------
 
 gams_source_dir = Path(__file__).parents[1].joinpath("message_ix", "model")
 gams_target_dir = "model"
