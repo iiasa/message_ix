@@ -8,10 +8,6 @@ from message_ix import Scenario, macro
 from message_ix.models import MACRO
 from message_ix.testing import SCENARIO, make_westeros
 
-# tons of deprecation warnings come from reading excel (xlrd library), ignore
-# them for now
-pytestmark = pytest.mark.filterwarnings("ignore")
-
 
 W_DATA_PATH = Path(__file__).parent / 'data' / 'westeros_macro_input.xlsx'
 MR_DATA_PATH = Path(__file__).parent / 'data' / 'multiregion_macro_input.xlsx'
@@ -20,7 +16,9 @@ MR_DATA_PATH = Path(__file__).parent / 'data' / 'multiregion_macro_input.xlsx'
 class MockScenario:
 
     def __init__(self):
-        self.data = pd.read_excel(MR_DATA_PATH, sheet_name=None)
+        self.data = pd.read_excel(
+            MR_DATA_PATH, sheet_name=None, engine="openpyxl"
+        )
         for name, df in self.data.items():
             if 'year' in df:
                 df = df[df.year >= 2030]
@@ -68,7 +66,7 @@ def test_calc_valid_data_file(westeros_solved):
 
 def test_calc_valid_data_dict(westeros_solved):
     s = westeros_solved
-    data = pd.read_excel(W_DATA_PATH, sheet_name=None)
+    data = pd.read_excel(W_DATA_PATH, sheet_name=None, engine="openpyxl")
     c = macro.Calculate(s, data)
     c.read_data()
 
@@ -93,7 +91,7 @@ def test_config(westeros_solved):
 
 def test_calc_data_missing_par(westeros_solved):
     s = westeros_solved
-    data = pd.read_excel(W_DATA_PATH, sheet_name=None)
+    data = pd.read_excel(W_DATA_PATH, sheet_name=None, engine="openpyxl")
     data.pop('gdp_calibrate')
     c = macro.Calculate(s, data)
     pytest.raises(ValueError, c.read_data)
@@ -101,7 +99,7 @@ def test_calc_data_missing_par(westeros_solved):
 
 def test_calc_data_missing_column(westeros_solved):
     s = westeros_solved
-    data = pd.read_excel(W_DATA_PATH, sheet_name=None)
+    data = pd.read_excel(W_DATA_PATH, sheet_name=None, engine="openpyxl")
     # skip first data point
     data['gdp_calibrate'] = data['gdp_calibrate'].drop('year', axis=1)
     c = macro.Calculate(s, data)
@@ -110,7 +108,7 @@ def test_calc_data_missing_column(westeros_solved):
 
 def test_calc_data_missing_datapoint(westeros_solved):
     s = westeros_solved
-    data = pd.read_excel(W_DATA_PATH, sheet_name=None)
+    data = pd.read_excel(W_DATA_PATH, sheet_name=None, engine="openpyxl")
     # skip first data point
     data['gdp_calibrate'] = data['gdp_calibrate'][1:]
     c = macro.Calculate(s, data)

@@ -3,11 +3,12 @@ name: nightly
 # features removed.
 
 on:
-  # Uncomment for debugging
+  # Uncomment these two lines for debugging, but leave them commented on the
+  # master branch
   # pull_request:
   #   branches: [ master ]
-  # 05:00 UTC = 06:00 CET = 07:00 CEST
   schedule:
+  # 05:00 UTC = 06:00 CET = 07:00 CEST
   - cron: "0 5 * * *"
 
 env:

@@ -128,6 +128,11 @@ intersphinx_mapping = {
 todo_include_todos = True
 
 
+# -- Options for sphinxcontrib.bibtex -----------------------------------------
+
+bibtex_bibfiles = ["bibs/main.bib"]
+
+
 # -- Options for grab_gams_doc ------------------------------------------------
 
 gams_source_dir = Path(__file__).parents[2] / 'message_ix' / 'model'
