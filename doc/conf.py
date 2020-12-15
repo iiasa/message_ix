@@ -10,14 +10,9 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-import os
-import sys
 from pathlib import Path
 
 from pkg_resources import get_distribution
-
-sys.path.insert(0, os.path.abspath(".."))
-
 
 # -- Project information -----------------------------------------------------
 
@@ -56,8 +51,8 @@ templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ["_themes/*"]
-
+# This pattern also affects html_static_path and html_extra_path.
+exclude_patterns = ["_build", "README.rst"]
 
 # A string of reStructuredText that will be included at the beginning of every
 # source file that is read.
@@ -130,10 +125,10 @@ todo_include_todos = True
 
 # -- Options for sphinxcontrib.bibtex -----------------------------------------
 
-bibtex_bibfiles = ["bibs/main.bib"]
+bibtex_bibfiles = ["references.bib"]
 
 
 # -- Options for grab_gams_doc ------------------------------------------------
 
-gams_source_dir = Path(__file__).parents[2] / "message_ix" / "model"
+gams_source_dir = Path(__file__).parents[1].joinpath("message_ix", "model")
 gams_target_dir = "model"

@@ -30,14 +30,14 @@ message_ix/model/MESSAGE_master.gms
 # Apple file system
 .DS_Store
 
-# sphinx
-/doc/build
-/doc/source/_build
-/doc/source/model
+# Sphinx
+doc/_build
+doc/bibtex.json
+doc/model
 
 # setuptools
-/build
-/dist
+build
+dist
 
 # rmessageix build folder and rhistory
 rmessageix/rmessageix*.zip
@@ -51,7 +51,9 @@ tests/data/nightly
 .Rproj.user
 
 # pytest and related
+.benchmarks
 .coverage*
+.mypy_cache
 .pytest_cache
 coverage.xml
 htmlcov
