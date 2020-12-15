@@ -8,14 +8,13 @@ from pkg_resources import DistributionNotFound, get_distribution
 from .core import Scenario
 from .models import MACRO, MESSAGE, MESSAGE_MACRO
 
-
 __all__ = [
-    'MACRO',
-    'MESSAGE',
-    'MESSAGE_MACRO',
-    'MODELS',
-    'Scenario',
-    'config',
+    "MACRO",
+    "MESSAGE",
+    "MESSAGE_MACRO",
+    "MODELS",
+    "Scenario",
+    "config",
 ]
 
 try:
@@ -25,12 +24,12 @@ except DistributionNotFound:
     __version__ = "999"
 
 # Register configuration keys with ixmp core and set default
-config.register('message model dir', Path, Path(__file__).parent / 'model')
+config.register("message model dir", Path, Path(__file__).parent / "model")
 
 # Register models with ixmp core
-MODELS['MACRO'] = MACRO
-MODELS['MESSAGE'] = MESSAGE
-MODELS['MESSAGE-MACRO'] = MESSAGE_MACRO
+MODELS["MACRO"] = MACRO
+MODELS["MESSAGE"] = MESSAGE
+MODELS["MESSAGE-MACRO"] = MESSAGE_MACRO
 
 # Create the top-level logger
 log = logging.getLogger(__name__)

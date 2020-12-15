@@ -1,18 +1,23 @@
 from logging import getLogger
 
-from ixmp.reporting.computations import (
-    concat as ixmp_concat,
-    write_report as ixmp_write_report,
-)
 import pint
-from pyam import IAMC_IDX, IamDataFrame, concat as pyam_concat
-
+from ixmp.reporting.computations import concat as ixmp_concat
+from ixmp.reporting.computations import write_report as ixmp_write_report
+from pyam import IAMC_IDX, IamDataFrame
+from pyam import concat as pyam_concat
 
 log = getLogger(__name__)
 
 
-def as_pyam(scenario, quantity, replace_vars=None, year_time_dim=None,
-            drop=[], collapse=None, unit=None):
+def as_pyam(
+    scenario,
+    quantity,
+    replace_vars=None,
+    year_time_dim=None,
+    drop=[],
+    collapse=None,
+    unit=None,
+):
     """Return a :class:`pyam.IamDataFrame` containing *quantity*.
 
     Warnings are logged if the arguments result in additional, unhandled
@@ -30,10 +35,10 @@ def as_pyam(scenario, quantity, replace_vars=None, year_time_dim=None,
     """
     rename_cols = {
         # Renamed automatically
-        'n': 'region',
-        'nl': 'region',
+        "n": "region",
+        "nl": "region",
         # Column to set as year or time dimension
-        year_time_dim: 'year' if year_time_dim.startswith('y') else 'time',
+        year_time_dim: "year" if year_time_dim.startswith("y") else "time",
     }
 
     # - Convert to pd.DataFrame
@@ -42,53 +47,56 @@ def as_pyam(scenario, quantity, replace_vars=None, year_time_dim=None,
     # - Apply the collapse callback, if given
     # - Replace values in the variable column
     # - Drop any unwanted columns
-    df = quantity.to_series() \
-        .rename('value') \
-        .reset_index() \
-        .rename(columns=rename_cols) \
+    df = (
+        quantity.to_series()
+        .rename("value")
+        .reset_index()
+        .rename(columns=rename_cols)
         .assign(
             variable=quantity.name,
-            unit=quantity.attrs.get('_unit', ''),
+            unit=quantity.attrs.get("_unit", ""),
             model=scenario.model,
-            scenario=scenario.scenario) \
-        .pipe(collapse or (lambda df: df)) \
-        .replace(dict(variable=replace_vars or dict())) \
+            scenario=scenario.scenario,
+        )
+        .pipe(collapse or (lambda df: df))
+        .replace(dict(variable=replace_vars or dict()))
         .drop(drop, axis=1)
+    )
 
     # Raise exception for non-unique data
-    duplicates = df.duplicated(subset=set(df.columns) - {'value'})
+    duplicates = df.duplicated(subset=set(df.columns) - {"value"})
     if duplicates.any():
-        raise ValueError('Duplicate IAMC indices cannot be converted:\n'
-                         + str(df[duplicates]))
+        raise ValueError(
+            "Duplicate IAMC indices cannot be converted:\n" + str(df[duplicates])
+        )
 
     # Convert units
     if len(df) and unit:
-        from_unit = df['unit'].unique()
+        from_unit = df["unit"].unique()
         if len(from_unit) > 1:
-            raise ValueError(
-                f'cannot convert non-unique units {repr(from_unit)}'
-            )
-        q = pint.Quantity(df['value'].values, from_unit[0]).to(unit)
-        df['value'] = q.magnitude
-        df['unit'] = unit
+            raise ValueError(f"cannot convert non-unique units {repr(from_unit)}")
+        q = pint.Quantity(df["value"].values, from_unit[0]).to(unit)
+        df["value"] = q.magnitude
+        df["unit"] = unit
 
     # Ensure units are a string, for pyam
-    if len(df) and not isinstance(df.loc[0, 'unit'], str):
+    if len(df) and not isinstance(df.loc[0, "unit"], str):
         # Convert pint.Unit to string
-        df['unit'] = f"{df.loc[0, 'unit']:~}"
+        df["unit"] = f"{df.loc[0, 'unit']:~}"
 
     # Warn about extra columns
-    extra = sorted(set(df.columns) - set(IAMC_IDX + ['year', 'time', 'value']))
+    extra = sorted(set(df.columns) - set(IAMC_IDX + ["year", "time", "value"]))
     if extra:
         log.warning(
-            f'Extra columns {repr(extra)} when converting '
-            f'{repr(quantity.name)} to IAMC format'
+            f"Extra columns {repr(extra)} when converting "
+            f"{repr(quantity.name)} to IAMC format"
         )
 
     return IamDataFrame(df)
 
 
 # Computations that operate on pyam.IamDataFrame inputs
+
 
 def concat(*args, **kwargs):
     """Concatenate *args*, which must all be :class:`pyam.IamDataFrame`."""
@@ -112,13 +120,15 @@ def write_report(quantity, path):
     if not isinstance(quantity, IamDataFrame):
         return ixmp_write_report(quantity, path)
 
-    if path.suffix == '.csv':
+    if path.suffix == ".csv":
         quantity.to_csv(path)
-    elif path.suffix == '.xlsx':
+    elif path.suffix == ".xlsx":
         quantity.to_excel(path, merge_cells=False)
     else:
-        raise ValueError('pyam.IamDataFrame can be written to .csv or .xlsx, '
-                         'not {}'.format(path.suffix))
+        raise ValueError(
+            "pyam.IamDataFrame can be written to .csv or .xlsx, "
+            "not {}".format(path.suffix)
+        )
 
 
 def collapse_message_cols(df, var, kind=None):
@@ -142,21 +152,21 @@ def collapse_message_cols(df, var, kind=None):
         The referenced columns are also dropped, so it is not necessary to
         provide the `drop` argument of :meth:`as_pyam`.
     """
-    if kind == 'ene':
+    if kind == "ene":
         # Region column
-        rcol = 'nd' if var == 'out' else 'no'
-        df['region'] = df['region'].str.cat(df[rcol], sep='|')
+        rcol = "nd" if var == "out" else "no"
+        df["region"] = df["region"].str.cat(df[rcol], sep="|")
         df.drop(rcol, axis=1, inplace=True)
 
-        var_cols = ['l', 'c', 't', 'm']
-    elif kind == 'emi':
-        var_cols = ['e', 't', 'm']
+        var_cols = ["l", "c", "t", "m"]
+    elif kind == "emi":
+        var_cols = ["e", "t", "m"]
     else:
-        var_cols = ['t']
+        var_cols = ["t"]
 
     # Assemble variable column
-    df['variable'] = var
-    df['variable'] = df['variable'].str.cat([df[c] for c in var_cols], sep='|')
+    df["variable"] = var
+    df["variable"] = df["variable"].str.cat([df[c] for c in var_cols], sep="|")
 
     # Drop same columns
     return df.drop(var_cols, axis=1)

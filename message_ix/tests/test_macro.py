@@ -8,19 +8,15 @@ from message_ix import Scenario, macro
 from message_ix.models import MACRO
 from message_ix.testing import SCENARIO, make_westeros
 
-
-W_DATA_PATH = Path(__file__).parent / 'data' / 'westeros_macro_input.xlsx'
-MR_DATA_PATH = Path(__file__).parent / 'data' / 'multiregion_macro_input.xlsx'
+W_DATA_PATH = Path(__file__).parent / "data" / "westeros_macro_input.xlsx"
+MR_DATA_PATH = Path(__file__).parent / "data" / "multiregion_macro_input.xlsx"
 
 
 class MockScenario:
-
     def __init__(self):
-        self.data = pd.read_excel(
-            MR_DATA_PATH, sheet_name=None, engine="openpyxl"
-        )
+        self.data = pd.read_excel(MR_DATA_PATH, sheet_name=None, engine="openpyxl")
         for name, df in self.data.items():
-            if 'year' in df:
+            if "year" in df:
                 df = df[df.year >= 2030]
                 self.data[name] = df
 
@@ -28,32 +24,29 @@ class MockScenario:
         return True
 
     def var(self, name, **kwargs):
-        df = self.data['aeei']
+        df = self.data["aeei"]
         # add extra commodity to be removed
-        extra_commod = df[df.sector == 'i_therm']
-        extra_commod['sector'] = self.data['config']['ignore_sectors'][0]
+        extra_commod = df[df.sector == "i_therm"]
+        extra_commod["sector"] = self.data["config"]["ignore_sectors"][0]
         # add extra region to be removed
-        extra_region = df[df.node == 'R11_AFR']
-        extra_region['node'] = self.data['config']['ignore_nodes'][0]
+        extra_region = df[df.node == "R11_AFR"]
+        extra_region["node"] = self.data["config"]["ignore_nodes"][0]
         df = pd.concat([df, extra_commod, extra_region])
 
-        if name == 'DEMAND':
-            df = df.rename(columns={'sector': 'commodity'})
-        elif name in ['COST_NODAL_NET', 'PRICE_COMMODITY']:
-            df = df.rename(columns={
-                'sector': 'commodity',
-                'value': 'lvl'
-            })
-            df['lvl'] = 1e3
+        if name == "DEMAND":
+            df = df.rename(columns={"sector": "commodity"})
+        elif name in ["COST_NODAL_NET", "PRICE_COMMODITY"]:
+            df = df.rename(columns={"sector": "commodity", "value": "lvl"})
+            df["lvl"] = 1e3
         return df
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def westeros_solved(test_mp):
     yield make_westeros(test_mp, solve=True)
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def westeros_not_solved(westeros_solved):
     yield westeros_solved.clone(keep_solution=False)
 
@@ -79,20 +72,20 @@ def test_calc_no_solution(westeros_not_solved):
 def test_config(westeros_solved):
     s = westeros_solved
     c = macro.Calculate(s, W_DATA_PATH)
-    c.nodes = set(list(c.nodes) + ['foo'])
-    c.sectors = set(list(c.sectors) + ['bar'])
+    c.nodes = set(list(c.nodes) + ["foo"])
+    c.sectors = set(list(c.sectors) + ["bar"])
 
-    assert c.nodes == set(['Westeros', 'foo'])
-    assert c.sectors == set(['light', 'bar'])
+    assert c.nodes == set(["Westeros", "foo"])
+    assert c.sectors == set(["light", "bar"])
     c.read_data()
-    assert c.nodes == set(['Westeros'])
-    assert c.sectors == set(['light'])
+    assert c.nodes == set(["Westeros"])
+    assert c.sectors == set(["light"])
 
 
 def test_calc_data_missing_par(westeros_solved):
     s = westeros_solved
     data = pd.read_excel(W_DATA_PATH, sheet_name=None, engine="openpyxl")
-    data.pop('gdp_calibrate')
+    data.pop("gdp_calibrate")
     c = macro.Calculate(s, data)
     pytest.raises(ValueError, c.read_data)
 
@@ -101,7 +94,7 @@ def test_calc_data_missing_column(westeros_solved):
     s = westeros_solved
     data = pd.read_excel(W_DATA_PATH, sheet_name=None, engine="openpyxl")
     # skip first data point
-    data['gdp_calibrate'] = data['gdp_calibrate'].drop('year', axis=1)
+    data["gdp_calibrate"] = data["gdp_calibrate"].drop("year", axis=1)
     c = macro.Calculate(s, data)
     pytest.raises(ValueError, c.read_data)
 
@@ -110,7 +103,7 @@ def test_calc_data_missing_datapoint(westeros_solved):
     s = westeros_solved
     data = pd.read_excel(W_DATA_PATH, sheet_name=None, engine="openpyxl")
     # skip first data point
-    data['gdp_calibrate'] = data['gdp_calibrate'][1:]
+    data["gdp_calibrate"] = data["gdp_calibrate"][1:]
     c = macro.Calculate(s, data)
     pytest.raises(ValueError, c.read_data)
 
@@ -225,50 +218,49 @@ def test_calc_aconst(westeros_solved):
 
 
 def test_init(message_test_mp):
-    scen = Scenario(message_test_mp, **SCENARIO['dantzig'])
+    scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
-    scen = scen.clone('foo', 'bar')
+    scen = scen.clone("foo", "bar")
     scen.check_out()
     MACRO.initialize(scen)
-    scen.commit('foo')
+    scen.commit("foo")
     scen.solve()
 
-    assert np.isclose(scen.var('OBJ')['lvl'], 153.675)
-    assert 'mapping_macro_sector' in scen.set_list()
-    assert 'aeei' in scen.par_list()
-    assert 'DEMAND' in scen.var_list()
-    assert 'COST_ACCOUNTING_NODAL' in scen.equ_list()
+    assert np.isclose(scen.var("OBJ")["lvl"], 153.675)
+    assert "mapping_macro_sector" in scen.set_list()
+    assert "aeei" in scen.par_list()
+    assert "DEMAND" in scen.var_list()
+    assert "COST_ACCOUNTING_NODAL" in scen.equ_list()
 
 
 def test_add_model_data(westeros_solved):
     base = westeros_solved
-    clone = base.clone('foo', 'bar', keep_solution=False)
+    clone = base.clone("foo", "bar", keep_solution=False)
     clone.check_out()
     MACRO.initialize(clone)
     macro.add_model_data(base, clone, W_DATA_PATH)
-    clone.commit('finished adding macro')
+    clone.commit("finished adding macro")
     clone.solve()
-    obs = clone.var('OBJ')['lvl']
-    exp = base.var('OBJ')['lvl']
+    obs = clone.var("OBJ")["lvl"]
+    exp = base.var("OBJ")["lvl"]
     assert np.isclose(obs, exp)
 
 
 def test_calibrate(westeros_solved):
     base = westeros_solved
-    clone = base.clone(base.model, 'test macro calibration',
-                       keep_solution=False)
+    clone = base.clone(base.model, "test macro calibration", keep_solution=False)
     clone.check_out()
     MACRO.initialize(clone)
     macro.add_model_data(base, clone, W_DATA_PATH)
-    clone.commit('finished adding macro')
+    clone.commit("finished adding macro")
 
-    start_aeei = clone.par('aeei')['value']
-    start_grow = clone.par('grow')['value']
+    start_aeei = clone.par("aeei")["value"]
+    start_grow = clone.par("grow")["value"]
 
     macro.calibrate(clone, check_convergence=True)
 
-    end_aeei = clone.par('aeei')['value']
-    end_grow = clone.par('grow')['value']
+    end_aeei = clone.par("aeei")["value"]
+    end_grow = clone.par("grow")["value"]
 
     # calibration should have changed some/all of these values and none should
     # be NaNs
@@ -280,16 +272,16 @@ def test_calibrate(westeros_solved):
 
 def test_calibrate_roundtrip(westeros_solved):
     # this is a regression test with values observed on Aug 9, 2019
-    with_macro = westeros_solved.add_macro(
-        W_DATA_PATH, check_convergence=True)
-    aeei = with_macro.par('aeei')['value'].values
+    with_macro = westeros_solved.add_macro(W_DATA_PATH, check_convergence=True)
+    aeei = with_macro.par("aeei")["value"].values
     assert len(aeei) == 4
     exp = np.array([20, 71.759022, 37.424904, 19.936694]) / 1e3
     assert np.allclose(aeei, exp)
-    grow = with_macro.par('grow')['value'].values
+    grow = with_macro.par("grow")["value"].values
     assert len(grow) == 4
     exp = np.array([26.583631, 69.101286, 79.520269, 24.529274]) / 1e3
     assert np.allclose(grow, exp)
+
 
 #
 # These are a series of tests to guarantee multiregion/multisector
@@ -309,22 +301,25 @@ def test_multiregion_derive_data():
     c.read_data()
     c.derive_data()
 
-    nodes = ['R11_AFR', 'R11_CPA']
-    sectors = ['i_therm', 'rc_spec']
+    nodes = ["R11_AFR", "R11_CPA"]
+    sectors = ["i_therm", "rc_spec"]
 
     # make sure no extraneous data is there
-    check = c.data['demand'].reset_index()
-    assert (check['node'].unique() == nodes).all()
-    assert (check['sector'].unique() == sectors).all()
+    check = c.data["demand"].reset_index()
+    assert (check["node"].unique() == nodes).all()
+    assert (check["sector"].unique() == sectors).all()
 
-    obs = c.data['aconst']
-    exp = pd.Series([3.74767687, 0.00285472], name='value',
-                    index=pd.Index(nodes, name='node'))
+    obs = c.data["aconst"]
+    exp = pd.Series(
+        [3.74767687, 0.00285472], name="value", index=pd.Index(nodes, name="node")
+    )
     pd.testing.assert_series_equal(obs, exp)
 
-    obs = c.data['bconst']
-    idx = pd.MultiIndex.from_product([nodes, sectors],
-                                     names=['node', 'sector'])
-    exp = pd.Series([1.071971e-08, 1.487598e-11, 9.637483e-09, 6.955715e-13],
-                    name='value', index=idx)
+    obs = c.data["bconst"]
+    idx = pd.MultiIndex.from_product([nodes, sectors], names=["node", "sector"])
+    exp = pd.Series(
+        [1.071971e-08, 1.487598e-11, 9.637483e-09, 6.955715e-13],
+        name="value",
+        index=idx,
+    )
     pd.testing.assert_series_equal(obs, exp)

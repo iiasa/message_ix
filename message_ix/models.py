@@ -1,76 +1,77 @@
+import re
 from collections import ChainMap
 from copy import copy, deepcopy
 from pathlib import Path
-import re
 
-from ixmp import config
 import ixmp.model.gams
+from ixmp import config
 
 from .macro import MACRO_ITEMS
 
-
 #: Solver options used by :meth:`message_ix.Scenario.solve`.
 DEFAULT_CPLEX_OPTIONS = {
-    'advind': 0,
-    'lpmethod': 2,
-    'threads': 4,
-    'epopt': 1e-6,
+    "advind": 0,
+    "lpmethod": 2,
+    "threads": 4,
+    "epopt": 1e-6,
 }
 
 # Common indices for some parameters in MESSAGE_ITEMS
-_idx_common = ['node', 'technology', 'level', 'commodity', 'year', 'time']
+_idx_common = ["node", "technology", "level", "commodity", "year", "time"]
 
 # NB only a partial list; see https://github.com/iiasa/message_ix/issues/254
 #: List of ixmp items for MESSAGE.
 MESSAGE_ITEMS = {
     # Index sets
     # Storage level
-    'level_storage': dict(ix_type='set'),
+    "level_storage": dict(ix_type="set"),
     # Storage reservoir technology
-    'storage_tec': dict(ix_type='set'),
-
+    "storage_tec": dict(ix_type="set"),
     # Mapping set: mapping of storage reservoir to charger/discharger
-    'map_tec_storage': dict(ix_type='set',
-                            idx_sets=['node', 'technology', 'storage_tec',
-                                      'level', 'commodity']),
-
+    "map_tec_storage": dict(
+        ix_type="set",
+        idx_sets=["node", "technology", "storage_tec", "level", "commodity"],
+    ),
     # Parameters
     # Order of sub-annual time steps
-    'time_order': dict(ix_type='par', idx_sets=['lvl_temporal', 'time']),
+    "time_order": dict(ix_type="par", idx_sets=["lvl_temporal", "time"]),
     # Initial amount of storage
-    'storage_initial': dict(ix_type='par', idx_sets=_idx_common),
+    "storage_initial": dict(ix_type="par", idx_sets=_idx_common),
     # Storage losses as a percentage of installed capacity
-    'storage_self_discharge': dict(ix_type='par', idx_sets=_idx_common),
+    "storage_self_discharge": dict(ix_type="par", idx_sets=_idx_common),
 }
 
 
 def _template(*parts):
     """Helper to make a template string relative to model_dir."""
-    return str(Path('{model_dir}', *parts))
+    return str(Path("{model_dir}", *parts))
 
 
 class GAMSModel(ixmp.model.gams.GAMSModel):
     """Extended :class:`ixmp.model.gams.GAMSModel` for MESSAGE & MACRO."""
+
     #: Default model options.
-    defaults = ChainMap({
-        # New keys for MESSAGE & MACRO
-        'model_dir': Path(__file__).parent / 'model',
-
-        # Override keys from GAMSModel
-        'model_file': _template('{model_name}_run.gms'),
-        'in_file': _template('data', 'MsgData_{case}.gdx'),
-        'out_file': _template('output', 'MsgOutput_{case}.gdx'),
-        'solve_args': [
-            '--in="{in_file}"',
-            '--out="{out_file}"',
-            '--iter="{}"'.format(
-                _template('output', 'MsgIterationReport_{case}.gdx')),
+    defaults = ChainMap(
+        {
+            # New keys for MESSAGE & MACRO
+            "model_dir": Path(__file__).parent / "model",
+            # Override keys from GAMSModel
+            "model_file": _template("{model_name}_run.gms"),
+            "in_file": _template("data", "MsgData_{case}.gdx"),
+            "out_file": _template("output", "MsgOutput_{case}.gdx"),
+            "solve_args": [
+                '--in="{in_file}"',
+                '--out="{out_file}"',
+                '--iter="{}"'.format(
+                    _template("output", "MsgIterationReport_{case}.gdx")
+                ),
             ],
-
-        # Disable the feature to put input/output GDX files, list files, etc.
-        # in a temporary directory
-        'use_temp_dir': False,
-    }, ixmp.model.gams.GAMSModel.defaults)
+            # Disable the feature to put input/output GDX files, list files, etc.
+            # in a temporary directory
+            "use_temp_dir": False,
+        },
+        ixmp.model.gams.GAMSModel.defaults,
+    )
 
     @classmethod
     def initialize(cls, scenario):
@@ -85,9 +86,9 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
 
     def __init__(self, name=None, **model_options):
         # Update the default options with any user-provided options
-        model_options.setdefault('model_dir', config.get('message model dir'))
+        model_options.setdefault("model_dir", config.get("message model dir"))
         self.cplex_opts = copy(DEFAULT_CPLEX_OPTIONS)
-        self.cplex_opts.update(model_options.pop('solve_options', {}))
+        self.cplex_opts.update(model_options.pop("solve_options", {}))
 
         super().__init__(name, **model_options)
 
@@ -111,9 +112,9 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         #      directory.
 
         # Write CPLEX options into an options file
-        optfile = self.model_dir / 'cplex.opt'
-        lines = ('{} = {}'.format(*kv) for kv in self.cplex_opts.items())
-        optfile.write_text('\n'.join(lines))
+        optfile = self.model_dir / "cplex.opt"
+        lines = ("{} = {}".format(*kv) for kv in self.cplex_opts.items())
+        optfile.write_text("\n".join(lines))
 
         try:
             result = super().run(scenario)
@@ -131,22 +132,25 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
 
 class MESSAGE(GAMSModel):
     """Model class for MESSAGE."""
-    name = 'MESSAGE'
+
+    name = "MESSAGE"
 
 
 class MACRO(GAMSModel):
     """Model class for MACRO."""
-    name = 'MACRO'
+
+    name = "MACRO"
 
     #: MACRO uses the GAMS ``break;`` statement, and thus requires GAMS 24.8.1
     #: or later.
-    GAMS_min_version = '24.8.1'
+    GAMS_min_version = "24.8.1"
 
     def __init__(self, *args, **kwargs):
         version = gams_release()
         if version < self.GAMS_min_version:
-            message = ('{0.name} requires GAMS >= {0.GAMS_min_version}; '
-                       'found {1}').format(self, version)
+            message = (
+                "{0.name} requires GAMS >= {0.GAMS_min_version}; " "found {1}"
+            ).format(self, version)
             raise RuntimeError(message)
 
         super().__init__(*args, **kwargs)
@@ -161,8 +165,8 @@ class MACRO(GAMSModel):
         #       initialize these items with specified idx_sets—even if the
         #       sets are correct.
         items = deepcopy(MACRO_ITEMS)
-        for name in 'C', 'COST_NODAL', 'COST_NODAL_NET', 'DEMAND', 'GDP', 'I':
-            items[name].pop('idx_sets')
+        for name in "C", "COST_NODAL", "COST_NODAL_NET", "DEMAND", "GDP", "I":
+            items[name].pop("idx_sets")
 
         # Initialize the ixmp items
         cls.initialize_items(scenario, items)
@@ -170,15 +174,16 @@ class MACRO(GAMSModel):
 
 class MESSAGE_MACRO(MACRO):
     """Model class for MESSAGE_MACRO."""
-    name = 'MESSAGE-MACRO'
+
+    name = "MESSAGE-MACRO"
 
     def __init__(self, *args, **kwargs):
         # Remove M-M iteration options from kwargs and convert to GAMS
         # command-line options
         mm_iter_args = []
-        for name in 'convergence_criterion', 'max_adjustment', 'max_iteration':
+        for name in "convergence_criterion", "max_adjustment", "max_iteration":
             try:
-                mm_iter_args.append(f'--{name.upper()}={kwargs.pop(name)}')
+                mm_iter_args.append(f"--{name.upper()}={kwargs.pop(name)}")
             except KeyError:
                 continue
 
@@ -197,26 +202,27 @@ def gams_release():
     #    check_output(['gams', '-LogOption=3'], ...) does not work, because
     #    GAMS does not accept options without an input file to execute.
     import os
-    from tempfile import mkdtemp
     from subprocess import check_output
+    from tempfile import mkdtemp
 
     # Create a temporary GAMS program that does nothing
     tmp_dir = Path(mkdtemp())
-    gms = tmp_dir / 'null.gms'
-    gms.write_text('$exit;')
+    gms = tmp_dir / "null.gms"
+    gms.write_text("$exit;")
 
     # Execute, capturing stdout
     output = check_output(
-        ['gams', 'null', '-LogOption=3'],
-        shell=os.name == 'nt',
+        ["gams", "null", "-LogOption=3"],
+        shell=os.name == "nt",
         cwd=tmp_dir,
-        universal_newlines=True)
+        universal_newlines=True,
+    )
 
     # Clean up
     gms.unlink()
-    gms.with_suffix('.lst').unlink()
+    gms.with_suffix(".lst").unlink()
     tmp_dir.rmdir()
 
     # Find and return the version string
-    pattern = r'^GAMS ([\d\.]+)\s*Copyright'
+    pattern = r"^GAMS ([\d\.]+)\s*Copyright"
     return re.search(pattern, output, re.MULTILINE).groups()[0]
