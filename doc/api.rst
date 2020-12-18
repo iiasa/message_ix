@@ -188,7 +188,7 @@ Model classes
 Utility methods
 ---------------
 
-.. automodule:: message_ix.utils
+.. automodule:: message_ix.util
    :members: make_df
 
 

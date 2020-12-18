@@ -7,7 +7,7 @@ from pkg_resources import DistributionNotFound, get_distribution
 
 from .core import Scenario
 from .models import MACRO, MESSAGE, MESSAGE_MACRO
-from .utils import make_df
+from .util import make_df
 
 __all__ = [
     "MACRO",

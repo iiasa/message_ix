@@ -6,6 +6,9 @@ Migration notes
 
 - Code that uses :func:`.make_df` can be adjusted in one of two ways.
   See the function documentation for details.
+  The function should be imported from the top level::
+
+    from message_ix import make_df
 
 
 All changes
