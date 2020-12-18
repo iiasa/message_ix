@@ -26,6 +26,26 @@ def make_df(name, **data):
     0  foo       baz  None  None  None    1.2  None
     1  bar       baz  None  None  None    3.4  None
 
+    Code that uses the deprecated signature:
+
+    >>> base = {"year": [2020, 2021, 2022]}
+    >>> make_df(base, value=1., unit="y")
+       year  value unit
+    0     1    1.0    y
+    1     2    1.0    y
+    2     3    1.0    y
+
+    can either be adjusted to use the new signature:
+
+    >>> make_df("duration_period", **base, value=1., unit="y")
+
+    or, emulated using the built-in pandas method :meth:`~.DataFrame.assign`:
+
+    >>> pd.DataFrame(base).assign(value=1., unit="y")
+
+    The former is recommended, because it will ensure the result has the correct
+    columns for the parameter.
+
     Parameters
     ----------
     name : str
@@ -33,7 +53,7 @@ def make_df(name, **data):
         :data:`MACRO_ITEMS`.
     data : optional
         Contents for dimensions of the parameter, its 'value', or 'unit'.
-        Additional keys are ignored.
+        Other keys are ignored.
 
     Returns
     -------
