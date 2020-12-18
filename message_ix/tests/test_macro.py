@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import numpy as np
+import numpy.testing as npt
 import pandas as pd
 import pytest
 
@@ -26,10 +27,10 @@ class MockScenario:
     def var(self, name, **kwargs):
         df = self.data["aeei"]
         # add extra commodity to be removed
-        extra_commod = df[df.sector == "i_therm"]
+        extra_commod = df[df.sector == "i_therm"].copy()
         extra_commod["sector"] = self.data["config"]["ignore_sectors"][0]
         # add extra region to be removed
-        extra_region = df[df.node == "R11_AFR"]
+        extra_region = df[df.node == "R11_AFR"].copy()
         extra_region["node"] = self.data["config"]["ignore_nodes"][0]
         df = pd.concat([df, extra_commod, extra_region])
 
@@ -55,6 +56,14 @@ def test_calc_valid_data_file(westeros_solved):
     s = westeros_solved
     c = macro.Calculate(s, W_DATA_PATH)
     c.read_data()
+
+
+def test_calc_invalid_data(westeros_solved):
+    with pytest.raises(TypeError, match="neither a dict nor a valid path"):
+        macro.Calculate(westeros_solved, list())
+
+    with pytest.raises(ValueError, match="not an Excel data file"):
+        macro.Calculate(westeros_solved, Path(__file__).joinpath("other.zip"))
 
 
 def test_calc_valid_data_dict(westeros_solved):
@@ -114,107 +123,32 @@ def test_calc_data_missing_datapoint(westeros_solved):
 #
 
 
-def test_calc_growth(westeros_solved):
-    s = westeros_solved
-    c = macro.Calculate(s, W_DATA_PATH)
-    c.read_data()
-    obs = c._growth()
-    assert len(obs) == 4
-    obs = obs.values
-    exp = np.array([0.0265836, 0.041380, 0.041380, 0.029186])
-    assert np.isclose(obs, exp).all()
+@pytest.mark.parametrize(
+    "method, test, expected",
+    (
+        ("_growth", "allclose", [0.02658363, 0.04137974, 0.04137974, 0.02918601]),
+        ("_rho", "equal", [-4.0]),
+        ("_gdp0", "equal", [500.0]),
+        ("_k0", "equal", [1500.0]),
+        (
+            "_total_cost",
+            "allclose",
+            1e-3 * np.array([15, 17.477751, 22.143634, 28.114812]),
+        ),
+        ("_price", "allclose", [195, 182.852229, 162.039539, 161.002627]),
+        ("_demand", "allclose", [90, 100, 150, 190]),
+        ("_bconst", "allclose", [3.6846576e-05]),
+        ("_aconst", "allclose", [26.027323]),
+    ),
+)
+def test_calc(westeros_solved, method, test, expected):
+    calc = macro.Calculate(westeros_solved, W_DATA_PATH)
+    calc.read_data()
 
+    function = getattr(calc, method)
+    assertion = getattr(npt, f"assert_{test}")
 
-def test_calc_rho(westeros_solved):
-    s = westeros_solved
-    c = macro.Calculate(s, W_DATA_PATH)
-    c.read_data()
-    obs = c._rho()
-    assert len(obs) == 1
-    obs = obs[0]
-    exp = -4
-    assert obs == exp
-
-
-def test_calc_gdp0(westeros_solved):
-    s = westeros_solved
-    c = macro.Calculate(s, W_DATA_PATH)
-    c.read_data()
-    obs = c._gdp0()
-    assert len(obs) == 1
-    obs = obs[0]
-    exp = 500
-    assert obs == exp
-
-
-def test_calc_k0(westeros_solved):
-    s = westeros_solved
-    c = macro.Calculate(s, W_DATA_PATH)
-    c.read_data()
-    obs = c._k0()
-    assert len(obs) == 1
-    obs = obs[0]
-    exp = 1500
-    assert obs == exp
-
-
-def test_calc_total_cost(westeros_solved):
-    s = westeros_solved
-    c = macro.Calculate(s, W_DATA_PATH)
-    c.read_data()
-    obs = c._total_cost()
-    # 4 values, 3 in model period, one in history
-    assert len(obs) == 4
-    obs = obs.values
-    exp = np.array([15, 17.477751, 22.143634, 28.114812]) / 1e3
-    assert np.isclose(obs, exp).all()
-
-
-def test_calc_price(westeros_solved):
-    s = westeros_solved
-    c = macro.Calculate(s, W_DATA_PATH)
-    c.read_data()
-    obs = c._price()
-    # 4 values, 3 in model period, one in history
-    assert len(obs) == 4
-    obs = obs.values
-    exp = np.array([195, 182.852229, 162.039539, 161.002627])
-    assert np.isclose(obs, exp).all()
-
-
-def test_calc_demand(westeros_solved):
-    s = westeros_solved
-    c = macro.Calculate(s, W_DATA_PATH)
-    c.read_data()
-    obs = c._demand()
-    # 4 values, 3 in model period, one in history
-    assert len(obs) == 4
-    obs = obs.values
-    exp = np.array([90, 100, 150, 190])
-    assert np.isclose(obs, exp).all()
-
-
-def test_calc_bconst(westeros_solved):
-    s = westeros_solved
-    c = macro.Calculate(s, W_DATA_PATH)
-    c.read_data()
-    obs = c._bconst()
-    assert len(obs) == 1
-    obs = obs[0]
-    exp = 3.6846576e-05
-    assert np.isclose(obs, exp)
-
-
-def test_calc_aconst(westeros_solved):
-    s = westeros_solved
-    c = macro.Calculate(s, W_DATA_PATH)
-    c.read_data()
-    obs = c._aconst()
-
-    assert len(obs) == 1
-    obs = obs[0]
-    exp = 26.027323
-    assert np.isclose(obs, exp)
+    assertion(function().values, expected)
 
 
 def test_init(message_test_mp):
@@ -274,13 +208,11 @@ def test_calibrate_roundtrip(westeros_solved):
     # this is a regression test with values observed on Aug 9, 2019
     with_macro = westeros_solved.add_macro(W_DATA_PATH, check_convergence=True)
     aeei = with_macro.par("aeei")["value"].values
-    assert len(aeei) == 4
-    exp = np.array([20, 71.759022, 37.424904, 19.936694]) / 1e3
-    assert np.allclose(aeei, exp)
+    npt.assert_allclose(aeei, 1e-3 * np.array([20, 71.759022, 37.424904, 19.936694]))
     grow = with_macro.par("grow")["value"].values
-    assert len(grow) == 4
-    exp = np.array([26.583631, 69.101286, 79.520269, 24.529274]) / 1e3
-    assert np.allclose(grow, exp)
+    npt.assert_allclose(
+        grow, 1e-3 * np.array([26.583631, 69.101286, 79.520269, 24.529274])
+    )
 
 
 #

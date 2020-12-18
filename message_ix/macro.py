@@ -1,7 +1,7 @@
-import collections
 import logging
 from functools import lru_cache
 from pathlib import Path
+from typing import Mapping
 
 import numpy as np
 import pandas as pd
@@ -24,8 +24,8 @@ You are using *experimental*, incomplete features from
 """
 
 
-# TODO all demands and prices are assumed to be on USEFUL level, need to extend
-#      this to support others
+# TODO all demands and prices are assumed to be on 'useful' level, need to extend this
+#      to support others
 
 DATA_KEY = dict(
     cost_MESSAGE="total_cost",
@@ -68,12 +68,15 @@ MACRO_ITEMS = dict(
     lotol=dict(ix_type="par", idx_sets=["node"]),
     prfconst=dict(ix_type="par", idx_sets=["node", "sector"]),
     price_MESSAGE=dict(ix_type="par", idx_sets=["node", "sector", "year"]),
+    # Total consumption
     C=dict(ix_type="var", idx_sets=["node", "year"]),
-    COST_NODAL_NET=dict(ix_type="var", idx_sets=["node", "year"]),
     COST_NODAL=dict(ix_type="var", idx_sets=["node", "year"]),
+    # Net of trade and emissions costs
+    COST_NODAL_NET=dict(ix_type="var", idx_sets=["node", "year"]),
     DEMAND=dict(ix_type="var", idx_sets=["node", "commodity", "level", "year", "time"]),
     EC=dict(ix_type="var", idx_sets=["node", "year"]),
     GDP=dict(ix_type="var", idx_sets=["node", "year"]),
+    # Total investment
     I=dict(ix_type="var", idx_sets=["node", "year"]),  # noqa: E741
     K=dict(ix_type="var", idx_sets=["node", "year"]),
     KN=dict(ix_type="var", idx_sets=["node", "year"]),
@@ -82,6 +85,13 @@ MACRO_ITEMS = dict(
     NEWENE=dict(ix_type="var", idx_sets=["node", "sector", "year"]),
     PHYSENE=dict(ix_type="var", idx_sets=["node", "sector", "year"]),
     PRICE=dict(ix_type="var", idx_sets=["node", "commodity", "level", "year", "time"]),
+    # commented: see description in models.py.
+    # PRICE_COMMODITY=dict(
+    #     ix_type="var", idx_sets=["node", "commodity", "level", "year", "time"]
+    # ),
+    # PRICE_EMISSION=dict(
+    #     ix_type="var", idx_sets=["node", "type_emission", "type_tec", "y"]
+    # ),
     PRODENE=dict(ix_type="var", idx_sets=["node", "sector", "year"]),
     UTILITY=dict(ix_type="var", idx_sets=None),
     Y=dict(ix_type="var", idx_sets=["node", "year"]),
@@ -121,9 +131,7 @@ def _validate_data(name, df, nodes, sectors, years):
 
         diff = set(values) - set(df[kind])
         if diff:
-            raise ValueError(
-                "Not all {}s included in {} data: {}".format(kind, name, diff)
-            )
+            raise ValueError(f"Not all {kind}s included in {name} data: {diff}")
 
     # check required columns
     if name in MACRO_DATA_FOR_DERIVATION:
@@ -133,8 +141,7 @@ def _validate_data(name, df, nodes, sectors, years):
     # TODO: cols += ['unit'] ?
     col_diff = set(cols) - set(df.columns)
     if col_diff:
-        msg = "Missing expected columns for {}: {}"
-        raise ValueError(msg.format(name, col_diff))
+        raise ValueError(f"Missing expected columns for {name}: {col_diff}")
 
     # check required column values
     checks = (
@@ -159,9 +166,9 @@ class Calculate:
 
     s : .Scenario
     data : dict (str -> pd.DataFrame) or os.PathLike
-        If :class:`.PathLike`, the path to an Excel file containing parameter
-        data, one per sheet. If :class:`dict`, a dictionary mapping parameter
-        names to data frames.
+        If :class:`.PathLike`, the path to an Excel file containing parameter data, one
+        per sheet. If :class:`dict`, a dictionary mapping parameter names to data
+        frames.
     """
 
     # TODO add comments
@@ -169,14 +176,14 @@ class Calculate:
     def __init__(self, s, data):
         self.s = s
 
-        if isinstance(data, collections.Mapping):
+        if isinstance(data, Mapping):
             self.data = data
         else:
             # Handle a file path
             try:
                 data_path = Path(data)
-            except ValueError:
-                raise ValueError(f"neither a dict nor a valid path: {data}")
+            except TypeError:
+                raise TypeError(f"neither a dict nor a valid path: {data}")
 
             if not data_path.exists() or data_path.suffix != ".xlsx":
                 raise ValueError(f"not an Excel data file: {data_path}")
@@ -201,7 +208,7 @@ class Calculate:
 
         par_diff = set(VERIFY_INPUT_DATA) - set(self.data)
         if par_diff:
-            raise ValueError("Missing required input data: {}".format(par_diff))
+            raise ValueError(f"Missing required input data: {par_diff}")
 
         for name in self.data:
             # no need to validate configuration, it was processed above
@@ -219,11 +226,10 @@ class Calculate:
         min_year_model = min(self.years)
         data_years_before_model = data_years[data_years < min_year_model]
         if len(data_years_before_model) < 2:
-            msg = (
-                "Must provide two gdp_calibrate data points prior to the"
-                + " modeling period in order to calculate growth rates"
+            raise ValueError(
+                "Must provide two gdp_calibrate data points prior to the modeling "
+                "period in order to calculate growth rates"
             )
-            raise ValueError(msg)
         # init year is most recent period PRIOR to the modeled period
         self.init_year = max(data_years_before_model)
         # base year is first model period
@@ -241,6 +247,7 @@ class Calculate:
     def derive_data(self):
         # calculate all necessary derived data, adding to self.data this is
         # done through method chaining, the bottom of which is aconst()
+        # NB this means it could be rewritten using reporting
         self._growth()
         self._rho()
         self._gdp0()
@@ -309,10 +316,9 @@ class Calculate:
         model_price = self._clean_model_data(
             self.s.var("PRICE_COMMODITY", filters={"level": "useful"})
         )
-        if np.isclose(model_price["lvl"], 0).any():
-            # TODO: this needs a test..
-            msg = "0-price found in MESSAGE variable PRICE_COMMODITY"
-            raise RuntimeError(msg)
+        if np.isclose(model_price["lvl"], 0).any():  # pragma: no cover
+            # TODO this needs a test
+            raise RuntimeError("0-price found in MESSAGE variable PRICE_COMMODITY")
         model_price.rename(
             columns={"lvl": "value", "commodity": "sector"}, inplace=True
         )
@@ -394,7 +400,7 @@ def add_model_data(base, clone, data):
         clone.add_set("cat_node", ["economy", n])
 
     # add sectoral set structure
-    # TODO: we shouldn't have to have a for loop here
+    # TODO we shouldn't need a loop here
     for s in c.sectors:
         clone.add_set("sector", s)
         clone.add_set("mapping_macro_sector", [s, s, "useful"])
@@ -414,8 +420,7 @@ def add_model_data(base, clone, data):
                 data = data[data["year"] >= c.init_year]
             clone.add_par(name, data)
         except Exception as e:
-            msg = "Error in adding parameter {}\n".format(name)
-            raise type(e)(msg + str(e))
+            raise type(e)(f"Error in adding parameter {name}\n{e}")
 
 
 def calibrate(s, check_convergence=True, **kwargs):
@@ -460,7 +465,6 @@ def calibrate(s, check_convergence=True, **kwargs):
 
         n_iter = test.var("N_ITER")["lvl"]
         if n_iter > 1:
-            msg = "Number of iterations after calibration > 1: {}"
-            raise RuntimeError(msg.format(n_iter))
+            raise RuntimeError(f"Number of iterations after calibration {n_iter} is >1")
 
     return s

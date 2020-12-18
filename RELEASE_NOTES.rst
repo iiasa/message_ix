@@ -1,9 +1,21 @@
 Next release
 ============
 
+Migration notes
+---------------
+
+- Code that uses :func:`.make_df` can be adjusted in one of two ways.
+  See the function documentation for details.
+  The function should be imported from the top level::
+
+    from message_ix import make_df
+
+
 All changes
 -----------
 
+- :pull:`415`: Improve :func:`.make_df` to generate empty, partially-, or fully-filled data frames with the correct columns for any MESSAGE or MACRO parameter.
+- :pull:`415`: Make complete lists of :data:`.MESSAGE_ITEMS`, :data:`.MACRO_ITEMS` and their dimensions accessible through the Python API.
 - :pull:`421`: Fix discounting from forward-looking to backward-looking and provide an explanation of the period structure and discounting in documentation of :doc:`time`.
 
 
