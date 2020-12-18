@@ -1,4 +1,3 @@
-import re
 from collections import ChainMap
 from copy import copy, deepcopy
 from functools import lru_cache

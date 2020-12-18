@@ -1,9 +1,9 @@
 from collections import defaultdict
 
+import ixmp
 import pytest
 
 from message_ix.models import MESSAGE, MESSAGE_ITEMS, MESSAGE_MACRO
-import ixmp
 
 
 def test_initialize(test_mp):
@@ -14,9 +14,7 @@ def test_initialize(test_mp):
 
     # Use ixmp.Scenario to avoid invoking ixmp_source/Java code that
     # automatically populates empty scenarios
-    s = ixmp.Scenario(
-        test_mp, "test_initialize", "test_initialize", version="new"
-    )
+    s = ixmp.Scenario(test_mp, "test_initialize", "test_initialize", version="new")
 
     # Initialization succeeds on a totally empty scenario
     MESSAGE.initialize(s)
