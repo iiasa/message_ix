@@ -58,6 +58,14 @@ def test_calc_valid_data_file(westeros_solved):
     c.read_data()
 
 
+def test_calc_invalid_data(westeros_solved):
+    with pytest.raises(TypeError, match="neither a dict nor a valid path"):
+        macro.Calculate(westeros_solved, list())
+
+    with pytest.raises(ValueError, match="not an Excel data file"):
+        macro.Calculate(westeros_solved, Path(__file__).joinpath("other.zip"))
+
+
 def test_calc_valid_data_dict(westeros_solved):
     s = westeros_solved
     data = pd.read_excel(W_DATA_PATH, sheet_name=None, engine="openpyxl")
