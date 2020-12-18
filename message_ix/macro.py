@@ -1,7 +1,7 @@
-import collections
 import logging
 from functools import lru_cache
 from pathlib import Path
+from typing import Mapping
 
 import numpy as np
 import pandas as pd
@@ -87,12 +87,10 @@ MACRO_ITEMS = dict(
     PRICE=dict(ix_type="var", idx_sets=["node", "commodity", "level", "year", "time"]),
     # commented: see description in models.py.
     # PRICE_COMMODITY=dict(
-    #     ix_type="var",
-    #     idx_sets=["node", "commodity", "level", "year", "time"]
+    #     ix_type="var", idx_sets=["node", "commodity", "level", "year", "time"]
     # ),
     # PRICE_EMISSION=dict(
-    #     ix_type="var",
-    #     idx_sets=["node", "type_emission", "type_tec", "y"]
+    #     ix_type="var", idx_sets=["node", "type_emission", "type_tec", "y"]
     # ),
     PRODENE=dict(ix_type="var", idx_sets=["node", "sector", "year"]),
     UTILITY=dict(ix_type="var", idx_sets=None),
@@ -181,7 +179,7 @@ class Calculate:
     def __init__(self, s, data):
         self.s = s
 
-        if isinstance(data, collections.Mapping):
+        if isinstance(data, Mapping):
             self.data = data
         else:
             # Handle a file path
@@ -213,7 +211,7 @@ class Calculate:
 
         par_diff = set(VERIFY_INPUT_DATA) - set(self.data)
         if par_diff:
-            raise ValueError("Missing required input data: {}".format(par_diff))
+            raise ValueError(f"Missing required input data: {par_diff}")
 
         for name in self.data:
             # no need to validate configuration, it was processed above
@@ -231,11 +229,10 @@ class Calculate:
         min_year_model = min(self.years)
         data_years_before_model = data_years[data_years < min_year_model]
         if len(data_years_before_model) < 2:
-            msg = (
-                "Must provide two gdp_calibrate data points prior to the"
-                + " modeling period in order to calculate growth rates"
+            raise ValueError(
+                "Must provide two gdp_calibrate data points prior to the modeling "
+                "period in order to calculate growth rates"
             )
-            raise ValueError(msg)
         # init year is most recent period PRIOR to the modeled period
         self.init_year = max(data_years_before_model)
         # base year is first model period
