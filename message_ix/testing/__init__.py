@@ -223,29 +223,28 @@ def make_westeros(mp, emissions=False, solve=False):
     country = "Westeros"
     scen.add_spatial_sets({"country": country})
 
-    sets = dict(
-        technology="coal_ppl wind_ppl grid bulb".split(),
-        mode=["standard"],
-        level="secondary final useful".split(),
-        commodity="electricity light".split(),
-    )
-    for name, values in sets.items():
+    for name, values in (
+        ("technology", ["coal_ppl", "wind_ppl", "grid", "bulb"]),
+        ("mode", ["standard"]),
+        ("level", ["secondary", "final", "useful"]),
+        ("commodity", ["electricity", "light"]),
+    ):
         scen.add_set(name, values)
 
     # Parameters — copy & paste from the tutorial notebook
 
     common = dict(
-        node=country,
-        node_loc=country,
-        node_dest=country,
-        node_origin=country,
-        year=model_horizon,
-        year_vtg=vintage_years,
-        year_act=act_years,
         mode="standard",
-        time="year",
+        node_dest=country,
+        node_loc=country,
+        node_origin=country,
+        node=country,
         time_dest="year",
         time_origin="year",
+        time="year",
+        year_act=act_years,
+        year_vtg=vintage_years,
+        year=model_horizon,
     )
 
     gdp_profile = np.array([1.0, 1.5, 1.9])
@@ -257,6 +256,7 @@ def make_westeros(mp, emissions=False, solve=False):
             **common,
             commodity="light",
             level="useful",
+            # FIXME should use demand_per_year; requires adjustments elsewhere.
             value=(100 * gdp_profile).round(),
             unit="GWa",
         ),
@@ -265,7 +265,7 @@ def make_westeros(mp, emissions=False, solve=False):
     grid_efficiency = 0.9
     common.update(unit="-")
 
-    for par, t, c, l, value in [
+    for name, tec, c, l, value in [
         ("input", "bulb", "electricity", "final", 1.0),
         ("output", "bulb", "light", "useful", 1.0),
         ("input", "grid", "electricity", "secondary", 1.0),
@@ -274,77 +274,66 @@ def make_westeros(mp, emissions=False, solve=False):
         ("output", "wind_ppl", "electricity", "secondary", 1.0),
     ]:
         scen.add_par(
-            par, make_df(par, **common, technology=t, commodity=c, level=l, value=value)
+            name,
+            make_df(name, **common, technology=tec, commodity=c, level=l, value=value),
         )
 
-    capacity_factor = {t: 1.0 for t in ("coal_ppl", "wind_ppl", "bulb")}
-    for tec, val in capacity_factor.items():
-        scen.add_par(
-            "capacity_factor",
-            make_df("capacity_factor", **common, technology=tec, value=val),
-        )
+    # FIXME the value for wind_ppl should be 0.36; requires adjusting other tests.
+    name = "capacity_factor"
+    capacity_factor = dict(coal_ppl=1.0, wind_ppl=1.0, bulb=1.0)
+    for tec, value in capacity_factor.items():
+        scen.add_par(name, make_df(name, **common, technology=tec, value=value))
 
+    name = "technical_lifetime"
     common.update(year_vtg=model_horizon, unit="y")
-    for tec, val in dict(coal_ppl=20, wind_ppl=20, bulb=1).items():
-        scen.add_par(
-            "technical_lifetime",
-            make_df("technical_lifetime", **common, technology=tec, value=val),
-        )
+    for tec, value in dict(coal_ppl=20, wind_ppl=20, bulb=1).items():
+        scen.add_par(name, make_df(name, **common, technology=tec, value=value))
 
+    name = "growth_activity_up"
     common.update(year_act=model_horizon, unit="-")
     for tec in "coal_ppl", "wind_ppl":
-        scen.add_par(
-            "growth_activity_up",
-            make_df("growth_activity_up", **common, technology=tec, value=0.1),
-        )
+        scen.add_par(name, make_df(name, **common, technology=tec, value=0.1))
 
     historic_demand = 0.85 * demand_per_year
     historic_generation = historic_demand / grid_efficiency
     coal_fraction = 0.6
 
     common.update(year_act=history, year_vtg=history, unit="GWa")
-    for tec, val in dict(
-        coal_ppl=coal_fraction * historic_generation,
-        wind_ppl=(1 - coal_fraction) * historic_generation,
-    ).items():
-        scen.add_par(
-            "historical_activity",
-            make_df("historical_activity", **common, technology=tec, value=val),
-        )
+    for tec, value in (
+        ("coal_ppl", coal_fraction * historic_generation),
+        ("wind_ppl", (1 - coal_fraction) * historic_generation),
+    ):
+        name = "historical_activity"
+        scen.add_par(name, make_df(name, **common, technology=tec, value=value))
         # 20 year lifetime
-        val *= 1 / 10 / capacity_factor[t] / 2
-        scen.add_par(
-            "historical_new_capacity",
-            make_df("historical_new_capacity", **common, technology=t, value=val),
+        name = "historical_new_capacity"
+        tmp = make_df(
+            name,
+            **common,
+            technology=tec,
+            value=value / (2 * 10 * capacity_factor[tec]),
         )
+        print(tmp)
+        scen.add_par(name, tmp)
 
-    scen.add_par(
-        "interestrate",
-        make_df("interestrate", year=model_horizon, value=0.05, unit="-"),
-    )
+    name = "interestrate"
+    scen.add_par(name, make_df(name, year=model_horizon, value=0.05, unit="-"))
 
-    common.update(year_vtg=model_horizon, year_act=model_horizon)
-    del common["unit"]
-
-    for t, par, value in [
-        ("coal_ppl", "inv_cost", 500),
-        ("wind_ppl", "inv_cost", 1500),
-        ("bulb", "inv_cost", 5),
-        ("coal_ppl", "fix_cost", 30),
-        ("wind_ppl", "fix_cost", 10),
-        ("coal_ppl", "var_cost", 30),
-        ("grid", "var_cost", 50),
+    for name, tec, value in [
+        ("inv_cost", "coal_ppl", 500),
+        ("inv_cost", "wind_ppl", 1500),
+        ("inv_cost", "bulb", 5),
+        ("fix_cost", "coal_ppl", 30),
+        ("fix_cost", "wind_ppl", 10),
+        ("var_cost", "coal_ppl", 30),
+        ("var_cost", "grid", 50),
     ]:
-        scen.add_par(
-            par,
-            make_df(
-                par,
-                **common,
-                technology=tec,
-                value=value,
-                unit="USD/kW" if par == "inv_cost" else "USD/kWa",
-            ),
+        common.update(
+            dict(year_vtg=model_horizon, unit="USD/kW")
+            if name == "inv_cost"
+            else dict(year_vtg=vintage_years, year_act=act_years, unit="USD/kWa")
         )
+        scen.add_par(name, make_df(name, **common, technology=tec, value=value))
 
     scen.commit("basic model of Westerosi electrification")
     scen.set_as_default()
@@ -357,16 +346,11 @@ def make_westeros(mp, emissions=False, solve=False):
         scen.add_cat("emission", "GHG", "CO2")
 
         # we now add CO2 emissions to the coal powerplant
+        name = "emission_factor"
+        common.update(year_vtg=vintage_years, year_act=act_years, unit="tCO2/kWa")
         scen.add_par(
-            "emission_factor",
-            make_df(
-                "emission_factor",
-                **common,
-                technology="coal_ppl",
-                emission="CO2",
-                value=100.0,
-                unit="tCO2/kWa",
-            ),
+            name,
+            make_df(name, **common, technology="coal_ppl", emission="CO2", value=100.0),
         )
 
         scen.commit("Added emissions sets/params to Westeros model.")
