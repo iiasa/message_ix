@@ -18,21 +18,26 @@ Read and understand the file ``LICENSE``; in particular, clause 7 (“Disclaimer
 
     Unless required by applicable law or agreed to in writing, Licensor provides the Work (and each Contributor provides its Contributions) on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied, including, without limitation, any warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for determining the appropriateness of using or redistributing the Work and assume any risks associated with Your exercise of permissions under this License.
 
+.. _notice-cite:
 
 2. Cite the scientific publication
 ----------------------------------
 
-Cite the following manuscript:
+Cite, at minimum, the following manuscript:
 
-  | Daniel Huppmann, Matthew Gidden, Oliver Fricko, Peter Kolp, Clara Orthofer,
-    Michael Pimmer, Nikolay Kushin, Adriano Vinca, Alessio Mastrucci,
-    Keywan Riahi, and Volker Krey.
+  | Daniel Huppmann, Matthew Gidden, Oliver Fricko, Peter Kolp, Clara Orthofer, Michael Pimmer, Nikolay Kushin, Adriano Vinca, Alessio Mastrucci, Keywan Riahi, and Volker Krey.
   | "The MESSAGEix Integrated Assessment Model and the ix modeling platform".
   | *Environmental Modelling & Software* 112:143-156, 2019.
   | doi: `10.1016/j.envsoft.2018.11.012`_
   | electronic pre-print available at `pure.iiasa.ac.at/15157/`_.
 
-In addition, include a hyperlink to the online resource `MESSAGEix.iiasa.ac.at`_.
+In addition:
+
+- Include a link, e.g. in a footnote, to the online documentation at https://docs.messageix.org.
+- Optionally, cite the code via Zenodo.
+  The DOI `10.5281/zenodo.4005684 <https://doi.org/10.5281/zenodo.4005684>`_ represents *all* versions of the :mod:`message_ix` code, and will always resolve to the latest version.
+  At that page, you can also choose a different DOI in order to cite one specific version; for instance, `10.5281/zenodo.4005685 <https://doi.org/10.5281/zenodo.4005685>`_ to cite v3.1.0.
+  Zenodo also provides citation export in BibTeX and other formats.
 
 
 3. Use the naming convention for new model instances
@@ -66,5 +71,4 @@ References
 
 ..  _`10.1016/j.envsoft.2018.11.012`: https://doi.org/10.1016/j.envsoft.2018.11.012
 .. _`pure.iiasa.ac.at/15157/`: https://pure.iiasa.ac.at/15157/
-.. _`MESSAGEix.iiasa.ac.at`: https://MESSAGEix.iiasa.ac.at/
 .. _`10.3389/fenrg.2019.00020`: https://doi.org/10.3389/fenrg.2019.00020

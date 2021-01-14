@@ -1,15 +1,16 @@
-Contributing to |MESSAGEix| development
-=======================================
+Contributing to development
+***************************
 
 We welcome contributions to the code base and development of new features for the |MESSAGEix| framework.
-This page contains guidelines for making these contributions.
+This page contains guidelines for making such contributions.
+Each section requires some of the listed :doc:`prerequisite knowledge and skills <prereqs>`; use the links there to external resources about git, Github, Python, etc. to ensure you are able to understand and complete the steps.
 
 .. contents::
   :local:
 
 
-Filing issues for bugs and enhancements
----------------------------------------
+File issues for bugs and enhancements
+=====================================
 
 We use Github **issues** for several purposes:
 
@@ -25,15 +26,12 @@ Then, if your issue is not found, `open a new one <https://github.com/iiasa/mess
 
 __ https://github.com/iiasa/message_ix/issues?q=is:issue
 
-Contributing code via Github PRs
---------------------------------
 
-See the `short introduction to the Github flow <https://guides.github.com/introduction/flow/>`_, which describes a **pull request** and how it is used.
-Use online documentation for git, Github, and Python to ensure you are able to complete the process below.
-Register a Github account, if you do not already have one.
+Contribute code via Github PRs
+==============================
 
 1. Choose a repository
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 Decide which part of the |MESSAGEix| software stack is the appropriate location for your code:
 
@@ -46,22 +44,27 @@ Decide which part of the |MESSAGEix| software stack is the appropriate location 
 :mod:`message_ix`
    Contributions not specific to *any particular MESSAGEix* model instance.
    Additions to ``message_ix`` should be usable in any MESSAGE-scheme model.
+
 :mod:`message_data` or :mod:`message_doc`
-   Contributions to the MESSAGE-GLOBIOM family of models, including the global
-   model; and its documentation, respectively.
+   Contributions to the MESSAGE-GLOBIOM family of models, including the global model; and its documentation, respectively.
+
 
 2. Fork, branch, and open a pull request
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------
 
+Register a Github account, if you do not already have one.
 Fork the chosen repository to your own Github account.
 Create a branch with an appropriate name:
 
-- ``all-lower-case-with-hyphens``.
+- ``all-lower-case-with-hyphens`` —underscores (``_``) are slower to type; don't use them.
 - ``issue/1234`` if you are addressing a specific issue.
 - ``feature/do-something`` if you are adding a new feature.
+- Don't use the ``master`` branch  in your fork for a PR.
+  This makes it hard for others to check out and play with your code.
 
 Open a PR (e.g. on `message_ix`__) to merge your code into the ``master`` branch.
-The ``message_ix`` and ``ixmp`` repositories each have a template for the text of the PR, including the minimum requirements:
+The ``message_ix`` and ``ixmp`` repositories each have a template for the text of the PR that is designed to help you write a clear description.
+It includes:
 
 __ https://github.com/iiasa/message_ix/pulls
 
@@ -69,18 +72,20 @@ __ https://github.com/iiasa/message_ix/pulls
   This is like the abstract of a publication: it should help a developer/reviewer/user quickly learn what the PR is about.
 - Confirm that unit or integration tests have been added or revised to cover the changed code, and that the tests pass (see below).
 - Confirm that documentation of the API and its usage is added or revised as necessary.
-- Add a line to the file ``RELEASE_NOTES.md`` describing the changes (use the same title or one-sentence summary as above) and linking to the PR.
+- Add a line to :file:`RELEASE_NOTES.rst` describing the changes (use the same title or one-sentence summary as above) and linking to the PR.
 
 Optionally:
 
+- Assign yourself and anyone else who will actually commit changes to the PR branch, or be actively involved in discussing/designing the code.
 - Include a longer description of the design, or any changes whose purpose is not clear by inspecting code.
-- Put “WIP:” or the construction sign Unicode character (🚧) at the start of the PR title to indicate “work in progress” while you continue to add commits; or use GitHub's `'draft' pull requests`__.
+- Put “WIP:” or the construction sign Unicode character (🚧) at the start of the PR title to indicate “work in progress” while you continue to add commits; or use GitHub's `'draft' pull requests`__ feature.
   This is good development practice: it ensures the automatic checks pass as you add to the code on your branch.
 
 __ https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests#draft-pull-requests
 
+
 3. Ensure checks pass
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 |MESSAGEix| has several kinds of automatic, or *continuous integration*, checks:
 
@@ -103,7 +108,9 @@ __ https://help.github.com/en/github/collaborating-with-issues-and-pull-requests
   nightly
      These tests run daily at 05:00 UTC.
      They download a particular package of full-scale, MESSAGEix-GLOBIOM global model scenarios from IIASA servers.
-     Each scenario's outputs are compared to an expected value.
+     Each scenario's outputs are compared to an expected value listed in :file:`message_ix/tests/data/scenarios.yaml`.
+     PRs that touch the GAMS code may cause the these objective function values to change; the values **must** be updated as part of such PRs.
+     See the comments in the file for how to temporarily enable these checks for every commit on a PR branch.
 
   anaconda, miniconda
      These workflows check that the package can be installed from conda-forge using Anaconda and Miniconda, respectively, on Windows only.
@@ -114,67 +121,112 @@ If your PR updates the documentation, the ``lint`` check will confirm that it ca
 However, you should also *manually* build and view the HTML documentation on your machine to confirm that the generated HTML is as expected, and address any warnings generated by Sphinx during the build phase.
 See ``doc/README.rst``.
 
+
 4. Review
-~~~~~~~~~
+---------
 
 Using the GitHub sidebar on your PR, request a review from another |MESSAGEix| contributor.
 GitHub suggests reviewers; optionally, contact the IIASA Energy Program to ask who should review your code.
-Address any comments raised by the reviewer, who will also merge your PR when it is ready.
+
+- If you want them to follow along with progress, tag them in the PR description, like “FYI @Alice @Bob”.
+- Only formally request review once the code is ready to review.
+  Doing this sends e-mail and other notifications (e.g. in Slack, the “Pull Reminders” bot sends notices every day).
+  If the code is not yet complete and ready for review, these notifications are noise.
+
+Address any comments raised by the reviewer.
 
 
-Other tips
-~~~~~~~~~~
+5. Merge
+--------
 
-- If other PRs are merged before yours, a **merge conflict** may arise and must be addressed to complete the above steps.
-  This means that your PR, and the other PR, both modify the same file(s) in the same location(s), and git cannot automatically determine which changes to use.
-  Learn how to:
+GitHub provides `three ways to incorporate a pull request <https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-request-merges>`_: merge, rebase, and squash.
+Current practice for the ``ixmp``, ``message_ix``, and ``message_data`` repositories is:
 
-  - `git merge <https://git-scm.com/docs/git-merge>`_. This brings all updates from the ``master`` branch into your PR branch, giving you a chance to fix conflicts and make a new commit.
-  - `git rebase <https://git-scm.com/docs/git-rebase>`_. This replays your PR branch commits one-by-one, starting from the tip of the ``master`` branch (rather than the original starting commit).
+- Use **squash and merge**…
+
+  - if the commit history for the PR is "messy", e.g. there are many merge commits from other branches, or the author did not write well-formatted commit messages (see “Code style”, below).
+  - if the PR is very old, i.e. it starts at an old commit on ``master``. However, it is better to rebase the PR branch on the HEAD of ``master`` and then use a merge commit (below).
+
+- Use **rebase and merge**…
+
+  - if the PR is only one or a few commits that are obviously related.
+  - if the PR does not involve user-facing changes, i.e. does not need to be linked from the release notes.
+
+- Use **merge pull request** (also written “create a merge commit”) in all other cases.
+
+  PR branches *should* be rebased on the HEAD of ``master`` before merging.
+  This is because some git-based tools will display commits from ``master`` and the PR branch interleaved if their dates and times are mixed, which makes it harder to read the commit history.
+  Rebasing avoids this problem by ensuring each PR's commits are displayed together & in sequence.
 
 
 Code style
-----------
+==========
 
-- **Python:**
+- Follow the `seven rules of a great Git commit message <https://chris.beams.io/posts/git-commit/#seven-rules>`_ for commit messages and PR titles.
+- Apply the following to new or modified **Python** code::
 
-   - Follow `PEP 8 <https://www.python.org/dev/peps/pep-0008/>`_.
-   - Docstrings are in the `numpydoc format <https://numpydoc.readthedocs.io/en/latest/format.html>`_.
+    isort -rc . && black . && mypy . && flake8
 
-- **R:** follow the style of the existing code base.
-- Jupyter notebooks (:file:`.ipynb`): see below, under `Contributing tutorials`_.
-- **Documentation** for ReStructuredText in :file:`.rst` files, and inline in :file:`.gms` files:
+  Links to the documentation for these tools:
 
-  - Do not hard-wrap lines.
+  - `isort <https://pypi.org/project/isort/>`_: sorts import lines at the top of code files in a consistent way.
+  - `black <https://black.readthedocs.io>`_: applies consistent code style & formatting.
+    Plugins are available for popular code editors.
+  - `mypy <https://mypy.readthedocs.io>`_: checks typing for inconsistencies.
+  - `flake8 <https://flake8.pycqa.org>`_: check code style against `PEP 8 <https://www.python.org/dev/peps/pep-0008>`_.
+
+  The ``lint`` continuous integration workflow runs these on every pull request.
+  PRs that fail the checks must be corrected before they can be merged.
+
+- Write docstrings in the `numpydoc <https://numpydoc.readthedocs.io/en/latest/format.html>`_ style.
+- For new or modified **R** code, follow the style of the existing code base.
+- For Jupyter notebooks (:file:`.ipynb`): see below, under `Contribute tutorials`_.
+- For **documentation** in ReStructuredText formats, in :file:`doc/*.rst` and inline in :file:`message_ix/model/*.gms` files:
+
   - Start each sentence on a new line.
+  - Do not hard-wrap sentences.
   - Ensure Sphinx does not give warnings about ReST syntax for new or modified documentation.
 
-- GAMS:
+- **GAMS** code:
 
   - Wrap lines at 121 characters, except for inline documentation (see above).
 
 - Other (file names, CLI, etc.): follow the style of the existing code base.
 
 
+.. _releases:
+
 Versions and releases
----------------------
+=====================
 
 - We use `semantic versioning <https://semver.org>`_.
+
+  To paraphrase: a **major** version increment (e.g. from 3.5 to 4.0) means there are *backwards-incompatible* changes to the API or functionality (e.g. code written for version 3.5 may no longer work with 4.0).
+  Major releases always include migration notes in :doc:`whatsnew` to alert users to such changes and suggest how to adjust their code.
+  A **minor** version increment may fix bugs or add new features, but does not change existing functionality.
+  Code written for e.g. version 3.5 will continue to work with 3.6.
+
+- Releases of :mod:`ixmp` and :mod:`message_ix` are generally made at the same time, and the version numbers kept synchronized.
+
+- Each version of :mod:`message_ix` has a minimum required version of :mod:`ixmp`.
+
 - We keep at least two active milestones on each of the message_ix and ixmp repositories:
 
-  - The next minor version. E.g. if the latest release was 3.5, the next minor release/milestone is 3.6.
-  - The next major version. E.g. 4.0.
+  - The next minor version. e.g. if the latest release was 3.5, the next minor release/milestone is 3.6.
+  - The next major version. e.g. 4.0.
 
 - The milestones are closed at the time a new version is released.
   If a major release (e.g. 4.0) is made without the preceding minor release (e.g. 3.6), both are closed together.
 
-- Every issue and PR must be assigned to a milestone to record the decision/intent to release it at a certain time.
+- Every issue and PR should be assigned to a milestone to record the decision/intent to release it at a certain time.
 
 - New releases are made by Energy Program staff using the `Release procedure <https://github.com/iiasa/message_ix/wiki/Release-procedure>`_, and appear on Github, PyPI, and conda-forge.
 
+- There is no fixed **release schedule**, but new releases are generally made twice each year, sometimes more often.
 
-Contributing tutorials
-----------------------
+
+Contribute tutorials
+====================
 
 Developers *and users* of the |MESSAGEix| framework are welcome to contribute **tutorials**, according to the following guidelines.
 Per the license and CLA, tutorials will become part of the message_ix test suite and will be publicly available.
@@ -187,11 +239,12 @@ These have complementary purposes:
 - Tutorials serve as *structured learning exercises* for the classroom or self-study.
   The intended learning outcome for each tutorial is that students understand how the model framework API may be used for scientific research, and can begin to implement their own models or model changes.
 
-Coding & writing style
-~~~~~~~~~~~~~~~~~~~~~~
 
-- Tutorials are formatted as Jupyter notebooks in Python or R.
-- Commit 'bare' notebooks in git, i.e. without cell output.
+Code and writing style
+----------------------
+
+- Format tutorials as Jupyter notebooks in Python or R.
+- Only commit 'bare' notebooks to git, i.e. without cell output.
   Notebooks will be run and rendered when the documentation is generated.
 - Add a line to ``tests/test_tutorials.py``, so that the parametrized test function runs the tutorial (as noted at :pull:`196`).
 - Optionally, use Jupyter notebook slide-show features so that the tutorial can be viewed as a presentation.
@@ -203,8 +256,9 @@ Coding & writing style
   - Place rendered versions of graphics in a directory with the tutorial (see `Location`_ below).
     Use SVG, PNG, JPG, or other web-ready formats.
 
+
 Structure
-~~~~~~~~~
+---------
 
 Generally, a tutorial should have the following elements or sections.
 
@@ -228,8 +282,9 @@ Generally, a tutorial should have the following elements or sections.
 
 - Exercises: include self-test questions, small activities, and exercises at the end of a tutorial so that users (and instructors, if any) can check their learning.
 
+
 Location
-~~~~~~~~
+--------
 
 Place notebooks in an appropriate location:
 
@@ -258,3 +313,29 @@ Place notebooks in an appropriate location:
        <group>_firm_capacity.ipynb
        <group>_flexible_generation.ipynb
        <group>_renewable_resources.ipynb
+
+
+Manage issues and pull requests
+===============================
+
+- Assign an issue or PRs to the person(s) who must take the next action towards completing it.
+  For example:
+
+  - Comment on the issue to provide information/decisions needed to move forward.
+  - Implement the requested changes in code.
+
+  This might be different from the person who opened the issue/PR.
+
+- Use the GitHub auto-linking feature to make clear the connection between related issues and PRs.
+- Look at the labels, milestones, and projects in the right sidebar.
+  Associate the issue with the correct one(s).
+- Follow-up on old issues (ones with no activity for a month or more):
+
+  - Ask (in a new comment, on Slack, in person) the assignee or last commenter what the status is.
+  - Close or re-assign, with a comment that describes your reasoning.
+
+----
+
+Included from :file:`CONTRIBUTOR_LICENSE.rst`:
+
+.. include:: ../CONTRIBUTOR_LICENSE.rst

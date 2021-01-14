@@ -1,14 +1,39 @@
 Next release
 ============
 
+Migration notes
+---------------
+
+- Code that uses :func:`.make_df` can be adjusted in one of two ways.
+  See the function documentation for details.
+  The function should be imported from the top level::
+
+    from message_ix import make_df
+
+
+All changes
+-----------
+
+- :pull:`415`: Improve :func:`.make_df` to generate empty, partially-, or fully-filled data frames with the correct columns for any MESSAGE or MACRO parameter.
+- :pull:`415`: Make complete lists of :data:`.MESSAGE_ITEMS`, :data:`.MACRO_ITEMS` and their dimensions accessible through the Python API.
+- :pull:`421`: Fix discounting from forward-looking to backward-looking and provide an explanation of the period structure and discounting in documentation of :doc:`time`.
+
+
+v3.1.0 (2020-08-28)
+===================
+
+:mod:`message_ix` v3.1.0 coincides with :mod:`ixmp` v3.1.0.
+
+For citing :mod:`message_ix`, distinct digital object identifiers (DOIs) are available for every release from v3.1.0 onwards; see the :ref:`user guidelines and notice <notice-cite>` for more information and how to cite.
+
 All changes
 -----------
 
 - :pull:`367`: Add new westeros tutorial on share constraints.
-- :pull:`366`: Add new westeros tutorial on modeling fossil resource supply curves.
-- :pull:`391`: Add a documentation page on :doc:`pre-requisite knowledge & skills <prereqs>`.
+- :pull:`366`: Add new Westeros tutorial on modeling fossil resource supply curves.
+- :pull:`391`, :pull:`392`: Add a documentation page on :doc:`pre-requisite knowledge & skills <prereqs>`; expand guidelines on :doc:`contributing`.
 - :pull:`389`: Fix a bug in :func:`.pyam.concat` using *non*-pyam objects.
-- :pull:`286`, :pull:`381`, :pull:`389`: Set ``duration_period`` in :meth:`.add_horizon`; add documentation of :doc:`time`.
+- :pull:`286`, :pull:`381`, :pull:`389`: Improve :meth:`.add_horizon` to also set ``duration_period``; add documentation of :doc:`time`.
 - :pull:`377`: Improve the :doc:`rmessageix <rmessageix>` R package, tutorials, and expand documentation and installation instructions.
 - :pull:`382`: Update discount factor from ``df_year`` to ``df_period`` in documentation of the objective function to match the GAMS formulation.
 

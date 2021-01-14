@@ -1,8 +1,7 @@
 Package: rmessageix
 Type: Package
 Title: MESSAGEix Modeling Framework
-Version: 3.0.1-9000
-Date: 2020-08-05
+Version: 3.1.0.9000
 Authors@R: c(
     person("Alessio", "Mastrucci", email = "mastrucc@iiasa.ac.at",
            role = c("aut", "cre")),

@@ -1,23 +1,22 @@
-from base64 import b64encode
 import json
 import os
+import tempfile
+import zipfile
+from base64 import b64encode
 from pathlib import Path
 from shutil import copyfile
 from urllib.request import Request, urlopen
-import tempfile
-import zipfile
 
 import click
 import ixmp
 from ixmp.cli import main
+
 import message_ix
 import message_ix.tools.add_year.cli
 
-
 # Override the docstring of the ixmp CLI so that it masquerades as the
 # message_ix CLI
-main.help == \
-    """MESSAGEix command-line interface
+main.help == """MESSAGEix command-line interface
 
     To view/run the 'nightly' commands, you need the testing dependencies.
     Run `pip install [--editable] .[tests]`.
@@ -27,12 +26,14 @@ main.help == \
 ixmp.cli.ScenarioClass = message_ix.Scenario
 
 
-@main.command('copy-model')
-@click.option('--set-default', is_flag=True,
-              help='Set the copy to be the default used when running MESSAGE.')
-@click.option('--overwrite', is_flag=True,
-              help='Overwrite existing files.')
-@click.argument('path', type=click.Path(file_okay=False))
+@main.command("copy-model")
+@click.option(
+    "--set-default",
+    is_flag=True,
+    help="Set the copy to be the default used when running MESSAGE.",
+)
+@click.option("--overwrite", is_flag=True, help="Overwrite existing files.")
+@click.argument("path", type=click.Path(file_okay=False))
 def copy_model(path, overwrite, set_default):
     """Copy the MESSAGE GAMS files to a new PATH.
 
@@ -42,10 +43,10 @@ def copy_model(path, overwrite, set_default):
     """
     path = Path(path).resolve()
 
-    src_dir = Path(__file__).parent / 'model'
-    for src in src_dir.rglob('*'):
+    src_dir = Path(__file__).parent / "model"
+    for src in src_dir.rglob("*"):
         # Skip certain files
-        if src.suffix in ('.gdx', '.log', '.lst'):
+        if src.suffix in (".gdx", ".log", ".lst"):
             continue
 
         # Destination path
@@ -61,35 +62,33 @@ def copy_model(path, overwrite, set_default):
         # Display output
         if dst.exists:
             if not overwrite:
-                print('{} exists, will not overwrite'.format(dst))
+                print("{} exists, will not overwrite".format(dst))
 
                 # Skip copyfile() below
                 continue
             else:
-                print('Overwriting {}'.format(dst))
+                print("Overwriting {}".format(dst))
         else:
-            print('Copying to {}'.format(dst))
+            print("Copying to {}".format(dst))
 
         copyfile(src, dst)
 
     if set_default:
-        ixmp.config.set('message model dir', path)
+        ixmp.config.set("message model dir", path)
         ixmp.config.save()
 
 
 @main.command()
-@click.option('--branch',
-              help='Repository branch to download from (e.g., master).')
-@click.option('--tag',
-              help='Repository tag to download from (e.g., v1.0.0).')
-@click.argument('path', type=click.Path())
+@click.option("--branch", help="Repository branch to download from (e.g., master).")
+@click.option("--tag", help="Repository tag to download from (e.g., v1.0.0).")
+@click.argument("path", type=click.Path())
 def dl(branch, tag, path):
     """Download MESSAGEix tutorial notebooks and extract to PATH.
 
     PATH is a local directory where to store the tutorial notebooks.
     """
     if tag and branch:
-        raise click.BadOptionUsage('Can only provide one of `tag` or `branch`')
+        raise click.BadOptionUsage("Can only provide one of `tag` or `branch`")
     elif branch:
         # Construct URL and filename from branch
         zipname = f"{branch}.zip"
@@ -100,20 +99,19 @@ def dl(branch, tag, path):
             url="https://api.github.com/repos/iiasa/message_ix/tags",
             headers=dict(),
         )
+        # GitHub's API rate limits unathenticated requests by IP address. On
+        # some CI services (e.g. Travis macOS), the build worker/runner re-uses
+        # an address, so the limit can sometimes be exceeded and the request
+        # fails. This (unadvertised) code uses HTTP Basic Auth with an
+        # encrypted username and password from environment variables to avoid
+        # the rate limit.
         try:
-            # Only for Travis/macOS: GitHub rate limits unathenticated API
-            # requests by IP address. Because the build worker shares an IP,
-            # the limit is exceeded and the request fails. Use HTTP Basic Auth
-            # with an encrypted username and  password from .travis.yml for a
-            # higher rate limit.
             auth_bytes = b64encode(
-                "{MESSAGE_IX_GH_USER}:{MESSAGE_IX_GH_PW}"
-                .format(**os.environ)
-                .encode()
+                "{MESSAGE_IX_GH_USER}:{MESSAGE_IX_GH_PW}".format(**os.environ).encode()
             )
             args["headers"]["Authorization"] = f"Basic {auth_bytes.decode()}"
         except KeyError:
-            pass
+            pass  # Variables not set
 
         with urlopen(Request(**args)) as response:
             tags_info = json.load(response)
@@ -152,8 +150,7 @@ def dl(branch, tag, path):
 
             # Extract only tutorial files
             archive.extractall(
-                path,
-                members=filter(lambda n: "/tutorial/" in n, archive.namelist())
+                path, members=filter(lambda n: "/tutorial/" in n, archive.namelist())
             )
 
 

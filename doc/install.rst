@@ -1,4 +1,4 @@
-.. include:: ../../INSTALL.rst
+.. include:: ../INSTALL.rst
 
 
 Copy GAMS model files for editing

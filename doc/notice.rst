@@ -1,0 +1,1 @@
+.. include:: ../NOTICE.rst

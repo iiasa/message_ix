@@ -19,7 +19,7 @@ Framework components
 
 **MESSAGE** is a specific mathematical formulation of a model developed for strategic energy planning and integrated assessment of energy-engineering-economy-environment systems (E4).
 The formulation included in :mod:`message_ix` is a re-implementation and extension of “MESSAGE V” (Messner and Strubegger, 1995 :cite:`messner_users_1995`), the integrated assessment model developed at |IIASA| since the 1980s.
-The optimization model can be linked to the general-economy **MACRO** model to incorporate feedback between prices and demand levels for energy and commodities.
+The optimization model can be linked to the general-equilibrium **MACRO** model to incorporate feedback between prices and demand levels for energy and commodities.
 The :mod:`message_ix` package includes code for both MESSAGE, MACRO, and the MESSAGE-MACRO link.
 These are written in the `GAMS`_ mathematical programming language.
 :mod:`message_ix` uses GAMS to compute the numerical solution of a model instance.
