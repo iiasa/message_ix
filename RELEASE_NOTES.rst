@@ -29,6 +29,7 @@ For citing :mod:`message_ix`, distinct digital object identifiers (DOIs) are ava
 All changes
 -----------
 
+- :pull:`367`: Add new westeros tutorial on share constraints.
 - :pull:`366`: Add new Westeros tutorial on modeling fossil resource supply curves.
 - :pull:`391`, :pull:`392`: Add a documentation page on :doc:`pre-requisite knowledge & skills <prereqs>`; expand guidelines on :doc:`contributing`.
 - :pull:`389`: Fix a bug in :func:`.pyam.concat` using *non*-pyam objects.
