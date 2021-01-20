@@ -3,7 +3,7 @@ from functools import partial
 from message_ix.reporting import Key, Reporter
 
 
-def stacked_bar(qty, dims=["nl", "t", "ya"], units="", title="", cf=1.):
+def stacked_bar(qty, dims=["nl", "t", "ya"], units="", title="", cf=1.0):
     """Plot `qty` as a stacked bar chart.
 
     Parameters
@@ -35,7 +35,7 @@ def stacked_bar(qty, dims=["nl", "t", "ya"], units="", title="", cf=1.):
         xlabel="Year",
         ylabel=units,
         title=f"{df.loc[0, dims[0]]} Energy System {title.title()}",
-    ).legend(loc="center left", bbox_to_anchor=(1., 0.5))
+    ).legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
 
 
 PLOTS = [
@@ -64,7 +64,7 @@ def prepare_tutorial_plots(rep: Reporter, input_costs="$/GWa") -> None:
     # TODO use exact units in all tutorials
     # TODO allow the correct units to pass through reporting
     cost_unit_conv = {
-        "$/GWa": 1.,
+        "$/GWa": 1.0,
         "$/MWa": 1e3,
         "$/kWa": 1e6,
     }.get(input_costs)
@@ -85,7 +85,7 @@ def prepare_tutorial_plots(rep: Reporter, input_costs="$/GWa") -> None:
             dims=key.dims,
             units=units,
             title=title,
-            cf=1. if title != "Prices" else (cost_unit_conv * 100 / 8760)
+            cf=1.0 if title != "Prices" else (cost_unit_conv * 100 / 8760),
         )
 
         # Add the computation under a key like "plot activity"
