@@ -10,6 +10,7 @@ __all__ = [
     # Defined here
     "broadcast_map",
     "map_as_qty",
+    "stacked_bar",
     # In .pyam
     "as_pyam",
     "concat",
@@ -76,3 +77,40 @@ def broadcast_map(quantity, map, rename={}):
         Dimensions to rename on the result.
     """
     return product(quantity, map).drop(map.dims[0]).rename(rename)
+
+
+def stacked_bar(qty, dims=["nl", "t", "ya"], units="", title="", cf=1.0):
+    """Plot `qty` as a stacked bar chart.
+
+    Parameters
+    ----------
+    qty : ixmp.reporting.Quantity
+        Data to plot.
+    dims : 3-tuple of str
+        Dimensions for, respectively:
+
+        1. The node/region.
+        2. Dimension to stack.
+        3. The ordinate (x-axis).
+    units : str
+        Units to display on the plot.
+    title : str
+        Title fragment; the plot title is "{node} {title}".
+    cf : float, optional
+        Conversion factor to apply to data.
+    """
+    # - Multiply by the conversion factor
+    # - Convert to a pd.Series
+    # - Unstack one dimension
+    # - Convert to pd.DataFrame
+    df = (cf * qty).to_series().unstack(dims[1]).reset_index()
+
+    # Plot using matplotlib via pandas
+    return df.plot(
+        x=dims[2],
+        kind="bar",
+        stacked=True,
+        xlabel="Year",
+        ylabel=units,
+        title=f"{df.loc[0, dims[0]]} Energy System {title.title()}",
+    ).legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
