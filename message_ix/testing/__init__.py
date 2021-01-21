@@ -1,3 +1,5 @@
+import io
+from itertools import product
 from typing import List, Union
 
 import numpy as np
@@ -7,6 +9,7 @@ from ixmp import IAMC_IDX
 from message_ix import Scenario, make_df
 
 SCENARIO = {
+    "austria": dict(model="Austrian energy model", scenario="baseline"),
     "dantzig": {"model": "Canning problem (MESSAGE scheme)", "scenario": "standard"},
     "dantzig multi-year": {
         "model": "Canning problem (MESSAGE scheme)",
@@ -37,6 +40,231 @@ TS_DF.index = range(len(TS_DF.index))
 TS_DF_CLEARED = TS_DF.copy()
 TS_DF_CLEARED.loc[0, 1963] = np.nan
 TS_DF_CLEARED.loc[0, 1964] = np.nan
+
+
+def _to_df(columns, table):
+    """Return a pd.DataFrame for a fixed-width text `table`."""
+    return pd.read_fwf(io.StringIO(table), index_col=0, header=None).set_axis(
+        columns.split(), axis=1
+    )
+
+
+AUSTRIA_TECH = _to_df(
+    "input_commodity input_level input_value output_commodity output_level "
+    "output_value",
+    """
+bio_ppl                                        electricity        secondary  1.0
+coal_ppl                                       electricity        secondary  1.0
+gas_ppl                                        electricity        secondary  1.0
+hydro_ppl                                      electricity        secondary  1.0
+oil_ppl                                        electricity        secondary  1.0
+solar_pv_ppl                                   electricity        final      1.0
+wind_ppl                                       electricity        secondary  1.0
+import                                         electricity        secondary  1.0
+electricity_grid  electricity  secondary  1.0  electricity        final      0.873
+appliances        electricity  final      1.0  other_electricity  useful     1.0
+bulb              electricity  final      1.0  light              useful     1.0
+cfl               electricity  final      0.3  light              useful     1.0
+""",
+)
+
+AUSTRIA_PAR = _to_df(
+    "activity capacity_factor technical_lifetime inv_cost fix_cost var_cost "
+    "emission_factor",
+    """
+bio_ppl             4554  0.75  30  1600  30  48.2
+coal_ppl            7184  0.85  40  1500  40  24.4  0.854
+gas_ppl            14346  0.75  30   870  25  42.4  0.339
+hydro_ppl          38406  0.5   60  3000  60
+oil_ppl             1275  0.75  30   950  25  77.8  0.5
+solar_pv_ppl          89  0.15  20  4000  25
+wind_ppl            2064  0.2   20  1100  40
+import              2340
+electricity_grid                              47.8
+appliances
+bulb                      0.1    1     5
+cfl                  0.0  0.1   10   900
+""",
+)
+
+
+def make_austria(mp, solve=False):
+    """Return an :class:`message_ix.Scenario` for the Austrian energy system.
+
+    This is the same model used in the ``austria.ipynb`` tutorial.
+
+    Parameters
+    ----------
+    mp : ixmp.Platform
+        Platform on which to create the scenario.
+    solve : bool, optional
+        If True, the scenario is solved.
+    """
+    mp.add_unit("USD/kW")
+    mp.add_unit("MtCO2")
+    mp.add_unit("tCO2/kWa")
+
+    scen = Scenario(
+        mp,
+        version="new",
+        **SCENARIO["austria"],
+        annotation="A stylized energy system model for illustration and testing",
+    )
+
+    # Structure
+
+    year = dict(all=list(range(2010, 2041, 10)))
+    scen.add_horizon(year=year["all"])
+    year_df = scen.vintage_and_active_years()
+    year["vtg"] = year_df["year_vtg"]
+    year["act"] = year_df["year_act"]
+
+    country = "Austria"
+    scen.add_spatial_sets({"country": country})
+
+    sets = dict(
+        commodity=["electricity", "light", "other_electricity"],
+        emission=["CO2"],
+        level=["secondary", "final", "useful"],
+        mode=["standard"],
+    )
+
+    sets["technology"] = AUSTRIA_TECH.index.to_list()
+    plants = sets["technology"][:7]
+    lights = sets["technology"][10:]
+
+    for name, values in sets.items():
+        scen.add_set(name, values)
+
+    scen.add_cat("emission", "GHGs", "CO2")
+
+    # Parameters
+
+    name = "interestrate"
+    scen.add_par(name, make_df(name, year=year["all"], value=0.05, unit="-"))
+
+    common = dict(
+        mode="standard",
+        node_dest=country,
+        node_loc=country,
+        node_origin=country,
+        node=country,
+        time_dest="year",
+        time_origin="year",
+        time="year",
+        year_act=year["act"],
+        year_vtg=year["vtg"],
+        year=year["all"],
+    )
+
+    gdp_profile = np.array([1.0, 1.21631, 1.4108, 1.63746])
+    beta = 0.7
+    demand_profile = gdp_profile ** beta
+
+    # From IEA statistics, in GW·h, converted to GW·a
+    base_annual_demand = dict(other_electricity=55209.0 / 8760, light=6134.0 / 8760)
+
+    name = "demand"
+    common.update(level="useful", unit="GWa")
+    for c, base in base_annual_demand.items():
+        scen.add_par(
+            name, make_df(name, **common, commodity=c, value=base * demand_profile)
+        )
+    common.pop("level")
+
+    # input, output
+    common.update(unit="-")
+    for name, (tec, info) in product(("input", "output"), AUSTRIA_TECH.iterrows()):
+        value = info[f"{name}_value"]
+        if np.isnan(value):
+            continue
+        scen.add_par(
+            name,
+            make_df(
+                name,
+                **common,
+                technology=tec,
+                commodity=info[f"{name}_commodity"],
+                level=info[f"{name}_level"],
+                value=value,
+            ),
+        )
+
+    data = AUSTRIA_PAR
+    # Convert GW·h to GW·a
+    data["activity"] = data["activity"] / 8760.0
+    # Convert USD / MW·h to USD / GW·a
+    data["var_cost"] = data["var_cost"] * 8760.0 / 1e3
+    # Convert t / MW·h to t / kw·a
+    data["emission_factor"] = data["emission_factor"] * 8760.0 / 1e3
+
+    def _add():
+        """Add using values from the calling scope."""
+        scen.add_par(name, make_df(name, **common, technology=tec, value=value))
+
+    name = "capacity_factor"
+    for tec, value in data[name].dropna().items():
+        _add()
+
+    name = "technical_lifetime"
+    common.update(year_vtg=year["all"], unit="y")
+    for tec, value in data[name].dropna().items():
+        _add()
+
+    name = "growth_activity_up"
+    common.update(year_act=year["all"][1:], unit="%")
+    value = 0.05
+    for tec in plants + lights:
+        _add()
+
+    name = "initial_activity_up"
+    common.update(year_act=year["all"][1:], unit="%")
+    value = 0.01 * base_annual_demand["light"] * demand_profile[1:]
+    for tec in lights:
+        _add()
+
+    # bound_activity_lo, bound_activity_up
+    common.update(year_act=year["all"][0], unit="GWa")
+    for (tec, value), kind in product(data["activity"].dropna().items(), ("up", "lo")):
+        name = f"bound_activity_{kind}"
+        _add()
+
+    name = "bound_activity_up"
+    common.update(year_act=year["all"][1:])
+    for tec in ("bio_ppl", "hydro_ppl", "import"):
+        value = data.loc[tec, "activity"]
+        _add()
+
+    name = "bound_new_capacity_up"
+    common.update(year_vtg=year["all"][0], unit="GW")
+    for tec, value in (data["activity"] / data["capacity_factor"]).dropna().items():
+        _add()
+
+    name = "inv_cost"
+    common.update(dict(year_vtg=year["all"], unit="USD/kW"))
+    for tec, value in data[name].dropna().items():
+        _add()
+
+    # fix_cost, var_cost
+    common.update(dict(year_vtg=year["vtg"], year_act=year["act"], unit="USD/kWa"))
+    for name in ("fix_cost", "var_cost"):
+        for tec, value in data[name].dropna().items():
+            _add()
+
+    name = "emission_factor"
+    common.update(
+        year_vtg=year["vtg"], year_act=year["act"], unit="tCO2/kWa", emission="CO2"
+    )
+    for tec, value in data[name].dropna().items():
+        _add()
+
+    scen.commit("Initial commit for Austria model")
+    scen.set_as_default()
+
+    if solve:
+        scen.solve()
+
+    return scen
 
 
 def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
