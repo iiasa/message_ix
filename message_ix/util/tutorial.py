@@ -36,7 +36,7 @@ def prepare_plots(rep: Reporter, input_costs="$/GWa") -> None:
         "$/GWa": 1.0,
         "$/MWa": 1e3,
         "$/kWa": 1e6,
-    }.get(input_costs)
+    }.get(input_costs, 1.0)
 
     # Basic setup of the reporter
     rep.configure(units={"replace": {"-": ""}})
