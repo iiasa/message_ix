@@ -79,7 +79,7 @@ def broadcast_map(quantity, map, rename={}):
     return product(quantity, map).drop(map.dims[0]).rename(rename)
 
 
-def stacked_bar(qty, dims=["nl", "t", "ya"], units="", title="", cf=1.0):
+def stacked_bar(qty, dims=["nl", "t", "ya"], units="", title="", cf=1.0, stacked=True):
     """Plot `qty` as a stacked bar chart.
 
     Parameters
@@ -109,8 +109,9 @@ def stacked_bar(qty, dims=["nl", "t", "ya"], units="", title="", cf=1.0):
     return df.plot(
         x=dims[2],
         kind="bar",
-        stacked=True,
+        stacked=stacked,
         xlabel="Year",
         ylabel=units,
         title=f"{df.loc[0, dims[0]]} {title}",
+        width=5.0,
     ).legend(loc="center left", bbox_to_anchor=(1.0, 0.5))

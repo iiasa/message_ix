@@ -1,8 +1,11 @@
+import logging
 from contextlib import contextmanager
 from functools import partial
 
-import message_ix
+from message_ix import Scenario
 from message_ix.reporting import Key, Reporter, computations
+
+log = logging.getLogger(__name__)
 
 PLOTS = [
     ("activity", computations.stacked_bar, "out:nl-t-ya", "GWa"),
@@ -51,7 +54,8 @@ def prepare_plots(rep: Reporter, input_costs="$/GWa") -> None:
             dims=key.dims,
             units=units,
             title=f"Energy System {title.title()}",
-            cf=1.0 if title != "Prices" else (cost_unit_conv * 100 / 8760),
+            cf=1.0 if title != "prices" else (cost_unit_conv * 100 / 8760),
+            stacked=title != "prices",
         )
 
         # Add the computation under a key like "plot activity"
@@ -62,36 +66,16 @@ def prepare_plots(rep: Reporter, input_costs="$/GWa") -> None:
 
 
 @contextmanager
-def read_scenario(platform, name, scen):
-    mp = platform
-    mp.open_db()
-    ds = message_ix.Scenario(mp, name, scen)
-
-    yield ds
-
-    mp.close_db()
-
-
-@contextmanager
-def make_scenario(platform, country, name, base_scen, scen):
-    mp = platform
-
-    mp.open_db()
-    base_ds = message_ix.Scenario(mp, name, base_scen)
-
-    by = "by 'tutorial/utils/run_scenarios.py:make_scenario()'"
-    ds = base_ds.clone(
-        name,
-        scen,
-        "scenario generated {}, {} - {}".format(by, name, scen),
+def solve_modified(base: Scenario, new_name: str):
+    s = base.clone(
+        scenario=new_name,
+        annotation=f"Cloned by solve_modified() from {repr(base.scenario)}",
         keep_solution=False,
     )
-    ds.check_out()
+    s.check_out()
 
-    yield ds
+    yield s
 
-    ds.commit("changes committed {}, {} - {}".format(by, name, scen))
-    ds.set_as_default()
-    ds.solve("MESSAGE")
-
-    mp.close_db()
+    s.commit("Commit by solve_modified() at end of 'with:' statement")
+    s.set_as_default()
+    s.solve()
