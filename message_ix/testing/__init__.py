@@ -535,14 +535,15 @@ def make_westeros(mp, emissions=False, solve=False):
         scen.add_par(name, make_df(name, **common, technology=tec, value=value))
         # 20 year lifetime
         name = "historical_new_capacity"
-        tmp = make_df(
+        scen.add_par(
             name,
-            **common,
-            technology=tec,
-            value=value / (2 * 10 * capacity_factor[tec]),
+            make_df(
+                name,
+                **common,
+                technology=tec,
+                value=value / (2 * 10 * capacity_factor[tec]),
+            ),
         )
-        print(tmp)
-        scen.add_par(name, tmp)
 
     name = "interestrate"
     scen.add_par(name, make_df(name, year=model_horizon, value=0.05, unit="-"))
