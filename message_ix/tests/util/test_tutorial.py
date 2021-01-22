@@ -1,9 +1,9 @@
 from ixmp.reporting import Key
 
 from message_ix import Scenario
+from message_ix.testing import SCENARIO
 from message_ix.util import make_df
 from message_ix.util.tutorial import prepare_plots, solve_modified
-from message_ix.testing import SCENARIO
 
 
 def test_prepare_plots(dantzig_reporter):

@@ -1,7 +1,7 @@
-from ixmp.reporting import Quantity
 import matplotlib
 import pandas as pd
 import pyam
+from ixmp.reporting import Quantity
 
 from message_ix import Scenario
 from message_ix.reporting import Reporter, computations
