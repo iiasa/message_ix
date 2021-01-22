@@ -7,6 +7,7 @@ from pkg_resources import DistributionNotFound, get_distribution
 
 from .core import Scenario
 from .models import MACRO, MESSAGE, MESSAGE_MACRO
+from .reporting import Reporter
 from .util import make_df
 
 __all__ = [
@@ -15,6 +16,7 @@ __all__ = [
     "MESSAGE_MACRO",
     "MODELS",
     "Scenario",
+    "Reporter",
     "config",
     "make_df",
 ]

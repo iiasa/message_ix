@@ -106,7 +106,7 @@ def stacked_bar(qty, dims=["nl", "t", "ya"], units="", title="", cf=1.0, stacked
     df = (cf * qty).to_series().unstack(dims[1]).reset_index()
 
     # Plot using matplotlib via pandas
-    return df.plot(
+    ax = df.plot(
         x=dims[2],
         kind="bar",
         stacked=stacked,
@@ -114,4 +114,7 @@ def stacked_bar(qty, dims=["nl", "t", "ya"], units="", title="", cf=1.0, stacked
         ylabel=units,
         title=f"{df.loc[0, dims[0]]} {title}",
         width=5.0,
-    ).legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
+    )
+    ax.legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
+
+    return ax
