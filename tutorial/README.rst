@@ -1,5 +1,5 @@
 Tutorials
-=========
+*********
 
 To get started with |MESSAGEix|, the following tutorials are provided as
 `Jupyter notebooks <https://jupyter.org/>`_, which combine code, sample output,
@@ -10,10 +10,10 @@ the links below. In order to execute the tutorial code or make modifications,
 read the Preparation_ section, next.
 
 Preparation
------------
+===========
 
 Getting tutorial files
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 If you installed |MESSAGEix| from source, all notebooks are in the ``tutorial``
 directory.
@@ -43,10 +43,10 @@ If you installed |MESSAGEix| using Anaconda, download the notebooks using the
    add ``--branch master``.
 
 Running tutorials
-~~~~~~~~~~~~~~~~~
+-----------------
 
 Using Anaconda
-..............
+~~~~~~~~~~~~~~
 
 The ``nb_conda`` package is required. It should be installed by default with
 Anaconda. If it was not, install it::
@@ -64,7 +64,7 @@ Anaconda. If it was not, install it::
    [conda root]`.
 
 From the command line
-.....................
+~~~~~~~~~~~~~~~~~~~~~
 
 1. Navigate to the tutorial folder. For instance, if ``message-ix dl`` was used
    above::
@@ -76,7 +76,7 @@ From the command line
        $ jupyter notebook
 
 Westeros Electrified
---------------------
+====================
 
 This tutorial demonstrates how to model a very simple energy system, and then
 uses it to illustrate a range of framework features.
@@ -123,7 +123,7 @@ uses it to illustrate a range of framework features.
 .. _austria-tutorials:
 
 Austrian energy system
-----------------------
+======================
 
 This tutorial demonstrates a stylized representation of a national electricity
 sector model, with several fossil and renewable power plant types.
@@ -145,3 +145,14 @@ sector model, with several fossil and renewable power plant types.
 .. _austria_single_policy.ipynb:             https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/austria_single_policy.ipynb
 .. _austria_multiple_policies.ipynb:         https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/austria_multiple_policies.ipynb
 .. _austria_multiple_policies-answers.ipynb: https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/austria_multiple_policies-answers.ipynb
+
+
+Code reference
+==============
+
+The module :mod:`message_ix.util.tutorial` contains some helper code used to simplify the tutorials; see also :func:`.reporting.computations.stacked_bar`.
+
+.. currentmodule:: message_ix.util.tutorial
+
+.. automodule:: message_ix.util.tutorial
+   :members:

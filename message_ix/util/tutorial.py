@@ -23,8 +23,10 @@ def prepare_plots(rep: Reporter, input_costs="$/GWa") -> None:
     Makes available several keys:
 
     - ``plot activity``
+    - ``plot demand``
     - ``plot extraction``
     - ``plot capacity``
+    - ``plot new capacity``
     - ``plot prices``
 
     To control the contents of each plot, use :meth:`.set_filters` on `rep`.
@@ -67,6 +69,23 @@ def prepare_plots(rep: Reporter, input_costs="$/GWa") -> None:
 
 @contextmanager
 def solve_modified(base: Scenario, new_name: str):
+    """Context manager for a cloned scenario.
+
+    At the end of the block, the modified Scenario yielded by :func:`solve_modified` is
+    committed, set as default, and solved. Use in a ``with:`` statement to make small
+    modifications and leave a variable in the current scope with the solved scenario.
+
+    Examples
+    --------
+    >>> with solve_modified(base_scen, "new name") as s:
+    ...     s.add_par( ... )  # Modify the scenario
+    ...     # `s` is solved at the end of the block
+
+    Yields
+    ------
+    .Scenario
+        Cloned from `base`, with the scenario name `new_name` and no solution.
+    """
     s = base.clone(
         scenario=new_name,
         annotation=f"Cloned by solve_modified() from {repr(base.scenario)}",
