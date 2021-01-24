@@ -25,6 +25,7 @@ def prepare_plots(rep: Reporter, input_costs="$/GWa") -> None:
     - ``plot activity``
     - ``plot demand``
     - ``plot extraction``
+    - ``plot fossil supply curve``
     - ``plot capacity``
     - ``plot new capacity``
     - ``plot prices``
@@ -63,8 +64,17 @@ def prepare_plots(rep: Reporter, input_costs="$/GWa") -> None:
         # Add the computation under a key like "plot activity"
         rep.add(f"plot {title}", (comp, key))
 
-    # TODO re-add plot_fossil_supply_curve()
-    rep.add("plot fossil supply curve", lambda: "(Not implemented)")
+    rep.add(
+        "plot fossil supply curve",
+        (
+            partial(
+                computations.plot_cumulative,
+                labels=("Fossil supply", "Resource volume", "Cost"),
+            ),
+            "resource_volume:n-g",
+            "resource_cost:n-g-y",
+        ),
+    )
 
 
 @contextmanager

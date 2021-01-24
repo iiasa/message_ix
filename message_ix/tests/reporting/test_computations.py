@@ -36,17 +36,44 @@ def test_concat(dantzig_reporter):
     rep.get(key)
 
 
+def test_plot_cumulative(tmp_path):
+    x = pd.Series(
+        {
+            ("region", "a"): 500,
+            ("region", "b"): 1000,
+        }
+    )
+    x.index.names = ["n", "g"]
+
+    y = pd.Series(
+        {
+            ("region", "a", 2020): 1.1,
+            ("region", "b", 2020): 2.2,
+            ("region", "a", 2021): 3.3,
+            ("region", "b", 2021): 4.4,
+        }
+    )
+    y.index.names = ["n", "g", "y"]
+
+    result = computations.plot_cumulative(
+        Quantity(x, units="GW a"),
+        Quantity(y, units="mole / kW a"),
+        labels=("Fossil supply", "Resource volume", "Cost"),
+    )
+    assert isinstance(result, matplotlib.axes.Axes)
+    matplotlib.pyplot.savefig(tmp_path / "plot_cumulative.svg")
+
+
 def test_stacked_bar():
-    data = pd.DataFrame(
-        [
-            ["region", "foo", 2020, 1.0],
-            ["region", "bar", 2020, 2.0],
-            ["region", "foo", 2021, 3.0],
-            ["region", "bar", 2021, 4.0],
-        ],
-        columns=["r", "t", "year", "value"],
-    ).set_index(["r", "t", "year"])["value"]
-    print(data)
-    qty = Quantity(data)
-    result = computations.stacked_bar(qty, dims=["r", "t", "year"])
+    data = pd.Series(
+        {
+            ("region", "foo", 2020): 1.0,
+            ("region", "bar", 2020): 2.0,
+            ("region", "foo", 2021): 3.0,
+            ("region", "bar", 2021): 4.0,
+        }
+    )
+    data.index.names = ["r", "t", "year"]
+
+    result = computations.stacked_bar(Quantity(data), dims=["r", "t", "year"])
     assert isinstance(result, matplotlib.axes.Axes)
