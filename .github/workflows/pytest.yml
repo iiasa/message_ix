@@ -120,7 +120,7 @@ jobs:
 
     - name: Install Python package and dependencies
       working-directory: message_ix
-      run: pip install .[docs,reporting,tests,tutorial]
+      run: pip install .[tests]
 
     - name: Install R package, dependencies, and tutorial requirements
       run: |
