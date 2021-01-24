@@ -75,7 +75,10 @@ jobs:
 
     - name: Check typing with mypy
       working-directory: message_ix
-      # Also install sphinx for checking message_ix.util.sphinx_gams
+      # Point to ixmp code for its type hints, without installing
+      env:
+        MYPYPATH: "../ixmp/"
+      # Also install packages that provide type hints
       run: |
         pip install mypy sphinx
         mypy .
