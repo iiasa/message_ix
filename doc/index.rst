@@ -134,12 +134,15 @@ Everyone is encouraged to use the framework to develop energy system and integra
 
 .. _help:
 
-Have a question?
+Have a question? Check…
 
-- Check the :doc:`faq`.
-- Search current and older `issues on GitHub <https://github.com/iiasa/message_ix/issues?q=is:issue>`_, or open a new one with your question.
-- Consult the community Google group on the web at https://groups.google.com/d/forum/message_ix, or via e-mail at <message_ix@googlegroups.com>.
+- …on GitHub:
 
+  - Join an existing `discussion <https://github.com/iiasa/message_ix/discussions>`_ or start a new one with your question.
+  - Search `current issues <https://github.com/iiasa/message_ix/issues?q=is:issue>`_, or open a new one to report a bug in the code.
+
+- …the :doc:`faq`.
+- …the message_ix Google Group, either `online <https://groups.google.com/d/forum/message_ix>`_ or via e-mail at <message_ix@googlegroups.com>.
 
 .. _`MESSAGEix-GLOBIOM documentation`: http://data.ene.iiasa.ac.at/message-globiom/
 .. _`APACHE 2.0 open-source license`: https://github.com/iiasa/message_ix/blob/master/LICENSE
