@@ -108,15 +108,15 @@ uses it to illustrate a range of framework features.
       module to ‘report’ results, e.g. do post-processing, plotting, and other
       calculations (`westeros_report.ipynb`_).
 
-.. _westeros_baseline.ipynb:            https://github.com/iiasa/message_ix/blob/v3.2.0/tutorial/westeros/westeros_baseline.ipynb
-.. _westeros_emissions_bounds.ipynb:    https://github.com/iiasa/message_ix/blob/v3.2.0/tutorial/westeros/westeros_emissions_bounds.ipynb
-.. _westeros_emissions_taxes.ipynb:     https://github.com/iiasa/message_ix/blob/v3.2.0/tutorial/westeros/westeros_emissions_taxes.ipynb
-.. _westeros_firm_capacity.ipynb:       https://github.com/iiasa/message_ix/blob/v3.2.0/tutorial/westeros/westeros_firm_capacity.ipynb
-.. _westeros_flexible_generation.ipynb: https://github.com/iiasa/message_ix/blob/v3.2.0/tutorial/westeros/westeros_flexible_generation.ipynb
-.. _westeros_seasonality.ipynb:         https://github.com/iiasa/message_ix/blob/v3.2.0/tutorial/westeros/westeros_seasonality.ipynb
-.. _westeros_share_constraint.ipynb:    https://github.com/iiasa/message_ix/blob/v3.2.0/tutorial/westeros/westeros_share_constraint.ipynb
-.. _westeros_fossil_resource.ipynb:     https://github.com/iiasa/message_ix/blob/v3.2.0/tutorial/westeros/westeros_fossil_resource.ipynb
-.. _westeros_report.ipynb:              https://github.com/iiasa/message_ix/blob/v3.2.0/tutorial/westeros/westeros_report.ipynb
+.. _westeros_baseline.ipynb:            https://github.com/iiasa/message_ix/blob/master/tutorial/westeros/westeros_baseline.ipynb
+.. _westeros_emissions_bounds.ipynb:    https://github.com/iiasa/message_ix/blob/master/tutorial/westeros/westeros_emissions_bounds.ipynb
+.. _westeros_emissions_taxes.ipynb:     https://github.com/iiasa/message_ix/blob/master/tutorial/westeros/westeros_emissions_taxes.ipynb
+.. _westeros_firm_capacity.ipynb:       https://github.com/iiasa/message_ix/blob/master/tutorial/westeros/westeros_firm_capacity.ipynb
+.. _westeros_flexible_generation.ipynb: https://github.com/iiasa/message_ix/blob/master/tutorial/westeros/westeros_flexible_generation.ipynb
+.. _westeros_seasonality.ipynb:         https://github.com/iiasa/message_ix/blob/master/tutorial/westeros/westeros_seasonality.ipynb
+.. _westeros_share_constraint.ipynb:    https://github.com/iiasa/message_ix/blob/master/tutorial/westeros/westeros_share_constraint.ipynb
+.. _westeros_fossil_resource.ipynb:     https://github.com/iiasa/message_ix/blob/master/tutorial/westeros/westeros_fossil_resource.ipynb
+.. _westeros_report.ipynb:              https://github.com/iiasa/message_ix/blob/master/tutorial/westeros/westeros_report.ipynb
 
 
 
@@ -138,13 +138,13 @@ sector model, with several fossil and renewable power plant types.
    completed code for the exercises
    (`austria_multiple_policies-answers.ipynb`_).
 
-.. _austria.ipynb:                           https://github.com/iiasa/message_ix/blob/v3.2.0/tutorial/Austrian_energy_system/austria.ipynb
-.. _R_austria.ipynb:                         https://github.com/iiasa/message_ix/blob/v3.2.0/tutorial/Austrian_energy_system/R_austria.ipynb
-.. _austria_load_scenario.ipynb:             https://github.com/iiasa/message_ix/blob/v3.2.0/tutorial/Austrian_energy_system/austria_load_scenario.ipynb
-.. _R_austria_load_scenario.ipynb:           https://github.com/iiasa/message_ix/blob/v3.2.0/tutorial/Austrian_energy_system/R_austria_load_scenario_R.ipynb
-.. _austria_single_policy.ipynb:             https://github.com/iiasa/message_ix/blob/v3.2.0/tutorial/Austrian_energy_system/austria_single_policy.ipynb
-.. _austria_multiple_policies.ipynb:         https://github.com/iiasa/message_ix/blob/v3.2.0/tutorial/Austrian_energy_system/austria_multiple_policies.ipynb
-.. _austria_multiple_policies-answers.ipynb: https://github.com/iiasa/message_ix/blob/v3.2.0/tutorial/Austrian_energy_system/austria_multiple_policies-answers.ipynb
+.. _austria.ipynb:                           https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/austria.ipynb
+.. _R_austria.ipynb:                         https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/R_austria.ipynb
+.. _austria_load_scenario.ipynb:             https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/austria_load_scenario.ipynb
+.. _R_austria_load_scenario.ipynb:           https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/R_austria_load_scenario_R.ipynb
+.. _austria_single_policy.ipynb:             https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/austria_single_policy.ipynb
+.. _austria_multiple_policies.ipynb:         https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/austria_multiple_policies.ipynb
+.. _austria_multiple_policies-answers.ipynb: https://github.com/iiasa/message_ix/blob/master/tutorial/Austrian_energy_system/austria_multiple_policies-answers.ipynb
 
 
 Code reference
