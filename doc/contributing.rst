@@ -5,8 +5,19 @@ We welcome contributions to the code base and development of new features for th
 This page contains guidelines for making such contributions.
 Each section requires some of the listed :doc:`prerequisite knowledge and skills <prereqs>`; use the links there to external resources about git, Github, Python, etc. to ensure you are able to understand and complete the steps.
 
+On this page:
+
 .. contents::
   :local:
+
+On separate pages:
+
+.. toctree::
+   :maxdepth: 1
+
+   contrib/version
+   contrib/tutorial
+   contrib/cla
 
 
 File issues for bugs and enhancements
@@ -89,7 +100,7 @@ __ https://help.github.com/en/github/collaborating-with-issues-and-pull-requests
 
 |MESSAGEix| has several kinds of automatic, or *continuous integration*, checks:
 
-- The `CLA Assistant <https://github.com/cla-assistant/>`_ ensures you have signed the `Contributor License Agreement`_ (text below).
+- The `CLA Assistant <https://github.com/cla-assistant/>`_ ensures you have signed the :doc:`contrib/cla` (follow link for text).
   All contributors are required to sign the CLA before any pull request can be reviewed.
   This ensures that all future users can benefit from your contribution, and that your contributions do not infringe on anyone else's rights.
 - GitHub Actions is used to run several *workflows*.
@@ -159,6 +170,8 @@ Current practice for the ``ixmp``, ``message_ix``, and ``message_data`` reposito
   Rebasing avoids this problem by ensuring each PR's commits are displayed together & in sequence.
 
 
+.. _code-style:
+
 Code style
 ==========
 
@@ -180,7 +193,7 @@ Code style
 
 - Write docstrings in the `numpydoc <https://numpydoc.readthedocs.io/en/latest/format.html>`_ style.
 - For new or modified **R** code, follow the style of the existing code base.
-- For Jupyter notebooks (:file:`.ipynb`): see below, under `Contribute tutorials`_.
+- Jupyter notebooks (:file:`.ipynb`): see :doc:`contrib/tutorial`.
 - For **documentation** in ReStructuredText formats, in :file:`doc/*.rst` and inline in :file:`message_ix/model/*.gms` files:
 
   - Start each sentence on a new line.
@@ -192,127 +205,6 @@ Code style
   - Wrap lines at 121 characters, except for inline documentation (see above).
 
 - Other (file names, CLI, etc.): follow the style of the existing code base.
-
-
-.. _releases:
-
-Versions and releases
-=====================
-
-- We use `semantic versioning <https://semver.org>`_.
-
-  To paraphrase: a **major** version increment (e.g. from 3.5 to 4.0) means there are *backwards-incompatible* changes to the API or functionality (e.g. code written for version 3.5 may no longer work with 4.0).
-  Major releases always include migration notes in :doc:`whatsnew` to alert users to such changes and suggest how to adjust their code.
-  A **minor** version increment may fix bugs or add new features, but does not change existing functionality.
-  Code written for e.g. version 3.5 will continue to work with 3.6.
-
-- Releases of :mod:`ixmp` and :mod:`message_ix` are generally made at the same time, and the version numbers kept synchronized.
-
-- Each version of :mod:`message_ix` has a minimum required version of :mod:`ixmp`.
-
-- We keep at least two active milestones on each of the message_ix and ixmp repositories:
-
-  - The next minor version. e.g. if the latest release was 3.5, the next minor release/milestone is 3.6.
-  - The next major version. e.g. 4.0.
-
-- The milestones are closed at the time a new version is released.
-  If a major release (e.g. 4.0) is made without the preceding minor release (e.g. 3.6), both are closed together.
-
-- Every issue and PR should be assigned to a milestone to record the decision/intent to release it at a certain time.
-
-- New releases are made by ECE Program staff using the `Release procedure <https://github.com/iiasa/message_ix/wiki/Release-procedure>`_, and appear on Github, PyPI, and conda-forge.
-
-- There is no fixed **release schedule**, but new releases are generally made twice each year, sometimes more often.
-
-
-Contribute tutorials
-====================
-
-Developers *and users* of the |MESSAGEix| framework are welcome to contribute **tutorials**, according to the following guidelines.
-Per the license and CLA, tutorials will become part of the message_ix test suite and will be publicly available.
-
-Developers **must** ensure new features (including :mod:`message_ix.tools` submodules) are fully documented.
-This can be done via the API documentation (this site) and, optionally, a tutorial.
-These have complementary purposes:
-
-- The API documentation (built using Sphinx and ReadTheDocs) must completely, but succinctly, *describe the arguments and behaviour* of every class and method in the code.
-- Tutorials serve as *structured learning exercises* for the classroom or self-study.
-  The intended learning outcome for each tutorial is that students understand how the model framework API may be used for scientific research, and can begin to implement their own models or model changes.
-
-
-Code and writing style
-----------------------
-
-- Format tutorials as Jupyter notebooks in Python or R.
-- Only commit 'bare' notebooks to git, i.e. without cell output.
-  Notebooks will be run and rendered when the documentation is generated.
-- Add a line to ``tests/test_tutorials.py``, so that the parametrized test function runs the tutorial (as noted at :pull:`196`).
-- Optionally, use Jupyter notebook slide-show features so that the tutorial can be viewed as a presentation.
-- When relevant, provide links to publications or sources that provide greater detail for the methodology, data, or other packages used.
-- Providing the mathematical formulation in the tutorial itself is optional.
-- Framework specific variables and parameters or functions must be in italic.
-- Relevant figures, tables, or diagrams should be added to the tutorial if these can help users to understand concepts.
-
-  - Place rendered versions of graphics in a directory with the tutorial (see `Location`_ below).
-    Use SVG, PNG, JPG, or other web-ready formats.
-
-
-Structure
----------
-
-Generally, a tutorial should have the following elements or sections.
-
-- Tutorial introduction:
-
-  - The general overview of tutorial.
-  - The intended learning outcome.
-  - An explanation of which features are covered.
-  - Reference and provide links to any tutorials that are interlinked or part of a series.
-
-- Description of individual steps:
-
-  - A brief explanation of the step.
-  - A link to any relevant mathematical documentation.
-
-- Modeling results and visualizations:
-
-  - Model outputs and post-processing calculations in tutorials should demonstrate usage of the :doc:`message_ix.reporting module <reporting>`.
-  - Plots to depict results should use `pyam <https://github.com/IAMconsortium/pyam/>`_.
-  - Include a brief discussion of insights from the results, in line with the learning objectives.
-
-- Exercises: include self-test questions, small activities, and exercises at the end of a tutorial so that users (and instructors, if any) can check their learning.
-
-
-Location
---------
-
-Place notebooks in an appropriate location:
-
-``tutorial/name.ipynb``:
-   Stand-alone tutorial.
-
-``tutorial/example/example_baseline.ipynb``:
-   Group of tutorials named “example.”
-   Each notebook's file name begins with the group name, followed by a name
-   beginning with underscores.
-   The group name can refer to a specific RES shared across multiple tutorials.
-   Some example names include::
-
-       <group>_baseline.ipynb
-
-       <group>_basic.ipynb  # Basic modeling features, e.g.:
-       <group>_emmission_bounds.ipynb
-       <group>_emission_taxes.ipynb
-       <group>_fossil_resources.ipynb
-
-       <group>_adv.ipynb  # Advanced modeling features, e.g.:
-       <group>_addon_technologies.ipynb
-       <group>_share_constraints.ipynb
-
-       <group>_renewables.ipynb  # Features related to renewable energy, e.g.:
-       <group>_firm_capacity.ipynb
-       <group>_flexible_generation.ipynb
-       <group>_renewable_resources.ipynb
 
 
 Manage issues and pull requests
@@ -333,9 +225,3 @@ Manage issues and pull requests
 
   - Ask (in a new comment, on Slack, in person) the assignee or last commenter what the status is.
   - Close or re-assign, with a comment that describes your reasoning.
-
-----
-
-Included from :file:`CONTRIBUTOR_LICENSE.rst`:
-
-.. include:: ../CONTRIBUTOR_LICENSE.rst
