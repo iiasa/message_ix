@@ -53,7 +53,7 @@ the form "MESSAGEix [xxx]" or "MESSAGEix-[xxx]", where [xxx] is replaced by:
 For example, the national model for South Africa developed by Orthofer et al. [1] is named "MESSAGEix South Africa".
 
 Ensure there is no naming conflict with existing versions of the |MESSAGEix| model family.
-When in doubt, contact the IIASA Energy Program at <message_ix@iiasa.ac.at> for a list of existing model instances.
+When in doubt, contact the IIASA ECE Program at <message_ix@iiasa.ac.at> for a list of existing model instances.
 
 
 4. Give notice of publication
