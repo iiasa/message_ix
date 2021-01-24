@@ -72,10 +72,10 @@ def make_df(name, **data):
     try:
         info = ChainMap(MESSAGE_ITEMS, MACRO_ITEMS)[name]
     except KeyError:
-        raise ValueError("{repr(name)} is not a MESSAGE or MACRO parameter")
+        raise ValueError(f"{repr(name)} is not a MESSAGE or MACRO parameter")
 
     if info["ix_type"] != "par":
-        raise ValueError("{repr(name)} is {info['ix_type']}, not par")
+        raise ValueError(f"{repr(name)} is {info['ix_type']}, not par")
 
     # Index names, if not given explicitly, are the same as the index sets
     idx_names = info.get("idx_names", info["idx_sets"])

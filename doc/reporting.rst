@@ -357,7 +357,7 @@ Defined by :mod:`message_ix`
 .. currentmodule:: message_ix.reporting
 
 .. automodule:: message_ix.reporting.computations
-   :members: as_pyam, broadcast_map, concat, map_as_qty, write_report
+   :members: as_pyam, broadcast_map, concat, map_as_qty, stacked_bar, write_report
 
 Inherited from ixmp
 -------------------

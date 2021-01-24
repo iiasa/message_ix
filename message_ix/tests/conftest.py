@@ -4,7 +4,7 @@ import pytest
 from click.testing import CliRunner
 
 import message_ix
-from message_ix.testing import make_dantzig
+from message_ix.testing import SCENARIO, make_dantzig
 
 # Hooks
 
@@ -51,3 +51,11 @@ def message_test_mp(test_mp):
     make_dantzig(test_mp)
     make_dantzig(test_mp, multi_year=True)
     yield test_mp
+
+
+@pytest.fixture
+def dantzig_reporter(message_test_mp):
+    scen = message_ix.Scenario(message_test_mp, **SCENARIO["dantzig"])
+    if not scen.has_solution():
+        scen.solve()
+    yield message_ix.Reporter.from_scenario(scen)

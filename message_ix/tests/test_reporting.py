@@ -131,28 +131,6 @@ def test_reporter_from_westeros(test_mp):
     assert_allclose(obs, exp)
 
 
-@pytest.fixture
-def dantzig_reporter(message_test_mp):
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
-    if not scen.has_solution():
-        scen.solve()
-    yield Reporter.from_scenario(scen)
-
-
-def test_as_pyam(message_test_mp):
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
-    if not scen.has_solution():
-        scen.solve()
-    rep = Reporter.from_scenario(scen)
-
-    # Quantities for 'ACT' variable at full resolution
-    qty = rep.get(rep.full_key("ACT"))
-
-    # Call as_pyam() with an empty quantity
-    p = computations.as_pyam(scen, qty[0:0], year_time_dim="ya")
-    assert isinstance(p, pyam.IamDataFrame)
-
-
 def test_reporter_convert_pyam(dantzig_reporter, caplog, tmp_path):
     rep = dantzig_reporter
 
@@ -260,17 +238,3 @@ def test_reporter_convert_pyam(dantzig_reporter, caplog, tmp_path):
     # Results have the expected units
     assert all(df5["unit"] == "centiUSD / case")
     assert_series_equal(df4["value"], df5["value"] / 100.0)
-
-
-def test_concat(dantzig_reporter):
-    """pyam.concat() correctly passes through to ixmp…concat()."""
-    rep = dantzig_reporter
-
-    key = rep.add(
-        "test",
-        computations.concat,
-        "fom:nl-t-ya",
-        "vom:nl-t-ya",
-        "tom:nl-t-ya",
-    )
-    rep.get(key)

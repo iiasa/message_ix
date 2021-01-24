@@ -14,6 +14,8 @@ Migration notes
 All changes
 -----------
 
+- :pull:`407`: Use :mod:`.reporting` in tutorials; add :mod:`.util.tutorial` for shorthand code used to streamline tutorials.
+- :pull:`407`: Make :class:`.Reporter` a top-level class.
 - :pull:`415`: Improve :func:`.make_df` to generate empty, partially-, or fully-filled data frames with the correct columns for any MESSAGE or MACRO parameter.
 - :pull:`415`: Make complete lists of :data:`.MESSAGE_ITEMS`, :data:`.MACRO_ITEMS` and their dimensions accessible through the Python API.
 - :pull:`421`: Fix discounting from forward-looking to backward-looking and provide an explanation of the period structure and discounting in documentation of :doc:`time`.
