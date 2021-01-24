@@ -126,7 +126,7 @@ See ``doc/README.rst``.
 ---------
 
 Using the GitHub sidebar on your PR, request a review from another |MESSAGEix| contributor.
-GitHub suggests reviewers; optionally, contact the IIASA Energy Program to ask who should review your code.
+GitHub suggests reviewers; optionally, contact the IIASA ECE Program to ask who should review your code.
 
 - If you want them to follow along with progress, tag them in the PR description, like “FYI @Alice @Bob”.
 - Only formally request review once the code is ready to review.
@@ -220,7 +220,7 @@ Versions and releases
 
 - Every issue and PR should be assigned to a milestone to record the decision/intent to release it at a certain time.
 
-- New releases are made by Energy Program staff using the `Release procedure <https://github.com/iiasa/message_ix/wiki/Release-procedure>`_, and appear on Github, PyPI, and conda-forge.
+- New releases are made by ECE Program staff using the `Release procedure <https://github.com/iiasa/message_ix/wiki/Release-procedure>`_, and appear on Github, PyPI, and conda-forge.
 
 - There is no fixed **release schedule**, but new releases are generally made twice each year, sometimes more often.
 

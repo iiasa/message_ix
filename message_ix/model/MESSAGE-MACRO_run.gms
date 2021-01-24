@@ -2,7 +2,7 @@ $TITLE The MESSAGEix-MACRO Integrated Assessment Model
 $ONDOLLAR
 $ONTEXT
 
-   Copyright 2018 IIASA Energy Program
+   Copyright 2017–2021 IIASA Energy, Climate, and Environment (ECE) Program
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
