@@ -1,14 +1,16 @@
-Next release
-============
+v3.2.0 (2021-01-24)
+===================
 
 Migration notes
 ---------------
 
 - Code that uses :func:`.make_df` can be adjusted in one of two ways.
   See the function documentation for details.
-  The function should be imported from the top level::
+  The function should be imported from the top level:
 
-    from message_ix import make_df
+  .. code-block:: python
+
+     from message_ix import make_df
 
 
 All changes
