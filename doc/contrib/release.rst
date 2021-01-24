@@ -78,9 +78,9 @@ Releasing
 
 4. Test publishing using TestPyPI.
 
-   1. On your local machine, create a *temporary* tag for the release number::
+   1. On your local machine, create a *temporary* tag for the release number, adding a 'rc' suffix::
 
-        git tag v<version>
+        git tag v<version>rc1
 
       - This is **NOT** the commit we will distribute. The tag is only for testing.
       - **DO NOT** push this tag anywhere, e.g. to GitHub!
@@ -92,16 +92,20 @@ Releasing
         twine check dist/*
 
       This should complete without any errors.
-      If it does not: fix any issues, create new commit(s), retag (``git tag --delete v<version>`` then ``git tag <version>``), and try again.
+      If it does not: fix any issues, create new commit(s), retag (``git tag --delete v<version>rc1`` then ``git tag v<version>rc1``), and try again.
 
    3. Publish and check::
 
         twine upload -r testpypi dist/*
 
       View and download the package from TestPyPI to ensure the README and contents are complete and free of errors.
-   4. Delete the test tag::
+      If they are not, fix any issues, create new commit(s), and try again fro step (4)(1), using an incremented ``rc`` part, e.g. ``v<version>rc2``.
 
-        git tag --delete v<version>
+   4. Delete all test tags created::
+
+        git tag --delete v<version>rc1
+        git tag --delete v<version>rc2
+        # etc.
 
 5. On Github, merge the RC PR using the ‘rebase’ approach.
 6. On your local machine, pull the now-updated 'master', tag and push:
@@ -118,6 +122,9 @@ Releasing
     python3 setup.py bdist_wheel sdist
     twine check dist/*
     twine upload dist/*
+
+    # Also upload to testpypi, so the latest version is not the RC above
+    twine upload -r testpypi dist/*
 
 9. Create a new release on GitHub.
 
