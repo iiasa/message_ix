@@ -129,7 +129,13 @@ Releasing
 9. Create a new release on GitHub.
 
    - Choose the existing tag ``v<version>`` created/pushed earlier; *do not* create a new one.
-   - Add a link to the section in the “What's New” page of the documentation corresponding to the new release.
+   - For the description, provide a link to the section in the “What's New” page of the documentation that corresponds to the new release.
+     For example:
+
+     .. code-block:: markdown
+
+        See the [“What's New” page](https://docs.messageix.org/projects/ixmp/en/stable/whatsnew.html#v3-1-0-2020-08-28) in the ixmp documentation for a list of all changes.
+
 
 10. Update on conda-forge.
     A PR should automatically be opened by a bot after the GitHub release (sometimes this takes up to 30 minutes).
