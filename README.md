@@ -40,7 +40,7 @@ including the complete mathematical formulation and associated files, is
 automatically created from mark-up comments in the GAMS, Python, and R code.
 
 - Documentation for the ‘latest’ or ‘stable’ release is shown by default.
-- Use the chooser to reach the [docs for the ``master`` branch](https://docs.messageix.org/en/master) of the GitHub repository, including the latest development code.
+- Use the chooser to access the [docs for the ‘master’ branch](https://docs.messageix.org/en/master) of the GitHub repository, including the latest development code; or, to access docs for a specific version of message_ix, e.g. `v3.2.0`.
 - For offline use, the documentation can be built from the source code.
   See the file `doc/README.rst`.
 

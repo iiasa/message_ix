@@ -66,9 +66,10 @@ Releasing
       - Add a short text description summarizing the release.
       - Optionally, add a subsection "Migration notes" explaining to users how to adjust to changes in the release.
 
-   2. :file:`README.rst`: Adjust the documentation badge to link to the 'stable' instead of 'master' version of the docs.
    3. :file:`tutorial/README.rst`: Adjust the links to the tutorials, replacing all instances of ``/blob/master/`` with ``blob/v<version>/``.
    4. :file:`rmessageix/DESCRIPTION` (message_ix only): Set the "Version:"" line to ``<version>``.
+
+   Commit with a message like “Prepare ``v<version>``”.
 
 3. Create a pull request to merge the RC branch into 'master'.
 
@@ -141,6 +142,5 @@ After the release
 The following changes essentially reverse the changes under step (2) in the release procedure, above.
 
 - :file:`RELEASE_NOTES.rst`: Add new section "Next Release" and subsection "All changes" above the section for the release.
-- :file:`README`: Adjust the docs badge to link to 'master' instead of 'stable'.
 - :file:`tutorial/README.rst`: Replace all instances of ``/blob/v<version>/`` with ``blob/master/``.
 - :file:`rmessageix/DESCRIPTION`: (message_ix only) Append ".9000" to the "Version: " line, e.g. "2.0.0.9000" to indicate a development version following v2.0.0.
