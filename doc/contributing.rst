@@ -16,6 +16,7 @@ On separate pages:
    :maxdepth: 1
 
    contrib/version
+   contrib/release
    contrib/tutorial
    contrib/cla
 
