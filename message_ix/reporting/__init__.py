@@ -1,12 +1,14 @@
 import logging
 from functools import partial
+from typing import Callable
 
-from ixmp.reporting import Key
-from ixmp.reporting import Reporter as IXMPReporter
-from ixmp.reporting import configure
+import genno
+from genno.compat.pyam import util
+from ixmp.reporting import Key, Reporter as IXMPReporter, configure
 
 from . import computations
 from .pyam import collapse_message_cols
+
 
 __all__ = [
     "Key",
@@ -81,12 +83,12 @@ PRODUCTS = (
 DERIVED = [
     # Each entry is ('full key', (computation tuple,)). Full keys are not
     # inferred and must be given explicitly.
-    ("tom:nl-t-yv-ya", (computations.add, "fom:nl-t-yv-ya", "vom:nl-t-yv-ya")),
+    ("tom:nl-t-yv-ya", (genno.computations.add, "fom:nl-t-yv-ya", "vom:nl-t-yv-ya")),
     # Broadcast from type_addon to technology_addon
     (
         "addon conversion:nl-t-yv-ya-m-h-ta",
         (
-            partial(computations.broadcast_map, rename={"n": "nl"}),
+            partial(genno.computations.broadcast_map, rename={"n": "nl"}),
             "addon_conversion:n-t-yv-ya-m-h-type_addon",
             "map_addon",
         ),
@@ -94,7 +96,7 @@ DERIVED = [
     (
         "addon up:nl-t-ya-m-h-ta",
         (
-            partial(computations.broadcast_map, rename={"n": "nl"}),
+            partial(genno.computations.broadcast_map, rename={"n": "nl"}),
             "addon_up:n-t-ya-m-h-type_addon",
             "map_addon",
         ),
@@ -103,9 +105,9 @@ DERIVED = [
     (
         "price emission:n-e-t-y",
         (
-            computations.broadcast_map,
+            genno.computations.broadcast_map,
             (
-                computations.broadcast_map,
+                genno.computations.broadcast_map,
                 "PRICE_EMISSION:n-type_emission-type_tec-y",
                 "map_emission",
             ),
@@ -160,7 +162,7 @@ class Reporter(IXMPReporter):
 
     # Module containing predefined computations, including those defined in
     # message_ix.reporting.computations
-    _computations = computations
+    modules = list(IXMPReporter.modules) + [computations]
 
     @classmethod
     def from_scenario(cls, scenario, **kwargs):
@@ -211,108 +213,13 @@ class Reporter(IXMPReporter):
 
         # Standard reports
         for group, pyam_keys in REPORTS.items():
-            put(group, computations.concat, *pyam_keys, strict=True)
+            put(group, rep._get_comp("concat"), *pyam_keys, strict=True)
 
         # Add all standard reporting to the default message node
-        put("message:default", computations.concat, *REPORTS.keys(), strict=True)
+        put("message:default", rep._get_comp("concat"), *REPORTS.keys(), strict=True)
 
         # Use ixmp.Reporter.add_queue() to process the entries. Retry at most
         # once; raise an exception if adding fails after that.
         rep.add_queue(to_add, max_tries=2, fail="raise")
 
         return rep
-
-    def convert_pyam(
-        self,
-        quantities,
-        year_time_dim,
-        tag="iamc",
-        drop={},
-        collapse=None,
-        unit=None,
-        replace_vars=None,
-    ):
-        """Add conversion of one or more **quantities** to IAMC format.
-
-        Parameters
-        ----------
-        quantities : str or Key or list of (str, Key)
-            Quantities to transform to :mod:`pyam`/IAMC format.
-        year_time_dim : str
-            Label of the dimension use for the ‘Year’ or ‘Time’ column of the
-            resulting :class:`pyam.IamDataFrame`. The column is labelled ‘Time’
-            if ``year_time_dim=='h'``, otherwise ‘Year’.
-        tag : str, optional
-            Tag to append to new Keys.
-        drop : iterable of str, optional
-            Label of additional dimensions to drop from the resulting data
-            frame. Dimensions ``h``, ``y``, ``ya``, ``yr``, and ``yv``—
-            except for the one named by `year_time_dim`—are automatically
-            dropped.
-        collapse : callable, optional
-            Callback to handle additional dimensions of the quantity. A
-            :class:`pandas.DataFrame` is passed as the sole argument to
-            `collapse`, which must return a modified dataframe.
-        unit : str or pint.Unit, optional
-            Convert values to these units.
-        replace_vars : str or Key
-            Other reporting key containing a :class:`dict` mapping variable
-            names to replace.
-
-        Returns
-        -------
-        list of Key
-            Each key converts a :class:`Quantity
-            <ixmp.reporting.utils.Quantity>` into a :class:`pyam.IamDataFrame`.
-
-        See also
-        --------
-        message_ix.reporting.computations.as_pyam
-        """
-        if isinstance(quantities, (str, Key)):
-            quantities = [quantities]
-        quantities = self.check_keys(*quantities)
-
-        keys = []
-        for qty in quantities:
-            # Key for the new quantity
-            qty = Key.from_str_or_key(qty)
-            new_key = ":".join([qty.name, tag])
-
-            # Dimensions to drop automatically
-            to_drop = set(drop) | set(qty.dims) & (
-                {"h", "y", "ya", "yr", "yv"} - {year_time_dim}
-            )
-
-            # Prepare the computation
-            comp = [
-                partial(
-                    computations.as_pyam,
-                    year_time_dim=year_time_dim,
-                    drop=to_drop,
-                    collapse=collapse,
-                    unit=unit,
-                ),
-                "scenario",
-                qty,
-            ]
-            if replace_vars:
-                comp.append(replace_vars)
-
-            # Add and store
-            self.add(new_key, tuple(comp))
-            keys.append(new_key)
-
-        return keys
-
-    # Use convert_pyam as a helper for computations.as_pyam
-    add_as_pyam = convert_pyam
-
-    def write(self, key, path):
-        """Compute *key* and write its value to the file at *path*.
-
-        In addition to the formats handled by :meth:`ixmp.Reporter.write`,
-        this version will write :class:`pyam.IamDataFrame` to CSV or Excel
-        files using built-in methods.
-        """
-        computations.write_report(self.get(key), path)
