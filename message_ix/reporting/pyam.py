@@ -1,7 +1,7 @@
 from typing import Callable
 
-from genno.compat.pyam import util
 import pandas as pd
+from genno.compat.pyam import util
 
 
 def collapse_message_cols(

@@ -8,13 +8,12 @@ from ixmp.reporting import (
     KeyExistsError,
     MissingKeyError,
     Quantity,
-    Reporter as IXMPReporter,
-    configure,
 )
+from ixmp.reporting import Reporter as IXMPReporter
+from ixmp.reporting import configure
 
 from . import computations
 from .pyam import collapse_message_cols
-
 
 __all__ = [
     "ComputationError",
