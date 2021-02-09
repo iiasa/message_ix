@@ -7,7 +7,7 @@ import pandas as pd
 def collapse_message_cols(
     df: pd.DataFrame, var: str = None, kind: str = None, var_cols=[]
 ) -> Callable:
-    """:meth:`as_pyam` `collapse=...` callback for MESSAGEix quantities.
+    """:func:`.as_pyam` `collapse=...` callback for MESSAGEix quantities.
 
     Wraps :func:`.collapse` with arguments particular to MESSAGEix.
 
