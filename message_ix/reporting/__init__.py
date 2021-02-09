@@ -2,16 +2,29 @@ import logging
 from functools import partial
 
 import genno
-from ixmp.reporting import Key, Reporter as IXMPReporter, configure
+from ixmp.reporting import (
+    ComputationError,
+    Key,
+    KeyExistsError,
+    MissingKeyError,
+    Quantity,
+    Reporter as IXMPReporter,
+    configure,
+)
 
 from . import computations
 from .pyam import collapse_message_cols
 
 
 __all__ = [
+    "ComputationError",
     "Key",
+    "KeyExistsError",
+    "MissingKeyError",
+    "Quantity",
     "Reporter",
     "configure",
+    "collapse_message_cols",
 ]
 
 log = logging.getLogger(__name__)

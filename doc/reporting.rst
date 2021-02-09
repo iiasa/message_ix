@@ -107,9 +107,13 @@ The following top-level objects from those packages may also be imported from
 .. autosummary::
 
    ~ixmp.reporting.reporter.Reporter
-   ~genno.config.configure
+   ~genno.core.exceptions.ComputationError
    ~genno.core.key.Key
+   ~genno.core.exceptions.KeyExistsError
+   ~genno.core.exceptions.MissingKeyError
    ~genno.core.quantity.Quantity
+   ~genno.config.configure
+
 
 The :meth:`ixmp.Reporter <ixmp.reporting.Reporter.from_scenario>` automatically adds keys based on the contents of the :class:`ixmp.Scenario` argument.
 The :class:`message_ix.reporting.Reporter` adds additional keys for **derived quantities** specific to the MESSAGEix model framework.
