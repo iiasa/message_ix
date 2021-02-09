@@ -80,7 +80,7 @@ jobs:
         MYPYPATH: "../ixmp/"
       # Also install packages that provide type hints
       run: |
-        pip install mypy sphinx
+        pip install mypy genno sphinx
         mypy .
 
     - name: Test package build
