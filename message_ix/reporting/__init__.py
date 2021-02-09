@@ -1,9 +1,7 @@
 import logging
 from functools import partial
-from typing import Callable
 
 import genno
-from genno.compat.pyam import util
 from ixmp.reporting import Key, Reporter as IXMPReporter, configure
 
 from . import computations
@@ -81,8 +79,8 @@ PRODUCTS = (
 
 #: Automatic quantities derived by other calculations.
 DERIVED = [
-    # Each entry is ('full key', (computation tuple,)). Full keys are not
-    # inferred and must be given explicitly.
+    # Each entry is ('full key', (computation tuple,)). Full keys are not inferred and
+    # must be given explicitly.
     ("tom:nl-t-yv-ya", (genno.computations.add, "fom:nl-t-yv-ya", "vom:nl-t-yv-ya")),
     # Broadcast from type_addon to technology_addon
     (
@@ -160,8 +158,7 @@ MAPPING_SETS = [
 class Reporter(IXMPReporter):
     """MESSAGEix Reporter."""
 
-    # Module containing predefined computations, including those defined in
-    # message_ix.reporting.computations
+    # Module containing predefined computations, including those defined by message_ix
     modules = list(IXMPReporter.modules) + [computations]
 
     @classmethod
@@ -179,11 +176,11 @@ class Reporter(IXMPReporter):
         # Invoke the ixmp method
         rep = super().from_scenario(scenario, **kwargs)
 
-        # Use a queue pattern via Reporter.add_queue(). This is more forgiving;
-        # e.g. 'addon ACT' from PRODUCTS depends on 'addon conversion::full';
-        # but the latter is added to the queue later (from DERIVED). Using
-        # strict=True below means that this will raise an exception; so the
-        # failed item is re-appended to the queue and tried 1 more time later.
+        # Use a queue pattern via Reporter.add_queue(). This is more forgiving; e.g.
+        # 'addon ACT' from PRODUCTS depends on 'addon conversion::full'; but the latter
+        # is added to the queue later (from DERIVED). Using strict=True below means
+        # that this will raise an exception; so the failed item is re-appended to the
+        # queue and tried 1 more time later.
 
         # Assemble queue of items to add. Each element is a 2-tuple:
         # - Positional arguments for Reporter.add();
@@ -208,18 +205,24 @@ class Reporter(IXMPReporter):
 
         # Conversions to IAMC format/pyam objects
         for qty, year_dim, collapse_kw in PYAM_CONVERT:
+            # Standard renaming from dimensions to column names
+            rename = dict(n="region", nl="region")
+            # Column to set as year or time dimension
+            rename[year_dim] = "year" if year_dim.lower().startswith("y") else "time"
+            # Callback function to further collapse other columns into IAMC columns
             collapse_cb = partial(collapse_message_cols, **collapse_kw)
-            put("as_pyam", qty, year_dim, "pyam", collapse=collapse_cb)
+
+            put("convert_pyam", qty, "pyam", rename=rename, collapse=collapse_cb)
 
         # Standard reports
         for group, pyam_keys in REPORTS.items():
-            put(group, rep._get_comp("concat"), *pyam_keys, strict=True)
+            put("concat", group, *pyam_keys, strict=True)
 
         # Add all standard reporting to the default message node
-        put("message:default", rep._get_comp("concat"), *REPORTS.keys(), strict=True)
+        put("concat", "message:default", *REPORTS.keys(), strict=True)
 
-        # Use ixmp.Reporter.add_queue() to process the entries. Retry at most
-        # once; raise an exception if adding fails after that.
+        # Use ixmp.Reporter.add_queue() to process the entries. Retry at most once;
+        # raise an exception if adding fails after that.
         rep.add_queue(to_add, max_tries=2, fail="raise")
 
         return rep
