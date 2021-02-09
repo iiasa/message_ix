@@ -18,7 +18,7 @@ def test_as_pyam(message_test_mp):
     qty = rep.get(rep.full_key("ACT"))
 
     # Call as_pyam() with an empty quantity
-    as_pyam = rep._get_comp("as_pyam")
+    as_pyam = rep.get_comp("as_pyam")
     p = as_pyam(scen, qty[0:0], rename=dict(nl="region", ya="year"))
     assert isinstance(p, pyam.IamDataFrame)
 

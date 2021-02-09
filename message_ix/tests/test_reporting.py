@@ -71,7 +71,7 @@ def test_reporter_from_scenario(message_test_mp):
     # …and expected values
     var_cost = rep.get(rep.full_key("var_cost"))
     ACT = rep.get(rep.full_key("ACT"))
-    product = rep._get_comp("product")
+    product = rep.get_comp("product")
     vom = product(var_cost, ACT)
     # check_attrs false because `vom` multiply above does not add units
     assert_qty_equal(vom, rep.get(vom_key))
@@ -135,7 +135,7 @@ def test_reporter_from_westeros(test_mp):
 
 def test_reporter_convert_pyam(dantzig_reporter, caplog, tmp_path):
     rep = dantzig_reporter
-    as_pyam = rep._get_comp("as_pyam")
+    as_pyam = rep.get_comp("as_pyam")
 
     # Key for 'ACT' variable at full resolution
     ACT = rep.full_key("ACT")
