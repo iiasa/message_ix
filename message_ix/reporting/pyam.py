@@ -1,10 +1,12 @@
-from functools import partial
 from typing import Callable
 
 from genno.compat.pyam import util
+import pandas as pd
 
 
-def collapse_message_cols(var: str = None, kind: str = None, var_cols=[]) -> Callable:
+def collapse_message_cols(
+    df: pd.DataFrame, var: str = None, kind: str = None, var_cols=[]
+) -> Callable:
     """:meth:`as_pyam` `collapse=...` callback for MESSAGEix quantities.
 
     Wraps :func:`.collapse` with arguments particular to MESSAGEix.
@@ -35,4 +37,4 @@ def collapse_message_cols(var: str = None, kind: str = None, var_cols=[]) -> Cal
     else:
         columns["variable"].extend(["t"] + var_cols)
 
-    return partial(util.collapse, columns=columns, sep="|")
+    return util.collapse(df, columns=columns, sep="|")
