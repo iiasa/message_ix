@@ -4,7 +4,7 @@ Next release
 All changes
 -----------
 
-
+- :pull:`441`: Adjust :mod:`message_ix.reporting` to use :mod:`genno` / :mod:`ixmp.reporting` changes in `ixmp PR #397 <https://github.com/iiasa/ixmp/pull/397`_.
 
 v3.2.0 (2021-01-24)
 ===================
