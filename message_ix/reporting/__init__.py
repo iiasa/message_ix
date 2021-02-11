@@ -188,6 +188,9 @@ class Reporter(IXMPReporter):
         # Invoke the ixmp method
         rep = super().from_scenario(scenario, **kwargs)
 
+        # Ensure that genno.compat.pyam is usable
+        rep.require_compat("pyam")
+
         # Use a queue pattern via Reporter.add_queue(). This is more forgiving; e.g.
         # 'addon ACT' from PRODUCTS depends on 'addon conversion::full'; but the latter
         # is added to the queue later (from DERIVED). Using strict=True below means
