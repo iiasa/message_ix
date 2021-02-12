@@ -28,51 +28,50 @@ __all__ = [
 
 log = logging.getLogger(__name__)
 
-
-# Adjust the ixmp default reporting for MESSAGEix
-configure(
-    # Units appearing in MESSAGEix test data
-    units={
-        "define": "y = year",
-    },
-    # Short names for dimensions
-    rename_dims={
-        # As defined in the documentation
-        "commodity": "c",
-        "emission": "e",
-        "grade": "g",
-        "land_scenario": "s",
-        "land_type": "u",
-        "level": "l",
-        "mode": "m",
-        "node": "n",
-        "rating": "q",
-        "relation": "r",
-        "technology": "t",
-        "time": "h",
-        "year": "y",
-        # Aliases
-        "node_dest": "nd",
-        "node_loc": "nl",
-        "node_origin": "no",
-        "node_rel": "nr",
-        "node_share": "ns",
-        "time_dest": "hd",
-        "time_origin": "ho",
-        "year_act": "ya",
-        "year_vtg": "yv",
-        "year_rel": "yr",
-        # Created by reporting
-        "technology_addon": "ta",
-        "technology_primary": "tp",
-    },
+#: Short names for dimensions (sets) in the |MESSAGEix| framework.
+DIMS = dict(
+    # As defined in the documentation
+    commodity="c",
+    emission="e",
+    grade="g",
+    land_scenario="s",
+    land_type="u",
+    level="l",
+    mode="m",
+    node="n",
+    rating="q",
+    relation="r",
+    technology="t",
+    time="h",
+    year="y",
+    # Aliases
+    node_dest="nd",
+    node_loc="nl",
+    node_origin="no",
+    node_rel="nr",
+    node_share="ns",
+    time_dest="hd",
+    time_origin="ho",
+    year_act="ya",
+    year_vtg="yv",
+    year_rel="yr",
+    # Created by reporting
+    technology_addon="ta",
+    technology_primary="tp",
 )
 
-#: Automatic quantities that are the :meth:`~computations.product` of two
-#: others.
+# Configure genno for message_ix.
+configure(
+    # Units appearing in MESSAGEix test data
+    units={"define": "y = year"},
+    # Short names for dimensions
+    rename_dims=DIMS.copy(),
+)
+
+#: Automatic quantities that are the :meth:`~computations.product` of two others.
 PRODUCTS = (
-    # Each entry is ('output key', ('quantities', 'to', 'multiply')). Full keys
-    # are inferred automatically, by add_product().
+    # Each entry is ('output key', ('quantities', 'to', 'multiply')). Full keys are
+    # inferred automatically, by add_product().
     ("out", ("output", "ACT")),
     ("in", ("input", "ACT")),
     ("rel", ("relation_activity", "ACT")),
