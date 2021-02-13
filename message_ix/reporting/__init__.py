@@ -174,15 +174,28 @@ class Reporter(IXMPReporter):
 
     @classmethod
     def from_scenario(cls, scenario, **kwargs):
-        """Create a Reporter by introspecting *scenario*.
+        """Create a Reporter by introspecting `scenario`.
+
+        Warnings are logged if `scenario` does not have a solution. In this case, any
+        keys/computations based on model output (ixmp variables and equations) may
+        return an empty Quantity, fail, or behave unpredictably. Keys/computations
+        based only on model input (ixmp sets and parameters) should function normally.
 
         Returns
         -------
         message_ix.reporting.Reporter
-            A reporter for *scenario*.
+            A reporter for `scenario`.
         """
-        if not scenario.has_solution():
-            raise RuntimeError("Scenario must have a solution to be reported")
+        solved = scenario.has_solution()
+
+        if not solved:
+            log.warning(
+                f'Scenario "{scenario.model}/{scenario.scenario}" has no solution'
+            )
+            log.warning("Some reporting may not function as expected")
+            fail_action = logging.DEBUG
+        else:
+            fail_action = "raise"
 
         # Invoke the ixmp method
         rep = super().from_scenario(scenario, **kwargs)
@@ -235,8 +248,7 @@ class Reporter(IXMPReporter):
         # Add all standard reporting to the default message node
         put("concat", "message:default", *REPORTS.keys(), strict=True)
 
-        # Use ixmp.Reporter.add_queue() to process the entries. Retry at most once;
-        # raise an exception if adding fails after that.
-        rep.add_queue(to_add, max_tries=2, fail="raise")
+        # Use Computer.add_queue() to process the entries. Retry at most once.
+        rep.add_queue(to_add, max_tries=2, fail=fail_action)
 
         return rep

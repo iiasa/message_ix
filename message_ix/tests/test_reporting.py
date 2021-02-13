@@ -5,11 +5,11 @@ from pathlib import Path
 
 import pandas as pd
 import pyam
-import pytest
 import xarray as xr
 from genno import Quantity
 from genno.testing import assert_qty_equal
 from ixmp.reporting import Reporter as ixmp_Reporter
+from ixmp.testing import assert_logs
 from numpy.testing import assert_allclose
 from pandas.testing import assert_frame_equal, assert_series_equal
 
@@ -18,10 +18,22 @@ from message_ix.reporting import Reporter, configure
 from message_ix.testing import SCENARIO, make_dantzig, make_westeros
 
 
-def test_reporter_no_solution(message_test_mp):
+def test_reporter_no_solution(caplog, message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
-    pytest.raises(RuntimeError, Reporter.from_scenario, scen)
+    with assert_logs(
+        caplog,
+        [
+            'Scenario "Canning problem (MESSAGE scheme)/standard" has no solution',
+            "Some reporting may not function as expected",
+        ],
+    ):
+        rep = Reporter.from_scenario(scen)
+
+    # Input parameters are still available
+    demand = rep.full_key("demand")
+    result = rep.get(demand)
+    assert 3 == len(result)
 
 
 def test_reporter_from_scenario(message_test_mp):
