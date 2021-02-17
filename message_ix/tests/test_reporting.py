@@ -1,29 +1,42 @@
+import logging
+import re
 from functools import partial
-from logging import WARNING
 from pathlib import Path
 
 import pandas as pd
 import pyam
-import pytest
 import xarray as xr
-from ixmp.reporting import Quantity
+from genno import Quantity
+from genno.testing import assert_qty_equal
 from ixmp.reporting import Reporter as ixmp_Reporter
-from ixmp.testing import assert_qty_equal
+from ixmp.testing import assert_logs
 from numpy.testing import assert_allclose
 from pandas.testing import assert_frame_equal, assert_series_equal
 
 from message_ix import Scenario
-from message_ix.reporting import Reporter, computations, configure
+from message_ix.reporting import Reporter, configure
 from message_ix.testing import SCENARIO, make_dantzig, make_westeros
 
 
-def test_reporter_no_solution(message_test_mp):
+def test_reporter_no_solution(caplog, message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
-    pytest.raises(RuntimeError, Reporter.from_scenario, scen)
+    with assert_logs(
+        caplog,
+        [
+            'Scenario "Canning problem (MESSAGE scheme)/standard" has no solution',
+            "Some reporting may not function as expected",
+        ],
+    ):
+        rep = Reporter.from_scenario(scen)
+
+    # Input parameters are still available
+    demand = rep.full_key("demand")
+    result = rep.get(demand)
+    assert 3 == len(result)
 
 
-def test_reporter(message_test_mp):
+def test_reporter_from_scenario(message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
     # Varies between local & CI contexts
@@ -70,7 +83,8 @@ def test_reporter(message_test_mp):
     # …and expected values
     var_cost = rep.get(rep.full_key("var_cost"))
     ACT = rep.get(rep.full_key("ACT"))
-    vom = computations.product(var_cost, ACT)
+    product = rep.get_comp("product")
+    vom = product(var_cost, ACT)
     # check_attrs false because `vom` multiply above does not add units
     assert_qty_equal(vom, rep.get(vom_key))
 
@@ -133,19 +147,16 @@ def test_reporter_from_westeros(test_mp):
 
 def test_reporter_convert_pyam(dantzig_reporter, caplog, tmp_path):
     rep = dantzig_reporter
+    as_pyam = rep.get_comp("as_pyam")
 
     # Key for 'ACT' variable at full resolution
     ACT = rep.full_key("ACT")
 
-    # Add a computation that converts ACT to a pyam.IamDataFrame
-    rep.add(
-        "ACT IAMC",
-        (
-            partial(computations.as_pyam, drop=["yv"], year_time_dim="ya"),
-            "scenario",
-            ACT,
-        ),
-    )
+    # Mapping from dimension IDs to column names
+    rename = dict(nl="region", ya="year")
+
+    # Add a task that converts ACT to a pyam.IamDataFrame
+    rep.add("ACT IAMC", (partial(as_pyam, rename=rename, drop=["yv"]), "scenario", ACT))
 
     # Result is an IamDataFrame
     idf1 = rep.get("ACT IAMC")
@@ -158,8 +169,8 @@ def test_reporter_convert_pyam(dantzig_reporter, caplog, tmp_path):
     assert idf1["variable"].unique() == "ACT"
 
     # Warning was logged because of extra columns
-    w = "Extra columns ['h', 'm', 't'] when converting 'ACT' to IAMC format"
-    assert ("message_ix.reporting.pyam", WARNING, w) in caplog.record_tuples
+    w = "Extra columns ['h', 'm', 't'] when converting to IAMC format"
+    assert ("genno.compat.pyam.util", logging.INFO, w) in caplog.record_tuples
 
     # Repeat, using the message_ix.Reporter convenience function
     def add_tm(df, name="Activity"):
@@ -168,12 +179,10 @@ def test_reporter_convert_pyam(dantzig_reporter, caplog, tmp_path):
         return df.drop(["t", "m"], axis=1)
 
     # Use the convenience function to add the node
-    keys = rep.convert_pyam(ACT, "ya", collapse=add_tm)
+    key2 = rep.convert_pyam(ACT, "iamc", rename=rename, collapse=add_tm)
 
     # Keys of added node(s) are returned
-    assert len(keys) == 1
-    key2, *_ = keys
-    assert key2 == ACT.name + ":iamc"
+    assert ACT.name + ":iamc" == key2
 
     caplog.clear()
 
@@ -211,10 +220,10 @@ def test_reporter_convert_pyam(dantzig_reporter, caplog, tmp_path):
     assert path.read_text() == expected.read_text()
 
     # Use a name map to replace variable names
-    rep.add("activity variables", {"Activity|canning_plant|production": "Foo"})
+    replacements = {re.escape("Activity|canning_plant|production"): "Foo"}
     key3 = rep.convert_pyam(
-        ACT, "ya", replace_vars="activity variables", collapse=add_tm
-    ).pop()
+        ACT, rename=rename, replace=dict(variable=replacements), collapse=add_tm
+    )
     df3 = rep.get(key3).as_pandas()
 
     # Values are the same; different names
@@ -225,14 +234,16 @@ def test_reporter_convert_pyam(dantzig_reporter, caplog, tmp_path):
 
     # Now convert variable cost
     cb = partial(add_tm, name="Variable cost")
-    key4 = rep.convert_pyam("var_cost", "ya", collapse=cb).pop()
+    key4 = rep.convert_pyam("var_cost", rename=rename, collapse=cb)
     df4 = rep.get(key4).as_pandas().drop(["model", "scenario"], axis=1)
 
     # Results have the expected units
     assert all(df4["unit"] == "USD / case")
 
     # Also change units
-    key5 = rep.convert_pyam("var_cost", "ya", collapse=cb, unit="centiUSD / case").pop()
+    key5 = rep.convert_pyam(
+        "var_cost", rename=rename, collapse=cb, unit="centiUSD / case"
+    )
     df5 = rep.get(key5).as_pandas().drop(["model", "scenario"], axis=1)
 
     # Results have the expected units

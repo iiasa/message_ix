@@ -38,7 +38,7 @@ jobs:
         exclude:
         # See https://github.com/iiasa/ixmp/issues/360
         - os: windows-latest
-          python-version: '3.6'
+          python-version: "3.6"
 
       fail-fast: false
 
@@ -46,10 +46,19 @@ jobs:
     name: ${{ matrix.os }}-py${{ matrix.python-version }}
 
     steps:
+    - name: Cancel previous runs that have not completed
+      uses: styfle/cancel-workflow-action@0.7.0
+      with:
+        access_token: ${{ github.token }}
+
     - name: Check out ixmp
       uses: actions/checkout@v2
       with:
         repository: iiasa/ixmp
+        # For PRs that depend on an ixmp PR branch, uncomment the following 2
+        # lines and adjust to suit:
+        # repository: USERNAME/ixmp
+        # ref: issue/999
         path: ixmp
         fetch-depth: ${{ env.depth }}
 
@@ -136,6 +145,9 @@ jobs:
       shell: Rscript {0}
 
     - name: Run test suite using pytest
+      env:
+        # For test_cli.test_dl; see code in message_ix.cli.dl
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       working-directory: message_ix
       run: pytest message_ix -m "not nightly" --verbose --cov-report=xml --color=yes
 
@@ -156,18 +168,6 @@ jobs:
       run: make --directory=doc html
 
     - name: Upload test coverage to Codecov.io
-
-      # NB would prefer to use Codecov's Action here, but it does not support
-      #    checkouts where 'path:' is used. See
-      #    https://github.com/codecov/codecov-action/pull/110
-      # uses: codecov/codecov-action@v1
-      # with:
-      #   working-directory: message_ix
-
-      # Manually download and run the codecov script in the message_ix directory
-      run: |
-        curl -o codecov.sh https://codecov.io/bash
-        chmod +x codecov.sh
-        ./codecov.sh
-      working-directory: message_ix
-      shell: bash
+      uses: codecov/codecov-action@v1.2.1
+      with:
+        root_dir: message_ix
