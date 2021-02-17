@@ -168,18 +168,6 @@ jobs:
       run: make --directory=doc html
 
     - name: Upload test coverage to Codecov.io
-
-      # NB would prefer to use Codecov's Action here, but it does not support
-      #    checkouts where 'path:' is used. See
-      #    https://github.com/codecov/codecov-action/pull/110
-      # uses: codecov/codecov-action@v1
-      # with:
-      #   working-directory: message_ix
-
-      # Manually download and run the codecov script in the message_ix directory
-      run: |
-        curl -o codecov.sh https://codecov.io/bash
-        chmod +x codecov.sh
-        ./codecov.sh
-      working-directory: message_ix
-      shell: bash
+      uses: codecov/codecov-action@v1.2.1
+      with:
+        root_dir: message_ix
