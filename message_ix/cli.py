@@ -1,11 +1,4 @@
-import json
-import os
-import tempfile
-import zipfile
-from base64 import b64encode
 from pathlib import Path
-from shutil import copyfile
-from urllib.request import Request, urlopen
 
 import click
 import ixmp
@@ -41,6 +34,8 @@ def copy_model(path, overwrite, set_default):
 
         $ message-ix config set "message model dir" PATH
     """
+    from shutil import copyfile
+
     path = Path(path).resolve()
 
     src_dir = Path(__file__).parent / "model"
@@ -87,6 +82,12 @@ def dl(branch, tag, path):
 
     PATH is a local directory where to store the tutorial notebooks.
     """
+    import json
+    import os
+    import tempfile
+    import zipfile
+    from urllib.request import Request, urlopen
+
     if tag and branch:
         raise click.BadOptionUsage("Can only provide one of `tag` or `branch`")
     elif branch:
@@ -99,17 +100,13 @@ def dl(branch, tag, path):
             url="https://api.github.com/repos/iiasa/message_ix/tags",
             headers=dict(),
         )
-        # GitHub's API rate limits unathenticated requests by IP address. On
-        # some CI services (e.g. Travis macOS), the build worker/runner re-uses
-        # an address, so the limit can sometimes be exceeded and the request
-        # fails. This (unadvertised) code uses HTTP Basic Auth with an
-        # encrypted username and password from environment variables to avoid
-        # the rate limit.
+
+        # The API rate-limits unathenticated requests by IP address. In some CI
+        # environments (including the macOS on GitHub Actions), the build worker/runner
+        # re-uses an address, so the limit can be exceeded and the request fails.
+        # This (unadvertised) code uses a GitHub API token to avoid the rate limit.
         try:
-            auth_bytes = b64encode(
-                "{MESSAGE_IX_GH_USER}:{MESSAGE_IX_GH_PW}".format(**os.environ).encode()
-            )
-            args["headers"]["Authorization"] = f"Basic {auth_bytes.decode()}"
+            args["headers"]["authorization"] = f"Bearer {os.environ['GITHUB_TOKEN']}"
         except KeyError:
             pass  # Variables not set
 

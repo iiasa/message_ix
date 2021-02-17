@@ -145,6 +145,9 @@ jobs:
       shell: Rscript {0}
 
     - name: Run test suite using pytest
+      env:
+        # For test_cli.test_dl; see code in message_ix.cli.dl
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       working-directory: message_ix
       run: pytest message_ix -m "not nightly" --verbose --cov-report=xml --color=yes
 
