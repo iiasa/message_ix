@@ -2,6 +2,9 @@ version: 2
 
 python:
   install:
+  # Install ixmp from latest `master`
+  - method: pip
+    path: git+https://github.com/iiasa/ixmp.git@master#egg=ixmp
   - method: pip
     path: .
     extra_requirements: [docs]
