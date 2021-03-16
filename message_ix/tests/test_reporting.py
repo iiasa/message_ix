@@ -145,7 +145,9 @@ def test_reporter_from_westeros(test_mp):
     assert_allclose(obs, exp)
 
 
-def test_reporter_convert_pyam(dantzig_reporter, caplog, tmp_path):
+def test_reporter_convert_pyam(caplog, tmp_path, dantzig_reporter):
+    caplog.set_level(logging.INFO)
+
     rep = dantzig_reporter
     as_pyam = rep.get_comp("as_pyam")
 
