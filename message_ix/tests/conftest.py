@@ -7,14 +7,6 @@ from click.testing import CliRunner
 import message_ix
 from message_ix.testing import SCENARIO, make_dantzig
 
-# Hooks
-
-
-def pytest_report_header(config, startdir):
-    """Add the message_ix import path to the pytest report header."""
-    return "message_ix location: {}".format(Path(message_ix.__file__).parent)
-
-
 # Fixtures
 
 
