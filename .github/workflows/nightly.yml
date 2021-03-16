@@ -1,4 +1,4 @@
-name: nightly
+name: Test MESSAGEix-GLOBIOM scenarios
 # This workflow is a stripped-down version of pytest.yaml, with multi-OS
 # features removed.
 
