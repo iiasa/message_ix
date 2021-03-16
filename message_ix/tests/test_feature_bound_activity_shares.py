@@ -14,7 +14,7 @@ def calculate_activity(scen, tec="transport_from_seattle"):
 
 def test_add_bound_activity_up(message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone()
-    scen.solve()
+    scen.solve(quiet=True)
 
     # data for act bound
     exp = 0.5 * calculate_activity(scen).sum()
@@ -47,7 +47,7 @@ def test_add_bound_activity_up(message_test_mp):
 
 def test_add_bound_activity_up_all_modes(message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone()
-    scen.solve()
+    scen.solve(quiet=True)
 
     # data for act bound
     exp = 0.95 * calculate_activity(scen).sum()
@@ -146,7 +146,7 @@ def test_commodity_share_up(message_test_mp):
 
     # initial data
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone()
-    scen.solve()
+    scen.solve(quiet=True)
     exp = 0.5
 
     # check shares orig, should be bigger than expected bound
@@ -288,7 +288,7 @@ def test_share_commodity_lo(message_test_mp):
 
 def test_add_share_mode_up(message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone()
-    scen.solve()
+    scen.solve(quiet=True)
 
     # data for share bound
     def calc_share(s):
@@ -330,7 +330,7 @@ def test_add_share_mode_up(message_test_mp):
 
 def test_add_share_mode_lo(message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone()
-    scen.solve()
+    scen.solve(quiet=True)
 
     # data for share bound
     def calc_share(s):

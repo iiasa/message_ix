@@ -42,7 +42,7 @@ def test_reporter_from_scenario(message_test_mp):
     # Varies between local & CI contexts
     # DEBUG may be due to reuse of test_mp in a non-deterministic order
     if not scen.has_solution():
-        scen.solve()
+        scen.solve(quiet=True)
 
     # IXMPReporter can be initialized on a MESSAGE Scenario
     rep_ix = ixmp_Reporter.from_scenario(scen)
@@ -90,7 +90,7 @@ def test_reporter_from_scenario(message_test_mp):
 
 
 def test_reporter_from_dantzig(test_mp):
-    scen = make_dantzig(test_mp, solve=True)
+    scen = make_dantzig(test_mp, solve=True, quiet=True)
 
     # Reporter.from_scenario can handle Dantzig example model
     rep = Reporter.from_scenario(scen)
@@ -100,7 +100,7 @@ def test_reporter_from_dantzig(test_mp):
 
 
 def test_reporter_from_westeros(test_mp):
-    scen = make_westeros(test_mp, emissions=True, solve=True)
+    scen = make_westeros(test_mp, emissions=True, solve=True, quiet=True)
 
     # Reporter.from_scenario can handle Westeros example model
     rep = Reporter.from_scenario(scen)

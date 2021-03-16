@@ -66,7 +66,7 @@ def dantzig_reporter(message_test_mp, ureg):
     scen = message_ix.Scenario(message_test_mp, **SCENARIO["dantzig"])
 
     if not scen.has_solution():
-        scen.solve()
+        scen.solve(quiet=True)
 
     rep = message_ix.Reporter.from_scenario(scen)
 
