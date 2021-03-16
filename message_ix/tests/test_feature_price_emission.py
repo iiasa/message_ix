@@ -66,7 +66,7 @@ def test_no_constraint(test_mp):
     scen = Scenario(test_mp, MODEL, "no_constraint", version="new")
     model_setup(scen, [2020, 2030])
     scen.commit("initialize test scenario")
-    scen.solve()
+    scen.solve(quiet=True)
 
     # without emissions constraint, the zero-cost technology satisfies demand
     assert scen.var("OBJ")["lvl"] == 0

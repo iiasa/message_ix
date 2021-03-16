@@ -57,5 +57,5 @@ def test_testing_make_scenario(test_mp):
     assert isinstance(scen, Scenario)
 
     # Westeros model can be created
-    scen = make_westeros(test_mp, True)
+    scen = make_westeros(test_mp, solve=True)
     assert isinstance(scen, Scenario)

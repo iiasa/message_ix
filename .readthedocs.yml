@@ -3,8 +3,7 @@ version: 2
 python:
   install:
   # Install ixmp from latest `master`
-  - method: pip
-    path: git+https://github.com/iiasa/ixmp.git@master#egg=ixmp
+  - requirements: ci/rtd-requirements.txt
   - method: pip
     path: .
     extra_requirements: [docs]

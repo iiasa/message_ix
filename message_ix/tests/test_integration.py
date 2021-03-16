@@ -38,7 +38,7 @@ def test_run_clone(tmpdir):
 
 def test_run_remove_solution(test_mp):
     # create a new instance of the transport problem and solve it
-    scen = make_dantzig(test_mp, solve=True)
+    scen = make_dantzig(test_mp, solve=True, quiet=True)
     assert np.isclose(scen.var("OBJ")["lvl"], 153.675)
 
     # check that re-solving the model will raise an error if a solution exists
@@ -56,7 +56,7 @@ def test_run_remove_solution(test_mp):
 
 
 def test_shift_first_model_year(test_mp):
-    scen = make_dantzig(test_mp, solve=True, multi_year=True)
+    scen = make_dantzig(test_mp, solve=True, multi_year=True, quiet=True)
 
     # assert that `historical_activity` is empty in the source scenario
     assert scen.par("historical_activity").empty
@@ -87,7 +87,7 @@ def assert_multi_db(mp1, mp2):
 def test_multi_db_run(tmpdir):
     # create a new instance of the transport problem and solve it
     mp1 = Platform(driver="hsqldb", path=tmpdir / "mp1")
-    scen1 = make_dantzig(mp1, solve=True)
+    scen1 = make_dantzig(mp1, solve=True, quiet=True)
 
     mp2 = Platform(driver="hsqldb", path=tmpdir / "mp2")
     # add other unit to make sure that the mapping is correct during clone

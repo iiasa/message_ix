@@ -44,7 +44,7 @@ class MockScenario:
 
 @pytest.fixture(scope="class")
 def westeros_solved(test_mp):
-    yield make_westeros(test_mp, solve=True)
+    yield make_westeros(test_mp, solve=True, quiet=True)
 
 
 @pytest.fixture(scope="class")
@@ -158,7 +158,7 @@ def test_init(message_test_mp):
     scen.check_out()
     MACRO.initialize(scen)
     scen.commit("foo")
-    scen.solve()
+    scen.solve(quiet=True)
 
     assert np.isclose(scen.var("OBJ")["lvl"], 153.675)
     assert "mapping_macro_sector" in scen.set_list()

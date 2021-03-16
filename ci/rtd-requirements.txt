@@ -1,0 +1,1 @@
+git+https://github.com/iiasa/ixmp.git@master#egg=ixmp
