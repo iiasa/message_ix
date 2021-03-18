@@ -110,7 +110,8 @@ uses it to illustrate a range of framework features.
    #. Add-on technologies: Add the possibility of co-generation for the coal
       power plant, by allowing it to produce heat via a passout-turbine
       (:tut:`westeros/westeros_addon_technologies.ipynb`).
-
+   #. Build the baseline scenario using data stored in xlsx files to populate sets and
+      parameters (`westeros_baseline_using_xlsx_import.ipynb`_).
 #. After the MESSAGE model has solved, use the :mod:`.message_ix.reporting`
    module to ‘report’ results, e.g. do post-processing, plotting, and other
    calculations (:tut:`westeros/westeros_report.ipynb`).
