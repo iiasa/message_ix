@@ -52,11 +52,13 @@ tutorials = [
 ids = [arg[0][-1] for arg in tutorials]
 
 # List of data files required to run tutorials
-data_files = ["westeroes_baseline_demand.xlsx",
-              "westeroes_baseline_technology_basic.xlsx",
-              "westeroes_baseline_technology_constraint.xlsx",
-              "westeroes_baseline_technology_economic.xlsx",
-              "westeroes_baseline_technology_historic.xlsx"]
+data_files = [
+    "westeroes_baseline_demand.xlsx",
+    "westeroes_baseline_technology_basic.xlsx",
+    "westeroes_baseline_technology_constraint.xlsx",
+    "westeroes_baseline_technology_economic.xlsx",
+    "westeroes_baseline_technology_historic.xlsx",
+]
 
 
 @pytest.fixture
