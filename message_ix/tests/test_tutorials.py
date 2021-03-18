@@ -23,6 +23,7 @@ tutorials = [
         [("solve-objective-value", 369297.75)],
         {},
     ),
+    (("westeros", "westeros_baseline_using_xlsx_import"), [], {}),
     (("westeros", "westeros_emissions_bounds"), [], {}),
     (("westeros", "westeros_emissions_taxes"), [], {}),
     (("westeros", "westeros_firm_capacity"), [], {}),
