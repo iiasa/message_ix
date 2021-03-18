@@ -1,4 +1,5 @@
 import sys
+from shutil import copyfile
 
 import numpy as np
 import pytest
@@ -50,6 +51,13 @@ tutorials = [
 # Short, readable IDs for the tests
 ids = [arg[0][-1] for arg in tutorials]
 
+# List of data files required to run tutorials
+data_files = ["westeroes_baseline_demand.xlsx",
+              "westeroes_baseline_technology_basic.xlsx",
+              "westeroes_baseline_technology_constraint.xlsx",
+              "westeroes_baseline_technology_economic.xlsx",
+              "westeroes_baseline_technology_historic.xlsx"]
+
 
 @pytest.fixture
 def nb_path(request, tutorial_path):
@@ -76,6 +84,10 @@ def test_tutorial(nb_path, cell_values, run_args, tmp_path, tmp_env):
     tmp_env["PYTHONPATH"] = path_sep.join(
         [str(nb_path.parent), tmp_env.get("PYTHONPATH", "")]
     )
+
+    # Copy necessary data files to tmp_path
+    for fil in data_files:
+        copyfile(f"{str(nb_path.parent)}\\{fil}", f"{tmp_path}\\{fil}")
 
     # The notebook can be run without errors
     nb, errors = run_notebook(nb_path, tmp_path, tmp_env, **run_args)
