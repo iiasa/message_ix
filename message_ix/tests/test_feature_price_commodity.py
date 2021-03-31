@@ -1,8 +1,6 @@
-from subprocess import CalledProcessError
-
 import pytest
 
-from message_ix import Scenario
+from message_ix import ModelError, Scenario
 
 
 def model_setup(scen, var_cost=1):
@@ -37,7 +35,8 @@ def test_commodity_price_equality(test_mp):
     scen.commit("initialize test model with negative variable costs")
 
     # negative variable costs and supply >= demand causes an unbounded ray
-    pytest.raises(CalledProcessError, scen.solve)
+    with pytest.raises(ModelError, match="GAMS errored with return code 3"):
+        scen.solve(quiet=True)
 
     # use the commodity-balance equality feature
     scen.check_out()

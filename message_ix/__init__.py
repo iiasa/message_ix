@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-from ixmp import config
+from ixmp import ModelError, config
 from ixmp.model import MODELS
 from pkg_resources import DistributionNotFound, get_distribution
 
@@ -15,8 +15,9 @@ __all__ = [
     "MESSAGE",
     "MESSAGE_MACRO",
     "MODELS",
-    "Scenario",
+    "ModelError",
     "Reporter",
+    "Scenario",
     "config",
     "make_df",
 ]

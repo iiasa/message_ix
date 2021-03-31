@@ -1,4 +1,4 @@
-name: nightly
+name: Test MESSAGEix-GLOBIOM scenarios
 # This workflow is a stripped-down version of pytest.yaml, with multi-OS
 # features removed.
 
@@ -71,4 +71,4 @@ jobs:
         MESSAGE_IX_CI_USER: ${{ secrets.ENE_DATA_USER }}
         MESSAGE_IX_CI_PW: ${{ secrets.ENE_DATA_PASS }}
       working-directory: message_ix
-      run: pytest message_ix -m nightly --verbose
+      run: pytest message_ix -m nightly -rA --verbose

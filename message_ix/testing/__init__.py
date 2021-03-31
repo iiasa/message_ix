@@ -88,7 +88,7 @@ cfl                  0.0  0.1   10   900
 )
 
 
-def make_austria(mp, solve=False):
+def make_austria(mp, solve=False, quiet=True):
     """Return an :class:`message_ix.Scenario` for the Austrian energy system.
 
     This is the same model used in the ``austria.ipynb`` tutorial.
@@ -262,7 +262,7 @@ def make_austria(mp, solve=False):
     scen.set_as_default()
 
     if solve:
-        scen.solve()
+        scen.solve(quiet=quiet)
 
     return scen
 
@@ -413,6 +413,7 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
     scen.set_as_default()
 
     if solve:
+        solve_opts.setdefault("quiet", True)
         scen.solve(**solve_opts)
 
     scen.check_out(timeseries_only=True)
@@ -423,7 +424,7 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
     return scen
 
 
-def make_westeros(mp, emissions=False, solve=False):
+def make_westeros(mp, emissions=False, solve=False, quiet=True):
     """Return an :class:`message_ix.Scenario` for the Westeros model.
 
     This is the same model used in the ``westeros_baseline.ipynb`` tutorial.
@@ -585,6 +586,6 @@ def make_westeros(mp, emissions=False, solve=False):
         scen.commit("Added emissions sets/params to Westeros model.")
 
     if solve:
-        scen.solve()
+        scen.solve(quiet=quiet)
 
     return scen
