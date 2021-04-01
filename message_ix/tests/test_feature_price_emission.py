@@ -82,7 +82,7 @@ def test_cumulative_equidistant(test_mp):
     scen.add_cat("year", "cumulative", years)
     scen.add_par("bound_emission", ["World", "ghg", "all", "cumulative"], 0, "tCO2")
     scen.commit("initialize test scenario")
-    scen.solve()
+    scen.solve(quiet=True)
 
     # with emissions constraint, the technology with costs satisfies demand
     assert scen.var("OBJ")["lvl"] > 0
@@ -101,7 +101,7 @@ def test_per_period_equidistant(test_mp):
         scen.add_cat("year", y, y)
         scen.add_par("bound_emission", ["World", "ghg", "all", y], 0, "tCO2")
     scen.commit("initialize test scenario")
-    scen.solve()
+    scen.solve(quiet=True)
 
     # with emissions constraint, the technology with costs satisfies demand
     assert scen.var("OBJ")["lvl"] > 0
@@ -118,7 +118,7 @@ def test_cumulative_variable_periodlength(test_mp):
     scen.add_cat("year", "cumulative", years)
     scen.add_par("bound_emission", ["World", "ghg", "all", "cumulative"], 0, "tCO2")
     scen.commit("initialize test scenario")
-    scen.solve()
+    scen.solve(quiet=True)
 
     # with an emissions constraint, the technology with costs satisfies demand
     assert scen.var("OBJ")["lvl"] > 0
@@ -137,7 +137,7 @@ def test_per_period_variable_periodlength(test_mp):
         scen.add_cat("year", y, y)
         scen.add_par("bound_emission", ["World", "ghg", "all", y], 0, "tCO2")
     scen.commit("initialize test scenario")
-    scen.solve()
+    scen.solve(quiet=True)
 
     # with an emissions constraint, the technology with costs satisfies demand
     assert scen.var("OBJ")["lvl"] > 0
@@ -156,7 +156,7 @@ def test_custom_type_variable_periodlength(test_mp):
     scen.add_par("bound_emission", ["World", "ghg", "all", "custom"], 0, "tCO2")
 
     scen.commit("initialize test scenario")
-    scen.solve()
+    scen.solve(quiet=True)
 
     # with an emissions constraint, the technology with costs satisfies demand
     assert scen.var("OBJ")["lvl"] > 0
@@ -177,7 +177,7 @@ def test_price_duality(test_mp):
             "bound_emission", ["World", "ghg", "all", "cumulative"], 0.5, "tCO2"
         )
         scen.commit("initialize test scenario")
-        scen.solve()
+        scen.solve(quiet=True)
 
         # set up a new scenario with emissions taxes
         tax_scen = Scenario(test_mp, MODEL, "tax_many_tecs", version="new")
@@ -192,7 +192,7 @@ def test_price_duality(test_mp):
         taxes["unit"] = "USD/tCO2"
         tax_scen.add_par("tax_emission", taxes)
         tax_scen.commit("initialize test scenario for taxes")
-        tax_scen.solve()
+        tax_scen.solve(quiet=True)
 
         # check that emissions are close between cumulative and tax scenario
         filters = {"node": "World"}

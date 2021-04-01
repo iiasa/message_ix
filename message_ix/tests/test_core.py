@@ -427,7 +427,7 @@ def test_rename_technology(dantzig_message_scenario):
     clone.rename("technology", {"canning_plant": "foo_bar"})
     assert not clone.par("output")["technology"].isin(["canning_plant"]).any()
     assert clone.par("output")["technology"].isin(["foo_bar"]).any()
-    clone.solve()
+    clone.solve(quiet=True)
     assert np.isclose(clone.var("OBJ")["lvl"], 153.675)
 
 
@@ -463,7 +463,7 @@ def test_excel_read_write(message_test_mp, tmp_path):
     scen1.to_excel(fname)
 
     # Writing to Excel when scenario has a solution
-    scen1.solve()
+    scen1.solve(quiet=True)
     scen1.to_excel(fname)
 
     scen2 = Scenario(message_test_mp, model="foo", scenario="bar", version="new")
@@ -482,7 +482,7 @@ def test_excel_read_write(message_test_mp, tmp_path):
     assert scen2.has_par("new_par")
     assert float(scen2.par("new_par")["value"]) == 2
 
-    scen2.solve()
+    scen2.solve(quiet=True)
     assert np.isclose(scen2.var("OBJ")["lvl"], scen1.var("OBJ")["lvl"])
 
 

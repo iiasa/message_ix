@@ -36,7 +36,7 @@ def test_add_bound_activity_up(message_test_mp):
     clone.check_out()
     clone.add_par("bound_activity_up", data)
     clone.commit("foo")
-    clone.solve()
+    clone.solve(quiet=True)
     obs = calculate_activity(clone).loc["to_chicago"]
     assert np.isclose(obs, exp)
 
@@ -69,7 +69,7 @@ def test_add_bound_activity_up_all_modes(message_test_mp):
     clone.check_out()
     clone.add_par("bound_activity_up", data)
     clone.commit("foo")
-    clone.solve()
+    clone.solve(quiet=True)
     obs = calculate_activity(clone).sum()
     assert np.isclose(obs, exp)
 
@@ -169,7 +169,7 @@ def test_commodity_share_up(message_test_mp):
     clone.check_out()
     add_data(clone, map_df)
     clone.commit("foo")
-    clone.solve()
+    clone.solve(quiet=True)
 
     # check shares new, should be lower than expected bound
     obs = calc_share(clone)
@@ -197,7 +197,7 @@ def test_commodity_share_up(message_test_mp):
     clone2.check_out()
     add_data(clone2, map_df2)
     clone2.commit("foo")
-    clone2.solve()
+    clone2.solve(quiet=True)
 
     # check shares new, should be lower than expected bound
     obs2 = calc_share(clone2)
@@ -214,7 +214,7 @@ def test_commodity_share_up(message_test_mp):
 
 def test_share_commodity_lo(message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone()
-    scen.solve()
+    scen.solve(quiet=True)
 
     # data for share bound
     def calc_share(s):
@@ -277,7 +277,7 @@ def test_share_commodity_lo(message_test_mp):
         ),
     )
     clone.commit("foo")
-    clone.solve()
+    clone.solve(quiet=True)
     obs = calc_share(clone)
     assert np.isclose(obs, exp)
 
@@ -319,7 +319,7 @@ def test_add_share_mode_up(message_test_mp):
         ),
     )
     clone.commit("foo")
-    clone.solve()
+    clone.solve(quiet=True)
     obs = calc_share(clone)
     assert np.isclose(obs, exp)
 
@@ -361,7 +361,7 @@ def test_add_share_mode_lo(message_test_mp):
         ),
     )
     clone.commit("foo")
-    clone.solve()
+    clone.solve(quiet=True)
 
     obs = calc_share(clone)
     assert np.isclose(obs, exp)

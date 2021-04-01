@@ -11,7 +11,7 @@ from message_ix.testing import SCENARIO
 def test_as_pyam(message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
     if not scen.has_solution():
-        scen.solve()
+        scen.solve(quiet=True)
     rep = Reporter.from_scenario(scen)
 
     # Quantities for 'ACT' variable at full resolution

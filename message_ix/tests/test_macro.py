@@ -174,7 +174,7 @@ def test_add_model_data(westeros_solved):
     MACRO.initialize(clone)
     macro.add_model_data(base, clone, W_DATA_PATH)
     clone.commit("finished adding macro")
-    clone.solve()
+    clone.solve(quiet=True)
     obs = clone.var("OBJ")["lvl"]
     exp = base.var("OBJ")["lvl"]
     assert np.isclose(obs, exp)
