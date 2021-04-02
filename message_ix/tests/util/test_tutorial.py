@@ -31,7 +31,7 @@ def test_solve_modified(caplog, message_test_mp):
     base = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
     # Base objective value
-    base.solve()
+    base.solve(quiet=True)
     base_obj = base.var("OBJ")["lvl"]
 
     with solve_modified(base, "new scenario name") as scenario:

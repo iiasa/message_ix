@@ -128,7 +128,7 @@ def storage_setup(test_mp, time_duration, comment):
     demand_share = {"a": 0.15, "b": 0.2, "c": 0.4, "d": 0.25}
     year_to_time(scen, "demand", demand_share)
     scen.commit("initialized a model with timesteps")
-    scen.solve(case="no_storage" + comment)
+    scen.solve(case="no_storage" + comment, quiet=True)
 
     # Second, adding upper bound on activity of the cheap technology (wind_ppl)
     scen.remove_solution()
@@ -138,7 +138,7 @@ def storage_setup(test_mp, time_duration, comment):
             "bound_activity_up", ["node", "wind_ppl", 2020, "mode", h], 0.25, "GWa"
         )
     scen.commit("activity bounded")
-    scen.solve(case="no_storage_bounded" + comment)
+    scen.solve(case="no_storage_bounded" + comment, quiet=True)
     cost_no_stor = scen.var("OBJ")["lvl"]
     act_no_stor = scen.var("ACT", {"technology": "gas_ppl"})["lvl"].sum()
 
@@ -149,7 +149,7 @@ def storage_setup(test_mp, time_duration, comment):
     time_order = {"a": 1, "b": 2, "c": 3, "d": 4}
     add_storage_data(scen, time_order)
     scen.commit("storage data added")
-    scen.solve(case="with_storage_no_input" + comment)
+    scen.solve(case="with_storage_no_input" + comment, quiet=True)
     act = scen.var("ACT")
 
     # Forth, adding storage technologies and providing input to storage device
@@ -166,7 +166,7 @@ def storage_setup(test_mp, time_duration, comment):
     df["value"] = 1.2
     scen.add_par("input", df)
     scen.commit("storage needs no separate input")
-    scen.solve(case="with_storage_and_input" + comment)
+    scen.solve(case="with_storage_and_input" + comment, quiet=True)
     cost_with_stor = scen.var("OBJ")["lvl"]
     act_with_stor = scen.var("ACT", {"technology": "gas_ppl"})["lvl"].sum()
 

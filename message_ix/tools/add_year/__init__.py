@@ -11,9 +11,12 @@
 #      calculating missing values
 
 # %% I) Importing required packages
+import logging
 
 import numpy as np
 import pandas as pd
+
+log = logging.getLogger(__name__)
 
 
 # %% II) Utility functions for dataframe manupulation
@@ -26,7 +29,7 @@ def intpol(y1, y2, x1, x2, x):
     x1, x2, x : int
     """
     if x2 == x1 and y2 != y1:
-        print(">>> Warning <<<: No difference between x1 and x2," "returned empty!!!")
+        log.warning("No difference between x1 and x2, returned empty")
         return []
     elif x2 == x1 and y2 == y1:
         return y1
@@ -145,8 +148,8 @@ def add_year(
     elif isinstance(parameter, str):
         par_list = [parameter]
     else:
-        print(
-            "Parameters should be defined in a list of strings or as a single string!"
+        log.warning(
+            "Parameters should be defined in a list of strings or as a single string"
         )
 
     if "technical_lifetime" in par_list:
@@ -159,7 +162,9 @@ def add_year(
     elif isinstance(region, str):
         reg_list = [region]
     else:
-        print("Regions should be defined in a list of strings or as a single string!")
+        log.warning(
+            "Regions should be defined in a list of strings or as a single string"
+        )
 
     # List of parameters to be ignored (even not copied to the new
     # scenario)
@@ -252,7 +257,7 @@ def add_year(
             )
 
     sc_new.set_as_default()
-    print("> All required parameters were successfully added to the new scenario.")
+    log.info("All required parameters were successfully added to the new scenario")
 
 
 # %% Submodules needed for running the main function
@@ -354,7 +359,7 @@ def add_year_set(
         sc_new.add_set(set_name, sc_ref.set(set_name))
 
     sc_new.commit("sets added!")
-    print("> All the sets updated and added to the new scenario.")
+    log.info("All the sets updated and added to the new scenario")
 
 
 # %% V) Adding new years to parameters
@@ -416,14 +421,14 @@ def add_year_par(
         nodes = ["N/A"]
 
     if not par_new.empty and not rewrite:
-        print(
-            f"> Parameter {repr(parname)} already has data in new scenario and left "
-            f"unchanged for node/s: {repr(reg_list)}"
+        log.info(
+            f"Parameter {repr(parname)} already has data in new scenario and left "
+            f"unchanged for node(s): {repr(reg_list)}"
         )
         return
     if par_old.empty:
-        print(
-            f"> Parameter {repr(parname)} is empty in reference scenario for node/s: "
+        log.info(
+            f"Parameter {repr(parname)} is empty in reference scenario for node(s): "
             + repr(reg_list)
         )
         return
@@ -437,9 +442,9 @@ def add_year_par(
 
     sc_new.check_out()
     if not par_new.empty and rewrite:
-        print(
-            '> Parameter "' + parname + '" is being removed from new'
-            " scenario to be updated for node/s in {}...".format(nodes)
+        log.info(
+            f"Parameter {parname} is being removed from new scenario to be updated for "
+            f"node(s) in {nodes}"
         )
         sc_new.remove_par(parname, par_new)
 
@@ -452,9 +457,9 @@ def add_year_par(
     if len(year_list) == 0:
         sc_new.add_par(parname, par_old)
         sc_new.commit(parname)
-        print(
-            '> Parameter "' + parname + '" just copied to new scenario '
-            "since has no time-related entries."
+        log.info(
+            f"Parameter {parname} just copied to new scenario since has no time-related"
+            "entries"
         )
 
     #   V.B.2) Parameters with one index related to time
@@ -473,10 +478,7 @@ def add_year_par(
         )
         sc_new.add_par(parname, df_y)
         sc_new.commit(" ")
-        print(
-            '> Parameter "{}" copied and new years'
-            ' added for node/s: "{}".'.format(parname, nodes)
-        )
+        log.info(f"Parameter {parname} copied and new years added for node(s): {nodes}")
 
     #   V.B.3) Parameters with two indexes related to time (such as 'input')
     elif len(year_list) == 2:
@@ -487,10 +489,7 @@ def add_year_par(
             return x[i + 1] - x[i] > x[i] - x[i - 1]
 
         year_diff = [x for x in horizon[1:-1] if f(horizon, horizon.index(x))]
-        print(
-            '> Parameter "{}" is being added for node/s'
-            ' "{}"...'.format(parname, nodes)
-        )
+        log.info(f"Parameter {parname} is being added for node(s): {nodes}")
 
         # Flagging technologies that have lifetime for adding new timesteps
         yr_list = [
@@ -527,10 +526,7 @@ def add_year_par(
         )
         sc_new.add_par(parname, df_y)
         sc_new.commit(parname)
-        print(
-            '> Parameter "{}" copied and new years added'
-            ' for node/s: "{}".'.format(parname, nodes)
-        )
+        log.info(f"Parameter {parname} copied and new years added for node(s): {nodes}")
 
 
 # %% VI) Required functions
@@ -680,10 +676,7 @@ def interpolate_1d(
         )
         df2 = df2.sort_values(idx).reset_index(drop=True)
     else:
-        print(
-            "+++ WARNING: The submitted dataframe is empty, so returned"
-            " empty results!!! +++"
-        )
+        log.warning("The submitted dataframe is empty, so returned empty results")
         df2 = df
     return df2
 
@@ -746,10 +739,7 @@ def interpolate_2d(
 
     if df.empty:
         return df
-        print(
-            "+++ WARNING: The submitted dataframe is empty, so"
-            " returned empty results!!! +++"
-        )
+        log.warning("The submitted dataframe is empty, so returned empty results")
 
     df_tec = df.loc[df["technology"].isin(tec_list)]
     idx = [x for x in df.columns if x not in [year_col, value_col]]

@@ -52,7 +52,7 @@ def test_bound_emission_year(test_mp):
     model_setup(scen, [2020, 2030])
     scen.commit("initialize test model")
     add_bound_emission(scen, bound=1.250, year=2020)
-    scen.solve(case="bound_emission_year")
+    scen.solve(case="bound_emission_year", quiet=True)
     assert_function(scen, year=2020)
 
 
@@ -62,7 +62,7 @@ def test_bound_emission_10y(test_mp):
     model_setup(scen, [2020, 2030, 2040, 2050])
     scen.commit("initialize test model")
     add_bound_emission(scen, bound=1.250)
-    scen.solve(case="bound_emission_10y")
+    scen.solve(case="bound_emission_10y", quiet=True)
     assert_function(scen, year="cumulative")
 
 
@@ -72,5 +72,5 @@ def test_bound_emission_5y(test_mp):
     model_setup(scen, [2020, 2025, 2030, 2040])
     scen.commit("initialize test model")
     add_bound_emission(scen, bound=1.250)
-    scen.solve(case="bound_emission_5y")
+    scen.solve(case="bound_emission_5y", quiet=True)
     assert_function(scen, year="cumulative")

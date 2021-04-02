@@ -7,7 +7,6 @@ on:
     branches: [ master ]
 
 env:
-  GAMS_VERSION: 25.1.1
   # See description in lint.yml
   depth: 100
 
@@ -18,7 +17,8 @@ jobs:
         os:
         - macos-latest
         - ubuntu-latest
-        - windows-latest
+        # Temporary excluded; see https://github.com/iiasa/message_ix/pull/452
+        # - windows-latest
         python-version:
         - "3.6"  # Earliest version supported by ixmp
         - "3.8"  # Latest version testable on GitHub Actions
@@ -107,18 +107,12 @@ jobs:
           ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-
           ${{ matrix.os }}-
 
-    - name: Install GAMS and Graphviz
-      # Use the scripts from the checked-out ixmp repo
-      env:
-        CI_OS: ${{ matrix.os }}
-      run: |
-        ixmp/ci/install-gams.sh
-        ixmp/ci/install-graphviz.sh
-      shell: bash
+    - uses: iiasa/actions/setup-gams@main
+      with:
+        version: 25.1.1
+        license: ${{ secrets.GAMS_LICENSE }}
 
-    - name: Check GAMS
-      run: gams
-      shell: bash
+    - uses: ts-graphviz/setup-graphviz@v1
 
     - name: Upgrade pip, wheel, setuptools-scm
       run: python -m pip install --upgrade pip wheel setuptools-scm

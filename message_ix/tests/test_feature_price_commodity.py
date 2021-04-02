@@ -23,7 +23,7 @@ def test_commodity_price(test_mp):
     scen = Scenario(test_mp, "test_commodity_price", "standard", version="new")
     model_setup(scen)
     scen.commit("initialize test model")
-    scen.solve(case="price_commodity_standard")
+    scen.solve(case="price_commodity_standard", quiet=True)
 
     assert scen.var("OBJ")["lvl"] == 1
     assert scen.var("PRICE_COMMODITY")["lvl"][0] == 1
@@ -42,7 +42,7 @@ def test_commodity_price_equality(test_mp):
     scen.check_out()
     scen.add_set("balance_equality", ["comm", "level"])
     scen.commit("set commodity-balance for `[comm, level]` as equality")
-    scen.solve(case="price_commodity_equality")
+    scen.solve(case="price_commodity_equality", quiet=True)
 
     assert scen.var("OBJ")["lvl"] == -1
     assert scen.var("PRICE_COMMODITY")["lvl"][0] == -1

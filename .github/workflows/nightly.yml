@@ -12,7 +12,6 @@ on:
   - cron: "0 5 * * *"
 
 env:
-  GAMS_VERSION: 25.1.1
   # See description in lint.yml
   depth: 100
 
@@ -55,10 +54,10 @@ jobs:
           ~/appdata/local/pip/cache
         key: gams${{ env.GAMS_VERSION }}
 
-    - name: Install GAMS
-      env:
-        CI_OS: ubuntu
-      run: ixmp/ci/install-gams.sh
+    - uses: iiasa/actions/setup-gams@main
+      with:
+        version: 25.1.1
+        license: ${{ secrets.GAMS_LICENSE }}
 
     - name: Install Python packages and dependencies
       run: |

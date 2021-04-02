@@ -28,7 +28,7 @@ def base_scen_mp(test_mp):
         scen.add_par("var_cost", tec_specs + ["year"], value, "USD/GWa")
 
     scen.commit("initialize test model")
-    scen.solve(case="original_years")
+    scen.solve(case="original_years", quiet=True)
 
     yield scen, test_mp
 
@@ -90,7 +90,7 @@ def test_add_year(base_scen_mp):
         test_mp, model="add_year", scenario="standard", version="new", annotation=" "
     )
     add_year(scen_ref, scen_new, YEARS_NEW)
-    scen_new.solve(case="new_years")
+    scen_new.solve(case="new_years", quiet=True)
 
     # Running the tests
     assert_function(scen_ref, scen_new, YEARS_NEW, yr_test=2025)

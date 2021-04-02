@@ -87,7 +87,7 @@ def test_addon_tec(message_test_mp):
     scen.add_par("bound_activity_up", bda)
     scen.commit("changing output and bounds")
 
-    scen.solve()
+    scen.solve(quiet=True)
 
     exp = scen.var("ACT", f)["lvl"]
     obs = scen.var("ACT", g)["lvl"]
@@ -105,7 +105,7 @@ def test_addon_up(message_test_mp):
     scen.add_par("addon_up", addon_share)
     scen.commit("adding upper bound on addon technology")
 
-    scen.solve()
+    scen.solve(quiet=True)
 
     exp = scen.var("ACT", f)["lvl"] * 0.5
     obs = scen.var("ACT", g)["lvl"]
@@ -124,7 +124,7 @@ def test_addon_lo(message_test_mp):
     scen.add_par("addon_lo", addon_share)
 
     scen.commit("adding lower bound on addon technology")
-    scen.solve()
+    scen.solve(quiet=True)
 
     exp = scen.var("ACT", f)["lvl"] * 0.5
     obs = scen.var("ACT", g)["lvl"]

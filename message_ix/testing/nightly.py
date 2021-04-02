@@ -3,7 +3,6 @@ import os
 import tarfile
 from asyncio import get_event_loop
 from pathlib import Path
-from subprocess import check_output
 
 import click
 import ixmp
@@ -46,23 +45,6 @@ def download(path, cli=False):
     with tarfile.open(data_path, "r:gz") as tf:
         tf.extractall(path)
 
-    # Download license
-    if cli:
-        gams_dir = path
-        log.info("Downloading GAMS license to {}".format(gams_dir))
-    else:
-        which_gams = check_output(["which", "gams"], universal_newlines=True)
-        gams_dir = Path(which_gams.strip()).parent
-        log.info("Located GAMS executable in {}".format(gams_dir))
-
-    fn = cfg["filename"]["license"]
-    url = cfg["http base"] + cfg["path"] + fn
-    log.info("Downloading from {}".format(url))
-
-    r = requests.get(url, auth=auth)
-    r.raise_for_status()
-    (gams_dir / fn).write_text(r.text)
-
 
 def fetch_scenarios(path, dbprops):
     mp = ixmp.Platform(dbprops=dbprops)
@@ -75,13 +57,11 @@ def iter_scenarios():
     try:
         with open(HERE.parent / "tests" / "data" / "scenarios.yaml", "r") as f:
             scenarios = yaml.safe_load(f)
-
     except FileNotFoundError as e:
-        msg = (
-            "Caught error: {}. Did you install message_ix using `$ pip "
-            "install --editable`?".format(str(e))
+        raise FileNotFoundError(
+            f"Caught error: {e}. Did you install message_ix using `pip install "
+            "--editable`?"
         )
-        raise FileNotFoundError(msg)
 
     for id, data in scenarios.items():
         yield id, (
@@ -120,7 +100,6 @@ async def _upload(path, username, password):
     ) as conn:
         target = (conn, cfg["ssh"]["base"] + cfg["path"])
         await scp(path / cfg["filename"]["data"], target)
-        await scp(path / cfg["filename"]["license"], target)
 
 
 @click.group("nightly")
@@ -189,9 +168,8 @@ def make(context):
 def upload_cmd(context, username, password):
     """Upload the test database and license file.
 
-    The two files are uploaded using SCP to a location that is also accessible
-    via HTTP. You must provide your SSH USERNAME; and will be prompted for your
-    password.
+    The two files are uploaded using SCP to a location that is also accessible via HTTP.
+    You must provide your SSH USERNAME; and will be prompted for your password.
     """
     upload(context["path"], username, password)
 
