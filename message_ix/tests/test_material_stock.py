@@ -1,16 +1,14 @@
-import numpy.testing as npt
 import pandas as pd
 import numpy as np
 import pandas.testing as pdt
-import pytest
 
-from message_ix import Scenario, make_df
-from message_ix.testing import make_dantzig, make_westeros
+from message_ix import make_df
+from message_ix.testing import make_westeros
 
 
 def test_new_params_defined(test_mp):
-    # Check whether the new material-related message_ix Parameters are initiated
-    # and have the correct shapes
+    # Check whether the new material-related message_ix Parameters are
+    # initiated and have the correct shapes
     result = make_df("input_cap")
     assert result.shape == (1, 10)
 
