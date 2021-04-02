@@ -17,7 +17,8 @@ jobs:
         os:
         - macos-latest
         - ubuntu-latest
-        - windows-latest
+        # Temporary excluded; see https://github.com/iiasa/message_ix/pull/452
+        # - windows-latest
         python-version:
         - "3.6"  # Earliest version supported by ixmp
         - "3.8"  # Latest version testable on GitHub Actions
