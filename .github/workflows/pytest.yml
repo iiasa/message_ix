@@ -137,6 +137,9 @@ jobs:
       working-directory: message_ix
       shell: Rscript {0}
 
+    # DEBUG
+    - run: pip list
+
     - name: Run test suite using pytest
       env:
         # For test_cli.test_dl; see code in message_ix.cli.dl
