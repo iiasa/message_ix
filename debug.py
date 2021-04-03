@@ -1,6 +1,8 @@
+import os
 import sys
-import pytest
 import traceback
+
+import pytest
 
 try:
     pytest.main(sys.argv[1:])
@@ -9,4 +11,5 @@ except BaseException:
     raise
 
 # Explicitly exit with 0
-sys.exit(0)
+# sys.exit(0)
+os._exit(0)
