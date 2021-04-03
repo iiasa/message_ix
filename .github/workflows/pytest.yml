@@ -140,13 +140,16 @@ jobs:
     # DEBUG
     - run: pip list
 
+    # DEBUG
+    - run: pip uninstall --yes pytest-cov coverage
+
     - name: Run test suite using pytest
       env:
         # For test_cli.test_dl; see code in message_ix.cli.dl
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       working-directory: message_ix
       run: |
-        python debug.py message_ix -m "not nightly" -rA --verbose --cov-report=xml --color=yes || echo "Spurious exit code $? from pytest"
+        python debug.py message_ix -m "not nightly" -rA --verbose --color=yes || echo "Spurious exit code $? from pytest"
       shell: bash
 
     - name: Run R CMD check
