@@ -147,6 +147,7 @@ jobs:
       working-directory: message_ix
       run: |
         python debug.py message_ix -m "not nightly" -rA --verbose --capture=no --cov-report=xml --color=yes || echo "Spurious exit code $? from pytest"
+      shell: bash
 
     - name: Run R CMD check
       run: |
