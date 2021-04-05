@@ -137,16 +137,14 @@ jobs:
       working-directory: message_ix
       shell: Rscript {0}
 
-    # DEBUG
-    - run: pip list
-
     - name: Run test suite using pytest
       env:
         # For test_cli.test_dl; see code in message_ix.cli.dl
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       working-directory: message_ix
+      # Work around iiasa/ixmp#411
       run: |
-        python debug.py message_ix -m "not nightly" -rA --verbose --capture=no --cov-report=xml --color=yes || echo "Spurious exit code $? from pytest"
+        pytest message_ix -m "not nightly" -rA --verbose --cov-report=xml --color=yes || ( [ $? -eq 127 -a "${{ runner.os }}" = "Windows" ] && echo "Spurious exit code 127 from pytest" && exit 0)
       shell: bash
 
     - name: Run R CMD check

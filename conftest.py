@@ -20,10 +20,3 @@ def pytest_report_header(config, startdir):
     import message_ix
 
     return f"message_ix location: {Path(message_ix.__file__).parent}"
-
-
-def pytest_unconfigure(config):
-    import jpype
-
-    if jpype.isJVMStarted():
-        jpype.shutdownJVM()
