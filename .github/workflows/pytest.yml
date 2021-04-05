@@ -17,8 +17,7 @@ jobs:
         os:
         - macos-latest
         - ubuntu-latest
-        # Temporary excluded; see https://github.com/iiasa/message_ix/pull/452
-        # - windows-latest
+        - windows-latest
         python-version:
         - "3.6"  # Earliest version supported by ixmp
         - "3.8"  # Latest version testable on GitHub Actions
@@ -143,7 +142,10 @@ jobs:
         # For test_cli.test_dl; see code in message_ix.cli.dl
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       working-directory: message_ix
-      run: pytest message_ix -m "not nightly" -rA --verbose --cov-report=xml --color=yes
+      # Work around iiasa/ixmp#411
+      run: |
+        pytest message_ix -m "not nightly" -rA --verbose --cov-report=xml --color=yes || ( [ $? -eq 127 -a "${{ runner.os }}" = "Windows" ] && echo "Spurious exit code 127 from pytest" && exit 0)
+      shell: bash
 
     - name: Run R CMD check
       run: |
