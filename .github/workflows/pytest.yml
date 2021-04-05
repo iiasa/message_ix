@@ -146,7 +146,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       working-directory: message_ix
       run: |
-        python debug.py message_ix -k make_df -rA --verbose --cov-report=xml --color=yes || echo "Spurious exit code $? from pytest"
+        python debug.py message_ix -k "make_df or year_int" -rA --verbose --cov-report=xml --color=yes || echo "Spurious exit code $? from pytest"
 
     - name: Run R CMD check
       run: |
