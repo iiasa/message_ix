@@ -132,7 +132,7 @@ Releasing
    - For the description, provide a link to the section in the “What's New” page of the documentation that corresponds to the new release.
      For example:
 
-     .. code-block:: markdown
+     .. code-block::
 
         See the [“What's New” page](https://docs.messageix.org/projects/ixmp/en/stable/whatsnew.html#v3-1-0-2020-08-28) in the ixmp documentation for a list of all changes.
 
