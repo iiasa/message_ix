@@ -2,17 +2,16 @@
 * MESSAGE core formulation
 * ========================
 *
-* The |MESSAGEix| systems-optimization model minimizes total costs
-* while satisfying given demand levels for commodities/services
-* and considering a broad range of technical/engineering constraints and societal restrictions
-* (e.g. bounds on greenhouse gas emissions, pollutants, system reliability).
-* Demand levels are static (i.e. non-elastic), but the demand response can be integrated by linking |MESSAGEix|
-* to the single sector general-economy MACRO model included in this framework.
+* The |MESSAGEix| systems-optimization model minimizes total costs while satisfying given demand levels for commodities/services and considering a broad range of technical/engineering constraints and societal restrictions (e.g. bounds on greenhouse gas emissions, pollutants, system reliability).
+* Demand levels are static (i.e. non-elastic), but the demand response can be integrated by linking |MESSAGEix| to the single sector general-economy MACRO model included in this framework.
 *
-* For the complete list of sets, mappings and parameters,
-* refer to the auto-documentation pages :ref:`sets_maps_def` and :ref:`parameter_def`.
-* The mathematical notation that is used to represent sets and mappings in the equations below
-* can also be found in the tables in :ref:`sets_maps_def`.
+* For the complete list of sets, mappings and parameters, refer to the auto-documentation page :ref:`sets_maps_def` and :ref:`parameter_def`.
+* The mathematical notation that is used to represent sets and mappings in the equations below can also be found in the tables in :ref:`sets_maps_def`.
+*
+* .. contents::
+*    :local:
+*    :backlinks: none
+*
 ***
 
 *----------------------------------------------------------------------------------------------------------------------*
