@@ -1511,13 +1511,16 @@ SHARE_CONSTRAINT_COMMODITY_LO(shares,node_share,year,time)$( share_commodity_lo(
 ***
 * .. _dynamic_constraints:
 *
-* Dynamic constraints on market penetration
-* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-* The constraints in this section specify dynamic upper and lower bounds on new capacity and activity,
-* i.e., constraints on market penetration and rate of expansion or phase-out of a technology.
+* Dynamic constraints on new capacity and activity
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*
+* The constraints in this section specify dynamic upper and lower bounds on new capacity and activity.
+* These can be used to model limits on market penetration and/or rates of expansion or phase-out of a technology.
 *
 * The formulation directly includes the option for 'soft' relaxations of dynamic constraints
 * (cf. Keppo and Strubegger, 2010 :cite:`keppo_short_2010`).
+*
+* See also the :ref:`corresponding parameter definitions <section_parameter_dynamic_constraints>`.
 *
 * .. _equation_new_capacity_constraint_up:
 *
