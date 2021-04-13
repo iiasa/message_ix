@@ -403,8 +403,8 @@ def test_years_active_extended2(test_mp):
         ),
     )
 
-    result = scen.years_active("foo", "bar",  years[-2])
-    print('Results for', years[-2], 'years:', result)
+    result = scen.years_active("foo", "bar", years[-2])
+    print("Results for", years[-2], "years:", result)
 
     # Correct return type
     assert isinstance(years, list)
