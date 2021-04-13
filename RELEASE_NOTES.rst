@@ -4,6 +4,7 @@ Next release
 All changes
 -----------
 
+- :pull:`456`: Fix bug in :func:`.years_active` to use the lifetime corresponding to the year_vintage for which the active years are being retrieved.
 - :pull:`408`: Add a PowerPoint document usable to generate the RES diagrams for the Westeros tutorials.
 - :pull:`460`: Expand documentation :doc:`install` for installing GAMS under macOS.
 - :pull:`365`: Add new Westeros :doc:`tutorial <tutorials>` on add-on technologies.
