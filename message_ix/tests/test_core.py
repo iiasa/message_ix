@@ -368,6 +368,52 @@ def test_years_active_extend(message_test_mp):
     npt.assert_array_equal(result, years[1:-1])
 
 
+def test_years_active_extended2(test_mp):
+    test_mp.add_unit("year")
+    scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
+    scen.add_set("node", "foo")
+    scen.add_set("technology", "bar")
+
+    # Periods of uneven length
+    years = [1990, 1995, 2000, 2005, 2010, 2020, 2030]
+
+    # First period length is immaterial
+    duration = [1900, 5, 5, 5, 5, 10, 10]
+    scen.add_horizon(year=years, firstmodelyear=years[-1])
+    scen.add_par(
+        "duration_period", pd.DataFrame(zip(years, duration), columns=["year", "value"])
+    )
+
+    # 'bar' built in period '2020' with 10-year lifetime:
+    # - is constructed in 2011-01-01.
+    # - by 2020-12-31, has operated 10 years.
+    # - operates until 2020-12-31. This is within the period '2020'.
+    # The test ensures that the correct lifetime value is retrieved,
+    # i.e. the lifetime for the vintage 2020.
+    scen.add_par(
+        "technical_lifetime",
+        pd.DataFrame(
+            dict(
+                node_loc="foo",
+                technology="bar",
+                unit="year",
+                value=[20, 20, 20, 20, 20, 10, 10],
+                year_vtg=years,
+            ),
+        ),
+    )
+
+    result = scen.years_active("foo", "bar",  years[-2])
+    print('Results for', years[-2], 'years:', result)
+
+    # Correct return type
+    assert isinstance(years, list)
+    assert isinstance(years[0], int)
+
+    # Years 2020
+    npt.assert_array_equal(result, years[-2])
+
+
 def test_new_timeseries_long_name64(message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO["dantzig multi-year"])
     scen = scen.clone(keep_solution=False)
