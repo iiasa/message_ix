@@ -4,6 +4,7 @@ Next release
 All changes
 -----------
 
+- :pull:`408`: Add a PowerPoint document usable to generate the RES diagrams for the Westeros tutorials.
 - :pull:`460`: Expand documentation :doc:`install` for installing GAMS under macOS.
 - :pull:`365`: Add new Westeros :doc:`tutorial <tutorials>` on add-on technologies.
 - :pull:`454`: Expand documentation of :ref:`dynamic constraint parameters <section_parameter_dynamic_constraints>`.
