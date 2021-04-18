@@ -86,10 +86,3 @@ jobs:
       run: |
         pip install mypy genno sphinx
         mypy .
-
-    - name: Test package build
-      working-directory: message_ix
-      run: |
-        pip install twine wheel
-        python3 setup.py bdist_wheel sdist
-        twine check dist/*
