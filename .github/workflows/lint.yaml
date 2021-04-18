@@ -6,16 +6,6 @@ on:
   pull_request:
     branches: [ master ]
 
-env:
-  # For setuptools-scm. With fetch --tags below, this ensures that
-  # enough history is fetched to contain the latest tag, so that
-  # setuptools-scm can generate the version number. Update:
-  # - See https://github.com/iiasa/message_ix/releases, at "NN commits to
-  #   master since this release". The value should be at least equal to
-  #   NN + the number of commits on any PR branch.
-  # - Reset to a lower value, e.g. 100, after a new release.
-  depth: 100
-
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -32,19 +22,11 @@ jobs:
         # repository: USERNAME/ixmp
         # ref: issue/999
         path: ixmp
-        fetch-depth: ${{ env.depth }}
 
     - name: Check out message_ix
       uses: actions/checkout@v2
       with:
         path: message_ix
-        fetch-depth: ${{ env.depth }}
-
-    - name: Fetch tags (for setuptools-scm)
-      run: |
-        (cd ixmp; git fetch --tags --depth=${{ env.depth }})
-        (cd message_ix; git fetch --tags --depth=${{ env.depth }})
-      shell: bash
 
     - uses: actions/setup-python@v2
       with:
