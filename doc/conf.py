@@ -95,10 +95,15 @@ html_static_path = ["_static"]
 latex_engine = "lualatex"
 
 
-# -- Options for sphinx.ext.extlinks ------------------------------------------
+# -- Options for sphinx.ext.extlinks ---------------------------------------------------
+
+# Link to "master" blob if a non-release version of the docs is being built; otherwise
+# to the tag for the release
+gh_ref = "master" if ".dev" in version else f"v{version}"
 
 extlinks = {
     "pull": ("https://github.com/iiasa/message_ix/pull/%s", "PR #"),
+    "tut": (f"https://github.com/iiasa/message_ix/blob/{gh_ref}/tutorial/%s", ""),
 }
 
 
