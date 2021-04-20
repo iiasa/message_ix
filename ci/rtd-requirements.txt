@@ -1,1 +1,1 @@
-git+https://github.com/iiasa/ixmp.git@master#egg=ixmp
+git+https://github.com/iiasa/ixmp.git@main#egg=ixmp

@@ -5,6 +5,7 @@ All changes
 -----------
 
 - :pull:`460`: Expand documentation :doc:`install` for installing GAMS under macOS.
+- :pull:`365`: Add new Westeros :doc:`tutorial <tutorials>` on add-on technologies.
 - :pull:`454`: Expand documentation of :ref:`dynamic constraint parameters <section_parameter_dynamic_constraints>`.
 - :pull:`441`: Adjust :mod:`message_ix.reporting` to use :mod:`genno` / :mod:`ixmp.reporting` changes in `ixmp PR #397 <https://github.com/iiasa/ixmp/pull/397>`_.
 
