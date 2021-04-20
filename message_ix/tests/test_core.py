@@ -336,8 +336,8 @@ def test_years_active(test_mp):
     result = scen.years_active("foo", "bar", years[1])
 
     # Correct return type
-    assert isinstance(years, list)
-    assert isinstance(years[0], int)
+    assert isinstance(result, list)
+    assert isinstance(result[0], int)
 
     # Years 1995 through 2020
     npt.assert_array_equal(result, years[1:-1])
@@ -404,11 +404,10 @@ def test_years_active_extended2(test_mp):
     )
 
     result = scen.years_active("foo", "bar", years[-2])
-    print("Results for", years[-2], "years:", result)
 
     # Correct return type
-    assert isinstance(years, list)
-    assert isinstance(years[0], int)
+    assert isinstance(result, list)
+    assert isinstance(result[0], int)
 
     # Years 2020
     npt.assert_array_equal(result, years[-2])
