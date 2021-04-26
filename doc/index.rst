@@ -46,6 +46,7 @@ Then, continue with the:
    framework
    install
    tutorials
+   newbuild
 
 
 
