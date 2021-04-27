@@ -487,8 +487,8 @@ class Scenario(ixmp.Scenario):
         list of int
         """
         # Handle arguments
-        filters = dict(node_loc=[node], technology=[tec])
         yv = int(yr_vtg)
+        filters = dict(node_loc=[node], technology=[tec], year_vtg=[yv])
 
         # Lifetime of the technology at the node
         lt = self.par("technical_lifetime", filters=filters).at[0, "value"]
