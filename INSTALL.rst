@@ -26,6 +26,13 @@ GAMS (required)
       - Check the box labeled “Use advanced installation mode.”
       - Check the box labeled “Add GAMS directory to PATH environment variable” on the Advanced Options page.
 
+   - on macOS, in the GAMS installer…
+
+      - When prompted to specify the "Installation Type" (step 3 of the installation process), select "Customise".
+      - Check the box labeled "Add GAMS to PATH".
+
+	If this option is not available see instructions below.
+
    - on other platforms (macOS or Linux), add the following line to a file such as :file:`~/.bash_profile` (macOS), :file:`~/.bashrc`, or :file:`~/.profile`::
 
        $ export PATH=$PATH:/path/to/gams-directory-with-gams-binary
