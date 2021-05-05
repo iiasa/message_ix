@@ -4,6 +4,7 @@ Next release
 All changes
 -----------
 
+- :pull:`450`: Add two new Westeros :doc:`tutorial <tutorials>` on creating scenarios from Excel files.
 - :pull:`456`: Fix bug in :meth:`.years_active` to use the lifetime corresponding to the vintage year for which the active years are being retrieved.
 - :pull:`408`: Add a PowerPoint document usable to generate the RES diagrams for the Westeros tutorials.
 - :pull:`460`: Expand documentation :doc:`install` for installing GAMS under macOS.
