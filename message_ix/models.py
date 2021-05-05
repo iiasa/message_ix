@@ -362,7 +362,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         # TODO move this call to ixmp.model.base.Model.run(); remove here
         self.enforce(scenario)
 
-        # If two runs are kicked off simulatenously with the same self.model_dir, then
+        # If two runs are kicked off simultaneously  with the same self.model_dir, then
         # they will try to write the same optfile, and may write different contents.
         #
         # TODO Re-enable the 'use_temp_dir' feature from ixmp.GAMSModel (disabled above)
