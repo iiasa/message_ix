@@ -92,14 +92,17 @@ uses it to illustrate a range of framework features.
       #. Introduce taxes on emissions
          (:tut:`westeros/westeros_emissions_taxes.ipynb`).
 
-   #. Represent both coal and wind electricity using a “firm capacity”
-      formulation (:tut:`westeros/westeros_firm_capacity.ipynb`): each
-      generation technology can supply some firm capacity, but the variable,
-      renewable technology (wind) supplies less than coal.
-   #. Represent coal and wind electricity using a different, “flexibility
-      requirement” formulation
-      (:tut:`westeros/westeros_flexible_generation.ipynb`), wherein wind
-      *requires* and coal *supplies* flexibility.
+   #. Renewables
+
+      #. Represent both coal and wind electricity using a “firm capacity”
+         formulation (:tut:`westeros/westeros_firm_capacity.ipynb`): each
+         generation technology can supply some firm capacity, but the variable,
+         renewable technology (wind) supplies less than coal.
+      #. Represent coal and wind electricity using a different, “flexibility
+         requirement” formulation
+         (:tut:`westeros/westeros_flexible_generation.ipynb`), wherein wind
+         *requires* and coal *supplies* flexibility.
+         
    #. Variablity in energy supply and demand by adding sub-annual time steps,
       e.g. winter and summer (:tut:`westeros/westeros_seasonality.ipynb`).
    #. Using share constraints to depict policies, i.e. require renewables to
