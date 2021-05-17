@@ -94,16 +94,16 @@ uses it to illustrate a range of framework features.
 
    #. Renewables
 
-      #. Represent both coal and wind electricity using a �firm capacity�
+      #. Represent both coal and wind electricity using a “firm capacity”
          formulation (:tut:`westeros/westeros_firm_capacity.ipynb`): each
          generation technology can supply some firm capacity, but the variable,
          renewable technology (wind) supplies less than coal.
-      #. Represent coal and wind electricity using a different, �flexibility
-         requirement� formulation
+      #. Represent coal and wind electricity using a different, “flexibility
+         requirement” formulation
          (:tut:`westeros/westeros_flexible_generation.ipynb`), wherein wind
          *requires* and coal *supplies* flexibility.
       #. Add a renewable-resource supply curve for the wind power plant,
-         (:tut:`westeros_renewable_resource.ipynb`).
+         (:tut:`westeros/westeros_renewable_resource.ipynb`).
 
    #. Variablity in energy supply and demand by adding sub-annual time steps,
       e.g. winter and summer (:tut:`westeros/westeros_seasonality.ipynb`).
