@@ -119,16 +119,13 @@ jobs:
       working-directory: message_ix
       run: pip install .[tests]
 
-    - name: Install R package, dependencies, and tutorial requirements
+    - name: Install R dependencies and tutorial requirements
       run: |
-        install.packages("remotes")
-        remotes::install_cran(c("rcmdcheck", "dplyr", "IRkernel"))
-        remotes::install_deps("rmessageix", dependencies = TRUE)
+        install.packages(c("reticulate", "dplyr", "IRkernel"))
 
         # For R tutorial notebooks, run via the pytest suite: set up R kernel;
         # actually install the R package
         IRkernel::installspec()
-        remotes::install_local("rmessageix")
       working-directory: message_ix
       shell: Rscript {0}
 
@@ -141,17 +138,6 @@ jobs:
       run: |
         pytest message_ix -m "not nightly" -rA --verbose --cov-report=xml --color=yes || ( [ $? -eq 127 -a "${{ runner.os }}" = "Windows" ] && echo "Spurious exit code 127 from pytest" && exit 0)
       shell: bash
-
-    - name: Run R CMD check
-      run: |
-        rcmdcheck::rcmdcheck(
-          "rmessageix",
-          args = c("--no-manual", "--as-cran", "--no-multiarch"),
-          error_on = "warning",
-          check_dir = "check"
-        )
-      working-directory: message_ix
-      shell: Rscript {0}
 
     - name: Test documentation build using Sphinx
       if: ${{ startsWith(matrix.os, 'ubuntu') }}
