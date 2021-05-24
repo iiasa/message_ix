@@ -121,12 +121,14 @@ jobs:
 
     - name: Install R dependencies and tutorial requirements
       run: |
-        install.packages(c("reticulate", "dplyr", "IRkernel"))
-
-        # For R tutorial notebooks, run via the pytest suite: set up R kernel;
-        # actually install the R package
+        install.packages("remotes")
+        remotes::install_cran(
+          c("dplyr", "IRkernel", "reticulate"),
+          dependencies = TRUE,
+          force = TRUE,
+        )
+        print(installed.packages())
         IRkernel::installspec()
-      working-directory: message_ix
       shell: Rscript {0}
 
     - name: Run test suite using pytest
