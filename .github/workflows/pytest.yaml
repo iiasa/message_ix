@@ -19,19 +19,14 @@ jobs:
         - ubuntu-latest
         - windows-latest
         python-version:
-        - "3.6"  # Earliest version supported by ixmp
-        - "3.8"  # Latest version testable on GitHub Actions
-
-        # Commented: binary wheels also not available (as of 2020-10-22) for
-        # recently-released Python 3.9.
-        # TODO monitor https://pypi.org/project/[PKG]/#files for the packages
-        #      mentioned below; enable once wheels for "cp39" are available.
-        # - "3.9"  # Latest version / latest supported by ixmp
+        - "3.6"  # Earliest version supported by message_ix
+        - "3.8"
+        - "3.9"  # Latest release / latest supported by message_ix
 
         # For development versions of Python, compiled binary wheels are not
         # available for some dependencies, e.g. llvmlite, numba, numpy, and/or
         # pandas. Compiling these on the job runner requires a more elaborate
-        # build environment, currently out of scope for the ixmp project.
+        # build environment, currently out of scope for the message_ix project.
         # - "3.10.0-alpha.1"  # Development version
 
         exclude:
