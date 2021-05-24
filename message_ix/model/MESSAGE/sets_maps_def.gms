@@ -1,12 +1,12 @@
 ***
 * .. _sets_maps_def:
 *
-* Sets and mappings definition
-* =============================
+* Sets and mappings
+* =================
 *
-* This file contains the definition of all sets and mappings used in |MESSAGEix|.
-* The short mathematical notation in the **Notation** column of the tables below is used
-* in the mathematical description relative to the GAMS code.
+* :file:`sets_maps_def.gms` defines all sets and mappings used in |MESSAGEix|. The symbols in the **Notation** column of
+* the tables below are used in the equations of the mathematical formulation, while the set names appear in the GAMS
+* code.
 ***
 
 * IMPORTANT
@@ -65,8 +65,7 @@ $ONEMPTY
 *      - Land-use types (e.g., field, forest, pasture)
 *    * - year [year_all] [#year_all]_ [#period_year]_
 *      - :math:`y \in Y`
-*      - Model horizon (including historical periods for vintage structure of installed capacity
-*        and dynamic constraints)
+*      - Periods, denoted by the final year, in the model horizon
 *    * - time [#time]_
 *      - :math:`h \in H`
 *      - Subannual time periods (seasons, days, hours)
@@ -94,20 +93,14 @@ $ONEMPTY
 *
 * .. [#mode] For example, high electricity or high heat production modes of operation for combined heat and power plants.
 *
-* .. [#year_all] In the |MESSAGEix| implementation in GAMS, the set ``year_all`` denotes the "superset"
-*    of the entire horizon (historical and model horizon), and the set ``year`` is a dynamic subset of ``year_all``.
-*    This facilitates an efficient implementation of the historical capacity build-up and
-*    the (optional) recursive-dynamic solution approach.
-*    When working with a :class:`message_ix.Scenario` via the scientific programming API, the set of all periods is
-*    called ``year`` for a more concise notation.
-*    The specification of the model horizon is implemented using the mapping set ``cat_year``
-*    and the type "firstmodelyear".
+* .. [#year_all] In the |MESSAGEix| implementation in GAMS, the set ``year_all`` denotes the "superset" of the entire
+*    horizon (historical and model horizon), and the set ``year`` is a dynamic subset of ``year_all``. This facilitates
+*    an efficient implementation of the historical capacity build-up and the (optional) recursive-dynamic solution
+*    approach. When working with a :class:`message_ix.Scenario` via the scientific programming API, the set of all
+*    periods is called ``year`` for a more concise notation. The specification of the model horizon is implemented
+*    using the mapping set ``cat_year`` and the type "firstmodelyear".
 *
-* .. _period_year_footnote:
-*
-* .. [#period_year] In |MESSAGEix|, the key of an element in set ``year`` identifies *the last year* of the period,
-*    i.e., in a set :math:`year = [2000, 2005, 2010, 2015]`,
-*    the period '2010' comprises the years :math:`[2006, .. ,2010]`.
+* .. [#period_year] See :doc:`/time`.
 *
 * .. [#time] The set ``time`` collects all sub-annual temporal units across all levels of temporal disaggregation.
 *    In a ``MESSAGE``-scheme :class:`ixmp.Scenario`, this set always includes an element "year",
@@ -119,6 +112,31 @@ $ONEMPTY
 * .. [#relations] A generic formulation of linear constraints is implemented in |MESSAGEix|,
 *    see :ref:`section_of_generic_relations`. These constraints can be used for testing and development,
 *    but specific new features should be implemented by specific equations and parameters.
+*
+* Index names
+* ~~~~~~~~~~~
+*
+* Where the same set is used 2 or more times to index multiple dimensions of the same :ref:`parameter <parameter_def>`,
+* these dimensions are given names (called **index names**) that differ from the name of the set. The table below
+* contains a partial list of index names appearing in the documentation.
+*
+* .. list-table::
+*    :widths: 18 18 64
+*    :header-rows: 1
+*
+*    * - Set
+*      - Index name
+*      - Description
+*    * - ``node``
+*      - ``node_dest``
+*      - Node to which a technology providers commodity output.
+*    * - ``node``
+*      - ``node_loc``
+*      - Node where a technology operates.
+*    * - ``node``
+*      - ``node_origin``
+*      - Node from which a technology receives commodity input.
+*
 ***
 
 Sets
