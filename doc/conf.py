@@ -102,6 +102,7 @@ latex_engine = "lualatex"
 gh_ref = "master" if ".dev" in version else f"v{version}"
 
 extlinks = {
+    "issue": ("https://github.com/iiasa/message_ix/issue/%s", "#"),
     "pull": ("https://github.com/iiasa/message_ix/pull/%s", "PR #"),
     "tut": (f"https://github.com/iiasa/message_ix/blob/{gh_ref}/tutorial/%s", ""),
 }
