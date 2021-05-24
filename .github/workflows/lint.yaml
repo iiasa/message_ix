@@ -29,10 +29,10 @@ jobs:
         path: message_ix
 
     - uses: actions/setup-python@v2
-      with:
-        # This should match the "Latest version testable on GitHub Actions"
-        # in pytest.yml
-        python-version: "3.8"
+      # This should match the "Latest version testable on GitHub Actions"
+      # in pytest.yaml
+      # with:
+      #   python-version: "3.9"
 
     - name: Cache Python packages
       uses: actions/cache@v2
