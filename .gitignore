@@ -26,6 +26,7 @@
 
 # MESSAGEix specifics
 message_ix/model/MESSAGE_master.gms
+message_ix/model/cplex.opt
 
 # Apple file system
 .DS_Store
