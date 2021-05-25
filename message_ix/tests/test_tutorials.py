@@ -1,4 +1,5 @@
 import sys
+from shutil import copyfile
 
 import numpy as np
 import pytest
@@ -23,6 +24,8 @@ tutorials = [
         [("solve-objective-value", 369297.75)],
         {},
     ),
+    (("westeros", "westeros_baseline_using_xlsx_import_part1"), [], {}),
+    (("westeros", "westeros_baseline_using_xlsx_import_part2"), [], {}),
     (("westeros", "westeros_emissions_bounds"), [], {}),
     (("westeros", "westeros_emissions_taxes"), [], {}),
     (("westeros", "westeros_firm_capacity"), [], {}),
@@ -48,6 +51,15 @@ tutorials = [
 
 # Short, readable IDs for the tests
 ids = [arg[0][-1] for arg in tutorials]
+
+# List of data files required to run tutorials
+data_files = [
+    "westeros_baseline_demand.xlsx",
+    "westeros_baseline_technology_basic.xlsx",
+    "westeros_baseline_technology_constraint.xlsx",
+    "westeros_baseline_technology_economic.xlsx",
+    "westeros_baseline_technology_historic.xlsx",
+]
 
 
 @pytest.fixture
@@ -75,6 +87,11 @@ def test_tutorial(nb_path, cell_values, run_args, tmp_path, tmp_env):
     tmp_env["PYTHONPATH"] = path_sep.join(
         [str(nb_path.parent), tmp_env.get("PYTHONPATH", "")]
     )
+
+    # Copy necessary data files to tmp_path
+    if "westeros_baseline_using_xlsx_import_part2" in nb_path.parts[-1]:
+        for fil in data_files:
+            copyfile(nb_path.parent / fil, tmp_path / fil)
 
     # The notebook can be run without errors
     nb, errors = run_notebook(nb_path, tmp_path, tmp_env, **run_args)
