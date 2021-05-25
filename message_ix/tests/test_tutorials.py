@@ -54,11 +54,11 @@ ids = [arg[0][-1] for arg in tutorials]
 
 # List of data files required to run tutorials
 data_files = [
-    "westeroes_baseline_demand.xlsx",
-    "westeroes_baseline_technology_basic.xlsx",
-    "westeroes_baseline_technology_constraint.xlsx",
-    "westeroes_baseline_technology_economic.xlsx",
-    "westeroes_baseline_technology_historic.xlsx",
+    "westeros_baseline_demand.xlsx",
+    "westeros_baseline_technology_basic.xlsx",
+    "westeros_baseline_technology_constraint.xlsx",
+    "westeros_baseline_technology_economic.xlsx",
+    "westeros_baseline_technology_historic.xlsx",
 ]
 
 
@@ -89,7 +89,6 @@ def test_tutorial(nb_path, cell_values, run_args, tmp_path, tmp_env):
     )
 
     # Copy necessary data files to tmp_path
-    print(nb_path)
     if "westeros_baseline_using_xlsx_import_part2" in nb_path.parts[-1]:
         for fil in data_files:
             copyfile(nb_path.parent / fil, tmp_path / fil)
