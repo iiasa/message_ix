@@ -8,6 +8,35 @@ Before starting
   - What data do I require and in what format is the data?
   - Single or multiple collabortors/developers?
 
+There are countless ways to structure an energy model.
+There is no single correct structure not is their a single right way to structure the underlying process of building an energy model.
+There are however several aspects to take into consideration, prior to commencing the modeling exercise.
+
+#. Question 1. What question do I want to answer with the model?
+
+   Building an energy model requires a careful balance in the level of detail represented.
+   The number of demand sectors or technologies, the geographical as well as the temporal resolution are just a few examples where the level of detail plays a particularly important role.
+   The reason for this is because they act as multiplicators to each other, hence they can quickly increase the model complexity.
+   A concrete research question or outline for the analysis which is to be undertaken, helps to focus on detailing those aspects of the model relevant to answering the question.
+   If for example the goal is to understand the effects of a policy, which increases the share of renewables in the electricity generation mix, on fuel mix in the transport sector, then attention can be given to detailing the transport sector and therewith associated fuel generation processes. The industrial, residential or commercial sectors may be depicted at a more aggregate level.
+   A helpful approach to structuring the model is to develop a "Reference Energy System" (RES). In addition to guiding the model development process, the RES is also a very useful reference in the future to help document the model.
+   
+#. Question 2. What data is available and in what format?
+
+   Having used the RES to structure the overall model layout, it will also be useful in identifying input data requirements.
+   The data used as input to the model is critical in determining the results.
+   The data used across different model aspects will not always come from a single source. Naming conventions, data formats, granularity or the time point at which the data was compiled can vary.
+   Possibly data availability will also influence the model structure.
+   Ideally sourcing data, cross checking the data for consistency and possibly identifying alternative methods or assumptions to compensate data gaps should largely be completed prior to commencing the modelling work.
+
+#. Question 3. Who will be developing/using the model?
+
+   Additional requirements may arise depending on the number of people developing the model or the future users.
+   On the one hand, the detail in the documentation of the model can differ, the coding style used in scripts to 
+
+   
+
+
 - Familiarize yourself with the documentation of MESSAGEix.
   - Documentation of functions and code.
   - Searching page for information.
