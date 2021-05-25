@@ -1,9 +1,20 @@
+.. _v3.3.0:
+
 Next release
 ============
+
+Migration notes
+---------------
+
+``rmessageix`` (and ``rixmp``) are deprecated and removed, as newer versions of the R `reticulate <https://rstudio.github.io/reticulate/>`_ package allow direct import and use of the Python modules with full functionality.
+See the updated page for :doc:`rmessageix`, and the updated instructions on how to :ref:`install-r`.
+
 
 All changes
 -----------
 
+- :pull:`473`: Remove ``rmessageix``.
+- Expand documentation of :ref:`commodity storage <gams-storage>` sets, parameters, and equations.
 - :pull:`450`: Add two new Westeros :doc:`tutorial <tutorials>` on creating scenarios from Excel files.
 - :pull:`456`: Fix bug in :meth:`.years_active` to use the lifetime corresponding to the vintage year for which the active years are being retrieved.
 - :pull:`408`: Add a PowerPoint document usable to generate the RES diagrams for the Westeros tutorials.
@@ -11,6 +22,7 @@ All changes
 - :pull:`365`: Add new Westeros :doc:`tutorial <tutorials>` on add-on technologies.
 - :pull:`454`: Expand documentation of :ref:`dynamic constraint parameters <section_parameter_dynamic_constraints>`.
 - :pull:`441`: Adjust :mod:`message_ix.reporting` to use :mod:`genno` / :mod:`ixmp.reporting` changes in `ixmp PR #397 <https://github.com/iiasa/ixmp/pull/397>`_.
+
 
 v3.2.0 (2021-01-24)
 ===================

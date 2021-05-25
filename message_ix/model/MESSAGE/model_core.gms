@@ -2162,14 +2162,14 @@ STORAGE_CHANGE(node,storage_tec,level_storage,commodity,year,time) ..
 * Equation STORAGE_BALANCE
 * """"""""""""""""""""""""
 *
-* This equation ensures the commodity balance of storage technologies,
-* where the commodity is shifted between sub-annual timesteps within a model period.
-* If the state of charge of storage is set exogenously in one timestep through :math:`storage\_initial_{n,t,l,y,h}` parameter,
-* the content from the previous timestep is not carried over to this timestep.
+* This equation ensures the commodity balance of storage technologies, where the commodity is shifted between sub-annual
+* timesteps within a model period. If the state of charge of storage is set exogenously in one timestep through
+* :math:`\storageinitial_{ntlcyh}`, the content from the previous timestep is not carried over to this timestep.
 *
-*   .. math::
-*      STORAGE_{n,t,l,y,h} \ = storage\_initial_{n,t,l,y,h} + STORAGE\_CHARGE_{n,t,l,y,h} + \\
-*      STORAGE_{n,t,l,y,h-1} \cdot (1 - storage\_self\_discharge_{n,t,l,y,h-1}) \quad \forall \ t \in T^{STOR}, & \forall \ l \in L^{STOR}
+* .. math::
+*    \STORAGE_{ntlcyh} =\ & \STORAGECHARGE_{ntlcyh} + \\
+*    & \STORAGE_{ntlcy(h-1)} \cdot (1 - \storageselfdischarge_{ntly(h-1)}) \\
+*    \forall\ & t \in T^{STOR}, l \in L^{STOR}, \storageinitial_{ntlcyh} = 0
 ***
 STORAGE_BALANCE(node,storage_tec,level,commodity,year,time2)$ (
     SUM(tec, map_tec_storage(node,tec,storage_tec,level,commodity) )
@@ -2184,6 +2184,20 @@ STORAGE_BALANCE(node,storage_tec,level,commodity,year,time2)$ (
 * considering storage self-discharge losses due to keeping the storage media between two subannual timesteps
         * (1 - storage_self_discharge(node,storage_tec,level,commodity,year,time) ) ) ;
 
+***
+* .. _equation_storage_balance_init:
+*
+* Equation STORAGE_BALANCE_INIT
+* """""""""""""""""""""""""""""
+*
+* Where :math:`\storageinitial_{ntlyh}` has a non-zero value, this equation ensures that the amount of commodity stored
+* at the end of the period is equal to that value plus any change during the period.
+*
+* .. math::
+*    \STORAGE_{ntlcyh} =\ & \storageinitial_{ntlcyh} + \STORAGECHARGE_{ntlcyh} \\
+*    \forall\ & \storageinitial_{ntlcyh} \neq 0
+***
+
 STORAGE_BALANCE_INIT(node,storage_tec,level,commodity,year,time)$ (
     SUM(tec, map_tec_storage(node,tec,storage_tec,level,commodity) )
     AND storage_initial(node,storage_tec,level,commodity,year,time) )..
@@ -2193,6 +2207,23 @@ STORAGE_BALANCE_INIT(node,storage_tec,level,commodity,year,time)$ (
 * (here the content from the previous time step is not carried over)
     storage_initial(node,storage_tec,level,commodity,year,time)
     + STORAGE_CHARGE(node,storage_tec,level,commodity,year,time) ;
+
+***
+* .. _equation_storage_equivalence:
+*
+* Equation STORAGE_EQUIVALENCE
+* """"""""""""""""""""""""""""
+*
+* This equation links :math:`\STORAGE` to activity (:math:`\ACT`) for each active storage *container* technology
+* :math:`t`; this is distinct from the *(dis)charge* technologies :math:`t^C,t^D` appearing in
+* :ref:`equation_storage_change`.
+*
+* .. math::
+*    \STORAGE_{ntlcy^Ah} =\ & \sum_{\{n^Ly^Vh^O \vert K\}} \durationtimerel_{hh^O} \times \ACT_{n^Lty^Vy^Amh^O} \\
+*    \forall\ & n,t,l,c,m,y^A,h \vert t \in T^{STOR} \\
+*    K:\ & \input_{n^Lty^Vy^Amn^Oclhh^O} \neq 0
+*
+***
 
 * Connecting an input commodity to maintain the operation of storage container over time (optional)
 STORAGE_EQUIVALENCE(node,storage_tec,level,commodity,level_storage,commodity2,mode,year,time)$

@@ -60,8 +60,8 @@
 *
 * .. [#year_auto] The values for this parameter are computed automatically when exporting a ``MESSAGE``-scheme
 *    :class:`ixmp.Scenario` to gdx.
-*    Note that in |MESSAGEix|, the elements of the ``year`` set are understood to be the last year in a period,
-*    see :ref:`this footnote <period_year_footnote>`.
+*    Note that in |MESSAGEix|, the elements of the ``year`` set are understood to be the last year in a period.
+*    See :doc:`/time`.
 *
 * .. [#df_auto] These parameters are computed during the GAMS execution.
 ***

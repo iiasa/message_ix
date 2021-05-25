@@ -21,11 +21,11 @@
 #*
 *#
 .
-*.Rproj
 *.eggs
 
 # MESSAGEix specifics
 message_ix/model/MESSAGE_master.gms
+message_ix/model/cplex.opt
 
 # Apple file system
 .DS_Store
@@ -38,12 +38,6 @@ doc/model
 # setuptools
 build
 dist
-
-# rmessageix build folder and rhistory
-rmessageix/rmessageix*.zip
-rmessageix/source/inst/docum/*.html
-rmessageix/source/.Rhistory
-!rmessageix/source/*.Rproj
 
 # testdb
 .cache/**

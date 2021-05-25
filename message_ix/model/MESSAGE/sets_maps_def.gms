@@ -1,12 +1,12 @@
 ***
 * .. _sets_maps_def:
 *
-* Sets and mappings definition
-* =============================
+* Sets and mappings
+* =================
 *
-* This file contains the definition of all sets and mappings used in |MESSAGEix|.
-* The short mathematical notation in the **Notation** column of the tables below is used
-* in the mathematical description relative to the GAMS code.
+* :file:`sets_maps_def.gms` defines all sets and mappings used in |MESSAGEix|. The symbols in the **Notation** column of
+* the tables below are used in the equations of the mathematical formulation, while the set names appear in the GAMS
+* code.
 ***
 
 * IMPORTANT
@@ -65,8 +65,7 @@ $ONEMPTY
 *      - Land-use types (e.g., field, forest, pasture)
 *    * - year [year_all] [#year_all]_ [#period_year]_
 *      - :math:`y \in Y`
-*      - Model horizon (including historical periods for vintage structure of installed capacity
-*        and dynamic constraints)
+*      - Periods, denoted by the final year, in the model horizon
 *    * - time [#time]_
 *      - :math:`h \in H`
 *      - Subannual time periods (seasons, days, hours)
@@ -75,13 +74,13 @@ $ONEMPTY
 *      - Set of constraints on shares of technologies and commodities
 *    * - relation [#relations]_
 *      - :math:`r \in R`
-*      - Set of generic relations (linear constraints)
+*      - Names of generic relations (linear constraints)
 *    * - lvl_spatial
 *      -
-*      - Set of spatial hierarchy levels (global, region, country, grid cell)
+*      - Spatial hierarchy levels, e.g.  global, region, country, or grid cell.
 *    * - lvl_temporal
 *      -
-*      - Set of temporal hierarchy levels (year, season, day, hour)
+*      - Temporal hierarchy levels, e.g. year, season, day, or hour.
 *    * - rating
 *      - :math:`q \in Q`
 *      - Identifies the 'quality' of the renewable energy potential (rating of non-dispatchable
@@ -94,20 +93,14 @@ $ONEMPTY
 *
 * .. [#mode] For example, high electricity or high heat production modes of operation for combined heat and power plants.
 *
-* .. [#year_all] In the |MESSAGEix| implementation in GAMS, the set ``year_all`` denotes the "superset"
-*    of the entire horizon (historical and model horizon), and the set ``year`` is a dynamic subset of ``year_all``.
-*    This facilitates an efficient implementation of the historical capacity build-up and
-*    the (optional) recursive-dynamic solution approach.
-*    When working with a :class:`message_ix.Scenario` via the scientific programming API, the set of all periods is
-*    called ``year`` for a more concise notation.
-*    The specification of the model horizon is implemented using the mapping set ``cat_year``
-*    and the type "firstmodelyear".
+* .. [#year_all] In the |MESSAGEix| implementation in GAMS, the set ``year_all`` denotes the "superset" of the entire
+*    horizon (historical and model horizon), and the set ``year`` is a dynamic subset of ``year_all``. This facilitates
+*    an efficient implementation of the historical capacity build-up and the (optional) recursive-dynamic solution
+*    approach. When working with a :class:`message_ix.Scenario` via the scientific programming API, the set of all
+*    periods is called ``year`` for a more concise notation. The specification of the model horizon is implemented
+*    using the mapping set ``cat_year`` and the type "firstmodelyear".
 *
-* .. _period_year_footnote:
-*
-* .. [#period_year] In |MESSAGEix|, the key of an element in set ``year`` identifies *the last year* of the period,
-*    i.e., in a set :math:`year = [2000, 2005, 2010, 2015]`,
-*    the period '2010' comprises the years :math:`[2006, .. ,2010]`.
+* .. [#period_year] See :doc:`/time`.
 *
 * .. [#time] The set ``time`` collects all sub-annual temporal units across all levels of temporal disaggregation.
 *    In a ``MESSAGE``-scheme :class:`ixmp.Scenario`, this set always includes an element "year",
@@ -119,6 +112,31 @@ $ONEMPTY
 * .. [#relations] A generic formulation of linear constraints is implemented in |MESSAGEix|,
 *    see :ref:`section_of_generic_relations`. These constraints can be used for testing and development,
 *    but specific new features should be implemented by specific equations and parameters.
+*
+* Index names
+* ~~~~~~~~~~~
+*
+* Where the same set is used 2 or more times to index multiple dimensions of the same :ref:`parameter <parameter_def>`,
+* these dimensions are given names (called **index names**) that differ from the name of the set. The table below
+* contains a partial list of index names appearing in the documentation.
+*
+* .. list-table::
+*    :widths: 18 18 64
+*    :header-rows: 1
+*
+*    * - Set
+*      - Index name
+*      - Description
+*    * - ``node``
+*      - ``node_dest``
+*      - Node to which a technology providers commodity output.
+*    * - ``node``
+*      - ``node_loc``
+*      - Node where a technology operates.
+*    * - ``node``
+*      - ``node_origin``
+*      - Node from which a technology receives commodity input.
+*
 ***
 
 Sets
@@ -191,6 +209,9 @@ Alias(commodity,commodity2);
 *    * - level_renewable (level) [#level_res]_
 *      - :math:`l \in L^{REN} \subseteq L`
 *      - Levels related to `renewables` representation
+*    * - level_storage(level)
+*      - :math:`l \in L^{STOR} \subseteq L`
+*      - Subsets of levels on which commodities are :ref:`stored <gams-storage>`; excluded from :ref:`commodity balances <commodity_balance_lt>`.
 *    * - type_node [#type_node]_
 *      - :math:`\widehat{n} \in \widehat{N}`
 *      - Category types for nodes
@@ -209,6 +230,9 @@ Alias(commodity,commodity2);
 *    * - renewable_tec (tec) [#renewable_tec]_
 *      - :math:`t \in T^{REN} \subseteq T`
 *      - Specific subset of renewable-energy technologies (all technologies which draw their input from the renewable level)
+*    * - storage_tec(tec)
+*      - :math:`t \in T^{STOR} \subseteq T`
+*      - Subset of technologies that are :ref:`storage <gams-storage>` container technologies (reservoirs)
 *    * - addon(tec)
 *      - :math:`t^a \in T^{A} \subseteq T`
 *      - Specific subset of technologies that are an add-on to other (parent) technologies
@@ -236,12 +260,6 @@ Alias(commodity,commodity2);
 *    * - balance_equality (commodity,level)
 *      - :math:`c \in C, l \in L`
 *      - Commodities and level related to :ref:`commodity_balance_lt`
-*    * - level_storage(level)
-*      - :math:`l \in L^{STOR} \subseteq L`
-*      - Levels related to `storage` representation (excluded from :ref:`commodity_balance_lt`)
-*    * - storage_tec(tec)
-*      - :math:`t \in T^{STOR} \subseteq T`
-*      - Set of `storage` container technologies (reservoirs)
 *
 * .. [#level_res] The constraint :ref:`extraction_equivalence` is active only for the levels included in this set,
 *    and the constraint :ref:`commodity_balance` is deactivated for these levels.
@@ -267,14 +285,16 @@ Alias(commodity,commodity2);
 
 * category types and mappings
 Sets
-    level_resource (level)                  subset of 'level' to mark all levels related to make hfossil resources
-    level_renewable(level)                  subset of 'level' to mark all levels related to renewable resources
+    level_resource (level)                  subset of 'level' related to make hfossil resources
+    level_renewable(level)                  subset of 'level' related to renewable resources
+    level_storage(level)                    subset of 'level' related to storage technologies (excluded from commodity balance)
     type_node                               types of nodes
     cat_node(type_node,node)                mapping of nodes to respective categories
     type_tec                                types of technologies
     cat_tec(type_tec,tec)                   mapping of technologies to respective categories
     inv_tec(tec)                            technologies that have explicit investment and capacity decision variables
     renewable_tec(tec)                      technologies that use renewable energy potentials
+    storage_tec(tec)                        technologies used as storage containers (reservoirs)
     addon(tec)                              technologies that are an add-on to other (parent) technologies
     type_addon                              types of add-on technologies (that can be applied mutually exclusive)
     cat_addon(type_addon,addon)             mapping of add-on technologies to respective add-on technology types
@@ -284,7 +304,6 @@ Sets
     cat_emission(type_emission,emission)    mapping of emissions to respective categories
     type_tec_land(type_tec)                 dynamic set whether emissions from land use are included in type_tec
     balance_equality(commodity,level)       mapping of commodities-level where the supply-demand balance must be maintained with equality
-* storage_tec and level_storage are defined at the bottom of this file.
 ;
 
 Alias(type_tec,type_tec_share);
@@ -297,8 +316,8 @@ Alias(type_tec,type_tec_total);
 ***
 * .. _section_maps_def:
 *
-* Mappings sets
-* -------------
+* Mapping sets
+* ------------
 *
 * .. note::
 *
@@ -319,7 +338,7 @@ Alias(type_tec,type_tec_total);
 *    * - map_time(time,time2)
 *      - Mapping of time periods across hierarchy levels (time2 is in time)
 *    * - map_time_period(year_all,lvl_temporal,time,time2)
-*      - Mapping of the sequence of sub-annual timesteps (used in `storage` equations)
+*      - Mapping of the sequence of sub-annual timesteps (used in :ref:`storage <gams-storage>`)
 *    * - map_resource(node,commodity,grade,year_all)
 *      - Mapping of resources and grades to node over time
 *    * - map_ren_grade(node,commodity,grade,year_all)
@@ -339,13 +358,15 @@ Alias(type_tec,type_tec_total);
 *    * - map_tec_mode(node,tec,year_all,mode)
 *      - Mapping of technology to modes
 *    * - map_tec_storage(node,tec,tec2,level,commodity)
-*      - Mapping of charge-discharge technologies ``tec`` to their storage container ``tec2``, and ``level`` and ``commodity`` of storage
+*      - Mapping of charge-discharge technologies ``tec`` to their storage container ``tec2``, stored ``commodity`` and ``level``.
+*    * - map_time_commodity_storage(node,tec,level,commodity,mode,year_all,time)
+*      - Mapping of storage containers to their input commodity-level (not commodity-level of stored media)
 ***
 
 Sets
-    map_node(node,location)                     mapping of nodes across hierarchy levels (location is in node)
-    map_time(time,time2)                        mapping of time periods across hierarchy levels (time2 is in time)
-* map_time_period and map_tec_storage are defined at the bottom of this file.
+    map_node(node,location)                            mapping of nodes across hierarchy levels (location is in node)
+    map_time(time,time2)                               mapping of time periods across hierarchy levels (time2 is in time)
+    map_time_period(year_all,lvl_temporal,time,time2)  mapping of the sequence of sub-annual timesteps
 
     map_resource(node,commodity,grade,year_all)  mapping of resources and grades to node over time
     map_ren_grade(node,commodity,grade,year_all) mapping of renewables and grades to node over time
@@ -355,11 +376,12 @@ Sets
     map_commodity(node,commodity,level,year_all,time)    mapping of commodity-level to node and time
     map_stocks(node,commodity,level,year_all)    mapping of commodity-level to node and time
 
-    map_tec(node,tec,year_all)                   mapping of technology to node and years
-    map_tec_time(node,tec,year_all,time)         mapping of technology to temporal dissagregation (time)
-    map_tec_mode(node,tec,year_all,mode)         mapping of technology to modes
-    map_tec_act(node,tec,year_all,mode,time)     mapping of technology to modes AND temporal dissagregation
-    map_tec_addon(tec,type_addon)                mapping of types of add-on technologies to the underlying parent technology
+    map_tec(node,tec,year_all)                      mapping of technology to node and years
+    map_tec_time(node,tec,year_all,time)            mapping of technology to temporal dissagregation (time)
+    map_tec_mode(node,tec,year_all,mode)            mapping of technology to modes
+    map_tec_act(node,tec,year_all,mode,time)        mapping of technology to modes AND temporal dissagregation
+    map_tec_addon(tec,type_addon)                   mapping of types of add-on technologies to the underlying parent technology
+    map_tec_storage(node,tec,tec2,level,commodity)  mapping of charge-discharging technologies to their respective storage container tec and level-commodity
 
     map_spatial_hierarchy(lvl_spatial,node,node)    mapping of spatial resolution to nodes (last index is 'parent')
     map_temporal_hierarchy(lvl_temporal,time,time)  mapping of temporal resolution to time (last index is 'parent')
@@ -371,6 +393,9 @@ Sets
 
     map_land(node,land_scenario,year_all)            mapping of land-use model emulator scenarios to nodes and years
     map_relation(relation,node,year_all)             mapping of generic (user-defined) relations to nodes and years
+
+* Storage
+    map_time_commodity_storage(node,tec,level,commodity,mode,year_all,time)  mapping of storage containers to their input commodity-level (not commodity-level of stored media)
 ;
 
 * additional sets created in GAMS to make notation more concise
@@ -455,16 +480,4 @@ Sets
     is_fixed_capacity(node,tec,vintage,year_all)           flag whether maintained capacity variable is fixed
     is_fixed_activity(node,tec,vintage,year_all,mode,time) flag whether activity variable is fixed
     is_fixed_land(node,land_scenario,year_all)             flag whether land level is fixed
-;
-
-*----------------------------------------------------------------------------------------------------------------------*
-* Storage sets and mappings                                                                             *
-*----------------------------------------------------------------------------------------------------------------------*
-
-Sets
-    level_storage(level)                                        level of storage technologies (excluded from commodity balance)
-    map_tec_storage(node,tec,tec2,level,commodity)              mapping of charge-discharging technologies to their respective storage container tec and level-commodity
-    storage_tec(tec)                                            storage container technologies (reservoir)
-    map_time_period(year_all,lvl_temporal,time,time2)           mapping of the sequence of sub-annual timesteps (used in storage equations)
-    map_time_commodity_storage(node,tec,level,commodity,mode,year_all,time)              mapping of storage containers to their input commodity-level (not commodity-level of stored media)
 ;

@@ -101,7 +101,6 @@ def stacked_bar(qty, dims=["nl", "t", "ya"], units="", title="", cf=1.0, stacked
         xlabel="Year",
         ylabel=units,
         title=f"{df.loc[0, dims[0]]} {title}",
-        width=5.0,
     )
     ax.legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
 

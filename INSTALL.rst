@@ -177,22 +177,31 @@ To check the current version::
     $ pip show message-ix
 
 
-Install ``rmessageix``
-======================
+.. _install-r:
 
-``rmessageix`` is the R interface to |MESSAGEix|; see :doc:`rmessageix`.
-You only need to install ``rmessageix`` if you intend to use :mod:`message_ix` from R, rather than from Python.
+Install R and reticulate
+========================
 
-Install |MESSAGEix| **from source**, per the previous section.
+You only need to install R if you want to use :mod:`message_ix` and :mod:`ixmp` from R, rather than from Python.
+
+First, install :mod:`message_ix` using one of the three methods above.
 Then:
 
-10. Open a command prompt in the :file:`message_ix/` directory and type the following commands to build, then install, ``rmessageix``::
+1. `Install R <https://www.r-project.org>`_.
 
-    $ R CMD build rmessageix
-    $ R CMD INSTALL rmessageix_*.zip
+   .. warning::
+      Ensure the the R version installed is either 32- *or* 64-bit (and >= 3.5.0), consistent with GAMS and Java.
+      Having both 32- and 64-bit versions of R, or mixed 32- and 64-bit versions of different packages, can cause errors.
 
-11. (Optional) Install `IRkernel`_, which allows running R code in Jupyter notebooks (see the link for instructions).
-    Check that the R interface works by using the built-in test suite to run the R tutorial notebooks::
+2. `Install reticulate <https://rstudio.github.io/reticulate/#installation>`_.
+
+3. (Optional) Install `IRkernel`_, which allows running R code in Jupyter notebooks (see the link for instructions).
+
+Next:
+
+- See :doc:`rmessageix` for further details.
+
+- If you installed :mod:`message_ix` from source, check that the R interface works by using the built-in test suite to run the R tutorial notebooks::
 
     $ pytest -m rmessageix
 
