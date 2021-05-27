@@ -45,12 +45,29 @@ tutorials = [
     ((AT, "austria_multiple_policies-answers"), [], {}),
     ((AT, "austria_load_scenario"), [], {}),
     # R tutorials / IR kernel
-    ((AT, "R_austria"), [], dict(kernel="IR")),
-    ((AT, "R_austria_load_scenario"), [], dict(kernel="IR")),
+    pytest.param(
+        (AT, "R_austria"),
+        [],
+        dict(kernel="IR"),
+        marks=pytest.mark.skipif(
+            sys.version_info[1] <= 6 and sys.platform != "linux",
+            reason="R/reticulate link fails on GitHub Actions workers for Python 3.6",
+        ),
+    ),
+    pytest.param(
+        (AT, "R_austria_load_scenario"),
+        [],
+        dict(kernel="IR"),
+        marks=pytest.mark.skipif(
+            sys.version_info[1] <= 6 and sys.platform != "linux",
+            reason="R/reticulate link fails on GitHub Actions workers for Python 3.6",
+        ),
+    ),
 ]
 
-# Short, readable IDs for the tests
-ids = [arg[0][-1] for arg in tutorials]
+# Short, readable IDs for the tests. Use getattr() to unpack the values from
+# pytest.param()
+ids = [getattr(arg, "values", arg)[0][-1] for arg in tutorials]
 
 # List of data files required to run tutorials
 data_files = [

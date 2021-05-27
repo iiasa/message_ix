@@ -1,0 +1,2 @@
+# Reduce the number of merge conflicts
+RELEASE_NOTES.rst merge=union

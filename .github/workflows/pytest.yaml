@@ -7,6 +7,7 @@ on:
     branches: [ master ]
 
 env:
+  GAMS_VERSION: 25.1.1
   # See description in lint.yml
   depth: 100
 
@@ -28,11 +29,6 @@ jobs:
         # pandas. Compiling these on the job runner requires a more elaborate
         # build environment, currently out of scope for the message_ix project.
         # - "3.10.0-alpha.1"  # Development version
-
-        exclude:
-        # See https://github.com/iiasa/ixmp/issues/360
-        - os: windows-latest
-          python-version: "3.6"
 
       fail-fast: false
 
@@ -78,6 +74,7 @@ jobs:
       shell: bash
 
     - uses: r-lib/actions/setup-r@master
+      id: setup-r
 
     - name: Use OpenJDK 14 (macOS only)
       # Using the default OpenJDK 1.8 on the macos-latest runner produces
@@ -96,14 +93,15 @@ jobs:
           ~/Library/Caches/pip
           ~/appdata/local/pip/cache
           ${{ env.R_LIBS_USER }}
-        key: ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-py${{ matrix.python-version }}
+        key: ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-py${{ matrix.python-version }}-R${{ steps.setup-r.outputs.installed-r-version }}
         restore-keys: |
+          ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-py${{ matrix.python-version }}-
           ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-
           ${{ matrix.os }}-
 
     - uses: iiasa/actions/setup-gams@main
       with:
-        version: 25.1.1
+        version: ${{ env.GAMS_VERSION }}
         license: ${{ secrets.GAMS_LICENSE }}
 
     - uses: ts-graphviz/setup-graphviz@v1
@@ -125,9 +123,8 @@ jobs:
         remotes::install_cran(
           c("dplyr", "IRkernel", "reticulate"),
           dependencies = TRUE,
-          force = TRUE,
+          # force = TRUE,
         )
-        print(installed.packages())
         IRkernel::installspec()
       shell: Rscript {0}
 
