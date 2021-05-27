@@ -7,6 +7,7 @@ on:
     branches: [ master ]
 
 env:
+  GAMS_VERSION: 25.1.1
   # See description in lint.yml
   depth: 100
 
@@ -73,6 +74,7 @@ jobs:
       shell: bash
 
     - uses: r-lib/actions/setup-r@master
+      id: setup-r
 
     - name: Use OpenJDK 14 (macOS only)
       # Using the default OpenJDK 1.8 on the macos-latest runner produces
@@ -91,14 +93,15 @@ jobs:
           ~/Library/Caches/pip
           ~/appdata/local/pip/cache
           ${{ env.R_LIBS_USER }}
-        key: ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-py${{ matrix.python-version }}
+        key: ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-py${{ matrix.python-version }}-R${{ steps.setup-r.outputs.installed-r-version }}
         restore-keys: |
+          ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-py${{ matrix.python-version }}-
           ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-
           ${{ matrix.os }}-
 
     - uses: iiasa/actions/setup-gams@main
       with:
-        version: 25.1.1
+        version: ${{ env.GAMS_VERSION }}
         license: ${{ secrets.GAMS_LICENSE }}
 
     - uses: ts-graphviz/setup-graphviz@v1
