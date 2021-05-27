@@ -13,7 +13,7 @@ Once installed, use reticulate to import the Python packages:
 
    library(reticulate)
    ixmp <- import("ixmp")
-   ixmp <- import("message_ix")
+   message_ix <- import("message_ix")
 
 This creates two global variables, ``ixmp`` and ``message_ix``, that can be used much like the Python modules:
 
