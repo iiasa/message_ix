@@ -123,9 +123,8 @@ jobs:
         remotes::install_cran(
           c("dplyr", "IRkernel", "reticulate"),
           dependencies = TRUE,
-          force = TRUE,
+          # force = TRUE,
         )
-        print(installed.packages())
         IRkernel::installspec()
       shell: Rscript {0}
 
