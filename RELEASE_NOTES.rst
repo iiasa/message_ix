@@ -1,7 +1,13 @@
+.. Next release
+.. ============
+
+.. All changes
+.. -----------
+
 .. _v3.3.0:
 
-Next release
-============
+v3.3.0 (2021-05-28)
+===================
 
 Migration notes
 ---------------
@@ -13,18 +19,18 @@ See the updated page for :doc:`rmessageix`, and the updated instructions on how 
 All changes
 -----------
 
-- :pull:`369`: Update the Westeros :doc:`tutorial <tutorials>` on flexible generation.
-- :pull:`370`: Add a Westeros :doc:`tutorial <tutorials>` on modeling renewable resource supply curves.
-- :pull:`368`: Update the Westeros :doc:`tutorial <tutorials>` on firm capacity.
-- :pull:`473`: Remove ``rmessageix``.
-- Expand documentation of :ref:`commodity storage <gams-storage>` sets, parameters, and equations.
-- :pull:`450`: Add two new Westeros :doc:`tutorial <tutorials>` on creating scenarios from Excel files.
-- :pull:`456`: Fix bug in :meth:`.years_active` to use the lifetime corresponding to the vintage year for which the active years are being retrieved.
-- :pull:`408`: Add a PowerPoint document usable to generate the RES diagrams for the Westeros tutorials.
-- :pull:`460`: Expand documentation :doc:`install` for installing GAMS under macOS.
-- :pull:`365`: Add new Westeros :doc:`tutorial <tutorials>` on add-on technologies.
-- :pull:`454`: Expand documentation of :ref:`dynamic constraint parameters <section_parameter_dynamic_constraints>`.
-- :pull:`441`: Adjust :mod:`message_ix.reporting` to use :mod:`genno` / :mod:`ixmp.reporting` changes in `ixmp PR #397 <https://github.com/iiasa/ixmp/pull/397>`_.
+- Update the Westeros :doc:`tutorial <tutorials>` on flexible generation (:pull:`369`).
+- Add a Westeros :doc:`tutorial <tutorials>` on modeling renewable resource supply curves (:pull:`370`).
+- Update the Westeros :doc:`tutorial <tutorials>` on firm capacity (:pull:`368`).
+- Remove ``rmessageix`` (:pull:`473`).
+- Expand documentation of :ref:`commodity storage <gams-storage>` sets, parameters, and equations (:pull:`473`).
+- Add two new Westeros :doc:`tutorial <tutorials>` on creating scenarios from Excel files (:pull:`450`).
+- Fix bug in :meth:`.years_active` to use the lifetime corresponding to the vintage year for which the active years are being retrieved (:pull:`456`).
+- Add a PowerPoint document usable to generate the RES diagrams for the Westeros tutorials (:pull:`408`).
+- Expand documentation :doc:`install` for installing GAMS under macOS (:pull:`460`).
+- Add new Westeros :doc:`tutorial <tutorials>` on add-on technologies (:pull:`365`).
+- Expand documentation of :ref:`dynamic constraint parameters <section_parameter_dynamic_constraints>` (:pull:`454`).
+- Adjust :mod:`message_ix.reporting` to use :mod:`genno` / :mod:`ixmp.reporting` changes in `ixmp PR #397 <https://github.com/iiasa/ixmp/pull/397>`_ (:pull:`441`).
 
 
 v3.2.0 (2021-01-24)
