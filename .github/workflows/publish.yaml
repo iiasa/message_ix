@@ -2,13 +2,13 @@ name: Build package / publish
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     tags: [ "v*" ]
   release:
     types: [ published ]
   # Check that package can be built even on PRs
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 
 jobs:

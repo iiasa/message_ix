@@ -8,7 +8,7 @@ on:
   - cron: "0 5 * * *"
   # Uncomment to debug
   # pull_request:
-  #   branches: [ master]
+  #   branches: [ main ]
 
 env:
   # Name of the test environment to create
