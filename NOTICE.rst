@@ -31,13 +31,13 @@ Cite, at minimum, the following manuscript:
   | doi: `10.1016/j.envsoft.2018.11.012`_
   | electronic pre-print available at `pure.iiasa.ac.at/15157/`_.
 
-In addition:
+In addition, you may:
 
-- Include a link, e.g. in a footnote, to the online documentation at https://docs.messageix.org.
-- Optionally, cite the code via Zenodo.
+- **Cite the code via Zenodo**.
   The DOI `10.5281/zenodo.4005684 <https://doi.org/10.5281/zenodo.4005684>`_ represents *all* versions of the :mod:`message_ix` code, and will always resolve to the latest version.
   At that page, you can also choose a different DOI in order to cite one specific version; for instance, `10.5281/zenodo.4005685 <https://doi.org/10.5281/zenodo.4005685>`_ to cite v3.1.0.
   Zenodo also provides citation export in BibTeX and other formats.
+- Include a link, e.g. in a footnote, to the online documentation at https://docs.messageix.org.
 
 
 3. Use the naming convention for new model instances

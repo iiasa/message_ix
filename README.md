@@ -8,65 +8,47 @@
 [![Test coverage](https://codecov.io/gh/iiasa/message_ix/branch/master/graph/badge.svg)](https://codecov.io/gh/iiasa/message_ix)
 
 
-MESSAGEix is a versatile, dynamic systems-optimization modeling framework developed by the IIASA Energy, Climate, and Environment (ECE) Program since the 1980s.
+MESSAGEix is a versatile, dynamic, model framework for energy-engineering-economy-environment (E4) systems research.
 
-MESSAGE is a specific mathematical formulation of a model for strategic energy planning and integrated assessment of energy-engineering-economy-environment (E4) systems.
-The linear-programming optimization model can be be linked to the general-equilibrium MACRO model to incorporate feedback between prices and demand levels for energy and commodities.
+**MESSAGE** (without “…ix”) is a specific formulation of a generic linear programming (LP) optimization model for strategic energy planning and integrated assessment of E4 systems, developed by the IIASA Energy, Climate, and Environment (ECE) Program since the 1980s.
+To incorporate feedback between prices and demand levels for energy and commodities, the LP model can optionally be linked to the economic general equilibrium (GE) **MACRO** model.
 
-The `message_ix` Python package includes [GAMS](http://www.gams.com) implementations of MESSAGE, MACRO, and their linkage, along with scientific programming APIs and tools for model-building, a test suite, and documentation.
-The framework is built on IIASA's [*ix* modeling platform (ixmp)](https://github.com/iiasa/ixmp), which provides data warehouse features for high-powered numerical scenario analysis.
+The `message_ix` Python package—also fully usable from R—includes:
 
+- Implementations of MESSAGE, MACRO, and their linkage, in GAMS,
+- Application programming interfaces (APIs) and tools for model building and scientific programming,
+- Extensive documentation and a complete test suite.
+
+The framework is built on IIASA's [*ix* modeling platform (`ixmp`)](https://github.com/iiasa/ixmp), which provides data warehouse features for high-powered numerical scenario analysis.
+
+## Documentation
+
+Complete documentation of the framework is avaiable at **https://docs.messageix.org/**.
+This includes:
+
+- **Installation** and recommended pre-requisite learning.
+  See [‘Getting started’](https://docs.messageix.org/en/stable/#getting-started), or the file [`INSTALL.rst`](INSTALL.rst).
+- **Tutorials** that introduce and demonstrate core features of the model framework using simple, single-country models, for both independent and classroom learning.
+  See [‘Tutorials’](https://docs.messageix.org/en/stable/tutorials.html) or the file  [`tutorial/README.rst`](tutorial/README.rst).
+- The [**Python and R APIs**](https://docs.messageix.org/en/stable/api.html).
+- The complete [**mathematical formulation**](https://docs.messageix.org/#mathematical-specification) of MESSAGE and MACRO, created automatically from inline comments in the GAMS source code.
+- How to **cite MESSAGEix when using it in published scientific work.**
+  See [‘User guidelines and notice’](https://docs.messageix.org/en/stable/notice.html) or the file [`NOTICE.rst`](NOTICE.rst).
+
+Other forms of documentation:
+
+- The online documentation is built automatically from the contents of the
+[`message_ix` GitHub repository](https://github.com/iiasa/messag_ix).
+- Documentation for the ‘latest’ or ‘stable’ release is shown by default.
+- Use the chooser to access the [‘latest’ version](https://docs.messageix.org/en/latest/), corresponding to the ``main`` branch and including the latest development code; or to access docs for a specific release, e.g. `v3.2.0`.
+- For offline use, the documentation can be built from the source code.
+  See the file [`doc/README.rst`](doc/README.rst)
 
 ## License
 
 Copyright © 2018–2021 IIASA Energy, Climate, and Environment (ECE) Program
 
-The MESSAGEix framework is licensed under the Apache License, Version 2.0 (the
-"License"); you may not use the files in this repository except in compliance
-with the License. You may obtain a copy of the License at
-<http://www.apache.org/licenses/LICENSE-2.0>.
+The MESSAGEix framework is licensed under the Apache License, Version 2.0 (the "License"); you may not use the files in this repository except in compliance with the License. You may obtain a copy of the License in [`LICENSE`](LICENSE) or at <http://www.apache.org/licenses/LICENSE-2.0>.
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
-
-See the user guidelines and notice [in the online documentation](https://docs.messageix.org/en/stable/notice.html) or the file [`NOTICE.rst`](NOTICE.rst).
-
-
-## Getting started
-
-### Documentation
-
-[Documentation of the MESSAGEix framework](https://docs.messageix.org/),
-including the complete mathematical formulation and associated files, is
-automatically created from mark-up comments in the GAMS, Python, and R code.
-
-- Documentation for the ‘latest’ or ‘stable’ release is shown by default.
-- Use the chooser to access the [docs for the ‘master’ branch](https://docs.messageix.org/en/master) of the GitHub repository, including the latest development code; or, to access docs for a specific version of message_ix, e.g. `v3.2.0`.
-- For offline use, the documentation can be built from the source code.
-  See the file `doc/README.rst`.
-
-### Installation
-
-See [the online documentation](https://docs.messageix.org/en/stable/#getting-started) or the file `INSTALL.rst`.
-
-### Tutorials
-
-For formal and self-guided learning, introductory tutorials are provided that
-illustrate the basic features of the modelling framework using simplified, single-country models.
-See [‘Tutorials’ in the documentation](https://docs.messageix.org/en/stable/tutorials.html) or the file `tutorial/README.rst`.
-
-
-## Scientific reference
-
-Please cite the following manuscript when using the MESSAGEix framework and/or
-the ix modeling platform for scientific publications or technical reports:
-
-> Daniel Huppmann, Matthew Gidden, Oliver Fricko, Peter Kolp, Clara Orthofer,
-  Michael Pimmer, Nikolay Kushin, Adriano Vinca, Alessio Mastrucci,
-  Keywan Riahi, and Volker Krey.
-  "The |MESSAGEix| Integrated Assessment Model and the ix modeling platform".
-  *Environmental Modelling & Software* 112:143-156, 2019.
-  doi: [10.1016/j.envsoft.2018.11.012](https://doi.org/10.1016/j.envsoft.2018.11.012)
-  electronic pre-print available at
-  [pure.iiasa.ac.at/15157/](https://pure.iiasa.ac.at/15157/)
-
-You may also cite the latest released version using the Zenodo DOI; again, see the `NOTICE`.
+In addition and per good scientific practice, you **must** cite the appropriate publications when you use MESSAGEix in scientific work.
+Again, see [‘User guidelines and notice’](https://docs.messageix.org/en/stable/notice.html) or the file [`NOTICE.rst`](NOTICE.rst).
