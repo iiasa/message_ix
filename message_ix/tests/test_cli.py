@@ -32,7 +32,7 @@ def test_copy_model(message_ix_cli, tmp_path, tmp_env):
     "opts",
     [
         "",
-        "--branch=master",
+        "--branch=main",
         "--tag=v1.2.0",
         # Nonexistent tag
         pytest.param("--tag=v999", marks=pytest.mark.xfail(raises=AssertionError)),

@@ -97,9 +97,9 @@ latex_engine = "lualatex"
 
 # -- Options for sphinx.ext.extlinks ---------------------------------------------------
 
-# Link to "master" blob if a non-release version of the docs is being built; otherwise
+# Link to "main" blob if a non-release version of the docs is being built; otherwise
 # to the tag for the release
-gh_ref = "master" if ".dev" in version else f"v{version}"
+gh_ref = "main" if ".dev" in version else f"v{version}"
 
 extlinks = {
     "issue": ("https://github.com/iiasa/message_ix/issue/%s", "#"),

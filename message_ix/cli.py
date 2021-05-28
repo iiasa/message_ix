@@ -74,7 +74,7 @@ def copy_model(path, overwrite, set_default):
 
 
 @main.command()
-@click.option("--branch", help="Repository branch to download from (e.g., master).")
+@click.option("--branch", help="Repository branch to download from (e.g., main).")
 @click.option("--tag", help="Repository tag to download from (e.g., v1.0.0).")
 @click.argument("path", type=click.Path())
 def dl(branch, tag, path):

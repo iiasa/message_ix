@@ -150,7 +150,7 @@ def cli(context, path):
 @click.option("--dbprops", type=click.File())
 @click.pass_obj
 def fetch(context, dbprops):
-    """Fetch scenarios from a master database to Excel files."""
+    """Fetch scenarios from a database to Excel files."""
     fetch_scenarios(context["path"], dbprops)
 
 

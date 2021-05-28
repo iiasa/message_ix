@@ -145,6 +145,6 @@ Have a question? Check…
 - …the message_ix Google Group, either `online <https://groups.google.com/d/forum/message_ix>`_ or via e-mail at <message_ix@googlegroups.com>.
 
 .. _`MESSAGEix-GLOBIOM documentation`: http://data.ene.iiasa.ac.at/message-globiom/
-.. _`APACHE 2.0 open-source license`: https://github.com/iiasa/message_ix/blob/master/LICENSE
+.. _`APACHE 2.0 open-source license`: https://github.com/iiasa/message_ix/blob/main/LICENSE
 
 .. [#rename] Known as the “Energy Program” until 2020-12-31.

@@ -71,10 +71,10 @@ Create a branch with an appropriate name:
 - ``all-lower-case-with-hyphens`` —underscores (``_``) are slower to type; don't use them.
 - ``issue/1234`` if you are addressing a specific issue.
 - ``feature/do-something`` if you are adding a new feature.
-- Don't use the ``master`` branch  in your fork for a PR.
+- Don't use the ``main`` branch in your fork for a PR.
   This makes it hard for others to check out and play with your code.
 
-Open a PR (e.g. on `message_ix`__) to merge your code into the ``master`` branch.
+Open a PR (e.g. on `message_ix`__) to merge your code into the ``main`` branch.
 The ``message_ix`` and ``ixmp`` repositories each have a template for the text of the PR that is designed to help you write a clear description.
 It includes:
 
@@ -157,7 +157,7 @@ Current practice for the ``ixmp``, ``message_ix``, and ``message_data`` reposito
 - Use **squash and merge**…
 
   - if the commit history for the PR is "messy", e.g. there are many merge commits from other branches, or the author did not write well-formatted commit messages (see “Code style”, below).
-  - if the PR is very old, i.e. it starts at an old commit on ``master``. However, it is better to rebase the PR branch on the HEAD of ``master`` and then use a merge commit (below).
+  - if the PR is very old, i.e. it starts at an old commit on ``main``. However, it is better to rebase the PR branch on the HEAD of ``main`` and then use a merge commit (below).
 
 - Use **rebase and merge**…
 
@@ -166,8 +166,8 @@ Current practice for the ``ixmp``, ``message_ix``, and ``message_data`` reposito
 
 - Use **merge pull request** (also written “create a merge commit”) in all other cases.
 
-  PR branches *should* be rebased on the HEAD of ``master`` before merging.
-  This is because some git-based tools will display commits from ``master`` and the PR branch interleaved if their dates and times are mixed, which makes it harder to read the commit history.
+  PR branches *should* be rebased on the HEAD of ``main`` before merging.
+  This is because some git-based tools will display commits from ``main`` and the PR branch interleaved if their dates and times are mixed, which makes it harder to read the commit history.
   Rebasing avoids this problem by ensuring each PR's commits are displayed together & in sequence.
 
 

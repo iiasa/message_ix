@@ -2,7 +2,7 @@ version: 2
 
 python:
   install:
-  # Install ixmp from latest `master`
+  # Install ixmp from latest `main`
   - requirements: ci/rtd-requirements.txt
   - method: pip
     path: .

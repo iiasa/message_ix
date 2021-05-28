@@ -119,8 +119,8 @@ You should be able to:
 3. Use the **Git version control system** and the ``git`` command-line tool to clone repositories, pull, fetch, create branches, and push.
    For :doc:`contributing to development <contributing>`, you should know how to:
 
-   - `git merge <https://git-scm.com/docs/git-merge>`_, i.e. bring all updates from the ``master`` branch into your PR branch, giving you a chance to fix conflicts and make a new commit.
-   - `git rebase <https://git-scm.com/docs/git-rebase>`_, i.e. replay your PR branch commits one-by-one, starting from the tip of the ``master`` branch (rather than the original starting commit).
+   - `git merge <https://git-scm.com/docs/git-merge>`_, i.e. bring all updates from the ``main`` branch into your PR branch, giving you a chance to fix conflicts and make a new commit.
+   - `git rebase <https://git-scm.com/docs/git-rebase>`_, i.e. replay your PR branch commits one-by-one, starting from the tip of the ``main`` branch (rather than the original starting commit).
 
    Optionally, do these things via a graphical program such as GitHub Desktop.
 
