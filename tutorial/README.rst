@@ -102,7 +102,9 @@ uses it to illustrate a range of framework features.
          requirement” formulation
          (:tut:`westeros/westeros_flexible_generation.ipynb`), wherein wind
          *requires* and coal *supplies* flexibility.
-         
+      #. Add a renewable-resource supply curve for the wind power plant,
+         (:tut:`westeros/westeros_renewable_resource.ipynb`).
+
    #. Variablity in energy supply and demand by adding sub-annual time steps,
       e.g. winter and summer (:tut:`westeros/westeros_seasonality.ipynb`).
    #. Using share constraints to depict policies, i.e. require renewables to
@@ -115,7 +117,7 @@ uses it to illustrate a range of framework features.
       (:tut:`westeros/westeros_addon_technologies.ipynb`).
    #. Build the baseline scenario using data stored in xlsx files to populate sets and
       parameters.
-      
+
       #. Export data to and Excel file and import the data to create a new scenario
          (:tut:`westeros/westeros_baseline_using_xlsx_import_part1.ipynb`).
       #. Import data from multiple excel files to create a new scenario
@@ -126,7 +128,7 @@ uses it to illustrate a range of framework features.
 
    #. Explore historical parameters and their usage
       (:tut:`westeros/westeros_historical_new_capacity.ipynb`).
-               
+        
 #. After the MESSAGE model has solved, use the :mod:`.message_ix.reporting`
    module to ‘report’ results, e.g. do post-processing, plotting, and other
    calculations (:tut:`westeros/westeros_report.ipynb`).
