@@ -205,13 +205,17 @@ class Calculate:
                             'Config data for "{}" is empty'.format(key))
 
         demand = s.var('DEMAND')
-        self.years = set(demand['year'].unique())
+        self.years = set(demand["year"])
 
     def read_data(self):
         # users define certain nodes, sectors and level for MACRO
         self.nodes = set(self.data['config']['node'].dropna())
         self.sectors = set(self.data['config']['sector'].dropna())
         self.levels = set(self.data['config']['level'].dropna())
+        yrs = set(self.data["config"]["year"].dropna())
+
+        # Accepting the years that are included in the model results
+        self.years = [x for x in yrs if x in self.years]
 
         par_diff = set(VERIFY_INPUT_DATA) - set(self.data)
         if par_diff:
