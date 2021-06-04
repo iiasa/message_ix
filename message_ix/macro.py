@@ -207,11 +207,11 @@ class Calculate:
         self.years = set(demand["year"])
 
     def read_data(self):
-        # users define certain nodes, sectors, level, and years for MACRO
-        self.nodes = set(self.data["config"]["node"].dropna())
-        self.sectors = set(self.data["config"]["sector"].dropna())
-        self.levels = set(self.data["config"]["level"].dropna())
-        yrs = set(self.data["config"]["year"].dropna())
+        # users define certain nodes, sectors and level for MACRO
+        self.nodes = set(self.data['config']['node'].dropna())
+        self.sectors = set(self.data['config']['sector'].dropna())
+        self.levels = set(self.data['config']['level'].dropna())
+        self.sector_mapping = self.data["config"]
 
         # Accepting the years that are included in the model results
         self.years = [x for x in yrs if x in self.years]
@@ -425,10 +425,18 @@ def add_model_data(base, clone, data):
     for n in c.nodes:
         clone.add_set("cat_node", ["economy", n])
 
-    # add sectoral set structure
-    for s, l in product(c.sectors, c.levels):
-        clone.add_set("sector", s)
-        clone.add_set("mapping_macro_sector", [s, s, l])
+    # Obtain the mapping data frame inlcuding sector, level and commodity
+    sector_mapping_df = c.sector_mapping
+
+    # Add sectoral set structure
+    # Itearte throguh rows in the mapping data frame
+
+    for i in sector_mapping_df.index:
+        s = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("sector")]
+        c = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("commodity")]
+        l = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("level")]
+        clone.add_set('sector', s)
+        clone.add_set("mapping_macro_sector", [s, c, l])
 
     # add parameters
     for name, info in MACRO_ITEMS.items():
