@@ -28,10 +28,10 @@ class MockScenario:
         df = self.data["aeei"]
         # add extra commodity to be removed
         extra_commod = df[df.sector == "i_therm"].copy()
-        extra_commod['sector'] = 'bar'
+        extra_commod["sector"] = "bar"
         # add extra region to be removed
         extra_region = df[df.node == "R11_AFR"].copy()
-        extra_region['node'] = 'foo'
+        extra_region["node"] = "foo"
         df = pd.concat([df, extra_commod, extra_region])
 
         if name == "DEMAND":
@@ -81,23 +81,23 @@ def test_calc_no_solution(westeros_not_solved):
 def test_config(westeros_solved):
     s = westeros_solved
     c = macro.Calculate(s, W_DATA_PATH)
-    assert 'config' in c.data
-    assert 'sector' in c.data['config']
+    assert "config" in c.data
+    assert "sector" in c.data["config"]
 
     # removing a column from config and testing
     data = c.data.copy()
-    data['config'] = c.data['config'][['node', 'sector']]
+    data["config"] = c.data["config"][["node", "sector"]]
     try:
         macro.Calculate(s, data)
     except KeyError as error:
-        assert ('Missing config data for "level"' in str(error))
+        assert 'Missing config data for "level"' in str(error)
 
     # removing config completely and testing
-    data.pop('config')
+    data.pop("config")
     try:
         macro.Calculate(s, data)
     except KeyError as error:
-        assert ('Missing config in input data' in str(error))
+        assert "Missing config in input data" in str(error)
 
     c.read_data()
     assert c.nodes == set(["Westeros"])
@@ -216,32 +216,32 @@ def test_calc_price(westeros_solved):
 # Testing how macro handles zero values in PRICE_COMMODITY
 def test_calc_price_zero(westeros_solved):
     s = westeros_solved
-    clone = s.clone(scenario='low_demand', keep_solution=False)
+    clone = s.clone(scenario="low_demand", keep_solution=False)
     clone.check_out()
     # Lowering demand in the first year
-    clone.add_par('demand', ['Westeros', 'light', 'useful', 700, 'year'],
-                  10, 'GWa')
+    clone.add_par("demand", ["Westeros", "light", "useful", 700, "year"], 10, "GWa")
     # Making investment and var cost zero for delivering light
     # TODO: these units are based on testing.make_westeros: needs improvement
-    clone.add_par('inv_cost', ['Westeros', 'bulb', 700], 0, 'USD/GWa')
+    clone.add_par("inv_cost", ["Westeros", "bulb", 700], 0, "USD/GWa")
     for y in [690, 700]:
-        clone.add_par('var_cost', ['Westeros', 'grid', y, 700, 'standard',
-                                   'year'], 0, 'USD/GWa')
+        clone.add_par(
+            "var_cost", ["Westeros", "grid", y, 700, "standard", "year"], 0, "USD/GWa"
+        )
 
-    clone.commit('demand reduced and zero cost for bulb')
+    clone.commit("demand reduced and zero cost for bulb")
     clone.solve()
-    price = clone.var('PRICE_COMMODITY')
+    price = clone.var("PRICE_COMMODITY")
     # Assert if there is no zero price (to make sure MACRO receives 0 price)
-    assert np.isclose(0, price['lvl']).any()
+    assert np.isclose(0, price["lvl"]).any()
     c = macro.Calculate(clone, W_DATA_PATH)
     c.read_data()
     try:
         c._price()
     except RuntimeError as err:
         # To make sure the right error message is raised in macro.py
-        assert ('0-price found in MESSAGE variable PRICE_' in str(err))
+        assert "0-price found in MESSAGE variable PRICE_" in str(err)
     else:
-        raise Exception('No error in macro.read_data() for zero price(s)')
+        raise Exception("No error in macro.read_data() for zero price(s)")
 
 
 def test_calc_demand(westeros_solved):

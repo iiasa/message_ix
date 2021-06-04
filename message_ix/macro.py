@@ -39,10 +39,10 @@ DATA_KEY = dict(
 )
 
 UNITS = dict(
-    cost_MESSAGE='cost_ref',
-    demand_MESSAGE='demand_ref',
-    historical_gdp='gdp_calibrate',
-    price_MESSAGE='price_ref',
+    cost_MESSAGE="cost_ref",
+    demand_MESSAGE="demand_ref",
+    historical_gdp="gdp_calibrate",
+    price_MESSAGE="price_ref",
 )
 
 #: ixmp items (sets, parameters, variables, and equations) in MACRO.
@@ -134,17 +134,17 @@ def _validate_data(name, df, nodes, sectors, levels, years):
     if name in MACRO_DATA_FOR_DERIVATION:
         cols = MACRO_DATA_FOR_DERIVATION[name]
     else:
-        cols = MACRO_ITEMS[name]['idx_sets']
-    col_diff = set(cols + ['unit']) - set(df.columns)
+        cols = MACRO_ITEMS[name]["idx_sets"]
+    col_diff = set(cols + ["unit"]) - set(df.columns)
     if col_diff:
         raise ValueError(f"Missing expected columns for {name}: {col_diff}")
 
     # check required column values
     checks = (
-        ('node', nodes),
-        ('sector', sectors),
-        ('year', years),
-        ('level', levels),
+        ("node", nodes),
+        ("sector", sectors),
+        ("year", years),
+        ("level", levels),
     )
 
     for kind, values in checks:
@@ -190,28 +190,27 @@ class Calculate:
         if not s.has_solution():
             raise RuntimeError("Scenario must have a solution to add MACRO")
 
-        if 'config' not in self.data:
-            raise KeyError('Missing config in input data')
+        if "config" not in self.data:
+            raise KeyError("Missing config in input data")
         else:
-            config = self.data['config']
-            for key in ['node', 'sector', 'level']:
+            config = self.data["config"]
+            for key in ["node", "sector", "level", "commodity", "year"]:
                 try:
                     config[key]
                 except KeyError:
                     raise KeyError('Missing config data for "{}"'.format(key))
                 else:
                     if config[key].dropna().empty:
-                        raise ValueError(
-                            'Config data for "{}" is empty'.format(key))
+                        raise ValueError('Config data for "{}" is empty'.format(key))
 
-        demand = s.var('DEMAND')
+        demand = s.var("DEMAND")
         self.years = set(demand["year"])
 
     def read_data(self):
-        # users define certain nodes, sectors and level for MACRO
-        self.nodes = set(self.data['config']['node'].dropna())
-        self.sectors = set(self.data['config']['sector'].dropna())
-        self.levels = set(self.data['config']['level'].dropna())
+        # users define certain nodes, sectors, level, and years for MACRO
+        self.nodes = set(self.data["config"]["node"].dropna())
+        self.sectors = set(self.data["config"]["sector"].dropna())
+        self.levels = set(self.data["config"]["level"].dropna())
         yrs = set(self.data["config"]["year"].dropna())
 
         # Accepting the years that are included in the model results
@@ -225,10 +224,11 @@ class Calculate:
             # no need to validate configuration, it was processed above
             if name == "config":
                 continue
-            idx = _validate_data(name, self.data[name], self.nodes,
-                                 self.sectors, self.levels, self.years)
-            self.units[name] = self.data[name]['unit'].mode().any()
-            self.data[name] = self.data[name].set_index(idx)['value']
+            idx = _validate_data(
+                name, self.data[name], self.nodes, self.sectors, self.levels, self.years
+            )
+            self.units[name] = self.data[name]["unit"].mode().any()
+            self.data[name] = self.data[name].set_index(idx)["value"]
 
         # special check for gdp_calibrate - it must have at minimum two years
         # prior to the model horizon in order to compute growth rates in the
@@ -245,14 +245,14 @@ class Calculate:
         self.init_year = max(data_years_before_model)
 
     def _clean_model_data(self, data):
-        if 'node' in data:
-            data = data[data['node'].isin(self.nodes)]
-        if 'commodity' in data:
-            data = data[data['commodity'].isin(self.sectors)]
-        if 'year' in data:
-            data = data[data['year'].isin(self.years)]
-        if 'level' in data:
-            data = data[data['level'].isin(self.levels)]
+        if "node" in data:
+            data = data[data["node"].isin(self.nodes)]
+        if "commodity" in data:
+            data = data[data["commodity"].isin(self.sectors)]
+        if "year" in data:
+            data = data[data["year"].isin(self.years)]
+        if "level" in data:
+            data = data[data["level"].isin(self.levels)]
         return data
 
     def derive_data(self):
@@ -314,8 +314,9 @@ class Calculate:
         cost_ref = self.data["cost_ref"].reset_index()
         cost_ref["year"] = self.init_year
         # combine into one value
-        total_cost = pd.concat([cost_ref, model_cost],
-                               sort=True).set_index(idx)['value']
+        total_cost = pd.concat([cost_ref, model_cost], sort=True).set_index(idx)[
+            "value"
+        ]
         if total_cost.isnull().any():
             raise RuntimeError("NaN values found in total_cost calculation")
         self.data["total_cost"] = total_cost
@@ -326,26 +327,29 @@ class Calculate:
         # read from scenario
         idx = ["node", "sector", "year"]
         model_price = self._clean_model_data(
-            self.s.var('PRICE_COMMODITY', filters={'level': self.levels})
+            self.s.var("PRICE_COMMODITY", filters={"level": self.levels})
         )
         for node, com in product(self.nodes, self.sectors):
-            test_price = model_price.loc[(model_price['node'] == node) & (
-                                         model_price['commodity'] == com)]
-            missing = len(test_price['year']) < len(self.years)
-            if np.isclose(test_price['lvl'], 0).any() or missing:
-                msg = ('0-price found in MESSAGE variable PRICE_COMMODITY'
-                       ' for commodity "{}" in node "{}".').format(com, node)
+            test_price = model_price.loc[
+                (model_price["node"] == node) & (model_price["commodity"] == com)
+            ]
+            missing = len(test_price["year"]) < len(self.years)
+            if np.isclose(test_price["lvl"], 0).any() or missing:
+                msg = (
+                    "0-price found in MESSAGE variable PRICE_COMMODITY"
+                    ' for commodity "{}" in node "{}".'
+                ).format(com, node)
                 raise RuntimeError(msg)
-        model_price.rename(columns={'lvl': 'value', 'commodity': 'sector'},
-                           inplace=True)
-        model_price = model_price[idx + ['value']]
+        model_price.rename(
+            columns={"lvl": "value", "commodity": "sector"}, inplace=True
+        )
+        model_price = model_price[idx + ["value"]]
 
         # get data provided in init year from data
         price_ref = self.data["price_ref"].reset_index()
         price_ref["year"] = self.init_year
         # combine into one value
-        price = pd.concat([price_ref, model_price],
-                          sort=True).set_index(idx)['value']
+        price = pd.concat([price_ref, model_price], sort=True).set_index(idx)["value"]
         if price.isnull().any():
             raise RuntimeError("NaN values found in price calculation")
         self.data["price"] = price
@@ -356,7 +360,7 @@ class Calculate:
         # read from scenario
         idx = ["node", "sector", "year"]
         model_demand = self._clean_model_data(
-            self.s.var('DEMAND', filters={'level': self.levels})
+            self.s.var("DEMAND", filters={"level": self.levels})
         )
         model_demand.rename(
             columns={"lvl": "value", "commodity": "sector"}, inplace=True
@@ -366,8 +370,9 @@ class Calculate:
         demand_ref = self.data["demand_ref"].reset_index()
         demand_ref["year"] = self.init_year
         # combine into one value
-        demand = pd.concat([demand_ref, model_demand],
-                           sort=True).set_index(idx)['value']
+        demand = pd.concat([demand_ref, model_demand], sort=True).set_index(idx)[
+            "value"
+        ]
         if demand.isnull().any():
             raise RuntimeError("NaN values found in demand calculation")
         self.data["demand"] = demand
@@ -422,7 +427,7 @@ def add_model_data(base, clone, data):
 
     # add sectoral set structure
     for s, l in product(c.sectors, c.levels):
-        clone.add_set('sector', s)
+        clone.add_set("sector", s)
         clone.add_set("mapping_macro_sector", [s, s, l])
 
     # add parameters
@@ -434,9 +439,9 @@ def add_model_data(base, clone, data):
             key = DATA_KEY.get(name, name)
             data = c.data[key].reset_index()
             if name in UNITS.keys():
-                data['unit'] = c.units.get(UNITS.get(name), '-')
+                data["unit"] = c.units.get(UNITS.get(name), "-")
             else:
-                data['unit'] = c.units.get(name, '-')
+                data["unit"] = c.units.get(name, "-")
             # some data may have information prior to the MACRO initialization
             # year which we need to remove in order to add it to the scenario
             if "year" in data:
@@ -457,14 +462,18 @@ def calibrate(s, check_convergence=True, **kwargs):
     log.info(msg.format(n_iter, max_iter))
 
     # get out calibrated values
-    aeei = s.var('aeei_calibrate') \
-            .rename(columns={'lvl': 'value'}) \
-            .drop('mrg', axis=1) \
-            .assign(unit=s.par('grow')['unit'].mode().any())
-    grow = s.var('grow_calibrate') \
-            .rename(columns={'lvl': 'value'}) \
-            .drop('mrg', axis=1) \
-            .assign(unit=s.par('grow')['unit'].mode().any())
+    aeei = (
+        s.var("aeei_calibrate")
+        .rename(columns={"lvl": "value"})
+        .drop("mrg", axis=1)
+        .assign(unit=s.par("grow")["unit"].mode().any())
+    )
+    grow = (
+        s.var("grow_calibrate")
+        .rename(columns={"lvl": "value"})
+        .drop("mrg", axis=1)
+        .assign(unit=s.par("grow")["unit"].mode().any())
+    )
 
     # update calibrated value parameters
     s.remove_solution()
