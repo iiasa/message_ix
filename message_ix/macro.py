@@ -433,10 +433,10 @@ def add_model_data(base, clone, data):
 
     for i in sector_mapping_df.index:
         s = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("sector")]
-        c = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("commodity")]
+        com = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("commodity")]
         l = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("level")]
         clone.add_set('sector', s)
-        clone.add_set("mapping_macro_sector", [s, c, l])
+        clone.add_set("mapping_macro_sector", [s, com, l])
 
     # add parameters
     for name, info in MACRO_ITEMS.items():
