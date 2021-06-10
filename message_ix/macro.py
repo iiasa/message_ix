@@ -208,13 +208,14 @@ class Calculate:
 
     def read_data(self):
         # users define certain nodes, sectors and level for MACRO
-        self.nodes = set(self.data['config']['node'].dropna())
-        self.sectors = set(self.data['config']['sector'].dropna())
-        self.levels = set(self.data['config']['level'].dropna())
+        self.nodes = set(self.data["config"]["node"].dropna())
+        self.sectors = set(self.data["config"]["sector"].dropna())
+        self.levels = set(self.data["config"]["level"].dropna())
         self.sector_mapping = self.data["config"]
 
         # Accepting the years that are included in the model results
         self.years = [x for x in yrs if x in self.years]
+        max_macro_year = max(self.years)
 
         par_diff = set(VERIFY_INPUT_DATA) - set(self.data)
         if par_diff:
@@ -228,6 +229,11 @@ class Calculate:
                 name, self.data[name], self.nodes, self.sectors, self.levels, self.years
             )
             self.units[name] = self.data[name]["unit"].mode().any()
+
+            # Accepting years lower than max MACRO year
+            if "year" in self.data[name].columns:
+                df = self.data[name]
+                self.data[name] = df.loc[df["year"] <= max_macro_year].copy()
             self.data[name] = self.data[name].set_index(idx)["value"]
 
         # special check for gdp_calibrate - it must have at minimum two years
@@ -426,7 +432,7 @@ def add_model_data(base, clone, data):
         clone.add_set("cat_node", ["economy", n])
 
     # Obtain the mapping data frame inlcuding sector, level and commodity
-    sector_mapping_df = c.sector_mapping
+    sector_mapping_df = c.sector_mapping[["sector", "commodity", "level"]].dropna()
 
     # Add sectoral set structure
     # Itearte throguh rows in the mapping data frame
@@ -435,7 +441,7 @@ def add_model_data(base, clone, data):
         s = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("sector")]
         com = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("commodity")]
         l = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("level")]
-        clone.add_set('sector', s)
+        clone.add_set("sector", s)
         clone.add_set("mapping_macro_sector", [s, com, l])
 
     # add parameters
