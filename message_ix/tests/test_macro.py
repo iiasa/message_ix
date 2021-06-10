@@ -73,6 +73,24 @@ def test_calc_valid_data_dict(westeros_solved):
     c.read_data()
 
 
+# Test for selecting desirable years specified in config from the Excel input
+def test_calc_valid_years(westeros_solved):
+    s = westeros_solved
+    data = pd.read_excel(W_DATA_PATH, sheet_name=None, engine="openpyxl")
+    # Adding an arbitrary year
+    arbitrary_yr = 2021
+    gdp_extra_yr = data["gdp_calibrate"].iloc[0, :].copy()
+    gdp_extra_yr["year"] = arbitrary_yr
+    data["gdp_calibrate"] = data["gdp_calibrate"].append(gdp_extra_yr)
+    # Check the arbitrary year is not in config
+    assert arbitrary_yr not in data["config"]["year"]
+    # But it is in gdp_calibrate
+    assert arbitrary_yr in set(data["gdp_calibrate"]["year"])
+    # And macro does calibration without error
+    c = macro.Calculate(s, data)
+    c.read_data()
+
+
 def test_calc_no_solution(westeros_not_solved):
     s = westeros_not_solved
     pytest.raises(RuntimeError, macro.Calculate, s, W_DATA_PATH)
@@ -197,7 +215,7 @@ def test_calc_total_cost(westeros_solved):
     # 4 values, 3 in model period, one in history
     assert len(obs) == 4
     obs = obs.values
-    exp = np.array([15, 17.477751, 22.143633, 28.189798]) / 1e3
+    exp = np.array([15, 17.477751, 22.143633, 28.11481]) / 1e3
     assert np.isclose(obs, exp).all()
 
 
@@ -209,7 +227,7 @@ def test_calc_price(westeros_solved):
     # 4 values, 3 in model period, one in history
     assert len(obs) == 4
     obs = obs.values
-    exp = np.array([195, 183.094376, 161.645111, 161.645111])
+    exp = np.array([195, 182.85222905, 162.03953933, 161.0026274])
     assert np.isclose(obs, exp).all()
 
 
