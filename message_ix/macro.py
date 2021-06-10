@@ -1,11 +1,11 @@
 import logging
+import numpy as np
+import pandas as pd
 from functools import lru_cache
 from pathlib import Path
 from itertools import product
 from typing import Mapping
 
-import numpy as np
-import pandas as pd
 
 log = logging.getLogger(__name__)
 
@@ -438,11 +438,11 @@ def add_model_data(base, clone, data):
     # Itearte throguh rows in the mapping data frame
 
     for i in sector_mapping_df.index:
-        s = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("sector")]
+        sec = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("sector")]
         com = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("commodity")]
-        l = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("level")]
-        clone.add_set("sector", s)
-        clone.add_set("mapping_macro_sector", [s, com, l])
+        lvl = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("level")]
+        clone.add_set("sector", sec)
+        clone.add_set("mapping_macro_sector", [sec, com, lvl])
 
     # add parameters
     for name, info in MACRO_ITEMS.items():
