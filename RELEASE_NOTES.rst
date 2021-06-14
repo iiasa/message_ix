@@ -4,6 +4,20 @@
 .. All changes
 .. -----------
 
+.. _v3.4.0:
+
+v3.4.0 (2021-MM-DD)
+===================
+
+All changes
+-----------
+
+- Update reference for activity and capacity soft constraints (:pull:`474`).
+
+
+All changes
+-----------
+
 .. _v3.3.0:
 
 v3.3.0 (2021-05-28)
