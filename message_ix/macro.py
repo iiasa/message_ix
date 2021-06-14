@@ -1,11 +1,11 @@
 import logging
-import numpy as np
-import pandas as pd
 from functools import lru_cache
-from pathlib import Path
 from itertools import product
+from pathlib import Path
 from typing import Mapping
 
+import numpy as np
+import pandas as pd
 
 log = logging.getLogger(__name__)
 
