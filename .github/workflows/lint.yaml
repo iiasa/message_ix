@@ -64,7 +64,7 @@ jobs:
       # Point to ixmp code for its type hints, without installing
       env:
         MYPYPATH: "../ixmp/"
-      # Also install packages that provide type hints
+      # Also install type stubs and full packages that provide type hints
       run: |
-        pip install mypy genno sphinx
+        pip install mypy genno sphinx types-pkg_resources types-requests types-PyYAML
         mypy .
