@@ -1574,7 +1574,7 @@ NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * Equation NEW_CAPACITY_SOFT_CONSTRAINT_UP
 * """"""""""""""""""""""""""""""""""""""""
 * This constraint ensures that the relaxation of the dynamic constraint on new capacity (investment) does not exceed
-* the level of the investment in the same period (cf. Keppo and Strubegger, 2010 :cite:`keppo_short_2010`).
+* the level of the investment in the previous period (cf. Keppo and Strubegger, 2010 :cite:`keppo_short_2010`).
 *
 *   .. math::
 *      CAP\_NEW\_UP_{n,t,y} \leq \sum_{y-1} CAP\_NEW_{n^L,t,y-1} & \text{if } y \neq 'first\_period' \\
@@ -1638,7 +1638,7 @@ NEW_CAPACITY_CONSTRAINT_LO(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * Equation NEW_CAPACITY_SOFT_CONSTRAINT_LO
 * """"""""""""""""""""""""""""""""""""""""
 * This constraint ensures that the relaxation of the dynamic constraint on new capacity does not exceed
-* level of the investment in the same year.
+* level of the investment in the previous year.
 *
 *   .. math::
 *      CAP\_NEW\_LO_{n,t,y} \leq \sum_{y-1} CAP\_NEW_{n^L,t,y-1} & \text{if } y \neq 'first\_period' \\
