@@ -1576,8 +1576,10 @@ NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * This constraint ensures that the relaxation of the dynamic constraint on new capacity (investment) does not exceed
 * the level of the investment in the same period (cf. Keppo and Strubegger, 2010 :cite:`keppo_short_2010`).
 *
-*  .. math::
-*     CAP\_NEW\_UP_{n,t,y} \leq CAP\_NEW_{n,t,y} \quad \forall \ t \ \in \ T^{INV}
+*   .. math::
+*      CAP\_NEW\_UP_{n,t,y} \leq \sum_{y-1} CAP\_NEW_{n^L,t,y-1} & \text{if } y \neq 'first\_period' \\
+*                                + \sum_{y-1} historical\_new\_capacity_{n^L,t,y-1} & \text{if } y = 'first\_period' \\
+*                           \quad \forall \ t \ \in \ T^{INV}   
 *
 ***
 NEW_CAPACITY_SOFT_CONSTRAINT_UP(node,inv_tec,year)$( soft_new_capacity_up(node,inv_tec,year) )..
@@ -1639,7 +1641,9 @@ NEW_CAPACITY_CONSTRAINT_LO(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * level of the investment in the same year.
 *
 *   .. math::
-*      CAP\_NEW\_LO_{n,t,y} \leq CAP\_NEW_{n,t,y} \quad \forall \ t \ \in \ T^{INV}
+*      CAP\_NEW\_LO_{n,t,y} \leq \sum_{y-1} CAP\_NEW_{n^L,t,y-1} & \text{if } y \neq 'first\_period' \\
+*                                + \sum_{y-1} historical\_new\_capacity_{n^L,t,y-1} & \text{if } y = 'first\_period' \\
+*                           \quad \forall \ t \ \in \ T^{INV}  
 *
 ***
 NEW_CAPACITY_SOFT_CONSTRAINT_LO(node,inv_tec,year)$( soft_new_capacity_lo(node,inv_tec,year) )..
@@ -1702,10 +1706,12 @@ ACTIVITY_CONSTRAINT_UP(node,tec,year,time)$( map_tec_time(node,tec,year,time)
 * Equation ACTIVITY_SOFT_CONSTRAINT_UP
 * """"""""""""""""""""""""""""""""""""
 * This constraint ensures that the relaxation of the dynamic activity constraint does not exceed the
-* level of the activity.
+* level of the activity in the previous period.
 *
 *   .. math::
-*      ACT\_UP_{n,t,y,h} \leq \sum_{y^V \leq y,m} ACT_{n^L,t,y^V,y,m,h}
+*      ACT\_UP_{n,t,y,h} \leq \sum_{y^V \leq y,m,y-1} ACT_{n^L,t,y^V,y-1,m,h} & \text{if } y \neq 'first\_period' \\
+*                             + \sum_{m,y-1} historical\_activity_{n^L,t,y-1,m,h} & \text{if } y = 'first\_period'
+*      
 *
 ***
 ACTIVITY_SOFT_CONSTRAINT_UP(node,tec,year,time)$( soft_activity_up(node,tec,year,time) )..
@@ -1767,10 +1773,11 @@ ACTIVITY_CONSTRAINT_LO(node,tec,year,time)$( map_tec_time(node,tec,year,time)
 * Equation ACTIVITY_SOFT_CONSTRAINT_LO
 * """"""""""""""""""""""""""""""""""""
 * This constraint ensures that the relaxation of the dynamic activity constraint does not exceed the
-* level of the activity.
+* level of the activity in the previous period.
 *
 *   .. math::
-*      ACT\_LO_{n,t,y,h} \leq \sum_{y^V \leq y,m} ACT_{n,t,y^V,y,m,h}
+*      ACT\_LO_{n,t,y,h} \leq \sum_{y^V \leq y,m,y-1} ACT_{n^L,t,y^V,y-1,m,h} & \text{if } y \neq 'first\_period' \\
+*                             + \sum_{m,y-1} historical\_activity_{n^L,t,y-1,m,h} & \text{if } y = 'first\_period'
 *
 ***
 ACTIVITY_SOFT_CONSTRAINT_LO(node,tec,year,time)$( soft_activity_lo(node,tec,year,time) )..
