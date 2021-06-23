@@ -126,7 +126,6 @@ Parameters
 Variables
     N_ITER
     MAX_ITER
-    GDP_corr(node, year_all)                   corrected gross domestic product (GDP) in market exchange rates for MACRO reporting
 ;
 
 
@@ -247,8 +246,7 @@ COST_NODAL_NET.L(node_macro,year) =
         * EMISS.L(node_macro,emission,type_tec,year) )
 ;
 
-GDP.L(node_macro,year) = (I.L(node_macro,year) + C.L(node_macro,year) + EC.L(node_macro,year)) * 1000 ;
-GDP_corr.L(node_macro,year) = (I.L(node_macro,year) + C.L(node_macro,year) + EC.L(node_macro,year) - ( trade_cost(node_macro, year) * 1E-6 ))*1000;
+GDP.L(node_macro,year) = (I.L(node_macro,year) + C.L(node_macro,year) + EC.L(node_macro,year) - ( trade_cost(node_macro, year) * 1E-6 ))*1000;
 
 
 * calculate convergence level (maximum absolute scaling factor minus 1 across all regions, sectors, and years)
