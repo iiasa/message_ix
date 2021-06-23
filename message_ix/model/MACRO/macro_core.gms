@@ -162,20 +162,20 @@ SUM(node_active,
 ***
 * Equation CAPITAL_CONSTRAINT
 * ---------------------------------
-* The following equation specifies the allocation of total production among current consumption :math:`\text{C}_{n, y}`, investment into building up capital stock excluding
-* the sectors represented in MESSAGE :math:`\text{I}_{n, y}`, and the MESSAGE system costs :math:`\text{EC}_{n, y}` which are derived from a previous MESSAGE model run. MESSAGE system
-* costs are all the energy system costs for a certain region including the trade balance from fuel and emissions certificate trade. Therefore, the constraint assures that the net
-* expenditures and savings cannot exceed the total income in a region. As described in :cite:`Manne-Richels-1992`, the first-order optimality conditions lead to the Ramsey rule for
-* the optimal allocation of savings, investment and consumption over time.
+* The following equation specifies the allocation of total production among current consumption :math:`\text{C}_{n, y}`, investment :math:`\text{I}_{n, y}` into building up capital stock, and 
+* MESSAGE system costs :math:`\text{EC}_{n, y}`. The constraint assures that the net expenditures and savings cannot exceed the total income in a region. Investment excludes the sectors 
+* represented in MESSAGE and the MESSAGE system costs are derived from a previous MESSAGE model run including all the energy systems costs :math:`\text{COST_NODAL}_{n, y}` for a certain
+* region considering the trade balance :math:`\text{import_cost}_{r, y} - \text{export_cost}_{n, y}`. As described in :cite:`Manne-Richels-1992`, the first-order optimality conditions lead to the Ramsey rule for
+* the optimal allocation of savings, investment and consumption over time. The production function in MACRO only accounts for non-energy producing parts of the economy and the
+* energy system is modeled separately in MESSAGE. In addition, MACRO does not include the trade of normal goods. Therefore, the revenues from fuel or emission certificate trade should
+* be separately added to the total regional income. This is assured by including the trade balance in the :math:`\text{EC}_{n, y}`.
 
-* Since MACRO does not include the trade of normal goods, there is not an explicit component in the equation which takes the trade revenues into account. The trade of energy goods and
-* emission certificates is accounted within :math:`\text{EC}_{n, y}` and not added as a separate component as well. The reason for that is that the NEW PRODUCTION equation in MACRO
-* only accounts for non-energy producing parts of the economy and the energy system is modeled separately in MESSAGE. However, the revenues from energy goods and emission allowances
-* would increase the domestic income and therefore should be accounted in the GDP definition. This is achieved via deducting the trade costs of MESSAGE from :math:`\text{Y}_{n, y}`in GDP
-* reporting. Positive contribution of EC to GDP would be counter-balanced by the decrease of consumption :math:`\text{C}_{n, y}` and investment :math:`\text{I}_{n, y}` in the certain year as well
-* as by the reduction in capacity to invest and grow the economy for later years. 
-*
+* The GDP is reported as the sum of investment, consumption, and energy costs without the trade balance. Positive contribution of :math:`\text{EC}_{n, y}` to GDP would be counter-balanced by the
+* decrease of consumption :math:`\text{C}_{n, y}` and investment :math:`\text{I}_{n, y}` in the certain year as well as by the reduction in capacity to invest and grow the economy for later years. 
+* 
 * .. math:: \text{Y}_{n, y} = \text{C}_{n, y} + \text{I}_{r, y} + \text{EC}_{n, y} \qquad \forall{n, y}
+* .. math:: \text{EC}_{n, y} = \text{COST_NODAL}_{n, y} + \text{import_cost}_{r, y} - \text{export_cost}_{n, y} \qquad \forall{n, y}
+* .. math:: \text{GDP}_{n, y} = \text{C}_{n, y} + \text{I}_{n, y} + \text{COST_NODAL}_{n, y}  \qquad \forall{n, y}
 *
 ***
 
