@@ -160,20 +160,20 @@ SUM(node_active,
 ***
 * Equation CAPITAL_CONSTRAINT
 * ---------------------------------
-* The following equation specifies the allocation of total production among current consumption :math:`{C}_{n, y}`, investment :math:`{I}_{n, y}` into building up capital stock and
-* MESSAGE system costs :math:`{EC}_{n, y}`. The constraint assures that the net expenditures and savings cannot exceed the total income in a region. Investment excludes the sectors
-* represented in MESSAGE  and the MESSAGE system costs are derived from a previous MESSAGE model run inclduing all the energy systems costs :math:`{COST_NODAL}_{n, y}` for a certain
-* region considering the trade balance :math:`import_cost_{r, y} - export_cost_{n, y}`. As described in :cite:`manne_buying_1992`, the first-order optimality conditions lead to the
-* Ramsey rule for the optimal allocation of investment and consumption over time. The production function in MACRO only accounts for non-energy producing part of the economy and the
-* energy system is modeled seperately in MESSAGE.In addition, MACRO does not include the trade of normal goods. Therefore, the revenues from fuel or emission certificate trade should
-* be sepertely added to the total regional income. This is assured by including the trade balance in the :math:`{EC}_{n, y}`.
+* The capital constraint as in the first equation specifies the allocation of total production among current consumption :math:`{C}_{n, y}`, investment :math:`{I}_{n, y}` into building up capital
+* stock and MESSAGE system costs :math:`{EC}_{n, y}`. The constraint assures that the net expenditures and savings cannot exceed the total income in a region. Investment excludes the sectors
+* represented in MESSAGE  and the MESSAGE system costs are derived from a previous MESSAGE model run inclduing all the energy systems costs, :math:`{COST NODAL}_{n, y}`, for a certain
+* region considering the trade balance which is :math:`import cost_{n, y} - export cost_{n, y}`. The production function in MACRO only accounts for non-energy producing part of the
+* economy and the energy system is modeled seperately in MESSAGE. In addition, MACRO does not include the trade of normal goods. Therefore, the revenues from fuel or emission certificate
+* trade should be sepertely added to the total regional income. This is assured by including the trade balance in the :math:`{EC}_{n, y}`. As described in :cite:`manne_buying_1992`,
+* the first-order optimality conditions lead to the Ramsey rule for the optimal allocation of investment and consumption over time. 
 
-* The GDP is reported as the sum of investment, consumption and energy costs without the trade balance. Positive contribution of :math:`{EC}_{n, y}` to GDP would be counter balanced by the
-* decrease of consumption :math:`{C}_{n, y}` and investment :math:`{I}_{n, y}` in the certain year as well as by the reduction in capacity to invest and grow the economy for later years. 
+* The GDP is reported as the sum of investment, consumption and energy costs without the trade balance. Positive contribution of energy costs to GDP would be counter balanced by the
+* decrease of consumption and investment in the certain year as well as by the reduction in capacity to invest and grow the economy for later years. 
 * 
-* .. math:: Y_{n, y} = C_{n, y} + I_{r, y} + {EC}_{n, y} \qquad \forall{n, y}
-* .. math:: EC_{n, y} = COST_NODAL_{n, y} + import_cost_{r, y} - export_cost_{n, y} \qquad \forall{n, y}
-* .. math:: GDP_{n, y} = C_{n, y} + I_{n, y} + COST_NODAL_{n, y}  \qquad \forall{n, y}
+* .. math:: Y_{n, y} = C_{n, y} + I_{n, y} + {EC}_{n, y} \qquad \forall{n, y}
+* .. math:: EC_{n, y} = COST NODAL_{n, y} + import cost_{r, y} - export cost_{n, y} \qquad \forall{n, y}
+* .. math:: GDP_{n, y} = C_{n, y} + I_{n, y} + COST NODAL_{n, y}  \qquad \forall{n, y}
 *
 ***
 
