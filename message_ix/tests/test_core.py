@@ -413,6 +413,39 @@ def test_years_active_extended2(test_mp):
     npt.assert_array_equal(result, years[-2])
 
 
+def test_years_active_extend3(test_mp):
+    test_mp.add_unit("year")
+    scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
+    scen.add_set("node", "foo")
+    scen.add_set("technology", "bar")
+
+    # Periods of uneven length
+    years = [1990, 1995, 2000, 2005, 2010, 2020, 2030]
+
+    scen.add_horizon(year=years, firstmodelyear=2010)
+
+    scen.add_set("year", [1992])
+    scen.add_par("duration_period", "1992", 2, "y")
+    scen.add_par("duration_period", "1995", 3, "y")
+
+    scen.add_par(
+        "technical_lifetime",
+        pd.DataFrame(
+            dict(
+                node_loc="foo",
+                technology="bar",
+                unit="year",
+                value=[20],
+                year_vtg=1990,
+            ),
+        ),
+    )
+
+    obs = scen.years_active("foo", "bar", 1990)
+
+    assert obs == [1990, 1992, 1995, 2000, 2005]
+
+
 def test_new_timeseries_long_name64(message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO["dantzig multi-year"])
     scen = scen.clone(keep_solution=False)
