@@ -7,6 +7,16 @@ All changes
 - Adjust the Westeros reporting tutorial to pyam 1.0 deprecations (:pull:`492`).
 
 
+.. _v3.4.0:
+
+v3.4.0 (2021-MM-DD)
+===================
+
+All changes
+-----------
+
+- Update `years_active()` to use sorted results (:pull:`491`).
+
 .. _v3.3.0:
 
 v3.3.0 (2021-05-28)
