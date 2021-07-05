@@ -15,7 +15,6 @@ EXPERIMENTAL = """
 
 You are using *experimental*, incomplete features from
 `message_ix.macro`—please exercise caution. Read more:
-- https://github.com/iiasa/message_ix/issues/315
 - https://github.com/iiasa/message_ix/issues/317
 - https://github.com/iiasa/message_ix/issues/318
 - https://github.com/iiasa/message_ix/issues/319
@@ -24,10 +23,7 @@ You are using *experimental*, incomplete features from
 ======================================================
 """
 
-
-# TODO all demands and prices are assumed to be on 'useful' level, need to extend this
-#      to support others
-
+# Pairing MACRO calibration parameters with variable names used in this module
 DATA_KEY = dict(
     cost_MESSAGE="total_cost",
     demand_MESSAGE="demand",
@@ -38,6 +34,7 @@ DATA_KEY = dict(
     price_MESSAGE="price",
 )
 
+# Pairing MACRO calibration parameters with input data for consistency of units
 UNITS = dict(
     cost_MESSAGE="cost_ref",
     demand_MESSAGE="demand_ref",
@@ -82,13 +79,6 @@ MACRO_ITEMS = dict(
     NEWENE=dict(ix_type="var", idx_sets=["node", "sector", "year"]),
     PHYSENE=dict(ix_type="var", idx_sets=["node", "sector", "year"]),
     PRICE=dict(ix_type="var", idx_sets=["node", "commodity", "level", "year", "time"]),
-    # commented: see description in models.py.
-    # PRICE_COMMODITY=dict(
-    #     ix_type="var", idx_sets=["node", "commodity", "level", "year", "time"]
-    # ),
-    # PRICE_EMISSION=dict(
-    #     ix_type="var", idx_sets=["node", "type_emission", "type_tec", "y"]
-    # ),
     PRODENE=dict(ix_type="var", idx_sets=["node", "sector", "year"]),
     UTILITY=dict(ix_type="var", idx_sets=None),
     Y=dict(ix_type="var", idx_sets=["node", "year"]),
@@ -98,13 +88,14 @@ MACRO_ITEMS = dict(
     COST_ACCOUNTING_NODAL=dict(ix_type="equ", idx_sets=["node", "year"]),
 )
 
-
+# Required index sets when deriving MACRO calibration parameters
 MACRO_DATA_FOR_DERIVATION = {
     "cost_ref": ["node"],
     "demand_ref": ["node", "sector"],
     "price_ref": ["node", "sector"],
 }
 
+# MACRO calibration parameters to be verified when reading the input data
 VERIFY_INPUT_DATA = [
     "price_ref",
     "lotol",
@@ -122,6 +113,38 @@ VERIFY_INPUT_DATA = [
 
 
 def _validate_data(name, df, nodes, sectors, levels, years):
+    """
+    Validate the input data for MACRO calibration to ensure the
+    format is compatibale with MESSAGEix.
+
+    Parameters
+    ----------
+    name : string
+        MESSAGEix parameter name related to MACRO calibration. When reading
+        data from Excel, these names are the Excel sheet names.
+    df : Pandas DataFrame
+        Data of each MACRO calibration parameter.
+    nodes : list
+        List of nodes for MACRO calibration.
+    sectors : list
+        List of sectors for MACRO calibration.
+    levels : list
+        List of levels for MACRO calibration.
+    years : list
+        List of model years for which MACRO calibration is applied.
+
+    Raises
+    ------
+    ValueError
+        Assert if some required set elements missing in MACRO calibration data.
+
+    Returns
+    -------
+    cols : List
+        Index sets of the validated MESSAGEix parameter.
+
+    """
+
     def validate(kind, values, df):
         if kind not in df:
             return
@@ -160,15 +183,13 @@ class Calculate:
 
     - have a solution;
 
-    s : .Scenario
+    s : message_ix.Scenario
     data : dict (str -> pd.DataFrame) or os.PathLike
         If :class:`.PathLike`, the path to an Excel file containing parameter data, one
         per sheet. If :class:`dict`, a dictionary mapping parameter names to data
         frames.
     """
 
-    # TODO add comments
-    # TODO add docstrings
     def __init__(self, s, data):
         self.s = s
         self.units = {}
@@ -189,7 +210,7 @@ class Calculate:
 
         if not s.has_solution():
             raise RuntimeError("Scenario must have a solution to add MACRO")
-
+        # check if "config" exists and has required information
         if "config" not in self.data:
             raise KeyError("Missing config in input data")
         else:
@@ -207,11 +228,23 @@ class Calculate:
         self.years = set(demand["year"])
 
     def read_data(self):
+        """
+        Read data from a input file or python dictionary, validate data, and
+        add data to the scenario for MACRO calibration.
+
+        Raises
+        ------
+        ValueError
+            Assert if required data for MACRO calibration is missing.
+
+
+        """
         # users define certain nodes, sectors and level for MACRO
         self.nodes = set(self.data["config"]["node"].dropna())
         self.sectors = set(self.data["config"]["sector"].dropna())
         self.levels = set(self.data["config"]["level"].dropna())
         self.sector_mapping = self.data["config"]
+        yrs = set(self.data["config"]["year"].dropna())
 
         # Accepting the years that are included in the model results
         self.years = [x for x in yrs if x in self.years]
@@ -251,6 +284,20 @@ class Calculate:
         self.init_year = max(data_years_before_model)
 
     def _clean_model_data(self, data):
+        """
+        Clean input data for MACRO calibration by slicing relevant data.
+
+        Parameters
+        ----------
+        data : pandas DataFrame
+            Input data of MESSAGEix MACRO calibration parameters.
+
+        Returns
+        -------
+        data : pandas DataFrame
+            Required data of MESSAGEix MACRO calibration parameters.
+
+        """
         if "node" in data:
             data = data[data["node"].isin(self.nodes)]
         if "commodity" in data:
@@ -262,9 +309,12 @@ class Calculate:
         return data
 
     def derive_data(self):
-        # calculate all necessary derived data, adding to self.data this is
-        # done through method chaining, the bottom of which is aconst()
-        # NB this means it could be rewritten using reporting
+        """
+        Calculate all necessary derived data, adding to self.data.
+        (This is done through method chaining, the bottom of which is aconst()
+        # NB this means it could be rewritten using reporting)
+
+        """
         self._growth()
         self._rho()
         self._gdp0()
@@ -277,6 +327,15 @@ class Calculate:
 
     @lru_cache()
     def _growth(self):
+        """
+        Calculate GDP growth rates between model periods.
+
+        Returns
+        -------
+        pandas DataFrame
+            Calculated "growth" parameter.
+
+        """
         gdp = self.data["gdp_calibrate"]
         diff = gdp.groupby(level="node").diff()
         years = sorted(gdp.index.get_level_values("year").unique())
@@ -288,12 +347,31 @@ class Calculate:
 
     @lru_cache()
     def _rho(self):
+        """
+        Calculate "rho" based on "esub", elasticity of substitution, for MACRO
+        calibration.
+
+        Returns
+        -------
+        pandas Series
+            Calculated "rho" parameter.
+
+        """
         esub = self.data["esub"]
         self.data["rho"] = (esub - 1) / esub
         return self.data["rho"]
 
     @lru_cache()
     def _gdp0(self):
+        """
+        Derive GDP reference values from "gdp_calibrate" for MACRO calibration.
+
+        Returns
+        -------
+        pandas Series
+            Calculated "gdp0" parameter.
+
+        """
         gdp = self.data["gdp_calibrate"]
         gdp0 = gdp.iloc[gdp.index.isin([self.init_year], level="year")]
         self.data["gdp0"] = gdp0
@@ -301,6 +379,15 @@ class Calculate:
 
     @lru_cache()
     def _k0(self):
+        """
+        Derive initial capital to GDP ratio in the base year ("kgdp") from
+        reference GDP.
+
+        Returns
+        -------
+        pandas Series
+            Calculated "k0" parameter.
+        """
         kgdp = self.data["kgdp"]
         gdp0 = self._gdp0()
         self.data["k0"] = kgdp * gdp0
@@ -308,6 +395,21 @@ class Calculate:
 
     @lru_cache()
     def _total_cost(self):
+        """
+        Extract total systems cost from a solution of MESSAGEix and combine them
+        with the cost values for the reference year.
+
+        Raises
+        ------
+        RuntimeError
+            If NaN values in the cost data.
+
+        Returns
+        -------
+        total_cost : pandas DataFrame
+            Total cost of the system.
+
+        """
         # read from scenario
         idx = ["node", "year"]
         model_cost = self._clean_model_data(self.s.var("COST_NODAL_NET"))
@@ -330,6 +432,21 @@ class Calculate:
 
     @lru_cache()
     def _price(self):
+        """
+        Reads PRICE_COMMODITY from MESSAGEix, validates the data, and combines
+        the data with a reference price specified for the base year of MACRO.
+
+        Raises
+        ------
+        RuntimeError
+            If there zero or missing values in PRICE_COMMODITY.
+
+        Returns
+        -------
+        price : pandas DataFrame
+            Data of price per commodity, region, and level.
+
+        """
         # read from scenario
         idx = ["node", "sector", "year"]
         model_price = self._clean_model_data(
@@ -363,6 +480,21 @@ class Calculate:
 
     @lru_cache()
     def _demand(self):
+        """
+        Reads DEMAND from MESSAGEix, validates the data, and combines
+        the data with a reference demand specified for the base year of MACRO.
+
+        Raises
+        ------
+        RuntimeError
+            If there zero or missing values in DEMAND.
+
+        Returns
+        -------
+        price : pandas DataFrame
+            Data of demand per commodity, region, and level.
+
+        """
         # read from scenario
         idx = ["node", "sector", "year"]
         model_demand = self._clean_model_data(
@@ -386,6 +518,16 @@ class Calculate:
 
     @lru_cache()
     def _bconst(self):
+        """
+        Calculate production function coefficient of different energy sectors ("bcosnt")
+        for MACRO calibration (specified as "prfconst" in GAMS formulation).
+
+        Returns
+        -------
+        pandas Series
+            Data as initial value for parameter "prfconst".
+
+        """
         price_ref = self.data["price_ref"]
         demand_ref = self.data["demand_ref"]
         rho = self._rho()
@@ -397,13 +539,22 @@ class Calculate:
 
     @lru_cache()
     def _aconst(self):
+        """
+        Calculate production function coefficient of capital and labor ("acosnt"),
+        for MACRO calibration (specified as "lakl" in GAMS formulation).
+
+        Returns
+        -------
+        pandas Series
+            Data as initial value for parameter "lakl".
+
+        """
         bconst = self._bconst()
         demand_ref = self.data["demand_ref"]
         rho = self._rho()
         gdp0 = self._gdp0()
         k0 = self._k0()
         kpvs = self.data["kpvs"]
-        # TODO: why name this partmp??
         partmp = (bconst * demand_ref**rho).groupby(level="node").sum()
         # TODO: automatically get the units here!!
         aconst = ((gdp0 / 1e3) ** rho - partmp) / (k0 / 1e3) ** (rho * kpvs)
@@ -413,6 +564,25 @@ class Calculate:
 
 
 def add_model_data(base, clone, data):
+    """
+    Cacluates required parameters for MACRO calibration and adds the data to
+    a clone of the submitted MESSAGEix scenario.
+
+    Parameters
+    ----------
+    base : message_ix.Scenario()
+        Base scenario with a solution.
+    clone : message_ix.Scenario()
+        Clone of base scenario for adding calibration parameters.
+    data : dict
+        Data of calibration.
+
+    Raises
+    ------
+    type
+        If the data format is not compatible with MESSAGEix parameters.
+
+    """
     c = Calculate(base, data)
     c.read_data()
     c.derive_data()
@@ -466,6 +636,29 @@ def add_model_data(base, clone, data):
 
 
 def calibrate(s, check_convergence=True, **kwargs):
+    """
+    Calibrates a MESSAGEix scenario to parameters of MACRO
+
+    Parameters
+    ----------
+    s : message_ix.Scenario()
+        MESSAGEix scenario with calibration data.
+    check_convergence : bool, optional, default: True
+        Test is MACRO-calibrated scenario converges in one iteration.
+    **kwargs : keyword arguments
+        To be passed to message_ix.Scenario.solve().
+
+    Raises
+    ------
+    RuntimeError
+        If calibrated scenario solves in more than one iteration.
+
+    Returns
+    -------
+    s : message_ix.Scenario()
+        MACRO-calibrated scenario.
+
+    """
     # solve MACRO standalone
     var_list = ["N_ITER", "MAX_ITER", "aeei_calibrate", "grow_calibrate"]
     gams_args = ["LogOption=2"]  # pass everything to log file
