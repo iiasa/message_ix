@@ -36,7 +36,7 @@ def plot_cumulative(x, y, labels):
     d0_labels = set(x.coords[d0].values) | set(y.coords[d0].values)
     assert (
         len(d0_labels) == 1
-    ), "non-unique values {repr(d0_labels)} for dimension {repr(d0)}"
+    ), f"non-unique values {repr(d0_labels)} for dimension {repr(d0)}"
 
     axes_properties = dict(
         title=f"{d0_labels.pop()} {labels[0].title()}",
