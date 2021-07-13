@@ -123,6 +123,9 @@ uses it to illustrate a range of framework features.
       #. Import data from multiple excel files to create a new scenario
          (:tut:`westeros/westeros_baseline_using_xlsx_import_part2.ipynb`).
 
+   #. Add soft constraints for activity related dynamic constraints
+      (:tut:`westeros/westeros_soft_constraints.ipynb`
+
 #. After the MESSAGE model has solved, use the :mod:`.message_ix.reporting`
    module to ‘report’ results, e.g. do post-processing, plotting, and other
    calculations (:tut:`westeros/westeros_report.ipynb`).
