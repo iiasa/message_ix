@@ -48,6 +48,7 @@ tests/data/nightly
 .benchmarks
 .coverage*
 .mypy_cache
+prof/
 .pytest_cache
 coverage.xml
 htmlcov

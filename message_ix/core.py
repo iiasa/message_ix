@@ -494,7 +494,7 @@ class Scenario(ixmp.Scenario):
         lt = self.par("technical_lifetime", filters=filters).at[0, "value"]
 
         # Duration of periods
-        data = self.par("duration_period")
+        data = self.par("duration_period").sort_values(by="year")
         # Cumulative sum for periods including the vintage period
         data["age"] = data.where(data.year >= yv, 0)["value"].cumsum()
 

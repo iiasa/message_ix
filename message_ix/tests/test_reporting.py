@@ -54,10 +54,10 @@ def test_reporter_from_scenario(message_test_mp):
     assert len(rep.graph["all"]) == 123
 
     # Quantities have short dimension names
-    assert "demand:n-c-l-y-h" in rep.graph
+    assert "demand:n-c-l-y-h" in rep
 
     # Aggregates are available
-    assert "demand:n-l-h" in rep.graph
+    assert "demand:n-l-h" in rep
 
     # Quantities contain expected data
     dims = dict(coords=["chicago new-york topeka".split()], dims=["n"])
