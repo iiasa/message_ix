@@ -9,9 +9,6 @@ All changes
 - Adjust the Westeros reporting tutorial to pyam 1.0 deprecations (:pull:`492`).
 
 
-All changes
------------
-
 .. _v3.3.0:
 
 v3.3.0 (2021-05-28)
