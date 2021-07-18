@@ -5,8 +5,9 @@ from itertools import product
 from warnings import warn
 
 import ixmp
+import numpy as np
 import pandas as pd
-from ixmp.utils import as_str_list, isscalar
+from ixmp.utils import as_str_list
 
 log = logging.getLogger(__name__)
 
@@ -274,7 +275,7 @@ class Scenario(ixmp.Scenario):
                         recurse(_k, _v, parent=_parent)
 
             level = k
-            children = [v] if isscalar(v) else v
+            children = [v] if np.isscalar(v) else v
             for child in children:
                 hierarchy.append([level, child, parent])
                 nodes.append(child)
