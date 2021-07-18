@@ -10,7 +10,6 @@
 #  VI. Two utility functions, interpolate_1d() and interpolate_2d(), for
 #      calculating missing values
 
-# %% I) Importing required packages
 import logging
 from typing import Literal
 
