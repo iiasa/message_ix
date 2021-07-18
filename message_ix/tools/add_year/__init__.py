@@ -15,6 +15,7 @@ from typing import Literal
 
 import numpy as np
 import pandas as pd
+from genno import Quantity, computations
 
 from message_ix import Scenario
 
@@ -707,6 +708,83 @@ def interpolate_1d(  # noqa: C901
         .sort_values(idx)
         .reset_index(drop=True)
     )
+
+
+def i1d_genno(
+    df: pd.DataFrame,
+    yrs_new: list[int],
+    horizon: list[int],
+    year_col: str,
+    value_col: str = "value",
+    extrapolate: bool = False,
+    extrapol_neg: float | None = None,
+    bound_extend: bool = True,
+) -> pd.DataFrame:
+    """:func:`interpolate_1d` vectorized using :mod:`genno`."""
+    if df.empty:
+        return df
+
+    # Existing range of years
+    y_df = df[year_col].unique()
+
+    # Split new periods into 5 lists:
+    # - Less than `horizon`.
+    # - Between `horizon` and `y_df`.
+    # - Within `y_df`.
+    # - Between `horizon` and `y_df`.
+    # - Greater than `horizon`.
+    y_lo1, y_lo0, y_mid, y_hi0, y_hi1 = np.split(
+        sorted(yrs_new),
+        np.searchsorted(yrs_new, [min(horizon), min(y_df), max(y_df), max(horizon)]),
+    )
+
+    # TODO check this logic is what is intended
+    if not extrapolate:
+        # Exclude periods that fall outside `horizon`
+        log.info(f"Omit periods {y_lo1 + y_lo0 + y_hi1} (extrapolate=False)")
+        yrs_new = np.concatenate([y_mid, y_hi0, y_hi1])
+    elif not bound_extend:
+        log.info(f"Omit periods {y_lo1 + y_hi1} (bound_extend=False)")
+        yrs_new = np.concatenate([y_lo0, y_mid, y_lo1])
+
+    y_all = sorted(set(horizon) | set(yrs_new))
+    # Index of the final period of the original data
+    i = y_all.index(sorted(horizon)[-1])
+
+    # Dimensions and units
+    dims = list(set(df.columns) - {value_col, "unit"})
+    unit = df["unit"].unique()
+    assert 1 == len(unit)
+
+    # - Convert to genno.Quantity
+    # - Apply genno's interpolation function
+    result = computations.interpolate(
+        Quantity(df.drop(columns="unit").set_index(dims)[value_col], units=unit[0]),
+        coords={year_col: y_all},
+        kwargs=dict(fill_value="extrapolate"),
+    )
+
+    # Handle extrapol_neg: check for negative values that should be overridden
+    # Select the final period of the original data, plus any extrapolated periods
+    check = (
+        Quantity([1]) if extrapol_neg is None else result.sel({year_col: y_all[i:]})
+    ) < 0
+
+    if check.any():
+        log.info(f"Override negative extrapolated values for:\n{check}")
+        # Keep `result` where values are > 0.
+        # Elsewhere:
+        # - Take the cumulative product of `extrapol_neg` for periods where the
+        #   extrapolated value is < 0.
+        # - Multiply by the value in the final year of the original data.
+        result = result.where(
+            result > 0,
+            check.map({True: extrapol_neg, False: np.nan}).cumprod(dim=year_col)
+            * result.sel({year_col: y_all[i]}),
+        )
+
+    # Convert back to pd.DataFrame
+    return result.to_dataframe().reset_index().assign(unit=result.units)
 
 
 # %% VI.B) Interpolating parameters with two dimensions related to time
