@@ -572,8 +572,8 @@ def interpolate_1d(  # noqa: C901
 ):
     """Interpolate data with one year dimension.
 
-    This function receives a parameter data as a dataframe, and adds new data
-    for the additonal years by interpolation and extrapolation.
+    This function receives parameter data as a data frame, and adds new data for
+    `yrs_new` by interpolation and extrapolation.
 
     Parameters
     ----------
@@ -582,20 +582,20 @@ def interpolate_1d(  # noqa: C901
     yrs_new : list of int
         New years to be added.
     horizon: list of int
-        The horizon of the reference scenario.
+        Years in the reference scenario.
     year_col : str
-        The header of the column to which the new years should be added, e.g.
-        `'year_act'`.
+        Dimension to which the new years should be added, e.g. ``year_act``.
     value_col : str
-        The header of the column containing values.
+        Label of the column containing values; default ``value``.
     extrapolate : bool
-        Allow extrapolation when a new year is outside the parameter years.
-    extrapol_neg : bool
-        Allow negative values obtained by extrapolation.
-
-        - Appears to have no effect when extrapolating *before* `horizon`.
+        Extrapolate data for new years before and after the existing years in
+        ``df[year_col]``.
+    extrapol_neg : float or None
+        If :obj:`None` (the default), allow extrapolation to produce negative values.
+        Otherwise, override such negative values with `extrapol_neg` times the value
+        in the preceding period.
     bound_extend : bool
-        Allow extrapolation of bounds for new years
+        Allow extrapolation of bounds for new years.
     """
     horizon_new = sorted(horizon + yrs_new)
     idx = [x for x in df.columns if x not in [year_col, value_col]]
