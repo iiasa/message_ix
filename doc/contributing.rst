@@ -176,36 +176,76 @@ Current practice for the ``ixmp``, ``message_ix``, and ``message_data`` reposito
 Code style
 ==========
 
-- Follow the `seven rules of a great Git commit message <https://chris.beams.io/posts/git-commit/#seven-rules>`_ for commit messages and PR titles.
-- Apply the following to new or modified **Python** code::
+- For both **commit messages** and **pull request (PR) titles**, memorize and use the `“7 rules of a great Git commit message” <https://chris.beams.io/posts/git-commit/#seven-rules>`_.
 
-    isort -rc . && black . && mypy . && flake8
+- **Python** code:
 
-  Links to the documentation for these tools:
+  - Follow the `PEP 8 naming conventions <https://www.python.org/dev/peps/pep-0008/#naming-conventions>`_.
 
-  - `isort <https://pypi.org/project/isort/>`_: sorts import lines at the top of code files in a consistent way.
-  - `black <https://black.readthedocs.io>`_: applies consistent code style & formatting.
-    Plugins are available for popular code editors.
-  - `mypy <https://mypy.readthedocs.io>`_: checks typing for inconsistencies.
-  - `flake8 <https://flake8.pycqa.org>`_: check code style against `PEP 8 <https://www.python.org/dev/peps/pep-0008>`_.
+  - Apply the following to all code::
 
-  The ``lint`` continuous integration workflow runs these on every pull request.
-  PRs that fail the checks must be corrected before they can be merged.
+      isort -rc . && black . && mypy . && flake8
 
-- Write docstrings in the `numpydoc <https://numpydoc.readthedocs.io/en/latest/format.html>`_ style.
-- For new or modified **R** code, follow the style of the existing code base.
-- Jupyter notebooks (:file:`.ipynb`): see :doc:`contrib/tutorial`.
-- For **documentation** in ReStructuredText formats, in :file:`doc/*.rst` and inline in :file:`message_ix/model/*.gms` files:
+    Links to the documentation for these tools:
 
-  - Start each sentence on a new line.
-  - Do not hard-wrap sentences.
-  - Ensure Sphinx does not give warnings about ReST syntax for new or modified documentation.
+    - `isort <https://pypi.org/project/isort/>`_: sorts import lines at the top of code files in a consistent way.
+    - `black <https://black.readthedocs.io>`_: applies consistent code style & formatting.
+      Plugins are available for popular code editors.
+    - `mypy <https://mypy.readthedocs.io>`_: checks typing for inconsistencies.
+    - `flake8 <https://flake8.pycqa.org>`_: check code style against `PEP 8 <https://www.python.org/dev/peps/pep-0008>`_.
+
+    The ``lint`` continuous integration workflow runs these on every pull request.
+    PRs that fail the checks must be corrected before they can be merged.
+
+  - Add type hints to new or changed functions, methods, and global variables.
 
 - **GAMS** code:
 
-  - Wrap lines at 121 characters, except for inline documentation (see above).
+    - Wrap lines at 121 characters, except for inline documentation (see above).
 
-- Other (file names, CLI, etc.): follow the style of the existing code base.
+- **R** code: follow the style of the existing code base.
+- Jupyter notebooks (:file:`.ipynb`): see :doc:`contrib/tutorial`.
+- Other (file names, CLI, etc.): follow the style of the existing code base, e.g.:
+
+  - Use lower-case file names and extensions.
+  - Except for Python source files, prefer hyphens to underscores.
+
+Documentation
+-------------
+
+- Write documentation in ReStructuredText formats for:
+
+  1. Python docstrings.
+  2. Documentation pages, :file:`doc/*.rst`.
+  3. Inline documentation in :file:`message_ix/model/*.gms` files.
+
+  For (2) and (3), start each sentence on a new line, and do not hard-wrap sentences.
+  For (1), wrap at the same 88 characters as :command:`black` enforces for code.
+
+- Ensure Sphinx does not give warnings about ReST syntax for new or modified documentation.
+
+- Use :mod:`sphinx.ext.intersphinx` (click for docs) to create cross-links within one project's documentation, or across projects.
+
+  - Understand the use of the ``~`` and ``.`` characters to resolve references across the project. See :ref:`sphinx:xref-syntax` in the Sphinx docs.
+  - See example usage in existing code.
+  - Check that intersphinx links are correctly resolved, by building the docs and attempting to click new or modified links.
+
+- Write docstrings in the `numpydoc <https://numpydoc.readthedocs.io/en/latest/format.html>`_ style.
+
+  Use single backticks to refer to function arguments, and asterisks for italics:
+
+  .. code-block:: python
+
+      def func(foo: str, bar: str) -> float:
+          """Perform some action.
+
+          If `foo` and `bar` have the same value, ``42.1`` is returned. *Nice!*
+          """
+
+References:
+
+- :doc:`sphinx:usage/restructuredtext/basics` in the Sphinx docs.
+- https://docutils.sourceforge.io/docs/user/rst/quickref.html
 
 
 Manage issues and pull requests
