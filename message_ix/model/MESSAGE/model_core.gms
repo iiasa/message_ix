@@ -554,6 +554,18 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 *         \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,y^V,y,m,h^A} & \\
 *     - \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} input_{n^L,t,y^V,y,m,n,c,l,h^A,h}
 *         \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,m,y,h^A} & \\
+*     + \sum_{\substack{n^L,t}} output\_cap\_new_{n^L,t,y,n,c,l,h}
+*         \cdot CAP\_NEW_{n^L,t,y} & \\
+*     - \sum_{\substack{n^L,t}} input\_cap\_new_{n^L,t,y,n,c,l,h}
+*         \cdot CAP\_NEW_{n^L,t,y} & \\
+*     + \sum_{\substack{n^L,t \\ y^V \leq y}} output\_cap\_ret_{n^L,t,y^V,n,c,l,h}
+*         \cdot ( CAP_{n^L,t,y^V,y-1} - CAP_{n^L,t,y^V,y} ) \cdot \frac{duration\_period_y}{duration\_period_CAP_y^V} & \\
+*     - \sum_{\substack{n^L,t \\ y^V \leq y}} input\_cap\_ret_{n^L,t,y^V,n,c,l,h}
+*         \cdot ( CAP_{n^L,t,y^V,y-1} - CAP_{n^L,t,y^V,y} ) \cdot \frac{duration\_period_y}{duration\_period_CAP_y^V} & \\
+*     + \sum_{\substack{n^L,t \\ y^V \leq y}} output\_cap_{n^L,t,y^V,y,n,c,l,h}
+*         \cdot CAP_{n^L,t,y^V,y} & \\
+*     - \sum_{\substack{n^L,t \\ y^V \leq y}} input\_cap_{n^L,t,y^V,y,n,c,l,h}
+*         \cdot CAP_{n^L,t,y^V,y} & \\
 *     + \ STOCK\_CHG_{n,c,l,y,h} + \ \sum_s \Big( land\_output_{n,s,y,c,l,h} - land\_input_{n,s,y,c,l,h} \Big) \cdot & LAND_{n,s,y} \\[4pt]
 *     - \ demand\_fixed_{n,c,l,y,h}
 *     = COMMODITY\_BALANCE_{n,c,l,y,h} \quad \forall \ l \notin (L^{RES}, & L^{REN}, L^{STOR} \subseteq L)
@@ -571,6 +583,47 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
 * export from node and input into technologies located at 'location' taking from 'node' and 'time2' taking from 'time'
         - input(location,tec,vintage,year,mode,node,commodity,level,time2,time)                                        \
         * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2) )                                  \
+* +++++
+* commodity input and output associated with construction of new technology capacity (during vintage period)
+  + SUM( (location,tec)$( inv_tec(tec) AND map_tec(location,tec,year) ),                                               \
+* output by all new capacity of technologies located at 'location' sending to 'node' and 'time'
+        output_cap_new(location,tec,year,node,commodity,level,time)                                                    \
+        * CAP_NEW(location,tec,year)                                                                                   \
+* input by all new capacity of technologies located at 'location' taking from 'node' and 'time'
+        - input_cap_new(location,tec,year,node,commodity,level,time)                                                   \
+        * CAP_NEW(location,tec,year) )                                                                                 \
+* commodity input and output associated with retirement of technology capacity (via differentials of capacity of successive periods)
+* for first model period (differential with historical remaining capacity)
+  + SUM( (location,tec,vintage,year2)$( inv_tec(tec) AND map_tec_lifetime(location,tec,vintage,year2)                  \
+            AND first_period(year) AND seq_period(year2,year) ),                                                       \
+* output by all new capacity of technologies located at 'location' sending to 'node' and 'time' distributed over years of periods
+        output_cap_ret(location,tec,vintage,node,commodity,level,time)                                                 \
+        * ( remaining_capacity(node,tec,vintage,year2) - CAP(location,tec,vintage,year) )                              \
+        / duration_period(year)                                                                                        \
+* input by all new capacity of technologies located at 'location' taking from 'node' and 'time' distributed over years of periods
+        - input_cap_ret(location,tec,vintage,node,commodity,level,time)                                                \
+        * ( remaining_capacity(node,tec,vintage,year2) - CAP(location,tec,vintage,year) )                              \
+        / duration_period(year) )                                                                                      \
+* for other model periods (differential with installed capacity of preceding period)
+  + SUM( (location,tec,vintage,year2)$( inv_tec(tec) AND map_tec_lifetime(location,tec,vintage,year2)                  \
+            AND NOT first_period(year) AND seq_period(year2,year) ),                                                   \
+* output by all new capacity of technologies located at 'location' sending to 'node' and 'time' distributed over years of periods
+        output_cap_ret(location,tec,vintage,node,commodity,level,time)                                                 \
+        * ( CAP(location,tec,vintage,year2) - CAP(location,tec,vintage,year) )                                         \
+        / duration_period(year)                                                                                        \
+* input by all new capacity of technologies located at 'location' taking from 'node' and 'time' distributed over years of periods
+        - input_cap_ret(location,tec,vintage,node,commodity,level,time)                                                \
+        * ( CAP(location,tec,vintage,year2) - CAP(location,tec,vintage,year) )                                         \
+        / duration_period(year) )                                                                                      \
+* commodity input and output associated with operation of capacity at any period
+  + SUM( (location,tec,vintage)$( inv_tec(tec) AND map_tec_lifetime(location,tec,vintage,year) ),                      \
+* output by all new capacity of technologies located at 'location' sending to 'node', 'year' and 'time'
+        output_cap(location,tec,vintage,year,node,commodity,level,time)                                                \
+        * CAP(location,tec,vintage,year)                                                                               \
+* input by all new capacity of technologies located at 'location' taking from 'node', 'year' and 'time'
+        - input_cap(location,tec,vintage,year,node,commodity,level,time)                                               \
+        * CAP(location,tec,vintage,year) )                                                                             \
+* +++++
 * quantity taken out from ( >0 ) or put into ( <0 ) inter-period stock (storage)
     + STOCK_CHG(node,commodity,level,year,time)$( map_stocks(node,commodity,level,year) )                              \
 * yield from land-use model emulator

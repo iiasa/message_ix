@@ -35,7 +35,7 @@ tutorials = [
     (("westeros", "westeros_soft_constraints"), [], {}),
     (("westeros", "westeros_addon_technologies"), [], {}),
     # NB this is the same value as in test_reporter()
-    (("westeros", "westeros_report"), [("len-rep-graph", 12688)], {}),
+    (("westeros", "westeros_report"), [("len-rep-graph", 13712)], {}),
     ((AT, "austria"), [("solve-objective-value", 206321.90625)], {}),
     (
         (AT, "austria_single_policy"),

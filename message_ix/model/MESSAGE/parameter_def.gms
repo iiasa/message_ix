@@ -180,6 +180,24 @@ Parameter
 *    * - output [#tecvintage]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` |
 *        ``node_dest`` | ``commodity`` | ``level`` | ``time`` | ``time_dest``
+*    * - input_cap [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` |
+*        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
+*    * - output_cap [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` |
+*        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
+*    * - input_cap_new [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
+*        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
+*    * - output_cap_new [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
+*        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
+*    * - input_cap_ret [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
+*        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
+*    * - output_cap_ret [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
+*        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
 *    * - inv_cost [#tecvintage]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - fix_cost [#tecvintage]_
@@ -235,6 +253,17 @@ Parameters
 * technology input-output mapping and costs parameters
     input(node,tec,vintage,year_all,mode,node,commodity,level,time,time)  relative share of input per unit of activity
     output(node,tec,vintage,year_all,mode,node,commodity,level,time,time) relative share of output per unit of activity
+* +++++
+* commodity input and output associated with construction of capacity
+    input_cap_new(node,tec,vintage,node,commodity,level,time)  relative share of input per unit of new capacity built
+    output_cap_new(node,tec,vintage,node,commodity,level,time) relative share of output per unit of new capacity built
+* commodity input and output associated with retirement of capacity
+    input_cap_ret(node,tec,vintage,node,commodity,level,time)  relative share of input per unit of capacity retired
+    output_cap_ret(node,tec,vintage,node,commodity,level,time) relative share of output per unit of capacity retired
+* commodity input and output associated with operation of capacity at any period
+    input_cap(node,tec,vintage,year_all,node,commodity,level,time)  relative share of input per unit of capacity
+    output_cap(node,tec,vintage,year_all,node,commodity,level,time) relative share of output per unit of capacity
+* +++++
     inv_cost(node,tec,year_all)                         investment costs (per unit of new capacity)
     fix_cost(node,tec,vintage,year_all)                 fixed costs per year (per unit of capacity maintained)
     var_cost(node,tec,vintage,year_all,mode,time)       variable costs of operation (per unit of capacity maintained)
