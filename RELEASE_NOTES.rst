@@ -9,6 +9,17 @@ All changes
 - Adjust the Westeros reporting tutorial to pyam 1.0 deprecations (:pull:`492`).
 
 
+.. _v3.4.0:
+
+v3.4.0
+======
+
+All changes
+-----------
+
+- Add Westeros :doc:`tutorial <tutorials>` on historical parameters (:pull:`478`).
+
+
 .. _v3.3.0:
 
 v3.3.0 (2021-05-28)

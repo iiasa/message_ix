@@ -126,6 +126,9 @@ uses it to illustrate a range of framework features.
    #. Add soft constraints for activity related dynamic constraints
       (:tut:`westeros/westeros_soft_constraints.ipynb`
 
+   #. Explore historical parameters and their usage
+      (:tut:`westeros/westeros_historical_new_capacity.ipynb`).
+        
 #. After the MESSAGE model has solved, use the :mod:`.message_ix.reporting`
    module to ‘report’ results, e.g. do post-processing, plotting, and other
    calculations (:tut:`westeros/westeros_report.ipynb`).
