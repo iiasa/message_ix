@@ -28,10 +28,10 @@ class MockScenario:
         df = self.data["aeei"]
         # add extra commodity to be removed
         extra_commod = df[df.sector == "i_therm"].copy()
-        extra_commod["sector"] = self.data["config"]["ignore_sectors"][0]
+        extra_commod["sector"] = "bar"
         # add extra region to be removed
         extra_region = df[df.node == "R11_AFR"].copy()
-        extra_region["node"] = self.data["config"]["ignore_nodes"][0]
+        extra_region["node"] = "foo"
         df = pd.concat([df, extra_commod, extra_region])
 
         if name == "DEMAND":
@@ -73,6 +73,24 @@ def test_calc_valid_data_dict(westeros_solved):
     c.read_data()
 
 
+# Test for selecting desirable years specified in config from the Excel input
+def test_calc_valid_years(westeros_solved):
+    s = westeros_solved
+    data = pd.read_excel(W_DATA_PATH, sheet_name=None, engine="openpyxl")
+    # Adding an arbitrary year
+    arbitrary_yr = 2021
+    gdp_extra_yr = data["gdp_calibrate"].iloc[0, :].copy()
+    gdp_extra_yr["year"] = arbitrary_yr
+    data["gdp_calibrate"] = data["gdp_calibrate"].append(gdp_extra_yr)
+    # Check the arbitrary year is not in config
+    assert arbitrary_yr not in data["config"]["year"]
+    # But it is in gdp_calibrate
+    assert arbitrary_yr in set(data["gdp_calibrate"]["year"])
+    # And macro does calibration without error
+    c = macro.Calculate(s, data)
+    c.read_data()
+
+
 def test_calc_no_solution(westeros_not_solved):
     s = westeros_not_solved
     pytest.raises(RuntimeError, macro.Calculate, s, W_DATA_PATH)
@@ -81,11 +99,24 @@ def test_calc_no_solution(westeros_not_solved):
 def test_config(westeros_solved):
     s = westeros_solved
     c = macro.Calculate(s, W_DATA_PATH)
-    c.nodes = set(list(c.nodes) + ["foo"])
-    c.sectors = set(list(c.sectors) + ["bar"])
+    assert "config" in c.data
+    assert "sector" in c.data["config"]
 
-    assert c.nodes == set(["Westeros", "foo"])
-    assert c.sectors == set(["light", "bar"])
+    # removing a column from config and testing
+    data = c.data.copy()
+    data["config"] = c.data["config"][["node", "sector"]]
+    try:
+        macro.Calculate(s, data)
+    except KeyError as error:
+        assert 'Missing config data for "level"' in str(error)
+
+    # removing config completely and testing
+    data.pop("config")
+    try:
+        macro.Calculate(s, data)
+    except KeyError as error:
+        assert "Missing config in input data" in str(error)
+
     c.read_data()
     assert c.nodes == set(["Westeros"])
     assert c.sectors == set(["light"])
@@ -149,6 +180,118 @@ def test_calc(westeros_solved, method, test, expected):
     assertion = getattr(npt, f"assert_{test}")
 
     assertion(function().values, expected)
+
+
+def test_calc_gdp0(westeros_solved):
+    s = westeros_solved
+    c = macro.Calculate(s, W_DATA_PATH)
+    c.read_data()
+    obs = c._gdp0()
+    assert len(obs) == 1
+    obs = obs[0]
+    exp = 500
+    assert obs == exp
+
+
+def test_calc_k0(westeros_solved):
+    s = westeros_solved
+    c = macro.Calculate(s, W_DATA_PATH)
+    c.read_data()
+    obs = c._k0()
+    assert len(obs) == 1
+    obs = obs[0]
+    exp = 1500
+    assert obs == exp
+
+
+def test_calc_total_cost(westeros_solved):
+    s = westeros_solved
+    c = macro.Calculate(s, W_DATA_PATH)
+    c.read_data()
+    obs = c._total_cost()
+    # 4 values, 3 in model period, one in history
+    assert len(obs) == 4
+    obs = obs.values
+    exp = np.array([15, 17.477751, 22.143633, 28.11481]) / 1e3
+    assert np.isclose(obs, exp).all()
+
+
+def test_calc_price(westeros_solved):
+    s = westeros_solved
+    c = macro.Calculate(s, W_DATA_PATH)
+    c.read_data()
+    obs = c._price()
+    # 4 values, 3 in model period, one in history
+    assert len(obs) == 4
+    obs = obs.values
+    exp = np.array([195, 182.85222905, 162.03953933, 161.0026274])
+    assert np.isclose(obs, exp).all()
+
+
+# Testing how macro handles zero values in PRICE_COMMODITY
+def test_calc_price_zero(westeros_solved):
+    s = westeros_solved
+    clone = s.clone(scenario="low_demand", keep_solution=False)
+    clone.check_out()
+    # Lowering demand in the first year
+    clone.add_par("demand", ["Westeros", "light", "useful", 700, "year"], 10, "GWa")
+    # Making investment and var cost zero for delivering light
+    # TODO: these units are based on testing.make_westeros: needs improvement
+    clone.add_par("inv_cost", ["Westeros", "bulb", 700], 0, "USD/GWa")
+    for y in [690, 700]:
+        clone.add_par(
+            "var_cost", ["Westeros", "grid", y, 700, "standard", "year"], 0, "USD/GWa"
+        )
+
+    clone.commit("demand reduced and zero cost for bulb")
+    clone.solve()
+    price = clone.var("PRICE_COMMODITY")
+    # Assert if there is no zero price (to make sure MACRO receives 0 price)
+    assert np.isclose(0, price["lvl"]).any()
+    c = macro.Calculate(clone, W_DATA_PATH)
+    c.read_data()
+    try:
+        c._price()
+    except RuntimeError as err:
+        # To make sure the right error message is raised in macro.py
+        assert "0-price found in MESSAGE variable PRICE_" in str(err)
+    else:
+        raise Exception("No error in macro.read_data() for zero price(s)")
+
+
+def test_calc_demand(westeros_solved):
+    s = westeros_solved
+    c = macro.Calculate(s, W_DATA_PATH)
+    c.read_data()
+    obs = c._demand()
+    # 4 values, 3 in model period, one in history
+    assert len(obs) == 4
+    obs = obs.values
+    exp = np.array([90, 100, 150, 190])
+    assert np.isclose(obs, exp).all()
+
+
+def test_calc_bconst(westeros_solved):
+    s = westeros_solved
+    c = macro.Calculate(s, W_DATA_PATH)
+    c.read_data()
+    obs = c._bconst()
+    assert len(obs) == 1
+    obs = obs[0]
+    exp = 3.6846576e-05
+    assert np.isclose(obs, exp)
+
+
+def test_calc_aconst(westeros_solved):
+    s = westeros_solved
+    c = macro.Calculate(s, W_DATA_PATH)
+    c.read_data()
+    obs = c._aconst()
+
+    assert len(obs) == 1
+    obs = obs[0]
+    exp = 26.027323
+    assert np.isclose(obs, exp)
 
 
 def test_init(message_test_mp):
