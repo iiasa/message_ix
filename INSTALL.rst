@@ -163,8 +163,9 @@ Verify that the version installed corresponds to the `latest release`_ by runnin
     # Show versions of message_ix, ixmp, and key dependencies
     $ message-ix show-versions
 
-    # Show the contents of the default local Platform (empty on install)
-    $ message-ix --platform=default list
+    # Show the list of modelling platforms that have been installed and the path to the database config file
+    # By default, just the local database should appear in the list
+    $ message-ix platform list
 
 The above commands will work as of :mod:`message_ix` 3.0 and in subsequent versions.
 If an error occurs, this may mean that an older version has been installed and should be updated.

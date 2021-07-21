@@ -346,7 +346,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
            processes simultaneously; but using *different* CPLEX options in
            each process may produced unexpected results.
         """
-        # If two runs are kicked off simulatenously with the same
+        # If two runs are kicked off simultaneously with the same
         # self.model_dir, then they will try to write the same optfile, and may
         # write different contents.
         #

@@ -37,6 +37,7 @@ Then, continue with the:
 - :doc:`framework` detailed description and feature list.
 - :doc:`install` of the software and essential dependencies.
 - :doc:`tutorials` for new users that demonstrate the basic features of the framework.
+- :doc:`Videos <video/index>` versions of parts of this documentation.
 
 .. toctree::
    :hidden:
@@ -46,8 +47,7 @@ Then, continue with the:
    framework
    install
    tutorials
-
-
+   video/index
 
 
 .. _core:
