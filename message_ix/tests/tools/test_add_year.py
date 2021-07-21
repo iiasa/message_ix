@@ -1,8 +1,8 @@
 import pytest
 from ixmp import Platform
 
-from message_ix import Scenario
-from message_ix.tools.add_year import add_year
+from message_ix import Scenario, make_df
+from message_ix.tools.add_year import add_year, interpolate_1d, i1d_genno
 
 
 @pytest.fixture
@@ -143,3 +143,70 @@ def test_add_year_cli(message_ix_cli, base_scen_mp):
     # Bad usage: not giving the base scenario info
     r = message_ix_cli(*cmd[6:], "--dry-run")
     assert r.exit_code == 2
+
+
+@pytest.mark.parametrize("func", [interpolate_1d, i1d_genno])
+def test_interpolate_1d(func):
+    # Input data
+    years_base = [2020, 2030, 2040]
+    df = make_df(
+        "technical_lifetime",
+        node_loc="n",
+        technology="t",
+        value=[10.0, 20, 30],
+        unit="year",
+        year_vtg=years_base,
+    )
+
+    years_new = [2015, 2025, 2035, 2045]
+
+    # With default extrapolate=False, extrapol_neg=None
+    args = dict(
+        df=df,
+        yrs_new=years_new,
+        horizon=years_base,
+        year_col="year_vtg",
+        extrapolate=False,
+        extrapol_neg=None,
+        bound_extend=True,
+    )
+    result = func(**args)
+    print("1", result)
+
+    # Result has all the expected years
+    assert set(years_base + years_new) - {2015} == set(result["year_vtg"])
+
+    # With extrapolate=True
+    args["extrapolate"] = True
+    result = func(**args)
+    print("2", result)
+
+    # Result has all the expected years
+    assert set(years_base + years_new) == set(result["year_vtg"])
+
+    # With extrapolation that produces negative values before `horizon`, extrapol_neg
+    # has no effect
+    years_new = [2000, 2015, 2025, 2035, 2045, 2050]
+    args["yrs_new"] = years_new
+    args["extrapol_neg"] = 1.1
+
+    result = func(**args)
+    print("3", result)
+
+    # Result has all the expected years
+    assert set(years_base + years_new) == set(result["year_vtg"])
+
+    # Extrapolation that produces negative values after `horizon`
+    df.loc[:, "value"] = [30.0, 20.0, 1.5]
+    args["extrapol_neg"] = 1.1
+
+    result = func(**args)
+    print("4", result)
+
+    # Result has all the expected years
+    assert set(years_base + years_new) == set(result["year_vtg"])
+
+    # With bound_extend=False
+    args["bound_extend"] = False
+    result = func(**args)
+    print("5", result)
