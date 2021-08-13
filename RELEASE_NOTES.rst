@@ -5,20 +5,10 @@ All changes
 -----------
 
 - Adjust test suite for pyam v1.1.0 compatibility (:pull:`499`).
+- Add Westeros :doc:`tutorial <tutorials>` on historical parameters (:pull:`478`).
 - Update reference for activity and capacity soft constraints (:pull:`474`).
 - Update :meth:`.years_active` to use sorted results (:pull:`491`).
 - Adjust the Westeros reporting tutorial to pyam 1.0 deprecations (:pull:`492`).
-
-
-.. _v3.4.0:
-
-v3.4.0
-======
-
-All changes
------------
-
-- Add Westeros :doc:`tutorial <tutorials>` on historical parameters (:pull:`478`).
 
 
 .. _v3.3.0:
