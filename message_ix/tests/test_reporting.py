@@ -129,7 +129,7 @@ def test_reporter_from_westeros(test_mp):
     )
     assert all(obs["year"] == [700, 710, 720] * 3)
 
-    obs = obs["value"].values
+    obs = obs.data["value"].values
     exp = [
         4832.177734,
         8786.515625,
