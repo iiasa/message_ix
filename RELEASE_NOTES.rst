@@ -4,6 +4,7 @@ Next release
 All changes
 -----------
 
+- Adjust test suite for pyam v1.1.0 compatibility (:pull:`499`).
 - Update reference for activity and capacity soft constraints (:pull:`474`).
 - Update :meth:`.years_active` to use sorted results (:pull:`491`).
 - Adjust the Westeros reporting tutorial to pyam 1.0 deprecations (:pull:`492`).
