@@ -224,6 +224,38 @@ To check which JVM will be used by ixmp, run the following in any prompt or term
     $ python -c "import jpype; print(jpype.getDefaultJVMPath())"
 
 
+“No module named 'pyam'”
+------------------------
+
+When running a test in ``message_ix`` an error like this may occur.
+Please don't ``pip install pyam`` directly, this will lead you to an unrelated
+package and additional error messages. The package you want to
+install is ``pyam-iamc``. ``pyam-iamc`` is a dependency of ``message_ix.reporting`` and is
+not automatically installed via ``setup.py`` since the package is listed under `extra requirement`_.
+When you want to run a test which needs this dependency you need to install this package
+additionally. So to resolve this error message and install the correct package,
+please use one of following commands within your environment::
+
+    # If installed using conda
+    $ conda install message_ix[reporting]
+    # or
+    $ conda install pyam-iamc
+
+    # If installed using pip
+    $ pip install message_ix[reporting]
+    # or
+    $ pip install pyam-iamc
+
+If you already installed the ``pyam`` package, please remove it from your environment
+with the following to avoid further issues::
+
+    # If installed using conda
+    $ conda remove pyam
+
+    # If installed using pip
+    $ pip uninstall pyam
+
+
 .. _`GAMS`: http://www.gams.com
 .. _`latest version`: https://www.gams.com/download/
 .. _`version 29`: https://www.gams.com/29/
@@ -242,3 +274,4 @@ To check which JVM will be used by ixmp, run the following in any prompt or term
 .. _`README`: https://github.com/iiasa/message_ix#install-from-source-advanced-users
 .. _`IRkernel`: https://irkernel.github.io/installation/
 .. _`these instructions`: https://javatutorial.net/set-java-home-windows-10
+.. _`extra requirement`: https://github.com/iiasa/message_ix/blob/128750720de91317e64c9913f26d7d0a4024fe4f/setup.py#L30-L36
