@@ -227,6 +227,28 @@ To check which JVM will be used by ixmp, run the following in any prompt or term
     $ python -c "import jpype; print(jpype.getDefaultJVMPath())"
 
 
+“No module named 'pyam'”
+------------------------
+
+The package `pyam-iamc <https://pypi.org/project/pyam-iamc/>`_ is one of the "reporting" extra dependencies of :mod:`message_ix`.
+These extra dependencies are not installed automatically, but can be installed using::
+
+    # If message_ix is installed using pip
+    $ pip install message_ix[reporting]
+    # or
+    $ pip install pyam-iamc
+
+    # If message_ix is installed using Anaconda (see note below)
+    $ conda install pyam
+
+Note that this package has the *different* name on conda-forge versus PyPI: `pyam <https://anaconda.org/conda-forge/pyam>`__.
+
+The package listed as `pyam <https://pypi.org/project/pyam/>`__ on PyPI (and not available via Anaconda) is unrelated to :mod:`message_ix`, not compatible with it, and will produce other error messages.
+If you installed this package accidentally, remove it using::
+
+    # If installed using pip
+    $ pip uninstall pyam
+
 .. _`GAMS`: http://www.gams.com
 .. _`latest version`: https://www.gams.com/download/
 .. _`version 29`: https://www.gams.com/29/
