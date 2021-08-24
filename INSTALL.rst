@@ -97,6 +97,12 @@ Again: at this point, installation is complete.
 You do not need to complete the steps in “Using ``pip``” or “From source”.
 Go to the section `Check that installation was successful`_.
 
+For further support with the installation of :mod:`message_ix` with Anaconda, please see the following video:
+
+.. raw:: html
+
+    <iframe width="690" height="360" src="https://www.youtube.com/embed/vJ6G0ry884Y" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 .. [1] See the `conda glossary`_ for the differences between Anaconda and Miniconda, and the definitions of the terms ‘channel’ and ‘environment’ here.
 .. [2] The ‘$’ character at the start of these lines indicates that the command text should be entered in the terminal or prompt, depending on the operating system.
        Do not retype the ‘$’ character itself.
