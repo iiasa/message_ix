@@ -1,5 +1,6 @@
 import sys
 from shutil import copyfile
+from typing import List, Tuple
 
 import numpy as np
 import pytest
@@ -17,7 +18,7 @@ AT = "Austrian_energy_system"
 # 3. Dictionary with extra keyword arguments to run_notebook().
 
 # FIXME check objective function of the rest of tutorials.
-tutorials = [
+tutorials: List[Tuple] = [
     # IPython kernel
     (
         ("westeros", "westeros_baseline"),
