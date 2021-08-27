@@ -4,6 +4,7 @@ Next release
 All changes
 -----------
 
+- Add a tool for :doc:`tools/check` (:pull:`506`).
 - Adjust test suite for pyam v1.1.0 compatibility (:pull:`499`).
 - Add Westeros :doc:`tutorial <tutorials>` on historical parameters (:pull:`478`).
 - Update reference for activity and capacity soft constraints (:pull:`474`).
