@@ -43,3 +43,27 @@ def test_check_westeros(test_mp):
     # Checks fail
     results = check(scen, config=config)
     assert not results[0]
+
+
+@pytest.mark.parametrize(
+    "url, config",
+    [
+        # ("ixmp://platform/model/scenario#version", dict()),
+    ],
+)
+def test_check_existing(url, config):
+    """Check existing scenarios.
+
+    For local use only: extend the list of parameters, above, but do not commit
+    additions to ``main``.
+    """
+    # import pint
+    # from iam_units import registry
+    #
+    # pint.set_application_registry(registry)
+
+    scen, mp = Scenario.from_url(url)
+    results = check(scen, config=config)
+
+    # Checks all pass
+    assert results[0], "\n".join(map(str, results))
