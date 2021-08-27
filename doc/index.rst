@@ -48,8 +48,6 @@ Then, continue with the:
    tutorials
 
 
-
-
 .. _core:
 
 Mathematical specification

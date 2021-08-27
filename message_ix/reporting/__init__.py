@@ -189,11 +189,14 @@ class Reporter(IXMPReporter):
         solved = scenario.has_solution()
 
         if not solved:
-            log.warning(
-                f'Scenario "{scenario.model}/{scenario.scenario}" has no solution'
-            )
-            log.warning("Some reporting may not function as expected")
-            fail_action = logging.DEBUG
+            if kwargs.pop("solved", True):
+                log.warning(
+                    f'Scenario "{scenario.model}/{scenario.scenario}" has no solution'
+                )
+                log.warning("Some reporting may not function as expected")
+                fail_action = logging.DEBUG
+            else:
+                fail_action = logging.NOTSET
         else:
             fail_action = "raise"
 
