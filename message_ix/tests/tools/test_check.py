@@ -13,16 +13,16 @@ def test_check_dantzig(test_mp):
     assert results[0]
 
 
-def test_check_westeros(test_mp):
-    scen = make_westeros(test_mp)
+@pytest.fixture
+def westeros(test_mp):
+    yield make_westeros(test_mp)
 
-    # Minimal config to make Westeros reportable
-    config = {"units": {"replace": {"-": ""}}}
 
-    # Checks all pass
-    results = check(scen, config=config)
-    assert results[0]
+# Minimal config to make Westeros reportable
+WESTEROS_CONFIG = {"units": {"replace": {"-": ""}}}
 
+
+def test_gaps_input(westeros):
     # Delete one value
     to_delete = make_df(
         "input",
@@ -37,24 +37,19 @@ def test_check_westeros(test_mp):
         time="year",
         time_origin="year",
     ).dropna(axis=1)
-    with scen.transact():
-        scen.remove_par("input", to_delete)
+    with westeros.transact():
+        westeros.remove_par("input", to_delete)
 
     # Checks fail
-    results = check(scen, config=config)
+    results = check(westeros, config=WESTEROS_CONFIG)
     assert not results[0]
 
 
-def test_check_tl_integer(test_mp):
-    scen = make_westeros(test_mp)
-
-    # Minimal config to make Westeros reportable
-    config = {"units": {"replace": {"-": ""}}}
-
+def test_check_tl_integer(westeros):
     # Change one value
     tl = "technical_lifetime"
-    with scen.transact():
-        scen.add_par(
+    with westeros.transact():
+        westeros.add_par(
             tl,
             make_df(
                 tl,
@@ -67,10 +62,10 @@ def test_check_tl_integer(test_mp):
         )
 
     # Checks fail
-    results = check(scen, config=config)
+    results = check(westeros, config=WESTEROS_CONFIG)
     assert not results[0]
 
-    assert """FAIL Non-integer values for technical_lifetime:
+    assert """FAIL Non-integer values for ``technical_lifetime``:
 See https://github.com/iiasa/message_ix/issues/503.
 - 1.1 at indices: nl=Westeros t=bulb yv=700""" in map(
         str, results
