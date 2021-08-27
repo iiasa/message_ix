@@ -45,6 +45,38 @@ def test_check_westeros(test_mp):
     assert not results[0]
 
 
+def test_check_tl_integer(test_mp):
+    scen = make_westeros(test_mp)
+
+    # Minimal config to make Westeros reportable
+    config = {"units": {"replace": {"-": ""}}}
+
+    # Change one value
+    tl = "technical_lifetime"
+    with scen.transact():
+        scen.add_par(
+            tl,
+            make_df(
+                tl,
+                node_loc="Westeros",
+                technology="bulb",
+                year_vtg=700,
+                value=1.1,
+                unit="y",
+            ),
+        )
+
+    # Checks fail
+    results = check(scen, config=config)
+    assert not results[0]
+
+    assert """FAIL Non-integer values for technical_lifetime:
+See https://github.com/iiasa/message_ix/issues/503.
+- 1.1 at indices: nl=Westeros t=bulb yv=700""" in map(
+        str, results
+    )
+
+
 @pytest.mark.parametrize(
     "url, config",
     [

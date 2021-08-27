@@ -1,4 +1,5 @@
 from functools import partial
+from inspect import getdoc
 from logging import ERROR as FAIL
 from logging import NOTSET as PASS
 from logging import WARNING
@@ -11,12 +12,13 @@ CHECKS = []
 
 def append(func):
     CHECKS.append(func)
+    return func
 
 
 class Result:
     """Container class for a check result and associated messages."""
 
-    desc: str
+    description: str
     result: int
     message: str = ""
 
@@ -95,6 +97,10 @@ def var_cost(rep):
     )
 
 
+def key_str(dims, key):
+    return " ".join(f"{d}={k}" for d, k in zip(dims, key))
+
+
 def check_gaps(qty, years, dim):
     """Check `qty` for gaps in data along `dim`."""
     result = PASS
@@ -122,10 +128,9 @@ def check_gaps(qty, years, dim):
         if len(gaps):
             # At least 1 gap; format a message
             result = WARNING
-            key_str = " ".join(f"{d}={k}" for d, k in zip(dims, key))
             messages.extend(
                 [
-                    f"- at indices: {key_str}",
+                    f"- at indices: {key_str(dims, key)}",
                     f"  for {dim}: {min(seen)} < {repr(gaps)} < {max(seen)}",
                 ]
             )
@@ -148,6 +153,36 @@ def gaps_tl(rep):
         rep.full_key("technical_lifetime"),
         "y",
     )
+
+
+def munge_docstring(func):
+    """Prepare Result.description and Result.messages from ``func.__doc__``."""
+    lines = getdoc(func).split("\n")
+    return lines[0].rstrip("."), lines[2:]
+
+
+@append
+def tl_integer(rep):
+    """Non-integer values for technical_lifetime.
+
+    See https://github.com/iiasa/message_ix/issues/503.
+    """
+
+    def _(tl):
+        # Quick check: convert all values to integer and look for changed values
+        mask = tl.astype(int) != tl
+        result = FAIL if mask.any() else PASS
+
+        desc, messages = munge_docstring(tl_integer)
+
+        # Process item-wise, only if there was some failure
+        for key, non_int in mask.groupby(list(tl.dims)) if result is FAIL else ():
+            if non_int.item():
+                messages.append(f"- {tl.loc[key]} at indices: {key_str(tl.dims, key)}")
+
+        return Result(desc, result, messages)
+
+    return rep.add("check tl integer", _, rep.full_key("technical_lifetime"))
 
 
 # @append
