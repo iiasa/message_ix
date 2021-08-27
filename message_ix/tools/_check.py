@@ -3,23 +3,45 @@ from inspect import getdoc
 from logging import ERROR as FAIL
 from logging import NOTSET as PASS
 from logging import WARNING
-from typing import Any, Dict, Iterable, Tuple, Union
+from typing import Dict, Iterable, List, Optional, Union
 
-from message_ix.reporting import Reporter
+from message_ix import Reporter, Scenario
 
+#: List of all check functions.
 CHECKS = []
+
+# Utility functions
 
 
 def append(func):
+    """Add `func` to `CHECKS`."""
     CHECKS.append(func)
     return func
 
 
-class Result:
-    """Container class for a check result and associated messages."""
+def key_str(dims, key):
+    return " ".join(f"{d}={k}" for d, k in zip(dims, key))
 
+
+def munge_docstring(func):
+    """Prepare Result.description and Result.messages from ``func.__doc__``."""
+    lines = getdoc(func).split("\n")
+    return lines[0].rstrip("."), lines[2:]
+
+
+class Result:
+    """Container class for a check result and associated messages.
+
+    Use ``str(result)`` for a complete, formatted description of the result.
+    """
+
+    #: 1-line description of the check.
     description: str
+
+    #: Outcome of the check. Either 0 (PASS), 30 (WARNING), or 40 (FAIL).
     result: int
+
+    #: Descriptive message when :attr:`result` is not PASS.
     message: str = ""
 
     def __init__(
@@ -45,22 +67,44 @@ class Result:
             return f"PASS {self.description}"
         else:
             result_str = {WARNING: "WARNING", FAIL: "FAIL"}.get(self.result)
-            return f"{result_str} {self.description}:\n{self.message}"
+            return f"{result_str} {self.description}" + (
+                f":\n{self.message}" if self.message else ""
+            )
 
     def __repr__(self):
         return str(self)
 
 
-def check(scenario, config=None) -> Dict[str, Tuple[bool, Any]]:
+def check(scenario: Scenario, config: Optional[Dict] = None) -> List[Result]:
     """Check that data in `scenario` is consistent with the MESSAGE(-MACRO) formulation.
 
-    :func:`check` applies multiple checks, including:
+    :func:`check` applies multiple checks; see :ref:`the list of checks
+    <checks-summary>`.
 
-    1. ``technical_lifetime`` (maybe also ``var_cost`` missing for corresponding with
-       ``input``/``output`` values.
-    2. Period “gaps” in data.
+    Parameters
+    ----------
+    scenario :
+        Scenario to be checked, possibly without a model solution.
+    config : optional
+        Configuration for :class:`~message_ix.Reporter`.
 
-    Other checks that could be added include:
+    Returns
+    -------
+    list of :class:`.Result`
+        The first object is an "overall" result: PASS iff all the other checks PASS.
+        Subsequent object are results for individual checks.
+
+    Example
+    -------
+    >>> from message_ix.tools import check
+    >>> results = check(scen)
+    >>> print(" ".join(map(str, results))
+    PASS Overall
+    PASS var_cost missing for corresponding input/output
+    PASS Data gaps in ``input`` along the year_act dimension
+    PASS Data gaps in ``technical_lifetime`` along the year_vtg dimension
+    PASS Non-integer values for ``technical_lifetime``
+
     """
     # Create a Reporter
     config = config or dict()
@@ -81,6 +125,9 @@ def check(scenario, config=None) -> Dict[str, Tuple[bool, Any]]:
     return results
 
 
+# Individual checks
+
+
 @append
 def var_cost(rep):
     def _(vc, input, output):
@@ -95,10 +142,6 @@ def var_cost(rep):
         key["input"],
         key["output"],
     )
-
-
-def key_str(dims, key):
-    return " ".join(f"{d}={k}" for d, k in zip(dims, key))
 
 
 def check_gaps(qty, years, dim):
@@ -140,6 +183,7 @@ def check_gaps(qty, years, dim):
 
 @append
 def gaps_input(rep):
+    """Data gaps in ``input`` along the year_act dimension."""
     return rep.add(
         "check gaps in input", partial(check_gaps, dim="ya"), rep.full_key("input"), "y"
     )
@@ -147,6 +191,7 @@ def gaps_input(rep):
 
 @append
 def gaps_tl(rep):
+    """Data gaps in ``technical_lifetime`` along the year_vtg dimension."""
     return rep.add(
         "check gaps in technical_lifetime",
         partial(check_gaps, dim="yv"),
@@ -155,15 +200,9 @@ def gaps_tl(rep):
     )
 
 
-def munge_docstring(func):
-    """Prepare Result.description and Result.messages from ``func.__doc__``."""
-    lines = getdoc(func).split("\n")
-    return lines[0].rstrip("."), lines[2:]
-
-
 @append
 def tl_integer(rep):
-    """Non-integer values for technical_lifetime.
+    """Non-integer values for ``technical_lifetime``.
 
     See https://github.com/iiasa/message_ix/issues/503.
     """
@@ -186,8 +225,8 @@ def tl_integer(rep):
 
 
 # @append
-def map_tec(rep):
-    def _(scen):
-        return Result("map_tec is present", FAIL, repr(scen.set("map_tec")))
-
-    return rep.add("map_tec", _, "scenario")
+# def map_tec(rep):
+#     def _(scen):
+#         return Result("map_tec is present", FAIL, repr(scen.set("map_tec")))
+#
+#     return rep.add("map_tec", _, "scenario")
