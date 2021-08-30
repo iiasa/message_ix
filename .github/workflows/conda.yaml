@@ -68,3 +68,15 @@ jobs:
         ixmp --platform default list
 
         conda list
+
+    - name: JPype check
+      if: ${{ matrix.conda_type == 'anaconda' }}
+      run: |
+        conda activate ${{ env.CONDA_ENV }}
+
+        conda install -c conda-forge pytest
+        pytest --pyargs message_ix.tests.test_core::test_add_cat -p ixmp.testing -p no:faulthandler
+
+        conda install -c conda-forge JPype1=1.2.1 --yes
+        pytest --pyargs message_ix.tests.test_core::test_add_cat -p ixmp.testing -p no:faulthandler
+
