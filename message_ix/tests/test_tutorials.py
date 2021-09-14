@@ -112,6 +112,18 @@ def test_tutorial(nb_path, cell_values, run_args, tmp_path, tmp_env):
         for fil in data_files:
             copyfile(nb_path.parent / fil, tmp_path / fil)
 
+    # Due to flakiness this test is marked as xfail,
+    # since it's still running on Python 3.9
+    if (
+        "R_austria.ipynb" in nb_path.parts[-1]
+        and sys.platform == "darwin"
+        and sys.version_info.minor == 8
+    ):
+        pytest.xfail(
+            "Due to flakiness this test is marked as xfail, "
+            "since it's still running on Python 3.9"
+        )
+
     # The notebook can be run without errors
     nb, errors = run_notebook(nb_path, tmp_path, tmp_env, **run_args)
     assert errors == []
