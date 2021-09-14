@@ -40,8 +40,8 @@ jobs:
       if: ${{ matrix.conda_type == 'anaconda' }}
       working-directory: ${{ github.workspace }}
       run: |
-        curl -O https://repo.anaconda.com/archive/Anaconda3-2020.11-Windows-x86_64.exe
-        Start-Process "Anaconda3-2020.11-Windows-x86_64.exe" "/S", "/D=${env:GITHUB_WORKSPACE}\anaconda3" -Wait
+        curl -O https://repo.anaconda.com/archive/Anaconda3-2021.05-Windows-x86_64.exe
+        Start-Process "Anaconda3-2021.05-Windows-x86_64.exe" "/S", "/D=${env:GITHUB_WORKSPACE}\anaconda3" -Wait
         "${env:GITHUB_WORKSPACE}/anaconda3/Scripts" | Out-File -FilePath $env:GITHUB_PATH -Append
 
     - name: Add build runner's pre-installed Miniconda to PATH
@@ -73,6 +73,7 @@ jobs:
       if: ${{ matrix.conda_type == 'anaconda' }}
       run: |
         conda activate ${{ env.CONDA_ENV }}
+        conda update -n base -c defaults conda
 
         conda install -c conda-forge pytest
         pytest --pyargs message_ix.tests.test_core::test_add_cat -p ixmp.testing -p no:faulthandler
