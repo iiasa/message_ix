@@ -239,7 +239,7 @@ It's a very quick process, so we already see that this folder has appeared, and 
    Do this.
 
 The tutorials are in the form of Jupyter notebooks.
-Understanding and working with Jupyter notebooks is one of the prerequisite skills for learning MESSAGEix, these are listed in the documentation.
+Remember - understanding and working with Jupyter notebooks is one of the prerequisite skills for learning MESSAGEix, these are listed in the documentation.
 This video does not cover this.
 
 As such, we want to start the Jupyter notebook server and use this to open the tutorials.
