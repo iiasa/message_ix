@@ -96,15 +96,6 @@ def test_tutorial(nb_path, cell_values, run_args, tmp_path, tmp_env):
 
     If *cell_values* are given, values in the specified cells are tested.
     """
-    # Add the tutorial directory to PYTHONPATH. The tutorials are executed in
-    # `tmp_path`; but they import from a tools.py file in the same directory as
-    # the notebook, ie. under `tutorial_path`.
-    # TODO remove the reliance on this 'hidden' code
-    path_sep = ";" if sys.platform.startswith("win") else ":"
-    tmp_env["PYTHONPATH"] = path_sep.join(
-        [str(nb_path.parent), tmp_env.get("PYTHONPATH", "")]
-    )
-
     # Copy necessary data files to tmp_path
     if "westeros_baseline_using_xlsx_import_part2" in nb_path.parts[-1]:
         for fil in data_files:
