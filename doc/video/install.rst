@@ -25,14 +25,23 @@ We begin with Step 5, opening the Anaconda Prompt from the Start Menu.
 
    Do this.
 
-In Step 6, we will make sure that “conda forge” is used as the default channel to download and install packages, including message_ix and other packages that it requires.
-We copy this command into the prompt and run it.
+In Step 6, we will first make sure that “conda forge” is used as the default channel to download and install packages, including message_ix and other packages that it requires. Secondly, we set the channel priority to 'strict'. This ensures that conda will select the latest version of message_ix from the "noarch" channel and ignore much older packages in OS-specific channels.
+
+We copy the first command into the prompt and run it.
 
 .. note::
 
    Do this.
 
 The output of the command shows us that this channel is now the top-priority or default channel.
+
+We then copy the second command into the prompt and run it.
+
+.. note::
+
+   Do this.
+
+Now the channel priority is set to strict.
 With that, we have completed Step 6, and we move on.
 
 In the next steps, we will create and activate a new Anaconda “environment”, and use that to install MESSAGEix.
