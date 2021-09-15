@@ -21,6 +21,9 @@ jobs:
     strategy:
       matrix:
         conda_type: [anaconda, miniconda]
+        extra_deps:
+          - ""
+          - "JPype1=1.2.1"
 
     name: ${{ matrix.conda_type }}
 
@@ -56,9 +59,10 @@ jobs:
       run: |
         conda config --prepend channels conda-forge
         conda config --set channel_priority strict
-        conda create --name ${{ env.CONDA_ENV }} --quiet message-ix
+        conda create --name ${{ env.CONDA_ENV }} --quiet message-ix pytest ${{ matrix.extra_deps }}
 
     - name: Check
+      # Check environment and run a single test from the suite to test code path to ixmp JDBCBackend
       run: |
         conda activate ${{ env.CONDA_ENV }}
 
@@ -68,16 +72,4 @@ jobs:
         ixmp --platform default list
 
         conda list
-
-    - name: JPype check
-      if: ${{ matrix.conda_type == 'anaconda' }}
-      run: |
-        conda activate ${{ env.CONDA_ENV }}
-        conda update -n base -c defaults conda
-
-        conda install -c conda-forge pytest
         pytest --pyargs message_ix.tests.test_core::test_add_cat -p ixmp.testing -p no:faulthandler
-
-        conda install -c conda-forge JPype1=1.2.1 --yes
-        pytest --pyargs message_ix.tests.test_core::test_add_cat -p ixmp.testing -p no:faulthandler
-
