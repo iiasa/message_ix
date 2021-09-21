@@ -10,6 +10,13 @@ from itertools import product
 from message_ix import Scenario
 
 
+# A function for adding required parameters for representing "capacity"
+def add_cap_par(scen, years, tec, data={"inv_cost": 0.1, "technical_lifetime": 5}):
+
+    for year, (parname, val) in product(years, data.items()):
+        scen.add_par(parname, ["node", tec, year], val, "-")
+
+
 # A function for generating a simple model with sub-annual time slices
 def model_generator(
     test_mp,
@@ -19,6 +26,7 @@ def model_generator(
     time_steps,
     demand,
     yr=2020,
+    capacity=True,
     unit="GWa",
 ):
     """
@@ -45,6 +53,8 @@ def model_generator(
         (e.g., demand = {"summer": 2.5})
     yr : int, optional
         Model year. The default is 2020.
+    capacity : bool, optional
+        Parameterization of capacity. The default is True.
     unit :  string
         Unit of "demand"
 
@@ -105,6 +115,10 @@ def model_generator(
                     h2,
                 ]
                 scen.add_par("input", ["node", tec] + inp_spec, 1, "-")
+
+    # Adding capacity related parameters
+    if capacity:
+        add_cap_par(scen, [2020], "gas_ppl")
 
     # Committing and solving
     scen.commit("scenario was set up.")
