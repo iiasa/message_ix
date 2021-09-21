@@ -252,3 +252,131 @@ def test_time_commodity(test_mp):
         ],
         demand={"summer": 1, "winter": 1},
     )
+    # 4) Meeting "demand" through three temporal levels ("month", "season", and "year")
+    # 4a) "month" is defined under "season" BUT "season" not linked to "year"
+    # Results: Model should not solve (no parent "time" for "season", i.e., no linkage to "gas_supply" at "year")
+    comment = "4a.unlinked-temporal-levels"
+    tec_dict["gas_ppl"]["time_origin"] = ["year", "year"]
+    tec_dict["gas_ppl"]["time"] = tec_dict["gas_ppl"]["time_dest"] = ["Jan", "Feb"]
+    tec_dict["gas_supply"]["time"] = tec_dict["gas_supply"]["time_dest"] = ["year"]
+
+    # Check the model shouldn't solve
+    try:
+        pytest.raises(
+            ValueError,
+            model_generator(
+                comment,
+                tec_dict,
+                com_dict,
+                time_steps=[
+                    ("Jan", 0.25, "month", "winter"),
+                    ("Feb", 0.25, "month", "winter"),
+                    ("Jun", 0.25, "month", "summer"),
+                    ("Jul", 0.25, "month", "summer"),
+                ],
+                demand={"Jan": 1, "Feb": 1},
+            ),
+        )
+    except:
+        pass
+
+    # 4b) "month" is defined under "season" AND "season" under "year"
+    # Results: Model should solve, linking "month" through "season" to "year" (i.e., "gas_supply" is active)
+    # With "duration_time_rel": "demand" and "ACT" of "gas_ppl" in each "month" = 1, yearly "gas_supply" = 0.5
+    # With "duration_time_rel": CAP of "gas_ppl" = 4
+    # Without "duration_time_rel": "demand" and "ACT" of "gas_ppl" in each "month" = 1, yearly "gas_supply" = 2
+    # Without "duration_time_rel": CAP of "gas_ppl" = 4
+    comment = "4b.linked-temporal-levels"
+    model_generator(
+        comment,
+        tec_dict,
+        com_dict,
+        time_steps=[
+            ("summer", 0.5, "season", "year"),
+            ("winter", 0.5, "season", "year"),
+            ("Jan", 0.25, "month", "winter"),
+            ("Feb", 0.25, "month", "winter"),
+            ("Jun", 0.25, "month", "summer"),
+            ("Jul", 0.25, "month", "summer"),
+        ],
+        demand={"Jan": 1, "Feb": 1},
+    )
+
+    # 4c) input of "gas_ppl" from lowest temporal level ("month") and output to highest ("year")
+    # output of "gas_supply" to "month", "demand" at "year"
+    # Results: Model should solve, linking "month" through "season" to "year" (i.e., "gas_supply" is active)
+    # With "duration_time_rel": "demand" = 2, "ACT" of "gas_ppl" in "month" = "gas_supply" = 8
+    # With "duration_time_rel": CAP of "gas_ppl" = 32
+    # Without "duration_time_rel": "demand" = 2, "ACT" of "gas_ppl" in "month" = "gas_supply" = 2
+    # Without "duration_time_rel": CAP of "gas_ppl" = 8
+    comment = "4c.linked-temporal-levels-month-to-year"
+    tec_dict["gas_ppl"]["time_origin"] = ["Jan", "Feb"]
+    tec_dict["gas_ppl"]["time_dest"] = ["year"]
+    tec_dict["gas_supply"]["time"] = tec_dict["gas_supply"]["time_dest"] = [
+        "Jan",
+        "Feb",
+    ]
+    model_generator(
+        comment,
+        tec_dict,
+        com_dict,
+        time_steps=[
+            ("summer", 0.5, "season", "year"),
+            ("winter", 0.5, "season", "year"),
+            ("Jan", 0.25, "month", "winter"),
+            ("Feb", 0.25, "month", "winter"),
+            ("Jun", 0.25, "month", "summer"),
+            ("Jul", 0.25, "month", "summer"),
+        ],
+        demand={"year": 2},
+    )
+
+    # 4d) input of "gas_ppl" from "season" and output to "year"
+    # output of "gas_supply" to "season", and "demand" at "year"
+    # Results: Model should solve, linking "month" through "season" to "year" (i.e., "gas_supply" is active)
+    # With "duration_time_rel": "demand" = 2, "ACT" of "gas_ppl" in "month"s = 8, "ACT" of "gas_supply" in "season" = 4
+    # With "duration_time_rel": CAP of "gas_ppl" = 16
+    # Without "duration_time_rel": "demand" = 2, "ACT" of "gas_ppl" in "month"s = "gas_supply" = 2
+    # Without "duration_time_rel": CAP of "gas_ppl" = 4
+    comment = "4d.linked-temporal-levels-season-to-year"
+    tec_dict["gas_ppl"]["time_origin"] = ["winter", "winter"]
+    tec_dict["gas_ppl"]["time_dest"] = ["year", "year"]
+    tec_dict["gas_supply"]["time"] = tec_dict["gas_supply"]["time_dest"] = [
+        "winter",
+        "summer",
+    ]
+    model_generator(
+        comment,
+        tec_dict,
+        com_dict,
+        time_steps=[
+            ("summer", 0.5, "season", "year"),
+            ("winter", 0.5, "season", "year"),
+            ("Jan", 0.25, "month", "winter"),
+            ("Feb", 0.25, "month", "winter"),
+            ("Jun", 0.25, "month", "summer"),
+            ("Jul", 0.25, "month", "summer"),
+        ],
+        demand={"year": 2},
+    )
+
+    # 4e) Meeting demand at "year", "gas_ppl" at two time slices, supply at "year"
+    # Results: Model should solve, (i.e., "gas_supply" is active)
+    # With "duration_time_rel": "ACT" of "gas_ppl" in each "season" = 2, yearly "ACT" of "gas_supply" = yearly "demand" = 2
+    # With "duration_time_rel": CAP of "gas_ppl" = 4
+    # Without "duration_time_rel": "ACT" of "gas_ppl" in each "season" = 1, yearly "ACT" of "gas_supply" = yearly "demand" = 2
+    # Without "duration_time_rel": CAP of "gas_ppl" = 2
+    comment = "4e.time-divider-aggregator"
+    tec_dict["gas_ppl"]["time_origin"] = ["year", "year"]
+    tec_dict["gas_ppl"]["time"] = ["summer", "winter"]
+    tec_dict["gas_supply"]["time"] = tec_dict["gas_supply"]["time_dest"] = ["year"]
+    model_generator(
+        comment,
+        tec_dict,
+        com_dict,
+        time_steps=[
+            ("summer", 0.5, "season", "year"),
+            ("winter", 0.5, "season", "year"),
+        ],
+        demand={"year": 2},
+    )
