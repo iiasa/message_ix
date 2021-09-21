@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 This test ensures that COMMODITY_BALANCE works for (sub-annual) time slices (index of "time" in MESSAGEix)
-at different temporal levels, like seasons, months, etc., and with different duration times.
+at different temporal levels, i.e., year, seasons, months, etc., and with different duration times.
 
 """
 
@@ -161,7 +161,7 @@ def model_generator(
 
 # 1) "gas_ppl" is active in "summer" and NOT linked to "gas_supply" in "year"
 # This setup should not solve, as the linkgae between power plant and fuel supply is not made.
-def test_commodity_not_linked(test_mp):
+def test_temporal_levels_not_linked(test_mp):
     comment = "1.not-linked"
     # Dictionary of technology input/output
     tec_dict = {
@@ -285,7 +285,7 @@ def test_seasons_to_seasons(test_mp):
 # 4) Meeting "demand" through three temporal levels ("month", "season", and "year")
 # 4a) "month" is defined under "season" BUT "season" not linked to "year"
 # Results: Model should not solve (no parent "time" for "season", i.e., no linkage to "gas_supply" at "year")
-def test_unlinked_three_temporal(test_mp):
+def test_unlinked_three_temporal_levels(test_mp):
     comment = "4a.unlinked-temporal-levels"
     # Dictionary of technology input/output
     tec_dict = {
@@ -328,7 +328,7 @@ def test_unlinked_three_temporal(test_mp):
 # With "duration_time_rel": CAP of "gas_ppl" = 4
 # Without "duration_time_rel": "demand" and "ACT" of "gas_ppl" in each "month" = 1, yearly "gas_supply" = 2
 # Without "duration_time_rel": CAP of "gas_ppl" = 4
-def test_linked_three_temporal(test_mp):
+def test_linked_three_temporal_levels(test_mp):
     comment = "4b.linked-temporal-levels"
     # Dictionary of technology input/output
     tec_dict = {
@@ -366,7 +366,7 @@ def test_linked_three_temporal(test_mp):
 # With "duration_time_rel": CAP of "gas_ppl" = 32
 # Without "duration_time_rel": "demand" = 2, "ACT" of "gas_ppl" in "month" = "gas_supply" = 2
 # Without "duration_time_rel": CAP of "gas_ppl" = 8
-def test_linked_three_levels_month_to_year(test_mp):
+def test_linked_three_temporal_levels_month_to_year(test_mp):
     comment = "4c.linked-temporal-levels-month-to-year"
     # Dictionary of technology input/output
     tec_dict = {
@@ -405,7 +405,7 @@ def test_linked_three_levels_month_to_year(test_mp):
 # With "duration_time_rel": CAP of "gas_ppl" = 16
 # Without "duration_time_rel": "demand" = 2, "ACT" of "gas_ppl" in "month"s = "gas_supply" = 2
 # Without "duration_time_rel": CAP of "gas_ppl" = 4
-def test_linked_three_levels_season_to_year(test_mp):
+def test_linked_three_temporal_levels_season_to_year(test_mp):
     comment = "4d.linked-temporal-levels-season-to-year"
     # Dictionary of technology input/output
     tec_dict = {
@@ -443,7 +443,7 @@ def test_linked_three_levels_season_to_year(test_mp):
 # With "duration_time_rel": CAP of "gas_ppl" = 4
 # Without "duration_time_rel": "ACT" of "gas_ppl" in each "season" = 1, yearly "ACT" of "gas_supply" = yearly "demand" = 2
 # Without "duration_time_rel": CAP of "gas_ppl" = 2
-def test_linked_three_levels_time_act(test_mp):
+def test_linked_three__temporal_levels_time_act(test_mp):
     comment = "4e.time-divider-aggregator"
     # Dictionary of technology input/output
     tec_dict = {
@@ -466,6 +466,45 @@ def test_linked_three_levels_time_act(test_mp):
         time_steps=[
             ("summer", 0.5, "season", "year"),
             ("winter", 0.5, "season", "year"),
+        ],
+        demand={"year": 2},
+    )
+
+
+# 4f) input of "gas_ppl" from lowest temporal level ("month") with different duration time
+# and output to highest ("year"), output of "gas_supply" to "month", "demand" at "year"
+# Results: Model should solve, linking "month" through "season" to "year" (i.e., "gas_supply" is active)
+# With "duration_time_rel": "demand" = 2, "ACT" of "gas_ppl" in "month" = "gas_supply" = 8
+# With "duration_time_rel": CAP of "gas_ppl" = 32
+# Without "duration_time_rel": "demand" = 2, "ACT" of "gas_ppl" in "month" = "gas_supply" = 2
+# Without "duration_time_rel": CAP of "gas_ppl" = 8
+def test_linked_three_temporal_levels_different_duration(test_mp):
+    comment = "4f.linked-temporal-levels-different-duration"
+    # Dictionary of technology input/output
+    tec_dict = {
+        "gas_ppl": {
+            "time_origin": ["Jan", "Feb"],
+            "time": ["Jan", "Feb"],
+            "time_dest": ["year"],
+        },
+        "gas_supply": {
+            "time_origin": [],
+            "time": ["Jan", "Feb"],
+            "time_dest": ["Jan", "Feb"],
+        },
+    }
+
+    model_generator(
+        test_mp,
+        comment,
+        tec_dict,
+        time_steps=[
+            ("summer", 0.5, "season", "year"),
+            ("winter", 0.5, "season", "year"),
+            ("Jan", 0.4, "month", "winter"),
+            ("Feb", 0.1, "month", "winter"),
+            ("Jun", 0.3, "month", "summer"),
+            ("Jul", 0.2, "month", "summer"),
         ],
         demand={"year": 2},
     )
