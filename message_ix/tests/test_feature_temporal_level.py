@@ -149,3 +149,106 @@ def model_generator(
         assert max(
             act.loc[act["technology"] == "gas_ppl", "capacity-corrected"]
         ) == float(scen.var("CAP", {"technology": "gas_ppl"})["lvl"])
+
+
+# Main tests for commodity balance over temporal levels (and "time" index)
+# In these tests (9 scenarios in total), "demand" is defined in different time slices with different "duration_time",
+# and there is one power plant to meet the demand ("gas_ppl"), which receives fuel from a supply technology ("gas_supply").
+# Different temporal level hierarchies are tested and linkages of "ACT" with "demand" and "CAP" is tested too.
+def test_time_commodity(test_mp):
+    com_dict = {
+        "gas_ppl": {"input": "fuel", "output": "electr"},
+        "gas_supply": {"input": [], "output": "fuel"},
+    }
+
+    # 1) "gas_ppl" is active in "summer" and NOT linked to "gas_supply" in "year"
+    # This setup should not solve, as the linkgae between power plant and fuel supply is not made.
+    tec_dict = {
+        "gas_ppl": {
+            "time_origin": ["summer"],
+            "time": ["summer"],
+            "time_dest": ["summer"],
+        },
+        "gas_supply": {"time_origin": [], "time": ["year"], "time_dest": ["year"]},
+    }
+
+    comment = "1.not-linked"
+    # Check the model shouldn't solve if there is no link between fuel supply and power plant
+    try:
+        pytest.raises(
+            ValueError,
+            model_generator(
+                comment,
+                tec_dict,
+                com_dict,
+                time_steps=[("summer", 1, "season", "year")],
+                demand={"summer": 2},
+            ),
+        )
+
+    except:
+        pass
+
+    # 2) Linking "gas_ppl" and "gas_supply" at one temporal level (e.g., "year")
+    # Only one "season" (duration = 1) and "demand" is defined only at "summer"
+    # Results: Model should solve and the linkage is made ("gas_supply" is active)
+    # With "duration_time_rel": "demand" = 2, "ACT" of "gas_ppl" = 2, "gas_supply" = 2
+    # With "duration_time_rel": CAP of "gas_ppl" = 2
+    # Without "duration_time_rel": "demand" = 2, "ACT" of "gas_ppl" = 2, "gas_supply" = 2
+    # Without "duration_time_rel": CAP of "gas_ppl" =
+    comment = "2.linked-one-season-with-year"
+    tec_dict["gas_ppl"]["time_origin"] = ["year"]
+    model_generator(
+        comment,
+        tec_dict,
+        com_dict,
+        time_steps=[("summer", 1, "season", "year")],
+        demand={"summer": 2},
+    )
+
+    # 3) Meeting "demand" in two time slices: "summer" and "winter" (duration = 0.5)
+    # 3a) "gas_supply" and "gas_ppl" linked at "year"
+    # Results: Model should solve and the linkage is made ("gas_supply" is active)
+    # With "duration_time_rel": "demand" and "ACT" of "gas_ppl" in each "season" = 1, yearly "gas_supply" = 1
+    # With "duration_time_rel": CAP of "gas_ppl" = 2
+    # Without "duration_time_rel": "demand" and "ACT" of "gas_ppl" in each "season" = 1, yearly "gas_supply" = 2
+    # Without "duration_time_rel": CAP of "gas_ppl" = 2
+    comment = "3a.linked-two-seasons-with-year"
+    tec_dict["gas_ppl"]["time_origin"] = ["year", "year"]
+    tec_dict["gas_ppl"]["time"] = tec_dict["gas_ppl"]["time_dest"] = [
+        "summer",
+        "winter",
+    ]
+    model_generator(
+        comment,
+        tec_dict,
+        com_dict,
+        time_steps=[
+            ("summer", 0.5, "season", "year"),
+            ("winter", 0.5, "season", "year"),
+        ],
+        demand={"summer": 1, "winter": 1},
+    )
+
+    # 3b) "gas_supply" and "gas_ppl" linked at each season
+    # Results: Model should solve and the linkage is made ("gas_supply" is active)
+    # With "duration_time_rel":  "demand", "ACT" of "gas_ppl" and "gas_supply" in each "season" = 1
+    # With "duration_time_rel": CAP of "gas_ppl" = 2
+    # Without "duration_time_rel": "demand", "ACT" of "gas_ppl" and "gas_supply" in each "season" = 1
+    # Without "duration_time_rel": CAP of "gas_ppl" = 2
+    comment = "3b.linked-two-seasons-with-two-seasons"
+    tec_dict["gas_ppl"]["time_origin"] = ["summer", "winter"]
+    tec_dict["gas_supply"]["time"] = tec_dict["gas_supply"]["time_dest"] = [
+        "summer",
+        "winter",
+    ]
+    model_generator(
+        comment,
+        tec_dict,
+        com_dict,
+        time_steps=[
+            ("summer", 0.5, "season", "year"),
+            ("winter", 0.5, "season", "year"),
+        ],
+        demand={"summer": 1, "winter": 1},
+    )
