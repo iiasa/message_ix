@@ -567,10 +567,10 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
             AND map_tec_lifetime(location,tec,vintage,year) ),                                                         \
 * import into node and output by all technologies located at 'location' sending to 'node' and 'time2' sending to 'time'
         output(location,tec,vintage,year,mode,node,commodity,level,time2,time)                                         \
-        * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2)                                    \
+        * ACT(location,tec,vintage,year,mode,time2)                                    \
 * export from node and input into technologies located at 'location' taking from 'node' and 'time2' taking from 'time'
         - input(location,tec,vintage,year,mode,node,commodity,level,time2,time)                                        \
-        * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2) )                                  \
+        * ACT(location,tec,vintage,year,mode,time2) )                                  \
 * quantity taken out from ( >0 ) or put into ( <0 ) inter-period stock (storage)
     + STOCK_CHG(node,commodity,level,year,time)$( map_stocks(node,commodity,level,year) )                              \
 * yield from land-use model emulator
@@ -980,7 +980,6 @@ COMMODITY_USE_LEVEL(node,commodity,level,year,time)$(
     SUM( (location,tec,vintage,mode,time2)$( map_tec_act(location,tec,year,mode,time2)
                                              AND map_tec_lifetime(location,tec,vintage,year) ),
         input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
-        * duration_time_rel(time,time2)
         * ACT(location,tec,vintage,year,mode,time2) ) ;
 
 ***
@@ -1037,7 +1036,6 @@ ACTIVITY_RATING_TOTAL(node,tec,vintage,year,commodity,level,time)$(
               AND map_tec_lifetime(location,tec,vintage,year) ),
             ( output(location,tec,vintage,year,mode,node,commodity,level,time2,time)
               + input(location,tec,vintage,year,mode,node,commodity,level,time2,time) )
-                * duration_time_rel(time,time2)
                 * ACT(location,tec,vintage,year,mode,time2) ) ;
 
 ***
@@ -1141,7 +1139,6 @@ SYSTEM_FLEXIBILITY_CONSTRAINT(node,commodity,level,year,time)$(
               AND map_tec_lifetime(location,tec,vintage,year) ),
             ( output(location,tec,vintage,year,mode,node,commodity,level,time2,time)
               + input(location,tec,vintage,year,mode,node,commodity,level,time2,time) )
-                * duration_time_rel(time,time2)
                 * ACT(location,tec,vintage,year,mode,time2) ) )
     + SUM((tec, vintage, mode, rating_unrated)$(
             flexibility_factor(node,tec,vintage,year,mode,commodity,level,time,rating_unrated)
@@ -1435,7 +1432,6 @@ SHARE_CONSTRAINT_COMMODITY_UP(shares,node_share,year,time)$( share_commodity_up(
             output(location,tec,vintage,year,mode,node,commodity,level,time2,time) +
             input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
         ) *
-        duration_time_rel(time,time2) *
         ACT(location,tec,vintage,year,mode,time2)
     )
     =L=
@@ -1452,7 +1448,6 @@ SHARE_CONSTRAINT_COMMODITY_UP(shares,node_share,year,time)$( share_commodity_up(
             output(location,tec,vintage,year,mode,node,commodity,level,time2,time) +
             input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
         ) *
-        duration_time_rel(time,time2) *
         ACT(location,tec,vintage,year,mode,time2)
     ) ) ;
 
@@ -1486,7 +1481,6 @@ SHARE_CONSTRAINT_COMMODITY_LO(shares,node_share,year,time)$( share_commodity_lo(
             output(location,tec,vintage,year,mode,node,commodity,level,time2,time) +
             input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
         ) *
-        duration_time_rel(time,time2) *
         ACT(location,tec,vintage,year,mode,time2)
     )
     =G=
@@ -1503,7 +1497,6 @@ SHARE_CONSTRAINT_COMMODITY_LO(shares,node_share,year,time)$( share_commodity_lo(
             output(location,tec,vintage,year,mode,node,commodity,level,time2,time) +
             input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
         ) *
-        duration_time_rel(time,time2) *
         ACT(location,tec,vintage,year,mode,time2)
     ) ) ;
 
@@ -2165,7 +2158,7 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 *          - \sum_{\substack{n^L,m,c,h-1 \\ y^V \leq y, (n,t^D,t,l,y) \sim S^{storage}}} input_{n^L,t^D,y^V,y,m,n,c,l,h-1,h}
 *              \cdot ACT_{n^L,t^D,y^V,y,m,h-1} \quad \forall \ t \in T^{STOR}, & \forall \ l \in L^{STOR}
 ***
-STORAGE_CHANGE(node,storage_tec,level_storage,commodity,year,time) ..
+STORAGE_CHANGE(node,storage_tec,level_storage,commodity,year,time)$sum(tec, map_tec_storage(node,tec,storage_tec,level_storage,commodity) ) ..
 * change in the content of storage in the examined timestep
     STORAGE_CHARGE(node,storage_tec,level_storage,commodity,year,time) =E=
 * increase in the content of storage due to the activity of charging technologies
@@ -2173,13 +2166,13 @@ STORAGE_CHANGE(node,storage_tec,level_storage,commodity,year,time) ..
         map_tec_lifetime(node,tec,vintage,year)
         AND map_tec_storage(node,tec,storage_tec,level_storage,commodity) ),
             output(location,tec,vintage,year,mode,node,commodity,level_storage,time2,time)
-            * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time) )
+            * ACT(location,tec,vintage,year,mode,time) )
 * decrease in the content of storage due to the activity of discharging technologies
         - SUM( (location,vintage,mode,tec,time2)$(
         map_tec_lifetime(node,tec,vintage,year)
         AND map_tec_storage(node,tec,storage_tec,level_storage,commodity) ),
             input(location,tec,vintage,year,mode,node,commodity,level_storage,time2,time)
-            * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time) );
+            * ACT(location,tec,vintage,year,mode,time) );
 
 ***
 * .. _equation_storage_balance:
@@ -2258,7 +2251,7 @@ STORAGE_EQUIVALENCE(node,storage_tec,level,commodity,level_storage,commodity2,mo
          STORAGE(node,storage_tec,level_storage,commodity2,year,time) =E=
         SUM( (location,vintage,time2)$(map_tec_lifetime(node,storage_tec,vintage,year)$(
               input(location,storage_tec,vintage,year,mode,node,commodity,level,time2,time) ) ),
-              duration_time_rel(time,time2) * ACT(location,storage_tec,vintage,year,mode,time) );
+              ACT(location,storage_tec,vintage,year,mode,time) )
 
 *----------------------------------------------------------------------------------------------------------------------*
 * model statements                                                                                                     *
