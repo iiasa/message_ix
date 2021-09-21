@@ -178,6 +178,7 @@ def test_time_commodity(test_mp):
         pytest.raises(
             ValueError,
             model_generator(
+                test_mp,
                 comment,
                 tec_dict,
                 com_dict,
@@ -199,6 +200,7 @@ def test_time_commodity(test_mp):
     comment = "2.linked-one-season-with-year"
     tec_dict["gas_ppl"]["time_origin"] = ["year"]
     model_generator(
+        test_mp,
         comment,
         tec_dict,
         com_dict,
@@ -220,6 +222,7 @@ def test_time_commodity(test_mp):
         "winter",
     ]
     model_generator(
+        test_mp,
         comment,
         tec_dict,
         com_dict,
@@ -243,6 +246,7 @@ def test_time_commodity(test_mp):
         "winter",
     ]
     model_generator(
+        test_mp,
         comment,
         tec_dict,
         com_dict,
@@ -265,6 +269,7 @@ def test_time_commodity(test_mp):
         pytest.raises(
             ValueError,
             model_generator(
+                test_mp,
                 comment,
                 tec_dict,
                 com_dict,
@@ -288,6 +293,7 @@ def test_time_commodity(test_mp):
     # Without "duration_time_rel": CAP of "gas_ppl" = 4
     comment = "4b.linked-temporal-levels"
     model_generator(
+        test_mp,
         comment,
         tec_dict,
         com_dict,
@@ -317,6 +323,7 @@ def test_time_commodity(test_mp):
         "Feb",
     ]
     model_generator(
+        test_mp,
         comment,
         tec_dict,
         com_dict,
@@ -346,6 +353,7 @@ def test_time_commodity(test_mp):
         "summer",
     ]
     model_generator(
+        test_mp,
         comment,
         tec_dict,
         com_dict,
@@ -371,6 +379,7 @@ def test_time_commodity(test_mp):
     tec_dict["gas_ppl"]["time"] = ["summer", "winter"]
     tec_dict["gas_supply"]["time"] = tec_dict["gas_supply"]["time_dest"] = ["year"]
     model_generator(
+        test_mp,
         comment,
         tec_dict,
         com_dict,
