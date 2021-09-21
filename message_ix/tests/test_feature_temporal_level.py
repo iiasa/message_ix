@@ -123,3 +123,29 @@ def model_generator(
     # Committing and solving
     scen.commit("scenario was set up.")
     scen.solve(case=comment)
+
+    # Reading "ACT" greater than zero from the solution
+    act = scen.var("ACT")[scen.var("ACT")["lvl"] > 0]
+
+    # 1) Testing if linkage between "gas_ppl" with "gas_supply" technology is made
+    assert "gas_supply" in set(act["technology"])
+
+    # 2) Testing if "ACT" of "gas_ppl" is correct (with respect to "duration_time_rel")
+    # i.e., sum("ACT" of "gas_ppl") = sum("ACT" of "gas_supply") = sum("demand")
+    assert (
+        sum(act.loc[act["technology"] == "gas_ppl"]["lvl"])
+        == sum(act.loc[act["technology"] == "gas_supply"]["lvl"])
+        == sum(scen.par("demand")["value"])
+    )
+
+    # 3) Testing if "CAP" of "gas_ppl" is correctly calculated based on "ACT" in time slices
+    # i.e., "CAP" = max("ACT" / "duration_time")
+    if capacity:
+        for h in act.loc[act["technology"] == "gas_ppl"]["time"]:
+            act.loc[
+                (act["time"] == h) & (act["technology"] == "gas_ppl"),
+                "capacity-corrected",
+            ] = act["lvl"] / float(scen.par("duration_time", {"time": h})["value"])
+        assert max(
+            act.loc[act["technology"] == "gas_ppl", "capacity-corrected"]
+        ) == float(scen.var("CAP", {"technology": "gas_ppl"})["lvl"])
