@@ -2251,7 +2251,7 @@ STORAGE_EQUIVALENCE(node,storage_tec,level,commodity,level_storage,commodity2,mo
          STORAGE(node,storage_tec,level_storage,commodity2,year,time) =E=
         SUM( (location,vintage,time2)$(map_tec_lifetime(node,storage_tec,vintage,year)$(
               input(location,storage_tec,vintage,year,mode,node,commodity,level,time2,time) ) ),
-              ACT(location,storage_tec,vintage,year,mode,time) )
+              ACT(location,storage_tec,vintage,year,mode,time) );
 
 *----------------------------------------------------------------------------------------------------------------------*
 * model statements                                                                                                     *
