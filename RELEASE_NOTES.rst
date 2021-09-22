@@ -13,6 +13,7 @@ All changes
 - Change precision of GAMS check for parameter "duration_time" (:pull:`513`).
 - Update light and historic demand in Westeros baseline tutorial (:pull:`523`).
 
+- Enhance mathematical formulation to represent sub-annual time slices consistently (:pull:`509`).
 
 .. _v3.3.0:
 

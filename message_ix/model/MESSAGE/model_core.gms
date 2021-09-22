@@ -2158,7 +2158,7 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 *          - \sum_{\substack{n^L,m,c,h-1 \\ y^V \leq y, (n,t^D,t,l,y) \sim S^{storage}}} input_{n^L,t^D,y^V,y,m,n,c,l,h-1,h}
 *              \cdot ACT_{n^L,t^D,y^V,y,m,h-1} \quad \forall \ t \in T^{STOR}, & \forall \ l \in L^{STOR}
 ***
-STORAGE_CHANGE(node,storage_tec,level_storage,commodity,year,time)$sum(tec, map_tec_storage(node,tec,storage_tec,level_storage,commodity) ) ..
+STORAGE_CHANGE(node,storage_tec,level_storage,commodity,year,time)..
 * change in the content of storage in the examined timestep
     STORAGE_CHARGE(node,storage_tec,level_storage,commodity,year,time) =E=
 * increase in the content of storage due to the activity of charging technologies

@@ -63,6 +63,14 @@ The sum of ``duration_time`` at each temporal level must be equal to 1. For exam
 ``duration_time`` of each "season" and "day" should be specified as 0.25 and 0.025, respectively.
 season
  
+Time slices are defined with their ``duration_time`` as a portion of the full year a value between 0 and 1. 
+For example, the user can define four time slices like 'summer', ''winter', 'jan', 'peak-hour', etc.
+with different ``duration_time``. The sume of ``duration_time`` must be equal to 1, otherwise an error is triggered in GAMS.
+
+Time slices can be represented at different temporal levels, using the sets ``lvl_temporal`` and ``map_temporal_hierarchy``.
+This helps introducing a flexible temporal resolution, e.g., by representing some technologies at finer time resolution
+while others at ``year``.
+
 Discounting
 ===========
 
