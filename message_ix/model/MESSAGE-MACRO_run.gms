@@ -119,7 +119,7 @@ Parameters
     price_diff_rel(*,node,sector,year_all)
 
     report_iteration(iteration,*)
-    trade_cost_detail(node, commodity, year_all)              'net of commodity import costs and commodity export revenues by commodity, node and year'
+    trade_cost_detail(node, commodity, year_all)              'net of commodity import costs and commodity export revenues by node,commodity and year'
 ;
 
 * variables to report back to user if needed
