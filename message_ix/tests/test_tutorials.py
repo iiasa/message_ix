@@ -1,5 +1,6 @@
 import sys
 from shutil import copyfile
+from typing import List, Tuple
 
 import numpy as np
 import pytest
@@ -7,23 +8,36 @@ from ixmp.testing import get_cell_output, run_notebook
 
 AT = "Austrian_energy_system"
 
+# Common marks for some test cases
+mark0 = pytest.mark.skipif(
+    condition=sys.version_info.minor <= 6 and sys.platform != "linux",
+    reason="R/reticulate link fails on GitHub Actions runners for Python 3.6",
+)
+
+# This mark does *not* affect macos-latest-py3.9, which must still pass
+mark1 = pytest.mark.xfail(
+    condition=sys.platform == "darwin" and sys.version_info.minor == 8,
+    reason="Fails occasionally on GitHub Actions runners for macOS / Python 3.8",
+)
+
 # Argument values to parametrize test_tutorial
 #
-# Each item is a 2-tuple:
+# Each item is a 3-tuple:
 # 1. Path fragments under tutorials directory,
 # 2. List containing 0 or more 2-tuples, each:
-#    a. Name or index of cell containing objective value,
-#    b. Expected objective value.
+#    a. Name or index of cell whose output will contain a certain value, e.g. the
+#       MESSAGE objective function value.
+#    b. Expected value for that cell output.
 # 3. Dictionary with extra keyword arguments to run_notebook().
-
-# FIXME check objective function of the rest of tutorials.
-tutorials = [
+tutorials: List[Tuple] = [
     # IPython kernel
     (
         ("westeros", "westeros_baseline"),
         [("solve-objective-value", 369297.75)],
         {},
     ),
+    # NB could also check objective function values in the following tutorials; however,
+    #    better to test features directly (not via Jupyter/IPython)
     (("westeros", "westeros_baseline_using_xlsx_import_part1"), [], {}),
     (("westeros", "westeros_baseline_using_xlsx_import_part2"), [], {}),
     (("westeros", "westeros_emissions_bounds"), [], {}),
@@ -46,25 +60,9 @@ tutorials = [
     ((AT, "austria_multiple_policies"), [], {}),
     ((AT, "austria_multiple_policies-answers"), [], {}),
     ((AT, "austria_load_scenario"), [], {}),
-    # R tutorials / IR kernel
-    pytest.param(
-        (AT, "R_austria"),
-        [],
-        dict(kernel="IR"),
-        marks=pytest.mark.skipif(
-            sys.version_info[1] <= 6 and sys.platform != "linux",
-            reason="R/reticulate link fails on GitHub Actions workers for Python 3.6",
-        ),
-    ),
-    pytest.param(
-        (AT, "R_austria_load_scenario"),
-        [],
-        dict(kernel="IR"),
-        marks=pytest.mark.skipif(
-            sys.version_info[1] <= 6 and sys.platform != "linux",
-            reason="R/reticulate link fails on GitHub Actions workers for Python 3.6",
-        ),
-    ),
+    # R tutorials using the IR Jupyter kernel
+    pytest.param((AT, "R_austria"), [], dict(kernel="IR"), marks=[mark0, mark1]),
+    pytest.param((AT, "R_austria_load_scenario"), [], dict(kernel="IR"), marks=[mark0]),
 ]
 
 # Short, readable IDs for the tests. Use getattr() to unpack the values from
@@ -98,15 +96,6 @@ def test_tutorial(nb_path, cell_values, run_args, tmp_path, tmp_env):
 
     If *cell_values* are given, values in the specified cells are tested.
     """
-    # Add the tutorial directory to PYTHONPATH. The tutorials are executed in
-    # `tmp_path`; but they import from a tools.py file in the same directory as
-    # the notebook, ie. under `tutorial_path`.
-    # TODO remove the reliance on this 'hidden' code
-    path_sep = ";" if sys.platform.startswith("win") else ":"
-    tmp_env["PYTHONPATH"] = path_sep.join(
-        [str(nb_path.parent), tmp_env.get("PYTHONPATH", "")]
-    )
-
     # Copy necessary data files to tmp_path
     if "westeros_baseline_using_xlsx_import_part2" in nb_path.parts[-1]:
         for fil in data_files:
