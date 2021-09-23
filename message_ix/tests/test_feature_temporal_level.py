@@ -6,8 +6,9 @@ months, etc., and with different duration times.
 
 """
 
-import pytest
 from itertools import product
+
+from ixmp.model.base import ModelError
 from message_ix import Scenario
 
 
@@ -179,19 +180,15 @@ def test_temporal_levels_not_linked(test_mp):
 
     # Check the model not solve if there is no link between fuel supply and power plant
     try:
-        pytest.raises(
-            ValueError,
-            model_generator(
-                test_mp,
-                comment,
-                tec_dict,
-                time_steps=[("summer", 1, "season", "year")],
-                demand={"summer": 2},
-            ),
-        )
+        model_generator(
+            test_mp,
+            comment,
+            tec_dict,
+            time_steps=[("summer", 1, "season", "year")],
+            demand={"summer": 2},
+        ),
 
-    except ValueError:
-        print("Model solves but it should not!")
+    except ModelError:
         pass
 
 
@@ -297,23 +294,19 @@ def test_unlinked_three_temporal_levels(test_mp):
 
     # Check the model shouldn't solve
     try:
-        pytest.raises(
-            ValueError,
-            model_generator(
-                test_mp,
-                comment,
-                tec_dict,
-                time_steps=[
-                    ("Jan", 0.25, "month", "winter"),
-                    ("Feb", 0.25, "month", "winter"),
-                    ("Jun", 0.25, "month", "summer"),
-                    ("Jul", 0.25, "month", "summer"),
-                ],
-                demand={"Jan": 1, "Feb": 1},
-            ),
-        )
-    except ValueError:
-        print("Model solves but it should not!")
+        model_generator(
+            test_mp,
+            comment,
+            tec_dict,
+            time_steps=[
+                ("Jan", 0.25, "month", "winter"),
+                ("Feb", 0.25, "month", "winter"),
+                ("Jun", 0.25, "month", "summer"),
+                ("Jul", 0.25, "month", "summer"),
+            ],
+            demand={"Jan": 1, "Feb": 1},
+        ),
+    except ModelError:
         pass
 
 
