@@ -8,8 +8,7 @@ months, etc., and with different duration times.
 
 from itertools import product
 
-from ixmp.model.base import ModelError
-from message_ix import Scenario
+from message_ix import ModelError, Scenario
 
 
 # A function for adding required parameters for representing "capacity"
