@@ -1,0 +1,249 @@
+# -*- coding: utf-8 -*-
+"""
+This test ensures that the parameter "duration_time" is specified correctly,
+and that the GAMS formulation checks pass.
+Several possible combinations of temporal levels, e.g., year, seasons,
+months; and different number of time slices at each level are tested.
+
+"""
+
+from itertools import product
+
+from message_ix import Scenario
+
+
+# A function for generating a simple model with sub-annual time slices
+def model_generator(
+    test_mp,
+    comment,
+    tec_time,
+    demand_time,
+    time_steps,
+    com_dict,
+    yr=2020,
+):
+    """
+
+    Generates a simple model with two technologies, and a flexible number of
+    time slices.
+
+    Parameters
+    ----------
+    test_mp : ixmp.Platform()
+    comment : string
+        Annotation for saving different scenarios and comparing their results.
+    tec_time : dict
+        A dictionary for mapping of a technology to its input/output temporal levels.
+        # Format: {<technology>: [<input temporal level>, <output temporal level>]}
+        (e.g., {"gas_ppl": ["year", "season"]})
+    demand_time : dict
+        A dictionary for mapping of total "demand" specified at a temporal level.
+        e.g., demand_time = {"season": 100}, means the sum of demand in all "time"
+        slices at the level of "season" must be 100.
+    time_steps : list of lists
+        Information about each time slice, packed in a tuple with four elements,
+        including: "temporal_lvl", number of time slices, and parent time slice.
+        e.g., time_steps = [["season", 4, "year"], ["day", 24, "season"]]
+    com_dict : dict
+        A dictionary for specifying "input" and "output" commodities.
+        (e.g., com_dict = {"gas_ppl": {"input": "fuel", "output": "electr"}})
+    yr : int, optional
+        Model year. The default is 2020.
+
+
+    """
+
+    # Building an empty scenario
+    scen = Scenario(test_mp, "test_duration_time", comment, version="new")
+
+    # Adding required sets
+    scen.add_set("node", "fairyland")
+    for c in com_dict.values():
+        scen.add_set("commodity", [x for x in list(c.values()) if x])
+
+    scen.add_set("level", "final")
+    scen.add_set("year", yr)
+    scen.add_set("type_year", yr)
+    scen.add_set("technology", list(tec_time.keys()))
+    scen.add_set("mode", "standard")
+
+    # Adding "time" related info to the model: "lvl_temporal", "time",
+    # "map_temporal_hierarchy", and "duration_time"
+    map_time = {}
+    for [tmp_lvl, number, parent] in time_steps:
+        scen.add_set("lvl_temporal", tmp_lvl)
+        if parent == "year":
+            times = [tmp_lvl[0] + "-" + str(x + 1) for x in range(number)]
+        else:
+            times = [
+                p + "_" + tmp_lvl[0] + "-" + str(x + 1)
+                for (p, x) in product(map_time[parent], range(number))
+            ]
+
+        map_time[tmp_lvl] = times
+        scen.add_set("time", times)
+
+        # Adding "map_temporal_hierarchy" and "duration_time"
+        for h in times:
+            if parent == "year":
+                p = "year"
+            else:
+                p = h.split("_" + tmp_lvl[0])[0]
+            # Temporal hierarchy (order: tenporal level, time, parent time)
+            scen.add_set("map_temporal_hierarchy", [tmp_lvl, h, p])
+
+            # Duration time is relative to the duration of the parent temporal level
+            dur_parent = float(scen.par("duration_time", {"time": p})["value"])
+            scen.add_par("duration_time", [h], dur_parent / number, "-")
+
+    # Adding "demand" at a temporal level (total demand divided by the number of
+    # time slices in that temporal level)
+    for tmp_lvl, value in demand_time.items():
+        times = scen.set("map_temporal_hierarchy", {"lvl_temporal": tmp_lvl})["time"]
+        for h in times:
+            scen.add_par(
+                "demand",
+                ["fairyland", "electr", "final", yr, h],
+                value / len(times),
+                "GWa",
+            )
+
+    # Adding "input" and "output" parameters of technologies
+    for tec, [tmp_lvl_in, tmp_lvl_out] in tec_time.items():
+        times_in = scen.set("map_temporal_hierarchy", {"lvl_temporal": tmp_lvl_in})[
+            "time"
+        ]
+        times_out = scen.set("map_temporal_hierarchy", {"lvl_temporal": tmp_lvl_out})[
+            "time"
+        ]
+        # If technology is linking two different temporal levels
+        if tmp_lvl_in != tmp_lvl_out:
+            time_pairs = product(times_in, times_out)
+        else:
+            time_pairs = zip(times_in, times_out)
+
+        # Configuring data for "time_origin" and "time" in "input"
+        for (h_in, h_act) in time_pairs:
+            # "input"
+            inp = com_dict[tec]["input"]
+            if inp:
+                inp_spec = [yr, yr, "standard", "fairyland", inp, "final", h_act, h_in]
+                scen.add_par("input", ["fairyland", tec] + inp_spec, 1, "-")
+        # "output"
+        for h in times_out:
+            out = com_dict[tec]["output"]
+            out_spec = [yr, yr, "standard", "fairyland", out, "final", h, h]
+            scen.add_par("output", ["fairyland", tec] + out_spec, 1, "-")
+
+    # Committing
+    scen.commit("scenario was set up.")
+
+    # Testing if the model solves in GAMS
+    scen.solve(case=comment)
+
+    # Testing if sum of duration_time is almost 1
+    for tmp_lvl in scen.set("lvl_temporal"):
+        times = scen.set("map_temporal_hierarchy", {"lvl_temporal": tmp_lvl})[
+            "time"
+        ].to_list()
+        print(sum(scen.par("duration_time", {"time": times})["value"]))
+        assert (
+            abs(sum(scen.par("duration_time", {"time": times})["value"]) - 1.0) < 1e-9
+        )
+    return scen
+
+
+# Tests for "duration_time" of different number of time slices, at different
+# temporal levels ("lvl_temporal")
+# In these tests "demand" is defined in different time slices and one power plant
+# to meet demand, which receives fuel from a supply technology.
+
+# 1) Testing one temporal level ("season") and different number of time slices
+def test_season(test_mp, n_time=[4, 12, 50, 122, 360, 2240]):
+    comment = "season"
+    com_dict = {"power-plant": {"input": [], "output": "electr"}}
+    # Dictionary of technology and input and output temporal levels
+    tec_time = {"power-plant": ["season", "season"]}
+    # Total demand in a temporal level
+    demand_time = {"season": 100}
+    # List of info for time slices: [temporal level, number, parent level]
+    for t in n_time:
+        time_steps = [["season", t, "year"]]
+        # Check the model solves without error and sum of duration times = 1
+        model_generator(test_mp, comment, tec_time, demand_time, time_steps, com_dict)
+
+
+# 2) Testing one temporal level ("season") linked to "year" with a technology
+def test_year_season(test_mp, n_time=[4, 12, 50, 122, 360, 2240]):
+    comment = "year_season"
+    com_dict = {
+        "power-plant": {"input": "fuel", "output": "electr"},
+        "fuel-supply": {"input": [], "output": "fuel"},
+    }
+    # Dictionary of technology and temporal level
+    tec_time = {"power-plant": ["year", "season"], "fuel-supply": ["year", "year"]}
+    # Total demand in a temporal level
+    demand_time = {"season": 100}
+    # List of info for time slices: [temporal level, number, parent level]
+    for t in n_time:
+        time_steps = [["season", t, "year"]]
+        # Check the model solves without error and sumof duration times = 1
+        model_generator(test_mp, comment, tec_time, demand_time, time_steps, com_dict)
+
+
+# 3) Testing two temporal levels with one technology
+def test_season_day(test_mp):
+    comment = "4-season_24-days"
+    com_dict = {
+        "power-plant": {"input": [], "output": "electr"},
+    }
+    # Dictionary of technology and temporal level
+    tec_time = {"power-plant": ["day", "day"]}
+    # Total demand in a temporal level
+    demand_time = {"day": 100}
+    # List of info for time slices: [temporal level, number, parent level]
+    time_steps = [["season", 4, "year"], ["day", 24, "season"]]
+
+    # Check the model solves without error and sumof duration times = 1
+    model_generator(test_mp, comment, tec_time, demand_time, time_steps, com_dict)
+
+
+# 4) Testing 24 days linked to 4 seasons, with two technologies
+def test_season_day_2tech(test_mp):
+    comment = "4-season_24-days_2-tech"
+    com_dict = {
+        "power-plant": {"input": "fuel", "output": "electr"},
+        "fuel-supply": {"input": [], "output": "fuel"},
+    }
+    # Dictionary of technology and temporal levels
+    tec_time = {"power-plant": ["season", "day"], "fuel-supply": ["season", "season"]}
+    # Total demand in a temporal level
+    demand_time = {"day": 100}
+    # List of info for time slices: [temporal level, number, parent level]
+    time_steps = [["season", 4, "year"], ["day", 24, "season"]]
+
+    # Check the model solves without error and sumof duration times = 1
+    model_generator(test_mp, comment, tec_time, demand_time, time_steps, com_dict)
+
+
+# 5) Testing 60 days linked to 4 seasons linked to year, with three technology
+def test_year_season_day(test_mp):
+    comment = "year_4-season_60-days_3-tech"
+    com_dict = {
+        "power-plant": {"input": "fuel", "output": "electr"},
+        "fuel-transport": {"input": "fuel", "output": "fuel"},
+        "fuel-supply": {"input": [], "output": "fuel"},
+    }
+    # Dictionary of technology and temporal levels
+    tec_time = {
+        "power-plant": ["season", "day"],
+        "fuel-transport": ["year", "season"],
+        "fuel-supply": ["year", "year"],
+    }
+    # Total demand in a temporal level
+    demand_time = {"day": 100}
+    # List of info for time slices: [temporal level, number, parent level]
+    time_steps = [["season", 4, "year"], ["day", 60, "season"]]
+
+    # Check the model solves without error and sumof duration times = 1
+    model_generator(test_mp, comment, tec_time, demand_time, time_steps, com_dict)
