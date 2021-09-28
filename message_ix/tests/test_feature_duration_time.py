@@ -159,7 +159,7 @@ def model_generator(
 # to meet demand, which receives fuel from a supply technology.
 
 # 1) Testing one temporal level ("season") and different number of time slices
-def test_season(test_mp, n_time=[4, 12, 50, 122, 360, 2240]):
+def test_season(test_mp, n_time=[4, 12, 50, 122]):
     comment = "season"
     com_dict = {"power-plant": {"input": [], "output": "electr"}}
     # Dictionary of technology and input and output temporal levels
@@ -174,7 +174,7 @@ def test_season(test_mp, n_time=[4, 12, 50, 122, 360, 2240]):
 
 
 # 2) Testing one temporal level ("season") linked to "year" with a technology
-def test_year_season(test_mp, n_time=[4, 12, 50, 122, 360, 2240]):
+def test_year_season(test_mp, n_time=[4, 365, 2400]):
     comment = "year_season"
     com_dict = {
         "power-plant": {"input": "fuel", "output": "electr"},
@@ -244,6 +244,38 @@ def test_year_season_day(test_mp):
     demand_time = {"day": 100}
     # List of info for time slices: [temporal level, number, parent level]
     time_steps = [["season", 4, "year"], ["day", 60, "season"]]
+
+    # Check the model solves without error and sumof duration times = 1
+    model_generator(test_mp, comment, tec_time, demand_time, time_steps, com_dict)
+
+
+# 6) Testing four temporal levels (year, season, day, hour) with four technologies
+def test_year_season_day_hour(test_mp):
+    n_season = 4
+    n_day = 2
+    n_hour = 6
+    comment = "y_4s_2d_6h"
+    com_dict = {
+        "power-plant": {"input": "fuel", "output": "electr"},
+        "fuel-transport": {"input": "fuel", "output": "fuel"},
+        "fuel-processing": {"input": "raw fuel", "output": "fuel"},
+        "fuel-supply": {"input": [], "output": "raw fuel"},
+    }
+    # Dictionary of technology and temporal levels
+    tec_time = {
+        "power-plant": ["day", "hour"],
+        "fuel-transport": ["season", "day"],
+        "fuel-processing": ["year", "season"],
+        "fuel-supply": ["year", "year"],
+    }
+    # Total demand in a temporal level
+    demand_time = {"hour": 100}
+    # List of info for time slices: [temporal level, number, parent level]
+    time_steps = [
+        ["season", n_season, "year"],
+        ["day", n_day, "season"],
+        ["hour", n_hour, "day"],
+    ]
 
     # Check the model solves without error and sumof duration times = 1
     model_generator(test_mp, comment, tec_time, demand_time, time_steps, com_dict)
