@@ -202,7 +202,7 @@ if (check,
 loop(lvl_temporal,
     loop(time2$( sum(time, map_temporal_hierarchy(lvl_temporal,time,time2) ) ),
         check = 1$( abs( sum( time$( map_temporal_hierarchy(lvl_temporal,time,time2) ),
-            duration_time(time) ) - duration_time(time2) ) > 1e-9 );
+            duration_time(time) ) - duration_time(time2) ) > 1e-12 );
     ) ;
 ) ;
 if (check,
