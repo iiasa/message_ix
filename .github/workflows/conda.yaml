@@ -21,6 +21,9 @@ jobs:
     strategy:
       matrix:
         conda_type: [anaconda, miniconda]
+        extra_deps:
+          - ""
+          - "JPype1=1.2.1"
 
     name: ${{ matrix.conda_type }}
 
@@ -40,14 +43,18 @@ jobs:
       if: ${{ matrix.conda_type == 'anaconda' }}
       working-directory: ${{ github.workspace }}
       run: |
-        curl -O https://repo.anaconda.com/archive/Anaconda3-2020.11-Windows-x86_64.exe
-        Start-Process "Anaconda3-2020.11-Windows-x86_64.exe" "/S", "/D=${env:GITHUB_WORKSPACE}\anaconda3" -Wait
+        curl -O https://repo.anaconda.com/archive/Anaconda3-2021.05-Windows-x86_64.exe
+        Start-Process "Anaconda3-2021.05-Windows-x86_64.exe" "/S", "/D=${env:GITHUB_WORKSPACE}\anaconda3" -Wait
         "${env:GITHUB_WORKSPACE}/anaconda3/Scripts" | Out-File -FilePath $env:GITHUB_PATH -Append
 
-    - name: Add build runner's pre-installed Miniconda to PATH
+    - name: Download and install Miniconda; add to PATH
       if: ${{ matrix.conda_type == 'miniconda' }}
+      working-directory: ${{ github.workspace }}
       run: |
-        "${env:CONDA}/Scripts" | Out-File -FilePath $env:GITHUB_PATH -Append
+        curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe
+        Start-Process "Miniconda3-latest-Windows-x86_64.exe" "/S", "/D=${env:GITHUB_WORKSPACE}\miniconda3" -Wait
+        "${env:GITHUB_WORKSPACE}/miniconda3/Scripts" | Out-File -FilePath $env:GITHUB_PATH -Append
+
 
     - name: Configure PowerShell for "conda activate"
       run: conda init powershell
@@ -56,9 +63,10 @@ jobs:
       run: |
         conda config --prepend channels conda-forge
         conda config --set channel_priority strict
-        conda create --name ${{ env.CONDA_ENV }} --quiet message-ix
+        conda create --name ${{ env.CONDA_ENV }} --quiet message-ix pytest ${{ matrix.extra_deps }}
 
     - name: Check
+      # Check environment and run a single test from the suite to test code path to ixmp JDBCBackend
       run: |
         conda activate ${{ env.CONDA_ENV }}
 
@@ -68,3 +76,4 @@ jobs:
         ixmp --platform default list
 
         conda list
+        pytest --pyargs message_ix.tests.test_core::test_add_cat -p ixmp.testing -p no:faulthandler
