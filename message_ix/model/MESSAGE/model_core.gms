@@ -118,6 +118,8 @@ Variables
     REL(relation,node,year_all)                  auxiliary variable for left-hand side of user-defined relations
 * change in the content of storage device
     STORAGE_CHARGE(node,tec,level,commodity,year_all,time)    charging of storage in each timestep (negative for discharge)
+* regional emission pool
+    EMISS_POOL(node,type_emission,type_tec,year_all)          nodal-regional-global emission pool size
 ;
 
 ***
@@ -272,6 +274,7 @@ Equations
     ACTIVITY_SOFT_CONSTRAINT_LO     bound on relaxation of the dynamic constraint on market penetration (lower bound)
     EMISSION_EQUIVALENCE            auxiliary equation to simplify the notation of emissions
     EMISSION_CONSTRAINT             nodal-regional-global constraints on emissions (by category)
+    EMISSION_POOL                   nodal-regional-global emission pool with carbon sink rate
     LAND_CONSTRAINT                 constraint on total land use (linear combination of land scenarios adds up to 1)
     DYNAMIC_LAND_SCEN_CONSTRAINT_UP dynamic constraint on land scenario change (upper bound)
     DYNAMIC_LAND_SCEN_CONSTRAINT_LO dynamic constraint on land scenario change (lower bound)
@@ -1579,12 +1582,12 @@ NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 *   .. math::
 *      CAP\_NEW\_UP_{n,t,y} \leq \sum_{y-1} CAP\_NEW_{n^L,t,y-1} & \text{if } y \neq 'first\_period' \\
 *                                + \sum_{y-1} historical\_new\_capacity_{n^L,t,y-1} & \text{if } y = 'first\_period' \\
-*                           \quad \forall \ t \ \in \ T^{INV}   
+*                           \quad \forall \ t \ \in \ T^{INV}
 *
 ***
 NEW_CAPACITY_SOFT_CONSTRAINT_UP(node,inv_tec,year)$( soft_new_capacity_up(node,inv_tec,year) )..
     CAP_NEW_UP(node,inv_tec,year) =L=
-        SUM(year2$( seq_period(year2,year) ), 
+        SUM(year2$( seq_period(year2,year) ),
             CAP_NEW(node,inv_tec,year2)) $ (NOT first_period(year))
       + SUM(year_all2$( seq_period(year_all2,year) ),
             historical_new_capacity(node,inv_tec,year_all2)) $ first_period(year)
@@ -1643,14 +1646,14 @@ NEW_CAPACITY_CONSTRAINT_LO(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 *   .. math::
 *      CAP\_NEW\_LO_{n,t,y} \leq \sum_{y-1} CAP\_NEW_{n^L,t,y-1} & \text{if } y \neq 'first\_period' \\
 *                                + \sum_{y-1} historical\_new\_capacity_{n^L,t,y-1} & \text{if } y = 'first\_period' \\
-*                           \quad \forall \ t \ \in \ T^{INV}  
+*                           \quad \forall \ t \ \in \ T^{INV}
 *
 ***
 NEW_CAPACITY_SOFT_CONSTRAINT_LO(node,inv_tec,year)$( soft_new_capacity_lo(node,inv_tec,year) )..
     CAP_NEW_LO(node,inv_tec,year) =L=
         SUM(year2$( seq_period(year2,year) ),
             CAP_NEW(node,inv_tec,year2) ) $ (NOT first_period(year))
-      + SUM(year_all2$( seq_period(year_all2,year) ), 
+      + SUM(year_all2$( seq_period(year_all2,year) ),
             historical_new_capacity(node,inv_tec,year_all2) ) $ first_period(year)
 ;
 
@@ -1711,7 +1714,7 @@ ACTIVITY_CONSTRAINT_UP(node,tec,year,time)$( map_tec_time(node,tec,year,time)
 *   .. math::
 *      ACT\_UP_{n,t,y,h} \leq \sum_{y^V \leq y,m,y-1} ACT_{n^L,t,y^V,y-1,m,h} & \text{if } y \neq 'first\_period' \\
 *                             + \sum_{m,y-1} historical\_activity_{n^L,t,y-1,m,h} & \text{if } y = 'first\_period'
-*      
+*
 *
 ***
 ACTIVITY_SOFT_CONSTRAINT_UP(node,tec,year,time)$( soft_activity_up(node,tec,year,time) )..
@@ -1863,6 +1866,37 @@ EMISSION_CONSTRAINT(node,type_emission,type_tec,type_year)$is_bound_emission(nod
       )
     / SUM(year_all2$( cat_year(type_year,year_all2) ), duration_period(year_all2) )
     =L= bound_emission(node,type_emission,type_tec,type_year) ;
+
+***
+* emission pool
+* ^^^^^^^^^^^^^
+*
+* .. _emission_pool:
+*
+* Equation EMISSION_POOL
+* """"""""""""""""""""""
+* :math:`EMISS_POOL_{n,\widehat{e},\widehat{t},\widehat{y}}` is the atmospheric pool at node :math:`n`
+* for emission type :math:`\widehat{e}` from technology set :math:`\widehat{t}` in year :math:`\widehat{y}`.
+* Via :math:`historical_emission` past emissions can be attributed to node :math:`n`, establishing the initial
+* conditions of the pools. The parameter :math:`emission_sink_rate` is projecting the sink rate of emissions
+* which in general depends on the size of the pool, but is here treated as an exogenous parameter that needs
+* to chosen in line with expected results (or adjusted iteratively).
+*
+***
+
+EMISSION_POOL(node,type_emission,type_tec,year)..
+    EMISS_POOL(node,type_emission,type_tec,year) =E=
+* emission pool from previous period
+    SUM(year_all$( seq_period(year_all,year) ),
+         EMISS_POOL(node,type_emission,type_tec,year_all)
+* emission additions in current period
+    + SUM(emission$( cat_emission(type_emission,emission) ),
+        duration_period(year) * emission_scaling(type_emission,emission) *
+            ( EMISS(node,emission,type_tec,year)
+                + historical_emission(node,emission,type_tec,year) )
+      )
+    ) / (1 + emission_sink_rate(node,type_emission,type_tec,year) * duration_period(year))
+;
 
 *----------------------------------------------------------------------------------------------------------------------*
 ***
