@@ -198,7 +198,7 @@ if (check,
     abort "There is a problem with the definition of the technical lifetime!" ;
 ) ;
 
-* check for validity of temporal resolution
+* check for validity of temporal resolution with an accepted difference in the scale of 1e-12, due to the different percision between GAMS and python values.
 loop(lvl_temporal,
     loop(time2$( sum(time, map_temporal_hierarchy(lvl_temporal,time,time2) ) ),
         check = 1$( abs( sum( time$( map_temporal_hierarchy(lvl_temporal,time,time2) ),
