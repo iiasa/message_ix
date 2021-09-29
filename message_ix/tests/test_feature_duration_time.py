@@ -7,10 +7,7 @@ months; and different number of time slices at each level are tested.
 
 """
 
-import os
 from itertools import product
-
-import pytest
 
 from message_ix import Scenario
 
