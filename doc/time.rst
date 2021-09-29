@@ -55,8 +55,9 @@ Example 4
 
 Duration of sub-annual time slices
 ----------------------------------
-The duration of each sub-annual time slice should be defined relative to the whole year, with
-a value between 0 and 1, using parameter ``duration_time``. For example, in a model with four seasons with the same length, ``duration_time`` of each season will be 0.25.
+The duration of each sub-annual time slice should be defined relative to the whole year, with a value
+between 0 and 1, using parameter ``duration_time``. For example, in a model with four seasons with the same length, ``duration_time`` of each season will be 0.25.
+This information is needed to calculate capacity of a technology that is active in different time slices.
 When there are more than one temporal levels, e.g., "season", "month", "day", etc., ``duration_time`` is defined for each **temporal level** separately.
 The sum of ``duration_time`` at each temporal level must be equal to 1. For example, in a model with 4 time slices as "season" and 10 time slices as "day" under each "season",
 ``duration_time`` of each "season" and "day" should be specified as 0.25 and 0.025, respectively.

@@ -7,7 +7,10 @@ months; and different number of time slices at each level are tested.
 
 """
 
+import os
 from itertools import product
+
+import pytest
 
 from message_ix import Scenario
 
@@ -24,7 +27,7 @@ def model_generator(
 ):
     """
 
-    Generates a simple model with two technologies, and a flexible number of
+    Generates a simple model with a few technologies, and a flexible number of
     time slices.
 
     Parameters
@@ -89,7 +92,7 @@ def model_generator(
                 p = "year"
             else:
                 p = h.split("_" + tmp_lvl[0])[0]
-            # Temporal hierarchy (order: tenporal level, time, parent time)
+            # Temporal hierarchy (order: temporal level, time, parent time)
             scen.add_set("map_temporal_hierarchy", [tmp_lvl, h, p])
 
             # Duration time is relative to the duration of the parent temporal level
@@ -148,7 +151,7 @@ def model_generator(
         ].to_list()
         print(sum(scen.par("duration_time", {"time": times})["value"]))
         assert (
-            abs(sum(scen.par("duration_time", {"time": times})["value"]) - 1.0) < 1e-9
+            abs(sum(scen.par("duration_time", {"time": times})["value"]) - 1.0) < 1e-12
         )
     return scen
 
@@ -159,7 +162,7 @@ def model_generator(
 # to meet demand, which receives fuel from a supply technology.
 
 # 1) Testing one temporal level ("season") and different number of time slices
-def test_season(test_mp, n_time=[4, 12, 50, 122]):
+def test_season(test_mp, n_time=[4, 12, 50]):
     comment = "season"
     com_dict = {"power-plant": {"input": [], "output": "electr"}}
     # Dictionary of technology and input and output temporal levels
@@ -173,8 +176,12 @@ def test_season(test_mp, n_time=[4, 12, 50, 122]):
         model_generator(test_mp, comment, tec_time, demand_time, time_steps, com_dict)
 
 
+@pytest.mark.skipif(
+    condition="GITHUB_WORKFLOW" in os.environ,
+    reason="Exceeds maximum size for GAMS without license.",
+)
 # 2) Testing one temporal level ("season") linked to "year" with a technology
-def test_year_season(test_mp, n_time=[4, 365, 2400]):
+def test_year_season(test_mp, n_time=[50, 365, 2400]):
     comment = "year_season"
     com_dict = {
         "power-plant": {"input": "fuel", "output": "electr"},
@@ -228,7 +235,7 @@ def test_season_day_2tech(test_mp):
 
 # 5) Testing 60 days linked to 4 seasons linked to year, with three technology
 def test_year_season_day(test_mp):
-    comment = "year_4-season_60-days_3-tech"
+    comment = "year_4-season_30-days_3-tech"
     com_dict = {
         "power-plant": {"input": "fuel", "output": "electr"},
         "fuel-transport": {"input": "fuel", "output": "fuel"},
@@ -243,7 +250,7 @@ def test_year_season_day(test_mp):
     # Total demand in a temporal level
     demand_time = {"day": 100}
     # List of info for time slices: [temporal level, number, parent level]
-    time_steps = [["season", 4, "year"], ["day", 60, "season"]]
+    time_steps = [["season", 4, "year"], ["day", 30, "season"]]
 
     # Check the model solves without error and sumof duration times = 1
     model_generator(test_mp, comment, tec_time, demand_time, time_steps, com_dict)
