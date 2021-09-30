@@ -115,6 +115,9 @@ MESSAGE_ITEMS = {
     "cat_relation": item("set", "type_relation relation"),
     "cat_tec": item("set", "type_tec t"),
     "cat_year": item("set", "type_year y"),
+    "is_emission_sink": dict(
+        ix_type="set", idx_sets=["node", "type_emission", "type_tec", "year"]
+    ),
     "level_renewable": dict(ix_type="set", idx_sets=["level"]),
     "level_resource": dict(ix_type="set", idx_sets=["level"]),
     "level_stocks": dict(ix_type="set", idx_sets=["level"]),

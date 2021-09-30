@@ -1884,7 +1884,7 @@ EMISSION_CONSTRAINT(node,type_emission,type_tec,type_year)$is_bound_emission(nod
 *
 ***
 
-EMISSION_POOL(node,type_emission,type_tec,year)$emission_sink_rate(node,type_emission,type_tec,year)..
+EMISSION_POOL(node,type_emission,type_tec,year)$is_emission_sink(node,type_emission,type_tec,year)..
     EMISS_POOL(node,type_emission,type_tec,year) =E=
 * emission pool from previous period if year != firstmodelyear
     SUM(year_all2$( seq_period(year_all2,year) ),
