@@ -257,6 +257,9 @@ MESSAGE_ITEMS = {
     "tax_emission": dict(
         ix_type="par", idx_sets=["node", "type_emission", "type_tec", "type_year"]
     ),
+    "tax_emission_pool": dict(
+        ix_type="par", idx_sets=["node", "type_emission", "type_tec", "year"]
+    ),
     "tax": item("par", "nl type_tec ya"),
     "technical_lifetime": item("par", "nl t yv"),
     # Order of sub-annual time steps

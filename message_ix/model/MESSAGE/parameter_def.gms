@@ -592,6 +592,8 @@ Parameters
 *      - ``node`` | ``type_emission`` | ``type_tec`` | ``year``
 *    * - historical_emission_pool [#hist]_
 *      - ``node`` | ``type_emission`` | ``type_tec`` | ``year``
+*    * - tax_emission_pool
+*      - ``node`` | ``type_emission`` | ``type_tec`` | ``year``
 *
 * .. [#em_scaling] The parameter ``emission_scaling`` is the scaling factor to harmonize bounds or taxes across types of
 *    emissions. It allows to efficiently aggregate different emissions/pollutants and set bounds or taxes on various categories.
@@ -605,6 +607,7 @@ Parameters
     tax_emission(node,type_emission,type_tec,type_year)     emission tax
     emission_sink_rate(node,type_emission,type_tec,year_all) emission sink rate for regional emission pool formulation
     historical_emission_pool(node,type_emission,type_tec,year_all) historical regional emission pool formulation
+    tax_emission_pool(node,type_emission,type_tec,year_all)     emission tax
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
