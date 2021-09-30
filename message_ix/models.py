@@ -167,6 +167,9 @@ MESSAGE_ITEMS = {
     "dynamic_land_up": item("par", "n land_scenario y land_type"),
     "emission_factor": item("par", "nl t yv ya m e"),
     "emission_scaling": item("par", "type_emission e"),
+    "emission_sink_rate": dict(
+        ix_type="par", idx_sets=["node", "type_emission", "type_tec", "year"]
+    ),
     "fix_cost": item("par", "nl t yv ya"),
     "fixed_activity": item("par", "nl t yv ya m h"),
     "fixed_capacity": item("par", "nl t yv ya"),
@@ -186,6 +189,9 @@ MESSAGE_ITEMS = {
     "historical_activity": item("par", "nl t ya m h"),
     "historical_emission": dict(
         ix_type="par", idx_sets=["node", "type_emission", "type_tec", "type_year"]
+    ),
+    "historical_emission_pool": dict(
+        ix_type="par", idx_sets=["node", "type_emission", "type_tec", "year"]
     ),
     "historical_extraction": item("par", "n c g y"),
     "historical_gdp": dict(ix_type="par", idx_sets=["node", "year"]),

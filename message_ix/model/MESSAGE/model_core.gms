@@ -1875,26 +1875,26 @@ EMISSION_CONSTRAINT(node,type_emission,type_tec,type_year)$is_bound_emission(nod
 *
 * Equation EMISSION_POOL
 * """"""""""""""""""""""
-* :math:`EMISS_POOL_{n,\widehat{e},\widehat{t},\widehat{y}}` is the atmospheric pool at node :math:`n`
+* :math:`EMISS\_POOL_{n,\widehat{e},\widehat{t},\widehat{y}}` is the atmospheric pool at node :math:`n`
 * for emission type :math:`\widehat{e}` from technology set :math:`\widehat{t}` in year :math:`\widehat{y}`.
-* Via :math:`historical_emission` past emissions can be attributed to node :math:`n`, establishing the initial
-* conditions of the pools. The parameter :math:`emission_sink_rate` is projecting the sink rate of emissions
+* Via :math:`historical\_emission` past emissions can be attributed to node :math:`n`, establishing the initial
+* conditions of the pools. The parameter :math:`emission\_sink\_rate` is projecting the sink rate of emissions
 * which in general depends on the size of the pool, but is here treated as an exogenous parameter that needs
 * to chosen in line with expected results (or adjusted iteratively).
 *
 ***
 
-EMISSION_POOL(node,type_emission,type_tec,year)..
+EMISSION_POOL(node,type_emission,type_tec,year)$emission_sink_rate(node,type_emission,type_tec,year)..
     EMISS_POOL(node,type_emission,type_tec,year) =E=
-* emission pool from previous period
-    SUM(year_all$( seq_period(year_all,year) ),
-         EMISS_POOL(node,type_emission,type_tec,year_all)
+* emission pool from previous period if year != firstmodelyear
+    SUM(year_all2$( seq_period(year_all2,year) ),
+         EMISS_POOL(node,type_emission,type_tec,year_all2)$(model_horizon(year_all2) AND NOT first_period(year))
 * emission additions in current period
     + SUM(emission$( cat_emission(type_emission,emission) ),
         duration_period(year) * emission_scaling(type_emission,emission) *
-            ( EMISS(node,emission,type_tec,year)
-                + historical_emission(node,emission,type_tec,year) )
-      )
+            ( EMISS(node,emission,type_tec,year) ) )
+* emission pool from historical period if year == firstmodelyear
+    + historical_emission_pool(node,type_emission,type_tec,year_all2)$first_period(year)
     ) / (1 + emission_sink_rate(node,type_emission,type_tec,year) * duration_period(year))
 ;
 
