@@ -275,6 +275,7 @@ Equations
     EMISSION_EQUIVALENCE            auxiliary equation to simplify the notation of emissions
     EMISSION_CONSTRAINT             nodal-regional-global constraints on emissions (by category)
     EMISSION_POOL                   nodal-regional-global emission pool with carbon sink rate
+    EMISSION_POOL_CONSTRAINT        nodal-regional-global constraints on emission pool (by type)
     LAND_CONSTRAINT                 constraint on total land use (linear combination of land scenarios adds up to 1)
     DYNAMIC_LAND_SCEN_CONSTRAINT_UP dynamic constraint on land scenario change (upper bound)
     DYNAMIC_LAND_SCEN_CONSTRAINT_LO dynamic constraint on land scenario change (lower bound)
@@ -1901,6 +1902,22 @@ EMISSION_POOL(node,type_emission,type_tec,year)$is_emission_sink(node,type_emiss
     + historical_emission_pool(node,type_emission,type_tec,year_all2)$first_period(year)
     ) / (1 + emission_sink_rate(node,type_emission,type_tec,year) * duration_period(year))
 ;
+
+***
+* Bound on emission pool
+* ^^^^^^^^^^^^^^^^^^^^^^
+*
+* .. _emission_pool_constraint:
+*
+* Equation EMISSION_POOL_CONSTRAINT
+* """""""""""""""""""""""""""""""""
+* This constraint enforces upper bounds on the emission pool.
+*
+*
+***
+EMISSION_POOL_CONSTRAINT(node,type_emission,type_tec,year)$is_bound_emission_pool(node,type_emission,type_tec,year)..
+    EMISS_POOL(node,type_emission,type_tec,year)
+    =L= bound_emission_pool(node,type_emission,type_tec,year) ;
 
 *----------------------------------------------------------------------------------------------------------------------*
 ***

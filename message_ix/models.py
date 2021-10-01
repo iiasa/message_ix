@@ -115,6 +115,9 @@ MESSAGE_ITEMS = {
     "cat_relation": item("set", "type_relation relation"),
     "cat_tec": item("set", "type_tec t"),
     "cat_year": item("set", "type_year y"),
+    "is_bound_emission_pool": dict(
+        ix_type="set", idx_sets=["node", "type_emission", "type_tec", "year"]
+    ),
     "is_emission_sink": dict(
         ix_type="set", idx_sets=["node", "type_emission", "type_tec", "year"]
     ),
@@ -155,6 +158,9 @@ MESSAGE_ITEMS = {
     "bound_activity_lo": item("par", "nl t ya m h"),
     "bound_activity_up": item("par", "nl t ya m h"),
     "bound_emission": item("par", "n type_emission type_tec type_year"),
+    "bound_emission_pool": dict(
+        ix_type="par", idx_sets=["node", "type_emission", "type_tec", "year"]
+    ),
     "bound_extraction_up": item("par", "n c g y"),
     "bound_new_capacity_lo": item("par", "nl t yv"),
     "bound_new_capacity_up": item("par", "nl t yv"),
