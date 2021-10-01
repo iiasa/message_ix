@@ -35,9 +35,7 @@ def model_generator(
         A dictionary for mapping a technology to its input/output temporal levels.
     demand_time : dict
         A dictionary for mapping the total "demand" specified at a temporal level.
-        e.g., {"season": 100}, means the sum of demand in all "time"
-        slices at the level of "season" must be 100.
-    time_steps : list of lists
+    time_steps : list of tuples
         Information about each time slice, packed in a tuple with three elements,
         including: "temporal_lvl", number of time slices, and the parent time slice.
     com_dict : dict
@@ -136,7 +134,7 @@ def model_generator(
     # Testing if the model solves in GAMS
     scen.solve(case=comment)
 
-    # Testing if sum of duration_time is almost 1
+    # Testing if sum of "duration_time" is almost 1
     for tmp_lvl in scen.set("lvl_temporal"):
         times = scen.set("map_temporal_hierarchy", {"lvl_temporal": tmp_lvl})[
             "time"
@@ -160,7 +158,7 @@ def test_season(test_mp, n_time=[4, 12, 50]):
 
     for t in n_time:
         time_steps = [("season", t, "year")]
-        # Check the model solves without error and sum of duration times = 1
+        # Check the model solves without error and sum of "duration_time" = 1
         model_generator(test_mp, comment, tec_time, demand_time, time_steps, com_dict)
 
 
