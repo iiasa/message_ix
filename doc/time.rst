@@ -53,7 +53,16 @@ Example 4
    - The ``time`` element 'summer', **used alone**, refers to a portion of any year.
    - In a |MESSAGEix| parameter indexed by (``year``, ``time``, …), values with the key (``2002``, 'summer', ...) refer to the 'summer' portion of the final year (2002-01-01 to 2002-12-31) within the entire period (2001-01-01 to 2002-12-31) denoted by ``2002``.
 
-
+Duration of sub-annual time slices
+----------------------------------
+The duration of each sub-annual time slice should be defined relative to the whole year, with a value
+between 0 and 1, using parameter ``duration_time``. For example, in a model with four seasons with the same length, ``duration_time`` of each season will be 0.25.
+This information is needed to calculate capacity of a technology that is active in different time slices.
+When there are more than one temporal levels, e.g., "season", "month", "day", etc., ``duration_time`` is defined for each **temporal level** separately.
+The sum of ``duration_time`` at each temporal level must be equal to 1. For example, in a model with 4 time slices as "season" and 10 time slices as "day" under each "season",
+``duration_time`` of each "season" and "day" should be specified as 0.25 and 0.025, respectively.
+season
+ 
 Discounting
 ===========
 
