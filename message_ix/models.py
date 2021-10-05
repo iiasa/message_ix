@@ -115,50 +115,50 @@ MESSAGE_ITEMS = {
     "cat_relation": item("set", "type_relation relation"),
     "cat_tec": item("set", "type_tec t"),
     "cat_year": item("set", "type_year y"),
-    "is_bound_emission_pool": dict(
-        ix_type="set", idx_sets=["node", "type_emission", "type_tec", "year"]
-    ),
-    "is_emission_sink": dict(
-        ix_type="set", idx_sets=["node", "type_emission", "type_tec", "year"]
-    ),
-    "level_renewable": dict(ix_type="set", idx_sets=["level"]),
-    "level_resource": dict(ix_type="set", idx_sets=["level"]),
-    "level_stocks": dict(ix_type="set", idx_sets=["level"]),
-    "map_node": dict(
-        ix_type="set", idx_sets=["node", "node"], idx_names=["node_parent", "node"]
-    ),
-    "map_shares_commodity_share": item("set", "s ns n type_tec m c l"),
-    "map_shares_commodity_total": item("set", "s ns n type_tec m c l"),
-    "map_spatial_hierarchy": dict(
-        ix_type="set",
-        idx_sets=["lvl_spatial", "node", "node"],
-        idx_names=["lvl_spatial", "node", "node_parent"],
-    ),
-    "map_tec_addon": dict(ix_type="set", idx_sets=["technology", "type_addon"]),
-    # Mapping of storage reservoir to charger/discharger
-    "map_tec_storage": item("set", "n t storage_tec l c"),
-    "map_temporal_hierarchy": dict(
-        ix_type="set",
-        idx_sets=["lvl_temporal", "time", "time"],
-        idx_names=["lvl_temporal", "time", "time_parent"],
-    ),
-    "map_time": dict(
-        ix_type="set", idx_sets=["time", "time"], idx_names=["time_parent", "time"]
-    ),
-    "type_tec_land": dict(ix_type="set", idx_sets=["type_tec"]),
-    #
-    # Parameters
-    "abs_cost_activity_soft_lo": item("par", "nl t ya h"),
-    "abs_cost_activity_soft_up": item("par", "nl t ya h"),
-    "abs_cost_new_capacity_soft_lo": item("par", "nl t yv"),
-    "abs_cost_new_capacity_soft_up": item("par", "nl t yv"),
-    "addon_conversion": item("par", "n t yv ya m h type_addon"),
-    "addon_lo": item("par", "n t ya m h type_addon"),
-    "addon_up": item("par", "n t ya m h type_addon"),
-    "bound_activity_lo": item("par", "nl t ya m h"),
-    "bound_activity_up": item("par", "nl t ya m h"),
-    "bound_emission": item("par", "n type_emission type_tec type_year"),
-    "bound_emission_pool": dict(
+        "is_bound_emission_pool": dict(
+            ix_type="set", idx_sets=["node", "type_emission", "type_tec", "year"]
+        ),
+        "is_emission_sink": dict(
+            ix_type="set", idx_sets=["node", "emission", "type_tec", "year"]
+        ),
+        "level_renewable": dict(ix_type="set", idx_sets=["level"]),
+        "level_resource": dict(ix_type="set", idx_sets=["level"]),
+        "level_stocks": dict(ix_type="set", idx_sets=["level"]),
+        "map_node": dict(
+            ix_type="set", idx_sets=["node", "node"], idx_names=["node_parent", "node"]
+        ),
+        "map_shares_commodity_share": item("set", "s ns n type_tec m c l"),
+        "map_shares_commodity_total": item("set", "s ns n type_tec m c l"),
+        "map_spatial_hierarchy": dict(
+            ix_type="set",
+            idx_sets=["lvl_spatial", "node", "node"],
+            idx_names=["lvl_spatial", "node", "node_parent"],
+        ),
+        "map_tec_addon": dict(ix_type="set", idx_sets=["technology", "type_addon"]),
+        # Mapping of storage reservoir to charger/discharger
+        "map_tec_storage": item("set", "n t storage_tec l c"),
+        "map_temporal_hierarchy": dict(
+            ix_type="set",
+            idx_sets=["lvl_temporal", "time", "time"],
+            idx_names=["lvl_temporal", "time", "time_parent"],
+        ),
+        "map_time": dict(
+            ix_type="set", idx_sets=["time", "time"], idx_names=["time_parent", "time"]
+        ),
+        "type_tec_land": dict(ix_type="set", idx_sets=["type_tec"]),
+        #
+        # Parameters
+        "abs_cost_activity_soft_lo": item("par", "nl t ya h"),
+        "abs_cost_activity_soft_up": item("par", "nl t ya h"),
+        "abs_cost_new_capacity_soft_lo": item("par", "nl t yv"),
+        "abs_cost_new_capacity_soft_up": item("par", "nl t yv"),
+        "addon_conversion": item("par", "n t yv ya m h type_addon"),
+        "addon_lo": item("par", "n t ya m h type_addon"),
+        "addon_up": item("par", "n t ya m h type_addon"),
+        "bound_activity_lo": item("par", "nl t ya m h"),
+        "bound_activity_up": item("par", "nl t ya m h"),
+        "bound_emission": item("par", "n type_emission type_tec type_year"),
+        "bound_emission_pool": dict(
         ix_type="par", idx_sets=["node", "type_emission", "type_tec", "year"]
     ),
     "bound_extraction_up": item("par", "n c g y"),
@@ -177,7 +177,7 @@ MESSAGE_ITEMS = {
     "emission_factor": item("par", "nl t yv ya m e"),
     "emission_scaling": item("par", "type_emission e"),
     "emission_sink_rate": dict(
-        ix_type="par", idx_sets=["node", "type_emission", "type_tec", "year"]
+        ix_type="par", idx_sets=["node", "emission", "type_tec", "year"]
     ),
     "fix_cost": item("par", "nl t yv ya"),
     "fixed_activity": item("par", "nl t yv ya m h"),
@@ -200,7 +200,7 @@ MESSAGE_ITEMS = {
         ix_type="par", idx_sets=["node", "type_emission", "type_tec", "type_year"]
     ),
     "historical_emission_pool": dict(
-        ix_type="par", idx_sets=["node", "type_emission", "type_tec", "year"]
+        ix_type="par", idx_sets=["node", "emission", "type_tec", "year"]
     ),
     "historical_extraction": item("par", "n c g y"),
     "historical_gdp": dict(ix_type="par", idx_sets=["node", "year"]),

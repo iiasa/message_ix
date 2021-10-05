@@ -48,6 +48,7 @@
 * :math:`ACT\_LO_{n,t,y,h} \in \mathbb{R}_+`               Relaxation of lower dynamic constraint on activity [#ACT_BD]_
 * :math:`LAND_{n,s,y} \in [0,1]`                           Relative share of land-use scenario (for land-use model emulator)
 * :math:`EMISS_{n,e,\widehat{t},y} \in \mathbb{R}`         Auxiliary variable for aggregate emissions by technology type
+* :math:`EMISS\_POOL_{n,e,\widehat{t},y} \in \mathbb{R}`   Auxiliary variable for aggregate emission pool by technology type
 * :math:`REL_{r,n,y} \in \mathbb{R}`                       Auxiliary variable for left-hand side of relations (linear constraints)
 * :math:`COMMODITY\_USE_{n,c,l,y} \in \mathbb{R}`          Auxiliary variable for amount of commodity used at specific level
 * :math:`COMMODITY\_BALANCE_{n,c,l,y,h} \in \mathbb{R}`    Auxiliary variable for right-hand side of :ref:`commodity_balance`
@@ -119,7 +120,7 @@ Variables
 * change in the content of storage device
     STORAGE_CHARGE(node,tec,level,commodity,year_all,time)    charging of storage in each timestep (negative for discharge)
 * regional emission pool
-    EMISS_POOL(node,type_emission,type_tec,year_all)          nodal-regional-global emission pool size
+    EMISS_POOL(node,emission,type_tec,year_all)          nodal-regional-global emission pool size
 ;
 
 ***
@@ -406,9 +407,11 @@ COST_ACCOUNTING_NODAL(node, year)..
         * tax_emission(node,type_emission,type_tec,type_year)
         * EMISS(node,emission,type_tec,year) )
 * emission pool taxes (by parent node, type of technology, year and type of emission)
-    + SUM((type_emission,type_tec)$( tax_emission_pool(node,type_emission,type_tec,year) ),
-        tax_emission_pool(node,type_emission,type_tec,year)
-        * EMISS_POOL(node,type_emission,type_tec,year) )
+    + SUM((type_emission,emission,type_tec)$( emission_scaling(type_emission,emission)
+            AND tax_emission_pool(node,type_emission,type_tec,year) ),
+        emission_scaling(type_emission,emission)
+        * tax_emission_pool(node,type_emission,type_tec,year)
+        * EMISS_POOL(node,emission,type_tec,year) )
 * cost terms from land-use model emulator (only includes valid node-land_scenario-year combinations)
     + SUM(land_scenario$( land_cost(node,land_scenario,year) ),
         land_cost(node,land_scenario,year) * LAND(node,land_scenario,year) )
@@ -1889,18 +1892,16 @@ EMISSION_CONSTRAINT(node,type_emission,type_tec,type_year)$is_bound_emission(nod
 *
 ***
 
-EMISSION_POOL(node,type_emission,type_tec,year)$is_emission_sink(node,type_emission,type_tec,year)..
-    EMISS_POOL(node,type_emission,type_tec,year) =E=
+EMISSION_POOL(node,emission,type_tec,year)$is_emission_sink(node,emission,type_tec,year)..
+    EMISS_POOL(node,emission,type_tec,year) =E=
 * emission pool from previous period if year != firstmodelyear
     SUM(year_all2$( seq_period(year_all2,year) ),
-         EMISS_POOL(node,type_emission,type_tec,year_all2)$(model_horizon(year_all2) AND NOT first_period(year))
+         EMISS_POOL(node,emission,type_tec,year_all2)$(model_horizon(year_all2) AND NOT first_period(year))
 * emission additions in current period
-    + SUM(emission$( cat_emission(type_emission,emission) ),
-        duration_period(year) * emission_scaling(type_emission,emission) *
-            ( EMISS(node,emission,type_tec,year) ) )
+    + duration_period(year) * EMISS(node,emission,type_tec,year)
 * emission pool from historical period if year == firstmodelyear
-    + historical_emission_pool(node,type_emission,type_tec,year_all2)$first_period(year)
-    ) / (1 + emission_sink_rate(node,type_emission,type_tec,year) * duration_period(year))
+    + historical_emission_pool(node,emission,type_tec,year_all2)$first_period(year)
+    ) / (1 + emission_sink_rate(node,emission,type_tec,year) * duration_period(year))
 ;
 
 ***
@@ -1916,7 +1917,10 @@ EMISSION_POOL(node,type_emission,type_tec,year)$is_emission_sink(node,type_emiss
 *
 ***
 EMISSION_POOL_CONSTRAINT(node,type_emission,type_tec,year)$is_bound_emission_pool(node,type_emission,type_tec,year)..
-    EMISS_POOL(node,type_emission,type_tec,year)
+    SUM( (emission)$( cat_emission(type_emission,emission) ),
+        emission_scaling(type_emission,emission)
+        * EMISS_POOL(node,emission,type_tec,year)
+      )
     =L= bound_emission_pool(node,type_emission,type_tec,year) ;
 
 *----------------------------------------------------------------------------------------------------------------------*
