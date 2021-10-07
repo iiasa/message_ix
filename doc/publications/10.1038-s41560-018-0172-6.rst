@@ -1,0 +1,21 @@
+A low energy demand scenario for meeting the 1.5 °C target and sustainable development goals without negative emission technologies
+======================================================================================================================================
+
+Authors
+-------
+Arnulf Grubler, Charlie Wilson, Nuno Bento, Benigna Boza-Kiss, Volker Krey, David L. McCollum, Narasimha D. Rao, Keywan Riahi, Joeri Rogelj, Simon De Stercke, Jonathan Cullen, Stefan Frank, Oliver Fricko, Fei Guo, Matt Gidden, Petr Havlík, Daniel Huppmann, Gregor Kiesewetter, Peter Rafaj, Wolfgang Schoepp & Hugo Valin
+
+Abstract
+--------
+
+Scenarios that limit global warming to 1.5 °C describe major transformations in energy supply and ever-rising energy demand.
+Here, we provide a contrasting perspective by developing a narrative of future change based on observable trends that results in low energy demand.
+We describe and quantify changes in activity levels and energy intensity in the global North and global South for all major energy services.
+We project that global final energy demand by 2050 reduces to 245 EJ, around 40% lower than today, despite rises in population, income and activity.
+Using an integrated assessment modelling framework, we show how changes in the quantity and type of energy services drive structural change in intermediate and upstream supply sectors (energy and land use).
+Down-sizing the global energy system dramatically improves the feasibility of a low-carbon supply-side transformation.
+Our scenario meets the 1.5 °C climate target as well as many sustainable development goals, without relying on negative emission technologies.
+
+.. raw:: html
+
+    <b><a href="https://www.nature.com/articles/s41560-018-0172-6">Get the full article</a></b>

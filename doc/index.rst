@@ -107,6 +107,24 @@ This section provides guidelines for how to make some common model design choice
    macro
 
 
+Usage outlook
+=============
+
+- :doc:`tools`
+- :doc:`projects`
+- :doc:`publications`
+
+
+.. toctree::
+   :hidden:
+   :titlesonly:
+   :caption: Help & reference
+
+   tools
+   projects
+   publications
+
+
 Using, getting help, and contributing
 =====================================
 

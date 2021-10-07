@@ -1,0 +1,21 @@
+Energy investment needs for fulfilling the Paris Agreement and achieving the Sustainable Development Goals
+==========================================================================================================
+
+Authors
+-------
+
+David L. McCollum, Wenji Zhou, Christoph Bertram, Harmen-Sytze de Boer, Valentina Bosetti, Sebastian Busch, Jacques Després, Laurent Drouet, Johannes Emmerling, Marianne Fay, Oliver Fricko, Shinichiro Fujimori, Matthew Gidden, Mathijs Harmsen, Daniel Huppmann, Gokul Iyer, Volker Krey, Elmar Kriegler, Claire Nicolas, Shonali Pachauri, Simon Parkinson, Miguel Poblete-Cazenave, Peter Rafaj, Narasimha Rao, Julie Rozenberg, Andreas Schmitz, Wolfgang Schoepp, Detlef van Vuuren & Keywan Riahi
+
+Abstract
+--------
+
+Low-carbon investments are necessary for driving the energy system transformation that is called for by both the Paris Agreement and Sustainable Development Goals.
+Improving understanding of the scale and nature of these investments under diverging technology and policy futures is therefore of great importance to decision makers.
+Here, using six global modelling frameworks, we show that the pronounced reallocation of the investment portfolio required to transform the energy system will not be initiated by the current suite of countries’ Nationally Determined Contributions.
+Charting a course toward ‘well below 2 °C’ instead sees low-carbon investments overtaking fossil investments globally by around 2025 or before and growing thereafter.
+Pursuing the 1.5 °C target demands a marked upscaling in low-carbon capital beyond that of a 2 °C-consistent future.
+Actions consistent with an energy transformation would increase the costs of achieving the goals of energy access and food security, but reduce the costs of achieving air-quality goals.
+
+.. raw:: html
+
+    <b><a href="https://www.nature.com/articles/s41560-018-0179-z">Get the full article</a></b>
