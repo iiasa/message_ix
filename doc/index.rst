@@ -48,8 +48,6 @@ Then, continue with the:
    tutorials
 
 
-
-
 .. _core:
 
 Mathematical specification
@@ -107,8 +105,11 @@ This section provides guidelines for how to make some common model design choice
    macro
 
 
-Usage outlook
-=============
+Information on tools, projects and publications
+===============================================
+
+The section is dedicated to give an outlook on what possibilities one has when using |MESSAGEix|.
+It illustrates which tools you can link to |MESSAGEix|, which projects currently and in the past use |MESSAGEix|, and which publications are based on |MESSAGEix|.
 
 - :doc:`tools`
 - :doc:`projects`
@@ -118,7 +119,7 @@ Usage outlook
 .. toctree::
    :hidden:
    :titlesonly:
-   :caption: Help & reference
+   :caption: Usage outlook
 
    tools
    projects
