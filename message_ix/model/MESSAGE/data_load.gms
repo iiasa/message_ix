@@ -52,7 +52,7 @@ rating_bin, reliability_factor, peak_load_factor, flexibility_factor
 renewable_capacity_factor, renewable_potential
 * emission factors, bounds and taxes on emissions (including mapping sets)
 historical_emission, emission_factor, emission_scaling, is_bound_emission, bound_emission, tax_emission,
-emission_sink_rate, is_emission_sink, historical_emission_pool, tax_emission_pool, is_bound_emission_pool, bound_emission_pool,
+emission_sink_rate, is_emission_sink_rate, historical_emission_pool, tax_emission_pool, is_bound_emission_pool, bound_emission_pool,
 * historical values of new capacity investment, activity and extraction
 historical_new_capacity, historical_activity, historical_extraction
 * parameters for land-use model emulator
