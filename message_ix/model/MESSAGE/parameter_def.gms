@@ -607,9 +607,9 @@ Parameters
     emission_scaling(type_emission,emission)                 scaling factor to harmonize bounds or taxes across types
     bound_emission(node,type_emission,type_tec,type_year)    upper bound on emissions
     tax_emission(node,type_emission,type_tec,type_year)      emission tax
-    emission_sink_rate(node,emission,type_tec,year_all) emission sink rate for regional emission pool formulation
-    historical_emission_pool(node,emission,type_tec,year_all) historical regional emission pool formulation
-    tax_emission_pool(node,type_emission,type_tec,year_all)  emission tax
+    emission_sink_rate(node,emission,type_tec,year_all)      emission sink rate for regional emission pool formulation
+    historical_emission_pool(node,emission,type_tec,year_all) historical size of emission pool by technology type
+    tax_emission_pool(node,type_emission,type_tec,year_all)  emission pool tax
     bound_emission_pool(node,type_emission,type_tec,year_all) upper bound on emission pool size
 ;
 

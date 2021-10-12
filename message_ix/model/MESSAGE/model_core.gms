@@ -1883,12 +1883,20 @@ EMISSION_CONSTRAINT(node,type_emission,type_tec,type_year)$is_bound_emission(nod
 *
 * Equation EMISSION_POOL
 * """"""""""""""""""""""
-* :math:`EMISS\_POOL_{n,\widehat{e},\widehat{t},\widehat{y}}` is the atmospheric pool at node :math:`n`
-* for emission type :math:`\widehat{e}` from technology set :math:`\widehat{t}` in year :math:`\widehat{y}`.
-* Via :math:`historical\_emission` past emissions can be attributed to node :math:`n`, establishing the initial
+* :math:`EMISS\_POOL_{n,e,\widehat{t},y}` is the atmospheric pool at node :math:`n`
+* for emission :math:`e` from technology set :math:`\widehat{t}` in year :math:`y`.
+* Via :math:`historical\_emission\_pool` past emissions can be attributed to node :math:`n`, establishing the initial
 * conditions of the pools. The parameter :math:`emission\_sink\_rate` is projecting the sink rate of emissions
 * which in general depends on the size of the pool, but is here treated as an exogenous parameter that needs
 * to chosen in line with expected results (or adjusted iteratively).
+*
+*   .. math::
+*      EMISS\_POOL_{n,e,\widehat{t},y} =
+*          \frac{EMISS\_POOL_{n,e,\widehat{t},y-1} \text{if } y \neq 'first\_period' \\
+*                + duration\_period_{y} \cdot EMISS_{n,e,\widehat{t},y}
+*                + historical\_emission\_pool_{n,e,\widehat{t},y-1} \text{if } y \eq 'first\_period'
+*              }
+*            { 1 + emission\_sink\_rate_{n,e,\widehat{t},y} \cdot EMISS_{n,e,\widehat{t},y}}
 *
 ***
 
