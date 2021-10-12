@@ -232,6 +232,11 @@ COST_NODAL_NET.L(node_macro,year) =
             AND map_node(node,node_macro) AND cat_year(type_year,year) ),
         emission_scaling(type_emission,emission) * tax_emission(node,type_emission,type_tec,type_year)
         * EMISS.L(node_macro,emission,type_tec,year) )
+* subtract emission pool taxes applied at any higher nodal level (via map_node set)
+    - sum((type_emission,emission,type_tec,node)$( emission_scaling(type_emission,emission)
+            AND map_node(node,node_macro) AND tax_emission_pool(node,type_emission,type_tec,year) ),
+        emission_scaling(type_emission,emission) * tax_emission_pool(node,type_emission,type_tec,year)
+        * EMISS_POOL.L(node_macro,emission,type_tec,year) )
 ;
 
 GDP.L(node_macro,year) = (I.L(node_macro,year) + C.L(node_macro,year) + EC.L(node_macro,year)) * 1000 ;
