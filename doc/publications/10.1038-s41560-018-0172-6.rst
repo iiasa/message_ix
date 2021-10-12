@@ -1,10 +1,6 @@
 A low energy demand scenario for meeting the 1.5 °C target and sustainable development goals without negative emission technologies
 ======================================================================================================================================
 
-Authors
--------
-Arnulf Grubler, Charlie Wilson, Nuno Bento, Benigna Boza-Kiss, Volker Krey, David L. McCollum, Narasimha D. Rao, Keywan Riahi, Joeri Rogelj, Simon De Stercke, Jonathan Cullen, Stefan Frank, Oliver Fricko, Fei Guo, Matt Gidden, Petr Havlík, Daniel Huppmann, Gregor Kiesewetter, Peter Rafaj, Wolfgang Schoepp & Hugo Valin
-
 Abstract
 --------
 
@@ -19,3 +15,10 @@ Our scenario meets the 1.5 °C climate target as well as many sustainable deve
 .. raw:: html
 
     <b><a href="https://www.nature.com/articles/s41560-018-0172-6">Get the full article</a></b>
+    <br>
+    <br>
+
+Citation
+--------
+
+Grubler, A., Wilson, C., Bento, N. et al. A low energy demand scenario for meeting the 1.5 °C target and sustainable development goals without negative emission technologies. Nat Energy 3, 515–527 (2018). https://doi.org/10.1038/s41560-018-0172-6

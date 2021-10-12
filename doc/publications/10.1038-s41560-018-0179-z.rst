@@ -1,11 +1,6 @@
 Energy investment needs for fulfilling the Paris Agreement and achieving the Sustainable Development Goals
 ==========================================================================================================
 
-Authors
--------
-
-David L. McCollum, Wenji Zhou, Christoph Bertram, Harmen-Sytze de Boer, Valentina Bosetti, Sebastian Busch, Jacques Després, Laurent Drouet, Johannes Emmerling, Marianne Fay, Oliver Fricko, Shinichiro Fujimori, Matthew Gidden, Mathijs Harmsen, Daniel Huppmann, Gokul Iyer, Volker Krey, Elmar Kriegler, Claire Nicolas, Shonali Pachauri, Simon Parkinson, Miguel Poblete-Cazenave, Peter Rafaj, Narasimha Rao, Julie Rozenberg, Andreas Schmitz, Wolfgang Schoepp, Detlef van Vuuren & Keywan Riahi
-
 Abstract
 --------
 
@@ -19,3 +14,10 @@ Actions consistent with an energy transformation would increase the costs of ach
 .. raw:: html
 
     <b><a href="https://www.nature.com/articles/s41560-018-0179-z">Get the full article</a></b>
+    <br>
+    <br>
+
+Citation
+--------
+
+McCollum, D.L., Zhou, W., Bertram, C. et al. Energy investment needs for fulfilling the Paris Agreement and achieving the Sustainable Development Goals. Nat Energy 3, 589–599 (2018). https://doi.org/10.1038/s41560-018-0179-z

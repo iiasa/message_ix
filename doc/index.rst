@@ -107,9 +107,13 @@ This section provides guidelines for how to make some common model design choice
 
 Information on tools, projects and publications
 ===============================================
+|MESSAGEix| is a flexible framework for analysing energy-environment-economy systems and can therefore be used for evaluating major energy challenges and supporting policy makers in their decisions.
+Being open source, |MESSAGEix| can be used by multiple people and institutions to provide answers for different research questions in various fields.
+Making this usage visible to share and exchange knowledge on how future energy-environment-economy systems might look like is of great benefit to further research.
 
-The section is dedicated to give an outlook on what possibilities one has when using |MESSAGEix|.
-It illustrates which tools you can link to |MESSAGEix|, which projects currently and in the past use |MESSAGEix|, and which publications are based on |MESSAGEix|.
+This section demonstrates the application of the |MESSAGEix| framework in different projects and publications, as well as tools that have been developed based on |MESSAGEix| or for supporting and improving it.
+The aim of this section is not to provide an exhaustive list, but to provide an outlook of different possibilities and applications for |MESSAGEix| users.
+
 
 - :doc:`tools`
 - :doc:`projects`

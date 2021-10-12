@@ -1,10 +1,6 @@
 Deep seawater cooling and desalination: Combining seawater air conditioning and desalination
 ============================================================================================
 
-Authors
--------
-Julian David Hunt, Natália de Assis Brasil Weber, Behnam Zakeri, Ahmadou Tidiane Diaby, Paul Byrne, Walter Leal Filho & Paulo Smith Schneider
-
 Abstract
 --------
 
@@ -21,3 +17,10 @@ It shows that the technology has substantial potential to contribute to the sust
 .. raw:: html
 
     <b><a href="https://www.sciencedirect.com/science/article/pii/S2210670721005333">Get the full article</a></b>
+    <br>
+    <br>
+
+Citation
+--------
+
+Hunt, J.D., de Assis Brasil Weber, N., Zakeri, B. et al. Deep seawater cooling and desalination: Combining seawater air conditioning and desalination. Sustainable Cities and Society 74, 103257 (2021). https://doi.org/10.1016/j.scs.2021.103257
