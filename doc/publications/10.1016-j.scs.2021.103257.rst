@@ -23,4 +23,4 @@ It shows that the technology has substantial potential to contribute to the sust
 Citation
 --------
 
-Hunt, J.D., de Assis Brasil Weber, N., Zakeri, B. et al. Deep seawater cooling and desalination: Combining seawater air conditioning and desalination. Sustainable Cities and Society 74, 103257 (2021). https://doi.org/10.1016/j.scs.2021.103257
+Hunt, J.D., Weber, N. de A. B., Zakeri, B. et al. Deep seawater cooling and desalination: Combining seawater air conditioning and desalination. Sustainable Cities and Society 74, 103257 (2021). https://doi.org/10.1016/j.scs.2021.103257
