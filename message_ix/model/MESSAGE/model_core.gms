@@ -144,7 +144,8 @@ Variables
 * auxiliary variables for demand, prices, costs and GDP (for reporting when MESSAGE is run with MACRO)
     DEMAND(node,commodity,level,year_all,time) demand
     PRICE_COMMODITY(node,commodity,level,year_all,time)  commodity price (derived from marginals of COMMODITY_BALANCE constraint)
-    PRICE_EMISSION(node,type_emission,type_tec,year_all) emission price (derived from marginals of EMISSION_BOUND constraint)
+    PRICE_EMISSION(node,type_emission,type_tec,year_all) emission price (derived from marginals of EMISSION_CONSTRAINT)
+    PRICE_EMISSION_POOL(node,type_emission,type_tec,year_all) price of pooled emissions (derived from marginals of EMISSION_POOL_CONSTRAINT)
     COST_NODAL_NET(node,year_all)              system costs at the node level over time including effects of energy trade
     GDP(node,year_all)                         gross domestic product (GDP) in market exchange rates for MACRO reporting
 ;
@@ -275,7 +276,7 @@ Equations
     ACTIVITY_SOFT_CONSTRAINT_LO     bound on relaxation of the dynamic constraint on market penetration (lower bound)
     EMISSION_EQUIVALENCE            auxiliary equation to simplify the notation of emissions
     EMISSION_CONSTRAINT             nodal-regional-global constraints on emissions (by category)
-    EMISSION_POOL                   nodal-regional-global emission pool with carbon sink rate
+    EMISSION_POOL_EQUIVALENCE       nodal-regional-global emission pool with carbon sink rate
     EMISSION_POOL_CONSTRAINT        nodal-regional-global constraints on emission pool (by type)
     LAND_CONSTRAINT                 constraint on total land use (linear combination of land scenarios adds up to 1)
     DYNAMIC_LAND_SCEN_CONSTRAINT_UP dynamic constraint on land scenario change (upper bound)
@@ -1886,7 +1887,7 @@ EMISSION_CONSTRAINT(node,type_emission,type_tec,type_year)$is_bound_emission(nod
 *
 * Equation EMISSION_POOL
 * """"""""""""""""""""""
-* :math:`EMISS\_POOL_{n,e,\widehat{t},y}` is the atmospheric pool at node :math:`n`
+* :math:`EMISS\_POOL\_EQUIVALENCE_{n,e,\widehat{t},y}` is the atmospheric pool at node :math:`n`
 * for emission :math:`e` from technology set :math:`\widehat{t}` in year :math:`y`.
 * Via :math:`historical\_emission\_pool` past emissions can be attributed to node :math:`n`, establishing the initial
 * conditions of the pools. The parameter :math:`emission\_sink\_rate` is projecting the sink rate of emissions
@@ -1906,7 +1907,7 @@ EMISSION_CONSTRAINT(node,type_emission,type_tec,type_year)$is_bound_emission(nod
 *
 ***
 
-EMISSION_POOL(node,emission,type_tec,year)$is_emission_sink_rate(node,emission,type_tec,year)..
+EMISSION_POOL_EQUIVALENCE(node,emission,type_tec,year)$is_emission_sink_rate(node,emission,type_tec,year)..
     EMISS_POOL(node,emission,type_tec,year) =E=
 * emission pool from previous period if year != firstmodelyear
     SUM(year_all2$( seq_period(year_all2,year) ),
