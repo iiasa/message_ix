@@ -360,6 +360,9 @@ OBJECTIVE..
 *      & + \sum_{\substack{\widehat{e},\widehat{t} \\ e \in E(\widehat{e})}}
 *            emission\_scaling_{\widehat{e},e} \cdot \ emission\_tax_{n,\widehat{e},\widehat{t},y}
 *            \cdot EMISS_{n,e,\widehat{t},y} \\
+*      & + \sum_{\substack{\widehat{e},\widehat{t} \\ e \in E(\widehat{e})}}
+*            emission\_scaling_{\widehat{e},e} \cdot \ emission\_tax\_pool_{n,\widehat{e},\widehat{t},y}
+*            \cdot EMISS\_POOL_{n,e,\widehat{t},y} \\
 *      & + \sum_{s} land\_cost_{n,s,y} \cdot LAND_{n,s,y} \\
 *      & + \sum_{r} relation\_cost_{r,n,y} \cdot REL_{r,n,y}
 ***
@@ -1892,9 +1895,12 @@ EMISSION_CONSTRAINT(node,type_emission,type_tec,type_year)$is_bound_emission(nod
 *
 *   .. math::
 *      EMISS\_POOL_{n,e,\widehat{t},y} =
-*          \frac{EMISS\_POOL_{n,e,\widehat{t},y-1} \text{if } y \neq 'first\_period' \\
-*                + duration\_period_{y} \cdot EMISS_{n,e,\widehat{t},y}
-*                + historical\_emission\_pool_{n,e,\widehat{t},y-1} \text{if } y \eq 'first\_period'
+*          \frac{
+*               \begin{array}{l}
+*                   EMISS\_POOL_{n,e,\widehat{t},y-1} \text{if } y \neq 'first\_period' \\
+*                   + duration\_period_{y} \cdot EMISS_{n,e,\widehat{t},y} \\
+*                   + historical\_emission\_pool_{n,e,\widehat{t},y-1} \text{if } y = 'first\_period'
+*               \end{array}
 *              }
 *            { 1 + emission\_sink\_rate_{n,e,\widehat{t},y} \cdot EMISS_{n,e,\widehat{t},y}}
 *
@@ -1922,6 +1928,10 @@ EMISSION_POOL(node,emission,type_tec,year)$is_emission_sink_rate(node,emission,t
 * """""""""""""""""""""""""""""""""
 * This constraint enforces upper bounds on the emission pool.
 *
+*   .. math::
+*          \sum_{e \in E(\widehat{e})}
+*                  emission\_scaling_{\widehat{e},e} \cdot EMISS\_POOL{n,e,\widehat{t},y} 
+*      \leq bound\_emission\_pool_{n,\widehat{e},\widehat{t},y}
 *
 ***
 EMISSION_POOL_CONSTRAINT(node,type_emission,type_tec,year)$is_bound_emission_pool(node,type_emission,type_tec,year)..
