@@ -485,7 +485,8 @@ def make_westeros(mp, emissions=False, solve=False, quiet=True):
             **common,
             commodity="light",
             level="useful",
-            value=(demand_per_year * gdp_profile).round(),
+            # FIXME should use demand_per_year; requires adjustments elsewhere.
+            value=(100 * gdp_profile).round(),
             unit="GWa",
         ),
     )
@@ -506,8 +507,9 @@ def make_westeros(mp, emissions=False, solve=False, quiet=True):
             make_df(name, **common, technology=tec, commodity=c, level=l, value=value),
         )
 
+    # FIXME the value for wind_ppl should be 0.36; requires adjusting other tests.
     name = "capacity_factor"
-    capacity_factor = dict(coal_ppl=1.0, wind_ppl=0.36, bulb=1.0)
+    capacity_factor = dict(coal_ppl=1.0, wind_ppl=1.0, bulb=1.0)
     for tec, value in capacity_factor.items():
         scen.add_par(name, make_df(name, **common, technology=tec, value=value))
 
@@ -521,7 +523,7 @@ def make_westeros(mp, emissions=False, solve=False, quiet=True):
     for tec in "coal_ppl", "wind_ppl":
         scen.add_par(name, make_df(name, **common, technology=tec, value=0.1))
 
-    historic_demand = 0.5 * demand_per_year
+    historic_demand = 0.85 * demand_per_year
     historic_generation = historic_demand / grid_efficiency
     coal_fraction = 0.6
 
@@ -563,7 +565,7 @@ def make_westeros(mp, emissions=False, solve=False, quiet=True):
         )
         scen.add_par(name, make_df(name, **common, technology=tec, value=value))
 
-    scen.commit("basic model of Westeros electrification")
+    scen.commit("basic model of Westerosi electrification")
     scen.set_as_default()
 
     if emissions:
