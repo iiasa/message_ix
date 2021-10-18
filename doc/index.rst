@@ -14,6 +14,7 @@ This is the documentation for :mod:`message_ix`, a Python package that ties toge
 
 - For the scientific reference of the framework, see Huppmann et al. (2019) :cite:`huppmann_messageix_2018`.
 - For an overview and recent publications related to the specific |MESSAGEix|-GLOBIOM global model instance used at the IIASA ECE Program, see the `MESSAGEix-GLOBIOM documentation`_.
+- To get a glimpse of what type of analysis you can do with the |MESSAGEix| framework, see :doc:`publications`.
 
 
 .. _getting-started:
@@ -140,6 +141,7 @@ Everyone is encouraged to use the framework to develop energy system and integra
 - :doc:`whatsnew` —release history and migration/upgrade notes.
 - :doc:`notice` —including how to properly cite the framework and software in scientific research.
 - :doc:`contributing` —we welcome enhancements to the framework itself that enable new features across all models.
+- :doc:`sharing`—we invite the sharing of the usage of the |MESSAGEix| framework.
 - :doc:`faq`
 - :doc:`bibliography`
 
@@ -152,6 +154,7 @@ Everyone is encouraged to use the framework to develop energy system and integra
    whatsnew
    notice
    contributing
+   sharing
    faq
    bibliography
 
