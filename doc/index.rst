@@ -14,7 +14,7 @@ This is the documentation for :mod:`message_ix`, a Python package that ties toge
 
 - For the scientific reference of the framework, see Huppmann et al. (2019) :cite:`huppmann_messageix_2018`.
 - For an overview and recent publications related to the specific |MESSAGEix|-GLOBIOM global model instance used at the IIASA ECE Program, see the `MESSAGEix-GLOBIOM documentation`_.
-- To get a glimpse of what type of analysis you can do with the |MESSAGEix| framework, see :doc:`publications`.
+- To get a glimpse of what type of analysis you can do with the |MESSAGEix| framework, see :doc:`publications` and :doc:`projects`.
 
 
 .. _getting-started:

@@ -10,7 +10,7 @@ Publications
 The publications are sorted by the following criteria.
 
 
-Geographic
+Scope
 ----------
 
 - :doc:`publications/country`

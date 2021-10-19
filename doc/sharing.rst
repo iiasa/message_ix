@@ -56,7 +56,7 @@ Publications
 4. (Optional) Add new category
 
    - If a category is not listed, which represents your paper best, feel free to add an additional REsT file under *message_ix/doc/publications* underlining the heading with "=".
-   - Link then the *publications.rst* file under *Topic* or *Geographic* (or any heading) with the following::
+   - Link then the *publications.rst* file under *Topic* or *Scope* (or any heading) with the following::
 
         - :doc:`publications/Name_of_the_file_with_new_category`
 
