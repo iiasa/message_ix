@@ -12,6 +12,12 @@ from message_ix.models import MESSAGE_ITEMS
 
 def make_df(name, **data):
     """Return a data frame for parameter `name` filled with `data`.
+    The "**" before 'data' implies the need to pass keyword arguments,
+    such as :commodity="baz":.
+
+    For a better understandig of keyword arguments and how to pass
+    them to functions, the `Python documentation <https://docs.python.org/3/tutorial/controlflow.html#keyword-arguments>`_
+    gives a comprehensive overview.
 
     :func:`make_df` always returns a data frame with the columns required by
     :meth:`.add_par`: the dimensions of the parameter `name`, plus 'value' and
@@ -19,21 +25,52 @@ def make_df(name, **data):
 
     Examples
     --------
+
     >>> make_df(
     ...    "demand", node=["foo", "bar"], commodity="baz", value=[1.2, 3.4]
     ... )
-      node commodity level  year  time  value  unit
-    0  foo       baz  None  None  None    1.2  None
-    1  bar       baz  None  None  None    3.4  None
+      node  commodity  level  year  time  value  unit
+    0  foo        baz   None  None  None    1.2  None
+    1  bar        baz   None  None  None    3.4  None
+
+    or
+
+    >>> make_df(
+    ...    "demand",
+    ...    node=["Westeros", "Middle-earth"],
+    ...    commodity="light",
+    ...    level='useful',
+    ...    year=[680, 700],
+    ...    time='year',
+    ...    value=[50, 80],
+    ...    unit='GWa'
+    ... )
+               node  commodity   level  year  time  value  unit
+    0      Westeros      light  useful   680  year     50   GWa
+    1  Middle-earth      light  useful   700  year     50   GWa
+
 
     Code that uses the deprecated signature:
 
     >>> base = {"year": [2020, 2021, 2022]}
     >>> make_df(base, value=1., unit="y")
-       year  value unit
-    0     1    1.0    y
-    1     2    1.0    y
-    2     3    1.0    y
+       year  value  unit
+    0     1    1.0     y
+    1     2    1.0     y
+    2     3    1.0     y
+
+    or
+
+    >>> base  = {
+    ...    'node': ["Westeros", "Middle-earth"],
+    ...    'year' : [680, 700],
+    ...    'time': 'year',
+    ...    'unit': '-',
+    ...    }
+    >>> make_df(base, mode='standard')
+               node  year  time  unit      mode
+    0      Westeros   680  year     -  standard
+    1  Middle-earth   700  year     -  standard
 
     can either be adjusted to use the new signature:
 
