@@ -254,7 +254,10 @@ def test_bound_emission_pool(test_mp):
             "emission": "CO2",
             "type_tec": "all",
             "year": [700, 710, 720],
-            "lvl": [87000, 85975.299326, 85000],
+            "lvl": [87000, 85476.734072, 85000],
+            # When changing the capacity factor of wind to 0.36,
+            # comment in the line below.
+            # "lvl": [87000, 85975.299326, 85000],
             "mrg": 0.0,
         }
     )
@@ -269,7 +272,10 @@ def test_bound_emission_pool(test_mp):
             "type_emission": "GHG",
             "type_tec": "all",
             "year": [700, 720],
-            "lvl": [27.397316, 44.070817],
+            "lvl": [1.8271384, 2.939589],
+            # When changing the capacity factor of wind to 0.36,
+            # comment in the line below.
+            # "lvl": [27.397316, 44.070817],
             "mrg": 0.0,
         }
     )
