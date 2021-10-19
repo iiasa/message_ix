@@ -57,12 +57,13 @@ When in doubt, contact the IIASA ECE Program at <message_ix@iiasa.ac.at> for a l
 4. Give notice of publication
 -----------------------------
 
-E-mail <message_ix@iiasa.ac.at> with notice of notice of any new or pending publication.
+E-mail <message_ix@iiasa.ac.at> with notice of any new or pending publication.
 
-5. Add your tool, project or publication to this documentation
---------------------------------------------------------------
+(Optional) Add your tool, project or publication to this documentation
+----------------------------------------------------------------------
 
-To add your :doc:`tools`, :doc:`projects` or :doc:`publications` to this documentation and make it visible, please see :doc:`sharing`.
+To make your usage of |MESSAGEix| visible, add your :doc:`tools`, :doc:`projects` or :doc:`publications` to this documentation.
+See :doc:`sharing` for details.
 
 References
 ----------
