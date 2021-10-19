@@ -39,7 +39,6 @@ In addition, you may:
   Zenodo also provides citation export in BibTeX and other formats.
 - Include a link, e.g. in a footnote, to the online documentation at https://docs.messageix.org.
 
-
 3. Use the naming convention for new model instances
 ----------------------------------------------------
 
@@ -55,12 +54,15 @@ For example, the national model for South Africa developed by Orthofer et al. [1
 Ensure there is no naming conflict with existing versions of the |MESSAGEix| model family.
 When in doubt, contact the IIASA ECE Program at <message_ix@iiasa.ac.at> for a list of existing model instances.
 
-
 4. Give notice of publication
 -----------------------------
 
 E-mail <message_ix@iiasa.ac.at> with notice of notice of any new or pending publication.
 
+5. Add your tool, project or publication to this documentation
+--------------------------------------------------------------
+
+To add your :doc:`tools`, :doc:`projects` or :doc:`publications` to this documentation and make it visible, please see :doc:`sharing`.
 
 References
 ----------
