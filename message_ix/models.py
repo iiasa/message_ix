@@ -138,6 +138,7 @@ MESSAGE_ITEMS = {
     "map_time": dict(
         ix_type="set", idx_sets=["time", "time"], idx_names=["time_parent", "time"]
     ),
+    "relative_time": dict(ix_type="set", idx_sets=["time"]),
     "type_tec_land": dict(ix_type="set", idx_sets=["type_tec"]),
     #
     # Parameters

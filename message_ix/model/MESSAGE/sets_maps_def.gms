@@ -260,6 +260,9 @@ Alias(commodity,commodity2);
 *    * - balance_equality (commodity,level)
 *      - :math:`c \in C, l \in L`
 *      - Commodities and level related to :ref:`commodity_balance_lt`
+*    * - relative_time (time)
+*      - :math:`h \in H`
+*      - Parent sub-annual time slices for considering relative time in parameter :ref:`duration_time_rel`
 *
 * .. [#level_res] The constraint :ref:`extraction_equivalence` is active only for the levels included in this set,
 *    and the constraint :ref:`commodity_balance` is deactivated for these levels.
@@ -304,7 +307,7 @@ Sets
     cat_emission(type_emission,emission)    mapping of emissions to respective categories
     type_tec_land(type_tec)                 dynamic set whether emissions from land use are included in type_tec
     balance_equality(commodity,level)       mapping of commodities-level where the supply-demand balance must be maintained with equality
-    relative_time(time)                     flag for treating unit of ACT in sub-annual time slices relative to parent 'time' (=activating parameter 'duration_time_rel')  
+    relative_time(time)                     flag for treating unit of ACT in sub-annual time slices relative to parent 'time' (=activating parameter 'duration_time_rel')
 ;
 
 Alias(type_tec,type_tec_share);
