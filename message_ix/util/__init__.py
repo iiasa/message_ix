@@ -16,7 +16,8 @@ def make_df(name, **data):
     such as :commodity="baz":.
 
     For a better understandig of keyword arguments and how to pass
-    them to functions, the `Python documentation <https://docs.python.org/3/tutorial/controlflow.html#keyword-arguments>`_
+    them to functions, the `Python documentation
+    <https://docs.python.org/3/tutorial/controlflow.html#keyword-arguments>`_
     gives a comprehensive overview.
 
     :func:`make_df` always returns a data frame with the columns required by
