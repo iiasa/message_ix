@@ -1932,7 +1932,7 @@ EMISSION_POOL_EQUIVALENCE(node,emission,type_tec,year)$is_emission_sink_rate(nod
 *
 *   .. math::
 *          \sum_{e \in E(\widehat{e})}
-*                  emission\_scaling_{\widehat{e},e} \cdot EMISS\_POOL{n,e,\widehat{t},y} 
+*                  emission\_scaling_{\widehat{e},e} \cdot EMISS\_POOL{n,e,\widehat{t},y}
 *      \leq bound\_emission\_pool_{n,\widehat{e},\widehat{t},y}
 *
 ***
