@@ -58,4 +58,4 @@ def test_soft_constraint(test_mp):
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
 
     # Ensure that the ovjective function is the same
-    assert np.isclose(s.var("OBJ")["lvl"], 318968.25)
+    assert np.isclose(s.var("OBJ")["lvl"], 175577.734375)
