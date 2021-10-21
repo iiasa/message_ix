@@ -65,6 +65,9 @@ jobs:
       env:
         MYPYPATH: "../ixmp/"
       # Also install type stubs and full packages that provide type hints
+      # and ensure the installation of the latest packages
       run: |
+        pip install llvmlite==0.37.0 numba==0.54.1 scipy==1.7.1
+
         pip install mypy genno sphinx types-pkg_resources types-requests types-PyYAML
         mypy .
