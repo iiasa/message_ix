@@ -133,11 +133,12 @@ def test_calc_data_missing_datapoint(westeros_solved):
         (
             "_total_cost",
             "allclose",
-            1e-3 * np.array([15, 17.477751, 22.143634, 28.114812]),
+            1e-3 * np.array([9.17583, 11.653576414880422, 12.446804289049216,
+                             15.369457033651215]),
         ),
-        ("_price", "allclose", [195, 182.852229, 162.039539, 161.002627]),
-        ("_demand", "allclose", [90, 100, 150, 190]),
-        ("_bconst", "allclose", [3.6846576e-05]),
+        ("_price", "allclose", [211, 511.02829331, 162.03953933, 161.0026274]),
+        ("_demand", "allclose", [27, 55, 82, 104]),
+        ("_bconst", "allclose", [9.68838201e-08]),
         ("_aconst", "allclose", [26.027323]),
     ),
 )
@@ -208,10 +209,10 @@ def test_calibrate_roundtrip(westeros_solved):
     # this is a regression test with values observed on Aug 9, 2019
     with_macro = westeros_solved.add_macro(W_DATA_PATH, check_convergence=True)
     aeei = with_macro.par("aeei")["value"].values
-    npt.assert_allclose(aeei, 1e-3 * np.array([20, 71.759022, 37.424904, 19.936694]))
+    npt.assert_allclose(aeei, 1e-3 * np.array([20, -7.514287920171298, 43.62562814596503, 21.143463116337838]))
     grow = with_macro.par("grow")["value"].values
     npt.assert_allclose(
-        grow, 1e-3 * np.array([26.583631, 69.101286, 79.520269, 24.529274])
+        grow, 1e-3 * np.array([26.583631304232025, 69.14176400235705, 79.1435807248404, 24.522555663877064])
     )
 
 
