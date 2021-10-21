@@ -209,10 +209,16 @@ def test_calibrate_roundtrip(westeros_solved):
     # this is a regression test with values observed on Aug 9, 2019
     with_macro = westeros_solved.add_macro(W_DATA_PATH, check_convergence=True)
     aeei = with_macro.par("aeei")["value"].values
-    npt.assert_allclose(aeei, 1e-3 * np.array([20, -7.514287920171298, 43.62562814596503, 21.143463116337838]))
+    npt.assert_allclose(aeei, 1e-3 * np.array([20,
+                                               -7.514287920171298,
+                                               43.62562814596503,
+                                               21.143463116337838]))
     grow = with_macro.par("grow")["value"].values
     npt.assert_allclose(
-        grow, 1e-3 * np.array([26.583631304232025, 69.14176400235705, 79.1435807248404, 24.522555663877064])
+        grow, 1e-3 * np.array([26.583631304232025,
+                               69.14176400235705,
+                               79.1435807248404,
+                               24.522555663877064])
     )
 
 
