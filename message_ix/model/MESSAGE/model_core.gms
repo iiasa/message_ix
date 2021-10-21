@@ -415,7 +415,8 @@ COST_ACCOUNTING_NODAL(node, year)..
             AND tax_emission_pool(node,type_emission,type_tec,year) ),
         emission_scaling(type_emission,emission)
         * tax_emission_pool(node,type_emission,type_tec,year)
-        * EMISS_POOL(node,emission,type_tec,year) )
+        * EMISS_POOL(node,emission,type_tec,year) 
+        / duration_period(year))
 * cost terms from land-use model emulator (only includes valid node-land_scenario-year combinations)
     + SUM(land_scenario$( land_cost(node,land_scenario,year) ),
         land_cost(node,land_scenario,year) * LAND(node,land_scenario,year) )
