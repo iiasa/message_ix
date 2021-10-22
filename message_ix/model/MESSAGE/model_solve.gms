@@ -68,7 +68,7 @@ EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
 * rescale the dual of the emission constraint to account that the constraint is defined on the average year, not total
 EMISSION_POOL_CONSTRAINT.m(node,type_emission,type_tec,year)$(
         EMISSION_POOL_CONSTRAINT.m(node,type_emission,type_tec,year) ) =
-    EMISSION_POOL_CONSTRAINT.m(node,type_emission,type_tec,year) / df_period(year) * df_year(year) ;
+    EMISSION_POOL_CONSTRAINT.m(node,type_emission,type_tec,year) / df_period(year) ;
 
     PRICE_EMISSION_POOL.l(node,type_emission,type_tec,year) =
                - EMISSION_POOL_CONSTRAINT.m(node,type_emission,type_tec,year) * duration_period(year)
