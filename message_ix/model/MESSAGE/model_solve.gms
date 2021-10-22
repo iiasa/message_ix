@@ -71,7 +71,8 @@ EMISSION_POOL_CONSTRAINT.m(node,type_emission,type_tec,year)$(
     EMISSION_POOL_CONSTRAINT.m(node,type_emission,type_tec,year) / df_period(year) * df_year(year) ;
 
     PRICE_EMISSION_POOL.l(node,type_emission,type_tec,year) =
-               - EMISSION_POOL_CONSTRAINT.m(node,type_emission,type_tec,year) ;
+               - EMISSION_POOL_CONSTRAINT.m(node,type_emission,type_tec,year) * duration_period(year)
+;
     PRICE_EMISSION_POOL.l(node,type_emission,type_tec,year)$(
         PRICE_EMISSION_POOL.l(node,type_emission,type_tec,year) = - inf ) = 0 ;
 
