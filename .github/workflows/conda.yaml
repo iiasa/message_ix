@@ -62,7 +62,6 @@ jobs:
     - name: Install message-ix
       run: |
         conda config --prepend channels conda-forge
-        conda config --set channel_priority strict
         conda create --name ${{ env.CONDA_ENV }} --quiet message-ix pytest ${{ matrix.extra_deps }}
 
     - name: Check
