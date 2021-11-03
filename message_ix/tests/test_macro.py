@@ -213,8 +213,7 @@ def test_calibrate_roundtrip(westeros_solved):
     aeei = with_macro.par("aeei")["value"].values
     npt.assert_allclose(
         aeei,
-        1e-3
-        * np.array([20, -7.5142879, 43.6256281, 21.1434631]),
+        1e-3 * np.array([20, -7.5142879, 43.6256281, 21.1434631]),
     )
     grow = with_macro.par("grow")["value"].values
     npt.assert_allclose(
