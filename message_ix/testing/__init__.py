@@ -540,7 +540,7 @@ def make_westeros(mp, emissions=False, solve=False, quiet=True):
                 name,
                 **common,
                 technology=tec,
-                value=value / (2 * 10 * capacity_factor[tec]),
+                value=value / capacity_factor[tec] / 10,
             ),
         )
 
