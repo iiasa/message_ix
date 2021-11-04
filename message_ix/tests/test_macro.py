@@ -164,10 +164,7 @@ def test_calc_data_missing_datapoint(westeros_solved):
         (
             "_total_cost",
             "allclose",
-            1e-3
-            * np.array(
-                [6.18242, 8.6601720, 13.4040172, 14.9067117]
-            ),
+            1e-3 * np.array([6.18242, 8.6601720, 13.4040172, 14.9067117]),
         ),
         ("_price", "allclose", [211, 511.0282933, 162.0395393, 161.0026274]),
         ("_demand", "allclose", [27, 55, 82, 104]),
