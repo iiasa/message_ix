@@ -415,7 +415,7 @@ COST_ACCOUNTING_NODAL(node, year)..
             AND tax_emission_pool(node,type_emission,type_tec,year) ),
         emission_scaling(type_emission,emission)
         * tax_emission_pool(node,type_emission,type_tec,year)
-        * EMISS_POOL(node,emission,type_tec,year) 
+        * EMISS_POOL(node,emission,type_tec,year)
         / duration_period(year))
 * cost terms from land-use model emulator (only includes valid node-land_scenario-year combinations)
     + SUM(land_scenario$( land_cost(node,land_scenario,year) ),
@@ -1881,7 +1881,7 @@ EMISSION_CONSTRAINT(node,type_emission,type_tec,type_year)$is_bound_emission(nod
     =L= bound_emission(node,type_emission,type_tec,type_year) ;
 
 ***
-* emission pool
+* Emission pool
 * ^^^^^^^^^^^^^
 *
 * .. _emission_pool:
@@ -1897,14 +1897,12 @@ EMISSION_CONSTRAINT(node,type_emission,type_tec,type_year)$is_bound_emission(nod
 *
 *   .. math::
 *      EMISS\_POOL_{n,e,\widehat{t},y} =
-*          \frac{
+*          \frac{1}{ 1 + emission\_sink\_rate_{n,e,\widehat{t},y} \cdot EMISS_{n,e,\widehat{t},y}} \cdot \\
 *               \begin{array}{l}
-*                   EMISS\_POOL_{n,e,\widehat{t},y-1} \text{if } y \neq 'first\_period' \\
+*                    ( EMISS\_POOL_{n,e,\widehat{t},y-1} \text{, if } y \neq 'first\_period' \\
 *                   + duration\_period_{y} \cdot EMISS_{n,e,\widehat{t},y} \\
-*                   + historical\_emission\_pool_{n,e,\widehat{t},y-1} \text{if } y = 'first\_period'
+*                   + historical\_emission\_pool_{n,e,\widehat{t},y-1} \text{, if } y = 'first\_period' )
 *               \end{array}
-*              }
-*            { 1 + emission\_sink\_rate_{n,e,\widehat{t},y} \cdot EMISS_{n,e,\widehat{t},y}}
 *
 ***
 
@@ -1932,7 +1930,7 @@ EMISSION_POOL_EQUIVALENCE(node,emission,type_tec,year)$is_emission_sink_rate(nod
 *
 *   .. math::
 *          \sum_{e \in E(\widehat{e})}
-*                  emission\_scaling_{\widehat{e},e} \cdot EMISS\_POOL{n,e,\widehat{t},y}
+*                  emission\_scaling_{\widehat{e},e} \cdot EMISS\_POOL_{n,e,\widehat{t},y}
 *      \leq bound\_emission\_pool_{n,\widehat{e},\widehat{t},y}
 *
 ***
