@@ -119,6 +119,9 @@ Variables
     REL(relation,node,year_all)                  auxiliary variable for left-hand side of user-defined relations
 * change in the content of storage device
     STORAGE_CHARGE(node,tec,level,commodity,year_all,time)    charging of storage in each timestep (negative for discharge)
+;
+
+Positive variables
 * regional emission pool
     EMISS_POOL(node,emission,type_tec,year_all)          nodal-regional-global emission pool size
 ;
@@ -1907,7 +1910,7 @@ EMISSION_CONSTRAINT(node,type_emission,type_tec,type_year)$is_bound_emission(nod
 ***
 
 EMISSION_POOL_EQUIVALENCE(node,emission,type_tec,year)$is_emission_sink_rate(node,emission,type_tec,year)..
-    EMISS_POOL(node,emission,type_tec,year) =E=
+    EMISS_POOL(node,emission,type_tec,year) =G=
 * emission pool from previous period if year != firstmodelyear
     SUM(year_all2$( seq_period(year_all2,year) ),
          EMISS_POOL(node,emission,type_tec,year_all2)$(model_horizon(year_all2) AND NOT first_period(year))
