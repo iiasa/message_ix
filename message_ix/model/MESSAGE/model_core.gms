@@ -1900,7 +1900,7 @@ EMISSION_CONSTRAINT(node,type_emission,type_tec,type_year)$is_bound_emission(nod
 *
 *   .. math::
 *      EMISS\_POOL_{n,e,\widehat{t},y} =
-*          \frac{1}{ 1 + emission\_sink\_rate_{n,e,\widehat{t},y} \cdot EMISS_{n,e,\widehat{t},y}} \cdot \\
+*          \frac{1}{ 1 + emission\_sink\_rate_{n,e,\widehat{t},y} \cdot duration\_period_{y}} \cdot \\
 *               \begin{array}{l}
 *                    ( EMISS\_POOL_{n,e,\widehat{t},y-1} \text{, if } y \neq 'first\_period' \\
 *                   + duration\_period_{y} \cdot EMISS_{n,e,\widehat{t},y} \\
