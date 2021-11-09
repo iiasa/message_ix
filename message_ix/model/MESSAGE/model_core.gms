@@ -1889,8 +1889,8 @@ EMISSION_CONSTRAINT(node,type_emission,type_tec,type_year)$is_bound_emission(nod
 *
 * .. _emission_pool:
 *
-* Equation EMISSION_POOL
-* """"""""""""""""""""""
+* Equation EMISSION_POOL_EQUIVALENCE
+* """"""""""""""""""""""""""""""""""
 * :math:`EMISS\_POOL\_EQUIVALENCE_{n,e,\widehat{t},y}` is the atmospheric pool at node :math:`n`
 * for emission :math:`e` from technology set :math:`\widehat{t}` in year :math:`y`.
 * Via :math:`historical\_emission\_pool` past emissions can be attributed to node :math:`n`, establishing the initial
@@ -1902,22 +1902,22 @@ EMISSION_CONSTRAINT(node,type_emission,type_tec,type_year)$is_bound_emission(nod
 *      EMISS\_POOL_{n,e,\widehat{t},y} =
 *          \frac{1}{ 1 + emission\_sink\_rate_{n,e,\widehat{t},y} \cdot duration\_period_{y}} \cdot \\
 *               \begin{array}{l}
-*                    ( EMISS\_POOL_{n,e,\widehat{t},y-1} \text{, if } y \neq 'first\_period' \\
-*                   + duration\_period_{y} \cdot EMISS_{n,e,\widehat{t},y} \\
-*                   + historical\_emission\_pool_{n,e,\widehat{t},y-1} \text{, if } y = 'first\_period' )
+*                    ( historical\_emission\_pool_{n,e,\widehat{t},y-1} \text{, if } y = 'first\_period' \\
+*                   + EMISS\_POOL_{n,e,\widehat{t},y-1} \text{, if } y \neq 'first\_period' \\
+*                   + duration\_period_{y} \cdot EMISS_{n,e,\widehat{t},y} )
 *               \end{array}
 *
 ***
 
 EMISSION_POOL_EQUIVALENCE(node,emission,type_tec,year)$is_emission_sink_rate(node,emission,type_tec,year)..
     EMISS_POOL(node,emission,type_tec,year) =G=
+* emission pool from historical period if year == firstmodelyear
+    historical_emission_pool(node,emission,type_tec,year_all2)$first_period(year)
 * emission pool from previous period if year != firstmodelyear
-    SUM(year_all2$( seq_period(year_all2,year) ),
+    + SUM(year_all2$( seq_period(year_all2,year) ),
          EMISS_POOL(node,emission,type_tec,year_all2)$(model_horizon(year_all2) AND NOT first_period(year))
 * emission additions in current period
     + duration_period(year) * EMISS(node,emission,type_tec,year)
-* emission pool from historical period if year == firstmodelyear
-    + historical_emission_pool(node,emission,type_tec,year_all2)$first_period(year)
     ) / (1 + emission_sink_rate(node,emission,type_tec,year) * duration_period(year))
 ;
 
