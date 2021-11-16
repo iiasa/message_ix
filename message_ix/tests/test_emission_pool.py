@@ -122,7 +122,7 @@ def test_tax_emission_pool(test_mp):
     s.add_par("tax_emission_pool", df)
     s.commit("tax_emission_pool added")
 
-    s.solve(var_list=["EMISS_POOL", "PRICE_EMISSION_POOL"])
+    s.solve()
 
     exp = pd.DataFrame(
         {
@@ -166,7 +166,7 @@ def test_tax_emission_pool_world(test_mp):
     s.add_par("tax_emission_pool", df)
     s.commit("tax_emission_pool added")
 
-    s.solve(var_list=["EMISS_POOL", "PRICE_EMISSION_POOL"])
+    s.solve()
 
     exp = pd.DataFrame(
         {
@@ -209,7 +209,7 @@ def test_bound_emission_pool(test_mp):
     s.add_par("bound_emission_pool", df)
     s.commit("bound_emission_pool added")
 
-    s.solve(var_list=["EMISS_POOL", "PRICE_EMISSION_POOL"])
+    s.solve()
 
     exp = pd.DataFrame(
         {
