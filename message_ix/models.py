@@ -299,6 +299,9 @@ MESSAGE_ITEMS = {
     # "REL": item("var", "relation nr yr"),
     # # Stock
     # "STOCK": item("var", "n c l y"),
+    # Emissions pools
+    "EMISS_POOL": item("var", "n e type_tec y"),
+    "PRICE_EMISSION_POOL": item("var", "n type_emission type_tec y"),
     #
     # # Equations
     # # Commodity balance
