@@ -240,3 +240,41 @@ def test_bound_emission_pool(test_mp):
     obs = s.var("PRICE_EMISSION_POOL")
 
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
+
+
+def test_bound_emission_pool_removal(test_mp):
+    s = make_westeros(test_mp, quiet=True)
+    prep_scenario(s, test_mp)
+
+    s.check_out()
+    df = pd.DataFrame(
+        {
+            "node": "Westeros",
+            "type_emission": "GHG",
+            "type_tec": "all",
+            "year": [700, 710, 720],
+            "value": [87000, 86000, 85000],
+            "unit": "???",
+        }
+    )
+    s.add_par("bound_emission_pool", df)
+    s.commit("bound_emission_pool added")
+
+    # Ensure that bound has been added
+    obs = s.par("bound_emission_pool")
+    pdt.assert_frame_equal(df, obs, check_dtype=False)
+
+    s.solve()
+
+    # Ensure that is_ set for bound has been added upon solving
+    exp = df.drop(["value", "unit"], axis=1)
+    obs = s.set("is_bound_emission_pool")
+    pdt.assert_frame_equal(exp, obs, check_dtype=False)
+
+    s.remove_solution()
+    s.check_out()
+    s.remove_par("bound_emission_pool", df)
+    s.commit("bound_emission_poll removed")
+
+    obs = s.set("is_bound_emission_pool")
+    assert obs.empty is True
