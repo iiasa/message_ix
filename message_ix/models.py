@@ -366,6 +366,17 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
 
         super().__init__(name, **model_options)
 
+        # Extend `var_list`. JDBCBackend does not automatically read vars from the model
+        # solution GDX file, even when they exist in the Scenario. Ensure the vars that
+        # are part of the MESSAGE scheme are always read.
+        self.var_list = self.var_list or []
+        # Iterate over names of "var" items that are not already in `var_list`
+        for name, _ in filter(
+            lambda kv: kv[1]["ix_type"] == "var" and kv[0] not in self.var_list,
+            MESSAGE_ITEMS.items(),
+        ):
+            self.var_list.append(name)
+
     def run(self, scenario):
         """Execute the model.
 
