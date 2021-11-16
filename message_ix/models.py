@@ -351,6 +351,13 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         # Initialize the ixmp items
         cls.initialize_items(scenario, MESSAGE_ITEMS)
 
+    @staticmethod
+    def enforce(scenario):
+        """Enforce data consistency in `scenario`."""
+        # Implemented in MESSAGE sub-class, below
+        # TODO make this an optional method of the ixmp.model.base.Model abstract class
+        pass
+
     def __init__(self, name=None, **model_options):
         # Update the default options with any user-provided options
         model_options.setdefault("model_dir", config.get("message model dir"))
@@ -370,6 +377,9 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
            simultaneously; but using *different* CPLEX options in each process may
            produced unexpected results.
         """
+        # Ensure the data in `scenario` is consistent with the MESSAGE formulation
+        # TODO move this call to ixmp.model.base.Model.run(); remove here
+        self.enforce(scenario)
 
         # Write CPLEX options into an options file
         # FIXME If two runs are kicked off simulatenously with the same self.model_dir,
@@ -398,6 +408,30 @@ class MESSAGE(GAMSModel):
     """Model class for MESSAGE."""
 
     name = "MESSAGE"
+
+    @staticmethod
+    def enforce(scenario):
+        """Enforce data consistency in `scenario`."""
+        # Check masks ("mapping sets") that indicate which elements of corresponding
+        # parameters are active/non-zero. Note that there are other masks currently
+        # handled in JDBCBackend. For the moment, this code does not backstop that
+        # behaviour.
+        # TODO Extend to handle all masks, e.g. for new backends.
+        for par_name in ("bound_emission_pool", "emission_sink_rate"):
+            # Name of the corresponding set
+            set_name = f"is_{par_name}"
+
+            # Existing and expected contents
+            existing = scenario.set(set_name)
+            expected = scenario.par(par_name).drop(columns=["value", "unit"])
+
+            if existing.equals(expected):
+                continue  # Contents are as expected; do nothing
+
+            # Not consistent; empty and then re-populate the set
+            with scenario.transact(f"Enforce consistency of {set_name} and {par_name}"):
+                scenario.remove_set(set_name, existing)
+                scenario.add_set(set_name, expected)
 
 
 class MACRO(GAMSModel):
