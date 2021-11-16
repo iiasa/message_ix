@@ -130,7 +130,7 @@ def test_tax_emission_pool(test_mp):
             "emission": "CO2",
             "type_tec": "all",
             "year": [700, 710, 720],
-            "lvl": [86874.248590, 80820.292479, 76971.707123],
+            "lvl": [85154.242090, 78031.405954, 74315.624718],
             "mrg": 0.0,
         }
     )
@@ -175,12 +175,12 @@ def test_tax_emission_pool_world(test_mp):
             "type_tec": "all",
             "year": [700, 710, 720, 700, 710, 720],
             "lvl": [
-                86874.248590,
-                80820.292479,
-                76971.707123,
-                86874.248590,
-                80820.292479,
-                76971.707123,
+                85154.242090,
+                78031.405954,
+                74315.624718,
+                85154.242090,
+                78031.405954,
+                74315.624718,
             ],
             "mrg": 0.0,
         }
@@ -217,10 +217,7 @@ def test_bound_emission_pool(test_mp):
             "emission": "CO2",
             "type_tec": "all",
             "year": [700, 710, 720],
-            "lvl": [87000, 85476.734072, 85000],
-            # When changing the capacity factor of wind to 0.36,
-            # comment in the line below.
-            # "lvl": [87000, 85975.299326, 85000],
+            "lvl": [86254.747976, 83545.115216, 85000],
             "mrg": 0.0,
         }
     )
@@ -234,11 +231,8 @@ def test_bound_emission_pool(test_mp):
             "node": "Westeros",
             "type_emission": "GHG",
             "type_tec": "all",
-            "year": [700, 720],
-            "lvl": [1.452659, 2.337108],
-            # When changing the capacity factor of wind to 0.36,
-            # comment in the line below.
-            # "lvl": [21.782120, 35.038315],
+            "year": [720],
+            "lvl": [33.075572],
             "mrg": 0.0,
         }
     )
