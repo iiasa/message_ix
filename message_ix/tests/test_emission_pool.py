@@ -7,35 +7,6 @@ from message_ix.testing import make_westeros
 def prep_scenario(s, test_mp):
     s.check_out()
 
-    # Initialize parameters
-    new_par = {
-        "historical_emission_pool": ["node", "emission", "type_tec", "year"],
-        "emission_sink_rate": ["node", "emission", "type_tec", "year"],
-        "bound_emission_pool": ["node", "type_emission", "type_tec", "year"],
-        "tax_emission_pool": ["node", "type_emission", "type_tec", "year"],
-    }
-    for par, idx in new_par.items():
-        if par not in s.par_list():
-            s.init_par(par, idx)
-
-    # Initialize sets
-    new_set = {
-        "is_bound_emission_pool": ["node", "type_emission", "type_tec", "year"],
-        "is_emission_sink_rate": ["node", "emission", "type_tec", "year"],
-    }
-    for sets, idx in new_set.items():
-        if sets not in s.set_list():
-            s.init_set(sets, idx)
-
-    # Initialize variables
-    new_var = {
-        "EMISS_POOL": ["node", "emission", "type_tec", "year"],
-        "PRICE_EMISSION_POOL": ["node", "type_emission", "type_tec", "year"],
-    }
-    for var, idx in new_var.items():
-        if var not in s.var_list():
-            s.init_var(var, idx)
-
     # Add emission parameters
     s.add_set("emission", "CO2")
     s.add_cat("emission", "GHG", "CO2")
@@ -82,7 +53,6 @@ def prep_scenario(s, test_mp):
         }
     )
     s.add_par("emission_sink_rate", df)
-    s.add_set("is_emission_sink_rate", df.drop(["value", "unit"], axis=1))
 
     s.commit("prep test sceanrios")
 
@@ -126,8 +96,7 @@ def test_add_setup(test_mp):
 
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
 
-    # Ensure that set is_emission_sink_rate
-    # has been added.
+    # Ensure that set is_emission_sink_rate has been added
     exp = exp.drop(["value", "unit"], axis=1)
 
     obs = s.set("is_emission_sink_rate")
@@ -184,11 +153,6 @@ def test_tax_emission_pool_world(test_mp):
         df["node"] = "World"
         s.add_par(par, df)
 
-    for set in ["is_emission_sink_rate"]:
-        df = s.set(set)
-        df["node"] = "World"
-        s.add_set(set, df)
-
     df = pd.DataFrame(
         {
             "node": "World",
@@ -243,7 +207,6 @@ def test_bound_emission_pool(test_mp):
         }
     )
     s.add_par("bound_emission_pool", df)
-    s.add_set("is_bound_emission_pool", df.drop(["value", "unit"], axis=1))
     s.commit("bound_emission_pool added")
 
     s.solve(var_list=["EMISS_POOL", "PRICE_EMISSION_POOL"])
