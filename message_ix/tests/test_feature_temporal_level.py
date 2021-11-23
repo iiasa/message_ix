@@ -11,8 +11,23 @@ from itertools import product
 from message_ix import ModelError, Scenario
 
 
-# A function for adding required parameters for representing "capacity"
 def add_cap_par(scen, years, tec, data={"inv_cost": 0.1, "technical_lifetime": 5}):
+    """
+    Adding required parameters for representing "capacity" in a model.
+
+    Parameters
+    ----------
+    scen : Class
+        message_ix.Scenario.
+    years : list of integers
+        Years for adding data.
+    tec : string
+        Technology name for adding capacity parameters.
+    data : Dict, optional
+        Dictionary of parameters and their values.
+        The default is {"inv_cost": 0.1, "technical_lifetime": 5}.
+
+    """
 
     for year, (parname, val) in product(years, data.items()):
         scen.add_par(parname, ["node", tec, year], val, "-")
@@ -25,6 +40,7 @@ def model_generator(
     tec_dict,
     time_steps,
     demand,
+    relative_time=[],
     com_dict={
         "gas_ppl": {"input": "fuel", "output": "electr"},
         "gas_supply": {"input": [], "output": "fuel"},
@@ -50,6 +66,9 @@ def model_generator(
         Information about each time slice, packed in a tuple with four elements,
         including: time slice name, duration relative to "year", "temporal_lvl",
         and parent time slice. (e.g., time_steps = [("summer", 1, "season", "year")])
+    relative_time: list of strings
+        List of parent "time" slices, for which a relative duration time is maintained.
+        This will be used to specify parameter "duration_time_rel" for these "time"s.
     demand : dict
         A dictionary for information of "demand" in each time slice.
         (e.g., demand = {"summer": 2.5})
@@ -82,6 +101,8 @@ def model_generator(
     scen.add_set("lvl_temporal", [x[2] for x in time_steps])
     scen.add_set("time", [x[0] for x in time_steps])
     scen.add_set("time", [x[3] for x in time_steps])
+    for x in relative_time:
+        scen.add_set("relative_time", x)
 
     # Adding "time" and "duration_time" to the model
     for (h, dur, tmp_lvl, parent) in time_steps:
@@ -156,12 +177,12 @@ def model_generator(
         ) == float(scen.var("CAP", {"technology": "gas_ppl"})["lvl"])
 
 
-# Main tests for commodity balance over temporal levels (and "time" index)
-# In these tests (9 scenarios in total), "demand" is defined in different time slices
+# Main tests for commodity balance over various temporal levels (and "time" index)
+# In these tests (9 + 2 scenarios in total), "demand" is defined in different time slices
 # with different "duration_time", there is one power plant ("gas_ppl") to meet "demand",
 # which receives fuel from a supply technology ("gas_supply").
-# Different temporal level hierarchies are tested and linkages of "ACT" with
-# "demand" and "CAP" is tested too.
+# Different temporal level hierarchies are tested, by linkages of "ACT" with
+# "demand" and "CAP".
 
 # 1) "gas_ppl" is active in "summer" and NOT linked to "gas_supply" in "year"
 # This setup should not solve, as no linkgae between power plant and fuel supply.
@@ -239,6 +260,34 @@ def test_two_seasons_to_year(test_mp):
         ],
         demand={"summer": 1, "winter": 1},
     )
+
+
+def test_two_seasons_to_year_relative(test_mp):
+    comment = "3a.linked-two-seasons-with-year-relative"
+    # Dictionary of technology input/output
+    tec_dict = {
+        "gas_ppl": {
+            "time_origin": ["year", "year"],
+            "time": ["summer", "winter"],
+            "time_dest": ["summer", "winter"],
+        },
+        "gas_supply": {"time_origin": [], "time": ["year"], "time_dest": ["year"]},
+    }
+    # Shouldn't pass the test, if adding relative duration time
+    try:
+        model_generator(
+            test_mp,
+            comment,
+            tec_dict,
+            time_steps=[
+                ("summer", 0.5, "season", "year"),
+                ("winter", 0.5, "season", "year"),
+            ],
+            relative_time=["year"],
+            demand={"summer": 1, "winter": 1},
+        )
+    except AssertionError:
+        pass
 
 
 # 3b) "gas_supply" and "gas_ppl" linked at each season
@@ -341,6 +390,43 @@ def test_linked_three_temporal_levels(test_mp):
         ],
         demand={"Jan": 1, "Feb": 1},
     )
+
+
+def test_linked_three_temporal_levels_relative(test_mp):
+    comment = "4b.linked-temporal-levels-relative"
+    # Dictionary of technology input/output
+    tec_dict = {
+        "gas_ppl": {
+            "time_origin": ["year", "year"],
+            "time": ["Jan", "Feb"],
+            "time_dest": ["Jan", "Feb"],
+        },
+        "gas_supply": {
+            "time_origin": [],
+            "time": ["year"],
+            "time_dest": ["year"],
+        },
+    }
+
+    # Shouldn't pass with a relative time duration
+    try:
+        model_generator(
+            test_mp,
+            comment,
+            tec_dict,
+            time_steps=[
+                ("summer", 0.5, "season", "year"),
+                ("winter", 0.5, "season", "year"),
+                ("Jan", 0.25, "month", "winter"),
+                ("Feb", 0.25, "month", "winter"),
+                ("Jun", 0.25, "month", "summer"),
+                ("Jul", 0.25, "month", "summer"),
+            ],
+            relative_time=["year", "summer"],
+            demand={"Jan": 1, "Feb": 1},
+        )
+    except AssertionError:
+        pass
 
 
 # 4c) input of "gas_ppl" from lowest temporal level ("month") and output to
