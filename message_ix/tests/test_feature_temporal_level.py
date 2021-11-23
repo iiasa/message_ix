@@ -178,7 +178,7 @@ def model_generator(
 
 
 # Main tests for commodity balance over various temporal levels (and "time" index)
-# In these tests (9 + 2 scenarios in total), "demand" is defined in different time slices
+# In these tests (11 scenarios in total), "demand" is defined in different time slices
 # with different "duration_time", there is one power plant ("gas_ppl") to meet "demand",
 # which receives fuel from a supply technology ("gas_supply").
 # Different temporal level hierarchies are tested, by linkages of "ACT" with
