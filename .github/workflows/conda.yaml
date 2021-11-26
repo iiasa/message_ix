@@ -61,14 +61,18 @@ jobs:
       run: conda info
 
     - name: Configure Shell for "conda activate"
-      if: ${{ matrix.os == 'macos-latest' }} && ${{ matrix.conda == 'miniconda' }}
+      if: |
+        ${{ matrix.os == 'macos-latest' }} ||
+        ${{ matrix.conda == 'miniconda' }}
       run: |
         conda init bash
         source ~/Miniconda3/etc/profile.d/conda.sh
 
 
     - name: Configure Shell for "conda activate"
-      if: ${{ matrix.os == 'macos-latest' }} && ${{ matrix.conda == 'anaconda' }}
+      if: |
+        ${{ matrix.os == 'macos-latest' }} ||
+        ${{ matrix.conda == 'anaconda' }}
       run: |
         conda init bash
         source ~/Anaconda3/etc/profile.d/conda.csh
