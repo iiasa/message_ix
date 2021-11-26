@@ -24,9 +24,10 @@ jobs:
         extra_deps:
           - ""
           - "JPype1=1.2.1"
+      fail-fast: false
 
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.conda }}
+    name: ${{ matrix.os }}-${{ matrix.conda }}
 
     steps:
     - name: Cache Anaconda installer, conda packages
@@ -55,6 +56,9 @@ jobs:
       with:
         installer: ${{ matrix.conda }}
         version: py39_4.9.2
+
+    - name: Check conda version and location
+      run: conda info
 
     - name: Configure Shell for "conda activate"
       if: ${{ matrix.os == 'macos-latest' }}
