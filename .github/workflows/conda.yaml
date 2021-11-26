@@ -19,13 +19,13 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, macos-latest]
-        conda_type: [anaconda, miniconda]
+        conda: [anaconda, miniconda]
         extra_deps:
           - ""
           - "JPype1=1.2.1"
 
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.conda_type }}
+    name: ${{ matrix.conda }}
 
     steps:
     - name: Cache Anaconda installer, conda packages
@@ -37,7 +37,7 @@ jobs:
           ~/anaconda3/pkgs
           ~/appdata/local/conda/conda/pkgs
           ${{ github.workspace }}/Anaconda*.*
-        key: ${{ matrix.os }}-${{ matrix.conda_type }}
+        key: ${{ matrix.os }}-${{ matrix.conda }}
 
     - name: Setup anaconda
       if: ${{ matrix.conda == 'anaconda' }}
