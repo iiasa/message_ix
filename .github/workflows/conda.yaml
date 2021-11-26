@@ -56,6 +56,9 @@ jobs:
         installer: ${{ matrix.conda }}
         version: py39_4.9.2
 
+    - name: Configure PowerShell for "conda activate"
+      run: conda init powershell
+
     - name: Install message-ix
       if: ${{ matrix.os == 'macos-latest' }}
       run: |
