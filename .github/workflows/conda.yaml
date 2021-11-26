@@ -39,42 +39,34 @@ jobs:
           ${{ github.workspace }}/Anaconda*.*
         key: ${{ matrix.os }}-${{ matrix.conda_type }}
 
-    - name: Download and install Anaconda for Windows; add to PATH
-      if: ${{ matrix.os == 'windows-latest' }} && ${{ matrix.conda_type == 'anaconda' }}
-      working-directory: ${{ github.workspace }}
-      run: |
-        curl -O https://repo.anaconda.com/archive/Anaconda3-2021.05-Windows-x86_64.exe
-        Start-Process "Anaconda3-2021.05-Windows-x86_64.exe" "/S", "/D=${env:GITHUB_WORKSPACE}\anaconda3" -Wait
-        "${env:GITHUB_WORKSPACE}/anaconda3/Scripts" | Out-File -FilePath $env:GITHUB_PATH -Append
+    - name: Setup anaconda
+      if: ${{ matrix.conda == 'anaconda' }}
+      # Todo change branch back to `main`
+      uses: iiasa/actions/setup-conda@feature/setup-conda-action
+      with:
+        installer: ${{ matrix.conda }}
+        version: 2019.03
 
-    - name: Download and install Miniconda for Windows; add to PATH
-      if: ${{ matrix.os == 'windows-latest' }} && ${{ matrix.conda_type == 'miniconda' }}
-      working-directory: ${{ github.workspace }}
-      run: |
-        curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe
-        Start-Process "Miniconda3-latest-Windows-x86_64.exe" "/S", "/D=${env:GITHUB_WORKSPACE}\miniconda3" -Wait
-        "${env:GITHUB_WORKSPACE}/miniconda3/Scripts" | Out-File -FilePath $env:GITHUB_PATH -Append
-
-    - name: Download and install Anaconda for MacOS; add to PATH
-      if: ${{ matrix.os == 'macos-latest' }} && ${{ matrix.conda_type == 'anaconda' }}
-      working-directory: ${{ github.workspace }}
-      run: |
-        curl -O https://repo.anaconda.com/archive/Anaconda3-2021.05-MacOSX-x86_64.pkg
-        Start-Process "Anaconda3-2021.05-MacOSX-x86_64.pkg" "/S", "/D=${env:GITHUB_WORKSPACE}\anaconda3" -Wait
-        "${env:GITHUB_WORKSPACE}/anaconda3/Scripts" | Out-File -FilePath $env:GITHUB_PATH -Append
-
-    - name: Download and install Miniconda for MacOS; add to PATH
-      if: ${{ matrix.os == 'macos-latest' }} && ${{ matrix.conda_type == 'miniconda' }}
-      working-directory: ${{ github.workspace }}
-      run: |
-        curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.pkg
-        Start-Process "Miniconda3-latest-MacOSX-x86_64.pkg" "/S", "/D=${env:GITHUB_WORKSPACE}\miniconda3" -Wait
-        "${env:GITHUB_WORKSPACE}/miniconda3/Scripts" | Out-File -FilePath $env:GITHUB_PATH -Append
+    - name: Setup miniconda
+      if: ${{ matrix.conda == 'miniconda' }}
+      # Todo change branch back to `main`
+      uses: iiasa/actions/setup-conda@feature/setup-conda-action
+      with:
+        installer: ${{ matrix.conda }}
+        version: py39_4.9.2
 
     - name: Configure PowerShell for "conda activate"
       run: conda init powershell
 
     - name: Install message-ix
+      if: ${{ matrix.os == 'macos-latest' }}
+      run: |
+        conda config --prepend channels conda-forge
+        conda config --set channel_priority strict
+        conda create --name ${{ env.CONDA_ENV }} --quiet message-ix pytest ${{ matrix.extra_deps }}
+
+    - name: Install message-ix
+      if: ${{ matrix.os == 'windows-latest' }}
       run: |
         conda config --prepend channels conda-forge
         conda create --name ${{ env.CONDA_ENV }} --quiet message-ix pytest ${{ matrix.extra_deps }}
