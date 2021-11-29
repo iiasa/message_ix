@@ -87,8 +87,8 @@ jobs:
 #        conda create --name ${{ env.CONDA_ENV }} --quiet message-ix pytest ${{ matrix.extra_deps }}
 
     - name: Install message-ix
-     if: ${{ matrix.os == 'windows-latest' }}
-     run: |
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: |
         conda config --prepend channels conda-forge
         conda create --name ${{ env.CONDA_ENV }} --quiet message-ix pytest ${{ matrix.extra_deps }}
 
