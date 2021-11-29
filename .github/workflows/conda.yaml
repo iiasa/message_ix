@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         # os: [windows-latest, macos-latest]
-        os: [macos-latest]
+        os: [windows-latest]
         conda: [anaconda, miniconda]
         extra_deps:
           - ""
@@ -30,69 +30,67 @@ jobs:
     name: ${{ matrix.os }}-${{ matrix.conda }}
 
     steps:
-    - name: Cache Anaconda installer, conda packages
-      uses: actions/cache@v2
-      with:
-        path: |
-          $CONDA/pkgs
-          ~/.conda/pkgs
-          ~/anaconda3/pkgs
-          ~/appdata/local/conda/conda/pkgs
-          ${{ github.workspace }}/Anaconda*.*
-        key: ${{ matrix.os }}-${{ matrix.conda }}
+#    - name: Cache Anaconda installer, conda packages
+#      uses: actions/cache@v2
+#      with:
+#        path: |
+#          $CONDA/pkgs
+#          ~/.conda/pkgs
+#          ~/anaconda3/pkgs
+#          ~/appdata/local/conda/conda/pkgs
+#          ${{ github.workspace }}/Anaconda*.*
+#        key: ${{ matrix.os }}-${{ matrix.conda }}
 
     - name: Setup anaconda
       if: ${{ matrix.conda == 'anaconda' }}
-      # Todo change branch back to `main`
-      uses: iiasa/actions/setup-conda@feature/setup-conda-action
+      uses: iiasa/actions/setup-conda@main
       with:
         installer: ${{ matrix.conda }}
-        version: 2019.03
+        version: 2021.11
 
     - name: Setup miniconda
       if: ${{ matrix.conda == 'miniconda' }}
-      # Todo change branch back to `main`
-      uses: iiasa/actions/setup-conda@feature/setup-conda-action
+      uses: iiasa/actions/setup-conda@main
       with:
         installer: ${{ matrix.conda }}
-        version: py39_4.9.2
+        version: py39_4.10.3
 
     - name: Check conda version and location
       run: conda info
 
-    - name: Configure Shell for "conda activate"
-      if: |
-        ${{ matrix.os == 'macos-latest' }} ||
-        ${{ matrix.conda == 'miniconda' }}
-      run: |
-        conda init bash
-        source ~/Miniconda3/etc/profile.d/conda.sh
+#    - name: Configure Shell for "conda activate"
+#      if: |
+#        ${{ matrix.os == 'macos-latest' }} ||
+#        ${{ matrix.conda == 'miniconda' }}
+#      run: |
+#        conda init bash
+#        source ~/Miniconda3/etc/profile.d/conda.sh
+#
+#
+#    - name: Configure Shell for "conda activate"
+#      if: |
+#        ${{ matrix.os == 'macos-latest' }} ||
+#        ${{ matrix.conda == 'anaconda' }}
+#      run: |
+#        conda init bash
+#        source ~/Anaconda3/etc/profile.d/conda.csh
 
-
-    - name: Configure Shell for "conda activate"
-      if: |
-        ${{ matrix.os == 'macos-latest' }} ||
-        ${{ matrix.conda == 'anaconda' }}
-      run: |
-        conda init bash
-        source ~/Anaconda3/etc/profile.d/conda.csh
-
-#    - name: Configure PowerShell for "conda activate"
-#      if: ${{ matrix.os == 'windows-latest' }}
-#      run: conda init powershell
+    - name: Configure PowerShell for "conda activate"
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: conda init powershell
+#
+#    - name: Install message-ix
+#      if: ${{ matrix.os == 'macos-latest' }}
+#      run: |
+#        conda config --prepend channels conda-forge
+#        conda config --set channel_priority strict
+#        conda create --name ${{ env.CONDA_ENV }} --quiet message-ix pytest ${{ matrix.extra_deps }}
 
     - name: Install message-ix
-      if: ${{ matrix.os == 'macos-latest' }}
-      run: |
+     if: ${{ matrix.os == 'windows-latest' }}
+     run: |
         conda config --prepend channels conda-forge
-        conda config --set channel_priority strict
         conda create --name ${{ env.CONDA_ENV }} --quiet message-ix pytest ${{ matrix.extra_deps }}
-
-#    - name: Install message-ix
-#     if: ${{ matrix.os == 'windows-latest' }}
-#     run: |
-#        conda config --prepend channels conda-forge
-#        conda create --name ${{ env.CONDA_ENV }} --quiet message-ix pytest ${{ matrix.extra_deps }}
 
     - name: Check
       # Check environment and run a single test from the suite to test code path to ixmp JDBCBackend
