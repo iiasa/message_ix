@@ -71,7 +71,7 @@ By default, the unit of ``ACT`` is treated per year in the GAMS formulation for 
 in time slice "year" and "month" both have the same unit (e.g., GWa). However, the user can report the values across parameters
 and variables with different units relative to the length of the full year. For example, the user can report ``ACT`` in units of
 "GWa" and "GWh" for time slices of "year" and "hour", respectively, in the same model. To activate this feature, the parent time slice
-for which the relative units are desired should be specified by set ``relative_time``. This will ensure that parameter ``duration_time_rel`` 
+for which the relative units are desired should be specified by set ``time_relative``. This will ensure that parameter ``duration_time_rel`` 
 is effective. Otherwise, this parameter is filled by value of 1, meaning that the units will be treated uniformly across
 different sub-annual time slices.
 

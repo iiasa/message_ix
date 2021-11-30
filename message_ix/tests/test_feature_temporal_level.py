@@ -102,7 +102,7 @@ def model_generator(
     scen.add_set("time", [x[0] for x in time_steps])
     scen.add_set("time", [x[3] for x in time_steps])
     for x in relative_time:
-        scen.add_set("relative_time", x)
+        scen.add_set("time_relative", x)
 
     # Adding "time" and "duration_time" to the model
     for (h, dur, tmp_lvl, parent) in time_steps:

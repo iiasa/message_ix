@@ -15,7 +15,7 @@ $LOAD map_node, map_time, map_commodity, map_resource, map_stocks, map_tec, map_
 $LOAD map_land, map_relation
 $LOAD type_tec, cat_tec, type_year, cat_year, type_emission, cat_emission, type_tec_land
 $LOAD inv_tec, renewable_tec
-$LOAD balance_equality, relative_time
+$LOAD balance_equality, time_relative
 $LOAD shares
 $LOAD addon, type_addon, cat_addon, map_tec_addon
 $LOAD storage_tec, level_storage, map_tec_storage
@@ -105,8 +105,8 @@ $INCLUDE includes/period_parameter_assignment.gms
 
 * compute auxiliary parameters for relative duration of subannual time periods
 duration_time_rel(time,time2)$( map_time(time,time2) ) = duration_time(time2) / duration_time(time) ;
-* making duration_time_rel equal to 1, i.e., unifroming the units of ACT in sub-annual time slices, for parent 'time' not specified in set 'relative_time'
-duration_time_rel(time,time2)$( Not relative_time(time) ) = 1 ;
+* making duration_time_rel equal to 1, i.e., unifroming the units of ACT in sub-annual time slices, for parent 'time' not specified in set 'time_relative'
+duration_time_rel(time,time2)$( Not time_relative(time) ) = 1 ;
 
 * assign an additional mapping set for technologies to nodes, modes and subannual time slices (for shorter reference)
 map_tec_act(node,tec,year_all,mode,time)$( map_tec_time(node,tec,year_all,time) AND
