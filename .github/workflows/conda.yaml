@@ -30,16 +30,16 @@ jobs:
     name: ${{ matrix.os }}-${{ matrix.conda }}
 
     steps:
-    - name: Cache Anaconda installer, conda packages
-      uses: actions/cache@v2
-      with:
-        path: |
-          $CONDA/pkgs
-          ~/.conda/pkgs
-          ~/anaconda3/pkgs
-          ~/appdata/local/conda/conda/pkgs
-          ${{ github.workspace }}/Anaconda*.exe
-        key: ${{ matrix.os }}-${{ matrix.conda }}
+#    - name: Cache Anaconda installer, conda packages
+#      uses: actions/cache@v2
+#      with:
+#        path: |
+#          $CONDA/pkgs
+#          ~/.conda/pkgs
+#          ~/anaconda3/pkgs
+#          ~/appdata/local/conda/conda/pkgs
+#          ${{ github.workspace }}/Anaconda*.exe
+#        key: ${{ matrix.os }}-${{ matrix.conda }}
 
     - name: Setup anaconda
       if: ${{ matrix.conda == 'anaconda' }}
