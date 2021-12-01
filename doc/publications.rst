@@ -11,7 +11,7 @@ The publications are sorted by the following criteria.
 
 
 Scope
-----------
+-----
 
 - :doc:`publications/country`
 - :doc:`publications/global`

@@ -7,7 +7,7 @@ Energy investment needs for fulfilling the Paris Agreement and achieving the Sus
    :width: 250px
    :align: right
 
-**McCollum, D.L., Zhou, W., Bertram, C. et al. (2018), Nature Energy**
+:cite:ct:`McCollum2018`
 
 Low-carbon investments are necessary for driving the energy system transformation that is called for by both the Paris Agreement and Sustainable Development Goals.
 Improving understanding of the scale and nature of these investments under diverging technology and policy futures is therefore of great importance ... `Read more → <https://www.nature.com/articles/s41560-018-0179-z>`_
@@ -18,7 +18,7 @@ A low energy demand scenario for meeting the 1.5 °C target and sustainable de
    :width: 250px
    :align: right
 
-**Grubler, A., Wilson, C., Bento, N. et al. (2018), Nature Energy**
+:cite:ct:`Grubler2018`
 
 Scenarios that limit global warming to 1.5 °C describe major transformations in energy supply and ever-rising energy demand.
 Here, we provide a contrasting perspective by developing a narrative of future change based on observable trends that results in low energy demand.
