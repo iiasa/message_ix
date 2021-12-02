@@ -27,7 +27,7 @@ jobs:
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.conda }}
+    name: ${{ matrix.os }}-${{ matrix.conda }}-${{ matrix.extra_deps }}
 
     steps:
 #    - name: Cache Anaconda installer, conda packages
@@ -46,7 +46,7 @@ jobs:
       uses: iiasa/actions/setup-conda@main
       with:
         installer: ${{ matrix.conda }}
-        version: 2021.11
+        version: 2019.03
 
     - name: Setup miniconda
       if: ${{ matrix.conda == 'miniconda' }}
@@ -103,4 +103,4 @@ jobs:
         ixmp --platform default list
 
         conda list
-        pytest --pyargs message_ix.tests.test_core::test_add_cat -p ixmp.testing -p no:faulthandler
+        pytest --pyargs message_ix.tests.test_core::test_add_cat --trace-config --full-trace -p ixmp.testing -p no:faulthandler
