@@ -20,7 +20,8 @@ jobs:
       matrix:
 #        os: [windows-latest, macos-latest]
         os: [macos-latest]
-        conda: [anaconda, miniconda]
+#        conda: [anaconda, miniconda]
+        conda: [miniconda]
         extra_deps:
           - ""
           - "JPype1=1.2.1"
