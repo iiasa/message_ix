@@ -73,7 +73,6 @@ jobs:
       if: ${{ matrix.os == 'macos-latest' }}
       run: |
         conda config --prepend channels conda-forge
-        conda config --set channel_priority strict
         conda create --name ${{ env.CONDA_ENV }} --quiet message-ix pytest ${{ matrix.extra_deps }}
 
     - name: Install message-ix on windows
