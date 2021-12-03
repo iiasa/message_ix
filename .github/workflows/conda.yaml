@@ -18,8 +18,8 @@ jobs:
   conda:
     strategy:
       matrix:
-        os: [windows-latest, macos-latest]
-#        os: [windows-latest]
+#        os: [windows-latest, macos-latest]
+        os: [macos-latest]
         conda: [anaconda, miniconda]
         extra_deps:
           - ""
@@ -82,6 +82,7 @@ jobs:
     - name: Check
       # Check environment and run a single test from the suite to test code path to ixmp JDBCBackend
       run: |
+        source ~/${{ matrix.conda }}3/etc/profile.d/conda.sh
         conda activate ${{ env.CONDA_ENV }}
 
         conda info
