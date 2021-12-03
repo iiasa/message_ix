@@ -18,8 +18,8 @@ jobs:
   conda:
     strategy:
       matrix:
-        # os: [windows-latest, macos-latest]
-        os: [windows-latest]
+        os: [windows-latest, macos-latest]
+#        os: [windows-latest]
         conda: [anaconda, miniconda]
         extra_deps:
           - ""
@@ -58,35 +58,22 @@ jobs:
     - name: Check conda version and location
       run: conda info
 
-#    - name: Configure Shell for "conda activate"
-#      if: |
-#        ${{ matrix.os == 'macos-latest' }} ||
-#        ${{ matrix.conda == 'miniconda' }}
-#      run: |
-#        conda init bash
-#        source ~/Miniconda3/etc/profile.d/conda.sh
-#
-#
-#    - name: Configure Shell for "conda activate"
-#      if: |
-#        ${{ matrix.os == 'macos-latest' }} ||
-#        ${{ matrix.conda == 'anaconda' }}
-#      run: |
-#        conda init bash
-#        source ~/Anaconda3/etc/profile.d/conda.csh
+    - name: Configure Shell for "conda activate" macos-latest
+      if: ${{ matrix.os == 'macos-latest' }}
+      run: conda init bash
 
-    - name: Configure PowerShell for "conda activate"
+    - name: Configure PowerShell for "conda activate" windows-latest
       if: ${{ matrix.os == 'windows-latest' }}
       run: conda init powershell
-#
-#    - name: Install message-ix
-#      if: ${{ matrix.os == 'macos-latest' }}
-#      run: |
-#        conda config --prepend channels conda-forge
-#        conda config --set channel_priority strict
-#        conda create --name ${{ env.CONDA_ENV }} --quiet message-ix pytest ${{ matrix.extra_deps }}
 
-    - name: Install message-ix
+    - name: Install message-ix on macos
+      if: ${{ matrix.os == 'macos-latest' }}
+      run: |
+        conda config --prepend channels conda-forge
+        conda config --set channel_priority strict
+        conda create --name ${{ env.CONDA_ENV }} --quiet message-ix pytest ${{ matrix.extra_deps }}
+
+    - name: Install message-ix on windows
       if: ${{ matrix.os == 'windows-latest' }}
       run: |
         conda config --prepend channels conda-forge
@@ -102,7 +89,5 @@ jobs:
         message-ix show-versions
         ixmp --platform default list
 
-        pip show message-ix
-
         conda list
-        pytest --pyargs message_ix.tests.test_core::test_add_cat --trace-config -p ixmp.testing -p no:faulthandler
+        pytest --pyargs message_ix.tests.test_core::test_add_cat --rootdir=D:\a\_actions\iiasa\actions\main\setup-conda\${{ matrix.conda }}3\envs\testenv\lib\site-packages -p ixmp.testing -p no:faulthandler
