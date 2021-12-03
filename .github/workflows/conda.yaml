@@ -102,5 +102,7 @@ jobs:
         message-ix show-versions
         ixmp --platform default list
 
+        pip show message-ix
+
         conda list
-        pytest --pyargs message_ix.tests.test_core::test_add_cat --trace-config --full-trace -p ixmp.testing -p no:faulthandler
+        pytest --pyargs message_ix.tests.test_core::test_add_cat --trace-config -p ixmp.testing -p no:faulthandler
