@@ -85,7 +85,9 @@ jobs:
     - name: Check
       # Check environment and run a single test from the suite to test code path to ixmp JDBCBackend
       run: |
-        conda activate ${{ env.CONDA_ENV }}
+        ps -p $$
+
+        source activate ${{ env.CONDA_ENV }}
 
         conda info
 
