@@ -83,7 +83,7 @@ jobs:
     - name: Check
       # Check environment and run a single test from the suite to test code path to ixmp JDBCBackend
       run: |
-        source /Users/runner/work/_actions/iiasa/actions/main/setup-conda/${{ matrix.conda }}3/etc/profile.d/conda.sh
+        source /Users/runner/work/_actions/iiasa/actions/main/setup-conda/${{ matrix.conda }}3/etc/profile.d/conda.sh  || true
         conda activate ${{ env.CONDA_ENV }}
 
         conda info
