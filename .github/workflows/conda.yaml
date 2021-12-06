@@ -63,7 +63,6 @@ jobs:
       if: ${{ matrix.os == 'macos-latest' }}
       run: |
         conda init bash
-        source /Users/runner/work/_actions/iiasa/actions/main/setup-conda/${{ matrix.conda }}3/etc/profile.d/conda.sh
 
     - name: Configure PowerShell for "conda activate" windows-latest
       if: ${{ matrix.os == 'windows-latest' }}
@@ -84,6 +83,7 @@ jobs:
     - name: Check
       # Check environment and run a single test from the suite to test code path to ixmp JDBCBackend
       run: |
+        source /Users/runner/work/_actions/iiasa/actions/main/setup-conda/${{ matrix.conda }}3/etc/profile.d/conda.sh
         conda activate ${{ env.CONDA_ENV }}
 
         conda info
