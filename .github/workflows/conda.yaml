@@ -24,7 +24,7 @@ jobs:
         conda: [miniconda]
         extra_deps:
           - ""
-          - "JPype1=1.2.1"
+#          - "JPype1=1.2.1"
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
@@ -84,9 +84,7 @@ jobs:
     - name: Check
       # Check environment and run a single test from the suite to test code path to ixmp JDBCBackend
       run: |
-        ps -p $$
-
-        source activate ${{ env.CONDA_ENV }}
+        conda activate ${{ env.CONDA_ENV }}
 
         conda info
 
