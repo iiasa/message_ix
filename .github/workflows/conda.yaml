@@ -83,13 +83,13 @@ jobs:
     - name: Check
       # Check environment and run a single test from the suite to test code path to ixmp JDBCBackend
       run: |
-        source /Users/runner/work/_actions/iiasa/actions/main/setup-conda/${{ matrix.conda }}3/etc/profile.d/conda.sh || true
+        source /Users/runner/work/_actions/iiasa/actions/main/setup-conda/${{ matrix.conda }}3/etc/profile.d/conda.sh
         conda activate ${{ env.CONDA_ENV }}
 
         conda info
 
         message-ix show-versions
-        ixmp --platform default list
+        ixmp --platform default list || true
 
         conda list
         pytest --pyargs message_ix.tests.test_core::test_add_cat --rootdir=D:\a\_actions\iiasa\actions\main\setup-conda\${{ matrix.conda }}3\envs\testenv\lib\site-packages -p ixmp.testing -p no:faulthandler
