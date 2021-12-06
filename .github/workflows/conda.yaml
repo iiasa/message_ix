@@ -92,4 +92,5 @@ jobs:
         ixmp --platform default list || true
 
         conda list
-        pytest --pyargs message_ix.tests.test_core::test_add_cat --rootdir=D:\a\_actions\iiasa\actions\main\setup-conda\${{ matrix.conda }}3\envs\testenv\lib\site-packages -p ixmp.testing -p no:faulthandler
+        pytest --pyargs message_ix.tests.test_core::test_add_cat --full-trace --trace-config --rootdir=/Users/runner/work/_actions/iiasa/actions/main/setup-conda/${{ matrix.conda }}3/envs/testenv/lib/python3.9/site-packages -p ixmp.testing -p no:faulthandler
+#        pytest --pyargs message_ix.tests.test_core::test_add_cat --rootdir=D:\a\_actions\iiasa\actions\main\setup-conda\${{ matrix.conda }}3\envs\testenv\lib\site-packages -p ixmp.testing -p no:faulthandler
