@@ -594,7 +594,9 @@ Parameters
 *      - ``node`` | ``emission`` | ``type_tec`` | ``year``
 *    * - tax_emission_pool
 *      - ``node`` | ``type_emission`` | ``type_tec`` | ``year``
-*    * - bound_emission_pool
+*    * - bound_emission_pool_up
+*      - ``node`` | ``type_emission`` | ``type_tec`` | ``type``
+*    * - bound_emission_pool_lo
 *      - ``node`` | ``type_emission`` | ``type_tec`` | ``type``
 *
 * .. [#em_scaling] The parameter ``emission_scaling`` is the scaling factor to harmonize bounds or taxes across types of
@@ -610,7 +612,8 @@ Parameters
     emission_sink_rate(node,emission,type_tec,year_all)      emission sink rate for regional emission pool formulation
     historical_emission_pool(node,emission,type_tec,year_all) historical size of emission pool by technology type
     tax_emission_pool(node,type_emission,type_tec,year_all)  emission pool tax
-    bound_emission_pool(node,type_emission,type_tec,year_all) upper bound on emission pool size
+    bound_emission_pool_up(node,type_emission,type_tec,year_all) upper bound on emission pool size
+    bound_emission_pool_lo(node,type_emission,type_tec,year_all) lower bound on emission pool size
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*

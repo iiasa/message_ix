@@ -115,15 +115,12 @@ Variables
     COST_NODAL(node, year_all)                   system costs at the node level over time
 * auxiliary variable for aggregate emissions by technology type and land-use model emulator
     EMISS(node,emission,type_tec,year_all)       aggregate emissions by technology type and land-use model emulator
+* regional emission pool
+    EMISS_POOL(node,emission,type_tec,year_all)  nodal-regional-global emission pool size
 * auxiliary variable for left-hand side of relations (linear constraints)
     REL(relation,node,year_all)                  auxiliary variable for left-hand side of user-defined relations
 * change in the content of storage device
     STORAGE_CHARGE(node,tec,level,commodity,year_all,time)    charging of storage in each timestep (negative for discharge)
-;
-
-Positive variables
-* regional emission pool
-    EMISS_POOL(node,emission,type_tec,year_all)          nodal-regional-global emission pool size
 ;
 
 ***
@@ -280,7 +277,8 @@ Equations
     EMISSION_EQUIVALENCE            auxiliary equation to simplify the notation of emissions
     EMISSION_CONSTRAINT             nodal-regional-global constraints on emissions (by category)
     EMISSION_POOL_EQUIVALENCE       nodal-regional-global emission pool with carbon sink rate
-    EMISSION_POOL_CONSTRAINT        nodal-regional-global constraints on emission pool (by type)
+    EMISSION_POOL_CONSTRAINT_UP     nodal-regional-global upper bound on emission pool (by type)
+    EMISSION_POOL_CONSTRAINT_LO     nodal-regional-global lower bound on emission pool (by type)
     LAND_CONSTRAINT                 constraint on total land use (linear combination of land scenarios adds up to 1)
     DYNAMIC_LAND_SCEN_CONSTRAINT_UP dynamic constraint on land scenario change (upper bound)
     DYNAMIC_LAND_SCEN_CONSTRAINT_LO dynamic constraint on land scenario change (lower bound)
@@ -1922,28 +1920,51 @@ EMISSION_POOL_EQUIVALENCE(node,emission,type_tec,year)$is_emission_sink_rate(nod
 ;
 
 ***
-* Bound on emission pool
+* Upper bound on emission pool
 * ^^^^^^^^^^^^^^^^^^^^^^
 *
-* .. _emission_pool_constraint:
+* .. _emission_pool_constraint_up:
 *
-* Equation EMISSION_POOL_CONSTRAINT
+* Equation EMISSION_POOL_CONSTRAINT_UP
 * """""""""""""""""""""""""""""""""
 * This constraint enforces upper bounds on the emission pool.
 *
 *   .. math::
 *          \sum_{e \in E(\widehat{e})}
 *                  emission\_scaling_{\widehat{e},e} \cdot EMISS\_POOL_{n,e,\widehat{t},y}
-*      \leq bound\_emission\_pool_{n,\widehat{e},\widehat{t},y}
+*      \leq bound\_emission\_pool\_up_{n,\widehat{e},\widehat{t},y}
 *
 ***
-EMISSION_POOL_CONSTRAINT(node,type_emission,type_tec,year)$is_bound_emission_pool(node,type_emission,type_tec,year)..
+
+EMISSION_POOL_CONSTRAINT_UP(node,type_emission,type_tec,year)$is_bound_emission_pool_up(node,type_emission,type_tec,year)..
     SUM( (emission)$( cat_emission(type_emission,emission) ),
         emission_scaling(type_emission,emission)
         * EMISS_POOL(node,emission,type_tec,year)
       )
-    =L= bound_emission_pool(node,type_emission,type_tec,year) ;
+    =L= bound_emission_pool_up(node,type_emission,type_tec,year) ;
 
+***
+* Lower bound on emission pool
+* ^^^^^^^^^^^^^^^^^^^^^^
+*
+* .. _emission_pool_constraint_lo:
+*
+* Equation EMISSION_POOL_CONSTRAINT_LO
+* """""""""""""""""""""""""""""""""
+* This constraint enforces upper bounds on the emission pool.
+*
+*   .. math::
+*          \sum_{e \in E(\widehat{e})}
+*                  emission\_scaling_{\widehat{e},e} \cdot EMISS\_POOL_{n,e,\widehat{t},y}
+*      \geq bound\_emission\_pool\_lo_{n,\widehat{e},\widehat{t},y}
+*
+***
+EMISSION_POOL_CONSTRAINT_LO(node,type_emission,type_tec,year)$is_bound_emission_pool_lo(node,type_emission,type_tec,year)..
+    SUM( (emission)$( cat_emission(type_emission,emission) ),
+        emission_scaling(type_emission,emission)
+        * EMISS_POOL(node,emission,type_tec,year)
+      )
+    =G= bound_emission_pool_lo(node,type_emission,type_tec,year) ;
 *----------------------------------------------------------------------------------------------------------------------*
 ***
 * .. _section_landuse_emulator:

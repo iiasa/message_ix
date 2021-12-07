@@ -61,15 +61,15 @@ EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
         PRICE_EMISSION.l(node,type_emission,type_tec,year) = - inf ) = 0 ;
 
 * rescale the dual of the emission pool constraint to account for the discount factor and period duration
-EMISSION_POOL_CONSTRAINT.m(node,type_emission,type_tec,year)$(
-    EMISSION_POOL_CONSTRAINT.m(node,type_emission,type_tec,year)) =
-    EMISSION_POOL_CONSTRAINT.m(node,type_emission,type_tec,year) / df_period(year);
+EMISSION_POOL_CONSTRAINT_UP.m(node,type_emission,type_tec,year)$(
+    EMISSION_POOL_CONSTRAINT_UP.m(node,type_emission,type_tec,year)) =
+    EMISSION_POOL_CONSTRAINT_UP.m(node,type_emission,type_tec,year) / df_period(year);
 
 PRICE_EMISSION_POOL.l(node,type_emission,type_tec,year) =
-               - EMISSION_POOL_CONSTRAINT.m(node,type_emission,type_tec,year) * duration_period(year)
+               - EMISSION_POOL_CONSTRAINT_UP.m(node,type_emission,type_tec,year) * duration_period(year)
 ;
-    PRICE_EMISSION_POOL.l(node,type_emission,type_tec,year)$(
-        PRICE_EMISSION_POOL.l(node,type_emission,type_tec,year) = - inf ) = 0 ;
+PRICE_EMISSION_POOL.l(node,type_emission,type_tec,year)$(
+    PRICE_EMISSION_POOL.l(node,type_emission,type_tec,year) = - inf ) = 0 ;
 
 %AUX_BOUNDS% AUX_ACT_BOUND_LO(node,tec,year_all,year_all2,mode,time)$( ACT.l(node,tec,year_all,year_all2,mode,time) < 0 AND
 %AUX_BOUNDS%    ACT.l(node,tec,year_all,year_all2,mode,time) = -%AUX_BOUND_VALUE% ) = yes ;
