@@ -2,7 +2,8 @@ Tools
 =====
 
 This page shows a section of modeling tools which has been developed based on |MESSAGEix|.
-It is not guaranteed that the tools listed on this page are maintained.
+
+*It is not guaranteed that the tools listed on this page are maintained.*
 
 
 d2ix: A Model Input-Data Management and Analysis Tool for MESSAGEix

@@ -7,7 +7,7 @@ Deep seawater cooling and desalination: Combining seawater air conditioning and 
    :width: 250px
    :align: right
 
-:cite:ct:`{HUNT2021103257`
+:cite:ct:`HUNT2021103257`
 
 In tropical climates, the energy consumed by heating, ventilation and air conditioning can exceed 50% of the total energy consumption of a building.
 The demand for cooling is rising steadily, driven by global warming and rapidly increasing living standards in developing economies.
