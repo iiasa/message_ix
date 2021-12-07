@@ -14,7 +14,7 @@ This is the documentation for :mod:`message_ix`, a Python package that ties toge
 
 - For the scientific reference of the framework, see Huppmann et al. (2019) :cite:`huppmann_messageix_2018`.
 - For an overview and recent publications related to the specific |MESSAGEix|-GLOBIOM global model instance used at the IIASA ECE Program, see the `MESSAGEix-GLOBIOM documentation`_.
-- To get a glimpse of what type of analysis you can do with the |MESSAGEix| framework, see :doc:`publications` and :doc:`projects`.
+- To get a glimpse of what type of analysis you can do with the |MESSAGEix| framework, see :doc:`usage`.
 
 
 .. _getting-started:
@@ -116,19 +116,16 @@ This section demonstrates the application of the |MESSAGEix| framework in differ
 The aim of this section is not to provide an exhaustive list, but to provide an outlook of different possibilities and applications for |MESSAGEix| users.
 
 
-- :doc:`tools`
-- :doc:`projects`
-- :doc:`publications`
+- :ref:`publications`
+- :ref:`tools`
+- :ref:`projects`
 
 
 .. toctree::
    :hidden:
-   :titlesonly:
    :caption: Usage outlook
 
-   tools
-   projects
-   publications
+   usage
 
 
 Using, getting help, and contributing
