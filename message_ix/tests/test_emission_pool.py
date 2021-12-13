@@ -191,7 +191,7 @@ def test_tax_emission_pool_world(test_mp):
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
 
 
-def test_bound_emission_pool(test_mp):
+def test_bound_emission_pool_up(test_mp):
     s = make_westeros(test_mp, quiet=True)
     prep_scenario(s, test_mp)
 
@@ -206,8 +206,8 @@ def test_bound_emission_pool(test_mp):
             "unit": "???",
         }
     )
-    s.add_par("bound_emission_pool", df)
-    s.commit("bound_emission_pool added")
+    s.add_par("bound_emission_pool_up", df)
+    s.commit("bound_emission_pool_up added")
 
     s.solve()
 
@@ -242,7 +242,7 @@ def test_bound_emission_pool(test_mp):
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
 
 
-def test_bound_emission_pool_removal(test_mp):
+def test_bound_emission_pool_lo(test_mp):
     s = make_westeros(test_mp, quiet=True)
     prep_scenario(s, test_mp)
 
@@ -257,31 +257,95 @@ def test_bound_emission_pool_removal(test_mp):
             "unit": "???",
         }
     )
-    s.add_par("bound_emission_pool", df)
-    s.commit("bound_emission_pool added")
+    s.add_par("bound_emission_pool_up", df)
+
+    df = pd.DataFrame(
+        {
+            "node": "Westeros",
+            "type_emission": "GHG",
+            "type_tec": "all",
+            "year": [710],
+            "value": [84000],
+            "unit": "???",
+        }
+    )
+    s.add_par("bound_emission_pool_lo", df)
+
+    s.commit("bound_emission_pool_lo and _up added")
+
+    s.solve()
+
+    exp = pd.DataFrame(
+        {
+            "node": "Westeros",
+            "emission": "CO2",
+            "type_tec": "all",
+            "year": [700, 710, 720],
+            "lvl": [86254.74797636835, 84000.0, 85000.0],
+            "mrg": 0.0,
+        }
+    )
+
+    obs = s.var("EMISS_POOL")
+
+    pdt.assert_frame_equal(exp, obs, check_dtype=False)
+
+    exp = pd.DataFrame(
+        {
+            "node": "Westeros",
+            "type_emission": "GHG",
+            "type_tec": "all",
+            "year": [720],
+            "lvl": [33.075572],
+            "mrg": 0.0,
+        }
+    )
+
+    obs = s.var("PRICE_EMISSION_POOL")
+
+    pdt.assert_frame_equal(exp, obs, check_dtype=False)
+
+
+def test_bound_emission_pool_up_removal(test_mp):
+    s = make_westeros(test_mp, quiet=True)
+    prep_scenario(s, test_mp)
+
+    s.check_out()
+    df = pd.DataFrame(
+        {
+            "node": "Westeros",
+            "type_emission": "GHG",
+            "type_tec": "all",
+            "year": [700, 710, 720],
+            "value": [87000, 86000, 85000],
+            "unit": "???",
+        }
+    )
+    s.add_par("bound_emission_pool_up", df)
+    s.commit("bound_emission_pool_up added")
 
     # Ensure that bound has been added
-    obs = s.par("bound_emission_pool")
+    obs = s.par("bound_emission_pool_up")
     pdt.assert_frame_equal(df, obs, check_dtype=False)
 
     s.solve()
 
     # Ensure that is_ set for bound has been added upon solving
     exp = df.drop(["value", "unit"], axis=1)
-    obs = s.set("is_bound_emission_pool")
+    obs = s.set("is_bound_emission_pool_up")
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
 
     # Esnure that is_ set is removed when removing parameter
     s.remove_solution()
     s.check_out()
-    s.remove_par("bound_emission_pool", df)
+    s.remove_par("bound_emission_pool_up", df)
     s.commit("bound_emission_poll removed")
 
-    obs = s.set("is_bound_emission_pool")
+    obs = s.set("is_bound_emission_pool_up")
     assert obs.empty is True
 
 
-def test_bound_emission_pool_modification_inc_yrs(test_mp):
+def test_bound_emission_pool_up_modification_inc_yrs(test_mp):
     s = make_westeros(test_mp, quiet=True)
     prep_scenario(s, test_mp)
 
@@ -296,18 +360,18 @@ def test_bound_emission_pool_modification_inc_yrs(test_mp):
             "unit": "???",
         }
     )
-    s.add_par("bound_emission_pool", df)
-    s.commit("bound_emission_pool added")
+    s.add_par("bound_emission_pool_up", df)
+    s.commit("bound_emission_pool_up added")
 
     # Ensure that bound has been added
-    obs = s.par("bound_emission_pool")
+    obs = s.par("bound_emission_pool_up")
     pdt.assert_frame_equal(df, obs, check_dtype=False)
 
     s.solve()
 
     # Ensure that is_ set for bound has been added upon solving
     exp = df.drop(["value", "unit"], axis=1)
-    obs = s.set("is_bound_emission_pool")
+    obs = s.set("is_bound_emission_pool_up")
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
 
     # Now check that when the dataframe is extended, if the "is_" set
@@ -324,22 +388,22 @@ def test_bound_emission_pool_modification_inc_yrs(test_mp):
             "unit": "???",
         }
     )
-    s.add_par("bound_emission_pool", df)
-    s.commit("bound_emission_pool added")
+    s.add_par("bound_emission_pool_up", df)
+    s.commit("bound_emission_pool_up added")
 
     # Ensure that bound has been added
-    obs = s.par("bound_emission_pool")
+    obs = s.par("bound_emission_pool_up")
     pdt.assert_frame_equal(df, obs, check_dtype=False)
 
     s.solve()
 
     # Ensure that is_ set for bound has been added upon solving
     exp = df.drop(["value", "unit"], axis=1)
-    obs = s.set("is_bound_emission_pool")
+    obs = s.set("is_bound_emission_pool_up")
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
 
 
-def test_bound_emission_pool_modification_red_yrs(test_mp):
+def test_bound_emission_pool_up_modification_red_yrs(test_mp):
     s = make_westeros(test_mp, quiet=True)
     prep_scenario(s, test_mp)
 
@@ -354,18 +418,18 @@ def test_bound_emission_pool_modification_red_yrs(test_mp):
             "unit": "???",
         }
     )
-    s.add_par("bound_emission_pool", df)
-    s.commit("bound_emission_pool added")
+    s.add_par("bound_emission_pool_up", df)
+    s.commit("bound_emission_pool_up added")
 
     # Ensure that bound has been added
-    obs = s.par("bound_emission_pool")
+    obs = s.par("bound_emission_pool_up")
     pdt.assert_frame_equal(df, obs, check_dtype=False)
 
     s.solve()
 
     # Ensure that is_ set for bound has been added upon solving
     exp = df.drop(["value", "unit"], axis=1)
-    obs = s.set("is_bound_emission_pool")
+    obs = s.set("is_bound_emission_pool_up")
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
 
     # Now check that when the dataframe is extended, if the "is_" set
@@ -374,8 +438,8 @@ def test_bound_emission_pool_modification_red_yrs(test_mp):
     s.check_out()
 
     # Remove existing
-    df = s.par("bound_emission_pool")
-    s.remove_par("bound_emission_pool", df)
+    df = s.par("bound_emission_pool_up")
+    s.remove_par("bound_emission_pool_up", df)
 
     df = pd.DataFrame(
         {
@@ -387,16 +451,16 @@ def test_bound_emission_pool_modification_red_yrs(test_mp):
             "unit": "???",
         }
     )
-    s.add_par("bound_emission_pool", df)
-    s.commit("bound_emission_pool added")
+    s.add_par("bound_emission_pool_up", df)
+    s.commit("bound_emission_pool_up added")
 
     # Ensure that bound has been added
-    obs = s.par("bound_emission_pool")
+    obs = s.par("bound_emission_pool_up")
     pdt.assert_frame_equal(df, obs, check_dtype=False)
 
     s.solve()
 
     # Ensure that is_ set for bound has been added upon solving
     exp = df.drop(["value", "unit"], axis=1)
-    obs = s.set("is_bound_emission_pool")
+    obs = s.set("is_bound_emission_pool_up")
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
