@@ -20,7 +20,7 @@ To add your publication, tool, or project to this page, see :doc:`sharing`.
 Publications
 ============
 
-In the following a section of publication are shown in which |MESSAGEix| is used.
+The following is a selection of academic publications in which |MESSAGEix| was used to carry out energy systems research.
 For each, the spatial scope/resolution, keywords and specific usage of |MESSAGEix| are described.
 
 Climate mitigation scenarios with persistent COVID-19-related energy demand changes
@@ -61,7 +61,7 @@ Energy investment needs for fulfilling the Paris Agreement and achieving the Sus
 
 - **Spatial**: Global
 - **Keywords**: Energy and society, finance, socioeconomic scenarios
-- **Usage**: Calculating SDG investment needs with a diverse set of approaches within a multi-model analysis.
+- **Usage**: Calculate SDG investment needs with a diverse set of approaches within a multi-model analysis.
 
 Low-carbon investments are necessary for driving the energy system… `Read more → <https://www.nature.com/articles/s41560-018-0179-z>`__
 
@@ -75,7 +75,7 @@ A low energy demand scenario for meeting the 1.5 °C target and sustainable de
 
 - **Spatial**: Global
 - **Keywords**: Energy modelling, socioeconomic scenarios
-- **Usage**: Calculating the energy supply impacts by imposing three types of constraints.
+- **Usage**: Calculate the energy supply impacts by imposing three types of constraints.
 
 Scenarios that limit global warming to 1.5 °C describe major… `Read more → <https://www.nature.com/articles/s41560-018-0172-6>`__
 
@@ -84,9 +84,10 @@ Scenarios that limit global warming to 1.5 °C describe major… `Read more �
 Tools
 =====
 
-This page shows a section of modeling tools which has been developed based on |MESSAGEix|.
+|MESSAGEix| and :mod:`ixmp` provide a robust feature set for modeling.
+However, these features are *general-purpose*, so some users have developed additional tools that extend or complement |MESSAGEix| to serve specific use-cases or needs.
 
-*It is not guaranteed that the tools listed on this page are maintained.*
+.. note:: It is not guaranteed that the tools listed in this section are maintained.
 
 d2ix: A Model Input-Data Management and Analysis Tool for MESSAGEix
 -------------------------------------------------------------------
@@ -107,4 +108,4 @@ Bottom-up integrated assessment models, like |MESSAGEix|, depend on the ... `Rea
 Projects
 ========
 
-For research projects of the Energy, Climate, and Environment Program with the usage of |MESSAGEix|, please take a look `here → <https://iiasa.ac.at/web/ece/Projects.html>`_
+For research projects of the IIASA Energy, Climate, and Environment Program that use |MESSAGEix|, visit https://iiasa.ac.at/web/ece/Projects.html.
