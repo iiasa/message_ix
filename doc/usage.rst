@@ -21,7 +21,7 @@ Publications
 ============
 
 In the following a section of publication are shown in which |MESSAGEix| is used.
-For every publication the regional scope, keywords and the usage of |MESSAGEix| are described.
+For each, the spatial scope/resolution, keywords and specific usage of |MESSAGEix| are described.
 
 Climate mitigation scenarios with persistent COVID-19-related energy demand changes
 -----------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ Climate mitigation scenarios with persistent COVID-19-related energy demand chan
 
 :cite:ct:`Kikstra2021`
 
-- **Region**: Global
+- **Spatial**: Global, :ref:`11-region aggregation <message-ix-models:R11>`
 - **Keywords**: Climate-change mitigation, energy and behaviour, energy supply and demand
 - **Usage**: Capture global economy, energy and climate dynamics and feedbacks in the medium-to-long term, including regionally heterogeneous responses to the COVID-19 emergency.
 
@@ -45,7 +45,7 @@ Deep seawater cooling and desalination: Combining seawater air conditioning and 
 
 :cite:ct:`HUNT2021103257`
 
-- **Region**: Malé, Maldives
+- **Spatial**: Malé, Maldives
 - **Keywords**: Building cooling, industrial cooling, energy efficiency, seawater air conditioning, low temperature thermal desalination, vertical farming
 - **Usage**: Simulate Malé´s cooling and water services demand and optimize the renewable energy supply.
 
@@ -59,7 +59,7 @@ Energy investment needs for fulfilling the Paris Agreement and achieving the Sus
 
 :cite:ct:`McCollum2018`
 
-- **Region**: Global
+- **Spatial**: Global
 - **Keywords**: Energy and society, finance, socioeconomic scenarios
 - **Usage**: Calculating SDG investment needs with a diverse set of approaches within a multi-model analysis.
 
@@ -73,7 +73,7 @@ A low energy demand scenario for meeting the 1.5 °C target and sustainable de
 
 :cite:ct:`Grubler2018`
 
-- **Region**: Global
+- **Spatial**: Global
 - **Keywords**: Energy modelling, socioeconomic scenarios
 - **Usage**: Calculating the energy supply impacts by imposing three types of constraints.
 

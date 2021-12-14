@@ -117,6 +117,10 @@ intersphinx_mapping = {
     # For a local build, uncomment and use the following line with a path to
     # the directory containing built HTML documentation for ixmp:
     # 'ixmp': ('/home/user/path-to-ixmp/doc/build/html', None),
+    "message-ix-models": (
+        "https://docs.messageix.org/projects/models/en/latest/",
+        None,
+    ),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
     "pint": ("https://pint.readthedocs.io/en/stable/", None),
     "pyam": ("https://pyam-iamc.readthedocs.io/en/stable/", None),
