@@ -1,5 +1,5 @@
 User guidelines and notice
-==========================
+**************************
 
 We ask that you take the following four actions whenever you:
 
@@ -9,7 +9,7 @@ We ask that you take the following four actions whenever you:
 The aim of this request is to ensure good scientific practice and collaborative development of the platform.
 
 1. Understand the code license
-------------------------------
+==============================
 
 Use the most recent version of |MESSAGEix| from the Github repository.
 Specify clearly which version (e.g. release tag, such as ``v1.1.0``, or commit hash, such as ``26cc08f``) you have used, and whether you have made any modifications to the code.
@@ -21,7 +21,7 @@ Read and understand the file ``LICENSE``; in particular, clause 7 (“Disclaimer
 .. _notice-cite:
 
 2. Cite the scientific publication
-----------------------------------
+==================================
 
 Cite, at minimum, the following manuscript:
 
@@ -40,7 +40,7 @@ In addition, you may:
 - Include a link, e.g. in a footnote, to the online documentation at https://docs.messageix.org.
 
 3. Use the naming convention for new model instances
-----------------------------------------------------
+====================================================
 
 For any new model instance under the |MESSAGEix| framework, choose a name of
 the form "MESSAGEix [xxx]" or "MESSAGEix-[xxx]", where [xxx] is replaced by:
@@ -55,14 +55,14 @@ Ensure there is no naming conflict with existing versions of the |MESSAGEix| mod
 When in doubt, contact the IIASA ECE Program at <message_ix@iiasa.ac.at> for a list of existing model instances.
 
 4. Give notice of publication
------------------------------
+=============================
 
 E-mail <message_ix@iiasa.ac.at> with notice of any new or pending publication.
 
-(Optional) Add your tool, project or publication to this documentation
-----------------------------------------------------------------------
+Optional: Add your tool, project or publication to this documentation
+---------------------------------------------------------------------
 
-To make your usage of |MESSAGEix| visible, add your :doc:`tools`, :doc:`projects` or :doc:`publications` to this documentation.
+To make your usage of |MESSAGEix| visible, add it to the :doc:`usage` page of this documentation, in the :ref:`tools`, :ref:`projects` or :ref:`publications` section.
 See :doc:`sharing` for details.
 
 References
