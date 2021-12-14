@@ -1,6 +1,9 @@
 Information on publications, tools and projects
 ===============================================
 
+This page demonstrates the application of the |MESSAGEix| framework in different publications and projects, as well as tools that have been developed based on |MESSAGEix| or for supporting and improving it.
+The aim of this section is not to provide an exhaustive list, but to provide an outlook of different possibilities and applications for |MESSAGEix| users.
+
 .. contents::
    :local:
 
@@ -73,7 +76,7 @@ Scenarios that limit global warming to 1.5 °C describe major ... `Read more �
 Tools
 -----
 
-This page section a section of modeling tools which has been developed based on |MESSAGEix|.
+This page shows a section of modeling tools which has been developed based on |MESSAGEix|.
 
 *It is not guaranteed that the tools listed on this page are maintained.*
 
