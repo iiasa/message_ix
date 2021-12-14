@@ -50,7 +50,7 @@ Energy investment needs for fulfilling the Paris Agreement and achieving the Sus
 
 - **Region**: Global
 - **Keywords**: Energy and society, finance, socioeconomic scenarios
-- **Usage**:
+- **Usage**: Calculating SDG investment needs with a diverse set of approaches within a multi-model analysis.
 
 Low-carbon investments are necessary for driving the energy system ...  `Read more → <https://www.nature.com/articles/s41560-018-0179-z>`_
 
@@ -64,7 +64,7 @@ A low energy demand scenario for meeting the 1.5 °C target and sustainable de
 
 - **Region**: Global
 - **Keywords**: Energy modelling, socioeconomic scenarios
-- **Usage**:
+- **Usage**: Calculating the energy supply impacts by imposing three types of constraints.
 
 Scenarios that limit global warming to 1.5 °C describe major ... `Read more → <https://www.nature.com/articles/s41560-018-0172-6>`_
 
