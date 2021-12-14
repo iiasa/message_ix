@@ -14,7 +14,6 @@ This is the documentation for :mod:`message_ix`, a Python package that ties toge
 
 - For the scientific reference of the framework, see Huppmann et al. (2019) :cite:`huppmann_messageix_2018`.
 - For an overview and recent publications related to the specific |MESSAGEix|-GLOBIOM global model instance used at the IIASA ECE Program, see the `MESSAGEix-GLOBIOM documentation`_.
-- To get a glimpse of what type of analysis you can do with the |MESSAGEix| framework, see :doc:`usage`.
 
 
 .. _getting-started:
@@ -38,6 +37,7 @@ Then, continue with the:
 - :doc:`framework` detailed description and feature list.
 - :doc:`install` of the software and essential dependencies.
 - :doc:`tutorials` for new users that demonstrate the basic features of the framework.
+- :doc:`Usage <usage>` of |MESSAGEix| in academic publications, research projects, and derived tools.
 
 .. toctree::
    :hidden:
@@ -47,6 +47,7 @@ Then, continue with the:
    framework
    install
    tutorials
+   Publications, Projects, and Tools <usage>
 
 
 .. _core:
@@ -104,28 +105,6 @@ This section provides guidelines for how to make some common model design choice
    reporting
    debugging
    macro
-
-
-Information on tools, projects and publications
-===============================================
-|MESSAGEix| is a flexible framework for analysing energy-environment-economy systems and can therefore be used for evaluating major energy challenges and supporting policy makers in their decisions.
-Being open source, |MESSAGEix| can be used by multiple people and institutions to provide answers for different research questions in various fields.
-Making this usage visible to share and exchange knowledge on how future energy-environment-economy systems might look like is of great benefit to further research.
-
-This section demonstrates the application of the |MESSAGEix| framework in different projects and publications, as well as tools that have been developed based on |MESSAGEix| or for supporting and improving it.
-The aim of this section is not to provide an exhaustive list, but to provide an outlook of different possibilities and applications for |MESSAGEix| users.
-
-
-- :ref:`publications`
-- :ref:`tools`
-- :ref:`projects`
-
-
-.. toctree::
-   :hidden:
-   :caption: Usage outlook
-
-   usage
 
 
 Using, getting help, and contributing

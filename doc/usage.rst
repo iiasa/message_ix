@@ -1,11 +1,19 @@
-Information on publications, tools and projects
-===============================================
+Usage in publications, projects, and tools
+******************************************
 
-This page demonstrates the application of the |MESSAGEix| framework in different publications and projects, as well as tools that have been developed based on |MESSAGEix| or for supporting and improving it.
-The aim of this section is not to provide an exhaustive list, but to provide an outlook of different possibilities and applications for |MESSAGEix| users.
+This page contains information on **usage and applications** of the |MESSAGEix| framework in academic *publications* and research *projects*.
+It also lists *tools* that have been developed by researchers beyond the IIASA ECE program to extend or complement |MESSAGEix|.
 
 .. contents::
    :local:
+   :depth: 1
+
+Because the model formulation is flexible, users (individuals and groups) of |MESSAGEix| have built a wide variety of concrete models to study research questions in a range of domains and fields.
+Model outputs are also used in a variety of ways, notably to inform policy-makers and other stakeholders facing energy systems challenges and decisions.
+
+The list is not exhaustive, but provided to illustrate the wide range of possible applications of |MESSAGEix| for current and prospective users, and also to encourage knowledge exchange within the |MESSAGEix| user community.
+
+To add your publication, tool, or project to this page, see :doc:`sharing`.
 
 .. _publications:
 
