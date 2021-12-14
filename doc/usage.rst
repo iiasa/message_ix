@@ -27,7 +27,7 @@ Climate mitigation scenarios with persistent COVID-19-related energy demand chan
 - **Keywords**: Climate-change mitigation, energy and behaviour, energy supply and demand
 - **Usage**: Capture global economy, energy and climate dynamics and feedbacks in the medium-to-long term, including regionally heterogeneous responses to the COVID-19 emergency.
 
-The COVID-19 pandemic caused radical temporary breaks with past energy use ... `Read more → <https://www.nature.com/articles/s41560-021-00904-8>`_
+The COVID-19 pandemic caused radical temporary breaks with past energy use ... `Read more → <https://www.nature.com/articles/s41560-021-00904-8>`__
 
 Deep seawater cooling and desalination: Combining seawater air conditioning and desalination
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -41,7 +41,7 @@ Deep seawater cooling and desalination: Combining seawater air conditioning and 
 - **Keywords**: Building cooling, industrial cooling, energy efficiency, seawater air conditioning, low temperature thermal desalination, vertical farming
 - **Usage**: Simulate Malé´s cooling and water services demand and optimize the renewable energy supply.
 
-In tropical climates, the energy consumed by heating, ventilation and air ... `Read more → <https://www.sciencedirect.com/science/article/pii/S2210670721005333>`_
+In tropical climates, the energy consumed by heating, ventilation and air ... `Read more → <https://www.sciencedirect.com/science/article/pii/S2210670721005333>`__
 
 Energy investment needs for fulfilling the Paris Agreement and achieving the Sustainable Development Goals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -55,7 +55,7 @@ Energy investment needs for fulfilling the Paris Agreement and achieving the Sus
 - **Keywords**: Energy and society, finance, socioeconomic scenarios
 - **Usage**: Calculating SDG investment needs with a diverse set of approaches within a multi-model analysis.
 
-Low-carbon investments are necessary for driving the energy system ...  `Read more → <https://www.nature.com/articles/s41560-018-0179-z>`_
+Low-carbon investments are necessary for driving the energy system ...  `Read more → <https://www.nature.com/articles/s41560-018-0179-z>`__
 
 A low energy demand scenario for meeting the 1.5 °C target and sustainable development goals without negative emission technologies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -69,7 +69,7 @@ A low energy demand scenario for meeting the 1.5 °C target and sustainable de
 - **Keywords**: Energy modelling, socioeconomic scenarios
 - **Usage**: Calculating the energy supply impacts by imposing three types of constraints.
 
-Scenarios that limit global warming to 1.5 °C describe major ... `Read more → <https://www.nature.com/articles/s41560-018-0172-6>`_
+Scenarios that limit global warming to 1.5 °C describe major ... `Read more → <https://www.nature.com/articles/s41560-018-0172-6>`__
 
 .. _tools:
 
