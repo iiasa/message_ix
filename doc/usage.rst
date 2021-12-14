@@ -97,11 +97,11 @@ d2ix: A Model Input-Data Management and Analysis Tool for MESSAGEix
 
 :cite:ct:`d2ix`
 
-- **Goal**: Manageable, comprehensible, and traceable representation of input-data.
-- **Output**: Spreadsheet interface (d2ix) that enables presentation and editing of model input-data in a concise form.
+- **Goal**: Manageable, comprehensible, and traceable representation of input data.
+- **Features**: Spreadsheet interface that enables presentation and editing of model input data in a concise form.
 - **GitHub**: https://github.com/tum-ewk/d2ix
 
-Bottom-up integrated assessment models, like |MESSAGEix|, depend on the ... `Read more → <https://www.mdpi.com/1996-1073/12/8/1483/htm>`_
+Bottom-up integrated assessment models, like |MESSAGEix|, depend on the… `Read more → <https://www.mdpi.com/1996-1073/12/8/1483/htm>`__
 
 .. _projects:
 
