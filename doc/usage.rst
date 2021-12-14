@@ -18,13 +18,13 @@ To add your publication, tool, or project to this page, see :doc:`sharing`.
 .. _publications:
 
 Publications
-------------
+============
 
 In the following a section of publication are shown in which |MESSAGEix| is used.
 For every publication the regional scope, keywords and the usage of |MESSAGEix| are described.
 
 Climate mitigation scenarios with persistent COVID-19-related energy demand changes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------------------------------------
 .. figure:: _static/usage_figures/41560_2021_904.webp
    :width: 250px
    :align: right
@@ -38,7 +38,7 @@ Climate mitigation scenarios with persistent COVID-19-related energy demand chan
 The COVID-19 pandemic caused radical temporary breaks with past energy use ... `Read more → <https://www.nature.com/articles/s41560-021-00904-8>`__
 
 Deep seawater cooling and desalination: Combining seawater air conditioning and desalination
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------------------------------------------------------
 .. figure:: _static/usage_figures/10.1016-j.scs.2021.103257.jpg
    :width: 250px
    :align: right
@@ -52,7 +52,7 @@ Deep seawater cooling and desalination: Combining seawater air conditioning and 
 In tropical climates, the energy consumed by heating, ventilation and air ... `Read more → <https://www.sciencedirect.com/science/article/pii/S2210670721005333>`__
 
 Energy investment needs for fulfilling the Paris Agreement and achieving the Sustainable Development Goals
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------------------------------------------------------------------
 .. figure:: _static/usage_figures/10.1038-s41560-018-0179-z.webp
    :width: 250px
    :align: right
@@ -66,7 +66,7 @@ Energy investment needs for fulfilling the Paris Agreement and achieving the Sus
 Low-carbon investments are necessary for driving the energy system ...  `Read more → <https://www.nature.com/articles/s41560-018-0179-z>`__
 
 A low energy demand scenario for meeting the 1.5 °C target and sustainable development goals without negative emission technologies
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------------------------------------------------------------------------------------
 .. figure:: _static/usage_figures/10.1038-s41560-018-0172-6.webp
    :width: 250px
    :align: right
@@ -82,14 +82,14 @@ Scenarios that limit global warming to 1.5 °C describe major ... `Read more �
 .. _tools:
 
 Tools
------
+=====
 
 This page shows a section of modeling tools which has been developed based on |MESSAGEix|.
 
 *It is not guaranteed that the tools listed on this page are maintained.*
 
 d2ix: A Model Input-Data Management and Analysis Tool for MESSAGEix
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------------------
 .. figure:: _static/usage_figures/10.3390-en12081483.png
    :width: 250px
    :align: right
@@ -105,6 +105,6 @@ Bottom-up integrated assessment models, like |MESSAGEix|, depend on the ... `Rea
 .. _projects:
 
 Projects
---------
+========
 
 For research projects of the Energy, Climate, and Environment Program with the usage of |MESSAGEix|, please take a look `here → <https://iiasa.ac.at/web/ece/Projects.html>`_
