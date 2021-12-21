@@ -166,7 +166,7 @@ MESSAGE_ITEMS = {
     ),
     "bound_emission_pool_lo": dict(
         ix_type="par", idx_sets=["node", "type_emission", "type_tec", "year"]
-    ),    
+    ),
     "bound_extraction_up": item("par", "n c g y"),
     "bound_new_capacity_lo": item("par", "nl t yv"),
     "bound_new_capacity_up": item("par", "nl t yv"),
@@ -434,9 +434,11 @@ class MESSAGE(GAMSModel):
         # handled in JDBCBackend. For the moment, this code does not backstop that
         # behaviour.
         # TODO Extend to handle all masks, e.g. for new backends.
-        for par_name in ("bound_emission_pool_up",
-                         "bound_emission_pool_lo",
-                         "emission_sink_rate"):
+        for par_name in (
+            "bound_emission_pool_up",
+            "bound_emission_pool_lo",
+            "emission_sink_rate",
+        ):
             # Name of the corresponding set
             set_name = f"is_{par_name}"
 
