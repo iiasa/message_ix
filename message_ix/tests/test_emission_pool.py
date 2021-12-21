@@ -296,7 +296,7 @@ def test_bound_emission_pool_lo(test_mp):
             "type_emission": "GHG",
             "type_tec": "all",
             "year": [720],
-            "lvl": [33.075572],
+            "lvl": [52.80722057294146],
             "mrg": 0.0,
         }
     )
@@ -335,11 +335,14 @@ def test_bound_emission_pool_up_removal(test_mp):
     obs = s.set("is_bound_emission_pool_up")
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
 
-    # Esnure that is_ set is removed when removing parameter
+    # Ensure that is_ set is removed when removing parameter
     s.remove_solution()
     s.check_out()
     s.remove_par("bound_emission_pool_up", df)
     s.commit("bound_emission_poll removed")
+
+    # Solve
+    s.solve()
 
     obs = s.set("is_bound_emission_pool_up")
     assert obs.empty is True
