@@ -1,3 +1,4 @@
+import os
 import sys
 from shutil import copyfile
 from typing import List, Tuple
@@ -88,6 +89,10 @@ def nb_path(request, tutorial_path):
 
 # Parametrize the first 3 arguments using the variables *tutorial* and *ids*.
 # Argument 'nb_path' is indirect so that the above function can modify it.
+@pytest.mark.xfail(
+    condition="GITHUB_ACTIONS" in os.environ and sys.platform == "darwin",
+    reason="Flaky; CellTimeoutError occurs on first executed cell",
+)
 @pytest.mark.parametrize(
     "nb_path,cell_values,run_args", tutorials, ids=ids, indirect=["nb_path"]
 )
