@@ -37,6 +37,7 @@ Then, continue with the:
 - :doc:`framework` detailed description and feature list.
 - :doc:`install` of the software and essential dependencies.
 - :doc:`tutorials` for new users that demonstrate the basic features of the framework.
+- :doc:`Usage <usage>` of |MESSAGEix| in academic publications, research projects, and derived tools.
 
 .. toctree::
    :hidden:
@@ -46,8 +47,7 @@ Then, continue with the:
    framework
    install
    tutorials
-
-
+   Publications, Projects, and Tools <usage>
 
 
 .. _core:
@@ -117,6 +117,7 @@ Everyone is encouraged to use the framework to develop energy system and integra
 - :doc:`whatsnew` —release history and migration/upgrade notes.
 - :doc:`notice` —including how to properly cite the framework and software in scientific research.
 - :doc:`contributing` —we welcome enhancements to the framework itself that enable new features across all models.
+- :doc:`sharing`—we invite the sharing of the usage of the |MESSAGEix| framework.
 - :doc:`faq`
 - :doc:`bibliography`
 
@@ -129,6 +130,7 @@ Everyone is encouraged to use the framework to develop energy system and integra
    whatsnew
    notice
    contributing
+   sharing
    faq
    bibliography
 

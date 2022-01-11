@@ -38,6 +38,7 @@ Then, if your issue is not found, `open a new one <https://github.com/iiasa/mess
 
 __ https://github.com/iiasa/message_ix/issues?q=is:issue
 
+.. _contrib-pr:
 
 Contribute code via Github PRs
 ==============================
