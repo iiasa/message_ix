@@ -102,7 +102,7 @@ def test_config(westeros_solved):
     assert "config" in c.data
     assert "sector" in c.data["config"]
 
-    # removing a column from config and testing
+    # Removing a column from config and testing
     data = c.data.copy()
     data["config"] = c.data["config"][["node", "sector"]]
     try:
@@ -110,7 +110,7 @@ def test_config(westeros_solved):
     except KeyError as error:
         assert 'Missing config data for "level"' in str(error)
 
-    # removing config completely and testing
+    # Removing config completely and testing
     data.pop("config")
     try:
         macro.Calculate(s, data)
@@ -185,52 +185,6 @@ def test_calc(westeros_solved, method, test, expected):
     assertion(function().values, expected)
 
 
-def test_calc_gdp0(westeros_solved):
-    s = westeros_solved
-    c = macro.Calculate(s, W_DATA_PATH)
-    c.read_data()
-    obs = c._gdp0()
-    assert len(obs) == 1
-    obs = obs[0]
-    exp = 500
-    assert obs == exp
-
-
-def test_calc_k0(westeros_solved):
-    s = westeros_solved
-    c = macro.Calculate(s, W_DATA_PATH)
-    c.read_data()
-    obs = c._k0()
-    assert len(obs) == 1
-    obs = obs[0]
-    exp = 1500
-    assert obs == exp
-
-
-def test_calc_total_cost(westeros_solved):
-    s = westeros_solved
-    c = macro.Calculate(s, W_DATA_PATH)
-    c.read_data()
-    obs = c._total_cost()
-    # 4 values, 3 in model period, one in history
-    assert len(obs) == 4
-    obs = obs.values
-    exp = np.array([15, 17.477751, 22.143633, 28.11481]) / 1e3
-    assert np.isclose(obs, exp).all()
-
-
-def test_calc_price(westeros_solved):
-    s = westeros_solved
-    c = macro.Calculate(s, W_DATA_PATH)
-    c.read_data()
-    obs = c._price()
-    # 4 values, 3 in model period, one in history
-    assert len(obs) == 4
-    obs = obs.values
-    exp = np.array([195, 182.85222905, 162.03953933, 161.0026274])
-    assert np.isclose(obs, exp).all()
-
-
 # Testing how macro handles zero values in PRICE_COMMODITY
 def test_calc_price_zero(westeros_solved):
     s = westeros_solved
@@ -260,41 +214,6 @@ def test_calc_price_zero(westeros_solved):
         assert "0-price found in MESSAGE variable PRICE_" in str(err)
     else:
         raise Exception("No error in macro.read_data() for zero price(s)")
-
-
-def test_calc_demand(westeros_solved):
-    s = westeros_solved
-    c = macro.Calculate(s, W_DATA_PATH)
-    c.read_data()
-    obs = c._demand()
-    # 4 values, 3 in model period, one in history
-    assert len(obs) == 4
-    obs = obs.values
-    exp = np.array([90, 100, 150, 190])
-    assert np.isclose(obs, exp).all()
-
-
-def test_calc_bconst(westeros_solved):
-    s = westeros_solved
-    c = macro.Calculate(s, W_DATA_PATH)
-    c.read_data()
-    obs = c._bconst()
-    assert len(obs) == 1
-    obs = obs[0]
-    exp = 3.6846576e-05
-    assert np.isclose(obs, exp)
-
-
-def test_calc_aconst(westeros_solved):
-    s = westeros_solved
-    c = macro.Calculate(s, W_DATA_PATH)
-    c.read_data()
-    obs = c._aconst()
-
-    assert len(obs) == 1
-    obs = obs[0]
-    exp = 26.027323
-    assert np.isclose(obs, exp)
 
 
 def test_init(message_test_mp):
