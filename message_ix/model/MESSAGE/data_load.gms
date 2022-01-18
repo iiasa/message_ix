@@ -105,7 +105,7 @@ $INCLUDE includes/period_parameter_assignment.gms
 
 * compute auxiliary parameters for relative duration of subannual time periods
 duration_time_rel(time,time2)$( map_time(time,time2) ) = duration_time(time2) / duration_time(time) ;
-* making duration_time_rel equal to 1, i.e., unifroming the units of ACT in sub-annual time slices, for parent 'time' not specified in set 'time_relative'
+* making duration_time_rel equal to 1, i.e., a consistent unit for ACT in sub-annual time slices, for parent 'time' not specified in set 'time_relative'
 duration_time_rel(time,time2)$( Not time_relative(time) ) = 1 ;
 
 * assign an additional mapping set for technologies to nodes, modes and subannual time slices (for shorter reference)
