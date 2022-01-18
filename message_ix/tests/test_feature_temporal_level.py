@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This test ensures that COMMODITY_BALANCE works for (sub-annual) time slices
 (index of "time" in MESSAGEix) at different temporal levels, i.e., year, seasons,
@@ -6,6 +5,7 @@ months, etc., and with different duration times.
 
 """
 
+import pytest
 from itertools import product
 
 from message_ix import ModelError, Scenario
@@ -33,7 +33,6 @@ def add_cap_par(scen, years, tec, data={"inv_cost": 0.1, "technical_lifetime": 5
         scen.add_par(parname, ["node", tec, year], val, "-")
 
 
-# A function for generating a simple model with sub-annual time slices
 def model_generator(
     test_mp,
     comment,
@@ -50,7 +49,6 @@ def model_generator(
     unit="GWa",
 ):
     """
-
     Generates a simple model with two technologies, and a number of time slices.
 
     Parameters
@@ -178,15 +176,24 @@ def model_generator(
 
 
 # Main tests for commodity balance over various temporal levels (and "time" index)
-# In these tests (11 scenarios in total), "demand" is defined in different time slices
+# In these tests, "demand" is defined in different time slices
 # with different "duration_time", there is one power plant ("gas_ppl") to meet "demand",
 # which receives fuel from a supply technology ("gas_supply").
 # Different temporal level hierarchies are tested, by linkages of "ACT" with
 # "demand" and "CAP".
 
-# 1) "gas_ppl" is active in "summer" and NOT linked to "gas_supply" in "year"
-# This setup should not solve, as no linkgae between power plant and fuel supply.
+
 def test_temporal_levels_not_linked(test_mp):
+    """
+    Testing two unlinked temporal levels.
+
+    "gas_ppl" is active in "summer" and NOT linked to "gas_supply" in "year"
+    This setup should not solve.
+
+    Parameters
+    ----------
+    test_mp : ixmp.Platform()
+    """
     comment = "1.not-linked"
     # Dictionary of technology input/output
     tec_dict = {
@@ -199,23 +206,28 @@ def test_temporal_levels_not_linked(test_mp):
     }
 
     # Check the model not solve if there is no link between fuel supply and power plant
-    try:
+    with pytest.raises(ModelError):
         model_generator(
             test_mp,
             comment,
             tec_dict,
             time_steps=[("summer", 1, "season", "year")],
             demand={"summer": 2},
-        ),
-
-    except ModelError:
-        pass
+        )
 
 
-# 2) Linking "gas_ppl" and "gas_supply" at one temporal level (e.g., "year")
-# Only one "season" (duration = 1) and "demand" is defined only at "summer"
-# Results: Model should solve and the linkage is made ("gas_supply" is active)
 def test_season_to_year(test_mp):
+    """
+    Testing two linked temporal levels.
+
+    Linking "gas_ppl" and "gas_supply" at one temporal level (e.g., "year")
+    Only one "season" (duration = 1) and "demand" is defined only at "summer"
+    Model solves and "gas_supply" is active.
+
+    Parameters
+    ----------
+    test_mp : ixmp.Platform()
+    """
     comment = "2.linked-one-season-with-year"
     # Dictionary of technology input/output
     tec_dict = {
@@ -235,10 +247,17 @@ def test_season_to_year(test_mp):
     )
 
 
-# 3) Meeting "demand" in two time slices: "summer" and "winter" (duration = 0.5)
-# 3a) "gas_supply" and "gas_ppl" linked at "year"
-# Results: Model should solve and the linkage is made ("gas_supply" is active)
 def test_two_seasons_to_year(test_mp):
+    """
+    Testing two linked temporal levels with two seasons.
+
+    "demand" in two time slices: "summer" and "winter" (duration = 0.5)
+    Model solves and "gas_supply" is active.
+
+    Parameters
+    ----------
+    test_mp : ixmp.Platform()
+    """
     comment = "3a.linked-two-seasons-with-year"
     # Dictionary of technology input/output
     tec_dict = {
@@ -263,6 +282,16 @@ def test_two_seasons_to_year(test_mp):
 
 
 def test_two_seasons_to_year_relative(test_mp):
+    """
+    Testing two linked temporal levels with two seasons and a relative time.
+
+    "demand" in two time slices: "summer" and "winter" (duration = 0.5)
+    Model should not solve.
+
+    Parameters
+    ----------
+    test_mp : ixmp.Platform()
+    """
     comment = "3a.linked-two-seasons-with-year-relative"
     # Dictionary of technology input/output
     tec_dict = {
@@ -290,9 +319,17 @@ def test_two_seasons_to_year_relative(test_mp):
         pass
 
 
-# 3b) "gas_supply" and "gas_ppl" linked at each season
-# Results: Model should solve and the linkage is made ("gas_supply" is active)
 def test_seasons_to_seasons(test_mp):
+    """
+    Testing two seasons at one temporal level.
+
+    "demand" in two time slices: "summer" and "winter" (duration = 0.5)
+    Model solves and "gas_supply" is active.
+
+    Parameters
+    ----------
+    test_mp : ixmp.Platform()
+    """
     comment = "3b.linked-two-seasons-with-two-seasons"
     # Dictionary of technology input/output
     tec_dict = {
@@ -320,11 +357,17 @@ def test_seasons_to_seasons(test_mp):
     )
 
 
-# 4) Meeting "demand" through three temporal levels ("month", "season", and "year")
-# 4a) "month" is defined under "season" BUT "season" not linked to "year"
-# Results: Model should not solve (no parent "time" for "season", i.e., no
-# linkage to "gas_supply" at "year")
 def test_unlinked_three_temporal_levels(test_mp):
+    """
+    Testing three unlinked temporal levels.
+
+    "month" is defined under "season" BUT "season" not linked to "year".
+    Model should not solve.
+
+    Parameters
+    ----------
+    test_mp : ixmp.Platform()
+    """
     comment = "4a.unlinked-temporal-levels"
     # Dictionary of technology input/output
     tec_dict = {
@@ -341,7 +384,7 @@ def test_unlinked_three_temporal_levels(test_mp):
     }
 
     # Check the model shouldn't solve
-    try:
+    with pytest.raises(ModelError):
         model_generator(
             test_mp,
             comment,
@@ -353,15 +396,20 @@ def test_unlinked_three_temporal_levels(test_mp):
                 ("Jul", 0.25, "month", "summer"),
             ],
             demand={"Jan": 1, "Feb": 1},
-        ),
-    except ModelError:
-        pass
+        )
 
 
-# 4b) "month" is defined under "season" AND "season" under "year"
-# Results: Model should solve, linking "month" through "season" to "year"
-# (i.e., "gas_supply" is active)
 def test_linked_three_temporal_levels(test_mp):
+    """
+    Testing three linked temporal levels.
+
+    "month" is defined under "season", and "season" is linked to "year".
+    Model solves.
+
+    Parameters
+    ----------
+    test_mp : ixmp.Platform()
+    """
     comment = "4b.linked-temporal-levels"
     # Dictionary of technology input/output
     tec_dict = {
@@ -393,6 +441,16 @@ def test_linked_three_temporal_levels(test_mp):
 
 
 def test_linked_three_temporal_levels_relative(test_mp):
+    """
+    Testing three linked temporal levels with a relative time.
+
+    "month" is defined under "season", and "season" is linked to "year".
+    Model solves.
+
+    Parameters
+    ----------
+    test_mp : ixmp.Platform()
+    """
     comment = "4b.linked-temporal-levels-relative"
     # Dictionary of technology input/output
     tec_dict = {
@@ -429,11 +487,17 @@ def test_linked_three_temporal_levels_relative(test_mp):
         pass
 
 
-# 4c) input of "gas_ppl" from lowest temporal level ("month") and output to
-# highest ("year") output of "gas_supply" to "month", "demand" at "year"
-# Results: Model should solve, linking "month" through "season" to "year"
-# (i.e., "gas_supply" is active)
 def test_linked_three_temporal_levels_month_to_year(test_mp):
+    """
+    Testing three linked temporal levels from month to season and year.
+
+    "month" is linked to "season", and "season" is linked to "year".
+    Model solves.
+
+    Parameters
+    ----------
+    test_mp : ixmp.Platform()
+    """
     comment = "4c.linked-temporal-levels-month-to-year"
     # Dictionary of technology input/output
     tec_dict = {
@@ -465,11 +529,16 @@ def test_linked_three_temporal_levels_month_to_year(test_mp):
     )
 
 
-# 4d) input of "gas_ppl" from "season" and output to "year"
-# output of "gas_supply" to "season", and "demand" at "year"
-# Results: Model should solve, linking "month" through "season" to "year"
-# (i.e., "gas_supply" is active)
 def test_linked_three_temporal_levels_season_to_year(test_mp):
+    """
+    Testing three linked temporal levels from season to year.
+
+    season" is linked to "year". Model solves.
+
+    Parameters
+    ----------
+    test_mp : ixmp.Platform()
+    """
     comment = "4d.linked-temporal-levels-season-to-year"
     # Dictionary of technology input/output
     tec_dict = {
@@ -501,9 +570,15 @@ def test_linked_three_temporal_levels_season_to_year(test_mp):
     )
 
 
-# 4e) Meeting demand at "year", "gas_ppl" at two time slices, supply at "year"
-# Results: Model should solve, (i.e., "gas_supply" is active)
-def test_linked_three__temporal_levels_time_act(test_mp):
+def test_linked_three_temporal_levels_time_act(test_mp):
+    """
+    Testing three linked temporal levels, with activity only at "time".
+    Model solves.
+
+    Parameters
+    ----------
+    test_mp : ixmp.Platform()
+    """
     comment = "4e.time-divider-aggregator"
     # Dictionary of technology input/output
     tec_dict = {
@@ -531,12 +606,15 @@ def test_linked_three__temporal_levels_time_act(test_mp):
     )
 
 
-# 4f) input of "gas_ppl" from lowest temporal level ("month")
-# with different duration time, and output to highest ("year"), output of
-# "gas_supply" to "month", "demand" at "year"
-# Results: Model should solve, linking "month" through "season" to "year"
-# (i.e., "gas_supply" is active)
 def test_linked_three_temporal_levels_different_duration(test_mp):
+    """
+    Testing three linked temporal levels with different duration times.
+    Model solves, linking "month" through "season" to "year".
+
+    Parameters
+    ----------
+    test_mp : ixmp.Platform()
+    """
     comment = "4f.linked-temporal-levels-different-duration"
     # Dictionary of technology input/output
     tec_dict = {
