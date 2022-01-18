@@ -5,8 +5,9 @@ months, etc., and with different duration times.
 
 """
 
-import pytest
 from itertools import product
+
+import pytest
 
 from message_ix import ModelError, Scenario
 
