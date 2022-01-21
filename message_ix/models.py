@@ -91,6 +91,7 @@ MESSAGE_ITEMS = {
     "storage_tec": dict(ix_type="set"),  # Storage reservoir technology
     "technology": dict(ix_type="set"),
     "time": dict(ix_type="set"),
+    "time_relative": dict(ix_type="set"),
     "type_addon": dict(ix_type="set"),
     "type_emission": dict(ix_type="set"),
     "type_node": dict(ix_type="set"),
