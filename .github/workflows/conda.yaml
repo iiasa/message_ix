@@ -63,7 +63,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
         conda config --prepend channels conda-forge
-        conda update -n base -c defaults conda
+        conda update --all
 
         # Also install pytest and packages required for testing. pip/PyPI
         # supports this via message_ix[testing], but conda does not.
@@ -75,7 +75,7 @@ jobs:
       run: |
         conda config --prepend channels conda-forge
         # conda config --set channel_priority strict
-        conda update -n base -c defaults conda
+        conda update --all
 
         # Also install pytest and packages required for testing. pip/PyPI
         # supports this via message_ix[testing], but conda does not.
