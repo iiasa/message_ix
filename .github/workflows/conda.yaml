@@ -74,7 +74,7 @@ jobs:
       if: matrix.os == 'macos-latest'
       run: |
         conda config --prepend channels conda-forge
-        conda config --set channel_priority strict
+        # conda config --set channel_priority strict
         conda update -n base -c defaults conda
 
         # Also install pytest and packages required for testing. pip/PyPI
