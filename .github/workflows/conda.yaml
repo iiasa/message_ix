@@ -14,10 +14,11 @@ jobs:
   conda:
     strategy:
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [windows-latest]
+#        os: [ windows-latest, macos-latest ]
         conda:
-        - {installer: anaconda, version: 2019.03}
-        - {installer: miniconda, version: py39_4.10.3}
+        - {installer: anaconda, version: 2018.12}
+#        - {installer: miniconda, version: py39_4.10.3}
         extra-deps: ["", "JPype1=1.2.1"]
       fail-fast: false
 
