@@ -14,11 +14,10 @@ jobs:
   conda:
     strategy:
       matrix:
-        os: [windows-latest]
-#        os: [ windows-latest, macos-latest ]
+        os: [ windows-latest, macos-latest ]
         conda:
         - {installer: anaconda, version: 2021.05}
-#        - {installer: miniconda, version: py39_4.10.3}
+        - {installer: miniconda, version: py39_4.10.3}
         extra-deps: ["", "JPype1=1.2.1"]
       fail-fast: false
 
@@ -61,16 +60,13 @@ jobs:
       run: conda init ${{ steps.shell.outputs.init }}
 
     - name: Configure conda channels, create environment, and install message-ix
-      env:
-        CONDA_INSTRUMENTATION_ENABLED: 1
       run: |
         conda config --prepend channels conda-forge
-        conda clean --packages
         conda update -n base -c defaults conda
 
         # Also install pytest and packages required for testing. pip/PyPI
         # supports this via message_ix[testing], but conda does not.
-        conda create --quiet --name testenv message-ix">1.0.0" ${{ matrix.extra-deps }} pytest asyncssh sphinx
+        conda create --quiet --name testenv message-ix ${{ matrix.extra-deps }} pytest asyncssh sphinx
         conda list --name testenv
 
     - name: Check CLI commands and run test
