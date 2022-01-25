@@ -60,8 +60,21 @@ jobs:
       run: conda init ${{ steps.shell.outputs.init }}
 
     - name: Configure conda channels, create environment, and install message-ix
+      if: matrix.os == 'windows-latest'
       run: |
         conda config --prepend channels conda-forge
+        conda update -n base -c defaults conda
+
+        # Also install pytest and packages required for testing. pip/PyPI
+        # supports this via message_ix[testing], but conda does not.
+        conda create --quiet --name testenv message-ix ${{ matrix.extra-deps }} pytest asyncssh sphinx
+        conda list --name testenv
+
+    - name: Configure conda channels, create environment, and install message-ix
+      if: matrix.os == 'macos-latest'
+      run: |
+        conda config --prepend channels conda-forge
+        conda config --set channel_priority strict
         conda update -n base -c defaults conda
 
         # Also install pytest and packages required for testing. pip/PyPI
