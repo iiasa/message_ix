@@ -100,8 +100,8 @@ Go to the section `Check that installation was successful`_.
 .. [2] The ‘$’ character at the start of these lines indicates that the command text should be entered in the terminal or prompt, depending on the operating system.
        Do not retype the ‘$’ character itself.
 .. [3] Notice that conda uses the hyphen (‘-’) in package names, different from the underscore (‘_’) used in Python when importing the package.
-       Specifying a version >1 is currently required on macOS.
-       On Windows, it is optional; one can also use conda install message-ix.
+       Specifying a version >1 is currently *required* on macOS.
+       On Windows, it is *optional*; one can also use ``conda install message-ix``.
 .. note:: When using Anaconda (not Miniconda), steps (5) through (8) can also be performed using the graphical Anaconda Navigator.
    See the `Anaconda Navigator documentation`_ for how to perform the various steps.
 
