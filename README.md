@@ -3,9 +3,9 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4005684.svg)](https://doi.org/10.5281/zenodo.4005684)
 [![PyPI version](https://img.shields.io/pypi/v/message_ix.svg)](https://pypi.python.org/pypi/message_ix/)
 [![Anaconda version](https://img.shields.io/conda/vn/conda-forge/message-ix)](https://anaconda.org/conda-forge/message-ix)
-[![Documentation build](https://readthedocs.com/projects/iiasa-energy-program-message-ix/badge/?version=master)](https://docs.messageix.org/en/master/)
+[![Documentation build](https://readthedocs.com/projects/iiasa-energy-program-message-ix/badge/?version=stable)](https://docs.messageix.org/en/stable/)
 [![Build status](https://github.com/iiasa/message_ix/actions/workflows/pytest.yaml/badge.svg)](https://github.com/iiasa/message_ix/actions/workflows/pytest.yaml)
-[![Test coverage](https://codecov.io/gh/iiasa/message_ix/branch/master/graph/badge.svg)](https://codecov.io/gh/iiasa/message_ix)
+[![Test coverage](https://codecov.io/gh/iiasa/message_ix/branch/main/graph/badge.svg)](https://codecov.io/gh/iiasa/message_ix)
 
 
 MESSAGEix is a versatile, dynamic, model framework for energy-engineering-economy-environment (E4) systems research.
@@ -46,7 +46,7 @@ Other forms of documentation:
 
 ## License
 
-Copyright © 2018–2021 IIASA Energy, Climate, and Environment (ECE) Program
+Copyright © 2018–2022 IIASA Energy, Climate, and Environment (ECE) Program
 
 The MESSAGEix framework is licensed under the Apache License, Version 2.0 (the "License"); you may not use the files in this repository except in compliance with the License. You may obtain a copy of the License in [`LICENSE`](LICENSE) or at <http://www.apache.org/licenses/LICENSE-2.0>.
 
