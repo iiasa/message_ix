@@ -88,6 +88,7 @@ jobs:
         # Activate the test environment
         conda activate testenv
         conda info
+        conda config --show
 
         # Check CLI tools
         message-ix show-versions
