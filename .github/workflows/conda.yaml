@@ -7,8 +7,8 @@ on:
   schedule:
   - cron: "0 5 * * *"
   # Uncomment to debug
-  # pull_request:
-  #   branches: [ main ]
+  pull_request:
+   branches: [ main ]
 
 jobs:
   conda:
