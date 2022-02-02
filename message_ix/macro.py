@@ -375,7 +375,7 @@ class Calculate:
         k0 = self._k0()
         kpvs = self.data["kpvs"]
         # TODO: why name this partmp??
-        partmp = (bconst * demand_ref ** rho).groupby(level="node").sum()
+        partmp = (bconst * demand_ref**rho).groupby(level="node").sum()
         # TODO: automatically get the units here!!
         aconst = ((gdp0 / 1e3) ** rho - partmp) / (k0 / 1e3) ** (rho * kpvs)
         # want the series to only have index of node

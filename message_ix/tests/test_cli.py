@@ -50,5 +50,5 @@ def test_dl(message_ix_cli, opts, tmp_path):
         major = message_ix.__version__.split(".")[0]
 
         # 'message-ix dl' defaults to the latest release
-        pattern = re.compile(fr"Default: latest release v{major}\.\d+\.\d+")
+        pattern = re.compile(rf"Default: latest release v{major}\.\d+\.\d+")
         assert pattern.match(r.output)

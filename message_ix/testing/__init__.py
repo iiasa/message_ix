@@ -159,7 +159,7 @@ def make_austria(mp, solve=False, quiet=True):
 
     gdp_profile = np.array([1.0, 1.21631, 1.4108, 1.63746])
     beta = 0.7
-    demand_profile = gdp_profile ** beta
+    demand_profile = gdp_profile**beta
 
     # From IEA statistics, in GW·h, converted to GW·a
     base_annual_demand = dict(other_electricity=55209.0 / 8760, light=6134.0 / 8760)
