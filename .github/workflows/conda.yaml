@@ -71,6 +71,7 @@ jobs:
     - name: Configure conda channels, update, create environment, and install message-ix
       run: |
         conda config --prepend channels conda-forge
+        conda config --set channel_priority strict
         conda update -n base -c defaults conda
 
         # Also install pytest and packages required for testing. pip/PyPI
