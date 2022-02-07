@@ -71,12 +71,11 @@ jobs:
     - name: Configure conda channels, update, create environment, and install message-ix
       run: |
         conda config --prepend channels conda-forge
-        conda config --set channel_priority strict
         conda update -n base -c defaults conda
 
         # Also install pytest and packages required for testing. pip/PyPI
         # supports this via message_ix[testing], but conda does not.
-        conda create --quiet --name testenv "message-ix${{ steps.spec.outputs.version }}" ${{ matrix.extra-deps }} pytest asyncssh sphinx
+        conda create --repodata-fn repodata.json --quiet --name testenv "message-ix${{ steps.spec.outputs.version }}" ${{ matrix.extra-deps }} pytest asyncssh sphinx
         conda list --name testenv
 
     - name: Check CLI commands and run test
@@ -89,7 +88,6 @@ jobs:
         # Activate the test environment
         conda activate testenv
         conda info
-        conda config --show
 
         # Check CLI tools
         message-ix show-versions
