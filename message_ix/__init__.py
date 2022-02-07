@@ -30,6 +30,8 @@ except DistributionNotFound:
 
 # Register configuration keys with ixmp core and set default
 config.register("message model dir", Path, Path(__file__).parent / "model")
+# FIXME this overwrites a value loaded from the user's config file
+# config.register("message solve options", dict, None)
 
 # Register models with ixmp core
 MODELS["MACRO"] = MACRO

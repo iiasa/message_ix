@@ -1,3 +1,4 @@
+import logging
 from collections import ChainMap
 from copy import copy, deepcopy
 from functools import lru_cache
@@ -8,6 +9,8 @@ from ixmp import config
 
 from .macro import MACRO_ITEMS
 
+log = logging.getLogger(__name__)
+
 #: Solver options used by :meth:`message_ix.Scenario.solve`.
 DEFAULT_CPLEX_OPTIONS = {
     "advind": 0,
@@ -15,6 +18,10 @@ DEFAULT_CPLEX_OPTIONS = {
     "threads": 4,
     "epopt": 1e-6,
 }
+
+# Set default value of "message model options" config key.
+# NB this should be in message_ix/__init__.py, but see FIXME there
+config.values.setdefault("message model options", dict())
 
 # Abbreviations for index sets and index names; the same used in the inline
 # documentation of the GAMS code.
@@ -332,6 +339,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         # Update the default options with any user-provided options
         model_options.setdefault("model_dir", config.get("message model dir"))
         self.cplex_opts = copy(DEFAULT_CPLEX_OPTIONS)
+        self.cplex_opts.update(config.get("message solve options"))
         self.cplex_opts.update(model_options.pop("solve_options", {}))
 
         super().__init__(name, **model_options)
@@ -359,6 +367,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         optfile = self.model_dir / "cplex.opt"
         lines = ("{} = {}".format(*kv) for kv in self.cplex_opts.items())
         optfile.write_text("\n".join(lines))
+        log.info(f"Use CPLEX options {self.cplex_opts}")
 
         try:
             result = super().run(scenario)
