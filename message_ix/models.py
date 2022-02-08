@@ -19,10 +19,6 @@ DEFAULT_CPLEX_OPTIONS = {
     "epopt": 1e-6,
 }
 
-# Set default value of "message model options" config key.
-# NB this should be in message_ix/__init__.py, but see FIXME there
-config.values.setdefault("message model options", dict())
-
 # Abbreviations for index sets and index names; the same used in the inline
 # documentation of the GAMS code.
 _ABBREV = {
