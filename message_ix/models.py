@@ -360,7 +360,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         #      directory.
 
         # Write CPLEX options into an options file
-        optfile = self.model_dir / "cplex.opt"
+        optfile = Path(self.model_dir).joinpath("cplex.opt")
         lines = ("{} = {}".format(*kv) for kv in self.cplex_opts.items())
         optfile.write_text("\n".join(lines))
         log.info(f"Use CPLEX options {self.cplex_opts}")
