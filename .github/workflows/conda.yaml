@@ -67,7 +67,7 @@ jobs:
 
         # Also install pytest and packages required for testing. pip/PyPI
         # supports this via message_ix[testing], but conda does not.
-        conda create --quiet --name testenv message-ix">1" ${{ matrix.extra-deps }} pytest asyncssh sphinx
+        conda create --quiet --name testenv message-ix=3.4 ${{ matrix.extra-deps }} pytest asyncssh sphinx
         conda list --name testenv
 
     - name: Check CLI commands and run test
