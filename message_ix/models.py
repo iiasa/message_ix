@@ -335,7 +335,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         # Update the default options with any user-provided options
         model_options.setdefault("model_dir", config.get("message model dir"))
         self.cplex_opts = copy(DEFAULT_CPLEX_OPTIONS)
-        self.cplex_opts.update(config.get("message solve options"))
+        self.cplex_opts.update(config.get("message solve options") or dict())
         self.cplex_opts.update(model_options.pop("solve_options", {}))
 
         super().__init__(name, **model_options)
