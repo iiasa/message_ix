@@ -446,6 +446,9 @@ Sets
     is_dynamic_activity_lo(node,tec,year_all,time)   flag whether lower dynamic constraint exists for a technology (activity)
 
     is_bound_emission(node,type_emission,type_tec,type_year) flag whether emissions bound exists
+    is_emission_sink_rate(node,emission,type_tec,year_all) flag whether emission sink rate exists for regional emission pool formulation
+    is_bound_emission_pool_up(node,type_emission,type_tec,year_all) flag whether upper emission pool bound exists for regional emission pool formulation
+    is_bound_emission_pool_lo(node,type_emission,type_tec,year_all) flag whether lower emission pool bound exists for regional emission pool formulation
 
     is_dynamic_land_scen_up(node,land_scenario,year_all)   flag whether dynamic upper constraint on land-scenario change exists
     is_dynamic_land_scen_lo(node,land_scenario,year_all)   flag whether dynamic lower constraint on land-scenario change exists

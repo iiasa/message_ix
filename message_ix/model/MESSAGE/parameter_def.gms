@@ -588,6 +588,16 @@ Parameters
 *      - ``node`` | ``type_emission`` | ``type_tec`` | ``type_year``
 *    * - tax_emission
 *      - ``node`` | ``type_emission`` | ``type_tec`` | ``type_year``
+*    * - emission_sink_rate
+*      - ``node`` | ``emission`` | ``type_tec`` | ``year``
+*    * - historical_emission_pool [#hist]_
+*      - ``node`` | ``emission`` | ``type_tec`` | ``year``
+*    * - tax_emission_pool
+*      - ``node`` | ``type_emission`` | ``type_tec`` | ``year``
+*    * - bound_emission_pool_up
+*      - ``node`` | ``type_emission`` | ``type_tec`` | ``type``
+*    * - bound_emission_pool_lo
+*      - ``node`` | ``type_emission`` | ``type_tec`` | ``type``
 *
 * .. [#em_scaling] The parameter ``emission_scaling`` is the scaling factor to harmonize bounds or taxes across types of
 *    emissions. It allows to efficiently aggregate different emissions/pollutants and set bounds or taxes on various categories.
@@ -595,10 +605,15 @@ Parameters
 ***
 
 Parameters
-    historical_emission(node,emission,type_tec,year_all)    historical emissions by technology type (including land)
-    emission_scaling(type_emission,emission)                scaling factor to harmonize bounds or taxes across types
-    bound_emission(node,type_emission,type_tec,type_year)   upper bound on emissions
-    tax_emission(node,type_emission,type_tec,type_year)     emission tax
+    historical_emission(node,emission,type_tec,year_all)     historical emissions by technology type (including land)
+    emission_scaling(type_emission,emission)                 scaling factor to harmonize bounds or taxes across types
+    bound_emission(node,type_emission,type_tec,type_year)    upper bound on emissions
+    tax_emission(node,type_emission,type_tec,type_year)      emission tax
+    emission_sink_rate(node,emission,type_tec,year_all)      emission sink rate for regional emission pool formulation
+    historical_emission_pool(node,emission,type_tec,year_all) historical size of emission pool by technology type
+    tax_emission_pool(node,type_emission,type_tec,year_all)  emission pool tax
+    bound_emission_pool_up(node,type_emission,type_tec,year_all) upper bound on emission pool size
+    bound_emission_pool_lo(node,type_emission,type_tec,year_all) lower bound on emission pool size
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*

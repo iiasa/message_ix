@@ -11,7 +11,7 @@ from .macro import MACRO_ITEMS
 #: Solver options used by :meth:`message_ix.Scenario.solve`.
 DEFAULT_CPLEX_OPTIONS = {
     "advind": 0,
-    "lpmethod": 2,
+    "lpmethod": 4,
     "threads": 4,
     "epopt": 1e-6,
 }
@@ -56,8 +56,8 @@ def item(ix_type, expr):
     ...     idx_names=["node_loc", "technology", "year_act"]
     ... )
     """
-    # Split expr on spaces. For each dimension, use an abbreviation (if one)
-    # exists, else the set name for both idx_sets and idx_names
+    # Split expr on spaces. For each dimension, use an abbreviation (if one) exists,
+    # else the set name for both idx_sets and idx_names
     sets, names = zip(*[_ABBREV.get(dim, (dim, dim)) for dim in expr.split()])
 
     # Assemble the result
@@ -102,8 +102,8 @@ MESSAGE_ITEMS = {
     #
     # Indexed sets
     "addon": dict(ix_type="set", idx_sets=["technology"]),
-    # commented: in test_solve_legacy_scenario(), ixmp_source complains that
-    # the item already exists
+    # commented: in test_solve_legacy_scenario(), ixmp_source complains that the item
+    # already exists
     # "balance_equality": item("set", "c l"),
     "cat_addon": dict(
         ix_type="set",
@@ -115,6 +115,15 @@ MESSAGE_ITEMS = {
     "cat_relation": item("set", "type_relation relation"),
     "cat_tec": item("set", "type_tec t"),
     "cat_year": item("set", "type_year y"),
+    "is_bound_emission_pool_up": dict(
+        ix_type="set", idx_sets=["node", "type_emission", "type_tec", "year"]
+    ),
+    "is_bound_emission_pool_lo": dict(
+        ix_type="set", idx_sets=["node", "type_emission", "type_tec", "year"]
+    ),
+    "is_emission_sink_rate": dict(
+        ix_type="set", idx_sets=["node", "emission", "type_tec", "year"]
+    ),
     "level_renewable": dict(ix_type="set", idx_sets=["level"]),
     "level_resource": dict(ix_type="set", idx_sets=["level"]),
     "level_stocks": dict(ix_type="set", idx_sets=["level"]),
@@ -152,6 +161,12 @@ MESSAGE_ITEMS = {
     "bound_activity_lo": item("par", "nl t ya m h"),
     "bound_activity_up": item("par", "nl t ya m h"),
     "bound_emission": item("par", "n type_emission type_tec type_year"),
+    "bound_emission_pool_up": dict(
+        ix_type="par", idx_sets=["node", "type_emission", "type_tec", "year"]
+    ),
+    "bound_emission_pool_lo": dict(
+        ix_type="par", idx_sets=["node", "type_emission", "type_tec", "year"]
+    ),
     "bound_extraction_up": item("par", "n c g y"),
     "bound_new_capacity_lo": item("par", "nl t yv"),
     "bound_new_capacity_up": item("par", "nl t yv"),
@@ -167,6 +182,9 @@ MESSAGE_ITEMS = {
     "dynamic_land_up": item("par", "n land_scenario y land_type"),
     "emission_factor": item("par", "nl t yv ya m e"),
     "emission_scaling": item("par", "type_emission e"),
+    "emission_sink_rate": dict(
+        ix_type="par", idx_sets=["node", "emission", "type_tec", "year"]
+    ),
     "fix_cost": item("par", "nl t yv ya"),
     "fixed_activity": item("par", "nl t yv ya m h"),
     "fixed_capacity": item("par", "nl t yv ya"),
@@ -186,6 +204,9 @@ MESSAGE_ITEMS = {
     "historical_activity": item("par", "nl t ya m h"),
     "historical_emission": dict(
         ix_type="par", idx_sets=["node", "type_emission", "type_tec", "type_year"]
+    ),
+    "historical_emission_pool": dict(
+        ix_type="par", idx_sets=["node", "emission", "type_tec", "year"]
     ),
     "historical_extraction": item("par", "n c g y"),
     "historical_gdp": dict(ix_type="par", idx_sets=["node", "year"]),
@@ -248,16 +269,21 @@ MESSAGE_ITEMS = {
     "tax_emission": dict(
         ix_type="par", idx_sets=["node", "type_emission", "type_tec", "type_year"]
     ),
+    "tax_emission_pool": dict(
+        ix_type="par", idx_sets=["node", "type_emission", "type_tec", "year"]
+    ),
     "tax": item("par", "nl type_tec ya"),
     "technical_lifetime": item("par", "nl t yv"),
     # Order of sub-annual time steps
     "time_order": dict(ix_type="par", idx_sets=["lvl_temporal", "time"]),
     "var_cost": item("par", "nl t yv ya m h"),
     #
-    # commented: for both variables and equations, ixmp_source requires that
-    # the `idx_sets` and `idx_names` parameters be empty, but then internally
-    # uses the correct sets and names to initialize.
-    # TODO adjust ixmp_source to accept these values, then uncomment.
+    # For certain variables and equations, the Java code of ixmp_source requires that
+    # the `idx_sets` and `idx_names` parameters be empty, but then internally uses the
+    # correct sets and names to initialize. For other (newer) var/equ, e.g.
+    # "EMISS_POOL", the Java code has no dedicated code, so this quirk does not occur.
+    #
+    # TODO Uncomment the items below once ixmp_source is adjusted or replaced.
     #
     # Variables
     #
@@ -279,6 +305,9 @@ MESSAGE_ITEMS = {
     # "REL": item("var", "relation nr yr"),
     # # Stock
     # "STOCK": item("var", "n c l y"),
+    # Emissions pools
+    "EMISS_POOL": item("var", "n e type_tec y"),
+    "PRICE_EMISSION_POOL": item("var", "n type_emission type_tec y"),
     #
     # # Equations
     # # Commodity balance
@@ -310,8 +339,8 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
                     _template("output", "MsgIterationReport_{case}.gdx")
                 ),
             ],
-            # Disable the feature to put input/output GDX files, list files, etc.
-            # in a temporary directory
+            # Disable the feature to put input/output GDX files, list files, etc. in a
+            # temporary directory
             "use_temp_dir": False,
         },
         ixmp.model.gams.GAMSModel.defaults,
@@ -328,6 +357,13 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         # Initialize the ixmp items
         cls.initialize_items(scenario, MESSAGE_ITEMS)
 
+    @staticmethod
+    def enforce(scenario):
+        """Enforce data consistency in `scenario`."""
+        # Implemented in MESSAGE sub-class, below
+        # TODO make this an optional method of the ixmp.model.base.Model abstract class
+        pass
+
     def __init__(self, name=None, **model_options):
         # Update the default options with any user-provided options
         model_options.setdefault("model_dir", config.get("message model dir"))
@@ -336,26 +372,38 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
 
         super().__init__(name, **model_options)
 
+        # Extend `var_list`. JDBCBackend does not automatically read vars from the model
+        # solution GDX file, even when they exist in the Scenario. Ensure the vars that
+        # are part of the MESSAGE scheme are always read.
+        self.var_list = self.var_list or []
+        # Iterate over names of "var" items that are not already in `var_list`
+        for name, _ in filter(
+            lambda kv: kv[1]["ix_type"] == "var" and kv[0] not in self.var_list,
+            MESSAGE_ITEMS.items(),
+        ):
+            self.var_list.append(name)
+
     def run(self, scenario):
         """Execute the model.
 
-        GAMSModel creates a file named ``cplex.opt`` in the model directory
-        containing the options in :obj:`DEFAULT_CPLEX_OPTIONS`, or any
-        overrides passed to :meth:`~message_ix.Scenario.solve`.
+        GAMSModel creates a file named ``cplex.opt`` in the model directory containing
+        the options in :obj:`DEFAULT_CPLEX_OPTIONS`, or any overrides passed to
+        :meth:`~message_ix.Scenario.solve`.
 
-        .. warning:: GAMSModel can solve Scenarios in two or more Python
-           processes simultaneously; but using *different* CPLEX options in
-           each process may produced unexpected results.
+        .. warning:: GAMSModel can solve Scenarios in two or more Python processes
+           simultaneously; but using *different* CPLEX options in each process may
+           produced unexpected results.
         """
-        # If two runs are kicked off simulatenously with the same
-        # self.model_dir, then they will try to write the same optfile, and may
-        # write different contents.
-        #
-        # TODO Re-enable the 'use_temp_dir' feature from ixmp.GAMSModel
-        #      (disabled above). Then cplex.opt will be specific to that
-        #      directory.
+        # Ensure the data in `scenario` is consistent with the MESSAGE formulation
+        # TODO move this call to ixmp.model.base.Model.run(); remove here
+        self.enforce(scenario)
 
         # Write CPLEX options into an options file
+        # FIXME If two runs are kicked off simulatenously with the same self.model_dir,
+        #       then they will try to write the same optfile, and may write different
+        #       contents. To fix, re-enable the 'use_temp_dir' feature from
+        #       ixmp.GAMSModel (disabled above). Then cplex.opt will be specific to
+        #       that directory.
         optfile = self.model_dir / "cplex.opt"
         lines = ("{} = {}".format(*kv) for kv in self.cplex_opts.items())
         optfile.write_text("\n".join(lines))
@@ -363,11 +411,10 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         try:
             result = super().run(scenario)
         finally:
-            # Remove the optfile regardless of whether the run completed
-            # without error. The file may have been removed already by another
-            # run (in a separate process) that completed before this one.
-            # py37 compat: check for existence instead of using
-            # unlink(missing_ok=True)
+            # Remove the optfile regardless of whether the run completed without error.
+            # The file may have been removed already by another run (in a separate
+            # process) that completed before this one.
+            # py37 compat: check for existence instead of using unlink(missing_ok=True)
             if optfile.exists():
                 optfile.unlink()
 
@@ -379,21 +426,48 @@ class MESSAGE(GAMSModel):
 
     name = "MESSAGE"
 
+    @staticmethod
+    def enforce(scenario):
+        """Enforce data consistency in `scenario`."""
+        # Check masks ("mapping sets") that indicate which elements of corresponding
+        # parameters are active/non-zero. Note that there are other masks currently
+        # handled in JDBCBackend. For the moment, this code does not backstop that
+        # behaviour.
+        # TODO Extend to handle all masks, e.g. for new backends.
+        for par_name in (
+            "bound_emission_pool_up",
+            "bound_emission_pool_lo",
+            "emission_sink_rate",
+        ):
+            # Name of the corresponding set
+            set_name = f"is_{par_name}"
+
+            # Existing and expected contents
+            existing = scenario.set(set_name)
+            expected = scenario.par(par_name).drop(columns=["value", "unit"])
+
+            if existing.equals(expected):
+                continue  # Contents are as expected; do nothing
+
+            # Not consistent; empty and then re-populate the set
+            with scenario.transact(f"Enforce consistency of {set_name} and {par_name}"):
+                scenario.remove_set(set_name, existing)
+                scenario.add_set(set_name, expected)
+
 
 class MACRO(GAMSModel):
     """Model class for MACRO."""
 
     name = "MACRO"
 
-    #: MACRO uses the GAMS ``break;`` statement, and thus requires GAMS 24.8.1
-    #: or later.
+    #: MACRO uses the GAMS ``break;`` statement, and thus requires GAMS 24.8.1 or later
     GAMS_min_version = "24.8.1"
 
     def __init__(self, *args, **kwargs):
         version = ixmp.model.gams.gams_version()
         if version < self.GAMS_min_version:
             message = (
-                "{0.name} requires GAMS >= {0.GAMS_min_version}; " "found {1}"
+                "{0.name} requires GAMS >= {0.GAMS_min_version}; found {1}"
             ).format(self, version)
             raise RuntimeError(message)
 
@@ -402,12 +476,11 @@ class MACRO(GAMSModel):
     @classmethod
     def initialize(cls, scenario, with_data=False):
         """Initialize the model structure."""
-        # NB some scenarios already have these items. This method simply adds
-        #    any missing items.
-
-        # FIXME the Java code under the JDBCBackend (ixmp_source) refuses to
-        #       initialize these items with specified idx_sets—even if the
-        #       sets are correct.
+        # NB some scenarios already have these items. This method simply adds any
+        #    missing items.
+        #
+        # FIXME the Java code under the JDBCBackend (ixmp_source) refuses to initialize
+        #       these items with specified idx_sets—even if the sets are correct.
         items = deepcopy(MACRO_ITEMS)
         for name in "C", "COST_NODAL", "COST_NODAL_NET", "DEMAND", "GDP", "I":
             items[name].pop("idx_sets")
@@ -422,8 +495,8 @@ class MESSAGE_MACRO(MACRO):
     name = "MESSAGE-MACRO"
 
     def __init__(self, *args, **kwargs):
-        # Remove M-M iteration options from kwargs and convert to GAMS
-        # command-line options
+        # Remove M-M iteration options from kwargs and convert to GAMS command-line
+        # options
         mm_iter_args = []
         for name in "convergence_criterion", "max_adjustment", "max_iteration":
             try:

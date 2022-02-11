@@ -48,6 +48,7 @@
 * :math:`ACT\_LO_{n,t,y,h} \in \mathbb{R}_+`               Relaxation of lower dynamic constraint on activity [#ACT_BD]_
 * :math:`LAND_{n,s,y} \in [0,1]`                           Relative share of land-use scenario (for land-use model emulator)
 * :math:`EMISS_{n,e,\widehat{t},y} \in \mathbb{R}`         Auxiliary variable for aggregate emissions by technology type
+* :math:`EMISS\_POOL_{n,e,\widehat{t},y} \in \mathbb{R}`   Auxiliary variable for aggregate emission pool by technology type
 * :math:`REL_{r,n,y} \in \mathbb{R}`                       Auxiliary variable for left-hand side of relations (linear constraints)
 * :math:`COMMODITY\_USE_{n,c,l,y} \in \mathbb{R}`          Auxiliary variable for amount of commodity used at specific level
 * :math:`COMMODITY\_BALANCE_{n,c,l,y,h} \in \mathbb{R}`    Auxiliary variable for right-hand side of :ref:`commodity_balance`
@@ -114,6 +115,8 @@ Variables
     COST_NODAL(node, year_all)                   system costs at the node level over time
 * auxiliary variable for aggregate emissions by technology type and land-use model emulator
     EMISS(node,emission,type_tec,year_all)       aggregate emissions by technology type and land-use model emulator
+* regional emission pool
+    EMISS_POOL(node,emission,type_tec,year_all)  nodal-regional-global emission pool size
 * auxiliary variable for left-hand side of relations (linear constraints)
     REL(relation,node,year_all)                  auxiliary variable for left-hand side of user-defined relations
 * change in the content of storage device
@@ -141,7 +144,8 @@ Variables
 * auxiliary variables for demand, prices, costs and GDP (for reporting when MESSAGE is run with MACRO)
     DEMAND(node,commodity,level,year_all,time) demand
     PRICE_COMMODITY(node,commodity,level,year_all,time)  commodity price (derived from marginals of COMMODITY_BALANCE constraint)
-    PRICE_EMISSION(node,type_emission,type_tec,year_all) emission price (derived from marginals of EMISSION_BOUND constraint)
+    PRICE_EMISSION(node,type_emission,type_tec,year_all) emission price (derived from marginals of EMISSION_CONSTRAINT)
+    PRICE_EMISSION_POOL(node,type_emission,type_tec,year_all) price of pooled emissions (derived from marginals of EMISSION_POOL_CONSTRAINT)
     COST_NODAL_NET(node,year_all)              system costs at the node level over time including effects of energy trade
     GDP(node,year_all)                         gross domestic product (GDP) in market exchange rates for MACRO reporting
 ;
@@ -272,6 +276,9 @@ Equations
     ACTIVITY_SOFT_CONSTRAINT_LO     bound on relaxation of the dynamic constraint on market penetration (lower bound)
     EMISSION_EQUIVALENCE            auxiliary equation to simplify the notation of emissions
     EMISSION_CONSTRAINT             nodal-regional-global constraints on emissions (by category)
+    EMISSION_POOL_EQUIVALENCE       nodal-regional-global emission pool with carbon sink rate
+    EMISSION_POOL_CONSTRAINT_UP     nodal-regional-global upper bound on emission pool (by type)
+    EMISSION_POOL_CONSTRAINT_LO     nodal-regional-global lower bound on emission pool (by type)
     LAND_CONSTRAINT                 constraint on total land use (linear combination of land scenarios adds up to 1)
     DYNAMIC_LAND_SCEN_CONSTRAINT_UP dynamic constraint on land scenario change (upper bound)
     DYNAMIC_LAND_SCEN_CONSTRAINT_LO dynamic constraint on land scenario change (lower bound)
@@ -355,6 +362,9 @@ OBJECTIVE..
 *      & + \sum_{\substack{\widehat{e},\widehat{t} \\ e \in E(\widehat{e})}}
 *            emission\_scaling_{\widehat{e},e} \cdot \ emission\_tax_{n,\widehat{e},\widehat{t},y}
 *            \cdot EMISS_{n,e,\widehat{t},y} \\
+*      & + \sum_{\substack{\widehat{e},\widehat{t} \\ e \in E(\widehat{e})}}
+*            emission\_scaling_{\widehat{e},e} \cdot \ emission\_tax\_pool_{n,\widehat{e},\widehat{t},y}
+*            \cdot EMISS\_POOL_{n,e,\widehat{t},y} \\
 *      & + \sum_{s} land\_cost_{n,s,y} \cdot LAND_{n,s,y} \\
 *      & + \sum_{r} relation\_cost_{r,n,y} \cdot REL_{r,n,y}
 ***
@@ -401,6 +411,13 @@ COST_ACCOUNTING_NODAL(node, year)..
         emission_scaling(type_emission,emission)
         * tax_emission(node,type_emission,type_tec,type_year)
         * EMISS(node,emission,type_tec,year) )
+* emission pool taxes (by parent node, type of technology, year and type of emission)
+    + SUM((type_emission,emission,type_tec)$( emission_scaling(type_emission,emission)
+            AND tax_emission_pool(node,type_emission,type_tec,year) ),
+        emission_scaling(type_emission,emission)
+        * tax_emission_pool(node,type_emission,type_tec,year)
+        * EMISS_POOL(node,emission,type_tec,year)
+        / duration_period(year))
 * cost terms from land-use model emulator (only includes valid node-land_scenario-year combinations)
     + SUM(land_scenario$( land_cost(node,land_scenario,year) ),
         land_cost(node,land_scenario,year) * LAND(node,land_scenario,year) )
@@ -1579,12 +1596,12 @@ NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 *   .. math::
 *      CAP\_NEW\_UP_{n,t,y} \leq \sum_{y-1} CAP\_NEW_{n^L,t,y-1} & \text{if } y \neq 'first\_period' \\
 *                                + \sum_{y-1} historical\_new\_capacity_{n^L,t,y-1} & \text{if } y = 'first\_period' \\
-*                           \quad \forall \ t \ \in \ T^{INV}   
+*                           \quad \forall \ t \ \in \ T^{INV}
 *
 ***
 NEW_CAPACITY_SOFT_CONSTRAINT_UP(node,inv_tec,year)$( soft_new_capacity_up(node,inv_tec,year) )..
     CAP_NEW_UP(node,inv_tec,year) =L=
-        SUM(year2$( seq_period(year2,year) ), 
+        SUM(year2$( seq_period(year2,year) ),
             CAP_NEW(node,inv_tec,year2)) $ (NOT first_period(year))
       + SUM(year_all2$( seq_period(year_all2,year) ),
             historical_new_capacity(node,inv_tec,year_all2)) $ first_period(year)
@@ -1643,14 +1660,14 @@ NEW_CAPACITY_CONSTRAINT_LO(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 *   .. math::
 *      CAP\_NEW\_LO_{n,t,y} \leq \sum_{y-1} CAP\_NEW_{n^L,t,y-1} & \text{if } y \neq 'first\_period' \\
 *                                + \sum_{y-1} historical\_new\_capacity_{n^L,t,y-1} & \text{if } y = 'first\_period' \\
-*                           \quad \forall \ t \ \in \ T^{INV}  
+*                           \quad \forall \ t \ \in \ T^{INV}
 *
 ***
 NEW_CAPACITY_SOFT_CONSTRAINT_LO(node,inv_tec,year)$( soft_new_capacity_lo(node,inv_tec,year) )..
     CAP_NEW_LO(node,inv_tec,year) =L=
         SUM(year2$( seq_period(year2,year) ),
             CAP_NEW(node,inv_tec,year2) ) $ (NOT first_period(year))
-      + SUM(year_all2$( seq_period(year_all2,year) ), 
+      + SUM(year_all2$( seq_period(year_all2,year) ),
             historical_new_capacity(node,inv_tec,year_all2) ) $ first_period(year)
 ;
 
@@ -1711,7 +1728,7 @@ ACTIVITY_CONSTRAINT_UP(node,tec,year,time)$( map_tec_time(node,tec,year,time)
 *   .. math::
 *      ACT\_UP_{n,t,y,h} \leq \sum_{y^V \leq y,m,y-1} ACT_{n^L,t,y^V,y-1,m,h} & \text{if } y \neq 'first\_period' \\
 *                             + \sum_{m,y-1} historical\_activity_{n^L,t,y-1,m,h} & \text{if } y = 'first\_period'
-*      
+*
 *
 ***
 ACTIVITY_SOFT_CONSTRAINT_UP(node,tec,year,time)$( soft_activity_up(node,tec,year,time) )..
@@ -1864,6 +1881,90 @@ EMISSION_CONSTRAINT(node,type_emission,type_tec,type_year)$is_bound_emission(nod
     / SUM(year_all2$( cat_year(type_year,year_all2) ), duration_period(year_all2) )
     =L= bound_emission(node,type_emission,type_tec,type_year) ;
 
+***
+* Emission pool
+* ^^^^^^^^^^^^^
+*
+* .. _emission_pool:
+*
+* Equation EMISSION_POOL_EQUIVALENCE
+* """"""""""""""""""""""""""""""""""
+* :math:`EMISS\_POOL\_EQUIVALENCE_{n,e,\widehat{t},y}` is the atmospheric pool at node :math:`n`
+* for emission :math:`e` from technology set :math:`\widehat{t}` in year :math:`y`.
+* Via :math:`historical\_emission\_pool` past emissions can be attributed to node :math:`n`, establishing the initial
+* conditions of the pools. The parameter :math:`emission\_sink\_rate` is projecting the sink rate of emissions
+* which in general depends on the size of the pool, but is here treated as an exogenous parameter that needs
+* to chosen in line with expected results (or adjusted iteratively).
+*
+*   .. math::
+*      EMISS\_POOL_{n,e,\widehat{t},y} =
+*          \frac{1}{ 1 + emission\_sink\_rate_{n,e,\widehat{t},y} \cdot duration\_period_{y}} \cdot \\
+*               \begin{array}{l}
+*                    ( historical\_emission\_pool_{n,e,\widehat{t},y-1} \text{, if } y = 'first\_period' \\
+*                   + EMISS\_POOL_{n,e,\widehat{t},y-1} \text{, if } y \neq 'first\_period' \\
+*                   + duration\_period_{y} \cdot EMISS_{n,e,\widehat{t},y} )
+*               \end{array}
+*
+***
+
+EMISSION_POOL_EQUIVALENCE(node,emission,type_tec,year)$is_emission_sink_rate(node,emission,type_tec,year)..
+    EMISS_POOL(node,emission,type_tec,year) =E=
+    SUM(year_all2$( seq_period(year_all2,year) ),
+* emission pool from historical period if year == firstmodelyear
+    historical_emission_pool(node,emission,type_tec,year_all2)$first_period(year)
+* emission pool from previous period if year != firstmodelyear
+    + EMISS_POOL(node,emission,type_tec,year_all2)$(model_horizon(year_all2) AND NOT first_period(year))
+* emission additions in current period
+    + duration_period(year) * EMISS(node,emission,type_tec,year)
+    ) / (1 + emission_sink_rate(node,emission,type_tec,year) * duration_period(year))
+;
+
+***
+* Upper bound on emission pool
+* ^^^^^^^^^^^^^^^^^^^^^^
+*
+* .. _emission_pool_constraint_up:
+*
+* Equation EMISSION_POOL_CONSTRAINT_UP
+* """""""""""""""""""""""""""""""""
+* This constraint enforces upper bounds on the emission pool.
+*
+*   .. math::
+*          \sum_{e \in E(\widehat{e})}
+*                  emission\_scaling_{\widehat{e},e} \cdot EMISS\_POOL_{n,e,\widehat{t},y}
+*      \leq bound\_emission\_pool\_up_{n,\widehat{e},\widehat{t},y}
+*
+***
+
+EMISSION_POOL_CONSTRAINT_UP(node,type_emission,type_tec,year)$is_bound_emission_pool_up(node,type_emission,type_tec,year)..
+    SUM( (emission)$( cat_emission(type_emission,emission) ),
+        emission_scaling(type_emission,emission)
+        * EMISS_POOL(node,emission,type_tec,year)
+      )
+    =L= bound_emission_pool_up(node,type_emission,type_tec,year) ;
+
+***
+* Lower bound on emission pool
+* ^^^^^^^^^^^^^^^^^^^^^^
+*
+* .. _emission_pool_constraint_lo:
+*
+* Equation EMISSION_POOL_CONSTRAINT_LO
+* """""""""""""""""""""""""""""""""
+* This constraint enforces upper bounds on the emission pool.
+*
+*   .. math::
+*          \sum_{e \in E(\widehat{e})}
+*                  emission\_scaling_{\widehat{e},e} \cdot EMISS\_POOL_{n,e,\widehat{t},y}
+*      \geq bound\_emission\_pool\_lo_{n,\widehat{e},\widehat{t},y}
+*
+***
+EMISSION_POOL_CONSTRAINT_LO(node,type_emission,type_tec,year)$is_bound_emission_pool_lo(node,type_emission,type_tec,year)..
+    SUM( (emission)$( cat_emission(type_emission,emission) ),
+        emission_scaling(type_emission,emission)
+        * EMISS_POOL(node,emission,type_tec,year)
+      )
+    =G= bound_emission_pool_lo(node,type_emission,type_tec,year) ;
 *----------------------------------------------------------------------------------------------------------------------*
 ***
 * .. _section_landuse_emulator:
