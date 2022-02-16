@@ -118,6 +118,7 @@ MESSAGE_ITEMS = {
     "cat_relation": item("set", "type_relation relation"),
     "cat_tec": item("set", "type_tec t"),
     "cat_year": item("set", "type_year y"),
+    "is_capacity_factor": item("set", "nl t yv ya h"),
     "level_renewable": dict(ix_type="set", idx_sets=["level"]),
     "level_resource": dict(ix_type="set", idx_sets=["level"]),
     "level_stocks": dict(ix_type="set", idx_sets=["level"]),
@@ -399,7 +400,7 @@ class MESSAGE(GAMSModel):
         # handled in JDBCBackend. For the moment, this code does not backstop that
         # behaviour.
         # TODO Extend to handle all masks, e.g. for new backends.
-        for par_name in ():
+        for par_name in ("capacity_factor",):
             # Name of the corresponding set
             set_name = f"is_{par_name}"
 
