@@ -6,10 +6,12 @@ with sub-annual time slices (index of "time" in MESSAGEix) as expected or not.
 
 from itertools import product
 
-from message_ix import Scenario
+import pytest
+
+from message_ix import ModelError, Scenario
 
 
-def add_cap_par(scen, years, tec, data={"inv_cost": 0.1, "technical_lifetime": 5}):
+def add_cap_par(scen, years, capacity):
     """
     Adding required parameters for representing "capacity" in a MESSAGEix model.
 
@@ -27,8 +29,9 @@ def add_cap_par(scen, years, tec, data={"inv_cost": 0.1, "technical_lifetime": 5
 
     """
 
-    for year, (parname, val) in product(years, data.items()):
-        scen.add_par(parname, ["node", tec, year], val, "-")
+    for year, tec in product(years, capacity.keys()):
+        for parname, val in capacity[tec].items():
+            scen.add_par(parname, ["node", tec, year], val, "-")
 
 
 def model_generator(
@@ -39,8 +42,9 @@ def model_generator(
     demand,
     com_dict={"gas_ppl": {"input": "fuel", "output": "electr"}},
     yr=2020,
-    capacity=True,
+    capacity={"gas_ppl": {"inv_cost": 0.1, "technical_lifetime": 5}},
     capacity_factor={},
+    var_cost={},
     unit="GWa",
 ):
     """
@@ -70,10 +74,12 @@ def model_generator(
         (e.g., com_dict = {"gas_ppl": {"input": "fuel", "output": "electr"}})
     yr : int, optional
         Model year. The default is 2020.
-    capacity : bool, optional
-        Parameterization of capacity. The default is True.
-    capacity_factor : dict
+    capacity : dict
+        Data for "inv_cost" and "technical_lifetime" per technology.
+    capacity_factor : dict, optional
         "capacity_factor" with technology as key and "time"/"value" pairs as value.
+    var_cost : dict, optional
+        "var_cost" with technology as key and "time"/"value" pairs as value.
     unit :  string
         Unit of "demand"
 
@@ -137,20 +143,25 @@ def model_generator(
 
     # Adding capacity related parameters
     if capacity:
-        add_cap_par(scen, [2020], "gas_ppl")
+        add_cap_par(scen, [2020], capacity)
 
     # Adding capacity factor (optional)
     for tec, data in capacity_factor.items():
         for h, val in data.items():
             scen.add_par("capacity_factor", ["node", tec, yr, yr, h], val, "-")
 
+    # Adding variable cost (optional)
+    for tec, data in var_cost.items():
+        for h, val in data.items():
+            scen.add_par("var_cost", ["node", tec, yr, yr, "mode", h], val, "-")
+
     # Committing and solving
     scen.commit("scenario was set up.")
     scen.solve(case=comment)
 
     # Reading "ACT" and "CAP" from the solution
-    act = scen.var("ACT", {"technology": "gas_ppl"}).set_index(["technology", "time"])
-    cap = scen.var("CAP")
+    act = scen.var("ACT").set_index(["technology", "time"])
+    cap = scen.var("CAP").set_index(["technology"])
 
     # 1) Test "ACT" is zero when capacity factor is zero
     cf = scen.par("capacity_factor").set_index(["technology", "time"])
@@ -160,17 +171,18 @@ def model_generator(
 
     # 2) Test if "CAP" is correctly calculated based on "ACT" and "capacity_factor"
     if capacity:
-        for i in act.index:
+        for i in act.loc[act["lvl"] > 0].index:
             # Correcting ACT based on duration of each time slice
             duration = float(scen.par("duration_time", {"time": i[1]})["value"])
             act.loc[i, "duration-corrected"] = act.loc[i, "lvl"] / duration
             # Dividing by (non-zero) capacity factor
-            cf = cf.loc[cf["value"] > 0]
             act.loc[i, "cf-corrected"] = act.loc[i, "duration-corrected"] / float(
                 cf.loc[i, "value"]
             )
+        act = act.fillna(0).reset_index().set_index(["technology"])
         # CAP = max("ACT" / "duration_time" / "capcity_factor")
-        assert max(act["cf-corrected"]) == float(cap["lvl"])
+        for i in cap.index:
+            assert max(act.loc[i, "cf-corrected"]) == float(cap.loc[i, "lvl"])
 
 
 # Main tests for checking the behaviour of "capacity_factor"
@@ -205,6 +217,7 @@ def test_capacity_factor_time(test_mp):
         ],
         demand={"summer": 2, "winter": 1},
         capacity_factor={"gas_ppl": {"summer": 0.8, "winter": 0.6}},
+        var_cost={"gas_ppl": {"summer": 0.2, "winter": 0.2}},
     )
 
 
@@ -239,6 +252,7 @@ def test_capacity_factor_unequal_time(test_mp):
         ],
         demand={"summer": 2, "winter": 1},
         capacity_factor={"gas_ppl": {"summer": 0.8, "winter": 0.8}},
+        var_cost={"gas_ppl": {"summer": 0.2, "winter": 0.2}},
     )
 
 
@@ -247,7 +261,8 @@ def test_capacity_factor_zero(test_mp):
     Testing zero capacity factor (CF) in a time slice.
 
     "gas_ppl" is active in "summer" and NOT active in "winter" (CF = 0).
-    It is expected that the model output shows no activity (ACT = 0) in "winter".
+    It is expected that the model will be infeasible, because "demand" in winter
+    cannot be met.
 
     Parameters
     ----------
@@ -263,15 +278,73 @@ def test_capacity_factor_zero(test_mp):
         },
     }
 
-    # # Build model and solve
+    # Build model and solve (should raise GAMS error)
+    with pytest.raises(ModelError):
+        model_generator(
+            test_mp,
+            comment,
+            tec_dict,
+            time_steps=[
+                ("summer", 0.5, "season", "year"),
+                ("winter", 0.5, "season", "year"),
+            ],
+            demand={"summer": 2, "winter": 1},
+            capacity_factor={"gas_ppl": {"summer": 0.8, "winter": 0}},
+            var_cost={"gas_ppl": {"summer": 0.2, "winter": 0.2}},
+        )
+
+
+def test_capacity_factor_zero_two(test_mp):
+    """
+    Testing zero capacity factor (CF) in a time slice.
+
+    "gas_ppl" is active in "summer" and NOT active in "winter" (CF = 0).
+    It is expected that the model output shows no activity of "gas_ppl" in "winter".
+    But "gas_ppl2" is active in winter even though it is a more expensive technology.
+
+    Parameters
+    ----------
+    test_mp : ixmp.Platform()
+    """
+    comment = "capacity-factor-zero-two"
+    # Technology input/output
+    tec_dict = {
+        "gas_ppl": {
+            "time_origin": [],
+            "time": ["summer", "winter"],
+            "time_dest": ["summer", "winter"],
+        },
+        "gas_ppl2": {
+            "time_origin": [],
+            "time": ["summer", "winter"],
+            "time_dest": ["summer", "winter"],
+        },
+    }
+
+    # Build model and solve
     model_generator(
         test_mp,
         comment,
         tec_dict,
+        com_dict={
+            "gas_ppl": {"input": "fuel", "output": "electr"},
+            "gas_ppl2": {"input": "fuel", "output": "electr"},
+        },
         time_steps=[
             ("summer", 0.5, "season", "year"),
             ("winter", 0.5, "season", "year"),
         ],
         demand={"summer": 2, "winter": 1},
-        capacity_factor={"gas_ppl": {"summer": 0.8, "winter": 0}},
+        capacity={
+            "gas_ppl": {"inv_cost": 0.1, "technical_lifetime": 5},
+            "gas_ppl2": {"inv_cost": 0.1, "technical_lifetime": 5},
+        },
+        capacity_factor={
+            "gas_ppl": {"summer": 0.8, "winter": 0},
+            "gas_ppl2": {"summer": 0.8, "winter": 0.4},
+        },
+        var_cost={
+            "gas_ppl": {"summer": 0.2, "winter": 0.2},
+            "gas_ppl2": {"summer": 0.2, "winter": 0.8},
+        },
     )
