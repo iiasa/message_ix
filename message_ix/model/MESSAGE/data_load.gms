@@ -12,6 +12,7 @@ $LOAD emission, land_scenario, land_type, relation
 $LOAD level_resource, level_renewable
 $LOAD lvl_spatial, lvl_temporal, map_spatial_hierarchy, map_temporal_hierarchy
 $LOAD map_node, map_time, map_commodity, map_resource, map_stocks, map_tec, map_tec_time, map_tec_mode
+$LOAD is_capacity_factor
 $LOAD map_land, map_relation
 $LOAD type_tec, cat_tec, type_year, cat_year, type_emission, cat_emission, type_tec_land
 $LOAD inv_tec, renewable_tec
@@ -142,7 +143,7 @@ map_rating(node,inv_tec,commodity,level,rating,year_all)$(
 
 * set the default capacity factor for technologies where no parameter value is provided in the input data
 capacity_factor(node,tec,year_all2,year_all,time)$( map_tec_time(node,tec,year_all,time)
-    AND map_tec_lifetime(node,tec,year_all2,year_all) AND NOT capacity_factor(node,tec,year_all2,year_all,time) ) = 1 ;
+    AND map_tec_lifetime(node,tec,year_all2,year_all) AND NOT is_capacity_factor(node,tec,year_all2,year_all,time) ) = 1 ;
 
 * assign the yearly average capacity factor (used in equation OPERATION_CONSTRAINT)
 capacity_factor(node,tec,year_all2,year_all,'year') =

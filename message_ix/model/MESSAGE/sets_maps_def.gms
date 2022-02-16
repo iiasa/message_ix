@@ -444,6 +444,7 @@ Sets
     is_dynamic_new_capacity_lo(node,tec,year_all)    flag whether lower dynamic constraint exists for new capacity (investment)
     is_dynamic_activity_up(node,tec,year_all,time)   flag whether upper dynamic constraint exists for a technology (activity)
     is_dynamic_activity_lo(node,tec,year_all,time)   flag whether lower dynamic constraint exists for a technology (activity)
+    is_capacity_factor(node,tec,year_all2,year_all,time)     flag whether capacity factor is defined
 
     is_bound_emission(node,type_emission,type_tec,type_year) flag whether emissions bound exists
 
