@@ -143,14 +143,13 @@ def model_generator(
     for tec, data in capacity_factor.items():
         for h, val in data.items():
             scen.add_par("capacity_factor", ["node", tec, yr, yr, h], val, "-")
-        
+
     # Committing and solving
     scen.commit("scenario was set up.")
     scen.solve(case=comment)
 
     # Reading "ACT" and "CAP" from the solution
-    act = scen.var("ACT", {"technology": "gas_ppl"}
-                   ).set_index(["technology", "time"])
+    act = scen.var("ACT", {"technology": "gas_ppl"}).set_index(["technology", "time"])
     cap = scen.var("CAP")
 
     # 1) Test "ACT" is zero when capacity factor is zero
@@ -167,8 +166,9 @@ def model_generator(
             act.loc[i, "duration-corrected"] = act.loc[i, "lvl"] / duration
             # Dividing by (non-zero) capacity factor
             cf = cf.loc[cf["value"] > 0]
-            act.loc[i, "cf-corrected"] = act.loc[i, "duration-corrected"
-                                                 ] / float(cf.loc[i, "value"])
+            act.loc[i, "cf-corrected"] = act.loc[i, "duration-corrected"] / float(
+                cf.loc[i, "value"]
+            )
         # CAP = max("ACT" / "duration_time" / "capcity_factor")
         assert max(act["cf-corrected"]) == float(cap["lvl"])
 
@@ -205,7 +205,7 @@ def test_capacity_factor_time(test_mp):
         ],
         demand={"summer": 2, "winter": 1},
         capacity_factor={"gas_ppl": {"summer": 0.8, "winter": 0.6}},
-        )
+    )
 
 
 def test_capacity_factor_unequal_time(test_mp):
@@ -239,7 +239,8 @@ def test_capacity_factor_unequal_time(test_mp):
         ],
         demand={"summer": 2, "winter": 1},
         capacity_factor={"gas_ppl": {"summer": 0.8, "winter": 0.8}},
-        )
+    )
+
 
 def test_capacity_factor_zero(test_mp):
     """
@@ -273,4 +274,4 @@ def test_capacity_factor_zero(test_mp):
         ],
         demand={"summer": 2, "winter": 1},
         capacity_factor={"gas_ppl": {"summer": 0.8, "winter": 0}},
-        )
+    )
