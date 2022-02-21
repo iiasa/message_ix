@@ -260,8 +260,8 @@ def test_capacity_factor_zero(test_mp):
     """
     Testing zero capacity factor (CF) in a time slice.
 
-    "gas_ppl" is active in "summer" and NOT active in "winter" (CF = 0).
-    It is expected that the model will be infeasible, because "demand" in winter
+    "solar_pv_ppl" is active in "day" and NOT at "night" (CF = 0).
+    It is expected that the model will be infeasible, because "demand" at night
     cannot be met.
 
     Parameters
@@ -271,10 +271,10 @@ def test_capacity_factor_zero(test_mp):
     comment = "capacity-factor-zero"
     # Technology input/output
     tec_dict = {
-        "gas_ppl": {
+        "solar_pv_ppl": {
             "time_origin": [],
-            "time": ["summer", "winter"],
-            "time_dest": ["summer", "winter"],
+            "time": ["day", "night"],
+            "time_dest": ["day", "night"],
         },
     }
 
@@ -284,13 +284,14 @@ def test_capacity_factor_zero(test_mp):
             test_mp,
             comment,
             tec_dict,
+            com_dict={"solar_pv_ppl": {"input": "fuel", "output": "electr"}},
             time_steps=[
-                ("summer", 0.5, "season", "year"),
-                ("winter", 0.5, "season", "year"),
+                ("day", 0.5, "subannual", "year"),
+                ("night", 0.5, "subannual", "year"),
             ],
-            demand={"summer": 2, "winter": 1},
-            capacity_factor={"gas_ppl": {"summer": 0.8, "winter": 0}},
-            var_cost={"gas_ppl": {"summer": 0.2, "winter": 0.2}},
+            demand={"day": 2, "night": 1},
+            capacity={"solar_pv_ppl": {"inv_cost": 0.2, "technical_lifetime": 5}},
+            capacity_factor={"solar_pv_ppl": {"day": 0.8, "night": 0}},
         )
 
 
@@ -298,9 +299,9 @@ def test_capacity_factor_zero_two(test_mp):
     """
     Testing zero capacity factor (CF) in a time slice.
 
-    "gas_ppl" is active in "summer" and NOT active in "winter" (CF = 0).
-    It is expected that the model output shows no activity of "gas_ppl" in "winter".
-    But "gas_ppl2" is active in winter even though it is a more expensive technology.
+    "solar_pv_ppl" is active in "day" and NOT at "night" (CF = 0).
+    The model output should show no activity of "solar_pv_ppl" at "night".
+    So, "gas_ppl" is active at "night", even though a more expensive technology.
 
     Parameters
     ----------
@@ -309,15 +310,15 @@ def test_capacity_factor_zero_two(test_mp):
     comment = "capacity-factor-zero-two"
     # Technology input/output
     tec_dict = {
+        "solar_pv_ppl": {
+            "time_origin": [],
+            "time": ["day", "night"],
+            "time_dest": ["day", "night"],
+        },
         "gas_ppl": {
             "time_origin": [],
-            "time": ["summer", "winter"],
-            "time_dest": ["summer", "winter"],
-        },
-        "gas_ppl2": {
-            "time_origin": [],
-            "time": ["summer", "winter"],
-            "time_dest": ["summer", "winter"],
+            "time": ["day", "night"],
+            "time_dest": ["day", "night"],
         },
     }
 
@@ -327,24 +328,24 @@ def test_capacity_factor_zero_two(test_mp):
         comment,
         tec_dict,
         com_dict={
+            "solar_pv_ppl": {"input": "fuel", "output": "electr"},
             "gas_ppl": {"input": "fuel", "output": "electr"},
-            "gas_ppl2": {"input": "fuel", "output": "electr"},
         },
         time_steps=[
-            ("summer", 0.5, "season", "year"),
-            ("winter", 0.5, "season", "year"),
+            ("day", 0.5, "season", "year"),
+            ("night", 0.5, "season", "year"),
         ],
-        demand={"summer": 2, "winter": 1},
+        demand={"day": 2, "night": 1},
         capacity={
+            "solar_pv_ppl": {"inv_cost": 0.1, "technical_lifetime": 5},
             "gas_ppl": {"inv_cost": 0.1, "technical_lifetime": 5},
-            "gas_ppl2": {"inv_cost": 0.1, "technical_lifetime": 5},
         },
         capacity_factor={
-            "gas_ppl": {"summer": 0.8, "winter": 0},
-            "gas_ppl2": {"summer": 0.8, "winter": 0.4},
+            "solar_pv_ppl": {"day": 0.8, "night": 0},
+            "gas_ppl": {"day": 0.8, "night": 0.8},
         },
         var_cost={
-            "gas_ppl": {"summer": 0.2, "winter": 0.2},
-            "gas_ppl2": {"summer": 0.2, "winter": 0.8},
+            "solar_pv_ppl": {"day": 0, "night": 0},
+            "gas_ppl": {"day": 0.2, "night": 0.2},
         },
     )
