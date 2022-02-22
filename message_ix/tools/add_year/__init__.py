@@ -845,10 +845,10 @@ def interpolate_2d(
                     year_pp = max([x for x in df2.columns if x < year_pre])
                     cond1 = (pd.isna(df2_t[yr])) & (~pd.isna(df2_t[year_pre]))
                     cond2 = pd.isna(df2_t[year_pre].shift(-1))
-                    if cond1.any() and cond2.any():
-                        df2_t[yr].loc[cond1 & cond2] = intpol(
-                            df2_t[year_pre], df2_t[year_pp], year_pre, year_pp, yr
-                        )
+
+                    df2_t[yr].loc[cond1 & cond2] = intpol(
+                        df2_t[year_pre], df2_t[year_pp], year_pre, year_pp, yr
+                    )
                     cond = (df2_t[yr] < 0) & (df2_t[year_pre] >= 0)
                     if not df2_t[yr].loc[cond].empty and extrapol_neg:
                         df2_t.loc[cond, yr] = df2_t.loc[cond, year_pre] * extrapol_neg
