@@ -20,7 +20,7 @@ jobs:
         - ubuntu-latest
         - windows-latest
         python-version:
-        - "3.6"  # Earliest version supported by message_ix
+        - "3.7"
         - "3.8"
         - "3.9"  # Latest release / latest supported by message_ix
 
