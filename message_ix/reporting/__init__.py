@@ -249,7 +249,13 @@ class Reporter(IXMPReporter):
         return rep
 
     def add_tasks(self, fail_action: Union[int, str] = "raise") -> None:
-        """Add the pre-defined MESSAGEix reporting tasks to the Reporter."""
+        """Add the pre-defined MESSAGEix reporting tasks to the Reporter.
+
+        Parameters
+        ----------
+        fail_action : “raise” or logging level
+            Passed to the `fail` argument of :meth:`.Reporter.add_queue`.
+        """
         # Ensure that genno.compat.pyam is usable
         self.require_compat("pyam")
 
