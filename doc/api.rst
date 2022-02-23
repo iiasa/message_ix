@@ -93,49 +93,111 @@ Model classes
 
    These configure the GAMS CPLEX solver (or another solver, if selected); see `the solver documentation <https://www.gams.com/latest/docs/S_CPLEX.html>`_ for possible values.
 
+.. autoclass:: GAMSModel
+   :members:
+   :exclude-members: defaults
+
+   The :class:`.MESSAGE`, :class:`MACRO`, and :class:`MESSAGE_MACRO` child classes encapsulate the GAMS code for the core MESSAGE (or MACRO) mathematical formulation.
+
+   The class receives `model_options` via :meth:`.Scenario.solve`. Some of these are passed on to the parent class :class:`ixmp.model.gams.GAMSModel` (see there for a list); others are handled as described below.
+
+   The “model_dir” option may be set in the user's :ref:`ixmp configuration file <ixmp:configuration>` using the key “message model dir”.
+   If not set, it defaults to “message_ix/model” below the directory where :mod:`message_ix` is installed.
+
+   The “solve_options” option may be set in the user's ixmp configuration file using the key “message solve options”.
+   If not set, it defaults to :data:`.DEFAULT_CPLEX_OPTIONS`.
+
+   For example, with the following configuration file:
+
+   .. code-block:: yaml
+
+      {
+        "platform": {
+          "default": "my-platform",
+          "my-platform": {"backend": "jdbc", "etc": "etc"},
+        },
+        "message model dir": "/path/to/custom/gams/source/files",
+        "message solve options": {"lpmethod": 4},
+      }
+
+   The following are equivalent:
+
+   .. code-block:: python
+
+      # Model options given explicitly
+      scen.solve(
+          model_dir="/path/to/custom/gams/source/files",
+          solve_options=dict(lpmethod=4),
+      )
+
+      # Model options are read from configuration file
+      scen.solve()
+
+   The following tables list all model options:
+
+   .. list-table:: Options in :class:`message_ix.models.GAMSModel` or overridden from :mod:`ixmp`
+      :widths: 20 40 40
+      :header-rows: 1
+
+      * - Option
+        - Usage
+        - Default value
+      * - **model_dir**
+        - Path to GAMS source files.
+        - See above.
+      * - **model_file**
+        - Path to GAMS source file.
+        - ``'{model_dir}/{model_name}_run.gms'``
+      * - **in_file**
+        - Path to write GDX input file.
+        - ``'{model_dir}/data/MsgData_{case}.gdx'``
+      * - **out_file**
+        - Path to read GDX output file.
+        - ``'{model_dir}/output/MsgOutput_{case}.gdx'``
+      * - **solve_args**
+        - Arguments passed directly to GAMS.
+        - .. code-block::
+
+             [
+                 '--in="{in_file}"',
+                 '--out="{out_file}"',
+                 '--iter="{model_dir}/output/MsgIterationReport_{case}.gdx"'
+             ]
+      * - **solve_options**
+        - Options for the GAMS LP solver.
+        - :data:`.DEFAULT_CPLEX_OPTIONS`
+
+   .. list-table:: Option defaults inherited from :class:`ixmp.model.gams.GAMSModel`
+      :widths: 20 80
+      :header-rows: 1
+
+      * - Option
+        - Default value
+      * - **case**
+        - ``'{scenario.model}_{scenario.scenario}'``
+      * - **gams_args**
+        - ``['LogOption=4']``
+      * - **check_solution**
+        - :obj:`True`
+      * - **comment**
+        - :obj:`None`
+      * - **equ_list**
+        - :obj:`None`
+      * - **var_list**
+        - :obj:`None`
+
 .. autoclass:: MESSAGE
    :members: initialize
    :exclude-members: defaults
    :show-inheritance:
 
-   The MESSAGE Python class encapsulates the GAMS code for the core MESSAGE mathematical formulation.
-   The *model_options* arguments are received from :meth:`.Scenario.solve`, and—except for *solve_options*—are passed on to the parent class :class:`~ixmp.model.gams.GAMSModel`; see there for a full list of options.
-
    .. autoattribute:: name
-
-   .. autoattribute:: defaults
-      :annotation: = dict(...)
-
-      The paths to MESSAGE GAMS source files use the ``MODEL_PATH`` configuration setting.
-      ``MODEL_PATH``, in turn, defaults to "message_ix/model" inside the directory where :mod:`message_ix` is installed.
-
-      ================== ===
-      Key                Value
-      ================== ===
-      MESSAGE defaults
-      ----------------------
-      **model_file**     ``'{MODEL_PATH}/{model_name}_run.gms'``
-      **in_file**        ``'{MODEL_PATH}/data/MsgData_{case}.gdx'``
-      **out_file**       ``'{MODEL_PATH}/output/MsgOutput_{case}.gdx'``
-      **solve_args**     ``['--in="{in_file}"', '--out="{out_file}"', '--iter="{MODEL_PATH}/output/MsgIterationReport_{case}.gdx"']``
-      ------------------ ---
-      Inherited from :class:`~ixmp.model.gams.GAMSModel`
-      ----------------------
-      **case**           ``'{scenario.model}_{scenario.scenario}'``
-      **gams_args**      ``['LogOption=4']``
-      **check_solution** :obj:`True`
-      **comment**        :obj:`None`
-      **equ_list**       :obj:`None`
-      **var_list**       :obj:`None`
-      ================== ===
-
 
 .. autoclass:: MACRO
    :members:
    :show-inheritance:
 
    .. autoattribute:: name
-
 
 .. autoclass:: MESSAGE_MACRO
    :members:
@@ -158,11 +220,6 @@ Model classes
 
    .. autoattribute:: name
 
-.. autoclass:: GAMSModel
-   :members:
-   :exclude-members: defaults
-   :show-inheritance:
-
 .. autodata:: MESSAGE_ITEMS
    :annotation: = dict(…)
 
@@ -170,7 +227,6 @@ Model classes
    These include all items listed in the MESSAGE mathematical specification, i.e. :ref:`sets_maps_def` and :ref:`parameter_def`.
 
    .. seealso:: :meth:`.MESSAGE.initialize`, :data:`.MACRO_ITEMS`
-
 
 .. currentmodule:: message_ix.macro
 
@@ -180,7 +236,6 @@ Model classes
    All of the items in the MACRO mathematical formulation.
 
    .. seealso:: :data:`.MESSAGE_ITEMS`
-
 
 
 .. _utils:

@@ -344,8 +344,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         """Execute the model.
 
         GAMSModel creates a file named ``cplex.opt`` in the model directory containing
-        the options in :obj:`DEFAULT_CPLEX_OPTIONS`, or any overrides passed to
-        :meth:`~message_ix.Scenario.solve`.
+        the “solve_options”, as described above.
 
         .. warning:: GAMSModel can solve Scenarios in two or more Python processes
            simultaneously; but using *different* CPLEX options in each process may
