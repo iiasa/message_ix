@@ -1,3 +1,4 @@
+import logging
 from collections import ChainMap
 from copy import copy, deepcopy
 from functools import lru_cache
@@ -7,6 +8,8 @@ import ixmp.model.gams
 from ixmp import config
 
 from .macro import MACRO_ITEMS
+
+log = logging.getLogger(__name__)
 
 #: Solver options used by :meth:`message_ix.Scenario.solve`.
 DEFAULT_CPLEX_OPTIONS = {
@@ -56,8 +59,8 @@ def item(ix_type, expr):
     ...     idx_names=["node_loc", "technology", "year_act"]
     ... )
     """
-    # Split expr on spaces. For each dimension, use an abbreviation (if one)
-    # exists, else the set name for both idx_sets and idx_names
+    # Split expr on spaces. For each dimension, use an abbreviation (if one) exists,
+    # else the set name for both idx_sets and idx_names
     sets, names = zip(*[_ABBREV.get(dim, (dim, dim)) for dim in expr.split()])
 
     # Assemble the result
@@ -102,8 +105,8 @@ MESSAGE_ITEMS = {
     #
     # Indexed sets
     "addon": dict(ix_type="set", idx_sets=["technology"]),
-    # commented: in test_solve_legacy_scenario(), ixmp_source complains that
-    # the item already exists
+    # commented: in test_solve_legacy_scenario(), ixmp_source complains that the item
+    # already exists
     # "balance_equality": item("set", "c l"),
     "cat_addon": dict(
         ix_type="set",
@@ -254,9 +257,9 @@ MESSAGE_ITEMS = {
     "time_order": dict(ix_type="par", idx_sets=["lvl_temporal", "time"]),
     "var_cost": item("par", "nl t yv ya m h"),
     #
-    # commented: for both variables and equations, ixmp_source requires that
-    # the `idx_sets` and `idx_names` parameters be empty, but then internally
-    # uses the correct sets and names to initialize.
+    # commented: for both variables and equations, ixmp_source requires that the
+    # `idx_sets` and `idx_names` parameters be empty, but then internally uses the
+    # correct sets and names to initialize.
     # TODO adjust ixmp_source to accept these values, then uncomment.
     #
     # Variables
@@ -310,8 +313,8 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
                     _template("output", "MsgIterationReport_{case}.gdx")
                 ),
             ],
-            # Disable the feature to put input/output GDX files, list files, etc.
-            # in a temporary directory
+            # Disable the feature to put input/output GDX files, list files, etc. in a
+            # temporary directory
             "use_temp_dir": False,
         },
         ixmp.model.gams.GAMSModel.defaults,
@@ -332,6 +335,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         # Update the default options with any user-provided options
         model_options.setdefault("model_dir", config.get("message model dir"))
         self.cplex_opts = copy(DEFAULT_CPLEX_OPTIONS)
+        self.cplex_opts.update(config.get("message solve options") or dict())
         self.cplex_opts.update(model_options.pop("solve_options", {}))
 
         super().__init__(name, **model_options)
@@ -339,35 +343,32 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
     def run(self, scenario):
         """Execute the model.
 
-        GAMSModel creates a file named ``cplex.opt`` in the model directory
-        containing the options in :obj:`DEFAULT_CPLEX_OPTIONS`, or any
-        overrides passed to :meth:`~message_ix.Scenario.solve`.
+        GAMSModel creates a file named ``cplex.opt`` in the model directory containing
+        the “solve_options”, as described above.
 
-        .. warning:: GAMSModel can solve Scenarios in two or more Python
-           processes simultaneously; but using *different* CPLEX options in
-           each process may produced unexpected results.
+        .. warning:: GAMSModel can solve Scenarios in two or more Python processes
+           simultaneously; but using *different* CPLEX options in each process may
+           produce unexpected results.
         """
-        # If two runs are kicked off simulatenously with the same
-        # self.model_dir, then they will try to write the same optfile, and may
-        # write different contents.
+        # If two runs are kicked off simulatenously with the same self.model_dir, then
+        # they will try to write the same optfile, and may write different contents.
         #
-        # TODO Re-enable the 'use_temp_dir' feature from ixmp.GAMSModel
-        #      (disabled above). Then cplex.opt will be specific to that
-        #      directory.
+        # TODO Re-enable the 'use_temp_dir' feature from ixmp.GAMSModel (disabled above)
+        #      so that cplex.opt will be specific to that directory.
 
         # Write CPLEX options into an options file
-        optfile = self.model_dir / "cplex.opt"
+        optfile = Path(self.model_dir).joinpath("cplex.opt")
         lines = ("{} = {}".format(*kv) for kv in self.cplex_opts.items())
         optfile.write_text("\n".join(lines))
+        log.info(f"Use CPLEX options {self.cplex_opts}")
 
         try:
             result = super().run(scenario)
         finally:
-            # Remove the optfile regardless of whether the run completed
-            # without error. The file may have been removed already by another
-            # run (in a separate process) that completed before this one.
-            # py37 compat: check for existence instead of using
-            # unlink(missing_ok=True)
+            # Remove the optfile regardless of whether the run completed without error.
+            # The file may have been removed already by another run (in a separate
+            # process) that completed before this one.
+            # py37 compat: check for existence instead of using unlink(missing_ok=True)
             if optfile.exists():
                 optfile.unlink()
 
@@ -385,29 +386,26 @@ class MACRO(GAMSModel):
 
     name = "MACRO"
 
-    #: MACRO uses the GAMS ``break;`` statement, and thus requires GAMS 24.8.1
-    #: or later.
+    #: MACRO uses the GAMS ``break;`` statement, and thus requires GAMS 24.8.1 or later.
     GAMS_min_version = "24.8.1"
 
     def __init__(self, *args, **kwargs):
         version = ixmp.model.gams.gams_version()
         if version < self.GAMS_min_version:
-            message = (
-                "{0.name} requires GAMS >= {0.GAMS_min_version}; " "found {1}"
-            ).format(self, version)
-            raise RuntimeError(message)
+            raise RuntimeError(
+                f"{self.name} requires GAMS >= {self.GAMS_min_version}; found {version}"
+            )
 
         super().__init__(*args, **kwargs)
 
     @classmethod
     def initialize(cls, scenario, with_data=False):
         """Initialize the model structure."""
-        # NB some scenarios already have these items. This method simply adds
-        #    any missing items.
+        # NB some scenarios already have these items. This method simply adds any
+        #    missing items.
 
-        # FIXME the Java code under the JDBCBackend (ixmp_source) refuses to
-        #       initialize these items with specified idx_sets—even if the
-        #       sets are correct.
+        # FIXME the Java code under the JDBCBackend (ixmp_source) refuses to initialize
+        #       these items with specified idx_sets—even if the sets are correct.
         items = deepcopy(MACRO_ITEMS)
         for name in "C", "COST_NODAL", "COST_NODAL_NET", "DEMAND", "GDP", "I":
             items[name].pop("idx_sets")
@@ -422,8 +420,8 @@ class MESSAGE_MACRO(MACRO):
     name = "MESSAGE-MACRO"
 
     def __init__(self, *args, **kwargs):
-        # Remove M-M iteration options from kwargs and convert to GAMS
-        # command-line options
+        # Remove M-M iteration options from kwargs and convert to GAMS command-line
+        # options
         mm_iter_args = []
         for name in "convergence_criterion", "max_adjustment", "max_iteration":
             try:

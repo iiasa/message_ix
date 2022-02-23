@@ -20,15 +20,22 @@ jobs:
         - ubuntu-latest
         - windows-latest
         python-version:
-        - "3.6"  # Earliest version supported by message_ix
+        - "3.7"  # Earliest version supported by message_ix
         - "3.8"
-        - "3.9"  # Latest release / latest supported by message_ix
+        - "3.9"
+        - "3.10"  # Latest release / latest supported by message_ix
 
-        # For development versions of Python, compiled binary wheels are not
-        # available for some dependencies, e.g. llvmlite, numba, numpy, and/or
-        # pandas. Compiling these on the job runner requires a more elaborate
-        # build environment, currently out of scope for the message_ix project.
+        # For freshy released or development versions of Python, compiled
+        # binary wheels are not available for some dependencies, e.g. llvmlite,
+        # numba, numpy, and/or pandas. Compiling these on the job runner
+        # requires a more elaborate build environment, currently out of scope
+        # for the message_ix project.
         # - "3.10.0-alpha.1"  # Development version
+
+        exclude:
+        # JPype1 (for ixmp) binary wheels are not available for this combination
+        - os: windows-latest
+          python-version: "3.10"
 
       fail-fast: false
 
@@ -37,7 +44,7 @@ jobs:
 
     steps:
     - name: Cancel previous runs that have not completed
-      uses: styfle/cancel-workflow-action@0.7.0
+      uses: styfle/cancel-workflow-action@0.9.1
       with:
         access_token: ${{ github.token }}
 
@@ -73,16 +80,8 @@ jobs:
       run: echo "RETICULATE_PYTHON=$pythonLocation" >> $GITHUB_ENV
       shell: bash
 
-    - uses: r-lib/actions/setup-r@master
+    - uses: r-lib/actions/setup-r@v2
       id: setup-r
-
-    - name: Use OpenJDK 14 (macOS only)
-      # Using the default OpenJDK 1.8 on the macos-latest runner produces
-      # "Abort trap: 6" when JPype1 starts the JVM
-      if: ${{ startsWith(matrix.os, 'macos') }}
-      uses: actions/setup-java@v1
-      with:
-        java-version: '14'
 
     - name: Cache GAMS installer, Python packages, and R packages
       uses: actions/cache@v2
@@ -144,6 +143,6 @@ jobs:
       run: make --directory=doc html
 
     - name: Upload test coverage to Codecov.io
-      uses: codecov/codecov-action@v1.2.1
+      uses: codecov/codecov-action@v2
       with:
-        root_dir: message_ix
+        directory: message_ix

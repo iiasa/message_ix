@@ -11,8 +11,8 @@ AT = "Austrian_energy_system"
 
 # Common marks for some test cases
 mark0 = pytest.mark.skipif(
-    condition=sys.version_info.minor <= 6 and sys.platform != "linux",
-    reason="R/reticulate link fails on GitHub Actions runners for Python 3.6",
+    condition="GITHUB_ACTIONS" in os.environ and sys.platform == "linux",
+    reason="IR kernel times out on GitHub Actions Ubuntu runners ",
 )
 
 # This mark does *not* affect macos-latest-py3.9, which must still pass

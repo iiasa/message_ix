@@ -1,8 +1,10 @@
-.. Next release
-.. ============
+Next release
+============
 
-.. All changes
-.. -----------
+All changes
+-----------
+
+- Allow setting the “model_dir” and “solve_options” options for :class:`.GAMSModel` (and subclasses :class:`.MESSAGE`, :class:`.MACRO`, and :class:`.MESSAGE_MACRO`) through the user's ixmp configuration file; expand documentation (:pull:`557`).
 
 .. _v3.4.0:
 
