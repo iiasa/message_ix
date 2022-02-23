@@ -59,23 +59,15 @@ jobs:
     - name: Initialize shell for "conda activate"
       run: conda init ${{ steps.shell.outputs.init }}
 
-    - name: Determine conda version spec
-      id: spec
-      run: |
-        print(
-            "::set-output name=version::" +
-            (">1" if "${{ matrix.os }}".split("-")[0] == "macos" else "")
-        )
-      shell: python
-
     - name: Configure conda channels, update, create environment, and install message-ix
       run: |
         conda config --prepend channels conda-forge
+        conda config --set channel_priority strict
         conda update -n base -c defaults conda
 
         # Also install pytest and packages required for testing. pip/PyPI
         # supports this via message_ix[testing], but conda does not.
-        conda create --quiet --name testenv "message-ix${{ steps.spec.outputs.version }}" ${{ matrix.extra-deps }} pytest asyncssh sphinx
+        conda create --quiet --name testenv message-ix=3.4 ${{ matrix.extra-deps }} pytest asyncssh sphinx
         conda list --name testenv
 
     - name: Check CLI commands and run test
