@@ -1,5 +1,6 @@
 import logging
-from functools import partial
+from functools import lru_cache, partial
+from typing import Mapping, Sequence, Tuple, Union, cast
 
 import genno
 from ixmp.reporting import (
@@ -166,6 +167,50 @@ MAPPING_SETS = [
 ]
 
 
+@lru_cache(1)
+def get_tasks() -> Sequence[Tuple[Tuple, Mapping]]:
+    """Return a list of tasks describing MESSAGE reporting calculations."""
+    # Assemble queue of items to add. Each element is a 2-tuple of (positional, keyword)
+    # arguments for Reporter.add()
+    to_add = []
+
+    # Helper to add elements to the queue
+    def put(*args, **kwargs):
+        to_add.append((args, kwargs))
+
+    # Quantities that represent mapping sets
+    for name, full_set in MAPPING_SETS:
+        put("map_as_qty", f"map_{name}", f"cat_{name}", full_set, strict=True)
+
+    # Product quantities
+    for name, quantities in PRODUCTS:
+        put("product", name, *quantities)
+
+    # Derived quantities
+    for key, args in DERIVED:
+        put(key, *args, strict=True, index=True, sums=True)
+
+    # Conversions to IAMC-format (pyam) objects
+    for qty, year_dim, collapse_kw in PYAM_CONVERT:
+        # Standard renaming from dimensions to column names
+        rename = dict(n="region", nl="region")
+        # Column to set as year or time dimension
+        rename[year_dim] = "year" if year_dim.lower().startswith("y") else "time"
+        # Callback function to further collapse other columns into IAMC columns
+        collapse_cb = partial(collapse_message_cols, **collapse_kw)
+
+        put("convert_pyam", qty, "pyam", rename=rename, collapse=collapse_cb)
+
+    # Standard reports
+    for group, pyam_keys in REPORTS.items():
+        put("concat", group, *pyam_keys, strict=True)
+
+    # Add all standard reporting to the default message node
+    put("concat", "message:default", *REPORTS.keys(), strict=True)
+
+    return to_add
+
+
 class Reporter(IXMPReporter):
     """MESSAGEix Reporter."""
 
@@ -200,55 +245,19 @@ class Reporter(IXMPReporter):
         # Invoke the ixmp method
         rep = super().from_scenario(scenario, **kwargs)
 
+        # Add the MESSAGEix calculations
+        rep.add_tasks(fail_action)
+
+        return rep
+
+    def add_tasks(self, fail_action: Union[int, str] = "raise") -> None:
+        """Add the pre-defined MESSAGEix reporting tasks to the Reporter."""
         # Ensure that genno.compat.pyam is usable
-        rep.require_compat("pyam")
+        self.require_compat("pyam")
 
         # Use a queue pattern via Reporter.add_queue(). This is more forgiving; e.g.
         # 'addon ACT' from PRODUCTS depends on 'addon conversion::full'; but the latter
-        # is added to the queue later (from DERIVED). Using strict=True below means
-        # that this will raise an exception; so the failed item is re-appended to the
-        # queue and tried 1 more time later.
-
-        # Assemble queue of items to add. Each element is a 2-tuple:
-        # - Positional arguments for Reporter.add();
-        # - Keyword arguments
-        to_add = []
-
-        def put(*args, **kwargs):
-            """Helper to add elements to the queue."""
-            to_add.append((args, kwargs))
-
-        # Quantities that represent mapping sets
-        for name, full_set in MAPPING_SETS:
-            put("map_as_qty", f"map_{name}", f"cat_{name}", full_set, strict=True)
-
-        # Product quantities
-        for name, quantities in PRODUCTS:
-            put("product", name, *quantities)
-
-        # Derived quantities
-        for key, args in DERIVED:
-            put(key, *args, strict=True, index=True, sums=True)
-
-        # Conversions to IAMC format/pyam objects
-        for qty, year_dim, collapse_kw in PYAM_CONVERT:
-            # Standard renaming from dimensions to column names
-            rename = dict(n="region", nl="region")
-            # Column to set as year or time dimension
-            rename[year_dim] = "year" if year_dim.lower().startswith("y") else "time"
-            # Callback function to further collapse other columns into IAMC columns
-            collapse_cb = partial(collapse_message_cols, **collapse_kw)
-
-            put("convert_pyam", qty, "pyam", rename=rename, collapse=collapse_cb)
-
-        # Standard reports
-        for group, pyam_keys in REPORTS.items():
-            put("concat", group, *pyam_keys, strict=True)
-
-        # Add all standard reporting to the default message node
-        put("concat", "message:default", *REPORTS.keys(), strict=True)
-
-        # Use Computer.add_queue() to process the entries. Retry at most once.
-        rep.add_queue(to_add, max_tries=2, fail=fail_action)
-
-        return rep
+        # is added to the queue later (from DERIVED). Using strict=True in the various
+        # add() calls means that that this will raise an exception; so the failed item
+        # is re-appended to the queue and tried at most 1 more time later.
+        self.add_queue(get_tasks(), max_tries=2, fail=fail_action)
