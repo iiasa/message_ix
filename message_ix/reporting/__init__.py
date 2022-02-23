@@ -141,8 +141,8 @@ PYAM_CONVERT = [
 ]
 
 
-#: Automatic reports that :meth:`~computations.concat` quantities converted to
-#: IAMC format.
+#: Automatic reports that :meth:`~computations.concat` quantities converted to IAMC
+#: format.
 REPORTS = {
     "message:system": ["out:pyam", "in:pyam", "CAP:pyam", "CAP_NEW:pyam"],
     "message:costs": ["inv:pyam", "fom:pyam", "vom:pyam", "tom:pyam"],
@@ -150,18 +150,16 @@ REPORTS = {
 }
 
 
-#: MESSAGE mapping sets, converted to reporting quantities via
-#: :meth:`~.map_as_qty`.
+#: MESSAGE mapping sets, converted to reporting quantities via :meth:`~.map_as_qty`.
 #:
-#: For instance, the mapping set ``cat_addon`` is available at the reporting
-#: key ``map_addon``, which produces a :class:`.Quantity` with the two
-#: dimensions ``type_addon`` and ``ta`` (short form of ``technology_addon``).
-#: This Quantity contains the value 1 at every valid (type_addon, ta) location,
-#: and 0 elsewhere.
+#: For instance, the mapping set ``cat_addon`` is available at the reporting key
+#: ``map_addon``, which produces a :class:`.Quantity` with the two dimensions
+#: ``type_addon`` and ``ta`` (short form of ``technology_addon``). This Quantity
+#: contains the value 1 at every valid (type_addon, ta) location, and 0 elsewhere.
 MAPPING_SETS = [
     ("addon", "t"),  # Mapping name, and full target set
     ("emission", "e"),
-    # 'node',  # Automatic addition fails because 'map_node' is defined
+    # 'node',  # Automatic addition fails because 'map_node' is defined explicitly
     ("tec", "t"),
     ("year", "y"),
 ]
