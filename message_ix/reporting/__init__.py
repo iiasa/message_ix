@@ -216,7 +216,7 @@ class Reporter(IXMPReporter):
     modules = list(IXMPReporter.modules) + [computations]
 
     @classmethod
-    def from_scenario(cls, scenario, **kwargs):
+    def from_scenario(cls, scenario, **kwargs) -> "Reporter":
         """Create a Reporter by introspecting `scenario`.
 
         Warnings are logged if `scenario` does not have a solution. In this case, any
@@ -236,12 +236,12 @@ class Reporter(IXMPReporter):
                 f'Scenario "{scenario.model}/{scenario.scenario}" has no solution'
             )
             log.warning("Some reporting may not function as expected")
-            fail_action = logging.DEBUG
+            fail_action: Union[int, str] = logging.DEBUG
         else:
             fail_action = "raise"
 
         # Invoke the ixmp method
-        rep = super().from_scenario(scenario, **kwargs)
+        rep = cast("Reporter", super().from_scenario(scenario, **kwargs))
 
         # Add the MESSAGEix calculations
         rep.add_tasks(fail_action)
