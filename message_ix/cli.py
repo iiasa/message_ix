@@ -55,7 +55,7 @@ def copy_model(path, overwrite, set_default):
             continue
 
         # Display output
-        if dst.exists:
+        if dst.exists():
             if not overwrite:
                 print("{} exists, will not overwrite".format(dst))
 
