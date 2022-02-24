@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import click
@@ -41,7 +42,7 @@ def copy_model(path, overwrite, set_default):
     src_dir = Path(__file__).parent / "model"
     for src in src_dir.rglob("*"):
         # Skip certain files
-        if src.suffix in (".gdx", ".log", ".lst"):
+        if src.suffix in (".gdx", ".log", ".lst") or re.search("(225)", src.stem):
             continue
 
         # Destination path
