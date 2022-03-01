@@ -88,7 +88,8 @@ Using Anaconda
     $ conda create --name message_env
     $ conda activate message_env
 
-8. Install the ``message-ix`` package into the current environment (either ``base``, or another name from step 7, e.g. ``message_env``) [3]_::
+8. Install the ``message-ix`` package into the current environment (either ``base``, or another name from step 7, e.g. ``message_env``).
+   This step can take up to ~45 minutes [3]_::
 
     $ conda install message-ix">1"
 
