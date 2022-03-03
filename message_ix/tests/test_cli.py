@@ -1,4 +1,5 @@
 import re
+import shutil
 from pathlib import Path
 
 import pytest
@@ -26,6 +27,13 @@ def test_copy_model(message_ix_cli, tmp_path, tmp_env):
     r = message_ix_cli("copy-model", "--set-default", str(tmp_path))
     assert r.exit_code == 0
     assert config.get("message model dir") == tmp_path
+
+    # Check if specific directory will be skipped
+    model_path = Path(message_ix.__file__).parent / "model" / "225" / "test.txt"
+    model_path.mkdir(parents=True, exist_ok=True)
+    message_ix_cli("copy-model", "--overwrite", str(tmp_path))
+    assert Path(tmp_path / "225").exists() is False
+    shutil.rmtree(Path(message_ix.__file__).parent / "model" / "225")
 
 
 @pytest.mark.parametrize(
