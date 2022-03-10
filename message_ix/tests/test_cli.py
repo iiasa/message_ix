@@ -29,11 +29,19 @@ def test_copy_model(message_ix_cli, tmp_path, tmp_env):
     assert config.get("message model dir") == tmp_path
 
     # Check if specific directory will be skipped
-    model_path = Path(message_ix.__file__).parent / "model" / "225" / "test.txt"
-    model_path.mkdir(parents=True, exist_ok=True)
+
+    # Create a GAMS runtime directory; these have names like "225a", etc.
+    model_path = Path(message_ix.__file__).parent.joinpath("model", "225c", "test.txt")
+    model_path.parent.mkdir(parents=True, exist_ok=True)
+    model_path.write_text("foo")
+
     message_ix_cli("copy-model", str(tmp_path))
-    assert Path(tmp_path / "225").exists() is False
-    shutil.rmtree(Path(message_ix.__file__).parent / "model" / "225")
+
+    # Directory is ignored
+    assert not Path(tmp_path / "225c").exists()
+
+    # Clean up
+    shutil.rmtree(model_path.parent)
 
 
 @pytest.mark.parametrize(
