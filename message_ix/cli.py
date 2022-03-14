@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import click
@@ -39,9 +40,9 @@ def copy_model(path, overwrite, set_default):
     path = Path(path).resolve()
 
     src_dir = Path(__file__).parent / "model"
-    for src in src_dir.rglob("*"):
+    for src in src_dir.rglob("*.*"):
         # Skip certain files
-        if src.suffix in (".gdx", ".log", ".lst"):
+        if src.suffix in (".gdx", ".log", ".lst") or re.search("225[a-z]+", str(src)):
             continue
 
         # Destination path
@@ -55,7 +56,7 @@ def copy_model(path, overwrite, set_default):
             continue
 
         # Display output
-        if dst.exists:
+        if dst.exists():
             if not overwrite:
                 print("{} exists, will not overwrite".format(dst))
 
