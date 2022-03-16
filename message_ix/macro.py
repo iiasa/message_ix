@@ -668,18 +668,21 @@ def calibrate(s, check_convergence=True, **kwargs):
     msg = "MACRO converged after {} of a maximum of {} iterations"
     log.info(msg.format(n_iter, max_iter))
 
+    units = s.par("grow")["unit"].unique()
+    assert 1 == len(units), "Non-unique units for 'grow'"
+
     # get out calibrated values
     aeei = (
         s.var("aeei_calibrate")
         .rename(columns={"lvl": "value"})
         .drop("mrg", axis=1)
-        .assign(unit=s.par("grow")["unit"].mode().any())
+        .assign(unit=units[0])
     )
     grow = (
         s.var("grow_calibrate")
         .rename(columns={"lvl": "value"})
         .drop("mrg", axis=1)
-        .assign(unit=s.par("grow")["unit"].mode().any())
+        .assign(unit=units[0])
     )
 
     # update calibrated value parameters
