@@ -564,9 +564,7 @@ class Calculate:
 
 
 def add_model_data(base, clone, data):
-    """
-    Cacluates required parameters for MACRO calibration and adds the data to
-    a clone of the submitted MESSAGEix scenario.
+    """Calculate required parameters and add data to `clone`.
 
     Parameters
     ----------
@@ -581,7 +579,6 @@ def add_model_data(base, clone, data):
     ------
     type
         If the data format is not compatible with MESSAGEix parameters.
-
     """
     c = Calculate(base, data)
     c.read_data()
@@ -621,15 +618,19 @@ def add_model_data(base, clone, data):
 
         try:
             key = DATA_KEY.get(name, name)
-            data = c.data[key].reset_index()
-            if name in UNITS.keys():
-                data["unit"] = c.units.get(UNITS.get(name), "-")
-            else:
-                data["unit"] = c.units.get(name, "-")
-            # some data may have information prior to the MACRO initialization
-            # year which we need to remove in order to add it to the scenario
+
+            # Retrieve data; assign units
+            data = (
+                c.data[key]
+                .reset_index()
+                .assign(unit=c.units.get(UNITS.get(name, name), "-"))
+            )
+
+            # Remove data prior to the MACRO initialization year so as not to add this
+            # to the scenario
             if "year" in data:
                 data = data[data["year"] >= c.init_year]
+
             clone.add_par(name, data)
         except Exception as e:
             raise type(e)(f"Error in adding parameter {name}\n{e}")
