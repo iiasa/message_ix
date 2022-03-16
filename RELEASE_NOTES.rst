@@ -4,6 +4,7 @@ Next release
 All changes
 -----------
 
+- Improve configurability of :mod:`.macro`; see the :doc:`documentation <macro>` (:pull:`327`).
 - Split :meth:`.Reporter.add_tasks` for use without an underlying :class:.`Scenario` (:pull:`567`).
 - Allow setting the “model_dir” and “solve_options” options for :class:`.GAMSModel` (and subclasses :class:`.MESSAGE`, :class:`.MACRO`, and :class:`.MESSAGE_MACRO`) through the user's ixmp configuration file; expand documentation (:pull:`557`).
 
