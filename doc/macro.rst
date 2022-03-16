@@ -1,17 +1,30 @@
-Tune MESSAGE-MACRO
-******************
+Calibrate and tune MESSAGE-MACRO
+********************************
 
 “MESSAGE-MACRO” refers to the combination of MESSAGE and MACRO, run iteratively in a multi-disciplinary optimization algorithm.
 This combination is activated by calling :meth:`.solve` with the argument `model='MESSAGE-MACRO'`, or using the GAMS :file:`MESSAGE-MACRO_run.gms` script directly (see :ref:`running` for details about these two methods).
 
-This page describes how to solve two numerical issues that can occur in large |MESSAGEix| models.
-
 .. contents::
    :local:
 
+.. _macro-input-data:
+
+Input data file
+===============
+
+Using :meth:`add_macro` requires an input data file.
+The format of this file is largely the same as :ref:`ixmp:excel-data-format`, with the following exceptions:
+
+.. todo:: Complete this section.
+
+
+Numerical issues
+================
+
+This section describes how to solve two numerical issues that can occur in large |MESSAGEix| models.
 
 Oscillation detection in the MESSAGE-MACRO algorithm
-====================================================
+----------------------------------------------------
 The documentation for the :class:`.MESSAGE_MACRO` class describes the algorithm and its three parameters:
 
 - `convergence_criterion`,
@@ -43,7 +56,7 @@ This has the effect of reducing the allowable relative change in demands, until 
 
 
 Issue 1: Oscillations not detected
-==================================
+----------------------------------
 
 Oscillation detection can fail, especially when the oscillation is very small.
 When this occurs, MESSAGE-MACRO will iterate until `max_iteration` (default ``50``) and then print a message indicating that it has not converged.
@@ -51,13 +64,13 @@ When this occurs, MESSAGE-MACRO will iterate until `max_iteration` (default ``50
 For the MESSAGEix-GLOBIOM global model, this issue can be encountered with scenarios which have stringent carbon budgets (e.g. <1000 Gt CO₂ cumulative) and require more aggressive reductions of demands.
 
 Identifying oscillation
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to find out whether failure to converge is due to undetected oscillation, check the iteration report in :file:`MsgIterationReport_<{model_name}>_<{scenario_name}>.gdx`.
 The initial iterations will show the objective function value either decreasing or increasing (depending on the model), but after a number of iterations, the objective function will flip-flop between two very similar values.
 
 Preventing oscillation
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 The issue can be resolved by tuning `max_adjustment` and `convergence_criterion` from their respective default values of ``0.2`` (20%) and ``0.01`` (1%).
 The general approach is to **reduce max_adjustment**.
@@ -74,7 +87,7 @@ These changes can be made in two ways:
 
 
 Issue 2: MESSAGE solves optimally with unscaled infeasibilities
-===============================================================
+---------------------------------------------------------------
 
 By default, :mod:`message_ix` is configured so that the CPLEX solver runs using the `lpmethod` option set to ``2``, selecting the dual simplex method.
 Solving models the size of MESSAGEix-GLOBIOM takes very long with the dual simplex method—scenarios with stringent constraints can take >10 hours on common hardware.
@@ -100,3 +113,13 @@ When this is not possible, there are some workarounds:
 3. Start the MESSAGE-MACRO algorithm with `lpmethod` set to ``4``.
    Manually monitor its progress, and after approximately 10 iterations have passed, delete the file :file:`cplex.opt`.
    When CPLEX can not find its option file, it will revert to using a simplex method (and advanced basis) from thereon.
+
+
+:mod:`message_ix.macro` internals
+=================================
+
+.. currentmodule:: message_ix.macro
+
+.. automodule:: message_ix.macro
+   :members:
+   :exclude-members: MACRO_ITEMS

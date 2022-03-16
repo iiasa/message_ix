@@ -581,8 +581,10 @@ class Scenario(ixmp.Scenario):
         kwargs
             Solve options when solving the calibrated scenario.
 
+        See also
+        --------
+        :ref:`macro-input-data`
         """
-
         from .macro import EXPERIMENTAL, add_model_data, calibrate
         from .models import MACRO
 
