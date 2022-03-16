@@ -1,6 +1,13 @@
 Next release
 ============
 
+Migration notes
+---------------
+
+The format of input data file for MACRO calibration has been changed.
+The previous versions of this file will not work after the improvements proposed in (:pull:`327`).
+Read about the new data file format in :doc:`documentation <macro>`.
+
 All changes
 -----------
 
