@@ -547,7 +547,7 @@ class Calculate:
     @lru_cache()
     def _aconst(self):
         """
-        Calculate production function coefficient of capital and labor ("acosnt"),
+        Calculate production function coefficient of capital and labor ("aconst"),
         for MACRO calibration (specified as "lakl" in GAMS formulation).
 
         Returns
