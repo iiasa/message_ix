@@ -228,60 +228,68 @@ class Calculate:
         self.years = set(demand["year"])
 
     def read_data(self):
-        """
-        Read data from a input file or python dictionary, validate data, and
-        add data to the scenario for MACRO calibration.
+        """Check and validate structure of data in ``self.data``.
 
         Raises
         ------
         ValueError
-            Assert if required data for MACRO calibration is missing.
-
-
+            if any of the require parameters for MACRO calibration
+            (:data:`VERIFY_INPUT_DATA`) is missing.
         """
-        # users define certain nodes, sectors and level for MACRO
+        # Store sets (node, sector, level) and mappings based on configuration
         self.nodes = set(self.data["config"]["node"].dropna())
         self.sectors = set(self.data["config"]["sector"].dropna())
         self.levels = set(self.data["config"]["level"].dropna())
         self.sector_mapping = self.data["config"]
-        yrs = set(self.data["config"]["year"].dropna())
 
-        # Accepting the years that are included in the model results
+        # Filter, keeping only years that are included in the model results
+        yrs = set(self.data["config"]["year"].dropna())
         self.years = [x for x in yrs if x in self.years]
         max_macro_year = max(self.years)
 
-        par_diff = set(VERIFY_INPUT_DATA) - set(self.data)
-        if par_diff:
-            raise ValueError(f"Missing required input data: {par_diff}")
+        # Ensure input data are complete
+        missing = set(VERIFY_INPUT_DATA) - set(self.data)
+        if missing:
+            raise ValueError(f"Missing required input data: {missing}")
 
-        for name in self.data:
-            # no need to validate configuration, it was processed above
+        # Process each parameter
+        for name, df in self.data.items():
             if name == "config":
+                # Configuration was processed above
                 continue
+
+            # Validate this parameter, retrieving the index columns/dimensions
             idx = _validate_data(
-                name, self.data[name], self.nodes, self.sectors, self.levels, self.years
+                name, df, self.nodes, self.sectors, self.levels, self.years
             )
-            self.units[name] = self.data[name]["unit"].mode().any()
 
-            # Accepting years lower than max MACRO year
-            if "year" in self.data[name].columns:
-                df = self.data[name]
-                self.data[name] = df.loc[df["year"] <= max_macro_year].copy()
-            self.data[name] = self.data[name].set_index(idx)["value"]
+            # Store units of this parameter
+            units = df["unit"].unique()
+            assert 1 == len(units), f"Non-unique units for parameter {name}"
+            self.units[name] = units[0]
 
-        # special check for gdp_calibrate - it must have at minimum two years
-        # prior to the model horizon in order to compute growth rates in the
-        # historical period (MACRO's "initializeyear")
-        data_years = self.data["gdp_calibrate"].index.get_level_values("year")
-        min_year_model = min(self.years)
-        data_years_before_model = data_years[data_years < min_year_model]
-        if len(data_years_before_model) < 2:
-            raise ValueError(
-                "Must provide two gdp_calibrate data points prior to the modeling "
-                "period in order to calculate growth rates"
-            )
-        # init year is most recent period PRIOR to the modeled period
-        self.init_year = max(data_years_before_model)
+            if "year" in df.columns:
+                # Discard data beyond `max_macro_year`
+                df = df.loc[df["year"] <= max_macro_year].copy()
+
+            if name == "gdp_calibrate":
+                # Check that gdp_calibrate has at least 2 periods before the model
+                # horizon. This is required in order to compute growth rates in the
+                # historical periods (MACRO's "initializeyear")
+                data_years_before_model = sorted(
+                    filter(lambda y: y < min(self.years), df["year"].unique())
+                )
+                if len(data_years_before_model) < 2:
+                    raise ValueError(
+                        "Must provide two gdp_calibrate data points prior to the model "
+                        "horizon in order to calculate growth rates"
+                    )
+
+                # Store init_year, the most recent period PRIOR to the model horizon
+                self.init_year = max(data_years_before_model)
+
+            # Store as pd.Series with multi-index
+            self.data[name] = df.set_index(idx)["value"]
 
     def _clean_model_data(self, data):
         """
