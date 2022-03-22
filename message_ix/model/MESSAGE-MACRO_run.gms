@@ -114,6 +114,7 @@ Parameters
     price_diff_rel(*,node,sector,year_all)
 
     report_iteration(iteration,*)
+    trade_cost_detail(node, commodity, year_all)              'net of commodity import costs and commodity export revenues by node,commodity and year'
 ;
 
 * variables to report back to user if needed
@@ -158,6 +159,8 @@ ctr = ctr + 1 ;
 * to keep the model in memory between runs, this will speed up computation
 MESSAGE_LP.solvelink = 1 ;
 
+*----------------------------------------------------------------------------------------------------------------------*
+
 $INCLUDE MESSAGE/model_solve.gms
 
 report_iteration(iteration, 'MESSAGEix OBJ') = OBJ.l ;
@@ -199,6 +202,10 @@ DISPLAY enestart, eneprice, total_cost ;
 * solve MACRO model                                                                                                    *
 *----------------------------------------------------------------------------------------------------------------------*
 
+* update total energy system costs by node and time with information from latest MESSAGE run
+total_cost(node_macro, year) = COST_NODAL_NET.L(node_macro, year) / 1000 ;
+trade_cost_detail(node, commodity, year) = import_cost(node, commodity, year) - export_cost(node, commodity, year) ;
+
 $INCLUDE MACRO/macro_solve.gms
 
 *----------------------------------------------------------------------------------------------------------------------*
@@ -234,7 +241,8 @@ COST_NODAL_NET.L(node_macro,year) =
         * EMISS.L(node_macro,emission,type_tec,year) )
 ;
 
-GDP.L(node_macro,year) = (I.L(node_macro,year) + C.L(node_macro,year) + EC.L(node_macro,year)) * 1000 ;
+GDP.L(node_macro,year) = (I.L(node_macro,year) + C.L(node_macro,year) + EC.L(node_macro,year) - ( trade_cost(node_macro, year) * 1E-6 ))*1000;
+
 
 * calculate convergence level (maximum absolute scaling factor minus 1 across all regions, sectors, and years)
 max_adjustment_pos = smax((node_macro,sector,year)$( NOT macro_base_period(year) AND demand_scale(node_macro,sector,year) > 1),
