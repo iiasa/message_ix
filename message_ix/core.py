@@ -566,8 +566,25 @@ class Scenario(ixmp.Scenario):
         super().solve(model=model, solve_options=solve_options, **kwargs)
 
     def add_macro(self, data, scenario=None, check_convergence=True, **kwargs):
-        """Add MACRO parametrization to the Scenario and calibrate."""
-        # TODO document
+        """
+        Add MACRO parametrization to the Scenario and calibrate.
+        Notice: existing MACRO calibration data will be overwritten by running this.
+
+        Parameters
+        ----------
+        data : dict (str -> DataFrame or Series)
+            Dictionary of required data for MACRO calibration.
+        scenario : string, optional, default: None.
+            Scenario name for calibrated MESSAGEix scenario.
+        check_convergence : bool, optional, default: True.
+            The calibrated scenario solves in one iteration.
+        kwargs
+            Solve options when solving the calibrated scenario.
+
+        See also
+        --------
+        :ref:`macro-input-data`
+        """
         from .macro import EXPERIMENTAL, add_model_data, calibrate
         from .models import MACRO
 

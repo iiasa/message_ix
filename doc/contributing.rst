@@ -232,6 +232,7 @@ Documentation
   - Check that intersphinx links are correctly resolved, by building the docs and attempting to click new or modified links.
 
 - Write docstrings in the `numpydoc <https://numpydoc.readthedocs.io/en/latest/format.html>`_ style.
+  This implies also `PEP 257 <https://peps.python.org/pep-0257/>`_; see in particular the format for `multi-line docstrings <https://peps.python.org/pep-0257/#multi-line-docstrings>`_.
 
   Use single backticks to refer to function arguments, and asterisks for italics:
 

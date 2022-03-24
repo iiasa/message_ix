@@ -1,9 +1,16 @@
 Next release
 ============
 
+Migration notes
+---------------
+
+The format of input data files for MACRO calibration has been changed in :pull:`327`.
+Files compatible with v3.4.0 and earlier will not work with this version and should be updated; see details of the current data file format in the :doc:`documentation <macro>`.
+
 All changes
 -----------
 
+- Improve configurability of :mod:`.macro`; see the :doc:`documentation <macro>` (:pull:`327`).
 - Split :meth:`.Reporter.add_tasks` for use without an underlying :class:.`Scenario` (:pull:`567`).
 - Allow setting the “model_dir” and “solve_options” options for :class:`.GAMSModel` (and subclasses :class:`.MESSAGE`, :class:`.MACRO`, and :class:`.MESSAGE_MACRO`) through the user's ixmp configuration file; expand documentation (:pull:`557`).
 
