@@ -26,10 +26,10 @@ class MockScenario:
 
     def var(self, name, **kwargs):
         df = self.data["aeei"]
-        # add extra commodity to be removed
+        # Add extra commodity to be removed
         extra_commod = df[df.sector == "i_therm"].copy()
         extra_commod["sector"] = "bar"
-        # add extra region to be removed
+        # Add extra region to be removed
         extra_region = df[df.node == "R11_AFR"].copy()
         extra_region["node"] = "foo"
         df = pd.concat([df, extra_commod, extra_region])

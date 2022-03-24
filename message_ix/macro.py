@@ -42,7 +42,7 @@ UNITS = dict(
     price_MESSAGE="price_ref",
 )
 
-#: ixmp items (sets, parameters, variables, and equations) in MACRO.
+# ixmp items (sets, parameters, variables, and equations) in MACRO.
 MACRO_ITEMS = dict(
     sector=dict(ix_type="set"),
     mapping_macro_sector=dict(ix_type="set", idx_sets=["sector", "commodity", "level"]),
@@ -591,16 +591,16 @@ def add_model_data(base, clone, data):
     c.read_data()
     c.derive_data()
 
-    # removing old initializeyear_macro before adding new one
+    # Removing old initializeyear_macro before adding new one
     cat = clone.set("cat_year", {"type_year": "initializeyear_macro"})
     if not cat.empty:
         clone.remove_set("cat_year", cat)
 
-    # add temporal set structure
+    # Add temporal set structure
     clone.add_set("type_year", "initializeyear_macro")
     clone.add_set("cat_year", ["initializeyear_macro", c.init_year])
 
-    # add nodal set structure
+    # Add nodal set structure
     clone.add_set("type_node", "economy")
     for n in c.nodes:
         clone.add_set("cat_node", ["economy", n])
@@ -618,7 +618,7 @@ def add_model_data(base, clone, data):
         clone.add_set("sector", sec)
         clone.add_set("mapping_macro_sector", [sec, com, lvl])
 
-    # add parameters
+    # Add parameters
     for name, info in MACRO_ITEMS.items():
         if info["ix_type"] != "par":
             continue
@@ -667,7 +667,7 @@ def calibrate(s, check_convergence=True, **kwargs):
         MACRO-calibrated scenario.
 
     """
-    # solve MACRO standalone
+    # Solve MACRO standalone
     var_list = ["N_ITER", "MAX_ITER", "aeei_calibrate", "grow_calibrate"]
     gams_args = ["LogOption=2"]  # pass everything to log file
     s.solve(model="MACRO", var_list=var_list, gams_args=gams_args)
@@ -679,7 +679,7 @@ def calibrate(s, check_convergence=True, **kwargs):
     units = s.par("grow")["unit"].unique()
     assert 1 == len(units), "Non-unique units for 'grow'"
 
-    # get out calibrated values
+    # Get out calibrated values
     aeei = (
         s.var("aeei_calibrate")
         .rename(columns={"lvl": "value"})
@@ -693,7 +693,7 @@ def calibrate(s, check_convergence=True, **kwargs):
         .assign(unit=units[0])
     )
 
-    # update calibrated value parameters
+    # Update calibrated value parameters
     s.remove_solution()
     s.check_out()
     s.add_par("aeei", aeei)
