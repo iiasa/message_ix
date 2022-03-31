@@ -416,7 +416,9 @@ class Scenario(ixmp.Scenario):
             ),
         )
 
-    def vintage_and_active_years(self, ya_args=None, in_horizon=True):
+    def vintage_and_active_years(
+        self, ya_args=None, in_horizon=True, vtg_lower=0, act_lower=0
+    ):
         """Return sets of vintage and active years for use in data input.
 
         For a valid pair `(year_vtg, year_act)`, the following conditions are
@@ -443,29 +445,59 @@ class Scenario(ixmp.Scenario):
             with columns 'year_vtg' and 'year_act', in which each row is a
             valid pair.
         """
-        first = self.firstmodelyear
-
-        # Prepare lists of vintage (yv) and active (ya) years
-        if ya_args:
-            if len(ya_args) != 3:
-                raise ValueError("3 arguments are required if using `ya_args`")
-            ya = self.years_active(*ya_args)
-            yv = ya[0:1]  # Just the first element, as a list
-        else:
-            # Product of all years
-            yv = ya = self.set("year")
-
         # Predicate for filtering years
         def _valid(elem):
             yv, ya = elem
-            return (yv <= ya) and (not in_horizon or (first <= ya))
+            return (yv <= ya and yv >= vtg_lower) and (
+                (not in_horizon or (first <= ya)) and (ya >= act_lower)
+            )
 
-        # - Cartesian product of all yv and ya.
-        # - Filter only valid years.
-        # - Convert to data frame.
-        return pd.DataFrame(
-            filter(_valid, product(yv, ya)), columns=["year_vtg", "year_act"]
-        )
+        first = self.firstmodelyear
+        columns = ["year_vtg", "year_act"]
+
+        # Prepare lists of vintage (yv) and active (ya) years
+        if ya_args:
+            ya_args = [ya_args] if type(ya_args) == str else ya_args
+            len_yargs = len(ya_args)
+            if len_yargs < 2:
+                raise ValueError("At least 2 arguments are required if using `ya_args`")
+            # If year_vtg is specified
+            if len_yargs != 2:
+                ya = self.years_active(*ya_args)
+                df = pd.DataFrame(filter(_valid, product(ya[0:1], ya)), columns=columns)
+            else:
+                yv = self.par(
+                    "technical_lifetime",
+                    filters={"node_loc": ya_args[0], "technology": ya_args[1]},
+                ).year_vtg.tolist()
+                df = (
+                    pd.concat(
+                        [
+                            pd.DataFrame(
+                                filter(
+                                    _valid,
+                                    product(
+                                        [y],
+                                        self.years_active(ya_args[0], ya_args[1], y),
+                                    ),
+                                ),
+                                columns=columns,
+                            )
+                            for y in yv
+                        ]
+                    )
+                    .reset_index()
+                    .drop("index", axis=1)
+                )
+
+        else:
+            # Product of all years
+            df = pd.DataFrame(
+                filter(_valid, product(self.set("year"), self.set("year"))),
+                columns=columns,
+            )
+        # Set type as filtering seems to cause issues
+        return df.astype({c: "int64" for c in columns})
 
     def years_active(self, node, tec, yr_vtg):
         """Return years in which *tec* of *yr_vtg* can be active in *node*.

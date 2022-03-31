@@ -68,11 +68,15 @@ def test_vintage_and_active_years(test_mp):
     obs = scen.vintage_and_active_years(
         ya_args=("foo", "bar", years[0]), in_horizon=True
     )
-    pdt.assert_frame_equal(pd.DataFrame(columns=["year_vtg", "year_act"]), obs)
+    pdt.assert_frame_equal(
+        pd.DataFrame(columns=["year_vtg", "year_act"]), obs, check_dtype=False
+    )
 
     # Exception is raised for incorrect arguments
-    with pytest.raises(ValueError, match="3 arguments are required if using `ya_args`"):
-        scen.vintage_and_active_years(ya_args=("foo", "bar"))
+    with pytest.raises(
+        ValueError, match="At least 2 arguments are required if using `ya_args`"
+    ):
+        scen.vintage_and_active_years(ya_args=("foo"))
 
 
 def test_vintage_and_active_years_upd(test_mp):
