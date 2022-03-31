@@ -1,9 +1,9 @@
 import pandas as pd
 import pandas.testing as pdt
+import pytest
 
 from message_ix import Scenario
 from message_ix.testing import SCENARIO
-import pytest
 
 
 def test_vintage_and_active_years(test_mp):
