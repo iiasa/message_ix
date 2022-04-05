@@ -105,16 +105,25 @@ uses it to illustrate a range of framework features.
       #. Add a renewable-resource supply curve for the wind power plant,
          (:tut:`westeros/westeros_renewable_resource.ipynb`).
 
-   #. Variablity in energy supply and demand by adding sub-annual time steps,
+   #. Variability in energy supply and demand by adding sub-annual time steps,
       e.g. winter and summer (:tut:`westeros/westeros_seasonality.ipynb`).
-   #. Using share constraints to depict policies, i.e. require renewables to
-      supply a certain share of total electricity generation
-      (:tut:`westeros/westeros_share_constraint.ipynb`).
-   #. Add a fossil-resource supply curve for the coal power plant,
-      (:tut:`westeros/westeros_fossil_resource.ipynb`).
-   #. Add-on technologies: Add the possibility of co-generation for the coal
-      power plant, by allowing it to produce heat via a passout-turbine
-      (:tut:`westeros/westeros_addon_technologies.ipynb`).
+
+   #. Constraints
+
+      #. Using share constraints to depict policies, i.e. require renewables to
+         supply a certain share of total electricity generation
+         (:tut:`westeros/westeros_share_constraint.ipynb`).
+      #. Add soft constraints for activity related dynamic constraints
+         (:tut:`westeros/westeros_soft_constraints.ipynb`
+
+   #. Fossil fuels
+
+      #. Add a fossil-resource supply curve for the coal power plant,
+         (:tut:`westeros/westeros_fossil_resource.ipynb`).
+      #. Add-on technologies: Add the possibility of co-generation for the coal
+         power plant, by allowing it to produce heat via a passout-turbine
+         (:tut:`westeros/westeros_addon_technologies.ipynb`).
+
    #. Build the baseline scenario using data stored in xlsx files to populate sets and
       parameters.
 
@@ -122,9 +131,6 @@ uses it to illustrate a range of framework features.
          (:tut:`westeros/westeros_baseline_using_xlsx_import_part1.ipynb`).
       #. Import data from multiple excel files to create a new scenario
          (:tut:`westeros/westeros_baseline_using_xlsx_import_part2.ipynb`).
-
-   #. Add soft constraints for activity related dynamic constraints
-      (:tut:`westeros/westeros_soft_constraints.ipynb`
 
    #. Explore historical parameters and their usage
       (:tut:`westeros/westeros_historical_new_capacity.ipynb`).
