@@ -137,9 +137,9 @@ def add_year(
     """
     # TODO: when #578 is solved, remove this
     raise NotImplementedError(
-        'This function is known to not work properly. '
-        'Please see https://github.com/iiasa/message_ix/issues/578.'
-        )
+        "This function is known to not work properly. "
+        "Please see https://github.com/iiasa/message_ix/issues/578."
+    )
 
     # III.A) Adding sets and required modifications
     years_new = sorted([x for x in years_new if str(x) not in set(sc_ref.set("year"))])
