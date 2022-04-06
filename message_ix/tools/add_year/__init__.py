@@ -135,6 +135,12 @@ def add_year(
         point for interpolation (e.g., permitting the extension of a bound to
         2025, when there is only one value in 2020).
     """
+    # TODO: when #578 is solved, remove this
+    raise NotImplementedError(
+        'This function is known to not work properly. '
+        'Please see https://github.com/iiasa/message_ix/issues/578.'
+        )
+
     # III.A) Adding sets and required modifications
     years_new = sorted([x for x in years_new if str(x) not in set(sc_ref.set("year"))])
     add_year_set(sc_ref, sc_new, years_new, firstyear_new, lastyear_new, baseyear_macro)
