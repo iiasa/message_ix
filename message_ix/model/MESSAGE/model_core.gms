@@ -810,7 +810,7 @@ RENEWABLES_EQUIVALENCE(node,renewable_tec,commodity,year,time)$(
         map_tec(node,renewable_tec,year) AND map_ren_com(node,renewable_tec,commodity,year) )..
     SUM(grade$( map_ren_grade(node,commodity,grade,year) ), REN(node,renewable_tec,commodity,grade,year,time) )
     =E= SUM((location,vintage,mode,level_renewable,time_act)$(
-                 map_tec_act(node,renewable_tec,year,mode,time)
+                 map_tec_act(node,renewable_tec,year,mode,time_act)
                  AND map_tec_lifetime(node,renewable_tec,vintage,year) ),
         input(location,renewable_tec,vintage,year,mode,node,commodity,level_renewable,time_act,time)
         * ACT(location,renewable_tec,vintage,year,mode,time_act) ) ;
