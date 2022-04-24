@@ -31,15 +31,15 @@ For example, one or more of:
 
 <!-- This item is always required. -->
 - [ ] Continuous integration checks all ✅
-<!--
-The following items are all *required* if the PR results in changes to user-
-facing behaviour, e.g. new features or fixes to existing behaviour. They are
-*optional* if the changes are solely to documentation, CI configuration, etc.
+  <!--
+  The following items are all *required* if the PR results in changes to user-
+  facing behaviour, e.g. new features or fixes to existing behaviour. They are
+  *optional* if the changes are solely to documentation, CI configuration, etc.
 
-In ambiguous cases, strike them out and add a short explanation, e.g.
+  In ambiguous cases, strike them out and add a short explanation, e.g.
 
-- ~Add or expand tests.~ No change in behaviour, simply refactoring.
--->
+  - ~Add or expand tests.~ No change in behaviour, simply refactoring.
+  -->
 - [ ] Add or expand tests; coverage checks both ✅
 - [ ] Add, expand, or update documentation.
 - [ ] Update release notes.
