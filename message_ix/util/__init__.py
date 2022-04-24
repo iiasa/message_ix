@@ -12,17 +12,14 @@ from message_ix.models import MESSAGE_ITEMS
 
 def make_df(name, **data):
     """Return a data frame for parameter `name` filled with `data`.
-    The "**" before 'data' implies the need to pass keyword arguments,
-    such as :commodity="baz":.
-
-    For a better understandig of keyword arguments and how to pass
-    them to functions, the `Python documentation
-    <https://docs.python.org/3/tutorial/controlflow.html#keyword-arguments>`_
-    gives a comprehensive overview.
 
     :func:`make_df` always returns a data frame with the columns required by
     :meth:`.add_par`: the dimensions of the parameter `name`, plus 'value' and
     'unit'. Columns not listed in `data` are left empty.
+
+    The `data` keyword arguments can be passed in many ways; see the
+    :ref:`python:tut-keywordargs` and “Function Examples” sections of the Python
+    introductory tutorial, or the examples below.
 
     Examples
     --------
@@ -34,24 +31,27 @@ def make_df(name, **data):
     0  foo        baz   None  None  None    1.2  None
     1  bar        baz   None  None  None    3.4  None
 
-    or
+    Pass some values as direct keyword arguments, and others by unpacking a dictionary:
 
+    >>> common = dict(
+    ...    commodity="light",
+    ...    level="useful",
+    ...    time="year",
+    ...    unit="GWa",
+    ... )
     >>> make_df(
     ...    "demand",
     ...    node=["Westeros", "Middle-earth"],
-    ...    commodity="light",
-    ...    level='useful',
     ...    year=[680, 700],
-    ...    time='year',
     ...    value=[50, 80],
-    ...    unit='GWa'
+    ...    # Use values from `common` as additional keyword args:
+    ...    **common,
     ... )
                node  commodity   level  year  time  value  unit
     0      Westeros      light  useful   680  year     50   GWa
     1  Middle-earth      light  useful   700  year     50   GWa
 
-
-    Code that uses the deprecated signature:
+    Code that uses the deprecated signature, such as:
 
     >>> base = {"year": [2020, 2021, 2022]}
     >>> make_df(base, value=1., unit="y")
@@ -60,38 +60,37 @@ def make_df(name, **data):
     1     2    1.0     y
     2     3    1.0     y
 
-    or
+    or:
 
-    >>> base  = {
-    ...    'node': ["Westeros", "Middle-earth"],
-    ...    'year' : [680, 700],
-    ...    'time': 'year',
-    ...    'unit': '-',
-    ...    }
-    >>> make_df(base, mode='standard')
+    >>> base = dict(
+    ...    node=["Westeros", "Middle-earth"],
+    ...    year=[680, 700],
+    ...    time="year",
+    ...    unit="-",
+    ... )
+    >>> make_df(base, mode="standard")
                node  year  time  unit      mode
     0      Westeros   680  year     -  standard
     1  Middle-earth   700  year     -  standard
 
-    can either be adjusted to use the new signature:
+    …can either be adjusted to use the new signature:
 
     >>> make_df("duration_period", **base, value=1., unit="y")
 
-    or, emulated using the built-in pandas method :meth:`~.DataFrame.assign`:
+    or, emulated using the :meth:`pandas.DataFrame.assign` method:
 
     >>> pd.DataFrame(base).assign(value=1., unit="y")
 
-    The former is recommended, because it will ensure the result has the correct
-    columns for the parameter.
+    The former is recommended, because it will ensure the result has the correct columns
+    for the parameter.
 
     Parameters
     ----------
     name : str
-        Name of a parameter listed in :data:`MESSAGE_ITEMS` or
-        :data:`MACRO_ITEMS`.
+        Name of a parameter listed in :data:`MESSAGE_ITEMS` or :data:`MACRO_ITEMS`.
     data : optional
-        Contents for dimensions of the parameter, its 'value', or 'unit'.
-        Other keys are ignored.
+        Contents for dimensions of the parameter, its 'value', or 'unit'. Other keys are
+        ignored.
 
     Returns
     -------
@@ -100,8 +99,8 @@ def make_df(name, **data):
     Raises
     ------
     ValueError
-        if `name` is not the name of a MESSAGE or MACRO parameter; if arrays in
-        `data` have uneven lengths.
+        if `name` is not the name of a MESSAGE or MACRO parameter; if arrays in `data`
+        have uneven lengths.
     """
     if isinstance(name, (Mapping, pd.Series, pd.DataFrame)):
         return _deprecated_make_df(name, **data)
