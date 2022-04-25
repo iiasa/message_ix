@@ -186,7 +186,7 @@ def get_tasks() -> Sequence[Tuple[Tuple, Mapping]]:
 
     # Derived quantities
     for key, args in DERIVED:
-        put(key, *args, strict=True, index=True, sums=True)
+        put(key, *args, strict=True, sums=True)
 
     # Conversions to IAMC-format (pyam) objects
     for qty, year_dim, collapse_kw in PYAM_CONVERT:
