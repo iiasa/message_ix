@@ -4,7 +4,7 @@ from typing import List, Union
 
 import numpy as np
 import pandas as pd
-from ixmp import IAMC_IDX, Platform
+from ixmp import IAMC_IDX
 
 from message_ix import Scenario, make_df
 
@@ -599,11 +599,11 @@ def make_subannual(
     capacity={"gas_ppl": {"inv_cost": 0.1, "technical_lifetime": 5}},
     capacity_factor={},
     var_cost={},
-    unit="GWa",
 ):
     """Return an :class:`message_ix.Scenario` with subannual time resolution.
 
-    Generates a simple model with two technologies, and a number of time slices.
+    The scenario contains a simple model with two technologies, and a number of time
+    slices.
 
     Parameters
     ----------
@@ -611,29 +611,27 @@ def make_subannual(
         The pytest ``request`` fixture.
     tec_dict : dict
         A dictionary for a technology and required info for time-related parameters.
-        (e.g., tec_dict = {"gas_ppl": {"time_origin": ["summer"],
-                                       "time": ["summer"], "time_dest": ["summer"]})
+        (e.g., ``tec_dict = {"gas_ppl": {"time_origin": ["summer"], "time": ["summer"],
+        "time_dest": ["summer"]}``)
     time_steps : list of tuples
         Information about each time slice, packed in a tuple with four elements,
         including: time slice name, duration relative to "year", "temporal_lvl",
-        and parent time slice. (e.g., time_steps = [("summer", 1, "season", "year")])
-    time_relative: list of str
-        List of parent "time" slices, for which a relative duration time is maintained.
-        This will be used to specify parameter "duration_time_rel" for these "time"s.
+        and parent time slice (e.g., ``time_steps = [("summer", 1, "season", "year")]``)
     demand : dict
         A dictionary for information of "demand" in each time slice.
-        (e.g., demand = {"summer": 2.5})
-    com_dict : dict
+        (e.g., 11demand = {"summer": 2.5}``)
+    time_relative: list of str, optional
+        List of parent "time" slices, for which a relative duration time is maintained.
+        This will be used to specify parameter "duration_time_rel" for these "time"s.
+    com_dict : dict, optional
         A dictionary for specifying "input" and "output" commodities.
-        (e.g., com_dict = {"gas_ppl": {"input": "fuel", "output": "electr"}})
-    capacity : dict
+        (e.g., ``com_dict = {"gas_ppl": {"input": "fuel", "output": "electr"}}``)
+    capacity : dict, optional
         Data for "inv_cost" and "technical_lifetime" per technology.
     capacity_factor : dict, optional
         "capacity_factor" with technology as key and "time"/"value" pairs as value.
     var_cost : dict, optional
         "var_cost" with technology as key and "time"/"value" pairs as value.
-    unit : str
-        Unit of "demand"
     """
     # Get the `test_mp` fixture for the requesting test function
     mp = request.getfixturevalue("test_mp")
@@ -646,7 +644,9 @@ def make_subannual(
     for c in com_dict.values():
         scen.add_set("commodity", [x for x in list(c.values()) if x])
 
+    # Fixed values
     y = 2020
+    unit = "GWa"
 
     scen.add_set("level", "level")
     scen.add_set("year", y)
@@ -676,7 +676,7 @@ def make_subannual(
         year_act=y,
     )
 
-    # Define demand
+    # Define demand; unpack (key, value) pairs into individual pd.DataFrame rows
     df = make_df(
         "demand",
         **common,
@@ -715,25 +715,13 @@ def make_subannual(
 
     common.pop("value")
 
-    # Add capacity factor (optional)
-    name = "capacity_factor"
-    for tec, data in capacity_factor.items():
-        scen.add_par(
-            name,
-            make_df(
+    # Add capacity factor and variable cost data, both optional
+    for name, arg in [("capacity_factor", capacity_factor), ("var_cost", var_cost)]:
+        for tec, data in arg.items():
+            df = make_df(
                 name, **common, technology=tec, time=data.keys(), value=data.values()
-            ),
-        )
-
-    # Add variable cost (optional)
-    name = "var_cost"
-    for tec, data in var_cost.items():
-        scen.add_par(
-            name,
-            make_df(
-                name, **common, technology=tec, time=data.keys(), value=data.values()
-            ),
-        )
+            )
+            scen.add_par(name, df)
 
     scen.commit(f"Scenario with subannual time resolution for {request.node.name}")
     scen.solve()
