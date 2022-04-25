@@ -32,24 +32,21 @@ def check_solution(scen: Scenario) -> None:
         assert max(act.loc[i, "cf-corrected"]) == float(cap.loc[i, "lvl"])
 
 
-def test_capacity_factor_time(request):
-    """
-    Testing capacity factor (CF) is calculated correctly in a model with
-    different CF per time slice.
-    """
-    # Technology input/output
-    tec_dict = {
-        "gas_ppl": {
-            "time_origin": [],
-            "time": ["summer", "winter"],
-            "time_dest": ["summer", "winter"],
-        },
-    }
+TD_0 = {
+    "gas_ppl": {
+        "time_origin": [],
+        "time": ["summer", "winter"],
+        "time_dest": ["summer", "winter"],
+    },
+}
 
+
+def test_capacity_factor_time(request):
+    """``capacity_factor`` is calculated correctly when it varies by time slice."""
     # Build model and solve
     scen = make_subannual(
         request,
-        tec_dict,
+        TD_0,
         time_steps=[
             ("summer", 0.5, "season", "year"),
             ("winter", 0.5, "season", "year"),
@@ -62,23 +59,11 @@ def test_capacity_factor_time(request):
 
 
 def test_capacity_factor_unequal_time(request):
-    """
-    Testing capacity factor (CF) is calculated correctly in a model with
-    different duration per time slice.
-    """
-    # Technology input/output
-    tec_dict = {
-        "gas_ppl": {
-            "time_origin": [],
-            "time": ["summer", "winter"],
-            "time_dest": ["summer", "winter"],
-        },
-    }
-
-    # # Build model and solve
+    """``capacity_factor`` is calculated correctly when ``duration_time`` is uneven."""
+    # Build model and solve
     scen = make_subannual(
         request,
-        tec_dict,
+        TD_0,
         time_steps=[
             ("summer", 0.3, "season", "year"),
             ("winter", 0.7, "season", "year"),
@@ -90,12 +75,17 @@ def test_capacity_factor_unequal_time(request):
     check_solution(scen)
 
 
-def test_capacity_factor_zero(request):
-    """Testing zero capacity factor (CF) in a time slice.
+TS_0 = [
+    ("day", 0.5, "subannual", "year"),
+    ("night", 0.5, "subannual", "year"),
+]
 
-    "solar_pv_ppl" is active in "day" and NOT at "night" (CF = 0).
-    It is expected that the model will be infeasible, because "demand" at night
-    cannot be met.
+
+def test_capacity_factor_zero(request):
+    """Test zero capacity factor (CF) in a time slice.
+
+    "solar_pv_ppl" is active in "day" and NOT at "night" (CF = 0). It is expected that
+    the model will be infeasible, because "demand" at night cannot be met.
     """
     # Technology input/output
     tec_dict = {
@@ -112,10 +102,7 @@ def test_capacity_factor_zero(request):
             request,
             tec_dict,
             com_dict={"solar_pv_ppl": {"input": "fuel", "output": "electr"}},
-            time_steps=[
-                ("day", 0.5, "subannual", "year"),
-                ("night", 0.5, "subannual", "year"),
-            ],
+            time_steps=TS_0,
             demand={"day": 2, "night": 1},
             capacity={"solar_pv_ppl": {"inv_cost": 0.2, "technical_lifetime": 5}},
             capacity_factor={"solar_pv_ppl": {"day": 0.8, "night": 0}},
@@ -123,11 +110,11 @@ def test_capacity_factor_zero(request):
 
 
 def test_capacity_factor_zero_two(request):
-    """Testing zero capacity factor (CF) in a time slice.
+    """Test zero capacity factor (CF) in a time slice.
 
-    "solar_pv_ppl" is active in "day" and NOT at "night" (CF = 0).
-    The model output should show no activity of "solar_pv_ppl" at "night".
-    So, "gas_ppl" is active at "night", even though a more expensive technology.
+    "solar_pv_ppl" is active in "day" and NOT at "night" (CF = 0). The model output
+    should show no activity of "solar_pv_ppl" at "night". So, "gas_ppl" is active at
+    "night", even though a more expensive technology.
     """
     # Technology input/output
     tec_dict = {
@@ -151,10 +138,7 @@ def test_capacity_factor_zero_two(request):
             "solar_pv_ppl": {"input": "fuel", "output": "electr"},
             "gas_ppl": {"input": "fuel", "output": "electr"},
         },
-        time_steps=[
-            ("day", 0.5, "season", "year"),
-            ("night", 0.5, "season", "year"),
-        ],
+        time_steps=TS_0,
         demand={"day": 2, "night": 1},
         capacity={
             "solar_pv_ppl": {"inv_cost": 0.1, "technical_lifetime": 5},
