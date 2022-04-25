@@ -4,7 +4,7 @@ from typing import List, Union
 
 import numpy as np
 import pandas as pd
-from ixmp import IAMC_IDX
+from ixmp import IAMC_IDX, Platform
 
 from message_ix import Scenario, make_df
 
@@ -585,5 +585,154 @@ def make_westeros(mp, emissions=False, solve=False, quiet=True):
 
     if solve:
         scen.solve(quiet=quiet)
+
+    return scen
+
+
+def make_subannual(
+    request,
+    tec_dict,
+    time_steps,
+    demand,
+    com_dict={"gas_ppl": {"input": "fuel", "output": "electr"}},
+    capacity={"gas_ppl": {"inv_cost": 0.1, "technical_lifetime": 5}},
+    capacity_factor={},
+    var_cost={},
+    unit="GWa",
+):
+    """Return an :class:`message_ix.Scenario` with subannual time resolution.
+
+    Generates a simple model with two technologies, and a number of time slices.
+
+    Parameters
+    ----------
+    request :
+        The pytest ``request`` fixture.
+    tec_dict : dict
+        A dictionary for a technology and required info for time-related parameters.
+        (e.g., tec_dict = {"gas_ppl": {"time_origin": ["summer"],
+                                       "time": ["summer"], "time_dest": ["summer"]})
+    time_steps : list of tuples
+        Information about each time slice, packed in a tuple with four elements,
+        including: time slice name, duration relative to "year", "temporal_lvl",
+        and parent time slice. (e.g., time_steps = [("summer", 1, "season", "year")])
+    relative_time: list of strings
+        List of parent "time" slices, for which a relative duration time is maintained.
+        This will be used to specify parameter "duration_time_rel" for these "time"s.
+    demand : dict
+        A dictionary for information of "demand" in each time slice.
+        (e.g., demand = {"summer": 2.5})
+    com_dict : dict
+        A dictionary for specifying "input" and "output" commodities.
+        (e.g., com_dict = {"gas_ppl": {"input": "fuel", "output": "electr"}})
+    capacity : dict
+        Data for "inv_cost" and "technical_lifetime" per technology.
+    capacity_factor : dict, optional
+        "capacity_factor" with technology as key and "time"/"value" pairs as value.
+    var_cost : dict, optional
+        "var_cost" with technology as key and "time"/"value" pairs as value.
+    unit : str
+        Unit of "demand"
+    """
+    # Get the `test_mp` fixture for the requesting test function
+    mp = request.getfixturevalue("test_mp")
+
+    # Build an empty scenario
+    scen = Scenario(mp, request.node.name, scenario="test", version="new")
+
+    # Add required sets
+    scen.add_set("node", "node")
+    for c in com_dict.values():
+        scen.add_set("commodity", [x for x in list(c.values()) if x])
+
+    y = 2020
+
+    scen.add_set("level", "level")
+    scen.add_set("year", y)
+    scen.add_set("type_year", y)
+    scen.add_set("mode", "mode")
+
+    scen.add_set("technology", list(tec_dict.keys()))
+
+    # Add "time" and "duration_time" to the model
+    for (h, dur, tmp_lvl, parent) in time_steps:
+        scen.add_set("time", h)
+        scen.add_set("time", parent)
+        scen.add_set("lvl_temporal", tmp_lvl)
+        scen.add_set("map_temporal_hierarchy", [tmp_lvl, h, parent])
+        scen.add_par("duration_time", [h], dur, "-")
+
+    # Common dimensions for parameter data
+    common = dict(
+        node="node",
+        node_loc="node",
+        mode="mode",
+        level="level",
+        year=y,
+        year_vtg=y,
+        year_act=y,
+    )
+
+    # Define demand
+    df = make_df(
+        "demand",
+        **common,
+        commodity="electr",
+        time=demand.keys(),
+        value=demand.values(),
+        unit=unit,
+    )
+    scen.add_par("demand", df)
+
+    # Add "input" and "output" parameters of technologies
+    common.update(value=1.0, unit="-")
+    base_output = make_df("output", **common, node_dest="node")
+    base_input = make_df("input", **common, node_origin="node")
+    for tec, times in tec_dict.items():
+        c = com_dict[tec]
+        for h1, h2 in zip(times["time"], times.get("time_dest", [])):
+            scen.add_par(
+                "output",
+                base_output.assign(
+                    technology=tec, commodity=c["output"], time=h1, time_dest=h2
+                ),
+            )
+        for h1, h2 in zip(times["time"], times.get("time_origin", [])):
+            scen.add_par(
+                "input",
+                base_input.assign(
+                    technology=tec, commodity=c["input"], time=h1, time_origin=h2
+                ),
+            )
+
+    # Add capacity related parameters
+    for year, tec in product([y], capacity.keys()):
+        for parname, val in capacity[tec].items():
+            scen.add_par(parname, ["node", tec, year], val, "-")
+
+    common.pop("value")
+
+    # Add capacity factor (optional)
+    name = "capacity_factor"
+    for tec, data in capacity_factor.items():
+        scen.add_par(
+            name,
+            make_df(
+                name, **common, technology=tec, time=data.keys(), value=data.values()
+            ),
+        )
+
+    # Add variable cost (optional)
+    name = "var_cost"
+    for tec, data in var_cost.items():
+        scen.add_par(
+            name,
+            make_df(
+                name, **common, technology=tec, time=data.keys(), value=data.values()
+            ),
+        )
+
+    scen.commit(f"Scenario with subannual time resolution for {request.node.name}")
+    scen.solve()
 
     return scen
