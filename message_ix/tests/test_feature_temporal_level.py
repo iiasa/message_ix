@@ -2,6 +2,11 @@
 
 The tests check at different temporal levels, i.e., year, seasons, months, etc., and
 with different duration_time values.
+
+In these tests, "demand" is defined in different time slices with different
+"duration_time", there is one power plant ("gas_ppl") to meet "demand", which receives
+fuel from a supply technology ("gas_supply"). Different temporal level hierarchies are
+tested, by linkages of "ACT" with "demand" and "CAP".
 """
 import pytest
 
@@ -42,12 +47,15 @@ def check_solution(scen: Scenario) -> None:
     )
 
 
-# Main tests for commodity balance over various temporal levels (and "time" index)
-# In these tests, "demand" is defined in different time slices
-# with different "duration_time", there is one power plant ("gas_ppl") to meet "demand",
-# which receives fuel from a supply technology ("gas_supply").
-# Different temporal level hierarchies are tested, by linkages of "ACT" with
-# "demand" and "CAP".
+# Dictionary of technology input/output
+TD_0 = {
+    "gas_ppl": {
+        "time_origin": [],
+        "time": ["summer"],
+        "time_dest": ["summer"],
+    },
+    "gas_supply": {"time_origin": [], "time": ["year"], "time_dest": ["year"]},
+}
 
 
 def test_temporal_levels_not_linked(request):
@@ -56,15 +64,8 @@ def test_temporal_levels_not_linked(request):
     "gas_ppl" is active in "summer" and NOT linked to "gas_supply" in "year". This
     setup should not solve.
     """
-    # Dictionary of technology input/output
-    tec_dict = {
-        "gas_ppl": {
-            "time_origin": ["summer"],
-            "time": ["summer"],
-            "time_dest": ["summer"],
-        },
-        "gas_supply": {"time_origin": [], "time": ["year"], "time_dest": ["year"]},
-    }
+    tec_dict = TD_0.copy()
+    tec_dict["gas_ppl"]["time_origin"] = ["summer"]
 
     # Check the model not solve if there is no link between fuel supply and power plant
     with pytest.raises(ModelError):
@@ -84,15 +85,9 @@ def test_season_to_year(request):
     Only one "season" (duration = 1) and "demand" is defined only at "summer"
     Model solves and "gas_supply" is active.
     """
-    # Dictionary of technology input/output
-    tec_dict = {
-        "gas_ppl": {
-            "time_origin": ["year"],
-            "time": ["summer"],
-            "time_dest": ["summer"],
-        },
-        "gas_supply": {"time_origin": [], "time": ["year"], "time_dest": ["year"]},
-    }
+    tec_dict = TD_0.copy()
+    tec_dict["gas_ppl"]["time_origin"] = ["year"]
+
     scen = make_subannual(
         request,
         tec_dict,
@@ -103,29 +98,31 @@ def test_season_to_year(request):
     check_solution(scen)
 
 
+# Dictionary of technology input/output
+TD_1 = {
+    "gas_ppl": {
+        "time_origin": ["year", "year"],
+        "time": ["summer", "winter"],
+        "time_dest": ["summer", "winter"],
+    },
+    "gas_supply": {"time_origin": [], "time": ["year"], "time_dest": ["year"]},
+}
+TS_0 = [
+    ("summer", 0.5, "season", "year"),
+    ("winter", 0.5, "season", "year"),
+]
+
+
 def test_two_seasons_to_year(request):
     """Test two linked temporal levels with two seasons.
 
     "demand" in two time slices: "summer" and "winter" (duration = 0.5). Model solves
     and "gas_supply" is active.
     """
-    # Dictionary of technology input/output
-    tec_dict = {
-        "gas_ppl": {
-            "time_origin": ["year", "year"],
-            "time": ["summer", "winter"],
-            "time_dest": ["summer", "winter"],
-        },
-        "gas_supply": {"time_origin": [], "time": ["year"], "time_dest": ["year"]},
-    }
-
     scen = make_subannual(
         request,
-        tec_dict,
-        time_steps=[
-            ("summer", 0.5, "season", "year"),
-            ("winter", 0.5, "season", "year"),
-        ],
+        TD_1,
+        time_steps=TS_0,
         demand={"summer": 1, "winter": 1},
         com_dict=COM_DICT,
     )
@@ -138,24 +135,12 @@ def test_two_seasons_to_year_relative(request):
     "demand" in two time slices: "summer" and "winter" (duration = 0.5)
     Model should not solve.
     """
-    # Dictionary of technology input/output
-    tec_dict = {
-        "gas_ppl": {
-            "time_origin": ["year", "year"],
-            "time": ["summer", "winter"],
-            "time_dest": ["summer", "winter"],
-        },
-        "gas_supply": {"time_origin": [], "time": ["year"], "time_dest": ["year"]},
-    }
     # Shouldn't pass the test, if adding relative duration time
     with pytest.raises(AssertionError):
         make_subannual(
             request,
-            tec_dict,
-            time_steps=[
-                ("summer", 0.5, "season", "year"),
-                ("winter", 0.5, "season", "year"),
-            ],
+            TD_1,
+            time_steps=TS_0,
             time_relative=["year"],
             demand={"summer": 1, "winter": 1},
             com_dict=COM_DICT,
@@ -185,14 +170,31 @@ def test_seasons_to_seasons(request):
     scen = make_subannual(
         request,
         tec_dict,
-        time_steps=[
-            ("summer", 0.5, "season", "year"),
-            ("winter", 0.5, "season", "year"),
-        ],
+        time_steps=TS_0,
         demand={"summer": 1, "winter": 1},
         com_dict=COM_DICT,
     )
     check_solution(scen)
+
+
+# Dictionary of technology input/output
+TD_2 = {
+    "gas_ppl": {
+        "time_origin": ["year", "year"],
+        "time": ["Jan", "Feb"],
+        "time_dest": ["Jan", "Feb"],
+    },
+    "gas_supply": {"time_origin": [], "time": ["year"], "time_dest": ["year"]},
+}
+
+TS_1 = [
+    ("summer", 0.5, "season", "year"),
+    ("winter", 0.5, "season", "year"),
+    ("Jan", 0.25, "month", "winter"),
+    ("Feb", 0.25, "month", "winter"),
+    ("Jun", 0.25, "month", "summer"),
+    ("Jul", 0.25, "month", "summer"),
+]
 
 
 def test_unlinked_three_temporal_levels(request):
@@ -201,31 +203,13 @@ def test_unlinked_three_temporal_levels(request):
     "month" is defined under "season" BUT "season" not linked to "year". Model should
     not solve.
     """
-    # Dictionary of technology input/output
-    tec_dict = {
-        "gas_ppl": {
-            "time_origin": ["year", "year"],
-            "time": ["Jan", "Feb"],
-            "time_dest": ["Jan", "Feb"],
-        },
-        "gas_supply": {
-            "time_origin": [],
-            "time": ["year"],
-            "time_dest": ["year"],
-        },
-    }
 
     # Check the model shouldn't solve
     with pytest.raises(ModelError):
         make_subannual(
             request,
-            tec_dict,
-            time_steps=[
-                ("Jan", 0.25, "month", "winter"),
-                ("Feb", 0.25, "month", "winter"),
-                ("Jun", 0.25, "month", "summer"),
-                ("Jul", 0.25, "month", "summer"),
-            ],
+            TD_2,
+            time_steps=TS_1[2:],  # Exclude the definitions of "summer" and "winter"
             demand={"Jan": 1, "Feb": 1},
             com_dict=COM_DICT,
         )
@@ -236,30 +220,10 @@ def test_linked_three_temporal_levels(request):
 
     "month" is defined under "season", and "season" is linked to "year". Model solves.
     """
-    # Dictionary of technology input/output
-    tec_dict = {
-        "gas_ppl": {
-            "time_origin": ["year", "year"],
-            "time": ["Jan", "Feb"],
-            "time_dest": ["Jan", "Feb"],
-        },
-        "gas_supply": {
-            "time_origin": [],
-            "time": ["year"],
-            "time_dest": ["year"],
-        },
-    }
     scen = make_subannual(
         request,
-        tec_dict,
-        time_steps=[
-            ("summer", 0.5, "season", "year"),
-            ("winter", 0.5, "season", "year"),
-            ("Jan", 0.25, "month", "winter"),
-            ("Feb", 0.25, "month", "winter"),
-            ("Jun", 0.25, "month", "summer"),
-            ("Jul", 0.25, "month", "summer"),
-        ],
+        TD_2,
+        time_steps=TS_1,
         demand={"Jan": 1, "Feb": 1},
         com_dict=COM_DICT,
     )
@@ -271,37 +235,31 @@ def test_linked_three_temporal_levels_relative(request):
 
     "month" is defined under "season", and "season" is linked to "year". Model solves.
     """
-    # Dictionary of technology input/output
-    tec_dict = {
-        "gas_ppl": {
-            "time_origin": ["year", "year"],
-            "time": ["Jan", "Feb"],
-            "time_dest": ["Jan", "Feb"],
-        },
-        "gas_supply": {
-            "time_origin": [],
-            "time": ["year"],
-            "time_dest": ["year"],
-        },
-    }
-
     # Shouldn't pass with a relative time duration
     with pytest.raises(AssertionError):
         make_subannual(
             request,
-            tec_dict,
-            time_steps=[
-                ("summer", 0.5, "season", "year"),
-                ("winter", 0.5, "season", "year"),
-                ("Jan", 0.25, "month", "winter"),
-                ("Feb", 0.25, "month", "winter"),
-                ("Jun", 0.25, "month", "summer"),
-                ("Jul", 0.25, "month", "summer"),
-            ],
+            TD_2,
+            time_steps=TS_1,
             time_relative=["year", "summer"],
             demand={"Jan": 1, "Feb": 1},
             com_dict=COM_DICT,
         )
+
+
+# Dictionary of technology input/output
+TD_3 = {
+    "gas_ppl": {
+        "time_origin": ["Jan", "Feb"],
+        "time": ["Jan", "Feb"],
+        "time_dest": ["year"],
+    },
+    "gas_supply": {
+        "time_origin": [],
+        "time": ["Jan", "Feb"],
+        "time_dest": ["Jan", "Feb"],
+    },
+}
 
 
 def test_linked_three_temporal_levels_month_to_year(request):
@@ -309,31 +267,11 @@ def test_linked_three_temporal_levels_month_to_year(request):
 
     "month" is linked to "season", and "season" is linked to "year". Model solves.
     """
-    # Dictionary of technology input/output
-    tec_dict = {
-        "gas_ppl": {
-            "time_origin": ["Jan", "Feb"],
-            "time": ["Jan", "Feb"],
-            "time_dest": ["year"],
-        },
-        "gas_supply": {
-            "time_origin": [],
-            "time": ["Jan", "Feb"],
-            "time_dest": ["Jan", "Feb"],
-        },
-    }
 
     scen = make_subannual(
         request,
-        tec_dict,
-        time_steps=[
-            ("summer", 0.5, "season", "year"),
-            ("winter", 0.5, "season", "year"),
-            ("Jan", 0.25, "month", "winter"),
-            ("Feb", 0.25, "month", "winter"),
-            ("Jun", 0.25, "month", "summer"),
-            ("Jul", 0.25, "month", "summer"),
-        ],
+        TD_3,
+        time_steps=TS_1,
         demand={"year": 2},
         com_dict=COM_DICT,
     )
@@ -361,14 +299,7 @@ def test_linked_three_temporal_levels_season_to_year(request):
     scen = make_subannual(
         request,
         tec_dict,
-        time_steps=[
-            ("summer", 0.5, "season", "year"),
-            ("winter", 0.5, "season", "year"),
-            ("Jan", 0.25, "month", "winter"),
-            ("Feb", 0.25, "month", "winter"),
-            ("Jun", 0.25, "month", "summer"),
-            ("Jul", 0.25, "month", "summer"),
-        ],
+        time_steps=TS_1,
         demand={"year": 2},
         com_dict=COM_DICT,
     )
@@ -397,10 +328,7 @@ def test_linked_three_temporal_levels_time_act(request):
     scen = make_subannual(
         request,
         tec_dict,
-        time_steps=[
-            ("summer", 0.5, "season", "year"),
-            ("winter", 0.5, "season", "year"),
-        ],
+        time_steps=TS_0,
         demand={"year": 2},
         com_dict=COM_DICT,
     )
@@ -412,31 +340,10 @@ def test_linked_three_temporal_levels_different_duration(request):
 
     Model solves, linking "month" through "season" to "year".
     """
-    # Dictionary of technology input/output
-    tec_dict = {
-        "gas_ppl": {
-            "time_origin": ["Jan", "Feb"],
-            "time": ["Jan", "Feb"],
-            "time_dest": ["year"],
-        },
-        "gas_supply": {
-            "time_origin": [],
-            "time": ["Jan", "Feb"],
-            "time_dest": ["Jan", "Feb"],
-        },
-    }
-
     scen = make_subannual(
         request,
-        tec_dict,
-        time_steps=[
-            ("summer", 0.5, "season", "year"),
-            ("winter", 0.5, "season", "year"),
-            ("Jan", 0.4, "month", "winter"),
-            ("Feb", 0.1, "month", "winter"),
-            ("Jun", 0.3, "month", "summer"),
-            ("Jul", 0.2, "month", "summer"),
-        ],
+        TD_3,
+        time_steps=TS_1,
         demand={"year": 2},
         com_dict=COM_DICT,
     )
