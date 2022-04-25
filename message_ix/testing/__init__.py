@@ -594,6 +594,7 @@ def make_subannual(
     tec_dict,
     time_steps,
     demand,
+    time_relative=[],
     com_dict={"gas_ppl": {"input": "fuel", "output": "electr"}},
     capacity={"gas_ppl": {"inv_cost": 0.1, "technical_lifetime": 5}},
     capacity_factor={},
@@ -616,7 +617,7 @@ def make_subannual(
         Information about each time slice, packed in a tuple with four elements,
         including: time slice name, duration relative to "year", "temporal_lvl",
         and parent time slice. (e.g., time_steps = [("summer", 1, "season", "year")])
-    relative_time: list of strings
+    time_relative: list of str
         List of parent "time" slices, for which a relative duration time is maintained.
         This will be used to specify parameter "duration_time_rel" for these "time"s.
     demand : dict
@@ -661,6 +662,8 @@ def make_subannual(
         scen.add_set("lvl_temporal", tmp_lvl)
         scen.add_set("map_temporal_hierarchy", [tmp_lvl, h, parent])
         scen.add_par("duration_time", [h], dur, "-")
+
+    scen.add_set("time_relative", time_relative)
 
     # Common dimensions for parameter data
     common = dict(
