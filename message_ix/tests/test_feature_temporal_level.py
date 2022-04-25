@@ -132,19 +132,20 @@ def test_two_seasons_to_year(request):
 def test_two_seasons_to_year_relative(request):
     """Test two linked temporal levels with two seasons and a relative time.
 
-    "demand" in two time slices: "summer" and "winter" (duration = 0.5)
-    Model should not solve.
+    "demand" in two time slices: "summer" and "winter" (duration = 0.5). Model solves,
+    but assertions fail.
     """
+    scen = make_subannual(
+        request,
+        TD_1,
+        time_steps=TS_0,
+        time_relative=["year"],
+        demand={"summer": 1, "winter": 1},
+        com_dict=COM_DICT,
+    )
     # Shouldn't pass the test, if adding relative duration time
     with pytest.raises(AssertionError):
-        make_subannual(
-            request,
-            TD_1,
-            time_steps=TS_0,
-            time_relative=["year"],
-            demand={"summer": 1, "winter": 1},
-            com_dict=COM_DICT,
-        )
+        check_solution(scen)
 
 
 def test_seasons_to_seasons(request):
@@ -233,18 +234,20 @@ def test_linked_three_temporal_levels(request):
 def test_linked_three_temporal_levels_relative(request):
     """Test three linked temporal levels with a relative time.
 
-    "month" is defined under "season", and "season" is linked to "year". Model solves.
+    "month" is defined under "season", and "season" is linked to "year". Model solves,
+    but assertions fail.
     """
+    scen = make_subannual(
+        request,
+        TD_2,
+        time_steps=TS_1,
+        time_relative=["year", "summer"],
+        demand={"Jan": 1, "Feb": 1},
+        com_dict=COM_DICT,
+    )
     # Shouldn't pass with a relative time duration
     with pytest.raises(AssertionError):
-        make_subannual(
-            request,
-            TD_2,
-            time_steps=TS_1,
-            time_relative=["year", "summer"],
-            demand={"Jan": 1, "Feb": 1},
-            com_dict=COM_DICT,
-        )
+        check_solution(scen)
 
 
 # Dictionary of technology input/output
