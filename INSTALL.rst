@@ -88,10 +88,9 @@ Using Anaconda
     $ conda create --name message_env
     $ conda activate message_env
 
-8. Install the ``message-ix`` package into the current environment (either ``base``, or another name from step 7, e.g. ``message_env``).
-   This step can take up to ~45 minutes [3]_::
+8. Install the ``message-ix`` package into the current environment (either e.g. ``message_env``, or another name from step 7) [3]_::
 
-    $ conda install message-ix">1"
+    $ conda install message-ix
 
 Again: at this point, installation is complete.
 You do not need to complete the steps in “Using ``pip``” or “From source”.
@@ -101,7 +100,6 @@ Go to the section `Check that installation was successful`_.
 .. [2] The ‘$’ character at the start of these lines indicates that the command text should be entered in the terminal or prompt, depending on the operating system.
        Do not retype the ‘$’ character itself.
 .. [3] Notice that conda uses the hyphen (‘-’) in package names, different from the underscore (‘_’) used in Python when importing the package.
-       Specifying a version >1 is currently *required* on macOS and Windows, please see issue `#558 <https://github.com/iiasa/message_ix/issues/558>`_.
 .. note:: When using Anaconda (not Miniconda), steps (5) through (8) can also be performed using the graphical Anaconda Navigator.
    See the `Anaconda Navigator documentation`_ for how to perform the various steps.
 
