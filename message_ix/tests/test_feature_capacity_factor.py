@@ -32,6 +32,7 @@ def check_solution(scen: Scenario) -> None:
         assert max(act.loc[i, "cf-corrected"]) == float(cap.loc[i, "lvl"])
 
 
+# Dictionary of technology input/output
 TD_0 = {
     "gas_ppl": {
         "time_origin": [],
@@ -75,6 +76,7 @@ def test_capacity_factor_unequal_time(request):
     check_solution(scen)
 
 
+# List of time step tuples
 TS_0 = [
     ("day", 0.5, "subannual", "year"),
     ("night", 0.5, "subannual", "year"),
@@ -87,7 +89,7 @@ def test_capacity_factor_zero(request):
     "solar_pv_ppl" is active in "day" and NOT at "night" (CF = 0). It is expected that
     the model will be infeasible, because "demand" at night cannot be met.
     """
-    # Technology input/output
+    # Dictionary of technology input/output
     tec_dict = {
         "solar_pv_ppl": {
             "time_origin": [],
@@ -116,7 +118,7 @@ def test_capacity_factor_zero_two(request):
     should show no activity of "solar_pv_ppl" at "night". So, "gas_ppl" is active at
     "night", even though a more expensive technology.
     """
-    # Technology input/output
+    # Dictionary of technology input/output
     tec_dict = {
         "solar_pv_ppl": {
             "time_origin": [],

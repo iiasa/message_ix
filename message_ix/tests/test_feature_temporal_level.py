@@ -107,6 +107,7 @@ TD_1 = {
     },
     "gas_supply": {"time_origin": [], "time": ["year"], "time_dest": ["year"]},
 }
+# List of time step tuples
 TS_0 = [
     ("summer", 0.5, "season", "year"),
     ("winter", 0.5, "season", "year"),
@@ -187,7 +188,7 @@ TD_2 = {
     },
     "gas_supply": {"time_origin": [], "time": ["year"], "time_dest": ["year"]},
 }
-
+# List of time step tuples
 TS_1 = [
     ("summer", 0.5, "season", "year"),
     ("winter", 0.5, "season", "year"),
