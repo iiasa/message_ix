@@ -11,6 +11,7 @@ All changes
 -----------
 
 - Extend documentation on decision variables "CAP_NEW" and "CAP" (:pull:`595`)
+- Extend documentation to guide users through the Westeros tutorials (:pull:`594`).
 - Correct typo in GAMS formulation, :ref:`equation_renewables_equivalence` (:pull:`581`).
 - Handle zero values in ``capacity_factor`` in models with sub-annual time resolution; expand tests (:issue:`515`, :pull:`561`).
 - Extend explanations, update :func:`.make_df` signature in tutorials (:pull:`524`).
