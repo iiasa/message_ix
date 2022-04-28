@@ -78,8 +78,17 @@ From the command line
 Westeros Electrified
 ====================
 
-This tutorial demonstrates how to model a very simple energy system, and then
-uses it to illustrate a range of framework features.
+The *Westeros Electrified* tutorial series demonstrates how to
+
+- model a very simple energy system,
+- add extra detail / constraints to the energy system, and
+- post-process e.g., visualize the results.
+
+As the tutorials illustrate a range of framework features, they are not equally challenging.
+When getting started with |MESSAGEix|, beginning with the :tut:`westeros/westeros_baseline.ipynb` gives you the best introduction to the framework, and enables you to go through the other tutorials.
+In this tutorial you will find the recommended order to follow the other tutorials.
+
+In the following list you will find all *Westeros Electrified* tutorials sorted by their topic.
 
 #. Build the baseline model (:tut:`westeros/westeros_baseline.ipynb`).
 
