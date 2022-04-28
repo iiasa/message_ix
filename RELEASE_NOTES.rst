@@ -12,6 +12,7 @@ All changes
 
 - Correct typo in GAMS formulation, :ref:`equation_renewables_equivalence` (:pull:`581`).
 - Handle zero values in ``capacity_factor`` in models with sub-annual time resolution; expand tests (:issue:`515`, :pull:`561`).
+- Extend explanations, update :func:`.make_df` signature in tutorials (:pull:`524`).
 - Improve configurability of :mod:`.macro`; see the :doc:`documentation <macro>` (:pull:`327`).
 - Split :meth:`.Reporter.add_tasks` for use without an underlying :class:.`Scenario` (:pull:`567`).
 - Allow setting the “model_dir” and “solve_options” options for :class:`.GAMSModel` (and subclasses :class:`.MESSAGE`, :class:`.MACRO`, and :class:`.MESSAGE_MACRO`) through the user's ixmp configuration file; expand documentation (:pull:`557`).

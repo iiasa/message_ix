@@ -34,7 +34,7 @@ tutorials: List[Tuple] = [
     # IPython kernel
     (
         ("westeros", "westeros_baseline"),
-        [("solve-objective-value", 193718.421875)],
+        [("solve-objective-value", 173795.09375)],
         {},
     ),
     # NB could also check objective function values in the following tutorials; however,

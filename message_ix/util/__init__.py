@@ -17,43 +17,80 @@ def make_df(name, **data):
     :meth:`.add_par`: the dimensions of the parameter `name`, plus 'value' and
     'unit'. Columns not listed in `data` are left empty.
 
+    The `data` keyword arguments can be passed in many ways; see the
+    :ref:`python:tut-keywordargs` and “Function Examples” sections of the Python
+    introductory tutorial, or the examples below.
+
     Examples
     --------
+
     >>> make_df(
     ...    "demand", node=["foo", "bar"], commodity="baz", value=[1.2, 3.4]
     ... )
-      node commodity level  year  time  value  unit
-    0  foo       baz  None  None  None    1.2  None
-    1  bar       baz  None  None  None    3.4  None
+      node  commodity  level  year  time  value  unit
+    0  foo        baz   None  None  None    1.2  None
+    1  bar        baz   None  None  None    3.4  None
 
-    Code that uses the deprecated signature:
+    Pass some values as direct keyword arguments, and others by unpacking a dictionary:
+
+    >>> common = dict(
+    ...    commodity="light",
+    ...    level="useful",
+    ...    time="year",
+    ...    unit="GWa",
+    ... )
+    >>> make_df(
+    ...    "demand",
+    ...    node=["Westeros", "Middle-earth"],
+    ...    year=[680, 700],
+    ...    value=[50, 80],
+    ...    # Use values from `common` as additional keyword args:
+    ...    **common,
+    ... )
+               node  commodity   level  year  time  value  unit
+    0      Westeros      light  useful   680  year     50   GWa
+    1  Middle-earth      light  useful   700  year     50   GWa
+
+    Code that uses the deprecated signature, such as:
 
     >>> base = {"year": [2020, 2021, 2022]}
     >>> make_df(base, value=1., unit="y")
-       year  value unit
-    0     1    1.0    y
-    1     2    1.0    y
-    2     3    1.0    y
+       year  value  unit
+    0     1    1.0     y
+    1     2    1.0     y
+    2     3    1.0     y
 
-    can either be adjusted to use the new signature:
+    or:
+
+    >>> base = dict(
+    ...    node=["Westeros", "Middle-earth"],
+    ...    year=[680, 700],
+    ...    time="year",
+    ...    unit="-",
+    ... )
+    >>> make_df(base, mode="standard")
+               node  year  time  unit      mode
+    0      Westeros   680  year     -  standard
+    1  Middle-earth   700  year     -  standard
+
+    …can either be adjusted to use the new signature:
 
     >>> make_df("duration_period", **base, value=1., unit="y")
 
-    or, emulated using the built-in pandas method :meth:`~.DataFrame.assign`:
+    or, emulated using the :meth:`pandas.DataFrame.assign` method:
 
     >>> pd.DataFrame(base).assign(value=1., unit="y")
 
-    The former is recommended, because it will ensure the result has the correct
-    columns for the parameter.
+    The former is recommended, because it will ensure the result has the correct columns
+    for the parameter.
 
     Parameters
     ----------
     name : str
-        Name of a parameter listed in :data:`MESSAGE_ITEMS` or
-        :data:`MACRO_ITEMS`.
+        Name of a parameter listed in :data:`MESSAGE_ITEMS` or :data:`MACRO_ITEMS`.
     data : optional
-        Contents for dimensions of the parameter, its 'value', or 'unit'.
-        Other keys are ignored.
+        Contents for dimensions of the parameter, its 'value', or 'unit'. Other keys are
+        ignored.
 
     Returns
     -------
@@ -62,8 +99,8 @@ def make_df(name, **data):
     Raises
     ------
     ValueError
-        if `name` is not the name of a MESSAGE or MACRO parameter; if arrays in
-        `data` have uneven lengths.
+        if `name` is not the name of a MESSAGE or MACRO parameter; if arrays in `data`
+        have uneven lengths.
     """
     if isinstance(name, (Mapping, pd.Series, pd.DataFrame)):
         return _deprecated_make_df(name, **data)

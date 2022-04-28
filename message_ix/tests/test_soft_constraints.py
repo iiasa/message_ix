@@ -11,7 +11,7 @@ def test_soft_constraint(test_mp):
 
     # Reduce dynamic constraint to require
     # soft_constraint to make a feasible scenario.
-    # Chnage from 10% t0 5%.
+    # Change from 10% to 5%.
     df = s.par("growth_activity_up")
     df.value = 0.05
     s.add_par("growth_activity_up", df)
@@ -57,5 +57,5 @@ def test_soft_constraint(test_mp):
 
     pdt.assert_frame_equal(exp, obs, check_dtype=False)
 
-    # Ensure that the ovjective function is the same
-    assert np.isclose(s.var("OBJ")["lvl"], 175577.734375)
+    # Ensure that the objective function is the same
+    assert np.isclose(s.var("OBJ")["lvl"], 173408.40625)
