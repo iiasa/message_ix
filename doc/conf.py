@@ -76,6 +76,8 @@ rst_prolog = r"""
 # A list of CSS files.
 html_css_files = ["custom.css"]
 
+html_favicon = "_static/messageix-favicon.svg"
+
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
 html_logo = "_static/logo_white.png"
