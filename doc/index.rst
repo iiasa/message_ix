@@ -45,7 +45,7 @@ Then, continue with the:
 
 .. figure:: _static/ix_features.svg
    :width: 360px
-   :align: right
+   :align: center
 
    Features of ``ixmp``, ``message_ix``, and related packages(:cite:`huppmann_messageix_2018`)
 
