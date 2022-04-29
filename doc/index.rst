@@ -5,7 +5,7 @@ The |MESSAGEix| framework
    :width: 360px
    :align: right
 
-   The |ixmp| (:cite:`huppmann_messageix_2018`)
+   Features of ``ixmp``, ``message_ix``, and related packages(:cite:`huppmann_messageix_2018`)
 
 |MESSAGEix| is a versatile, dynamic systems-optimization modelling framework developed by the |IIASA| Energy, Climate, and Environment (ECE) Program [#rename]_ since the 1980s.
 
