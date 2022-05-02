@@ -91,9 +91,7 @@ html_static_path = ["_static"]
 # a list of builtin themes.
 html_theme = "sphinx_rtd_theme"
 
-html_theme_options = {
-    'logo_only': True
-}
+html_theme_options = {"logo_only": True}
 
 # -- Options for LaTeX output -------------------------------------------------
 
