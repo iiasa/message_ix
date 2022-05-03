@@ -60,7 +60,13 @@
 *
 * All decision variables are by year, not by (multi-year) period, except :math:`STOCK_{n,c,l,y}`.
 * In particular, the new capacity variable :math:`CAP\_NEW_{n,t,y}` has to be multiplied by the number of years
-* in a period :math:`|y| = duration\_period_{y}` to determine the available capacity in subsequent periods.
+* in a period :math:`|y| = duration\_period_{y}` to determine the available capacity :math:`CAP_{n,t,y^V,y}`
+* in subsequent periods (assuming the newly build capacity is not immediately decommissioned):
+*
+* :math:`CAP_{n,t,y^V,y} = CAP\_NEW_{n,t,y} * duration\_period_{y}`
+*
+* :math:`CAP\_NEW_{n,t,y}` is therefore the amount of newly installed capacity *in one year* and
+* :math:`CAP_{n,t,y^V,y}` the amount, which is installed at the *end of a (usually multi-year) period*.
 * This formulation gives more flexibility when it comes to using periods of different duration
 * (more intuitive comparison across different periods).
 *
