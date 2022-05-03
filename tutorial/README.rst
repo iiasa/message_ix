@@ -101,7 +101,7 @@ In the following list you will find all *Westeros Electrified* tutorials sorted 
       #. Introduce taxes on emissions
          (:tut:`westeros/westeros_emissions_taxes.ipynb`).
 
-   #. Renewables
+   #. Renewables and integration constraints
 
       #. Represent both coal and wind electricity using a “firm capacity”
          formulation (:tut:`westeros/westeros_firm_capacity.ipynb`): each
@@ -114,8 +114,10 @@ In the following list you will find all *Westeros Electrified* tutorials sorted 
       #. Add a renewable-resource supply curve for the wind power plant,
          (:tut:`westeros/westeros_renewable_resource.ipynb`).
 
-   #. Variability in energy supply and demand by adding sub-annual time steps,
-      e.g. winter and summer (:tut:`westeros/westeros_seasonality.ipynb`).
+   #. Sub-annual time steps
+
+      #. Variability in energy supply and demand by adding sub-annual time steps,
+         e.g. winter and summer (:tut:`westeros/westeros_seasonality.ipynb`).
 
    #. Constraints
 
@@ -125,11 +127,14 @@ In the following list you will find all *Westeros Electrified* tutorials sorted 
       #. Add soft constraints for activity related dynamic constraints
          (:tut:`westeros/westeros_soft_constraints.ipynb`
 
-   #. Fossil fuels
+   #. Fossil Resources
 
       #. Add a fossil-resource supply curve for the coal power plant,
          (:tut:`westeros/westeros_fossil_resource.ipynb`).
-      #. Add-on technologies: Add the possibility of co-generation for the coal
+
+   #. Add-on technologies
+
+      #. Add the possibility of co-generation for the coal
          power plant, by allowing it to produce heat via a passout-turbine
          (:tut:`westeros/westeros_addon_technologies.ipynb`).
 
