@@ -12,14 +12,22 @@ read the Preparation_ section, next.
 Preparation
 ===========
 
+The tutorials refer to terms and concepts from energy systems research (i.e.
+how they are measured and modeled mathematically) and to scientific programming
+languages and tools (i.e. Python/R language syntax and popular packages in
+either language)—however, they **do not** provide a full introduction to these.
+Read the :doc:`pre-requisite knowledge <prereqs>` documentation page for an
+outline of things you should learn first, in order to fully understand the
+tutorials.
+
 Getting tutorial files
 ----------------------
 
 If you installed |MESSAGEix| from source, all notebooks are in the ``tutorial``
 directory.
 
-If you installed |MESSAGEix| using Anaconda, download the notebooks using the
-``message-ix`` command-line program. In a command prompt::
+If you installed |MESSAGEix| using Anaconda or :program:`pip`, download the
+notebooks using the ``message-ix`` command-line program. In a command prompt::
 
     $ message-ix dl /path/to/tutorials
 
@@ -37,10 +45,10 @@ If you installed |MESSAGEix| using Anaconda, download the notebooks using the
 
 .. note::
 
-   By default, the tutorials for your installed version of |MESSAGEix| are
+   By default, the tutorials matching your installed version of |MESSAGEix| are
    downloaded. To download a different version, add e.g. ``--tag v1.2.0`` to
    the above command. To download the tutorials from the development version,
-   add ``--branch master``.
+   add ``--branch main``.
 
 Running tutorials
 -----------------
@@ -78,30 +86,40 @@ From the command line
 Westeros Electrified
 ====================
 
-The *Westeros Electrified* tutorial series demonstrates how to
+The *Westeros Electrified* tutorial series demonstrates how to:
 
-- model a very simple energy system,
-- add extra detail / constraints to the energy system, and
-- post-process e.g., visualize the results.
+- create a minimal model that represents a very simple energy system,
+- add extra detail / constraints to this representation, and
+- post-process (analyze, visualize, or ‘report’) the results.
 
-As the tutorials illustrate a range of framework features, they are not equally challenging.
-When getting started with |MESSAGEix|, beginning with the :tut:`westeros/westeros_baseline.ipynb` gives you the best introduction to the framework, and enables you to go through the other tutorials.
-In this tutorial you will find the recommended order to follow the other tutorials.
+The following list groups the tutorials by topic.
+For new or beginner users, the following sequence of six tutorials (also marked
+with ⭐, below) requires the lowest amount of background knowledge and is
+sufficient for a basic introduction:
 
-In the following list you will find all *Westeros Electrified* tutorials sorted by their topic.
+    1 — 2.1 — 2.2 — 3.1 — 3.2.1
 
-#. Build the baseline model (:tut:`westeros/westeros_baseline.ipynb`).
+The remaining tutorials require deeper energy systems knowledge; greater
+scientific programming skills; and/or relate to more advanced uses of the
+framework, such as used in global research applications of |MESSAGEix|.
 
-#. Add extra detail and constraints to the model
+#. ⭐ Build the baseline model (:tut:`westeros/westeros_baseline.ipynb`).
 
-   #. Emissions
+#. Add extra detail and constraints to the model:
+
+   #. ⭐ Emissions:
 
       #. Introduce emissions and a bound on the emissions
          (:tut:`westeros/westeros_emissions_bounds.ipynb`).
       #. Introduce taxes on emissions
          (:tut:`westeros/westeros_emissions_taxes.ipynb`).
 
-   #. Renewables and integration constraints
+   #. ⭐ Supply of resources:
+
+      Add a fossil-resource supply curve for the coal power plant,
+      (:tut:`westeros/westeros_fossil_resource.ipynb`).
+
+   #. Renewables and integration constraints:
 
       #. Represent both coal and wind electricity using a “firm capacity”
          formulation (:tut:`westeros/westeros_firm_capacity.ipynb`): each
@@ -114,12 +132,13 @@ In the following list you will find all *Westeros Electrified* tutorials sorted 
       #. Add a renewable-resource supply curve for the wind power plant,
          (:tut:`westeros/westeros_renewable_resource.ipynb`).
 
-   #. Sub-annual time steps
+   #. Sub-annual time resolution:
 
-      #. Variability in energy supply and demand by adding sub-annual time steps,
-         e.g. winter and summer (:tut:`westeros/westeros_seasonality.ipynb`).
+      Represent variability in energy supply and demand by adding sub-annual
+      time resolution, e.g. winter and summer
+      (:tut:`westeros/westeros_seasonality.ipynb`).
 
-   #. Constraints
+   #. Constraints:
 
       #. Using share constraints to depict policies, i.e. require renewables to
          supply a certain share of total electricity generation
@@ -127,39 +146,35 @@ In the following list you will find all *Westeros Electrified* tutorials sorted 
       #. Add soft constraints for activity related dynamic constraints
          (:tut:`westeros/westeros_soft_constraints.ipynb`
 
-   #. Fossil Resources
+   #. Add-on technologies:
 
-      #. Add a fossil-resource supply curve for the coal power plant,
-         (:tut:`westeros/westeros_fossil_resource.ipynb`).
+      Add the possibility of co-generation for the coal power plant, by
+      allowing it to produce heat via a passout-turbine
+      (:tut:`westeros/westeros_addon_technologies.ipynb`).
 
-   #. Add-on technologies
+   #. Use parameters to represent the historical characteristics of the energy
+      system (:tut:`westeros/westeros_historical_new_capacity.ipynb`).
 
-      #. Add the possibility of co-generation for the coal
-         power plant, by allowing it to produce heat via a passout-turbine
-         (:tut:`westeros/westeros_addon_technologies.ipynb`).
+#. Use other features of :mod:`message_ix` and :mod:`ixmp`:
 
-   #. Build the baseline scenario using data stored in xlsx files to populate sets and
-      parameters.
+   #. ⭐ After the MESSAGE model has solved, use the :mod:`.message_ix.reporting`
+      module to ‘report’ results, e.g. do post-processing, plotting, and other
+      calculations (:tut:`westeros/westeros_report.ipynb`).
 
-      #. Export data to and Excel file and import the data to create a new scenario
+   #. ⭐ Build the baseline scenario using data stored in Excel files to
+      populate sets and parameters:
+
+      #. Export data to file and import the data to create a new scenario
          (:tut:`westeros/westeros_baseline_using_xlsx_import_part1.ipynb`).
-      #. Import data from multiple excel files to create a new scenario
+      #. Import and combine data from multiple files to create a new scenario
          (:tut:`westeros/westeros_baseline_using_xlsx_import_part2.ipynb`).
-
-   #. Explore historical parameters and their usage
-      (:tut:`westeros/westeros_historical_new_capacity.ipynb`).
-        
-#. After the MESSAGE model has solved, use the :mod:`.message_ix.reporting`
-   module to ‘report’ results, e.g. do post-processing, plotting, and other
-   calculations (:tut:`westeros/westeros_report.ipynb`).
-
 
 .. _austria-tutorials:
 
 Austrian energy system
 ======================
 
-This tutorial demonstrates a stylized representation of a national electricity
+These tutorials demonstrate a stylized representation of a national electricity
 sector model, with several fossil and renewable power plant types.
 
 #. Prepare the base model version, in Python
