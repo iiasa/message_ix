@@ -161,10 +161,10 @@ framework, such as used in global research applications of |MESSAGEix|.
       module to ‘report’ results, e.g. do post-processing, plotting, and other
       calculations (:tut:`westeros/westeros_report.ipynb`).
 
-   #. ⭐ Build the baseline scenario using data stored in Excel files to
+   #. Build the baseline scenario using data stored in Excel files to
       populate sets and parameters:
 
-      #. Export data to file and import the data to create a new scenario
+      #. ⭐ Export data to file and import the data to create a new scenario
          (:tut:`westeros/westeros_baseline_using_xlsx_import_part1.ipynb`).
       #. Import and combine data from multiple files to create a new scenario
          (:tut:`westeros/westeros_baseline_using_xlsx_import_part2.ipynb`).
