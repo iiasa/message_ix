@@ -47,7 +47,7 @@ Then, continue with the:
    :width: 360px
    :align: center
 
-   Features of ``ixmp``, ``message_ix``, and related packages(:cite:`huppmann_messageix_2018`)
+   Features of ``ixmp``, ``message_ix``, and related packages :cite:`huppmann_messageix_2018`
 
 
 .. _core:
