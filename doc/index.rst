@@ -1,12 +1,6 @@
 The |MESSAGEix| framework
 *************************
 
-.. figure:: _static/ix_features.png
-   :width: 320px
-   :align: right
-
-   The |ixmp| (:cite:`huppmann_messageix_2018`)
-
 |MESSAGEix| is a versatile, dynamic systems-optimization modelling framework developed by the |IIASA| Energy, Climate, and Environment (ECE) Program [#rename]_ since the 1980s.
 
 This is the documentation for :mod:`message_ix`, a Python package that ties together all components of the framework.
@@ -48,6 +42,12 @@ Then, continue with the:
    install
    tutorials
    Publications, Projects, and Tools <usage>
+
+.. figure:: _static/ix_features.svg
+   :width: 360px
+   :align: center
+
+   Features of ``ixmp``, ``message_ix``, and related packages :cite:`huppmann_messageix_2018`
 
 
 .. _core:
