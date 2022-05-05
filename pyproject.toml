@@ -90,20 +90,16 @@ profile = "black"
 module = [
   "asyncssh",
   "matplotlib.*",
-  "numpy",
   "pandas.*",
-  "pint",
   "pyam",
   "pytest",
   "setuptools",
-  "xarray",
   # Indirectly via ixmp; this should be a subset of the list in ixmp's setup.cfg
   "dask",
   "jpype",
   "nbclient",
   "nbformat",
   "memory_profiler",
-  "sparse",
 ]
 ignore_missing_imports = true
 
