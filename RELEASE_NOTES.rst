@@ -10,6 +10,7 @@ Files compatible with v3.4.0 and earlier will not work with this version and sho
 All changes
 -----------
 
+- Extend documentation on historical capacity and activity values (:pull:`496`)
 - Extend documentation on decision variables "CAP_NEW" and "CAP" (:pull:`595`)
 - Extend documentation to guide users through the Westeros tutorials (:pull:`594`).
 - Add new logo and diagram to the documentation (:pull:`597`).

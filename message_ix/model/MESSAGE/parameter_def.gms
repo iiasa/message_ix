@@ -500,7 +500,11 @@ Parameters
 * Historical capacity and activity values
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
-* Historical data on new capacity and activity levels are included in |MESSAGEix| for
+* To model the transition of an energy system, the initial energy system with its energy mix
+* needs to be defined first. The historical activity and the historical new capacity do this.
+* These parameters have to be defined in order to limit the capacity in the first model period.
+*
+* Historical data on new capacity and activity levels are therefore included in |MESSAGEix| for
 * correct accounting of the vintage portfolio and a seamless implementation of dynamic constraints from
 * historical years to model periods.
 *
@@ -514,6 +518,25 @@ Parameters
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - historical_activity [#hist]_
 *      - ``node_loc`` | ``tec`` | ``year_act`` | ``mode`` | ``time``
+*
+*
+* The activity in the historic period can be defined with
+*
+* .. math::
+*    \sum_{m} \text{ACT}_{n,t,y^V,y,m,h} \leq \text{duration_time}_{h} \cdot \text{capacity_factor}_{n,t,y^V,y,h} \\
+*    \cdot \text{CAP}_{n,t,y^V,y} \quad t \ \in \ T^{INV}
+*
+* and the historical new capacity with
+*
+* .. math::
+*    \text{CAP_NEW}_{n,t,y^V} = \frac{\text{CAP}_{n,t,y^V,y}}{\text{duration_period}_{y}}
+*
+* Both equations are equally valid for model periods. However, to calculate ``historical_new_capacity``
+* and ``historical_activity`` all parameters must describe the historic period.
+*
+* The ``duration_period`` of the first period (historic period) is set to the value that appears
+* most frequently in the model. If, for example, the majority of periods in the model
+* consists of 10 years, the ``duration_period`` of the first period is likewise 10 years.
 *
 ***
 
