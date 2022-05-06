@@ -15,6 +15,12 @@ Migration notes
 The format of input data files for MACRO calibration has been changed in :pull:`327`.
 Files compatible with v3.4.0 and earlier will not work with this version and should be updated; see details of the current data file format in the :doc:`documentation <macro>`.
 
+:pull:`561` corrected the model internal logic for handling zero values in the :ref:`capacity_factor <params-tech>` parameter.
+Before this change, the GAMS code inserted a ``capacity_factor`` value of 1.0 where such zero values appeared; now, zeros are preserved, so the technologies may be created (``CAP``) but none of their capacity will be usable at the
+:math:`(n, t, y^V, y, h)` where zero values appear.
+This is consistent with the general concept of a “capacity factor”: for instance, a solar photovoltaic technology for electricity generation may have a non-zero *capacity* with a *capacity factor* of 0 at :math:`h=\text{night}`.
+This may cause changes in model output for scenarios where such zero values appear; see :issue:`591` for discussion, including methods to check for and adjust/remove such values.
+
 All changes
 -----------
 
