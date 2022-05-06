@@ -1,0 +1,115 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+
+# Replacement for setup.cfg
+#
+# Support for this section is experimental in setuptools 61–62.1.0. This should
+# not be enabled until that support is stable.
+#
+# [project]
+# name = "message_ix"
+# description = "the MESSAGEix integrated assessment model"
+# authors = [
+#   { email = "message_ix@iiasa.ac.at" },
+#   { name = "IIASA Energy, Climate, and Environment (ECE) Program" }
+# ]
+# license = { text = "Apache" }
+# readme = { file = "README.md", content-type = "text/markdown" }
+# classifiers = [
+#     "Development Status :: 5 - Production/Stable",
+#     "Intended Audience :: Developers",
+#     "Intended Audience :: Science/Research",
+#     "License :: OSI Approved :: Apache Software License",
+#     "Natural Language :: English",
+#     "Operating System :: OS Independent",
+#     "Programming Language :: Python",
+#     "Programming Language :: Python :: 3",
+#     "Programming Language :: Python :: 3.7",
+#     "Programming Language :: Python :: 3.8",
+#     "Programming Language :: Python :: 3.9",
+#     "Programming Language :: Python :: 3.10",
+#     "Programming Language :: R",
+#     "Topic :: Scientific/Engineering",
+#     "Topic :: Scientific/Engineering :: Information Analysis"
+# ]
+# dependencies = [
+#   "click",
+#   "ixmp >= 3.5.0",
+#   "numpy",
+#   "pandas >= 1.2",
+#   "PyYAML",
+# ]
+# dynamic = ["version"]
+#
+# [project.urls]
+# documentation = "https://docs.messageix.org/"
+# repository = "http://github.com/iiasa/message_ix"
+#
+# [tool.setuptools]
+# zip-safe = true
+#
+# [project.optional-dependencies]
+# report = ["ixmp[report]"]
+# docs = [
+#   # Duplicated from above; see pypa/setuptools#3221
+#   "ixmp[report]",
+#   "numpydoc",
+#   "sphinx >= 4.0",
+#   "sphinx_rtd_theme",
+#   "sphinxcontrib-bibtex",
+# ]
+# tutorial = [
+#   "ixmp[report]",
+#   "jupyter",
+#   "matplotlib"
+# ]
+# test = [
+#   "ixmp[report]",
+#   "numpydoc",
+#   "sphinx >= 4.0",
+#   "sphinx_rtd_theme",
+#   "sphinxcontrib-bibtex",
+#   "jupyter",
+#   "matplotlib"
+#   "asyncssh"
+#   "pint"
+#   "pyam-iamc >= 0.6"
+#   "pytest >= 5"
+#   "pytest-cov"
+#   "requests"
+# ]
+#
+# [project.scripts]
+# ixmp = "message-ix = message_ix.cli:main"
+
+[tool.isort]
+profile = "black"
+
+[[tool.mypy.overrides]]
+# Packages/modules for which no type hints are available.
+module = [
+  "asyncssh",
+  "matplotlib.*",
+  "pandas.*",
+  "pyam",
+  "pytest",
+  "setuptools",
+  # Indirectly via ixmp; this should be a subset of the list in ixmp's setup.cfg
+  "dask",
+  "jpype",
+  "nbclient",
+  "nbformat",
+  "memory_profiler",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+# Disable faulthandler plugin on Windows to prevent spurious console noise
+addopts = """
+  --cov=message_ix --cov-report=
+  -m "not nightly and not rmessageix"
+  -p no:faulthandler"""
+markers = [
+  "nightly: Slow-running nightly tests of particular scenarios.",
+  "rmessageix: test of the message_ix R interface.",
+]
