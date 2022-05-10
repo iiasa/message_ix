@@ -1,0 +1,76 @@
+name: Test MESSAGEix-GLOBIOM scenarios on Approved PR
+# This workflow is a stripped-down version of pytest.yaml, with multi-OS
+# features removed.
+
+on:
+  pull_request_review:
+    types: [ submitted ]
+    branches: [ 'main' ]
+
+env:
+  # See description in lint.yml
+  depth: 100
+
+jobs:
+  nightly:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out ixmp
+      if: github.event.review.state == 'approved'
+      uses: actions/checkout@v2
+      with:
+        repository: iiasa/ixmp
+        path: ixmp
+        fetch-depth: ${{ env.depth }}
+
+    - name: Check out message_ix
+      if: github.event.review.state == 'approved'
+      uses: actions/checkout@v2
+      with:
+        path: message_ix
+        fetch-depth: ${{ env.depth }}
+
+    - name: Fetch tags (for setuptools-scm)
+      if: github.event.review.state == 'approved'
+      run: |
+        (cd ixmp; git fetch --tags --depth=${{ env.depth }})
+        (cd message_ix; git fetch --tags --depth=${{ env.depth }})
+
+    - uses: actions/setup-python@v2
+      # This should match the "Latest version testable on GitHub Actions"
+      # in pytest.yaml
+      # with:
+      #   python-version: "3.10"
+
+    - name: Cache GAMS installer and Python packages
+      if: github.event.review.state == 'approved'
+      uses: actions/cache@v2
+      with:
+        path: |
+          gams
+          ~/.cache/pip
+          ~/Library/Caches/pip
+          ~/appdata/local/pip/cache
+        key: gams${{ env.GAMS_VERSION }}
+
+    - uses: iiasa/actions/setup-gams@main
+      if: github.event.review.state == 'approved'
+      with:
+        version: 25.1.1
+        license: ${{ secrets.GAMS_LICENSE }}
+
+    - name: Install Python packages and dependencies
+      if: github.event.review.state == 'approved'
+      run: |
+        python -m pip install --upgrade pip wheel setuptools-scm
+        (cd ixmp; pip install .[tests])
+        (cd message_ix; pip install .[tests])
+
+    - name: Run test suite using pytest
+      if: github.event.review.state == 'approved'
+      env:
+        MESSAGE_IX_CI_USER: ${{ secrets.ENE_DATA_USER }}
+        MESSAGE_IX_CI_PW: ${{ secrets.ENE_DATA_PASS }}
+      working-directory: message_ix
+      run: pytest message_ix -m nightly -rA --verbose
