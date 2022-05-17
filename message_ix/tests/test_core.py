@@ -113,7 +113,11 @@ def test_add_spatial_hierarchy(test_mp):
         (
             ([2030, 2010, 2020],),
             dict(),
-            {"year": [2010, 2020, 2030], "fmy": [2010], "dp": [10, 10, 10],},
+            {
+                "year": [2010, 2020, 2030],
+                "fmy": [2010],
+                "dp": [10, 10, 10],
+            },
         ),
         # Deprecated usage with a dict as the first positional argument
         (
@@ -184,7 +188,8 @@ def test_add_horizon_repeat(test_mp, caplog):
     npt.assert_array_equal([10, 10, 10], scen.par("duration_period")["value"])
 
     with pytest.raises(
-        ValueError, match=r"Scenario has year=\[2010, 2020, 2030\] and related values",
+        ValueError,
+        match=r"Scenario has year=\[2010, 2020, 2030\] and related values",
     ):
         scen.add_horizon([2015, 2020, 2025], firstmodelyear=2010)
 
@@ -378,12 +383,18 @@ def test_new_timeseries_long_name64(message_test_mp):
     scen.check_out(timeseries_only=True)
     df = pd.DataFrame(
         {
-            "region": ["India",],
+            "region": [
+                "India",
+            ],
             "variable": [
                 ("Emissions|CO2|Energy|Demand|Transportation|Aviation|" "Domestic|Fre"),
             ],
-            "unit": ["Mt CO2/yr",],
-            "2012": [0.257009,],
+            "unit": [
+                "Mt CO2/yr",
+            ],
+            "2012": [
+                0.257009,
+            ],
         }
     )
     scen.add_timeseries(df)
@@ -396,15 +407,21 @@ def test_new_timeseries_long_name64plus(message_test_mp):
     scen.check_out(timeseries_only=True)
     df = pd.DataFrame(
         {
-            "region": ["India",],
+            "region": [
+                "India",
+            ],
             "variable": [
                 (
                     "Emissions|CO2|Energy|Demand|Transportation|Aviation|"
                     "Domestic|Freight|Oil"
                 ),
             ],
-            "unit": ["Mt CO2/yr",],
-            "2012": [0.257009,],
+            "unit": [
+                "Mt CO2/yr",
+            ],
+            "2012": [
+                0.257009,
+            ],
         }
     )
     scen.add_timeseries(df)
