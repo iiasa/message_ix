@@ -113,11 +113,7 @@ def test_add_spatial_hierarchy(test_mp):
         (
             ([2030, 2010, 2020],),
             dict(),
-            {
-                "year": [2010, 2020, 2030],
-                "fmy": [2010],
-                "dp": [10, 10, 10],
-            },
+            {"year": [2010, 2020, 2030], "fmy": [2010], "dp": [10, 10, 10],},
         ),
         # Deprecated usage with a dict as the first positional argument
         (
@@ -188,79 +184,9 @@ def test_add_horizon_repeat(test_mp, caplog):
     npt.assert_array_equal([10, 10, 10], scen.par("duration_period")["value"])
 
     with pytest.raises(
-        ValueError,
-        match=r"Scenario has year=\[2010, 2020, 2030\] and related values",
+        ValueError, match=r"Scenario has year=\[2010, 2020, 2030\] and related values",
     ):
         scen.add_horizon([2015, 2020, 2025], firstmodelyear=2010)
-
-
-def test_vintage_and_active_years(test_mp):
-    scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
-
-    years = [2000, 2010, 2020]
-    scen.add_horizon(year=years, firstmodelyear=2010)
-    obs = scen.vintage_and_active_years()
-    exp = pd.DataFrame(
-        {
-            "year_vtg": (2000, 2000, 2010, 2010, 2020),
-            "year_act": (2010, 2020, 2010, 2020, 2020),
-        }
-    )
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
-
-    # Add a technology, its lifetime, and period durations
-    scen.add_set("node", "foo")
-    scen.add_set("technology", "bar")
-    scen.add_par(
-        "duration_period", pd.DataFrame({"unit": "???", "value": 10, "year": years})
-    )
-    scen.add_par(
-        "technical_lifetime",
-        pd.DataFrame(
-            {
-                "node_loc": "foo",
-                "technology": "bar",
-                "unit": "???",
-                "value": 20,
-                "year_vtg": years,
-            }
-        ),
-    )
-
-    # part is before horizon
-    obs = scen.vintage_and_active_years(ya_args=("foo", "bar", "2000"))
-    exp = pd.DataFrame({"year_vtg": (2000,), "year_act": (2010,)})
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
-
-    obs = scen.vintage_and_active_years(
-        ya_args=("foo", "bar", "2000"), in_horizon=False
-    )
-    exp = pd.DataFrame({"year_vtg": (2000, 2000), "year_act": (2000, 2010)})
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
-
-    # fully in horizon
-    obs = scen.vintage_and_active_years(ya_args=("foo", "bar", "2010"))
-    exp = pd.DataFrame({"year_vtg": (2010, 2010), "year_act": (2010, 2020)})
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
-
-    # part after horizon
-    obs = scen.vintage_and_active_years(ya_args=("foo", "bar", "2020"))
-    exp = pd.DataFrame({"year_vtg": (2020,), "year_act": (2020,)})
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
-
-    # Advance the first model year
-    scen.add_cat("year", "firstmodelyear", years[-1], is_unique=True)
-
-    # Empty data frame: only 2000 and 2010 valid year_act for this node/tec;
-    # but both are before the first model year
-    obs = scen.vintage_and_active_years(
-        ya_args=("foo", "bar", years[0]), in_horizon=True
-    )
-    pdt.assert_frame_equal(pd.DataFrame(columns=["year_vtg", "year_act"]), obs)
-
-    # Exception is raised for incorrect arguments
-    with pytest.raises(ValueError, match="3 arguments are required if using `ya_args`"):
-        scen.vintage_and_active_years(ya_args=("foo", "bar"))
 
 
 def test_cat_all(dantzig_message_scenario):
@@ -452,18 +378,12 @@ def test_new_timeseries_long_name64(message_test_mp):
     scen.check_out(timeseries_only=True)
     df = pd.DataFrame(
         {
-            "region": [
-                "India",
-            ],
+            "region": ["India",],
             "variable": [
                 ("Emissions|CO2|Energy|Demand|Transportation|Aviation|" "Domestic|Fre"),
             ],
-            "unit": [
-                "Mt CO2/yr",
-            ],
-            "2012": [
-                0.257009,
-            ],
+            "unit": ["Mt CO2/yr",],
+            "2012": [0.257009,],
         }
     )
     scen.add_timeseries(df)
@@ -476,21 +396,15 @@ def test_new_timeseries_long_name64plus(message_test_mp):
     scen.check_out(timeseries_only=True)
     df = pd.DataFrame(
         {
-            "region": [
-                "India",
-            ],
+            "region": ["India",],
             "variable": [
                 (
                     "Emissions|CO2|Energy|Demand|Transportation|Aviation|"
                     "Domestic|Freight|Oil"
                 ),
             ],
-            "unit": [
-                "Mt CO2/yr",
-            ],
-            "2012": [
-                0.257009,
-            ],
+            "unit": ["Mt CO2/yr",],
+            "2012": [0.257009,],
         }
     )
     scen.add_timeseries(df)
