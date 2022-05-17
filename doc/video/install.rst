@@ -14,12 +14,14 @@ Introduction
 
 Hello everybody and welcome to this video tutorial on the installation of MESSAGEix through Anaconda on Windows.
 
-You can also find on the Installation page of the MESSAGEix documentation at docs dot messageix dot org, shown here. It is also linked in the description below. While you are there, make sure to check the prerequisite knowledge and skills to use MESSAGEix, as this will not be covered in our tutorials.
+You can also find on the Installation page of the MESSAGEix documentation at docs dot messageix dot org, as it is shown here on the right side.
+It is also linked in the description below.
+While you are there, make sure to check the prerequisite knowledge and skills to use MESSAGEix, as this will not be covered in our tutorials.
 
-That being said, let's jump straight into installing MESSAGEix through Anaconda
+That being said, let's jump straight into installing MESSAGEix through Anaconda.
 At this point, we have already completed Steps 1 through 3, to install GAMS and add its PATH environment variable on the system.
-We have also completed Step 4, installing Anaconda using the instructions linked from this page.
-If you haven't completed these Steps 1 through 4 yet, you should read these instructions for those steps, complete them—then come back to this video.
+We have also completed Step 4, installing Anaconda using the instructions linked from the page.
+If you haven't completed these Steps 1 through 4 yet, you should read the documentation and instructions for those steps, complete them, and then come back to this video.
 
 We begin with Step 5, opening the Anaconda Prompt from the Start Menu.
 
@@ -27,7 +29,9 @@ We begin with Step 5, opening the Anaconda Prompt from the Start Menu.
 
    Do this.
 
-In Step 6, we will first make sure that “conda forge” is used as the default channel to download and install packages, including message_ix and other packages that it requires. Secondly, we set the channel priority to 'strict'. This ensures that conda will select the latest version of message_ix from the "noarch" channel and ignore much older packages in OS-specific channels.
+In Step 6, we will first make sure that “conda forge” is used as the default channel to download and install packages, including message_ix and other packages that it requires.
+Secondly, we set the channel priority to 'strict'.
+This ensures that conda will select the latest version of message_ix from the "noarch" channel and ignore much older packages in OS-specific channels.
 
 We copy the first command into the prompt and run it.
 
@@ -35,7 +39,7 @@ We copy the first command into the prompt and run it.
 
    Do this.
 
-The output of the command shows us that this channel is now the top-priority or default channel.
+This channel is now the top-priority or our default channel.
 
 We then copy the second command into the prompt and run it.
 
@@ -52,7 +56,7 @@ For this video, we will do everything with just 1 environment.
 
 Let's go through each step, one by one.
 In Step 7, we create a new environment.
-Note that the prompt shows us “base” in parentheses at the left here.
+Note that the prompt shows us “base” in the parentheses at the left side here.
 
 .. note::
 
@@ -60,15 +64,15 @@ Note that the prompt shows us “base” in parentheses at the left here.
 
 This means that we are currently in the “base” environment.
 For MESSAGEix, all we need to remember is that we cannot use the “base” environment; we must create and use a new one.
-Let's do that, by typing conda create double-dash name and then "message_env" which will be the name for our new environment.
-(We can also use any other name we want.)
+Let's do that, by typing conda create double-dash name and then "message_env", or copying the first command of Step 7.
+"message_env" will be the name of our new environment, but we can also use any other name.
 
 .. note::
 
    Type ``conda create --name message_env`` and hit [Enter].
 
 We are prompted to say “yes” to creating this new environment, to be stored in this specific folder.
-Now we see that the environment has been created, and we enter the next command from Step 7, "conda activate message_env", giving the name of the environment we just created.
+Now we see that the environment has been created, and we enter the next command from Step 7, "conda activate message_env", giving it the name of the environment we just created.
 
 .. note::
 
@@ -87,11 +91,13 @@ We enter the command "conda install message-ix".
 
    Do this.
 
-We see that it's now “solving” the environment. It lists all the packages and dependencies that will be installed which are required by MESSAGEix.
-So, at the end of the list, confirm with “yes”. Now we wait for all these packages to be installed.
+We see that it's now “solving” the environment.
+It lists all the packages and dependencies that will be installed, which are required by MESSAGEix.
+So, at the end of the list, confirm with “yes” and now we wait for all these packages to be installed.
 
-To check that this process has picked out the latest version of MESSAGEix, we can type Ctrl+F and look for message-ix. We can see that, first, it is one of the packages that will be installed, and second, the version matches the latest version shown in the documentation.
-Currently this is version [VERSION], but it may be a newer version as you watch this.
+To check that this process has picked out the latest version of MESSAGEix, we can type Ctrl+F and search for message-ix.
+We can see that, first, it is one of the packages that will be installed, and second, the version matches the latest version shown in the documentation.
+Currently this is version 3.3.0, but it may be a newer version as you watch this.
 So in this case, we are OK.
 
 .. note::
@@ -100,7 +106,7 @@ So in this case, we are OK.
    Highlight message_ix and version number when searching for it
    Prepare https://github.com/iiasa/message_ix/releases in a browser window to quickly switch there for version control
 
-We can also check that our default channel, that we set in Step 6, is being used: both message-ix and ixmp will be installed from conda-forge.
+We can also check that our default channel, that we set in Step 6, is being used: both message-ix and ixmp will be installed from the conda-forge channel.
 
 .. note::
 
@@ -123,7 +129,7 @@ If we look again at the install instructions…
    Change to the browser window where the install instructions appear.
 
 
-…there are instructions for different ways of installing MESSAGEix, that are not covered in this video.
+…we can see that there are instructions for different ways of installing MESSAGEix, that are not covered in this video.
 Since we have already installed using Anaconda, we can skip down to the section titled “Check that the installation was successful”.
 
 To check this, we run two commands:
@@ -138,14 +144,15 @@ This is a way of accessing MESSAGEix from the command line, and it becomes avail
 
 By the way: when you experience an issue with MESSAGEix and you want to seek support via GitHub, it is very important to include the output of this command, because it includes essential information about your specific versions, operating system, etc.
 
-The second command, "message-ix platform list", shows a list of all the "platforms" that are configured on our system.
+The second command, "message-ix platform list", shows us a list of all the "platforms" that are configured on your system.
 In the IIASA ECE program, for instance, this will include our central database that we used as a shared storage for our models and scenarios.
 
 .. note::
 
    Do this.
 
-If you've just installed MESSAGEix for the first time, you will see a platform that's named "local". This is stored in a specific file on your system, and the path is shown here.
+If you've just installed MESSAGEix for the first time, you will see a platform that's named "local".
+This is stored in a specific file on your system, and the path is shown here.
 It also shows us that "local" is the default platform.
 
 Another thing we can do, in order to check where Anaconda, our environment, and MESSAGEix are, is run the command "conda info".
@@ -191,7 +198,7 @@ Another place to look is on GitHub directly:
    Switch to a browser tab with https://github.com/iiasa/message_ix.
    Navigate into the "message_ix/model/" folder.
 
-Similarly, the code for the ixmp package, that handles the data storage underlying MESSAGEix, can also be found in "site-packages".
+Equally, the code for the ixmp package, that handles the data storage underlying MESSAGEix, can also be found in "site-packages".
 
 
 Download and start tutorials
@@ -202,13 +209,13 @@ The last thing we will cover in this video, and the first thing you will probabl
 
 Our team has developed a very rich set of example models that give you an introduction to the use of MESSAGEix, ixmp, and some of the many capabilities of the framework.
 
-Complete information about these tutorials is available in the documentation
+Complete information about these tutorials is available in the documentation…
 
 .. note::
 
    Go to documentation, navigate to page about “Tutorials”.
 
-…on this page.
+…here on this page.
 
 So we will cover the instructions under “Getting tutorial files” and “Running tutorials using Anaconda”.
 
@@ -218,21 +225,21 @@ This is why we need to download them.
 
 The "message-ix" program we already used has a command "dl" that does this for us.
 We only need to choose a specific folder or directory where we want the downloaded tutorials to be placed.
-In this case, let's put them on the Desktop—but they could also be placed anywhere else.
-We use Windows Explorer to navigate to the Desktop, and then copy the full path.
+In this case, let's put them into the Document folder—but they can also be placed anywhere else.
+We use Windows Explorer to navigate to the Document folder, and then we copy the full path.
 
 .. note::
 
    Do this.
 
-Next, with that same "message_env" Anaconda environment active, we run the command "message-ix dl " and then paste the path we just copied.
+Next, with that same environment "message_env" active, we run the command "message-ix dl " and then paste the path we just copied.
 
 .. note::
 
     Do this.
 
-We see that it retrieves some data and unzips it into that specific folder.
-It's a very quick process, so we already see that this folder has appeared, and if we double-click on it and then we will find this “tutorial” folder, containing all the different tutorials.
+We see that it receives some data and unzips it into that specific folder.
+It is a very quick process, so we already see that this folder has appeared, and if we double-click on it, then we see the folder where our tutorials are stored in.
 
 .. note::
 
@@ -242,9 +249,19 @@ The tutorials are in the form of Jupyter notebooks.
 Remember - understanding and working with Jupyter notebooks is one of the prerequisite skills for learning MESSAGEix, these are listed in the documentation.
 This video does not cover this.
 
+The last thing we need to do in order to run the tutorials, is to install the "nb_conda" package for being able to run Jupyter.
+So what we do is copy this command and paste it in out Anaconda Prompt and run it.
+
+.. note::
+
+   Do this.
+
+It collects again some package meta data and solves the environment.
+Here, please answer also with "Yes", so the specific packages can be downloaded.
+
 As such, we want to start the Jupyter notebook server and use this to open the tutorials.
 In order to do this, we want to switch the current working directory to this tutorial folder.
-We again use Windows Explorer to copy the tutorials path, and then, in the Anaconda Prompt, we use the "cd" or "change directory" command, to move into this folder.
+We again use Windows Explorer to copy the tutorials path, and then, in the Anaconda Prompt, we use the "cd" or "change directory" command, to move into that folder.
 
 .. note::
 
@@ -264,7 +281,7 @@ As a last step, let's open one tutorial notebook, for the “Westeros baseline�
 We do this by clicking on the “Westeros” directory, and then on the file “westeros_baseline.ipynb.”
 
 So a new browser tab opens with the tutorial.
-The first thing we will need to check is that the “kernel” which runs the notebook code is associated with the environment where we earlier installed MESSAGEix.
+The first thing we will need to check is that the “Kernel” which runs the notebook code is associated with the environment where we earlier installed MESSAGEix.
 To do that, we click on “Kernel” in the menu, then “Change Kernel.”
 An asterisk (\*) shows which environment is currently active.
 As we can see, it appears by "message_env", so we know that this notebook is running in the correct environment.
@@ -291,7 +308,3 @@ Please read the documentation and explore the tutorials to learn more about the 
 .. ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. This video follows up on a request of one of our September workshop participants that suggested that a video tutorial going through the installation steps of the MESSAGEix framework would be very useful.
-.. But, before doing that we will have to install the nb_conda package as I've shown in in today's workshop presentation.
-.. And this package, I repeat, it's for being able to manage different environments and to run Jupyter notebooks in different environments.
-.. So, we will proceed to conda install nb_conda.
-.. So, it's asking us that these two packages will be installed we will say 'yes'.
