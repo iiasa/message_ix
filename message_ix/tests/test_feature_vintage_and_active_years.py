@@ -6,7 +6,7 @@ from message_ix import Scenario
 from message_ix.testing import SCENARIO
 
 
-def test_vintage_and_active_years(test_mp):
+def test_vintage_and_active_years1(test_mp):
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
 
     years = [2000, 2010, 2020]
@@ -79,7 +79,7 @@ def test_vintage_and_active_years(test_mp):
         scen.vintage_and_active_years(ya_args=("foo"))
 
 
-def test_vintage_and_active_years_upd(test_mp):
+def test_vintage_and_active_years2(test_mp):
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
 
     # Add years of differing time length
@@ -271,6 +271,74 @@ def test_vintage_and_active_years_upd(test_mp):
         {
             "year_vtg": (2005, 2010, 2010, 2015, 2015, 2020, 2020, 2030),
             "year_act": (2020, 2020, 2030, 2020, 2030, 2020, 2030, 2030),
+        }
+    )
+    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+
+
+def test_vintage_and_active_years3(test_mp):
+    scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
+
+    # Add years of differing time length
+    years = [2000, 2005, 2010, 2015, 2020, 2030]
+    scen.add_horizon(year=years, firstmodelyear=2010)
+
+    # Add a technology, its lifetime, and period durations
+    scen.add_set("node", "foo")
+    scen.add_set("technology", "bar")
+    scen.add_par(
+        "duration_period",
+        pd.DataFrame({"unit": "???", "value": [5, 5, 5, 5, 5, 10], "year": years}),
+    )
+    scen.add_par(
+        "technical_lifetime",
+        pd.DataFrame(
+            {
+                "node_loc": "foo",
+                "technology": "bar",
+                "unit": "???",
+                "value": 20,
+                "year_vtg": [y for y in years if y <= 2020],
+            }
+        ),
+    )
+
+    # Check standard functionality with different period duration lengths
+    obs = scen.vintage_and_active_years(ya_args=("foo", "bar", "2010"))
+    exp = pd.DataFrame({"year_vtg": (2010, 2010, 2010), "year_act": (2010, 2015, 2020)})
+    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+
+    # Check if no vintge-year is passed, that all values corresponding
+    # to technical lifetime are passed if the active years >= 2010
+    obs = scen.vintage_and_active_years(ya_args=("foo", "bar"))
+    exp = pd.DataFrame(
+        {
+            "year_vtg": (
+                2000,
+                2000,
+                2005,
+                2005,
+                2005,
+                2010,
+                2010,
+                2010,
+                2015,
+                2015,
+                2020,
+            ),
+            "year_act": (
+                2010,
+                2015,
+                2010,
+                2015,
+                2020,
+                2010,
+                2015,
+                2020,
+                2015,
+                2020,
+                2020,
+            ),
         }
     )
     pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order

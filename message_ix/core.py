@@ -427,17 +427,28 @@ class Scenario(ixmp.Scenario):
         1. Both the vintage year (`year_vtg`) and active year (`year_act`) are
            in the model's ``year`` set.
         2. `year_vtg` <= `year_act`.
-        3. `year_act` <= the model's first year **or** `year_act` is in the
+        3. `year_act` >= the model's first year **or** `year_act` is in the
            smaller subset :meth:`ixmp.Scenario.years_active` for the given
-           `ya_args`.
+           `act_lower` **and** `year_act` <= maximum defined technical lifetime
+           if "ya_args" are passed.
 
         Parameters
         ----------
-        ya_args : tuple of (node, tec, yr_vtg), optional
-            Arguments to :meth:`years_active`.
+        ya_args : tuple of (node, tec) or (node, tec, yr_vtg), optional
+            If only (node, tec) is provided, then the vintage and active
+            years are returned for all years for which a technical_lifetime
+            is defined.
+            If in addition a "yr_vtg" is specified, results will be limited
+            to that vintage year.
+            In all cases, the "year_act" will <= maximum defined
+            `technical_lifetime` for the given technology.
         in_horizon : bool, optional
-            Only return years within the model horizon
+            Only return year_act within the model horizon
             (:obj:`firstmodelyear` or later).
+        vtg_lower : int, optional
+            Only returns year_vtg from the specified value onwards.
+        act_lower : int, optional
+            Only returns year_act from the specified value onwards.
 
         Returns
         -------
@@ -449,7 +460,9 @@ class Scenario(ixmp.Scenario):
         def _valid(elem):
             yv, ya = elem
             return (yv <= ya and yv >= vtg_lower) and (
-                (not in_horizon or (first <= ya)) and (ya >= act_lower)
+                (not in_horizon or (first <= ya))
+                and (ya >= act_lower)
+                and (ya <= tl_max)
             )
 
         first = self.firstmodelyear
@@ -461,15 +474,16 @@ class Scenario(ixmp.Scenario):
             len_yargs = len(ya_args)
             if len_yargs < 2:
                 raise ValueError("At least 2 arguments are required if using `ya_args`")
+            yv = self.par(
+                "technical_lifetime",
+                filters={"node_loc": ya_args[0], "technology": ya_args[1]},
+            ).year_vtg.tolist()
+            tl_max = max(yv)
             # If year_vtg is specified
             if len_yargs != 2:
                 ya = self.years_active(*ya_args)
                 df = pd.DataFrame(filter(_valid, product(ya[0:1], ya)), columns=columns)
             else:
-                yv = self.par(
-                    "technical_lifetime",
-                    filters={"node_loc": ya_args[0], "technology": ya_args[1]},
-                ).year_vtg.tolist()
                 df = (
                     pd.concat(
                         [
@@ -492,6 +506,7 @@ class Scenario(ixmp.Scenario):
 
         else:
             # Product of all years
+            tl_max = max(self.set("year"))
             df = pd.DataFrame(
                 filter(_valid, product(self.set("year"), self.set("year"))),
                 columns=columns,
