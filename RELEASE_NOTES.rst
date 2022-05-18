@@ -4,6 +4,8 @@
 .. All changes
 .. -----------
 
+- Extend functionality of :meth:`.vintage_and_active_years` (:pull:`572`)
+
 .. _v3.5.0:
 
 v3.5.0 (2022-05-06)
