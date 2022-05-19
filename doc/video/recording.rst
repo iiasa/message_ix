@@ -3,7 +3,7 @@ Recording video documentation
 
 This page describes how to prepare :mod:`message_ix` documentation in video format.
 
-Install the software.
+**Installation of the software.**
 We use free and open source software so that production of the videos (like the documentation and the software itself) can be done by anyone.
 
 - `OBS Studio <https://obsproject.com>`_ for screen recording.
