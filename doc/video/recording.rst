@@ -58,6 +58,13 @@ The following concats all videos listed in *to_concat.txt* and safe them into a 
 .. note::
    Only videos in the same format can be concated.
 
+*Add textbox via ffmpeg*
+
+In some cases it is needed to add a title or a note to the video, e.g. *title.png*.
+This image can be overlaid during a certain time onto the video [1]_::
+
+    $ ffmpeg -i concat.mp4 -i ~\titel.png -filter_complex "[0:v][1:v] overlay=25:25:enable='between(t,0,20)'" -pix_fmt yuv420p -c:a copy concat-w-title.mp4
+
 
 Current videos
 ==============
@@ -65,3 +72,5 @@ Current videos
 .. toctree::
 
    install
+
+.. [1]  For extensive information, please have a e.g. a look `here <https://video.stackexchange.com/questions/12105/add-an-image-overlay-in-front-of-video-using-ffmpeg>`_.
