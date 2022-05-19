@@ -11,7 +11,7 @@ We use free and open source software so that production of the videos (like the 
 
 Compare existing examples:
 
-- http://software.ene.iiasa.ac.at/ixmp-server/tutorials.html —tutorials for the Scenario Explorer web interface.
+- http://software.ece.iiasa.ac.at/ixmp-server/tutorials.html —tutorials for the Scenario Explorer web interface.
 
 **Scripts and subtitles.**
 The folder containing this file (:file:`doc/source/video/`) also holds scripts (in :file:`.rst` format) and example subtitle files (in :file:`.srt`) format for videos already recorded.
