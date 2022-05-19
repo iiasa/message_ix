@@ -7,7 +7,7 @@ Install the software.
 We use free and open source software so that production of the videos (like the documentation and the software itself) can be done by anyone.
 
 - `OBS Studio <https://obsproject.com>`_ for screen recording.
-- `Shotcut <https://shotcut.org>`_ for editing.
+- `Shotcut <https://shotcut.org>`_ or `ffmpeg <https://ffmpeg.org/>`_ for editing.
 
 Compare existing examples:
 
