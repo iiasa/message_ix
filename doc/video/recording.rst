@@ -13,6 +13,10 @@ Compare existing examples:
 
 - http://software.ece.iiasa.ac.at/ixmp-server/tutorials.html —tutorials for the Scenario Explorer web interface.
 
+**Recording.**
+Since recording a video tutorial in one cut without making any mistakes can be very difficult, it is advised to pause or stop the recording in between.
+The recording snippets can then be easily concat with one of the above editing software.
+
 **Scripts and subtitles.**
 The folder containing this file (:file:`doc/source/video/`) also holds scripts (in :file:`.rst` format) and example subtitle files (in :file:`.srt`) format for videos already recorded.
 
