@@ -3,7 +3,10 @@ Recording video documentation
 
 This page describes how to prepare :mod:`message_ix` documentation in video format.
 
-**Installation of the software.**
+.. contents:: :local:
+
+Installation of the software
+============================
 We use free and open source software so that production of the videos (like the documentation and the software itself) can be done by anyone.
 
 - `OBS Studio <https://obsproject.com>`_ for screen recording.
@@ -13,7 +16,8 @@ Compare existing examples:
 
 - http://software.ece.iiasa.ac.at/ixmp-server/tutorials.html —tutorials for the Scenario Explorer web interface.
 
-**Recording.**
+Recording
+=========
 Since recording a video tutorial in one cut without making any mistakes can be very difficult, it is advised to pause or stop the recording in between.
 The recording snippets can then be easily concat with one of the above editing software.
 
@@ -21,7 +25,8 @@ General rules:
   - Avoid filler words (“okay”, “um”, etc.).
     Instead, use silence to separate sentences and sections.
 
-**Scripts and subtitles.**
+Scripts and subtitles
+=====================
 The folder containing this file (:file:`doc/source/video/`) also holds scripts (in :file:`.rst` format) and example subtitle files (in :file:`.srt`) format for videos already recorded.
 
 - If adding a new video, also add the script and subtitles.
@@ -31,7 +36,8 @@ The folder containing this file (:file:`doc/source/video/`) also holds scripts (
 General rules:
   - Do not mention specific dates or events.
 
-**Editing.**
+Editing
+=======
 As the video tutorials should be properly IIASA-branded one need to follow the `"General video guidelines" <https://iiasahub.sharepoint.com/:w:/r/sites/com/_layouts/15/Doc.aspx?sourcedoc=%7B674376E4-F94C-4C8B-967F-CF1238E6A4B7%7D&file=Video%20Guidelines.docx&action=default&mobileredirect=true&DefaultItemOpen=1>`_.
 The following examples will help to concat the intros and outros to the recording, and possible recording snippets, if the video wasn't recorded in one cut.
 
