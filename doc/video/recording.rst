@@ -31,6 +31,26 @@ The folder containing this file (:file:`doc/source/video/`) also holds scripts (
 General rules:
   - Do not mention specific dates or events.
 
+**Editing.**
+As the video tutorials should be properly IIASA-branded one need to follow the `"General video guidelines" <https://iiasahub.sharepoint.com/:w:/r/sites/com/_layouts/15/Doc.aspx?sourcedoc=%7B674376E4-F94C-4C8B-967F-CF1238E6A4B7%7D&file=Video%20Guidelines.docx&action=default&mobileredirect=true&DefaultItemOpen=1>`_.
+The following examples will help to concat the intros and outros to the recording, and possible recording snippets, if the video wasn't recorded in one cut.
+
+*Concat videos via ffmpeg*
+
+Create a .txt file, e.g. *to_concat.txt*.
+In this file, add "file" and the path to each of the video files you want to concat in "''".
+The first path is to the video, which will be shown first::
+
+    file '~\video_1.mp4'
+    file '~\video_2.mp4'
+    file '~\video_3.mp4'
+
+The following concats all videos listed in *to_concat.txt* and safe them into a new video *concat.mp4*::
+
+    $ ffmpeg -safe 0 -f concat -i ~\to_concat -c copy concat.mp4
+
+
+
 Current videos
 ==============
 
