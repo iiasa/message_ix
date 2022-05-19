@@ -17,17 +17,19 @@ Compare existing examples:
 Since recording a video tutorial in one cut without making any mistakes can be very difficult, it is advised to pause or stop the recording in between.
 The recording snippets can then be easily concat with one of the above editing software.
 
+General rules:
+  - Avoid filler words (“okay”, “um”, etc.).
+    Instead, use silence to separate sentences and sections.
+
 **Scripts and subtitles.**
 The folder containing this file (:file:`doc/source/video/`) also holds scripts (in :file:`.rst` format) and example subtitle files (in :file:`.srt`) format for videos already recorded.
 
 - If adding a new video, also add the script and subtitles.
   This is so the script can be modified and re-read in order to update the video with minimal effort.
 - Like a screenplay, include both the *words spoken* and the *actions performed on screen*, in the intended order.
-- General rules:
 
+General rules:
   - Do not mention specific dates or events.
-  - Avoid filler words (“okay”, “um”, etc.).
-    Instead, use silence to separate sentences and sections.
 
 Current videos
 ==============
