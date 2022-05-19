@@ -55,6 +55,8 @@ The following concats all videos listed in *to_concat.txt* and safe them into a 
 
     $ ffmpeg -safe 0 -f concat -i ~\to_concat -c copy concat.mp4
 
+.. note::
+   Only videos in the same format can be concated.
 
 
 Current videos
