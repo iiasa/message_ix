@@ -3,10 +3,10 @@ from typing import Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
-import pandas.testing as pdt
 import pytest
+from pandas.testing import assert_frame_equal
 
-from message_ix import Scenario
+from message_ix import Scenario, make_df
 from message_ix.testing import SCENARIO
 
 
@@ -81,40 +81,40 @@ def _q(
 def test_vintage_and_active_years1(test_mp):
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
 
-    obs = scen.vintage_and_active_years()
-    exp = pd.DataFrame(
-        {
-            "year_vtg": (2000, 2000, 2010, 2010, 2020),
-            "year_act": (2010, 2020, 2010, 2020, 2020),
-        }
-    )
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
     years = (2000, 2010, 2020)
     fmy = years[1]
 
     _setup(scen, years, fmy)
 
+    # All possible combinations of yv and ya
+    yvya_all = _generate_yv_ya(2000, 2020, 10)
+
+    # Default / no arguments
+    assert_frame_equal(
+        _q(yvya_all, f"year_act >= {fmy}"),
+        scen.vintage_and_active_years(),
+    )
 
     # part is before horizon
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar", "2000"))
     exp = pd.DataFrame({"year_vtg": (2000,), "year_act": (2010,)})
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+    assert_frame_equal(exp, obs)
 
     obs = scen.vintage_and_active_years(
         ya_args=("foo", "bar", "2000"), in_horizon=False
     )
     exp = pd.DataFrame({"year_vtg": (2000, 2000), "year_act": (2000, 2010)})
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+    assert_frame_equal(exp, obs)
 
     # fully in horizon
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar", "2010"))
     exp = pd.DataFrame({"year_vtg": (2010, 2010), "year_act": (2010, 2020)})
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+    assert_frame_equal(exp, obs)
 
     # part after horizon
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar", "2020"))
     exp = pd.DataFrame({"year_vtg": (2020,), "year_act": (2020,)})
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+    assert_frame_equal(exp, obs)
 
     # Advance the first model year
     scen.add_cat("year", "firstmodelyear", years[-1], is_unique=True)
@@ -124,7 +124,7 @@ def test_vintage_and_active_years1(test_mp):
     obs = scen.vintage_and_active_years(
         ya_args=("foo", "bar", years[0]), in_horizon=True
     )
-    pdt.assert_frame_equal(
+    assert_frame_equal(
         pd.DataFrame(columns=["year_vtg", "year_act"]), obs, check_dtype=False
     )
 
@@ -144,175 +144,42 @@ def test_vintage_and_active_years2(test_mp):
 
     _setup(scen, years, fmy)
 
+    yvya_all = _generate_yv_ya(years)
+    extra = pd.Series(dict(year_vtg=2010, year_act=2030)).to_frame().T
+
     # Check if default function call is valid
     obs = scen.vintage_and_active_years()
-    exp = pd.DataFrame(
-        {
-            "year_vtg": (
-                2000,
-                2000,
-                2000,
-                2000,
-                2005,
-                2005,
-                2005,
-                2005,
-                2010,
-                2010,
-                2010,
-                2010,
-                2015,
-                2015,
-                2015,
-                2020,
-                2020,
-                2030,
-            ),
-            "year_act": (
-                2010,
-                2015,
-                2020,
-                2030,
-                2010,
-                2015,
-                2020,
-                2030,
-                2010,
-                2015,
-                2020,
-                2030,
-                2015,
-                2020,
-                2030,
-                2020,
-                2030,
-                2030,
-            ),
-        }
-    )
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
-
+    exp = _q(yvya_all, f"year_act >= {fmy}")
+    assert_frame_equal(exp, obs)
 
     # Check standard functionality with different period duration lengths
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar", "2010"))
-    exp = pd.DataFrame(
-        {"year_vtg": (2010, 2010, 2010, 2010), "year_act": (2010, 2015, 2020, 2030)}
-    )
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+    exp = _q(yvya_all, f"year_vtg == 2010 and year_act >= {fmy}")
+    assert_frame_equal(exp, obs)
 
     # Check if no vintge-year is passed, that all values corresponding
     # to technical lifetime are passed if the active years >= 2010
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar"))
-    exp = pd.DataFrame(
-        {
-            "year_vtg": (
-                2000,
-                2000,
-                2005,
-                2005,
-                2005,
-                2010,
-                2010,
-                2010,
-                2010,
-                2015,
-                2015,
-                2015,
-                2020,
-                2020,
-                2030,
-            ),
-            "year_act": (
-                2010,
-                2015,
-                2010,
-                2015,
-                2020,
-                2010,
-                2015,
-                2020,
-                2030,
-                2015,
-                2020,
-                2030,
-                2020,
-                2030,
-                2030,
-            ),
-        }
-    )
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+    exp = _q(yvya_all, f"year_act >= {fmy} and year_act - year_vtg < 20", extra)
+    assert_frame_equal(exp, obs)
 
     # Check if no vintge-year is passed, that all values corresponding
     # to technical lifetime are passed if the active years >= 2010
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar"), in_horizon=False)
-    exp = pd.DataFrame(
-        {
-            "year_vtg": (
-                2000,
-                2000,
-                2000,
-                2000,
-                2005,
-                2005,
-                2005,
-                2005,
-                2010,
-                2010,
-                2010,
-                2010,
-                2015,
-                2015,
-                2015,
-                2020,
-                2020,
-                2030,
-            ),
-            "year_act": (
-                2000,
-                2005,
-                2010,
-                2015,
-                2005,
-                2010,
-                2015,
-                2020,
-                2010,
-                2015,
-                2020,
-                2030,
-                2015,
-                2020,
-                2030,
-                2020,
-                2030,
-                2030,
-            ),
-        }
-    )
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+    exp = _q(yvya_all, "year_act - year_vtg < 20", extra)
+    assert_frame_equal(exp, obs)
 
     # Check if no vintge-year is passed, that all values corresponding
     # to technical lifetime are passed if the vintage years >= 2010
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar"), vtg_lower=2010)
-    exp = pd.DataFrame(
-        {
-            "year_vtg": (2010, 2010, 2010, 2010, 2015, 2015, 2015, 2020, 2020, 2030),
-            "year_act": (2010, 2015, 2020, 2030, 2015, 2020, 2030, 2020, 2030, 2030),
-        }
-    )
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+    exp = _q(yvya_all, f"year_vtg >= {fmy}")
+    assert_frame_equal(exp, obs)
 
     # Check if no vintge-year is passed, that all values corresponding
     # to technical lifetime are passed if the active years >= 2020
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar"), act_lower=2020)
-    exp = pd.DataFrame(
-        {
-            "year_vtg": (2005, 2010, 2010, 2015, 2015, 2020, 2020, 2030),
-            "year_act": (2020, 2020, 2030, 2020, 2030, 2020, 2030, 2030),
-        }
-    )
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+    exp = _q(yvya_all, "2020 <= year_act and year_act - year_vtg < 20", extra)
+    assert_frame_equal(exp, obs)
 
 
 def test_vintage_and_active_years3(test_mp):
@@ -325,43 +192,15 @@ def test_vintage_and_active_years3(test_mp):
 
     _setup(scen, years, fmy, filter(lambda y: y <= y_max, years))
 
+    yvya_all = _generate_yv_ya(years)
 
     # Check standard functionality with different period duration lengths
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar", "2010"))
     exp = pd.DataFrame({"year_vtg": (2010, 2010, 2010), "year_act": (2010, 2015, 2020)})
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+    assert_frame_equal(exp, obs)
 
     # Check if no vintge-year is passed, that all values corresponding
     # to technical lifetime are passed if the active years >= 2010
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar"))
-    exp = pd.DataFrame(
-        {
-            "year_vtg": (
-                2000,
-                2000,
-                2005,
-                2005,
-                2005,
-                2010,
-                2010,
-                2010,
-                2015,
-                2015,
-                2020,
-            ),
-            "year_act": (
-                2010,
-                2015,
-                2010,
-                2015,
-                2020,
-                2010,
-                2015,
-                2020,
-                2015,
-                2020,
-                2020,
-            ),
-        }
-    )
-    pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+    exp = _q(yvya_all, f"{fmy} <= year_act <= {y_max} and year_act - year_vtg < 20")
+    assert_frame_equal(exp, obs)
