@@ -455,6 +455,25 @@ class Scenario(ixmp.Scenario):
         -------
         pandas.DataFrame
             with columns 'year_vtg' and 'year_act', in which each row is a valid pair.
+
+        Examples
+        --------
+        :meth:`pandas.DataFrame.query` can be used to further manipulate the data in the
+        returned data frame. To limit the vintage years included:
+
+        >>> base = s.vintage_and_active_years(("node", "tech"))
+        >>> df = base.query("year_vtg >= 2022")
+
+        Limit the active years included:
+
+        >>> df = base.query("year_act >= 2040")
+
+        More complex expressions as a chained call:
+
+        >>> df = s.vintage_and_active_years(
+        ...     ("node", "tech"), in_horizon=True
+        ... ).query("year_act >= 2025 or year_vtg < 2010")
+
         """
         # Predicate for filtering years
         def _valid(elem):

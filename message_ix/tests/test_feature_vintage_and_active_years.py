@@ -178,11 +178,27 @@ def test_vintage_and_active_years2(test_mp):
     exp = _q(yvya_all, f"year_vtg >= {fmy}")
     assert_frame_equal(exp, obs)
 
+    # Alternative to the above
+    assert_frame_equal(
+        exp,
+        scen.vintage_and_active_years(ya_args=("foo", "bar"))
+        .query("year_vtg >= 2010")
+        .reset_index(drop=True),
+    )
+
     # Check if no vintge-year is passed, that all values corresponding to technical
     # lifetime are passed if the active years >= 2020
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar"), act_lower=2020)
     exp = _q(yvya_all, "2020 <= year_act and year_act - year_vtg < 20", extra)
     assert_frame_equal(exp, obs)
+
+    # Alternative to the above
+    assert_frame_equal(
+        exp,
+        scen.vintage_and_active_years(ya_args=("foo", "bar"))
+        .query("year_act >= 2020")
+        .reset_index(drop=True),
+    )
 
 
 def test_vintage_and_active_years3(test_mp):
