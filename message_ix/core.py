@@ -427,36 +427,37 @@ class Scenario(ixmp.Scenario):
         r"""Return matched pairs of vintage and active years for use in data input.
 
         Each returned pair of (vintage year :math:`y^V`, active year :math:`y^A`)
-        satisfies the following conditions:
+        satisfies all of the following conditions:
 
-        1. :math:`y^V, y^A \in Y`, i.e. both vintage and active year are in the
-           ``year`` set of the Scenario.
-        2. :math:`y^V \leq y^A`, i.e. a technology cannot be active before it is
-           constructed.
-        3. :math:`y^A \geq y_0`, the model's first year; **or** :math:`y^A` is in the
-           smaller subset :meth:`.years_active` for the given `act_lower` **and**
-           :math:`y^A` is within the defined technical lifetime if "ya_args" are passed.
+        1. :math:`y^V, y^A \in Y`: both vintage and active year are in the ``year`` set
+           of the Scenario.
+        2. :math:`y^V \leq y^A`: a technology cannot be active before it is constructed.
+        3. (If `in_horizon` is :obj:`True`) :math:`y^A \geq y_0`, the
+           :attr:`.firstmodelyear`.
+        4. (If `ya_args` are given) :math:`y^A - y^V + \text{duration_period}_{y^V} <
+           \text{technical_lifetime}_{y^V}`; that is, at least part of the active period
+           is within the technical lifetime defined for technology of the corresponding
+           vintage. This is the same condition satisfied by :meth:`years_active`.
 
         Parameters
         ----------
         ya_args : tuple of (node, tec) or (node, tec, yr_vtg), optional
-            If only (node, tec) is provided, then the vintage and active years are
-            returned for all years for which a technical lifetime is defined. If in
-            addition a "yr_vtg" is specified, results will be limited to that vintage
-            year. In all cases, the "year_act" will <= maximum defined
-            ``technical_lifetime`` for the given technology.
+            If all three are provided, they are supplied directly to
+            :meth:`.years_active`, and only the `yr_vtg` will appear in the results. If
+            only (node, tec) are provided, then :meth:`.years_active` is called for
+            every vintage where the (node, tec) has a defined technical lifetime.
         in_horizon : bool, optional
-            Only return year_act within the model horizon (:obj:`firstmodelyear` or
+            Only return year_act within the model horizon (:attr:`.firstmodelyear` or
             later).
         vtg_lower : int, optional
-            Only returns year_vtg from the specified value onwards.
+            Only return year_vtg from the specified value onwards.
         act_lower : int, optional
-            Only returns year_act from the specified value onwards.
+            Only return year_act from the specified value onwards.
 
         Returns
         -------
         pandas.DataFrame
-            with columns 'year_vtg' and 'year_act', in which each row is a valid pair.
+            with columns "year_vtg" and "year_act", in which each row is a valid pair.
 
         Examples
         --------
