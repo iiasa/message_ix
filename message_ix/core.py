@@ -2,6 +2,7 @@ import logging
 from collections.abc import Mapping
 from functools import lru_cache
 from itertools import product
+from typing import Iterable, List, Optional, Sequence, Union
 from warnings import warn
 
 import ixmp
@@ -20,9 +21,9 @@ log.addHandler(_sh)
 class Scenario(ixmp.Scenario):
     """|MESSAGEix| Scenario.
 
-    See :class:`ixmp.TimeSeries` for the meaning of arguments `mp`, `model`,
-    `scenario`, `version`, and `annotation`. The `scheme` of a newly-created
-    Scenario is always 'MESSAGE'.
+    See :class:`ixmp.TimeSeries` for the meaning of arguments `mp`, `model`, `scenario`,
+    `version`, and `annotation`. The `scheme` of a newly-created Scenario is always
+    "MESSAGE".
     """
 
     def __init__(
@@ -289,21 +290,26 @@ class Scenario(ixmp.Scenario):
         self.add_set("lvl_spatial", levels)
         self.add_set("map_spatial_hierarchy", hierarchy)
 
-    def add_horizon(self, year=[], firstmodelyear=None, data=None):
+    def add_horizon(
+        self,
+        year: Iterable[int] = [],
+        firstmodelyear: Optional[int] = None,
+        data: Optional[dict] = None,
+    ) -> None:
         """Set the scenario time horizon via ``year`` and related categories.
 
-        :meth:`add_horizon` acts like ``add_set("year", ...)``, except with
-        additional conveniences:
+        :meth:`add_horizon` acts like ``add_set("year", ...)``, except with additional
+        conveniences:
 
-        - The `firstmodelyear` argument can be used to set the first period
-          handled by the MESSAGE optimization. This is equivalent to::
+        - The `firstmodelyear` argument can be used to set the first period handled by
+          the MESSAGE optimization. This is equivalent to::
 
             scenario.add_cat("year", "firstmodelyear", ..., is_unique=True)
 
-        - Parameter ``duration_period`` is assigned values based on `year`:
-          The duration of periods is calculated as the interval between
-          successive `year` elements, and the duration of the first period is
-          set to value that appears most frequently.
+        - Parameter ``duration_period`` is assigned values based on `year`: The duration
+          of periods is calculated as the interval between successive `year` elements,
+          and the duration of the first period is set to value that appears most
+          frequently.
 
         See :doc:`time` for a detailed terminology of years and periods in
         :mod:`message_ix`.
@@ -314,25 +320,24 @@ class Scenario(ixmp.Scenario):
             The set of periods.
 
         firstmodelyear : int, optional
-            First period for the model solution. If not given, the first entry
-            of `year` is used.
+            First period for the model solution. If not given, the first entry of `year`
+            is used.
 
         Other parameters
         ----------------
         data : dict
             .. deprecated:: 3.1
 
-               The "year" key corresponds to `year` and is required.
-               A "firstmodelyear" key corresponds to `firstmodelyear` and is
-               optional.
+               The "year" key corresponds to `year` and is required. A "firstmodelyear"
+               key corresponds to `firstmodelyear` and is optional.
 
         Raises
         ------
         ValueError
-            If the ``year`` set of the Scenario is already populated. Changing
-            the time periods of an existing Scenario can entail complex
-            adjustments to data. For this purpose, adjust each set and
-            parameter individually, or see :mod:`.tools.add_year`.
+            If the ``year`` set of the Scenario is already populated. Changing the time
+            periods of an existing Scenario can entail complex adjustments to data. For
+            this purpose, adjust each set and parameter individually, or see
+            :mod:`.tools.add_year`.
 
         Examples
         --------
@@ -343,8 +348,8 @@ class Scenario(ixmp.Scenario):
         >>> s.add_horizon([2020, 2030, 2040])
         """
         # Check arguments
-        # NB once the deprecated signature is removed, these two 'if' blocks
-        #    and the data= argument can be deleted.
+        # NB once the deprecated signature is removed, these two 'if' blocks and the
+        #    data= argument can be deleted.
         if isinstance(year, dict):
             # Move a dict argument to `data` to trigger the next block
             if data:
@@ -353,7 +358,7 @@ class Scenario(ixmp.Scenario):
 
         if data:
             warn(
-                "dict() argument to add_horizon(); use year= and " "firstmodelyear=",
+                "dict() argument to add_horizon(); use year= and firstmodelyear=",
                 DeprecationWarning,
             )
 
@@ -391,8 +396,8 @@ class Scenario(ixmp.Scenario):
             # Cannot infer any durations with only 1 period
             return
         elif len(set(duration)) == 1:
-            # All periods have the same duration; use this for the duration of
-            # the first period
+            # All periods have the same duration; use this for the duration of the first
+            # period
             duration_first = duration[0]
         else:
             # More than one period duration. Use the mode, i.e. the most common
@@ -408,43 +413,39 @@ class Scenario(ixmp.Scenario):
         self.add_par(
             "duration_period",
             pd.DataFrame(
-                {
-                    "year": year,
-                    "value": [duration_first] + duration,
-                    "unit": "y",
-                }
+                {"year": year, "value": [duration_first] + duration, "unit": "y"}
             ),
         )
 
     def vintage_and_active_years(
-        self, ya_args=None, in_horizon=True, vtg_lower=0, act_lower=0
-    ):
+        self,
+        ya_args: Union[str, Sequence] = None,
+        in_horizon: bool = True,
+        vtg_lower: int = 0,
+        act_lower: int = 0,
+    ) -> pd.DataFrame:
         """Return sets of vintage and active years for use in data input.
 
-        For a valid pair `(year_vtg, year_act)`, the following conditions are
-        satisfied:
+        For a valid pair `(year_vtg, year_act)`, the following conditions are satisfied:
 
-        1. Both the vintage year (`year_vtg`) and active year (`year_act`) are
-           in the model's ``year`` set.
+        1. Both the vintage year (`year_vtg`) and active year (`year_act`) are in the
+           model's ``year`` set.
         2. `year_vtg` <= `year_act`.
-        3. `year_act` >= the model's first year **or** `year_act` is in the
-           smaller subset :meth:`ixmp.Scenario.years_active` for the given
-           `act_lower` **and** `year_act` <= maximum defined technical lifetime
-           if "ya_args" are passed.
+        3. `year_act` >= the model's first year **or** `year_act` is in the smaller
+           subset :meth:`ixmp.Scenario.years_active` for the given `act_lower` **and**
+           `year_act` <= maximum defined technical lifetime if "ya_args" are passed.
 
         Parameters
         ----------
         ya_args : tuple of (node, tec) or (node, tec, yr_vtg), optional
-            If only (node, tec) is provided, then the vintage and active
-            years are returned for all years for which a technical_lifetime
-            is defined.
-            If in addition a "yr_vtg" is specified, results will be limited
-            to that vintage year.
-            In all cases, the "year_act" will <= maximum defined
-            `technical_lifetime` for the given technology.
+            If only (node, tec) is provided, then the vintage and active years are
+            returned for all years for which a technical_lifetime is defined. If in
+            addition a "yr_vtg" is specified, results will be limited to that vintage
+            year. In all cases, the "year_act" will <= maximum defined
+            ``technical_lifetime`` for the given technology.
         in_horizon : bool, optional
-            Only return year_act within the model horizon
-            (:obj:`firstmodelyear` or later).
+            Only return year_act within the model horizon (:obj:`firstmodelyear` or
+            later).
         vtg_lower : int, optional
             Only returns year_vtg from the specified value onwards.
         act_lower : int, optional
@@ -453,8 +454,7 @@ class Scenario(ixmp.Scenario):
         Returns
         -------
         pandas.DataFrame
-            with columns 'year_vtg' and 'year_act', in which each row is a
-            valid pair.
+            with columns 'year_vtg' and 'year_act', in which each row is a valid pair.
         """
         # Predicate for filtering years
         def _valid(elem):
@@ -514,12 +514,12 @@ class Scenario(ixmp.Scenario):
         # Set type as filtering seems to cause issues
         return df.astype({c: "int64" for c in columns})
 
-    def years_active(self, node, tec, yr_vtg):
-        """Return years in which *tec* of *yr_vtg* can be active in *node*.
+    def years_active(self, node: str, tec: str, yr_vtg: Union[int, str]) -> List[int]:
+        """Return years in which `tec` of `yr_vtg` can be active in `node`.
 
         The :ref:`parameters <params-tech>` ``duration_period`` and
-        ``technical_lifetime`` are used to determine which periods are partly
-        or fully within the lifetime of the technology.
+        ``technical_lifetime`` are used to determine which periods are partly or fully
+        within the lifetime of the technology.
 
         Parameters
         ----------
@@ -547,8 +547,8 @@ class Scenario(ixmp.Scenario):
         data["age"] = data.where(data.year >= yv, 0)["value"].cumsum()
 
         # Return periods:
-        # - the tec's age at the end of the *prior* period is less than or
-        #   equal to its lifetime, and
+        # - the tec's age at the end of the *prior* period is less than or equal to its
+        #   lifetime, and
         # - at or later than the vintage year.
         return (
             data.where(data.age.shift(1, fill_value=0) < lt)
