@@ -246,6 +246,7 @@ Equations
     CAPACITY_MAINTENANCE_HIST       constraint for capacity maintenance  historical installation (built before start of model horizon)
     CAPACITY_MAINTENANCE_NEW        constraint for capacity maintenance of new capacity built in the current period (vintage == year)
     CAPACITY_MAINTENANCE            constraint for capacity maintenance over the technical lifetime
+    CAPACITY_MAINTENANCE2           constraint for capacity maintenance after the technical lifetime (should be zero)
     OPERATION_CONSTRAINT            constraint on maximum yearly operation (scheduled down-time for maintenance)
     MIN_UTILIZATION_CONSTRAINT      constraint for minimum yearly operation (aggregated over the course of a year)
     RENEWABLES_POTENTIAL_CONSTRAINT constraint on renewable resource potential
@@ -807,6 +808,26 @@ CAPACITY_MAINTENANCE(node,inv_tec,vintage,year)$( map_tec_lifetime(node,inv_tec,
     =L= remaining_capacity(node,inv_tec,vintage,year) *
         ( SUM(year2$( seq_period(year2,year) ),
               CAP(node,inv_tec,vintage,year2) ) ) ;
+
+***
+* .. _equation_capacity_maintenance2:
+*
+* Equation CAPACITY_MAINTENANCE2
+* """"""""""""""""""""""""""""""
+* This constraint ensures that the capacity is not preserved after the technical lifetime of a technology. 
+* 
+*   .. math::
+*      CAP_{n,t,y^V,y} =
+*          0 \\
+*      \quad & \text{if } y > y^V \text{ and } y^V  > 'first\_period' \text{ and } |y| - |y^V| >= technical\_lifetime_{n,t,y^V}
+*      \quad \forall \ t \in T^{INV}
+*
+***
+CAPACITY_MAINTENANCE2(node,inv_tec,vintage,year)$( map_tec(node,inv_tec,vintage) AND NOT map_tec_lifetime(node,inv_tec,vintage,year)
+        AND NOT first_period(year) AND year_order(vintage) < year_order(year))..
+    CAP(node,inv_tec,vintage,year)
+    =L= 0 ;
+
 
 ***
 * .. _equation_operation_constraint:
