@@ -138,7 +138,7 @@ def test_vintage_and_active_years1(test_mp):
     with pytest.raises(
         ValueError, match="At least 2 arguments are required if using `ya_args`"
     ):
-        scen.vintage_and_active_years(ya_args=("foo"))
+        scen.vintage_and_active_years(ya_args=("foo",))
 
 
 def test_vintage_and_active_years2(test_mp):

@@ -419,7 +419,7 @@ class Scenario(ixmp.Scenario):
 
     def vintage_and_active_years(
         self,
-        ya_args: Union[str, Sequence] = None,
+        ya_args: Sequence = None,
         in_horizon: bool = True,
         vtg_lower: int = 0,
         act_lower: int = 0,
@@ -489,7 +489,6 @@ class Scenario(ixmp.Scenario):
 
         # Prepare lists of vintage (yv) and active (ya) years
         if ya_args:
-            ya_args = [ya_args] if type(ya_args) == str else ya_args
             len_yargs = len(ya_args)
             if len_yargs < 2:
                 raise ValueError("At least 2 arguments are required if using `ya_args`")
