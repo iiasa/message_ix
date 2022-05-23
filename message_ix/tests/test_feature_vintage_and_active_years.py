@@ -221,3 +221,26 @@ def test_vintage_and_active_years3(test_mp):
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar"))
     exp = _q(yvya_all, f"{fmy} <= year_act <= {y_max} and year_act - year_vtg < 20")
     assert_frame_equal(exp, obs)
+
+
+def test_vintage_and_active_years4(test_mp):
+    """Technology with 'gaps'.
+
+    In this test, no ``technical_lifetime`` is designated for the 2020 and 2030
+    vintages. The technology thus cannot be vintaged in these periods, or active in the
+    2030 period, so these should not appear in the results.
+    """
+    years = (2000, 2010, 2020, 2030, 2040, 2050, 2060)
+    fmy = years[1]
+
+    # Set up scenario, tech, and retrieve valid (yv, ya) pairs
+    scen, yvya_all = _setup(test_mp, years, fmy)
+
+    # Change the technical_lifetime of the technology
+    tl = "technical_lifetime"
+    data = scen.par(tl)
+    scen.remove_par(tl, data.query("year_vtg == 2020 or year_vtg == 2030"))
+
+    obs = scen.vintage_and_active_years(("foo", "bar"))
+    assert 2030 not in obs["year_act"]
+    assert not any(y in obs["year_vtg"] for y in (2020, 2030))
