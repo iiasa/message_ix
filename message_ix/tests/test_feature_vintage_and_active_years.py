@@ -1,9 +1,10 @@
 from functools import lru_cache
-from typing import Optional, Tuple, Union
+from typing import Optional, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
 import pytest
+from ixmp import Platform
 from pandas.testing import assert_frame_equal
 
 from message_ix import Scenario, make_df
@@ -83,6 +84,7 @@ def _q(
 
 
 def test_vintage_and_active_years1(test_mp):
+    """Basic functionality of :meth:`.vintage_and_active_years`."""
     years = (2000, 2010, 2020)
     fmy = years[1]
 
@@ -119,8 +121,8 @@ def test_vintage_and_active_years1(test_mp):
     # Advance the first model year
     scen.add_cat("year", "firstmodelyear", years[-1], is_unique=True)
 
-    # Empty data frame: only 2000 and 2010 valid year_act for this node/tec;
-    # but both are before the first model year
+    # Empty data frame: only 2000 and 2010 valid year_act for this node/tec; but both
+    # are before the first model year
     obs = scen.vintage_and_active_years(
         ya_args=("foo", "bar", years[0]), in_horizon=True
     )
@@ -136,7 +138,7 @@ def test_vintage_and_active_years1(test_mp):
 
 
 def test_vintage_and_active_years2(test_mp):
-    # Add years of differing time length
+    """:meth:`.vintage_and_active_years` with periods of uneven duration."""
     years = (2000, 2005, 2010, 2015, 2020, 2030)
     fmy = years[2]
 
@@ -154,37 +156,38 @@ def test_vintage_and_active_years2(test_mp):
     exp = _q(yvya_all, f"year_vtg == 2010 and year_act >= {fmy}")
     assert_frame_equal(exp, obs)
 
-    # Check if no vintge-year is passed, that all values corresponding
-    # to technical lifetime are passed if the active years >= 2010
+    # Check if no vintge-year is passed, that all values corresponding to technical
+    # lifetime are passed if the active years >= 2010
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar"))
     exp = _q(yvya_all, f"year_act >= {fmy} and year_act - year_vtg < 20", extra)
     assert_frame_equal(exp, obs)
 
-    # Check if no vintge-year is passed, that all values corresponding
-    # to technical lifetime are passed if the active years >= 2010
+    # Check if no vintge-year is passed, that all values corresponding to technical
+    # lifetime are passed if the active years >= 2010
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar"), in_horizon=False)
     exp = _q(yvya_all, "year_act - year_vtg < 20", extra)
     assert_frame_equal(exp, obs)
 
-    # Check if no vintge-year is passed, that all values corresponding
-    # to technical lifetime are passed if the vintage years >= 2010
+    # Check if no vintge-year is passed, that all values corresponding to technical
+    # lifetime are passed if the vintage years >= 2010
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar"), vtg_lower=2010)
     exp = _q(yvya_all, f"year_vtg >= {fmy}")
     assert_frame_equal(exp, obs)
 
-    # Check if no vintge-year is passed, that all values corresponding
-    # to technical lifetime are passed if the active years >= 2020
+    # Check if no vintge-year is passed, that all values corresponding to technical
+    # lifetime are passed if the active years >= 2020
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar"), act_lower=2020)
     exp = _q(yvya_all, "2020 <= year_act and year_act - year_vtg < 20", extra)
     assert_frame_equal(exp, obs)
 
 
 def test_vintage_and_active_years3(test_mp):
-    # Add years of differing time length
+    """Technology with ``technical_lifetime`` not defined to the end of the horizon."""
     years = (2000, 2005, 2010, 2015, 2020, 2030)
     fmy = years[2]
-    y_max = years[-2]
 
+    # Last year for which the technical_lifetime of "bar" will be defined
+    y_max = years[-2]
 
     scen, yvya_all = _setup(test_mp, years, fmy, filter(lambda y: y <= y_max, years))
 
@@ -193,8 +196,8 @@ def test_vintage_and_active_years3(test_mp):
     exp = pd.DataFrame({"year_vtg": (2010, 2010, 2010), "year_act": (2010, 2015, 2020)})
     assert_frame_equal(exp, obs)
 
-    # Check if no vintge-year is passed, that all values corresponding
-    # to technical lifetime are passed if the active years >= 2010
+    # Check if no vintge-year is passed, that all values corresponding to technical
+    # lifetime are passed if the active years >= 2010
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar"))
     exp = _q(yvya_all, f"{fmy} <= year_act <= {y_max} and year_act - year_vtg < 20")
     assert_frame_equal(exp, obs)
