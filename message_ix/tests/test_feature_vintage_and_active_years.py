@@ -40,7 +40,9 @@ def _generate_yv_ya(
     )
 
 
-def _setup(scenario, years, firstmodelyear, tl_years=None):
+def _setup(
+    mp: Platform, years: Sequence[int], firstmodelyear: int, tl_years=None
+) -> Tuple[Scenario, pd.DataFrame]:
     """Common setup for test of :meth:`.vintage_and_active_years`.
 
     Adds:
@@ -49,7 +51,11 @@ def _setup(scenario, years, firstmodelyear, tl_years=None):
     - a node 'foo'
     - a technology 'bar', with a ``technical_lifetime`` of 20 years; either for all
       `years`, or for a subset of `tl_years`.
+
+    Returns the Scenario and a data frame from :func:`_generate_yv_ya`.
     """
+    scenario = Scenario(mp, **SCENARIO["dantzig"], version="new")
+
     scenario.add_horizon(year=years, firstmodelyear=firstmodelyear)
     scenario.add_set("node", "foo")
     scenario.add_set("technology", "bar")
@@ -65,6 +71,8 @@ def _setup(scenario, years, firstmodelyear, tl_years=None):
         ),
     )
 
+    return scenario, _generate_yv_ya(years)
+
 
 def _q(
     df: pd.DataFrame, query: str, append: Optional[pd.DataFrame] = None
@@ -79,15 +87,11 @@ def _q(
 
 
 def test_vintage_and_active_years1(test_mp):
-    scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
-
     years = (2000, 2010, 2020)
     fmy = years[1]
 
-    _setup(scen, years, fmy)
-
-    # All possible combinations of yv and ya
-    yvya_all = _generate_yv_ya(2000, 2020, 10)
+    # Set up scenario, tech, and retrieve valid (yv, ya) pairs
+    scen, yvya_all = _setup(test_mp, years, fmy)
 
     # Default / no arguments
     assert_frame_equal(
@@ -136,15 +140,12 @@ def test_vintage_and_active_years1(test_mp):
 
 
 def test_vintage_and_active_years2(test_mp):
-    scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
-
     # Add years of differing time length
     years = (2000, 2005, 2010, 2015, 2020, 2030)
     fmy = years[2]
 
-    _setup(scen, years, fmy)
+    scen, yvya_all = _setup(test_mp, years, fmy)
 
-    yvya_all = _generate_yv_ya(years)
     extra = pd.Series(dict(year_vtg=2010, year_act=2030)).to_frame().T
 
     # Check if default function call is valid
@@ -183,16 +184,13 @@ def test_vintage_and_active_years2(test_mp):
 
 
 def test_vintage_and_active_years3(test_mp):
-    scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
-
     # Add years of differing time length
     years = (2000, 2005, 2010, 2015, 2020, 2030)
     fmy = years[2]
     y_max = years[-2]
 
-    _setup(scen, years, fmy, filter(lambda y: y <= y_max, years))
 
-    yvya_all = _generate_yv_ya(years)
+    scen, yvya_all = _setup(test_mp, years, fmy, filter(lambda y: y <= y_max, years))
 
     # Check standard functionality with different period duration lengths
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar", "2010"))
