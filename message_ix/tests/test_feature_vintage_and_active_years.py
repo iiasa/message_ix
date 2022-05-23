@@ -6,8 +6,17 @@ from message_ix import Scenario
 from message_ix.testing import SCENARIO
 
 
-def _add_tl(scenario, years):
-    """Add a technology, its lifetime, and period durations."""
+def _setup(scenario, years, firstmodelyear, tl_years=None):
+    """Common setup for test of :meth:`.vintage_and_active_years`.
+
+    Adds:
+
+    - the model time horizon, using `years` and `firstmodelyear`.
+    - a node 'foo'
+    - a technology 'bar', with a ``technical_lifetime`` of 20 years; either for all
+      `years`, or for a subset of `tl_years`.
+    """
+    scenario.add_horizon(year=years, firstmodelyear=firstmodelyear)
     scenario.add_set("node", "foo")
     scenario.add_set("technology", "bar")
     scenario.add_par(
@@ -18,7 +27,7 @@ def _add_tl(scenario, years):
             technology="bar",
             unit="y",
             value=20,
-            year_vtg=years,
+            year_vtg=tl_years or years,
         ),
     )
 
@@ -26,8 +35,6 @@ def _add_tl(scenario, years):
 def test_vintage_and_active_years1(test_mp):
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
 
-    years = [2000, 2010, 2020]
-    scen.add_horizon(year=years, firstmodelyear=2010)
     obs = scen.vintage_and_active_years()
     exp = pd.DataFrame(
         {
@@ -36,10 +43,11 @@ def test_vintage_and_active_years1(test_mp):
         }
     )
     pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
+    years = (2000, 2010, 2020)
+    fmy = years[1]
 
-    # Add a technology, its lifetime, and period durations
-    _add_tl(scen, years)
-    assert all((10, 10, 10) == scen.par("duration_period")["value"])
+    _setup(scen, years, fmy)
+
 
     # part is before horizon
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar", "2000"))
@@ -85,8 +93,10 @@ def test_vintage_and_active_years2(test_mp):
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
 
     # Add years of differing time length
-    years = [2000, 2005, 2010, 2015, 2020, 2030]
-    scen.add_horizon(year=years, firstmodelyear=2010)
+    years = (2000, 2005, 2010, 2015, 2020, 2030)
+    fmy = years[2]
+
+    _setup(scen, years, fmy)
 
     # Check if default function call is valid
     obs = scen.vintage_and_active_years()
@@ -136,9 +146,6 @@ def test_vintage_and_active_years2(test_mp):
     )
     pdt.assert_frame_equal(exp, obs, check_like=True)  # ignore col order
 
-    # Add a technology, its lifetime, and period durations
-    _add_tl(scen, years)
-    assert all((5, 5, 5, 5, 5, 10) == scen.par("duration_period")["value"])
 
     # Check standard functionality with different period duration lengths
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar", "2010"))
@@ -266,12 +273,12 @@ def test_vintage_and_active_years3(test_mp):
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
 
     # Add years of differing time length
-    years = [2000, 2005, 2010, 2015, 2020, 2030]
-    scen.add_horizon(year=years, firstmodelyear=2010)
+    years = (2000, 2005, 2010, 2015, 2020, 2030)
+    fmy = years[2]
+    y_max = years[-2]
 
-    # Add a technology, its lifetime, and period durations
-    _add_tl(scen, filter(lambda y: y <= 2020, years))
-    assert all((5, 5, 5, 5, 5, 10) == scen.par("duration_period")["value"].values)
+    _setup(scen, years, fmy, filter(lambda y: y <= y_max, years))
+
 
     # Check standard functionality with different period duration lengths
     obs = scen.vintage_and_active_years(ya_args=("foo", "bar", "2010"))
