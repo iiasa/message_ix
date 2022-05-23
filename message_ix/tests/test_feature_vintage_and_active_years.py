@@ -135,9 +135,7 @@ def test_vintage_and_active_years1(test_mp):
     )
 
     # Exception is raised for incorrect arguments
-    with pytest.raises(
-        ValueError, match="At least 2 arguments are required if using `ya_args`"
-    ):
+    with pytest.raises(ValueError, match=r"got \('foo',\) of length 1"):
         scen.vintage_and_active_years(ya_args=("foo",))
 
 

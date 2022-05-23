@@ -1,8 +1,8 @@
 import logging
 from collections.abc import Mapping
 from functools import lru_cache
-from itertools import product
-from typing import Iterable, List, Optional, Sequence, Union
+from itertools import chain, product
+from typing import Iterable, List, Optional, Tuple, Union
 from warnings import warn
 
 import ixmp
@@ -419,27 +419,29 @@ class Scenario(ixmp.Scenario):
 
     def vintage_and_active_years(
         self,
-        ya_args: Sequence = None,
+        ya_args: Union[Tuple[str, str], Tuple[str, str, Union[int, str]]] = None,
         in_horizon: bool = True,
         vtg_lower: int = 0,
         act_lower: int = 0,
     ) -> pd.DataFrame:
-        """Return sets of vintage and active years for use in data input.
+        r"""Return matched pairs of vintage and active years for use in data input.
 
-        For a valid pair `(year_vtg, year_act)`, the following conditions are satisfied:
+        Each returned pair of (vintage year :math:`y^V`, active year :math:`y^A`)
+        satisfies the following conditions:
 
-        1. Both the vintage year (`year_vtg`) and active year (`year_act`) are in the
-           model's ``year`` set.
-        2. `year_vtg` <= `year_act`.
-        3. `year_act` >= the model's first year **or** `year_act` is in the smaller
-           subset :meth:`ixmp.Scenario.years_active` for the given `act_lower` **and**
-           `year_act` <= maximum defined technical lifetime if "ya_args" are passed.
+        1. :math:`y^V, y^A \in Y`, i.e. both vintage and active year are in the
+           ``year`` set of the Scenario.
+        2. :math:`y^V \leq y^A`, i.e. a technology cannot be active before it is
+           constructed.
+        3. :math:`y^A \geq y_0`, the model's first year; **or** :math:`y^A` is in the
+           smaller subset :meth:`.years_active` for the given `act_lower` **and**
+           :math:`y^A` is within the defined technical lifetime if "ya_args" are passed.
 
         Parameters
         ----------
         ya_args : tuple of (node, tec) or (node, tec, yr_vtg), optional
             If only (node, tec) is provided, then the vintage and active years are
-            returned for all years for which a technical_lifetime is defined. If in
+            returned for all years for which a technical lifetime is defined. If in
             addition a "yr_vtg" is specified, results will be limited to that vintage
             year. In all cases, the "year_act" will <= maximum defined
             ``technical_lifetime`` for the given technology.
@@ -475,58 +477,54 @@ class Scenario(ixmp.Scenario):
         ... ).query("year_act >= 2025 or year_vtg < 2010")
 
         """
+        # Prepare lists of vintage (yv) and active (ya) years
+        if ya_args is None:
+            # Product of all years
+            years = self.set("year")
+            values: Iterable = product(years, years)
+        elif len(ya_args) == 3:
+            # Specific vintage for `years_active()`
+            values = map(
+                lambda y: (int(ya_args[-1]), y),  # type: ignore
+                self.years_active(*ya_args),
+            )
+        elif len(ya_args) == 2:
+            # All possible vintages for the given (node, technology)
+            vintages = sorted(
+                self.par(
+                    "technical_lifetime",
+                    filters={"node_loc": ya_args[0], "technology": ya_args[1]},
+                )["year_vtg"].unique()
+            )
+
+            # One list of (yv, ya) values for each vintage
+            # NB this could be made more efficient using a modified version of the
+            #    code in years_active(); however any performance penalty from repeated
+            #    calls is probably mitigated by caching.
+            iters = []
+            for yv in vintages:
+                iters.append(
+                    [(yv, y) for y in self.years_active(ya_args[0], ya_args[1], yv)]
+                )
+            values = chain(*iters)
+        else:
+            raise ValueError(
+                f"ya_args must be a 2- or 3-tuple; got {ya_args} of length "
+                f"{len(ya_args)}"
+            )
+
+        # Minimum value for year_act
+        ya_lower = max(self.firstmodelyear if in_horizon else -np.inf, act_lower)
+        # ya_lower = self.firstmodelyear if in_horizon else -np.inf  # Without act_lower
+
         # Predicate for filtering years
         def _valid(elem):
             yv, ya = elem
-            return (yv <= ya and yv >= vtg_lower) and (
-                (not in_horizon or (first <= ya))
-                and (ya >= act_lower)
-                and (ya <= tl_max)
-            )
+            return vtg_lower <= yv <= ya and ya_lower <= ya
+            # return yv <= ya and ya_lower <= ya  # Without vtg_lower
 
-        first = self.firstmodelyear
-        columns = ["year_vtg", "year_act"]
-
-        # Prepare lists of vintage (yv) and active (ya) years
-        if ya_args:
-            len_yargs = len(ya_args)
-            if len_yargs < 2:
-                raise ValueError("At least 2 arguments are required if using `ya_args`")
-            yv = self.par(
-                "technical_lifetime",
-                filters={"node_loc": ya_args[0], "technology": ya_args[1]},
-            ).year_vtg.tolist()
-            tl_max = max(yv)
-            # If year_vtg is specified
-            if len_yargs != 2:
-                ya = self.years_active(*ya_args)
-                df = pd.DataFrame(filter(_valid, product(ya[0:1], ya)), columns=columns)
-            else:
-                df = pd.concat(
-                    [
-                        pd.DataFrame(
-                            filter(
-                                _valid,
-                                product(
-                                    [y],
-                                    self.years_active(ya_args[0], ya_args[1], y),
-                                ),
-                            ),
-                            columns=columns,
-                        )
-                        for y in yv
-                    ],
-                    ignore_index=True,
-                )
-        else:
-            # Product of all years
-            tl_max = max(self.set("year"))
-            df = pd.DataFrame(
-                filter(_valid, product(self.set("year"), self.set("year"))),
-                columns=columns,
-            )
-        # Set type as filtering seems to cause issues
-        return df.astype({c: "int64" for c in columns})
+        # Filter values and convert to data frame
+        return pd.DataFrame(filter(_valid, values), columns=["year_vtg", "year_act"])
 
     def years_active(self, node: str, tec: str, yr_vtg: Union[int, str]) -> List[int]:
         """Return years in which `tec` of `yr_vtg` can be active in `node`.
@@ -552,7 +550,7 @@ class Scenario(ixmp.Scenario):
         yv = int(yr_vtg)
         filters = dict(node_loc=[node], technology=[tec], year_vtg=[yv])
 
-        # Lifetime of the technology at the node
+        # Lifetime of the technology at the node and year_vtg
         lt = self.par("technical_lifetime", filters=filters).at[0, "value"]
 
         # Duration of periods
