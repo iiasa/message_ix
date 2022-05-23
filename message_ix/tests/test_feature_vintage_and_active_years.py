@@ -1,9 +1,43 @@
+from functools import lru_cache
+from typing import Optional, Tuple, Union
+
+import numpy as np
 import pandas as pd
 import pandas.testing as pdt
 import pytest
 
 from message_ix import Scenario
 from message_ix.testing import SCENARIO
+
+
+@lru_cache()
+def _generate_yv_ya(
+    start_or_periods: Union[Tuple[int, ...], int],
+    end: Optional[int] = None,
+    dp: Optional[int] = None,
+) -> pd.DataFrame:
+    """All meaningful combinations of (vintage year, active year).
+
+    Can be called one of two ways:
+
+    1. (start, end, dp): the values are the start period, final period, and (single)
+       value for ``duration_period``. The intermediate periods are inferred.
+    2. A sequence (tuple) of periods: the values are used directly as the periods.
+    """
+    # Create a mesh grid using numpy built-ins
+    if isinstance(start_or_periods, int):
+        assert end is not None
+        _s = slice(start_or_periods, end + 1, dp)
+        data = np.mgrid[_s, _s]
+    else:
+        assert end is None and dp is None
+        data = np.meshgrid(start_or_periods, start_or_periods, indexing="ij")
+    # Take the upper-triangular portion (setting the rest to 0), reshape
+    data = np.triu(data).reshape((2, -1))
+    # Filter only non-zero pairs
+    return pd.DataFrame(
+        filter(sum, zip(data[0, :], data[1, :])), columns=["year_vtg", "year_act"]
+    )
 
 
 def _setup(scenario, years, firstmodelyear, tl_years=None):
@@ -30,6 +64,18 @@ def _setup(scenario, years, firstmodelyear, tl_years=None):
             year_vtg=tl_years or years,
         ),
     )
+
+
+def _q(
+    df: pd.DataFrame, query: str, append: Optional[pd.DataFrame] = None
+) -> pd.DataFrame:
+    """Shorthand to query the results of :func:`_generate_yv_ya`."""
+    result = df.query(query).reset_index(drop=True)
+    if append is not None:
+        result = pd.concat([result, append]).sort_values(
+            ["year_vtg", "year_act"], ignore_index=True
+        )
+    return result
 
 
 def test_vintage_and_active_years1(test_mp):
