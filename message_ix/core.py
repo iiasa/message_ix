@@ -503,26 +503,22 @@ class Scenario(ixmp.Scenario):
                 ya = self.years_active(*ya_args)
                 df = pd.DataFrame(filter(_valid, product(ya[0:1], ya)), columns=columns)
             else:
-                df = (
-                    pd.concat(
-                        [
-                            pd.DataFrame(
-                                filter(
-                                    _valid,
-                                    product(
-                                        [y],
-                                        self.years_active(ya_args[0], ya_args[1], y),
-                                    ),
+                df = pd.concat(
+                    [
+                        pd.DataFrame(
+                            filter(
+                                _valid,
+                                product(
+                                    [y],
+                                    self.years_active(ya_args[0], ya_args[1], y),
                                 ),
-                                columns=columns,
-                            )
-                            for y in yv
-                        ]
-                    )
-                    .reset_index()
-                    .drop("index", axis=1)
+                            ),
+                            columns=columns,
+                        )
+                        for y in yv
+                    ],
+                    ignore_index=True,
                 )
-
         else:
             # Product of all years
             tl_max = max(self.set("year"))
