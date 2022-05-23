@@ -12,7 +12,7 @@ from message_ix.testing import SCENARIO
 
 
 @lru_cache()
-def _generate_yv_ya(periods: Tuple[int, ...], dtype) -> pd.DataFrame:
+def _generate_yv_ya(periods: Tuple[int, ...]) -> pd.DataFrame:
     """All meaningful combinations of (vintage year, active year) given `periods`."""
     # commented: currently unused, this does the same as the line below, using (start
     # period, final period, uniform ``duration_period). The intermediate periods are
@@ -28,7 +28,7 @@ def _generate_yv_ya(periods: Tuple[int, ...], dtype) -> pd.DataFrame:
     return pd.DataFrame(
         filter(sum, zip(data[0, :], data[1, :])),
         columns=["year_vtg", "year_act"],
-        dtype=dtype,
+        dtype=np.int64,
     )
 
 
@@ -63,9 +63,7 @@ def _setup(
         ),
     )
 
-    return scenario, _generate_yv_ya(
-        years, dtype=scenario.par("duration_period").dtypes["year"]
-    )
+    return scenario, _generate_yv_ya(years)
 
 
 def _q(
