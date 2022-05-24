@@ -623,6 +623,10 @@ class Scenario(ixmp.Scenario):
         """
         return int(self.cat("year", "firstmodelyear")[0])
 
+    @property
+    def y0(self):
+        """Alias for :attr:`.firstmodelyear`."""
+
     def clone(self, *args, **kwargs):
         """Clone the current scenario and return the clone.
 
