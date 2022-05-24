@@ -131,7 +131,7 @@ def test_vintage_and_active_years1(test_mp):
             ya_args=("foo", "bar", years[0]), in_horizon=True
         )
     assert_frame_equal(
-        pd.DataFrame(columns=["year_vtg", "year_act"]), obs, check_dtype=False
+        pd.DataFrame(columns=["year_vtg", "year_act"], dtype=np.int64), obs
     )
 
     # Exception is raised for incorrect arguments

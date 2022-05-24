@@ -561,7 +561,9 @@ class Scenario(ixmp.Scenario):
             return yv <= ya and ya_min <= ya <= ya_max
 
         # Filter values and convert to data frame
-        return pd.DataFrame(filter(_valid, values), columns=["year_vtg", "year_act"])
+        return pd.DataFrame(
+            filter(_valid, values), columns=["year_vtg", "year_act"], dtype=np.int64
+        )
 
     #: Alias for :meth:`vintage_and_active_years`.
     yv_ya = vintage_and_active_years
@@ -606,7 +608,7 @@ class Scenario(ixmp.Scenario):
             data.where(data.age.shift(1, fill_value=0) < lt)
             .where(data.year >= yv)["year"]
             .dropna()
-            .astype(int)
+            .astype(np.int64)
             .tolist()
         )
 
