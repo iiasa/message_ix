@@ -68,6 +68,8 @@ The full API is also available from R; see :doc:`rmessageix`.
       var
       vintage_and_active_years
       years_active
+      ya
+      yv_ya
 
    .. automethod:: add_macro
 

@@ -563,6 +563,9 @@ class Scenario(ixmp.Scenario):
         # Filter values and convert to data frame
         return pd.DataFrame(filter(_valid, values), columns=["year_vtg", "year_act"])
 
+    #: Alias for :meth:`vintage_and_active_years`.
+    yv_ya = vintage_and_active_years
+
     def years_active(self, node: str, tec: str, yr_vtg: Union[int, str]) -> List[int]:
         """Return periods in which `tec` hnology of `yr_vtg` can be active in `node`.
 
@@ -606,6 +609,9 @@ class Scenario(ixmp.Scenario):
             .astype(int)
             .tolist()
         )
+
+    #: Alias for :meth:`years_active`.
+    ya = years_active
 
     @property
     def firstmodelyear(self):
