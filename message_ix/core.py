@@ -420,39 +420,53 @@ class Scenario(ixmp.Scenario):
     def vintage_and_active_years(
         self,
         ya_args: Union[Tuple[str, str], Tuple[str, str, Union[int, str]]] = None,
-        in_horizon: bool = True,
-        vtg_lower: int = 0,
-        act_lower: int = 0,
+        tl_only: bool = True,
+        **kwargs,
     ) -> pd.DataFrame:
-        r"""Return matched pairs of vintage and active years for use in data input.
+        r"""Return matched pairs of vintage and active periods for use in data input.
 
-        Each returned pair of (vintage year :math:`y^V`, active year :math:`y^A`)
+        Each returned pair of (vintage period :math:`y^V`, active period :math:`y`)
         satisfies all of the following conditions:
 
-        1. :math:`y^V, y^A \in Y`: both vintage and active year are in the ``year`` set
+        1. :math:`y^V, y \in Y`: both vintage and active period are in the ``year`` set
            of the Scenario.
-        2. :math:`y^V \leq y^A`: a technology cannot be active before it is constructed.
-        3. (If `in_horizon` is :obj:`True`) :math:`y^A \geq y_0`, the
+        2. :math:`y^V \leq y`: a technology cannot be active before it is constructed.
+        3. If `ya_args` (node :math:`n`, technology :math:`t`, and optionally
+           :math:`y^V`) are given:
+
+           a. :math:`y^V` is in the subset of :math:`Y` for which
+              :math:`\text{technical_lifetime}_{n,t,y^V}` is defined (or the single,
+              specified value).
+           b. :math:`y - y^V + \text{duration_period}_{n,t,y^V} <
+              \text{technical_lifetime}_{n,t,y^V}`: the active period is partly or fully
+              within the technical lifetime defined for that technology, node, and
+              vintage. This is the same condition as :meth:`years_active`.
+
+        4. If `ya_args` are given and `tl_only` is :obj:`True` (the default): :math:`y`
+           is in the subset of :math:`Y` for which
+           :math:`\text{technical_lifetime}_{n,t,y}` is defined.[1]_
+        5. (Deprecated) If `in_horizon` is :obj:`True`: :math:`y \geq y_0`, the
            :attr:`.firstmodelyear`.
-        4. (If `ya_args` are given) :math:`y^A - y^V + \text{duration_period}_{y^V} <
-           \text{technical_lifetime}_{y^V}`; that is, at least part of the active period
-           is within the technical lifetime defined for technology of the corresponding
-           vintage. This is the same condition satisfied by :meth:`years_active`.
+
+        .. [1] note this applies to :math:`y`, whereas condition 3(a) applies to
+           :math:`y^V`.
 
         Parameters
         ----------
-        ya_args : tuple of (node, tec) or (node, tec, yr_vtg), optional
-            If all three are provided, they are supplied directly to
-            :meth:`.years_active`, and only the `yr_vtg` will appear in the results. If
-            only (node, tec) are provided, then :meth:`.years_active` is called for
-            every vintage where the (node, tec) has a defined technical lifetime.
+        ya_args : tuple of (node, technology) or (node, technology, year_vtg), optional
+            Supplied directly to :meth:`years_active`. If the third element is omitted,
+            :meth:`years_active` is called repeatedly, once for each vintage for which a
+            technical lifetime value is set (condition (3)).
+        tl_only : bool, optional
+            Condition (4), above.
         in_horizon : bool, optional
-            Only return year_act within the model horizon (:attr:`.firstmodelyear` or
-            later).
-        vtg_lower : int, optional
-            Only return year_vtg from the specified value onwards.
-        act_lower : int, optional
-            Only return year_act from the specified value onwards.
+            Condition (5), above.
+
+            .. deprecated:: 3.6
+
+               In :mod:`message_ix` 4.0 or later, `in_horizon` will be removed, and the
+               default behaviour of :func:`vintage_and_active_years` will change to the
+               equivalent of `in_horizon` = :obj:`False`.
 
         Returns
         -------
@@ -462,34 +476,49 @@ class Scenario(ixmp.Scenario):
         Examples
         --------
         :meth:`pandas.DataFrame.query` can be used to further manipulate the data in the
-        returned data frame. To limit the vintage years included:
+        returned data frame. To limit the vintage periods included:
 
         >>> base = s.vintage_and_active_years(("node", "tech"))
-        >>> df = base.query("year_vtg >= 2022")
+        >>> df = base.query("2020 <= year_vtg")
 
-        Limit the active years included:
+        Limit the active periods included:
 
-        >>> df = base.query("year_act >= 2040")
+        >>> df = base.query("2040 < year_act")
 
-        More complex expressions as a chained call:
+        Limit year_act to the first model year or later (same as deprecated `in_horizon`
+        argument):
+
+        >>> df = base.query(f"{s.firstmodelyear} <= year_act")
+
+        More complex expressions and a chained pandas call:
 
         >>> df = s.vintage_and_active_years(
-        ...     ("node", "tech"), in_horizon=True
-        ... ).query("year_act >= 2025 or year_vtg < 2010")
+        ...     ("node", "tech"), tl_only=False
+        ... ).query("2025 <= year_act or year_vtg < 2010")
 
+        See also
+        --------
+        :doc:`time`
+        pandas.DataFrame.query
+        .years_active
         """
+        extra = set(kwargs.keys()) - {"in_horizon"}
+        if len(extra):
+            raise TypeError(f"{__name__}() got unexpected keyword argument(s) {extra}")
+
+        ya_max = np.inf
+
         # Prepare lists of vintage (yv) and active (ya) years
         if ya_args is None:
             # Product of all years
             years = self.set("year")
             values: Iterable = product(years, years)
-        elif len(ya_args) == 3:
-            # Specific vintage for `years_active()`
-            values = map(
-                lambda y: (int(ya_args[-1]), y),  # type: ignore
-                self.years_active(*ya_args),
+        elif len(ya_args) not in {2, 3}:
+            raise ValueError(
+                f"ya_args must be a 2- or 3-tuple; got {ya_args} of length "
+                f"{len(ya_args)}"
             )
-        elif len(ya_args) == 2:
+        else:
             # All possible vintages for the given (node, technology)
             vintages = sorted(
                 self.par(
@@ -497,38 +526,45 @@ class Scenario(ixmp.Scenario):
                     filters={"node_loc": ya_args[0], "technology": ya_args[1]},
                 )["year_vtg"].unique()
             )
+            ya_max = max(vintages) if tl_only else np.inf
 
-            # One list of (yv, ya) values for each vintage
-            # NB this could be made more efficient using a modified version of the
-            #    code in years_active(); however any performance penalty from repeated
-            #    calls is probably mitigated by caching.
-            iters = []
-            for yv in vintages:
-                iters.append(
-                    [(yv, y) for y in self.years_active(ya_args[0], ya_args[1], yv)]
+            if len(ya_args) == 3:
+                # Specific vintage for `years_active()`
+                values = map(
+                    lambda y: (int(ya_args[-1]), y),  # type: ignore
+                    self.years_active(*ya_args),
                 )
-            values = chain(*iters)
-        else:
-            raise ValueError(
-                f"ya_args must be a 2- or 3-tuple; got {ya_args} of length "
-                f"{len(ya_args)}"
-            )
+            else:
+                # One list of (yv, ya) values for each vintage
+                # NB this could be made more efficient using a modified version of the
+                #    code in years_active(); however any performance penalty from
+                #    repeated calls is probably mitigated by caching.
+                iters = []
+                for yv in vintages:
+                    iters.append(
+                        [(yv, y) for y in self.years_active(ya_args[0], ya_args[1], yv)]
+                    )
+                values = chain(*iters)
 
         # Minimum value for year_act
-        ya_lower = max(self.firstmodelyear if in_horizon else -np.inf, act_lower)
-        # ya_lower = self.firstmodelyear if in_horizon else -np.inf  # Without act_lower
+        if "in_horizon" in kwargs:
+            warn(
+                "'in_horizon' argument to .vintage_and_active_years() will be removed "
+                "in message_ix>=4.0. Use .query(…) instead per documentation examples.",
+                DeprecationWarning,
+            )
+        ya_min = self.firstmodelyear if kwargs.get("in_horizon", True) else -np.inf
 
         # Predicate for filtering years
         def _valid(elem):
             yv, ya = elem
-            return vtg_lower <= yv <= ya and ya_lower <= ya
-            # return yv <= ya and ya_lower <= ya  # Without vtg_lower
+            return yv <= ya and ya_min <= ya <= ya_max
 
         # Filter values and convert to data frame
         return pd.DataFrame(filter(_valid, values), columns=["year_vtg", "year_act"])
 
     def years_active(self, node: str, tec: str, yr_vtg: Union[int, str]) -> List[int]:
-        """Return years in which `tec` of `yr_vtg` can be active in `node`.
+        """Return periods in which `tec` hnology of `yr_vtg` can be active in `node`.
 
         The :ref:`parameters <params-tech>` ``duration_period`` and
         ``technical_lifetime`` are used to determine which periods are partly or fully
