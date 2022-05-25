@@ -70,6 +70,13 @@ If you are not doing this, then skip those sections.
 Using Anaconda
 --------------
 
+.. note:: This section is also available as a narrated video on the `IIASA YouTube channel`_.
+   If you are a beginner, you may want to watch the video before attempting the installation yourself.
+
+   .. raw:: html
+
+      <iframe width="690" height="360" src="https://www.youtube.com/embed/QZw-7rIqUJ0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 4. Install Python via either `Miniconda`_ or `Anaconda`_. [1]_
    We recommend the latest version; currently Python 3.8.
 
@@ -254,6 +261,7 @@ If you installed this package accidentally, remove it using::
 .. _`Graphviz download page`: https://www.graphviz.org/download/
 .. _`Miniconda`: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
 .. _`Anaconda`: https://docs.continuum.io/anaconda/install/
+.. _`IIASA YouTube channel`: https://www.youtube.com/user/IIASALive
 .. _`conda glossary`: https://docs.conda.io/projects/conda/en/latest/glossary.html
 .. _`ixmp`: https://github.com/iiasa/ixmp
 .. _Anaconda Navigator documentation: https://docs.anaconda.com/anaconda/navigator/
