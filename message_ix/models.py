@@ -472,3 +472,29 @@ class MESSAGE_MACRO(MACRO):
 
         # Append to the prepared solve_args
         self.solve_args.extend(mm_iter_args)
+
+    @staticmethod
+    def enforce(scenario):
+        """Enforce data consistency in `scenario`."""
+        # Check masks ("mapping sets") that indicate which elements of corresponding
+        # parameters are active/non-zero. Note that there are other masks currently
+        # handled in JDBCBackend. For the moment, this code does not backstop that
+        # behaviour.
+        # TODO Extend to handle all masks, e.g. for new backends.
+        for par_name in ("capacity_factor",):
+            # Name of the corresponding set
+            set_name = f"is_{par_name}"
+
+            # Existing and expected contents
+            existing = scenario.set(set_name)
+            expected = scenario.par(par_name).drop(columns=["value", "unit"])
+
+            if existing.equals(expected):
+                continue  # Contents are as expected; do nothing
+            # else:
+            #     scenario.add_set(set_name, expected)
+
+            # Not consistent; empty and then re-populate the set
+            with scenario.transact(f"Enforce consistency of {set_name} and {par_name}"):
+                scenario.remove_set(set_name, existing)
+                scenario.add_set(set_name, expected)
