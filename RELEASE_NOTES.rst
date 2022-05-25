@@ -18,10 +18,7 @@ All changes
 
 - Extend functionality of :meth:`.vintage_and_active_years`; add aliases
   :meth:`.yv_ya`, :meth:`.ya`, and :attr:`.y0` (:pull:`572`).
-All changes
------------
-
-- Add scripts for documentation on videos and add first installation video tutorial (:pull:`396`)
+- Add scripts and HOWTO for documentation videos (:pull:`396`)
 
 .. _v3.5.0:
 
