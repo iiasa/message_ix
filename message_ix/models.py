@@ -335,9 +335,8 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
     @staticmethod
     def enforce(scenario):
         """Enforce data consistency in `scenario`."""
-        # Implemented in MESSAGE sub-class, below
+        # No-op; implemented in MESSAGE sub-class, below
         # TODO make this an optional method of the ixmp.model.base.Model abstract class
-        pass
 
     def __init__(self, name=None, **model_options):
         # Update the default options with any user-provided options
@@ -410,8 +409,6 @@ class MESSAGE(GAMSModel):
 
             if existing.equals(expected):
                 continue  # Contents are as expected; do nothing
-            # else:
-            #     scenario.add_set(set_name, expected)
 
             # Not consistent; empty and then re-populate the set
             with scenario.transact(f"Enforce consistency of {set_name} and {par_name}"):
@@ -452,7 +449,7 @@ class MACRO(GAMSModel):
         cls.initialize_items(scenario, items)
 
 
-class MESSAGE_MACRO(MACRO):
+class MESSAGE_MACRO(MESSAGE, MACRO):
     """Model class for MESSAGE_MACRO."""
 
     name = "MESSAGE-MACRO"
