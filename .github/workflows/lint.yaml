@@ -67,4 +67,4 @@ jobs:
       # Also install type stubs and full packages that provide type hints
       run: |
         pip install mypy genno sphinx types-pkg_resources types-requests types-PyYAML
-        mypy .
+        mypy --show-error-codes .
