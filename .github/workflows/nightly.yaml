@@ -4,8 +4,8 @@ name: Test MESSAGEix-GLOBIOM scenarios
 
 on:
   # Uncomment these two lines for debugging, but leave them commented on 'main'
-  # pull_request:
-  #   branches: [ main ]
+  pull_request:
+    branches: [ main ]
   schedule:
   # 05:00 UTC = 06:00 CET = 07:00 CEST
   - cron: "0 5 * * *"
