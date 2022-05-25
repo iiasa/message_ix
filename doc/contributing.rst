@@ -19,7 +19,7 @@ On separate pages:
    contrib/release
    contrib/tutorial
    contrib/cla
-
+   contrib/video
 
 File issues for bugs and enhancements
 =====================================
