@@ -1,8 +1,23 @@
-.. Next release
-.. ============
+Next release
+============
 
-.. All changes
-.. -----------
+Migration notes
+---------------
+
+- The `in_horizon` argument to :meth:`.vintage_and_active_years` is deprecated, and will be removed in :mod:`message_ix` 4.0 or later.
+  At the same time, the behaviour will change to be the equivalent of providing `in_horizon` = :obj:`False`, i.e. the method will no longer filter to the scenario time horizon by default.
+  To prepare for this change, user code that expects values confined to the time horizon can be altered to use :meth:`.pandas.DataFrame.query`:
+
+  .. code-block:: python
+  
+     df = scen.vintage_and_active_years().query(f"{scen.y0} <= year_vtg")
+
+
+All changes
+-----------
+
+- Extend functionality of :meth:`.vintage_and_active_years`; add aliases
+  :meth:`.yv_ya`, :meth:`.ya`, and :attr:`.y0` (:pull:`572`).
 
 .. _v3.5.0:
 

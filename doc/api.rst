@@ -67,7 +67,10 @@ The full API is also available from R; see :doc:`rmessageix`.
       to_excel
       var
       vintage_and_active_years
+      y0
       years_active
+      ya
+      yv_ya
 
    .. automethod:: add_macro
 

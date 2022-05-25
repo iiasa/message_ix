@@ -1,34 +1,29 @@
-# GAMS, R, Python-specific auxiliary files
-*.~gm
-*.bak
-*.egg-info
-*.~op
-*.pyc
-*.gdx
-*.lst
-*.log
-*.lxi
-*.gch
-*.gpr
-/model/2*/**
-/model/$gms*
-*.dat
-*.tmp
-*.RData*
-*.pyc
+# Python, R, etc.
 *-checkpoint.ipynb
+*.bak
+*.dat
+*.egg-info
+*.eggs
+*.lxi
+*.pyc
+*.RData*
+*.tmp
+*#
 *~
 #*
-*#
-.
-*.eggs
 
-# MESSAGEix specifics
+# GAMS
+*.~gm
+*.~op
+*.gch
+*.gdx
+*.gpr
+*.log
+*.lst
+message_ix/model/2*/**
+message_ix/model/$gms*
 message_ix/model/MESSAGE_master.gms
 message_ix/model/cplex.opt
-
-# Apple file system
-.DS_Store
 
 # Sphinx
 doc/_build
@@ -42,16 +37,20 @@ dist
 # testdb
 .cache/**
 tests/data/nightly
-.Rproj.user
 
 # pytest and related
 .benchmarks
 .coverage*
 .mypy_cache
-prof/
 .pytest_cache
 coverage.xml
 htmlcov
+prof/
 
-# JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
+# JetBrains IDEs incl. PyCharm
 /**/.idea
+# RStudio
+.Rproj.user
+
+# macOS
+.DS_Store

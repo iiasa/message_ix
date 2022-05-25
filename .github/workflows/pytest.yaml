@@ -32,11 +32,6 @@ jobs:
         # for the message_ix project.
         # - "3.10.0-alpha.1"  # Development version
 
-        exclude:
-        # JPype1 (for ixmp) binary wheels are not available for this combination
-        - os: windows-latest
-          python-version: "3.10"
-
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
