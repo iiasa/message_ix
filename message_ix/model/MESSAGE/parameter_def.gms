@@ -638,6 +638,7 @@ Parameters
 Parameters
     construction_time_factor(node,tec,year_all) scaling factor to account for construction time of new capacity
     remaining_capacity(node,tec,year_all,year_all) scaling factor to account for remaining capacity in period
+    remaining_capacity_extended(node,tec,year_all,year_all) scaling factor to account for remaining capacity in period (including historical years)
     end_of_horizon_factor(node,tec,year_all)    multiplier for value of investment at end of model horizon
     beyond_horizon_lifetime(node,tec,year_all)  remaining technical lifetime at the end of model horizon
     beyond_horizon_factor(node,tec,year_all)    discount factor of remaining lifetime beyond model horizon
