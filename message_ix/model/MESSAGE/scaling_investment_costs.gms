@@ -171,9 +171,15 @@ end_of_horizon_factor(node,inv_tec,vintage)$( map_tec(node,inv_tec,vintage) ) =
 
 # set default to 1 (assume that the full capacity is available over the entire period)
 remaining_capacity(node,tec,vintage,year_all)$( map_tec_lifetime(node,tec,vintage,year_all) ) = 1 ;
+remaining_capacity_extended(node,tec,vintage,year_all)$( map_tec_lifetime_extended(node,tec,vintage,year_all) ) = 1 ;
 
 # if technical lifetime ends in the respective period, set remaining_capacity factor as share of lifetime in that period
 remaining_capacity(node,tec,vintage,year_all)$( map_tec_lifetime(node,tec,vintage,year_all)
+        AND ( technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) < duration_period(year_all) )
+        AND ( technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) > 0 ) )
+    = ( technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) ) / duration_period(year_all) ;
+
+remaining_capacity_extended(node,tec,vintage,year_all)$( map_tec_lifetime_extended(node,tec,vintage,year_all)
         AND ( technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) < duration_period(year_all) )
         AND ( technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) > 0 ) )
     = ( technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) ) / duration_period(year_all) ;
