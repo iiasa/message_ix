@@ -605,7 +605,7 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
 * commodity input and output associated with retirement of technology capacity (via differentials of capacity of successive periods)
 * for first model period (differential with historical remaining capacity)
   + SUM( (location,tec,vintage,year2)$( inv_tec(tec) AND map_tec_lifetime_extended(location,tec,vintage,year2)                  \
-            AND first_period(year) AND seq_period(year2,year) ),                                                                 \ 
+           AND NOT map_tec_lifetime_extended(location,tec,vintage,year) AND first_period(year) AND seq_period(year2,year) ),                                                                 \ 
 * output by all new capacity of technologies located at 'location' sending to 'node' and 'time' distributed over years of periods
         output_cap_ret(location,tec,vintage,node,commodity,level,time)                                                 \
         *  (historical_new_capacity(node,tec,vintage) * remaining_capacity_extended(node,tec,vintage,year2))            \
