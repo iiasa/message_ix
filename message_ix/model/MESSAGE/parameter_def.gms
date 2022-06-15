@@ -202,24 +202,6 @@ Parameter
 *    * - output [#tecvintage]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` |
 *        ``node_dest`` | ``commodity`` | ``level`` | ``time`` | ``time_dest``
-*    * - input_cap [#tecvintage]_
-*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` |
-*        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
-*    * - output_cap [#tecvintage]_
-*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` |
-*        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
-*    * - input_cap_new [#tecvintage]_
-*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
-*        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
-*    * - output_cap_new [#tecvintage]_
-*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
-*        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
-*    * - input_cap_ret [#tecvintage]_
-*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
-*        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
-*    * - output_cap_ret [#tecvintage]_
-*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
-*        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
 *    * - inv_cost [#tecvintage]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg``
 *    * - fix_cost [#tecvintage]_
@@ -250,6 +232,41 @@ Parameter
 *      - ``node`` | ``commodity`` | ``grade`` | ``level`` | ``year``
 *    * - emission_factor
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``emission``
+*
+* Input/output mapping related to technology capacities
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*
+* .. list-table::
+*    :widths: 25 60 55
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index dimensions
+*      - Explanatory comments
+*    * - input_cap [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` |
+*        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
+*      - relative share of input per unit of capacity
+*    * - output_cap [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` |
+*        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
+*      - relative share of output per unit of capacity
+*    * - input_cap_new [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
+*        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
+*      - relative share of input per unit of new capacity built
+*    * - output_cap_new [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
+*        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
+*      - relative share of output per unit of new capacity built
+*    * - input_cap_ret [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
+*        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
+*      - relative share of input per unit of capacity retired
+*    * - output_cap_ret [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
+*        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
+*      - relative share of output per unit of capacity retired
 *
 * .. [#tecvintage] Fixed and variable cost parameters and technical specifications are indexed over both
 *    the year of construction (vintage) and the year of operation (actual).
