@@ -4,6 +4,13 @@ Next release
 All changes
 -----------
 
+- Extend the auxiliary variable :ref:`_commodity_balance` to include input and output flows based on CAP and CAP_NEW variables (:pull:`451`).
+
+  When loading a Scenario created with `message_ix` version 3.11.0 or earlier,
+  these items will be initialized (and left empty),
+  using at most one call to :meth:`~message_ix.Scenario.commit`.
+  See :meth:`.MESSAGE.initialize`.
+
 - Document the :ref:`minimum version of Java <install-java>` required for :class:`ixmp.JDBCBackend <ixmp.backend.jdbc.JDBCBackend>` (:pull:`962`).
 - Improve type hinting (:pull:`963`).
 
