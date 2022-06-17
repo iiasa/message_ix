@@ -609,23 +609,25 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
            AND (remaining_capacity_extended(location,tec,vintage,year) = 0)                                                               \
 ),                                                                                                                                      \
 * output by all new capacity of technologies located at 'location' sending to 'node' and 'time' distributed over years of periods
+* Based on the condition that remaining capacity in the first year is 0. 
         output_cap_ret(location,tec,vintage,node,commodity,level,time)                                                 \
         *  (historical_new_capacity(node,tec,vintage) * remaining_capacity_extended(node,tec,vintage,year_all2))            \
 * input by all new capacity of technologies located at 'location' taking from 'node' and 'time' distributed over years of periods
         - input_cap_ret(location,tec,vintage,node,commodity,level,time)                                                \
         *  (historical_new_capacity(node,tec,vintage) * remaining_capacity_extended(node,tec,vintage,year_all2))) \      
 * commodity input and output associated with retirement of technology capacity (via differentials of capacity of successive periods)
-* for first model period (differential with historical remaining capacity), for lifetimes out of duraion_period
+* for first model period (differential with historical remaining capacity)
+* for lifetimes out of duraion_period, remaining capacity is different than 1 or 0 in the first model period. 
   + SUM( (location,tec,vintage,year_all2)$( inv_tec(tec) AND map_tec_lifetime_extended(location,tec,vintage,year_all2)                      \
            AND first_period(year) AND seq_period(year_all2,year)                                                                             \
            AND (remaining_capacity_extended(location,tec,vintage,year)< 1) AND (remaining_capacity_extended(location,tec,vintage,year)>0)     \
 ),                                                                                                                                             \                                                                                                                           
 * output by all new capacity of technologies located at 'location' sending to 'node' and 'time' distributed over years of periods
         output_cap_ret(location,tec,vintage,node,commodity,level,time)                                                 \
-        *  (historical_new_capacity(node,tec,vintage) * remaining_capacity_extended(node,tec,vintage,year))            \
+        *  (historical_new_capacity(node,tec,vintage) * (1 - remaining_capacity_extended(node,tec,vintage,year)))            \
 * input by all new capacity of technologies located at 'location' taking from 'node' and 'time' distributed over years of periods
         - input_cap_ret(location,tec,vintage,node,commodity,level,time)                                                \
-        *  (historical_new_capacity(node,tec,vintage) * remaining_capacity_extended(node,tec,vintage,year))) \
+        *  (historical_new_capacity(node,tec,vintage) * (1-remaining_capacity_extended(node,tec,vintage,year))) ) \
 * for other model periods (differential with installed capacity of preceding period)
   + SUM( (location,tec,vintage,year2)$( inv_tec(tec) AND map_tec_lifetime(location,tec,vintage,year2)                  \
             AND NOT first_period(year) AND seq_period(year2,year) ),                                                   \
