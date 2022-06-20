@@ -630,7 +630,8 @@ Parameters
 *
 * Auxiliary investment cost parameters include the remaining technical lifetime at the end of model horizon (``beyond_horizon_lifetime``) in addition to the
 * different scaling factors and multipliers as listed below. These factors account for remaining capacity (``remaining_capacity``) or construction time of new capacity (``construction_time_factor``),
-* the value of investment at the end of model horizon (``end_of_horizon_factor``) or the discount factor of remaining lifetime beyond model horizon (``beyond_horizon_factor``).
+* the value of investment at the end of model horizon (``end_of_horizon_factor``) or the discount factor of remaining lifetime beyond model horizon (``beyond_horizon_factor``). ``remaining_capacity_extended``
+* is defined the same as ``remaining_capacity`` but extended to historical periods as well.
 *
 * .. list-table::
 *    :widths: 35 50
@@ -641,6 +642,8 @@ Parameters
 *    * - construction_time_factor
 *      - ``node`` | ``tec`` | ``year``
 *    * -  remaining_capacity
+*      - ``node`` | ``tec`` | ``year``
+*    * -  remaining_capacity_extended
 *      - ``node`` | ``tec`` | ``year``
 *    * - end_of_horizon_factor
 *      - ``node`` | ``tec`` | ``year``

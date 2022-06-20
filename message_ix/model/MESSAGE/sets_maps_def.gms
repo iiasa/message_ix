@@ -361,6 +361,8 @@ Sets
 *      - Mapping of technology to node and years
 *    * - map_tec_extended(node,tec,year_all)
 *      - Mapping of technology to node and years including all historical years
+*    * - map_tec_lifetime_extended(node,tec,year_all)
+*      - Mapping of technologies to periods within technical lifetime including all historical years
 *    * - map_tec_time(node,tec,year_all,time)
 *      - Mapping of technology to temporal dissagregation (time)
 *    * - map_tec_mode(node,tec,year_all,mode)
