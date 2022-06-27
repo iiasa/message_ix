@@ -20,10 +20,10 @@ def _generate_yv_ya(periods: Tuple[int, ...]) -> pd.DataFrame:
     # _s = slice(periods_or_start, end + 1, dp)
     # data = np.mgrid[_s, _s]
 
-    # Create a mesh grid using numpy built-ins
-    data = np.meshgrid(periods, periods, indexing="ij")
-    # Take the upper-triangular portion (setting the rest to 0), reshape
-    data = np.triu(data).reshape((2, -1))
+    # - Create a mesh grid using numpy built-ins
+    # - Take the upper-triangular portion (setting the rest to 0)
+    # - Reshape
+    data = np.triu(np.meshgrid(periods, periods, indexing="ij")).reshape((2, -1))
     # Filter only non-zero pairs
     return pd.DataFrame(
         filter(sum, zip(data[0, :], data[1, :])),
