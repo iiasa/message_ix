@@ -16,6 +16,7 @@ Migration notes
 All changes
 -----------
 
+- Correct functionality-syntax of :meth:`.vintage_and_active_years` (:pull:`623`).
 - Extend functionality of :meth:`.vintage_and_active_years`; add aliases
   :meth:`.yv_ya`, :meth:`.ya`, and :attr:`.y0` (:pull:`572`).
 - Add scripts and HOWTO for documentation videos (:pull:`396`)

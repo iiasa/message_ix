@@ -593,7 +593,9 @@ class Scenario(ixmp.Scenario):
         filters = dict(node_loc=[node], technology=[tec], year_vtg=[yv])
 
         # Lifetime of the technology at the node and year_vtg
-        lt = self.par("technical_lifetime", filters=filters).at[0, "value"]
+        lt = (
+            self.par("technical_lifetime", filters=filters).reset_index().at[0, "value"]
+        )
 
         # Duration of periods
         data = self.par("duration_period").sort_values(by="year")
