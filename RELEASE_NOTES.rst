@@ -9,17 +9,16 @@ Migration notes
   To prepare for this change, user code that expects values confined to the time horizon can be altered to use :meth:`.pandas.DataFrame.query`:
 
   .. code-block:: python
-  
+
      df = scen.vintage_and_active_years().query(f"{scen.y0} <= year_vtg")
 
 
 All changes
 -----------
 
-- Correct functionality-syntax of :meth:`.vintage_and_active_years` (:pull:`623`).
-- Extend functionality of :meth:`.vintage_and_active_years`; add aliases
-  :meth:`.yv_ya`, :meth:`.ya`, and :attr:`.y0` (:pull:`572`).
-- Add scripts and HOWTO for documentation videos (:pull:`396`)
+- New reporting computation :func:`.as_message_df` (:pull:`628`).
+- Extend functionality of :meth:`.vintage_and_active_years`; add aliases :meth:`.yv_ya`, :meth:`.ya`, and :attr:`.y0` (:pull:`572`, :pull:`623`).
+- Add scripts and HOWTO for documentation videos (:pull:`396`).
 
 .. _v3.5.0:
 
