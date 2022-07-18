@@ -185,13 +185,13 @@ Other added keys include:
 - Computations to convert internal :func:`Quantity` data format to the IAMC data format, i.e. as :class:`pyam.IamDataFrame` objects.
   These include:
 
-  - ``<name>:pyam`` for most of the above derived quantities.
-  - ``CAP:pyam`` (from ``CAP``)
-  - ``CAP_NEW:pyam`` (from ``CAP_NEW``)
+  - ``<name>::pyam`` for most of the above derived quantities.
+  - ``CAP::pyam`` (from ``CAP``)
+  - ``CAP_NEW::pyam`` (from ``CAP_NEW``)
 
 - ``map_<name>`` as "one-hot" or indicator quantities for the respective |MESSAGEix| mapping sets ``cat_<name>``.
-- Standard reports ``message:system``, ``message:costs``, and ``message:emissions`` per :data:`REPORTS`.
-- The report ``message:default``, collecting all of the above reports.
+- Standard reports ``message::system``, ``message::costs``, and ``message::emissions`` per :data:`REPORTS`.
+- The report ``message::default``, collecting all of the above reports.
 
 These automatic contents are prepared using:
 

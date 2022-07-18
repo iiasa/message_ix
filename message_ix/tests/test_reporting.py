@@ -184,7 +184,7 @@ def test_reporter_convert_pyam(caplog, tmp_path, dantzig_reporter):
     key2 = rep.convert_pyam(ACT, "iamc", rename=rename, collapse=add_tm)
 
     # Keys of added node(s) are returned
-    assert ACT.name + ":iamc" == key2
+    assert ACT.name + "::iamc" == key2
 
     caplog.clear()
 

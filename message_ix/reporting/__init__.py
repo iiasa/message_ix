@@ -143,9 +143,9 @@ PYAM_CONVERT = [
 #: Automatic reports that :meth:`~computations.concat` quantities converted to IAMC
 #: format.
 REPORTS = {
-    "message:system": ["out:pyam", "in:pyam", "CAP:pyam", "CAP_NEW:pyam"],
-    "message:costs": ["inv:pyam", "fom:pyam", "vom:pyam", "tom:pyam"],
-    "message:emissions": ["emi:pyam"],
+    "message::system": ["out::pyam", "in::pyam", "CAP::pyam", "CAP_NEW::pyam"],
+    "message::costs": ["inv::pyam", "fom::pyam", "vom::pyam", "tom::pyam"],
+    "message::emissions": ["emi::pyam"],
 }
 
 
