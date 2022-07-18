@@ -264,6 +264,7 @@ Computations
    .. autosummary::
       ~ixmp.reporting.computations.data_for_quantity
       ~ixmp.reporting.computations.map_as_qty
+      ~ixmp.reporting.computations.store_ts
       ~ixmp.reporting.computations.update_scenario
 
    …and by :mod:`genno.computation` and its compatibility modules. See the package documentation for details.
@@ -278,10 +279,16 @@ Computations
       ~genno.computations.combine
       ~genno.computations.concat
       ~genno.computations.disaggregate_shares
+      ~genno.computations.div
       ~genno.computations.group_sum
+      ~genno.computations.index_to
+      ~genno.computations.interpolate
       ~genno.computations.load_file
-      ~genno.computations.product
+      ~genno.computations.mul
+      ~genno.computations.pow
       ~genno.computations.ratio
+      ~genno.computations.relabel
+      ~genno.computations.rename_dims
       ~genno.computations.select
       ~genno.computations.sum
       ~genno.computations.write_report
