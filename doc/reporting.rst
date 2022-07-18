@@ -251,10 +251,11 @@ Computations
 .. automodule:: message_ix.reporting.computations
    :members:
 
-   :mod:`message_ix.reporting` only provides two computations, which are currently only used in the tutorials to produce simple plots.
-   For custom plotting, :mod:`genno.compat.plotnine` is recommended.
+   :mod:`message_ix.reporting` provides a small number of computations.
+   Two of these (:func:`.plot_cumulative` and :func:`.stacked_bar`) are currently only used in the tutorials to produce simple plots; for more flexible plotting, :mod:`genno.compat.plotnine` is recommended instead.
 
    .. autosummary::
+      as_message_df
       plot_cumulative
       stacked_bar
 
