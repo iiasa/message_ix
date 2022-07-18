@@ -89,6 +89,7 @@ profile = "black"
 # Packages/modules for which no type hints are available.
 module = [
   "asyncssh",
+  "dask.core",
   "matplotlib.*",
   "pandas.*",
   "pyam",

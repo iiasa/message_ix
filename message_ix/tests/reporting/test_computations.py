@@ -1,11 +1,66 @@
+from functools import partial
+
 import matplotlib
 import pandas as pd
 import pyam
+from dask.core import literal
+from genno.testing import random_qty
 from ixmp.reporting import Quantity
 
 from message_ix import Scenario
 from message_ix.reporting import Reporter, computations
 from message_ix.testing import SCENARIO
+
+
+def test_as_message_df(test_mp):
+    q = random_qty(dict(c=3, h=2, nl=5))
+    q.units = "kg"
+
+    args = (
+        literal("demand"),
+        dict(commodity="c", node="nl", time="h"),
+        dict(level="l", year=2022),
+    )
+
+    # Can be called directly
+    result0 = computations.as_message_df(q, *args, wrap=False)
+    assert not result0.isna().any().any()
+
+    # Through a Reporter, with default wrap=True
+    r = Reporter()
+    key = r.add("q:nl-c", q)
+    r.add("as_message_df", "q::ixmp", key, *args)
+    result1 = r.get("q::ixmp")
+    assert not result1["demand"].isna().any().any()
+
+    # Works together with ixmp.reporting.computations.update_scenario
+
+    # Prepare a Scenario
+    s = Scenario(test_mp, "m", "s", version="new")
+
+    # Minimal structure to accept the data in `q`
+    for col, values in result0.items():
+        if col in ("value", "unit"):
+            continue
+        s.add_set(col, values.unique().tolist())
+    s.add_set("technology", "t")
+    s.commit("")
+
+    # Add the Scenario to the Reporter
+    r.add("scenario", s)
+
+    # Convert with wrap=False
+    r.add("q::ixmp", partial(computations.as_message_df, wrap=False), key, *args)
+    # Add a task to update the scenario
+    us = r.get_comp("update_scenario")
+    key = r.add("add q", partial(us, params=["demand"]), "scenario", "q::ixmp")
+
+    # No data in "demand" parameter
+    assert 0 == len(s.par("demand"))
+    # Computation succeeds
+    r.get(key)
+    # All data was added
+    assert q.size == len(s.par("demand"))
 
 
 def test_as_pyam(message_test_mp):

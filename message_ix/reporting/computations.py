@@ -45,6 +45,7 @@ def as_message_df(
     pandas.DataFrame
         if `wrap` is :data:`False`.
     """
+    name = getattr(name, "data", name)  # Unwrap dask.core.literal
     base = qty.to_series().reset_index(name="value")
     df = make_df(
         name,
