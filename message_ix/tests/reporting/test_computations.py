@@ -25,6 +25,13 @@ def test_as_message_df(test_mp):
     # Can be called directly
     result0 = computations.as_message_df(q, *args, wrap=False)
     assert not result0.isna().any().any()
+    # Values appear with the correct indices
+    assert (
+        q.sel(c="c2", h="h1", nl="nl4").item()
+        == result0.query("commodity == 'c2' and time == 'h1' and node == 'nl4'")[
+            "value"
+        ].iloc[0]
+    )
 
     # Through a Reporter, with default wrap=True
     r = Reporter()
