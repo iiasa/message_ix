@@ -13,7 +13,6 @@ from ixmp.reporting import (
 from ixmp.reporting import Reporter as IXMPReporter
 from ixmp.reporting import configure
 
-from . import computations
 from .pyam import collapse_message_cols
 
 __all__ = [
@@ -144,9 +143,9 @@ PYAM_CONVERT = [
 #: Automatic reports that :meth:`~computations.concat` quantities converted to IAMC
 #: format.
 REPORTS = {
-    "message:system": ["out:pyam", "in:pyam", "CAP:pyam", "CAP_NEW:pyam"],
-    "message:costs": ["inv:pyam", "fom:pyam", "vom:pyam", "tom:pyam"],
-    "message:emissions": ["emi:pyam"],
+    "message::system": ["out::pyam", "in::pyam", "CAP::pyam", "CAP_NEW::pyam"],
+    "message::costs": ["inv::pyam", "fom::pyam", "vom::pyam", "tom::pyam"],
+    "message::emissions": ["emi::pyam"],
 }
 
 
@@ -212,8 +211,12 @@ def get_tasks() -> Sequence[Tuple[Tuple, Mapping]]:
 class Reporter(IXMPReporter):
     """MESSAGEix Reporter."""
 
-    # Module containing predefined computations, including those defined by message_ix
-    modules = list(IXMPReporter.modules) + [computations]
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Append message_ix.reporting.computations to the modules in which the Computer
+        # will look up computations names.
+        self.require_compat("message_ix.reporting.computations")
 
     @classmethod
     def from_scenario(cls, scenario, **kwargs) -> "Reporter":

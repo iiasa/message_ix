@@ -185,13 +185,13 @@ Other added keys include:
 - Computations to convert internal :func:`Quantity` data format to the IAMC data format, i.e. as :class:`pyam.IamDataFrame` objects.
   These include:
 
-  - ``<name>:pyam`` for most of the above derived quantities.
-  - ``CAP:pyam`` (from ``CAP``)
-  - ``CAP_NEW:pyam`` (from ``CAP_NEW``)
+  - ``<name>::pyam`` for most of the above derived quantities.
+  - ``CAP::pyam`` (from ``CAP``)
+  - ``CAP_NEW::pyam`` (from ``CAP_NEW``)
 
 - ``map_<name>`` as "one-hot" or indicator quantities for the respective |MESSAGEix| mapping sets ``cat_<name>``.
-- Standard reports ``message:system``, ``message:costs``, and ``message:emissions`` per :data:`REPORTS`.
-- The report ``message:default``, collecting all of the above reports.
+- Standard reports ``message::system``, ``message::costs``, and ``message::emissions`` per :data:`REPORTS`.
+- The report ``message::default``, collecting all of the above reports.
 
 These automatic contents are prepared using:
 
@@ -251,10 +251,11 @@ Computations
 .. automodule:: message_ix.reporting.computations
    :members:
 
-   :mod:`message_ix.reporting` only provides two computations, which are currently only used in the tutorials to produce simple plots.
-   For custom plotting, :mod:`genno.compat.plotnine` is recommended.
+   :mod:`message_ix.reporting` provides a small number of computations.
+   Two of these (:func:`.plot_cumulative` and :func:`.stacked_bar`) are currently only used in the tutorials to produce simple plots; for more flexible plotting, :mod:`genno.compat.plotnine` is recommended instead.
 
    .. autosummary::
+      as_message_df
       plot_cumulative
       stacked_bar
 
@@ -263,6 +264,7 @@ Computations
    .. autosummary::
       ~ixmp.reporting.computations.data_for_quantity
       ~ixmp.reporting.computations.map_as_qty
+      ~ixmp.reporting.computations.store_ts
       ~ixmp.reporting.computations.update_scenario
 
    …and by :mod:`genno.computation` and its compatibility modules. See the package documentation for details.
@@ -277,10 +279,16 @@ Computations
       ~genno.computations.combine
       ~genno.computations.concat
       ~genno.computations.disaggregate_shares
+      ~genno.computations.div
       ~genno.computations.group_sum
+      ~genno.computations.index_to
+      ~genno.computations.interpolate
       ~genno.computations.load_file
-      ~genno.computations.product
+      ~genno.computations.mul
+      ~genno.computations.pow
       ~genno.computations.ratio
+      ~genno.computations.relabel
+      ~genno.computations.rename_dims
       ~genno.computations.select
       ~genno.computations.sum
       ~genno.computations.write_report

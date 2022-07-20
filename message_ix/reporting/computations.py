@@ -1,7 +1,60 @@
+from typing import Mapping, Union
+
+import pandas as pd
+from ixmp.reporting import Quantity
+
+from message_ix.util import make_df
+
 __all__ = [
+    "as_message_df",
     "plot_cumulative",
     "stacked_bar",
 ]
+
+
+def as_message_df(
+    qty: Quantity, name: str, dims: Mapping, common: Mapping, wrap: bool = True
+) -> Union[pd.DataFrame, dict]:
+    """Convert `qty` to an :mod:`ixmp.add_par`-ready data frame using :func:`make_df`.
+
+    The resulting data frame has:
+
+    - A "value" column populated with the values of `qty`.
+    - A "unit" column with the string representation of the units of `qty`.
+    - Other dimensions/key columns filled with labels of `qty` according to `dims`.
+    - Other dimensions/key columns filled with uniform values from `common`.
+
+    Parameters
+    ----------
+    qty : :class:`.genno.Quantity`
+    name : str
+        Name of the :ref:`MESSAGEix parameter <parameter_def>` to prepare.
+    dims : mapping (str → str)
+        Each key corresponds to a dimension of the target parameter `name`, e.g.
+        "node_loc"; the label corresponds to a dimension of `qty`, e.g. "nl".
+    common : mapping (str → Any)
+        Each key corresponds to a dimension of the target parameter; values are used
+        literally, as if passed to :func:`.make_df`.
+    wrap : bool, optional
+        See below.
+
+    Returns
+    -------
+    length-1 :class:`dict` of `name` → pandas.DataFrame
+        if `wrap` is :data:`True`, the default; or
+    pandas.DataFrame
+        if `wrap` is :data:`False`.
+    """
+    name = getattr(name, "data", name)  # Unwrap dask.core.literal
+    base = qty.to_series().reset_index(name="value")
+    df = make_df(
+        name,
+        unit=f"{qty.units:~}",
+        value=base["value"],
+        **{k1: base[k2] for k1, k2 in dims.items()},
+        **common,
+    )
+    return {name: df} if wrap else df
 
 
 def plot_cumulative(x, y, labels):
