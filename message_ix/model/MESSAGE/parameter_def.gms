@@ -439,8 +439,8 @@ Parameters
 ***
 
 Parameters
-    storage_initial(node,tec,level,commodity,year_all,time)                       initial content of storage
-    storage_self_discharge(node,tec,level,commodity,year_all,time)                self-discharge (loss) of storage as % of storage level in each timestep
+    storage_initial(node,tec,mode,level,commodity,year_all,time)                       initial content of storage
+    storage_self_discharge(node,tec,mode,level,commodity,year_all,time)                self-discharge (loss) of storage as % of storage level in each timestep
     time_order(lvl_temporal,time)                                                 sequence of subannual timesteps
 ;
 
