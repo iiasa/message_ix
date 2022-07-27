@@ -27,6 +27,7 @@ _ABBREV = {
     "g": ("grade", "grade"),
     "l": ("level", "level"),
     "m": ("mode", "mode"),
+    "ms": ("mode", "storage_mode"),
     "n": ("node", "node"),
     "nd": ("node", "node_dest"),
     "nl": ("node", "node_loc"),
@@ -36,6 +37,7 @@ _ABBREV = {
     "r": ("rating", "rating"),
     "s": ("shares", "shares"),
     "t": ("technology", "technology"),
+    "ts": ("technology", "storage_tec"),
     "h": ("time", "time"),
     "hd": ("time", "time_dest"),
     "ho": ("time", "time_origin"),
@@ -134,13 +136,7 @@ MESSAGE_ITEMS = {
     ),
     "map_tec_addon": dict(ix_type="set", idx_sets=["technology", "type_addon"]),
     # Mapping of storage reservoir to charger/discharger
-    "map_tec_storage": dict(
-        ix_type="set",
-        idx_sets=["node", "technology", "mode", "technology",
-                  "mode", "level", "commodity", "lvl_temporal"],
-        idx_names=["node", "technology", "mode", "storage_tec",
-                   "storage_mode", "level", "commodity", "lvl_temporal"]
-        ),
+    "map_tec_storage": item("set", "n t m ts ms l c lvl_temporal"),
     "map_temporal_hierarchy": dict(
         ix_type="set",
         idx_sets=["lvl_temporal", "time", "time"],
@@ -254,9 +250,8 @@ MESSAGE_ITEMS = {
     "storage_initial": item("par", "n t m l c y h"),
     # Storage losses as a percentage of installed capacity
     "storage_self_discharge": item("par", "n t m l c y h"),
-	'STORAGE': item("var", "n t m l c y h"),
-	'STORAGE_CHARGE': item("var", "n t m l c y h"),
-    
+    "STORAGE": item("var", "n t m l c y h"),
+    "STORAGE_CHARGE": item("var", "n t m l c y h"),
     "subsidy": item("par", "nl type_tec ya"),
     "tax_emission": dict(
         ix_type="par", idx_sets=["node", "type_emission", "type_tec", "type_year"]
@@ -424,6 +419,50 @@ class MESSAGE(GAMSModel):
             with scenario.transact(f"Enforce consistency of {set_name} and {par_name}"):
                 scenario.remove_set(set_name, existing)
                 scenario.add_set(set_name, expected)
+
+        # Enforcing new indexes for existing set and parameters
+        # TODO: this should ideally done by introducing a new method called
+        #        `reinitiate_items()` that would reinitialize some items with new index sets
+        sets = ["map_tec_storage"]
+        pars = ["storage_self_discharge", "storage_initial"]
+        scenario.check_out()
+        for set_name in sets:
+            try:
+                scenario.init_set(
+                    set_name, idx_sets=MESSAGE_ITEMS(set_name)["idx_sets"]
+                )
+            except:
+                df = scenario.set(set_name)
+                if df.empty:
+                    scenario.remove_set(set_name)
+                    scenario.init_set(
+                        set_name,
+                        idx_sets=MESSAGE_ITEMS[set_name]["idx_sets"],
+                        idx_names=MESSAGE_ITEMS[set_name]["idx_names"],
+                    )
+                else:
+                    raise RuntimeError(
+                        f"{item} requires an updated index sets: {MESSAGE_ITEMS[item]['idx_sets']}"
+                    )
+        for par_name in pars:
+            try:
+                scenario.init_par(
+                    par_name, idx_sets=MESSAGE_ITEMS[par_name]["idx_sets"]
+                )
+            except:
+                df = scenario.par(par_name)
+                if df.empty:
+                    scenario.remove_par(par_name)
+                    scenario.init_par(
+                        par_name,
+                        idx_sets=MESSAGE_ITEMS[par_name]["idx_sets"],
+                    )
+                else:
+                    raise RuntimeError(
+                        f"{item} requires an updated index sets: {MESSAGE_ITEMS[item]['idx_sets']}!"
+                    )
+
+        scenario.commit("indexes updated")
 
 
 class MACRO(GAMSModel):
