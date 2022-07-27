@@ -51,8 +51,8 @@
 * :math:`REL_{r,n,y} \in \mathbb{R}`                       Auxiliary variable for left-hand side of relations (linear constraints)
 * :math:`COMMODITY\_USE_{n,c,l,y} \in \mathbb{R}`          Auxiliary variable for amount of commodity used at specific level
 * :math:`COMMODITY\_BALANCE_{n,c,l,y,h} \in \mathbb{R}`    Auxiliary variable for right-hand side of :ref:`commodity_balance`
-* :math:`STORAGE_{n,t,l,c,y,h} \in \mathbb{R}`             State of charge or content of storage at each sub-annual timestep
-* :math:`STORAGE\_CHARGE_{n,t,l,c,y,h} \in \mathbb{R}`     Charging of storage in each sub-annual timestep (negative for discharging)
+* :math:`STORAGE_{n,t,l,c,y,h} \in \mathbb{R}`             State of charge or content of storage at each sub-annual time slice
+* :math:`STORAGE\_CHARGE_{n,t,l,c,y,h} \in \mathbb{R}`     Charging of storage in each sub-annual time slice (negative for discharging)
 * ======================================================== ====================================================================================
 *
 * The index :math:`y^V` is the year of construction (vintage) wherever it is necessary to
@@ -106,7 +106,7 @@ Positive Variables
 * land-use model emulator
     LAND(node,land_scenario,year_all) relative share of land-use scenario
 * content of storage
-    STORAGE(node,tec,mode,level,commodity,year_all,time)       state of charge (SoC) of storage at each sub-annual timestep (positive)
+    STORAGE(node,tec,mode,level,commodity,year_all,time)       state of charge (SoC) of storage at each sub-annual time slice (positive)
 ;
 
 Variables
@@ -123,7 +123,7 @@ Variables
 * auxiliary variable for left-hand side of relations (linear constraints)
     REL(relation,node,year_all)                  auxiliary variable for left-hand side of user-defined relations
 * change in the content of storage device
-    STORAGE_CHARGE(node,tec,mode,level,commodity,year_all,time)    charging of storage in each timestep (negative for discharge)
+    STORAGE_CHARGE(node,tec,mode,level,commodity,year_all,time)    charging of storage in each time slice (negative for discharge)
 ;
 
 ***
@@ -1591,12 +1591,12 @@ NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 *   .. math::
 *      CAP\_NEW\_UP_{n,t,y} \leq \sum_{y-1} CAP\_NEW_{n^L,t,y-1} & \text{if } y \neq 'first\_period' \\
 *                                + \sum_{y-1} historical\_new\_capacity_{n^L,t,y-1} & \text{if } y = 'first\_period' \\
-*                           \quad \forall \ t \ \in \ T^{INV}   
+*                           \quad \forall \ t \ \in \ T^{INV}
 *
 ***
 NEW_CAPACITY_SOFT_CONSTRAINT_UP(node,inv_tec,year)$( soft_new_capacity_up(node,inv_tec,year) )..
     CAP_NEW_UP(node,inv_tec,year) =L=
-        SUM(year2$( seq_period(year2,year) ), 
+        SUM(year2$( seq_period(year2,year) ),
             CAP_NEW(node,inv_tec,year2)) $ (NOT first_period(year))
       + SUM(year_all2$( seq_period(year_all2,year) ),
             historical_new_capacity(node,inv_tec,year_all2)) $ first_period(year)
@@ -1665,14 +1665,14 @@ NEW_CAPACITY_CONSTRAINT_LO(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 *   .. math::
 *      CAP\_NEW\_LO_{n,t,y} \leq \sum_{y-1} CAP\_NEW_{n^L,t,y-1} & \text{if } y \neq 'first\_period' \\
 *                                + \sum_{y-1} historical\_new\_capacity_{n^L,t,y-1} & \text{if } y = 'first\_period' \\
-*                           \quad \forall \ t \ \in \ T^{INV}  
+*                           \quad \forall \ t \ \in \ T^{INV}
 *
 ***
 NEW_CAPACITY_SOFT_CONSTRAINT_LO(node,inv_tec,year)$( soft_new_capacity_lo(node,inv_tec,year) )..
     CAP_NEW_LO(node,inv_tec,year) =L=
         SUM(year2$( seq_period(year2,year) ),
             CAP_NEW(node,inv_tec,year2) ) $ (NOT first_period(year))
-      + SUM(year_all2$( seq_period(year_all2,year) ), 
+      + SUM(year_all2$( seq_period(year_all2,year) ),
             historical_new_capacity(node,inv_tec,year_all2) ) $ first_period(year)
 ;
 
@@ -1733,7 +1733,7 @@ ACTIVITY_CONSTRAINT_UP(node,tec,year,time)$( map_tec_time(node,tec,year,time)
 *   .. math::
 *      ACT\_UP_{n,t,y,h} \leq \sum_{y^V \leq y,m,y-1} ACT_{n^L,t,y^V,y-1,m,h} & \text{if } y \neq 'first\_period' \\
 *                             + \sum_{m,y-1} historical\_activity_{n^L,t,y-1,m,h} & \text{if } y = 'first\_period'
-*      
+*
 *
 ***
 ACTIVITY_SOFT_CONSTRAINT_UP(node,tec,year,time)$( soft_activity_up(node,tec,year,time) )..
@@ -2151,27 +2151,33 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 * Storage section
 * ---------------
 *
-* Storage technologies can be used to store a commodity (e.g., water, heat, electricity, etc.)
-* and shift it over sub-annual time slices. The storage solution presented here has three
-* distinctive parts: (i) Charger: a technology for charging a commodity to the storage container,
+* MESSAGEix offers a set of equations to represent a wide range of storage solutions flexibly.
+* Storage solutions are modeled as "technologies" that can be used to store a "commodity" (e.g., water, heat, electricity, etc.)
+* and shift it over sub-annual time slices within one model period. The storage solution presented here has three
+* distinct parts: (i) Charger: a technology for charging a commodity to the storage container,
 * for example, a pump in a pumped hydropower storage (PHS) plant. (ii) Discharger: a technology
 * to convert the stored commodity to the output commodity, e.g., a turbine in PHS.
 * (iii) Storage container: a device for storing a commodity over time, such as a water reservoir in PHS.
+* If desired, the user can combine charger and discharger parts into one technology, using two different "modes" of operation
+* for that technology like turbo-machinery in PHS. This way the capacity related information, like investment cost, lifetime, capacity factor, etc.,
+* will be defined only for one technology (i.e., charger-discharger), as opposed to modeling these two parts separately.
 *
 * .. figure:: ../../_static/storage.png
 *
 * Storage equations
 * ^^^^^^^^^^^^^^^^^
 * The content of storage device depends on three factors: charge or discharge in
-* one time step (represented by `Equation STORAGE_CHANGE`_), the state of charge in the previous
-* time step, and storage losses between two consecutive time steps.
+* one time slice (represented by `Equation STORAGE_CHANGE`_), linked to the state of charge in the previous
+* time slice and storage losses between these two consecutive time slices (represented by `Equation STORAGE_BALANCE`_).
+* Moreover, the storage device can be optionally filled with an initial value as percentage of its capacity (see more details under `Equation STORAGE_BALANCE_INIT`_).
+* Another option is to link a commodity for maintaining the operation of storage device over time (see `Equation STORAGE_INPUT`_).
 *
 * .. _equation_storage_change:
 *
 * Equation STORAGE_CHANGE
 * """""""""""""""""""""""
 * This equation shows the change in the content of the storage container in each
-* sub-annual timeslice. This change is based on the activity of charger and discharger
+* sub-annual time slice. This change is based on the activity of charger and discharger
 * technologies connected to that storage container. The notation :math:`S^{storage}`
 * represents the mapping set `map_tec_storage` denoting charger-discharger
 * technologies connected to a specific storage container in a specific node and
@@ -2190,7 +2196,7 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 ***
 STORAGE_CHANGE(node,storage_tec,mode,level_storage,commodity,year,time)$sum(
                (tec,mode2,lvl_temporal), map_tec_storage(node,tec,mode2,storage_tec,mode,level_storage,commodity,lvl_temporal) ) ..
-* change in the content of storage in the examined timeslice
+* change in the content of storage in the examined time slice
     STORAGE_CHARGE(node,storage_tec,mode,level_storage,commodity,year,time) =E=
 * increase in the content of storage due to the activity of charging technologies
         SUM( (location,vintage,tec,mode2,time2,time3,lvl_temporal)$(
@@ -2212,26 +2218,26 @@ STORAGE_CHANGE(node,storage_tec,mode,level_storage,commodity,year,time)$sum(
 * """"""""""""""""""""""""
 *
 * This equation ensures the commodity balance of storage technologies, where the commodity is shifted between sub-annual
-* timeslices within a model period. If the state of charge of storage is set exogenously in one timeslice through
-* :math:`\storageinitial_{ntlcyh}`, the content from the previous timeslice is not carried over to this timeslice.
+* time slices within a model period. If the state of charge of storage is set exogenously in one time slice through
+* :math:`\storageinitial_{ntlcyh}`, the content from the previous time slice is not carried over to this time slice.
 *
 * .. math::
-*    \STORAGE_{ntlcyh} =\ & \STORAGECHARGE_{ntlcyh} + \\
-*    & \STORAGE_{ntlcy(h-1)} \cdot (1 - \storageselfdischarge_{ntly(h-1)}) \\
+*    \STORAGE_{ntlcyh} =\ & \STORAGECHARGE_{ntlcyh} \\
+*    & + \STORAGE_{ntlcy(h-1)} \cdot (1 - \storageselfdischarge_{ntly(h-1)}) \\
 *    \forall\ & t \in T^{STOR}, l \in L^{STOR}, \storageinitial_{ntlcyh} = 0
 ***
 STORAGE_BALANCE(node,storage_tec,mode,level,commodity,year,time2,lvl_temporal)$ (
     SUM((tec,mode2), map_tec_storage(node,tec,mode2,storage_tec,mode,level,commodity,lvl_temporal) )
 *    AND NOT storage_initial(node,storage_tec,mode,level,commodity,year,time2)
 )..
-* Showing the the state of charge of storage at each timeslice
+* Showing the the state of charge of storage at each time slice
     STORAGE(node,storage_tec,mode,level,commodity,year,time2) =E=
-* change in the content of storage in the examined timeslice
+* change in the content of storage in the examined time slice
     + STORAGE_CHARGE(node,storage_tec,mode,level,commodity,year,time2)
-* storage content in the previous subannual timeslice
+* storage content in the previous subannual time slice
     + SUM(time$map_time_period(year,lvl_temporal,time,time2),
         STORAGE(node,storage_tec,mode,level,commodity,year,time)
-* considering storage self-discharge losses due to keeping the storage media between two subannual timeslices
+* considering storage self-discharge losses due to keeping the storage media between two subannual time slices
         * (1 - storage_self_discharge(node,storage_tec,mode,level,commodity,year,time) ) ) ;
 
 ***
@@ -2241,20 +2247,22 @@ STORAGE_BALANCE(node,storage_tec,mode,level,commodity,year,time2,lvl_temporal)$ 
 * """""""""""""""""""""""""""""
 *
 * Where :math:`\storageinitial_{ntlyh}` has a non-zero value, this equation ensures that the amount of commodity stored
-* at the end of the period is equal to the initial content of storage.
+* at the end of a sub-annual time slice is equal or greater than the initialized content of storage in the following time slice.
+* The values in parameter :math:`\storageinitial_{ntlyh}` are percentages showing
+* a fraction of installed capacity of storage device (container) that can be filled initially.
 *
 * .. math::
-*    \STORAGE_{ntlcyh} =\ & \storageinitial_{ntlcyh} + \STORAGECHARGE_{ntlcyh} \\
-*    \forall\ & \storageinitial_{ntlcyh} \neq 0
+*    \STORAGE_{ntlcy(h-1)} \geq &  \storageinitial_{ntlcyh} \cdot duration\_time_{h} \cdot capacity\_factor_{n,t,y^V,y,h} \cdot CAP_{n,t,y^V,y}  \\
+*    \quad \forall \ t \ \in \ T^{INV}, \forall\ & \storageinitial_{ntlcyh} \neq 0
 ***
 
 STORAGE_BALANCE_INIT(node,storage_tec,mode,level,commodity,year,time,time2)$ (
     SUM((tec,mode2,lvl_temporal), map_tec_storage(node,tec,mode2,storage_tec,mode,level,commodity,lvl_temporal)
         AND map_time_period(year,lvl_temporal,time,time2) )
     AND storage_initial(node,storage_tec,mode,level,commodity,year,time2) )..
-* Showing the state of charge of storage at a timeslice with an initial storage content
-    STORAGE(node,storage_tec,mode,level,commodity,year,time) =L=
-* initial content of storage in the examined timeslice as a multiplier in available capacity of storage
+* Showing the state of charge of storage at a time slice prior to a time slice that has initial storage content
+    STORAGE(node,storage_tec,mode,level,commodity,year,time) =G=
+* Initial content of storage in the examined time slice as a percentage multiplier in available capacity of storage
         storage_initial(node,storage_tec,mode,level,commodity,year,time2)
         * SUM(vintage$( map_tec_lifetime(node,storage_tec,vintage,year) ), capacity_factor(node,storage_tec,vintage,year,time2)
              * CAP(node,storage_tec,vintage,year) / duration_time(time2)  )
@@ -2265,8 +2273,10 @@ STORAGE_BALANCE_INIT(node,storage_tec,mode,level,commodity,year,time,time2)$ (
 * Equation STORAGE_INPUT
 * """"""""""""""""""""""""""""
 *
-* This equation links :math:`\STORAGE` to an input commodity to maintain the activity (:math:`\ACT`) for each active storage *container* technology
-* :math:`t`; this is distinct from the *(dis)charge* technologies :math:`t^C,t^D` appearing in
+* This equation links :math:`\STORAGE` to an input commodity to maintain the activity (:math:`\ACT`) of each active storage *container* technology
+* :math:`t`. This input commodity is distinct from the stored commodity. For example, in a pumped hydro storage solution, a user can link heating
+* for keeping the stored water warm. In this case, the input commodity is not a function of charge or discharge, but the amount of stored media in the container over time.
+* Therefore, the input commodity specified here is distinct from the one stored and discharged by *(dis)charge* technologies :math:`t^C,t^D` appearing in
 * :ref:`equation_storage_change`.
 *
 * .. math::

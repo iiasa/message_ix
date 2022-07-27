@@ -41,6 +41,9 @@ Migration notes
 
   This matches fixed behaviour upstream in :mod:`genno` version 1.12 to avoid unintended confusion with keys like ``A:i``: ``i`` (after the first colon) is the name for the sole dimension of a 1-dimensional quantity, whereas ``default`` in ``message::default`` is a tag.
 
+- The index sets in :meth:`.map_tec_storage` are extended to include "mode" of operation and temporal level of a storage container ("lvl_temporal").
+  Therefore, if this set is parameterized in a scenario without "mode" and "lvl_temporal", the mathematical equation does not work.
+  The user needs to add the "mode" of operation for both charger-discharge technologies and the storage device in this mapping set.
 
 All changes
 -----------
@@ -49,6 +52,7 @@ All changes
 - New reporting computation :func:`.as_message_df` (:pull:`628`).
 - Extend functionality of :meth:`.vintage_and_active_years`; add aliases :meth:`.yv_ya`, :meth:`.ya`, and :attr:`.y0` (:pull:`572`, :pull:`623`).
 - Add scripts and HOWTO for documentation videos (:pull:`396`).
+- Extend functionality of storage solutions to include "mode" and "temporal level" (:pull:`396`).
 
 .. _v3.5.0:
 
