@@ -75,7 +75,10 @@ def add_storage_data(scen, time_order):
 
     # Adding mapping for storage and charger/discharger technologies
     for tec in ["pump", "turbine"]:
-        scen.add_set("map_tec_storage", ["node", tec, "M1", "dam", "M1", "storage", "water", "season"])
+        scen.add_set(
+            "map_tec_storage",
+            ["node", tec, "M1", "dam", "M1", "storage", "water", "season"],
+        )
 
     # Adding time sequence
     for h in time_order.keys():
@@ -166,8 +169,11 @@ def storage_setup(test_mp, time_duration, comment):
     df["value"] = 1.2
     scen.add_par("input", df)
     scen.commit("storage needs no separate input")
-    scen.solve(case="with_storage_and_input" + comment, quiet=True,
-               var_list=["STORAGE", "STORAGE_CHARGE"])
+    scen.solve(
+        case="with_storage_and_input" + comment,
+        quiet=True,
+        var_list=["STORAGE", "STORAGE_CHARGE"],
+    )
     cost_with_stor = scen.var("OBJ")["lvl"]
     act_with_stor = scen.var("ACT", {"technology": "gas_ppl"})["lvl"].sum()
 
