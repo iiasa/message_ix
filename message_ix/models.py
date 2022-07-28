@@ -422,16 +422,17 @@ class MESSAGE(GAMSModel):
 
         # Enforcing new indexes for existing set and parameters
         # TODO: this should ideally done by introducing a new method called
-        #        `reinitiate_items()` that would reinitialize some items with new index sets
+        # `reinitiate_items()` that would reinitialize some items with new index sets
         sets = ["map_tec_storage"]
         pars = ["storage_self_discharge", "storage_initial"]
+
         scenario.check_out()
         for set_name in sets:
             try:
                 scenario.init_set(
-                    set_name, idx_sets=MESSAGE_ITEMS(set_name)["idx_sets"]
+                    set_name, idx_sets=MESSAGE_ITEMS[set_name]["idx_sets"]
                 )
-            except:
+            except ValueError:
                 df = scenario.set(set_name)
                 if df.empty:
                     scenario.remove_set(set_name)
@@ -441,15 +442,20 @@ class MESSAGE(GAMSModel):
                         idx_names=MESSAGE_ITEMS[set_name]["idx_names"],
                     )
                 else:
-                    raise RuntimeError(
-                        f"{item} requires an updated index sets: {MESSAGE_ITEMS[item]['idx_sets']}"
-                    )
+                    print(set(df.columns))
+                    if tuple(df.columns) == MESSAGE_ITEMS[set_name]["idx_names"]:
+                        continue
+                    else:
+                        raise RuntimeError(
+                            f"{set_name} requires an updated index sets:",
+                            f" {MESSAGE_ITEMS[set_name]['idx_sets']}",
+                        )
         for par_name in pars:
             try:
                 scenario.init_par(
                     par_name, idx_sets=MESSAGE_ITEMS[par_name]["idx_sets"]
                 )
-            except:
+            except ValueError:
                 df = scenario.par(par_name)
                 if df.empty:
                     scenario.remove_par(par_name)
@@ -458,9 +464,14 @@ class MESSAGE(GAMSModel):
                         idx_sets=MESSAGE_ITEMS[par_name]["idx_sets"],
                     )
                 else:
-                    raise RuntimeError(
-                        f"{item} requires an updated index sets: {MESSAGE_ITEMS[item]['idx_sets']}!"
-                    )
+                    check = tuple([x for x in df.columns if x not in ["unit", "value"]])
+                    if check == MESSAGE_ITEMS[par_name]["idx_sets"]:
+                        continue
+                    else:
+                        raise RuntimeError(
+                            f"{par_name} requires an updated index sets:"
+                            f" {MESSAGE_ITEMS[par_name]['idx_sets']}!"
+                        )
 
         scenario.commit("indexes updated")
 

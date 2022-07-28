@@ -44,7 +44,7 @@ Migration notes
 - The index sets in :meth:`.map_tec_storage` are extended to include "mode" of operation and temporal level of a storage container ("lvl_temporal").
   Therefore, if this set is already populated in a scenario without "mode" and "lvl_temporal", the updated mathematical equation does not work.
   To resolve this, the user needs to populate this set again, by adding the "mode" of operation for both charger-discharge technologies, and adding "mode" and "lvl_temporal" for the storage device.
-  Furthermore, parameters "storage_initial" and "storage_self_discharge" should be updated as well by including "lvl_temporal" for each storage device.
+  Furthermore, parameters "storage_initial" and "storage_self_discharge" should be updated as well by including "mode" for each storage device.
 
 All changes
 -----------
