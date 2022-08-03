@@ -81,6 +81,7 @@ class Item:
     #: The same set name may be repeated if it indexes multiple dimensions.
     coords: Tuple[str, ...] = field(default_factory=tuple)
 
+	"relation_activity_time": item("par", "relation nr yr nl t ya m h"),
     #: Dimensions of the item.
     dims: Tuple[str, ...] = field(default_factory=tuple)
 
@@ -285,7 +286,7 @@ class MESSAGE(GAMSModel):
         # handled in JDBCBackend. For the moment, this code does not backstop that
         # behaviour.
         # TODO Extend to handle all masks, e.g. for new backends.
-        for par_name in ("capacity_factor",):
+        for par_name in ("capacity_factor", "relation_lower_time", "relation_upper_time"):
             # Name of the corresponding set
             set_name = f"is_{par_name}"
 
