@@ -203,7 +203,7 @@ def get_tasks() -> Sequence[Tuple[Tuple, Mapping]]:
         put("concat", group, *pyam_keys, strict=True)
 
     # Add all standard reporting to the default message node
-    put("concat", "message:default", *REPORTS.keys(), strict=True)
+    put("concat", "message::default", *REPORTS.keys(), strict=True)
 
     return to_add
 
