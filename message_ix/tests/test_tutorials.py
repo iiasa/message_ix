@@ -21,6 +21,11 @@ mark1 = pytest.mark.xfail(
     reason="Fails occasionally on GitHub Actions runners for macOS / Python 3.8",
 )
 
+mark2 = pytest.mark.xfail(
+    condition=sys.platform == "win32" and sys.version_info.minor == 10,
+    reason="Fails occasionally on GitHub Actions runners for Windows / Python 3.10",
+)
+
 # Argument values to parametrize test_tutorial
 #
 # Each item is a 3-tuple:
@@ -62,8 +67,10 @@ tutorials: List[Tuple] = [
     ((AT, "austria_multiple_policies-answers"), [], {}),
     ((AT, "austria_load_scenario"), [], {}),
     # R tutorials using the IR Jupyter kernel
-    pytest.param((AT, "R_austria"), [], dict(kernel="IR"), marks=[mark0, mark1]),
-    pytest.param((AT, "R_austria_load_scenario"), [], dict(kernel="IR"), marks=[mark0]),
+    pytest.param((AT, "R_austria"), [], dict(kernel="IR"), marks=[mark0, mark1, mark2]),
+    pytest.param(
+        (AT, "R_austria_load_scenario"), [], dict(kernel="IR"), marks=[mark0, mark2]
+    ),
 ]
 
 # Short, readable IDs for the tests. Use getattr() to unpack the values from

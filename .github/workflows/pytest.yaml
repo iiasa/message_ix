@@ -5,6 +5,9 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  # 05:00 UTC = 06:00 CET = 07:00 CEST
+  schedule:
+  - cron: "0 5 * * *"
 
 env:
   GAMS_VERSION: 25.1.1
