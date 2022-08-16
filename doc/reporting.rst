@@ -182,6 +182,8 @@ Other added keys include:
   Each of these is also available in a Reporter: for example ``rep.get("n")`` returns a list with the elements of the |MESSAGEix| set named "node".
   These keys can be used as input
 
+.. _default-reports:
+
 - Computations to convert internal :func:`Quantity` data format to the IAMC data format, i.e. as :class:`pyam.IamDataFrame` objects.
   These include:
 

@@ -113,7 +113,7 @@ def test_reporter_from_westeros(test_mp):
 
     # message default target can be calculated
     # TODO if df is empty, year is cast to float
-    obs = rep.get("message:default")
+    obs = rep.get("message::default")
 
     # all expected reporting exists
     assert len(obs.data) == 69

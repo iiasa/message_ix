@@ -22,8 +22,8 @@ mark1 = pytest.mark.xfail(
 )
 
 mark2 = pytest.mark.xfail(
-    condition=sys.platform == "win32" and sys.version_info.minor == 10,
-    reason="Fails occasionally on GitHub Actions runners for Windows / Python 3.10",
+    condition=sys.platform == "win32",
+    reason="Fails occasionally on GitHub Actions runners for Windows",
 )
 
 # Argument values to parametrize test_tutorial

@@ -12,10 +12,16 @@ Migration notes
 
      df = scen.vintage_and_active_years().query(f"{scen.y0} <= year_vtg")
 
+- The :ref:`default reports <default-reports>` (tables in IAMC format) available in a :class:`~message_ix.reporting.Reporter` have changed keys to e.g. ``message::default`` with **two** colons.
+  Code using e.g. ``message:default`` (one colon) should be updated to use the current keys.
+
+  This matches fixed behaviour upstream in :mod:`genno` version 1.12 to avoid unintended confusion with keys like ``A:i``: ``i`` (after the first colon) is the name for the sole dimension of a 1-dimensional quantity, whereas ``default`` in ``message::default`` is a tag.
+
 
 All changes
 -----------
 
+- Adjust keys for IAMC-format reporting nodes (:pull:`628`, :pull:`641`)
 - New reporting computation :func:`.as_message_df` (:pull:`628`).
 - Extend functionality of :meth:`.vintage_and_active_years`; add aliases :meth:`.yv_ya`, :meth:`.ya`, and :attr:`.y0` (:pull:`572`, :pull:`623`).
 - Add scripts and HOWTO for documentation videos (:pull:`396`).
