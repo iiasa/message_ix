@@ -48,21 +48,25 @@ For instance, an item marked as deprecated in v2.1 can be removed as of v3.0; an
       But *may* also be removed from the ``master`` branch *immediately after* 2.0.0 is released.
       This is preferred, because it forces tutorials, user code, etc. to stay ahead of deprecations.
 
+3. (message_ix only) Edit :file:`setup.cfg`, updating the ``install_requires`` line for ixmp as necessary.
+
+   Each version of message_ix depends on a minimum version of ixmp.
+   message_ix **must not** depend on or use deprecated features of ixmp; it **should** remain compatible with earlier versions of ixmp, where possible.
+
 **Check continuous integration.**
-Any failures in (3) or (4) must be corrected before releasing.
+Any failures in (4) or (5) must be corrected before releasing.
 
-3. Check https://github.com/iiasa/message_ix/actions/ (or `equivalent for ixmp <https://github.com/iiasa/ixmp/actions/>`__) to ensure that the push and scheduled builds are passing.
-4. Check https://readthedocs.com/projects/iiasa-energy-program-message-ix/builds/ (or `ixmp <https://readthedocs.com/projects/iiasa-energy-program-ixmp/builds/>`_) to ensure that the docs build is passing.
+4. Check https://github.com/iiasa/message_ix/actions/ (or `equivalent for ixmp <https://github.com/iiasa/ixmp/actions/>`__) to ensure that the push and scheduled builds are passing.
+5. Check https://readthedocs.com/projects/iiasa-energy-program-message-ix/builds/ (or `ixmp <https://readthedocs.com/projects/iiasa-energy-program-ixmp/builds/>`_) to ensure that the docs build is passing.
 
-If necessary, make and merge ≥1 PR(s) to address (1–4).
+If necessary, make and merge ≥1 PR(s) to address (1–5).
 
 Releasing
 =========
 
-1. (message_ix only) Edit :file:`setup.cfg`, to update the ``install_requires`` line for ixmp.
+1. Create a new branch::
 
-   Each version of message_ix must depend on the corresponding version of ixmp.
-   For instance, message_ix 3.1.0 depends on ixmp ≥ 3.1.0; not ixmp 3.0.0.
+    $ git checkout -v release/X.Y.Z
 
 2. Edit :file:`RELEASE_NOTES.rst`:
 
@@ -119,10 +123,11 @@ Releasing
 3. Make a commit with a message like “Mark v<version> in release notes”.
 4. Tag the release candidate version, i.e. with a ``rcN`` suffix, and push::
 
-   $ git tag v1.2.3rc1
-   $ git push --tags origin main
+   $ git tag vX.Y.ZrcN
+   $ git push --tags <upstream> release/X.Y.Z
 
-5. Check:
+5. Open a PR with the title “Release vX.Y.Z” using this branch.
+   Check:
 
    - at https://github.com/iiasa/message_ix/actions/workflows/publish.yaml (or `ixmp <https://github.com/iiasa/ixmp/actions/workflows/publish.yaml>`__) that the workflow completes: the package builds successfully and is published to TestPyPI.
    - at https://test.pypi.org/project/message-ix/ (or `ixmp <https://test.pypi.org/project/ixmp/>`__) that:
@@ -130,36 +135,37 @@ Releasing
      - The package can be downloaded, installed and run.
      - The README is rendered correctly.
 
-   Address any warnings or errors that appear.
-   If needed, make a new commit.
-   Go back to step (2), incrementing the release candidate number, e.g. from ``rc1`` to ``rc2``.
+   Address any warnings or errors that appear, if necessary through ≥1 new commit(s).
+   Then continue from step (4), incrementing the release candidate number, e.g. from ``rc1`` to ``rc2``.
 
-6. (optional) Tag the release itself and push::
+6. Merge the PR using the ‘rebase and merge’ method.
+
+7. (optional) Tag the release itself and push::
 
     $ git tag v<version>
     $ git push --tags origin main
 
-   This step (but *not* step (4)) can be performed directly on GitHub; see (7), next.
+   This step (but *not* step (4)) can be performed directly on GitHub; see (8), next.
 
-7. Visit https://github.com/iiasa/message-ix/releases (or `ixmp <https://github.com/iiasa/ixmp/releases>`__) and mark the new release: either using the pushed tag from (6), or by creating the tag and release simultaneously.
+8. Visit https://github.com/iiasa/message-ix/releases (or `ixmp <https://github.com/iiasa/ixmp/releases>`__) and mark the new release: either using the pushed tag from (8), or by creating the tag and release simultaneously.
 
-   For the description, provide a link to the section in the “What's New” page of the documentation that corresponds to the new release, using the anchor added in (2), above.
+   For the description, provide a link to the section in the “What's New” page of the documentation that corresponds to the new release, using the anchor added in (3), above.
    For example:
 
    .. code-block::
 
       See [“What's New”](https://docs.messageix.org/en/stable/whatsnew.html#v99-98-0) in the documentation for a list of all changes.
 
-8. Check at https://github.com/iiasa/message_ix/actions/workflows/publish.yaml (or `ixmp <https://github.com/iiasa/ixmp/actions/workflows/publish.yaml>`__) and https://pypi.org/project/message-ix/ (or `ixmp <https://pypi.org/project/ixmp/>`__) that the distributions are published.
+9. Check at https://github.com/iiasa/message_ix/actions/workflows/publish.yaml (or `ixmp <https://github.com/iiasa/ixmp/actions/workflows/publish.yaml>`__) and https://pypi.org/project/message-ix/ (or `ixmp <https://pypi.org/project/ixmp/>`__) that the distributions are published.
 
-9. Update on conda-forge.
-   A PR should automatically be opened by a bot after the GitHub release (sometimes this takes up to 30 minutes).
+10. Update on conda-forge.
+    A PR should automatically be opened by a bot after the GitHub release (sometimes this takes from 30 minutes to several hours).
 
-   1. Confirm that any new dependencies are added.
-      The minimum versions in :file:`meta.yaml` should match the versions in :file:`setup.cfg`.
-   2. Ensure that tests pass and complete any other checklist items.
-   3. Merge the PR.
-   4. Check that the new package version appears on conda-forge. This may take up to several hours.
+    1. Confirm that any new dependencies are added.
+       The minimum versions in :file:`meta.yaml` should match the versions in :file:`setup.cfg`.
+    2. Ensure that tests pass and complete any other checklist items.
+    3. Merge the PR.
+    4. Check that the new package version appears on conda-forge. This may take up to several hours.
 
-10. Announce the release(s) on our mailing list/Google group and/or on Twitter.
+11. Announce the release(s) on our mailing list/Google group and/or on Twitter.
     Copy the text from the What's New page of the built documentation.
