@@ -4,6 +4,8 @@
 .. All changes
 .. -----------
 
+- Add additional oscillation detection mechanism for macro iterations (:pull:`645`)
+
 .. _v3.6.0:
 
 v3.6.0 (2022-08-17)
