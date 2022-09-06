@@ -97,10 +97,12 @@ Scalar
     convergence_status status of convergence (1 if successful)                      / 0 /
     scaling            scaling factor to adjust step size when iteration oscillates / 1 /
     max_it             maximum number of iterations                                 / %MAX_ITERATION% /
-    ctr                iteration counter                                            /0 /
+    ctr                iteration counter                                            / 0 /
     obj_func_chng      change of obejective function compared iteration-1           / 0 /
     obj_func_chng_pre  change of obejective function of iteration-1 compared to iteration-2 / 0 /
     obj_func_pre       objective function from iteration-1                          / 0 /
+    osc_check          tracks which oscillation check is used                       / 0 /
+    osc_check_final    tracks if any oscillation check has been triggered           / 0 /
 ;
 
 
@@ -247,6 +249,7 @@ max_adjustment_neg = smin((node_macro,sector,year)$( NOT macro_base_period(year)
 max_adjustment = max_adjustment_pos ;
 max_adjustment$( max_adjustment_neg < - max_adjustment_pos ) = max_adjustment_neg ;
 
+* Add entry to log-file: which of the checks have been used
 report_iteration(iteration, 'max adjustment pos') = max_adjustment_pos ;
 report_iteration(iteration, 'max adjustment neg') = -max_adjustment_neg ;
 report_iteration(iteration, 'absolute max adjustment max/min') = abs(max_adjustment) ;
@@ -260,6 +263,11 @@ if ( abs(max_adjustment) < %CONVERGENCE_CRITERION%,
     else
         put_utility 'log' /"+++ Convergence criteria satisfied after ", ORD(iteration):0:0, " iterations +++ " ;
     ) ;
+    if ( osc_check_final = 1,
+        put_utility 'log' /"+++ Convergence achieved via oscillation check mechanims; check iteration log for further details +++ " ;
+    else
+        put_utility 'log' /"+++ Natural convergence achieved +++ " ;
+    ) ;
     break ;
 ) ;
 * Check_change in objective function.
@@ -271,15 +279,26 @@ if ( ORD(iteration) > 1,
 if ( ORD(iteration) > 1 AND sign(max_adjustment_pre) = -sign(max_adjustment)
         AND abs(max_adjustment_pre) > abs(max_adjustment) * 0.9,
     scaling = scaling * sqrt(2) ;
+    osc_check = 1 ;
+    osc_check_final = 1;
     put_utility 'log' /"+++ Indication of oscillation, increase the scaling parameter (", scaling:0:0, ") +++" ;
 elseif abs( max_adjustment_pos + max_adjustment_neg ) < 1e-4 ,
     scaling = scaling * sqrt(2) ;
+    osc_check = 2 ;
+    osc_check_final = 1 ;
 *    scaling = scaling + 1;
     put_utility 'log' /"+++ Indication of instability, increase the scaling parameter (", scaling:0:0, ") +++" ;
 elseif ORD(iteration) > 2 AND abs(obj_func_chng_pre + obj_func_chng) < 1e-4 ,
     scaling = scaling * sqrt(2) ;
+    osc_check = 3 ;
+    osc_check_final = 1;
     put_utility 'log' /"+++ Indication of oscillating objective function, increase the scaling parameter (", scaling:0:0, ") +++" ;
 ) ;
+
+* Add entry to log-file: which of the checks have been used
+report_iteration(iteration, 'oscillation check') = osc_check ;
+* Reset check for next iteration
+osc_check = 0;
 
 * shift current values to *_pre* for use in the next iteration.
 obj_func_pre = OBJ.l
