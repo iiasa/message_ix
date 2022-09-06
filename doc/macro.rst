@@ -58,6 +58,10 @@ The algorithm detects 'oscillation', which occurs when MESSAGE and MACRO each re
 
 If the difference between these points is greater than `convergence_criterion`, the algorithm might jump between these two points infinitely.
 Instead, the algorithm detects oscillation by comparing model solutions on each iteration to previous values recorded in the iteration log.
+Specifically, the algorithm checks for three patterns across the iterations.
+1. Does the sign of the `max_adjustment` parameter change?
+2. Are the maximum-positive and maximum-negative adjustments equal to each other?
+3. Do the solutions jump between two objective functions?
 
 If the algorithm picks up on the oscillation between iterations, then after MACRO has solved and before solving MESSAGE, a log message is printed as follows::
 
