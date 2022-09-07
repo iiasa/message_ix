@@ -59,6 +59,7 @@ The algorithm detects 'oscillation', which occurs when MESSAGE and MACRO each re
 If the difference between these points is greater than `convergence_criterion`, the algorithm might jump between these two points infinitely.
 Instead, the algorithm detects oscillation by comparing model solutions on each iteration to previous values recorded in the iteration log.
 Specifically, the algorithm checks for three patterns across the iterations.
+
 1. Does the sign of the `max_adjustment` parameter change?
 2. Are the maximum-positive and maximum-negative adjustments equal to each other?
 3. Do the solutions jump between two objective functions?
@@ -78,9 +79,27 @@ If the algorithm picks up on the oscillation between iterations, then after MACR
 
 .. note:: This example is from a particular model run, and the actual message may differ.
 
+Which of the three checks listed above has been invoked is logged in the iteration report in :file:`MsgIterationReport_<{model_name}>_<{scenario_name}>.gdx` under the header "oscillation check".
+
 The algorithm then gradually reduces `max_adjustment` from the user-supplied value.
 This has the effect of reducing the allowable relative change in demands, until the `convergence_criterion` is met.
 
+If none of the checks have been invoked over the iterations, then MESSAGEix and MACRO converged *naturally*.
+A log message as follows is printed::
+
+    --- Reading solution for model MESSAGE_MACRO
+    --- Executing after solve: elapsed 7:42:24.622
+    --- MESSAGE-MACRO_run.gms(5176) 1116 Mb
+        +++ Convergence criteria satisfied after 14 iterations +++
+        +++ Natural convergence achieved +++
+
+If in any of the iterations, any of the three oscillation checks were invoked, a log message is printed as follows::
+
+    --- Reading solution for model MESSAGE_MACRO
+    --- Executing after solve: elapsed 7:42:24.622
+    --- MESSAGE-MACRO_run.gms(5176) 1116 Mb
+        +++ Convergence criteria satisfied after 14 iterations +++
+        +++ Convergence achieved via oscillation check mechanism; check iteration log for further details +++
 
 Issue 1: Oscillations not detected
 ----------------------------------
@@ -93,7 +112,7 @@ For the MESSAGEix-GLOBIOM global model, this issue can be encountered with scena
 Identifying oscillation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-In order to find out whether failure to converge is due to undetected oscillation, check the iteration report in :file:`MsgIterationReport_<{model_name}>_<{scenario_name}>.gdx`.
+In order to find out whether failure to converge is due to undetected oscillation, check the iteration report.
 The initial iterations will show the objective function value either decreasing or increasing (depending on the model), but after a number of iterations, the objective function will flip-flop between two very similar values.
 
 Preventing oscillation
@@ -129,17 +148,24 @@ The most direct solution is to rescale the parameters in the model itself.
 
 When this is not possible, there are some workarounds:
 
-1. Adjust CPLEX's convergence criterion, `epopt` (this is distinct from the `convergence_criterion` of the MESSAGE_MACRO algorithm).
+1. Adjust CPLEX's scaling parameter; specify `scaind = 1`.
+   This will result in more "aggressive" scaling.
+
+2. Adjust CPLEX's barrier crossover algorithm; specify `barcrossalg = 2`.
+   By default, CPLEX will choose between either `Primal crossover` or `Dual crossover`.
+   Unscaled infeasibilities will result only with `Primal crossover`, hence forcing CPLEX to use the latter will resolve the issue.
+   This will result in longer solving times, but will guarantee overcoming the issue.
+
+3. Adjust CPLEX's convergence criterion, `epopt` (this is distinct from the `convergence_criterion` of the MESSAGE_MACRO algorithm).
    In :mod:`message_ix`, :data:`.DEFAULT_CPLEX_OPTIONS` sets this to ``1e-6`` by default.
    This approach is delicate, as changing the tolerance may also change the solution by a significant amount.
    This has not been tested in detail and should be handled with care.
 
-2. Switch to other methods provided by CPLEX, using e.g. `lpmethod` = ``2``.
+4. Switch to other methods provided by CPLEX, using e.g. `lpmethod` = ``2``.
    A disadvantage of this approach is the longer runtime, as described above.
 
-3. Start the MESSAGE-MACRO algorithm with `lpmethod` set to ``4``.
-   Manually monitor its progress, and after approximately 10 iterations have passed, delete the file :file:`cplex.opt`.
-   When CPLEX can not find its option file, it will revert to using a simplex method (and advanced basis) from thereon.
+The arguments can be passed with the solve command, e.g. `scenario.solve(solve_options={"barcrossalg": "2"})`
+Alternatively the arguments can be specified either in :file:`models.py`.
 
 
 :mod:`message_ix.macro` internals
