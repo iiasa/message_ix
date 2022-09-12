@@ -289,7 +289,6 @@ elseif abs( max_adjustment_pos + max_adjustment_neg ) < 1e-4 ,
     scaling = scaling * sqrt(2) ;
     osc_check = 2 ;
     osc_check_final = 1 ;
-*    scaling = scaling + 1;
     put_utility 'log' /"+++ Indication of instability, increase the scaling parameter (", scaling:0:0, ") +++" ;
 * Oscillation check 3: Do the solutions jump between two objective functions?
 elseif ORD(iteration) > 2 AND abs(obj_func_chng_pre + obj_func_chng) < 1e-4 ,
@@ -308,6 +307,15 @@ osc_check = 0;
 obj_func_pre = OBJ.l
 if ( ORD(Iteration) > 1,
     obj_func_chng_pre = obj_func_chng;
+) ;
+
+* In the case that the model solves with unscaled infeasibilities, the cplex options file `cplex.op2`
+* will be used which forces the use of `Dual Crossover` when solving with Barrier. This will avoid
+* solving further with unscaled infeasibilities.
+if( MESSAGE_LP.modelstat = 5,
+   put_utility 'log' /'+++ Detected issues solving with unscaled infeasibilities. Enforcing Dual crossover +++ ' ;
+   MESSAGE_LP.optFile = 2;
+   report_iteration(iteration, 'unscaled infeasibilities') = 1 ;
 ) ;
 
 * store the maximum adjustment in this iteration for the oscillation-prevention query in the next iteration
