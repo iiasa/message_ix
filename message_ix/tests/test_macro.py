@@ -164,7 +164,7 @@ def test_calc_data_missing_datapoint(westeros_solved):
         (
             "_total_cost",
             "allclose",
-            1e-3 * np.array([6.18242, 8.6601720, 13.4040172, 14.9067117]),
+            np.array([6.18242, 8.6601720, 13.4040172, 14.9067117]),
         ),
         ("_price", "allclose", [211, 511.0282933, 162.0395393, 161.0026274]),
         ("_demand", "allclose", [27, 55, 82, 104]),
@@ -272,7 +272,7 @@ def test_calibrate_roundtrip(westeros_solved):
     aeei = with_macro.par("aeei")["value"].values
     npt.assert_allclose(
         aeei,
-        1e-3 * np.array([20, -7.5142661, 43.6256127, 21.14346]),
+        1e-3 * np.array([20, -7.53474955303437, 43.6388021078658, 21.1470758210961]),
     )
     grow = with_macro.par("grow")["value"].values
     npt.assert_allclose(
@@ -280,10 +280,10 @@ def test_calibrate_roundtrip(westeros_solved):
         1e-3
         * np.array(
             [
-                26.5836313,
-                69.1417537,
-                79.1435885,
-                24.5225555,
+                26.583631304232,
+                69.1441230700944,
+                79.1406795348988,
+                24.5225816398262,
             ]
         ),
     )
