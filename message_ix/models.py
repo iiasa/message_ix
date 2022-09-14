@@ -373,6 +373,11 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         optfile.write_text("\n".join(lines))
         log.info(f"Use CPLEX options {self.cplex_opts}")
 
+        self.cplex_opts.update({"barcrossalg": 2})
+        optfile2 = Path(self.model_dir).joinpath("cplex.op2")
+        lines2 = ("{} = {}".format(*kv) for kv in self.cplex_opts.items())
+        optfile2.write_text("\n".join(lines2))
+
         try:
             result = super().run(scenario)
         finally:
@@ -382,6 +387,8 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
             # py37 compat: check for existence instead of using unlink(missing_ok=True)
             if optfile.exists():
                 optfile.unlink()
+            if optfile2.exists():
+                optfile2.unlink()
 
         return result
 
