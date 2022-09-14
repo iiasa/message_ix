@@ -98,7 +98,7 @@ Scalar
     scaling            scaling factor to adjust step size when iteration oscillates / 1 /
     max_it             maximum number of iterations                                 / %MAX_ITERATION% /
     ctr                iteration counter                                            / 0 /
-    obj_func_chng      change of objective function compared iteration-1           / 0 /
+    obj_func_chng      change of objective function compared to iteration-1         / 0 /
     obj_func_chng_pre  change of objective function of iteration-1 compared to iteration-2 / 0 /
     obj_func_pre       objective function from iteration-1                          / 0 /
     osc_check          tracks which oscillation check is used                       / 0 /
