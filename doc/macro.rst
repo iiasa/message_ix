@@ -7,37 +7,68 @@ This combination is activated by calling :meth:`.solve` with the argument `model
 .. contents::
    :local:
 
+Prior to solving MESSAGE in combination with MACRO, MACRO will need to be calibrated to MESSAGE.
+
+The calibration process adjusts the AEEI improvement rates and labour productivity growth rates by comparing MACRO GDP with exogenous GDP growth rates.
+
+This necessitates a scenario which has already been solved with standalone MESSAGE.
+Ideally, this scenario will be a counterfactual scenario or a reference-scenario, meaning that this scenario will not include any long-term climate policy targets.
+The calibration of the scenario is invoked using the :meth:`.add_macro`.
+
+The calibration will be run for the entire optimization-time horizon i.e., for all time-periods after and including, the `firstmodelyear`.
+It will be necessary to provide the calibration process with calibration data, which amongst other data, specifies data for the last historic time-period in the model i.e., the time-period prior to the `firstmodelyear`, later referred to as the "reference year".
+This "reference year" represents the time-period for which commodity prices and energy system cost are known for a given demand of those commodities.
+This is detailed in the :ref:`next section <macro-input-data>`.
+
+The calibration itself is carried out by the :file:`message_ix/model/MACRO/macro_calibration.gms`.
+In the file, `max_it` is used to specify the number of iterations carried out between MESSAGE and MACRO as part of the calibration process.
+The default value is set to 100 iterations, which has proven to be sufficient for the calibration of MACRO to MESSAGE reference scenario.
+Adjustment of labor productivity growth rates is carried out during even iterations.
+Adjustment of AEEI improvement rates is carried out during odd iterations.
+
+.. note:: Note, that no actual check is carried out to see if the calibration process has been successful.
+
+The information from the calibration process is logged in :file:`message_ix/model/MACRO_run.lst`.
+Successful calibration of MACRO to MESSAGE can be identified by looking at the reported values for the "PARAMETER growth_correction" for the last "even" iteration, which should be somewhere around 1e-14 to 1e-16 for positive adjustments or -1e-14 to -1e-16 for negative adjustments.
+Likewise, the "PARAMETER aeei_correction" can be checked for the loss "odd" iteration.  
+Once the calibration process has been completed, the scenario will be populated with :ref:`additional parameters <macro-core-formulation>`.
+As part of the calibration process, final check will automatically be carried out, solving the freshly calibrated scenario in combination with MACRO, ensuring that the convergence criteria is met after the first iteration.
+
 .. _macro-input-data:
 
 Input data file
 ===============
 
-Using :meth:`.add_macro` requires an input data file in Microsoft Excel format.
-The format of this file is largely the same as for ixmp :ref:`ixmp:excel-data-format`, and includes the following sheets.
-For example input data files, see the files :file:`message_ix/tests/data/*_macro_input.xlsx` included as part of the :mod:`message_ix` test suite; either in your local installation, or `here on GitHub <https://github.com/iiasa/message_ix/tree/main/message_ix/tests/data>`_.
+The calibration process requires an input data file (Microsoft Excel format), largely built around :ref:`ixmp:excel-data-format`.
+For an example of such input data files, see the files :file:`message_ix/tests/data/*_macro_input.xlsx` included as part of the :mod:`message_ix` test suite; either in your local installation, or `here on GitHub <https://github.com/iiasa/message_ix/tree/main/message_ix/tests/data>`_. The input data file includes the following sheets: 
 
-“``config``” sheet
-   This configuration sheet specifies MACRO-related nodes and years, and mapps MACRO sectors to MESSAGE commodities and levels.
-   The ``config`` sheet has five columns, each of which is a list of labels/codes for a corresponding :ref:`ixmp set <ixmp:data-model-data>`:
+General configuration sheet
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- ``config``: This configuration sheet specifies MACRO-related nodes and years, and maps MACRO sectors to MESSAGE commodities and levels.
+   The sheet has five columns, each of which is a list of labels/codes for a corresponding :ref:`ixmp set <ixmp:data-model-data>`:
 
    - "node", "year": these can each have any length, depending on the number of regions and years to be included in the MACRO calibration process.
    - "sector", "commodity", "level": these 3 columns must have equal lengths.
      They describe a one-to-one mapping between MACRO sectors (entries in the "sector" column) and MESSAGE commodities and levels (paired entries in the "commodity" and "level" columns).
 
 MACRO parameter sheets
+~~~~~~~~~~~~~~~~~~~~~~
    The remaining sheets each contain data for one MACRO parameter:
 
-   - ``price_ref``: prices of MESSAGE commodities in a reference year.
-     This reference year is a year for which commodity prices and energy system cost are known for a given demand of those commodities.
+   - ``price_ref``: prices of MESSAGE commodities in a reference year. 
+     These can be obtained from the variable `PRICE_COMMODITY`. 
    - ``cost_ref``: total cost of the energy system in the reference year.
-   - ``demand_ref``: demand for different commodities in the referenbce year.
+     These can be obtained from the variable `COST_NODAL_NET` and should be divided by a factor of 1000. 
+   - ``demand_ref``: demand for different commodities in the reference year.
    - ``lotol``: tolerance factor for lower bounds on MACRO variabales.
    - ``esub``: elasticity between capital-labor and energy.
-   - ``drate``: social discount rate.
+   - ``drate``: social discount rate. 
    - ``depr``: annual percent depreciation.
    - ``kpvs``: capital value share parameter.
    - ``kgdp``: initial capital to GDP ratio in base year.
    - ``gdp_calibrate``: trajectory of GDP in optimization years calibrated to energy demand to MESSAGE.
+     Values for atleast two periods prior to the `firstmodelyear` are required in order to compute the growth rates in historical years. 
    - ``aeei``: annual potential decrease of energy intensity in sector sector.
    - ``MERtoPPP``: conversion factor of GDP from market exchange rates to purchasing power parity.
 
@@ -155,6 +186,12 @@ When this is not possible, there are some workarounds:
    By default, CPLEX will choose between either `Primal crossover` or `Dual crossover`.
    Unscaled infeasibilities will result only with `Primal crossover`, hence forcing CPLEX to use the latter will resolve the issue.
    This will result in longer solving times, but will guarantee overcoming the issue.
+
+.. note:: This solution has been implemented as part of the MESSAGE-MACRO iterations process.
+   During the iterations, a check is performed on the solution status (LP status (5)) of MESSAGE.
+   If the solution status is found to show the solution is "optimal with unscaled infeasibilities", then a secondary CPLEX configuration file is used.
+   The secondary CPLEX configuration file :file:`message_ix\model\cplex.op2` is a duplicate of :file:`message_ix\model\cplex.opt` with the addition of the argument `barcrossalg = 2`.
+   This secondary CPLEX configuration file is generated together with the primary CPLEX configuration file in :file:`message_ix\models.py`.
 
 3. Adjust CPLEX's convergence criterion, `epopt` (this is distinct from the `convergence_criterion` of the MESSAGE_MACRO algorithm).
    In :mod:`message_ix`, :data:`.DEFAULT_CPLEX_OPTIONS` sets this to ``1e-6`` by default.
