@@ -6,6 +6,8 @@ All changes
 
 - Adjust :meth:`.Scenario.add_macro` calculations for pandas 1.5.0 (:pull:`656`).
 - Add additional oscillation detection mechanism for MACRO iterations (:pull:`645`).
+- Correct calculation of `COST_NODAL_NET` for standalone MESSAGE (:pull:`648`)
+- Add additional oscillation detection mechanism for macro iterations (:pull:`645`)
 
 .. _v3.6.0:
 
