@@ -42,12 +42,12 @@ jobs:
 
     steps:
     - name: Cancel previous runs that have not completed
-      uses: styfle/cancel-workflow-action@0.9.1
+      uses: styfle/cancel-workflow-action@0.10.0
       with:
         access_token: ${{ github.token }}
 
     - name: Check out ixmp
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: iiasa/ixmp
         # For PRs that depend on an ixmp PR branch, uncomment the following 2
@@ -58,7 +58,7 @@ jobs:
         fetch-depth: ${{ env.depth }}
 
     - name: Check out message_ix
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         path: message_ix
         fetch-depth: ${{ env.depth }}
@@ -69,7 +69,7 @@ jobs:
         (cd message_ix; git fetch --tags --depth=${{ env.depth }})
       shell: bash
 
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -82,7 +82,7 @@ jobs:
       id: setup-r
 
     - name: Cache GAMS installer, Python packages, and R packages
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           gams
@@ -144,6 +144,6 @@ jobs:
       run: make --directory=doc html
 
     - name: Upload test coverage to Codecov.io
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v3
       with:
         directory: message_ix
