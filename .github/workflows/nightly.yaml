@@ -43,14 +43,19 @@ jobs:
       # with:
       #   python-version: "3.10"
 
+    - name: Upgrade pip, wheel, setuptools-scm
+      id: pip
+      run: |
+        python -m pip install --upgrade pip wheel setuptools-scm
+        # Locate pip cache directory
+        echo "::set-output name=cache-dir::$(pip cache dir)"
+
     - name: Cache GAMS installer and Python packages
       uses: actions/cache@v3
       with:
         path: |
           gams
-          ~/.cache/pip
-          ~/Library/Caches/pip
-          ~/appdata/local/pip/cache
+          ${{ steps.pip.outputs.cache-dir }}
         key: gams${{ env.GAMS_VERSION }}
 
     - uses: iiasa/actions/setup-gams@main
