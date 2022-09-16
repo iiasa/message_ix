@@ -112,7 +112,10 @@ jobs:
 
     - name: Install Python package and dependencies
       working-directory: message_ix
-      run: pip install .[tests]
+      run: |
+        pip install .[tests]
+        # TEMPORARY work around has2k1/plotnine#619, khaeru/genno#71
+        pip install "matplotlib<3.6.0"
 
     - name: Install R dependencies and tutorial requirements
       run: |
