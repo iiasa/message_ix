@@ -1,8 +1,8 @@
-.. Next release
-.. ============
+Next release
+============
 
-.. All changes
-.. -----------
+All changes
+-----------
 
 - Add additional oscillation detection mechanism for macro iterations (:pull:`645`)
 
