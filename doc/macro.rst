@@ -1,17 +1,19 @@
 Calibrate and tune MESSAGE-MACRO
 ********************************
 
-“MESSAGE-MACRO” refers to the combination of MESSAGE and MACRO, run iteratively in a multi-disciplinary optimization algorithm.
+Demand elasticities are modelled in MESSAGE via an iterative link to MACRO :cite:`Messner2000`. 
+The iterative solution process between MESSAGE and MACRO, referred to as "MESSAGE-MACRO", exchanges information on energy-prices, -demands, and -system costs until the demand responses are such that the two models have reached equilibrium (:cite:`johnson_VRE_2016`, further details can be found :ref:`here <message_doc:macro>`). 
 This combination is activated by calling :meth:`.solve` with the argument `model='MESSAGE-MACRO'`, or using the GAMS :file:`MESSAGE-MACRO_run.gms` script directly (see :ref:`running` for details about these two methods).
 
 .. contents::
    :local:
 
-Prior to solving MESSAGE in combination with MACRO, MACRO will need to be calibrated to MESSAGE.
+As described in :cite:`johnson_VRE_2016`, this "process is parameterized off of a baseline scenario (which assumes some autonomous rate of energy efficiency improvement, AEEI) and is conducted for all MESSAGE regions simultaneously. Therefore, the demand responses motivated by MACRO are meant to represent the additional (compared to the baseline) energy efficiency improvements and conservation that would occur in each region as a result of higher prices for energy services."
+Prior to initiating MESSAGE-MACRO, the two modules need to be calibrated to each other.
 
-The calibration process adjusts the AEEI improvement rates and labour productivity growth rates by comparing MACRO GDP with exogenous GDP growth rates.
+In the calibration process, the user defines a reference energy price (`price_ref`) and reference total cost (`cost_ref`) for the energy system that corresponds to a reference value for demand (`demand_ref`) for a base year. Then, using these reference values plus energy prices (`PRICE_COMMODITY`) and total system cost (`COST_NODAL_NET`) from the solution of MESSAGE for a given demand time series (`demand`), the calibration process changes the autonomous rate of energy efficiency improvement (`aeei`) and growth in GDP (`grow`) so that the output of MACRO (`GDP` and `DEMAND`) would converge to an initially specified timeseries trajectory of GDP (`gdp_calibrate`) and demand (`demand`) for a scenario. This is usually a baseline scenario. Without this calibration, the output of MACRO (`GDP` and `DEMAND`) can be different from the initial exogenous assumption for GDP and demand (`gdp_calibrate` and `demand`) for a scenario.
 
-This necessitates a scenario which has already been solved with standalone MESSAGE.
+The calibration therefore necessitates a scenario which has already been solved with standalone MESSAGE.
 Ideally, this scenario will be a counterfactual scenario or a reference-scenario, meaning that this scenario will not include any long-term climate policy targets.
 The calibration of the scenario is invoked using the :meth:`.add_macro`.
 
