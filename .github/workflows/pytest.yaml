@@ -27,6 +27,7 @@ jobs:
         - "3.8"
         - "3.9"
         - "3.10"  # Latest release / latest supported by message_ix
+        # - "3.x"  #
 
         # For freshy released or development versions of Python, compiled
         # binary wheels are not available for some dependencies, e.g. llvmlite,
