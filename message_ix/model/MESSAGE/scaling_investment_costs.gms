@@ -28,12 +28,14 @@ beyond_horizon_lifetime(node,inv_tec,vintage)$( beyond_horizon_lifetime(node,inv
 * where :math:`|y| = technical\_lifetime_{n,t,y}`. This formulation implicitly assumes constant fixed
 * and variable costs over time.
 *
-* **Warning:** All soft relaxations of the dynamic activity constraint are
+* **Warning:** 
+* Levelized capital costs do not include fuel-related costs.
+* All soft relaxations of the dynamic activity constraint are
 * disabled if the levelized costs are negative!
 ***
 
-levelized_cost(node,tec,year,time)$( map_tec_time(node,tec,year,time) AND inv_tec(tec) ) =
-    inv_cost(node,tec,year)
+levelized_cost(node,tec,year,time)$( map_tec_time(node,tec,year,time)) =
+    (inv_cost(node,tec,year)
         * (
 * compute discounted annualized investment costs if interest rate > 0
             ( interestrate(year)
@@ -47,7 +49,7 @@ levelized_cost(node,tec,year,time)$( map_tec_time(node,tec,year,time) AND inv_te
     + ( fix_cost(node,tec,year,year) /
           sum(time2$( map_tec_time(node,tec,year,time2) ),
              duration_time(time2) * capacity_factor(node,tec,year,year,time2) )
-        )$( fix_cost(node,tec,year,year) )
+        )$( fix_cost(node,tec,year,year) ))$(inv_tec(tec))
     + sum(mode$( map_tec_act(node,tec,year,mode,time) ), var_cost(node,tec,year,year,mode,time) )
 ;
 
