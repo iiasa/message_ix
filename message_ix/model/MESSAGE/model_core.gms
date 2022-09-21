@@ -1551,7 +1551,7 @@ NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * actual new capacity
     CAP_NEW(node,inv_tec,year) =L=
 * initial new capacity (compounded over the duration of the period)
-        initial_new_capacity_up(node,inv_tec,year) * (
+        (initial_new_capacity_up(node,inv_tec,year) * (
             ( ( POWER( 1 + growth_new_capacity_up(node,inv_tec,year) , duration_period(year) ) - 1 )
                 / growth_new_capacity_up(node,inv_tec,year) )$( growth_new_capacity_up(node,inv_tec,year) )
               + ( duration_period(year) )$( NOT growth_new_capacity_up(node,inv_tec,year) )
@@ -1565,7 +1565,9 @@ NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * 'soft' relaxation of dynamic constraints
         + ( CAP_NEW_UP(node,inv_tec,year)
             * ( POWER( 1 + soft_new_capacity_up(node,inv_tec,year) , duration_period(year) ) - 1 )
-           )$( soft_new_capacity_up(node,inv_tec,year) )
+           )$( soft_new_capacity_up(node,inv_tec,year) ))
+       * SUM(year_all2$( seq_period(year_all2,year) ),
+            ( duration_period(year_all2) / duration_period(year) ))
 * optional relaxation for calibration and debugging
 %SLACK_CAP_NEW_DYNAMIC_UP% + SLACK_CAP_NEW_DYNAMIC_UP(node,inv_tec,year)
 ;
@@ -1619,7 +1621,7 @@ NEW_CAPACITY_CONSTRAINT_LO(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * actual new capacity
     CAP_NEW(node,inv_tec,year) =G=
 * initial new capacity (compounded over the duration of the period)
-        - initial_new_capacity_lo(node,inv_tec,year) * (
+        (- initial_new_capacity_lo(node,inv_tec,year) * (
             ( ( POWER( 1 + growth_new_capacity_lo(node,inv_tec,year) , duration_period(year) ) - 1 )
                 / growth_new_capacity_lo(node,inv_tec,year) )$( growth_new_capacity_lo(node,inv_tec,year) )
               + ( duration_period(year) )$( NOT growth_new_capacity_lo(node,inv_tec,year) )
@@ -1633,7 +1635,9 @@ NEW_CAPACITY_CONSTRAINT_LO(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * 'soft' relaxation of dynamic constraints
         - ( CAP_NEW_LO(node,inv_tec,year)
             * ( POWER( 1 + soft_new_capacity_lo(node,inv_tec,year) , duration_period(year) ) - 1 )
-           )$( soft_new_capacity_lo(node,inv_tec,year) )
+           )$( soft_new_capacity_lo(node,inv_tec,year) ))
+       * SUM(year_all2$( seq_period(year_all2,year) ),
+            ( duration_period(year_all2) / duration_period(year) ))
 * optional relaxation for calibration and debugging
 %SLACK_CAP_NEW_DYNAMIC_LO% - SLACK_CAP_NEW_DYNAMIC_LO(node,inv_tec,year)
 ;
