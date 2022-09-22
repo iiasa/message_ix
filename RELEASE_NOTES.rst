@@ -18,6 +18,7 @@ All changes
 - Ensure `levelized_cost` are also calculated for technologies with only variable costs (:pull:`653`).
 - Correct calculation of `COST_NODAL_NET` for standalone MESSAGE (:pull:`648`)
 - Account for difference in period-length in equations `NEW_CAPACITY_CONSTRAINT_LO` and `NEW_CAPACITY_CONSTRAINT_UP` (:pull:`654`)
+- Ensure `levelized_cost` are also calculated for technologies with only variable costs (:pull:`653`)
 - Add additional oscillation detection mechanism for macro iterations (:pull:`645`)
 
 .. _v3.6.0:
