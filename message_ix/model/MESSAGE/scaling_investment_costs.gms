@@ -13,8 +13,8 @@ beyond_horizon_lifetime(node,inv_tec,vintage)$( map_tec(node,inv_tec,vintage) ) 
 beyond_horizon_lifetime(node,inv_tec,vintage)$( beyond_horizon_lifetime(node,inv_tec,vintage) < 0 ) = 0 ;
 
 ***
-* Levelized capital costs
-* -----------------------
+* Levelized costs excluding fuel costs
+* ------------------------------------
 * For the 'soft' relaxations of the dynamic constraints and the associated penalty factor in the objective function,
 * we need to compute the parameter :math:`levelized\_cost_{n,t,y}`.
 *
