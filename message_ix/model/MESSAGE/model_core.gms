@@ -1536,12 +1536,13 @@ SHARE_CONSTRAINT_COMMODITY_LO(shares,node_share,year,time)$( share_commodity_lo(
 *
 *  .. math::
 *     CAP\_NEW_{n,t,y}
-*         \leq & ~ initial\_new\_capacity\_up_{n,t,y}
+*         \leq & \Bigg(~ initial\_new\_capacity\_up_{n,t,y}
 *             \cdot \frac{ \Big( 1 + growth\_new\_capacity\_up_{n,t,y} \Big)^{|y|} - 1 }
 *                        { growth\_new\_capacity\_up_{n,t,y} } \\
 *              & + \Big( CAP\_NEW_{n,t,y-1} + historical\_new\_capacity_{n,t,y-1} \Big) \\
 *              & \hspace{2 cm} \cdot \Big( 1 + growth\_new\_capacity\_up_{n,t,y} \Big)^{|y|} \\
-*              & + CAP\_NEW\_UP_{n,t,y} \cdot \Bigg( \Big( 1 + soft\_new\_capacity\_up_{n,t,y}\Big)^{|y|} - 1 \Bigg) \\
+*              & + CAP\_NEW\_UP_{n,t,y} \cdot \Bigg( \Big( 1 + soft\_new\_capacity\_up_{n,t,y}\Big)^{|y|} - 1 \Bigg)\Bigg) \\
+*              & * \frac{|y-1|}{|y|} \\
 *         & \quad \forall \ t \ \in \ T^{INV}
 *
 * Here, :math:`|y|` is the number of years in period :math:`y`, i.e., :math:`duration\_period_{y}`.
@@ -1607,12 +1608,13 @@ NEW_CAPACITY_SOFT_CONSTRAINT_UP(node,inv_tec,year)$( soft_new_capacity_up(node,i
 *
 *  .. math::
 *     CAP\_NEW_{n,t,y}
-*         \geq & - initial\_new\_capacity\_lo_{n,t,y}
+*         \geq & \Bigg(- initial\_new\_capacity\_lo_{n,t,y}
 *             \cdot \frac{ \Big( 1 + growth\_new\_capacity\_lo_{n,t,y} \Big)^{|y|} }
 *                        { growth\_new\_capacity\_lo_{n,t,y} } \\
 *              & + \Big( CAP\_NEW_{n,t,y-1} + historical\_new\_capacity_{n,t,y-1} \Big) \\
 *              & \hspace{2 cm} \cdot \Big( 1 + growth\_new\_capacity\_lo_{n,t,y} \Big)^{|y|} \\
-*              & - CAP\_NEW\_LO_{n,t,y} \cdot \Bigg( \Big( 1 + soft\_new\_capacity\_lo_{n,t,y}\Big)^{|y|} - 1 \Bigg) \\
+*              & - CAP\_NEW\_LO_{n,t,y} \cdot \Bigg( \Big( 1 + soft\_new\_capacity\_lo_{n,t,y}\Big)^{|y|} - 1 \Bigg)\Bigg) \\
+*              & * \frac{|y-1|}{|y|} \\
 *         & \quad \forall \ t \ \in \ T^{INV}
 *
 ***
