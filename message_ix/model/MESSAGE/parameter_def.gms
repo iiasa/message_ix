@@ -271,6 +271,7 @@ Parameter
 * .. [#tecvintage] Fixed and variable cost parameters and technical specifications are indexed over both
 *    the year of construction (vintage) and the year of operation (actual).
 *    This allows to represent changing technology characteristics depending on the age of the plant.
+*    Material flows can also vary based on the vintage and active years.
 *
 * .. [#levelizedcost] The parameter ``levelized_cost`` is computed in the GAMS pre-processing under the assumption of
 *    full capacity utilization until the end of the technical lifetime.
