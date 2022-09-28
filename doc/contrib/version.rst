@@ -6,7 +6,7 @@ Versions and releases
 - We use `semantic versioning <https://semver.org>`_.
 
   To paraphrase: a **major** version increment (e.g. from 3.5 to 4.0) means there are *backwards-incompatible* changes to the API or functionality (e.g. code written for version 3.5 may no longer work with 4.0).
-  Major releases always include migration notes in :doc:`whatsnew` to alert users to such changes and suggest how to adjust their code.
+  Major releases always include migration notes in :doc:`/whatsnew` to alert users to such changes and suggest how to adjust their code.
   A **minor** version increment may fix bugs or add new features, but does not change existing functionality.
   Code written for e.g. version 3.5 will continue to work with 3.6.
 

@@ -11,7 +11,7 @@ from .macro import MACRO_ITEMS
 
 log = logging.getLogger(__name__)
 
-#: Solver options used by :meth:`message_ix.Scenario.solve`.
+#: Solver options used by :meth:`.Scenario.solve`.
 DEFAULT_CPLEX_OPTIONS = {
     "advind": 0,
     "lpmethod": 2,
@@ -74,7 +74,7 @@ def item(ix_type, expr):
 
 
 # NB order by ix_type (set, par, var, equ), then alphabetically.
-#: List of ixmp items for MESSAGE.
+#: ixmp items (sets, parameters, variables, and equations) for MESSAGE.
 MESSAGE_ITEMS = {
     # Index sets
     "commodity": dict(ix_type="set"),

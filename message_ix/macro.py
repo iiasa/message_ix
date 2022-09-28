@@ -43,7 +43,8 @@ UNITS = dict(
     price_MESSAGE="price_ref",
 )
 
-# ixmp items (sets, parameters, variables, and equations) in MACRO.
+#: All of the ixmp items (sets, parameters, variables, and equations) in the MACRO
+#: mathematical formulation.
 MACRO_ITEMS = dict(
     sector=dict(ix_type="set"),
     mapping_macro_sector=dict(ix_type="set", idx_sets=["sector", "commodity", "level"]),

@@ -91,6 +91,7 @@ Model classes
    GAMSModel
    DEFAULT_CPLEX_OPTIONS
    MESSAGE_ITEMS
+   MACRO_ITEMS
 
 .. autodata:: DEFAULT_CPLEX_OPTIONS
 
@@ -194,13 +195,9 @@ Model classes
    :exclude-members: defaults
    :show-inheritance:
 
-   .. autoattribute:: name
-
 .. autoclass:: MACRO
    :members:
    :show-inheritance:
-
-   .. autoattribute:: name
 
 .. autoclass:: MESSAGE_MACRO
    :members:
@@ -221,8 +218,6 @@ Model classes
 
    .. seealso:: :meth:`.Scenario.add_macro`
 
-   .. autoattribute:: name
-
 .. autodata:: MESSAGE_ITEMS
    :annotation: = dict(…)
 
@@ -235,8 +230,6 @@ Model classes
 
 .. autodata:: MACRO_ITEMS
    :annotation: = dict(…)
-
-   All of the items in the MACRO mathematical formulation.
 
    .. seealso:: :data:`.MESSAGE_ITEMS`
 

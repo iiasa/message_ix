@@ -17,7 +17,7 @@ from pkg_resources import get_distribution
 # -- Project information -----------------------------------------------------
 
 project = "MESSAGEix"
-copyright = "2021, IIASA Energy, Climate, and Environment (ECE) Program"
+copyright = "2018–2022, IIASA Energy, Climate, and Environment (ECE) Program"
 author = "MESSAGEix Developers"
 
 # The major project version, used as the replacement for |version|.
