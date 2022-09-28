@@ -12,6 +12,7 @@
 
 ***
 * .. _section_parameter_general:
+* .. _duration_time_rel:
 *
 * General parameters of the |MESSAGEix| implementation
 * ----------------------------------------------------

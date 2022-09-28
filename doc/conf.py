@@ -17,7 +17,7 @@ from pkg_resources import get_distribution
 # -- Project information -----------------------------------------------------
 
 project = "MESSAGEix"
-copyright = "2021, IIASA Energy, Climate, and Environment (ECE) Program"
+copyright = "2018–2022, IIASA Energy, Climate, and Environment (ECE) Program"
 author = "MESSAGEix Developers"
 
 # The major project version, used as the replacement for |version|.
@@ -106,9 +106,9 @@ latex_engine = "lualatex"
 gh_ref = "main" if ".dev" in version else f"v{version}"
 
 extlinks = {
-    "issue": ("https://github.com/iiasa/message_ix/issue/%s", "#"),
-    "pull": ("https://github.com/iiasa/message_ix/pull/%s", "PR #"),
-    "tut": (f"https://github.com/iiasa/message_ix/blob/{gh_ref}/tutorial/%s", ""),
+    "issue": ("https://github.com/iiasa/message_ix/issue/%s", "#%s"),
+    "pull": ("https://github.com/iiasa/message_ix/pull/%s", "PR #%s"),
+    "tut": (f"https://github.com/iiasa/message_ix/blob/{gh_ref}/tutorial/%s", None),
 }
 
 

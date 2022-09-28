@@ -43,7 +43,8 @@ UNITS = dict(
     price_MESSAGE="price_ref",
 )
 
-# ixmp items (sets, parameters, variables, and equations) in MACRO.
+#: All of the ixmp items (sets, parameters, variables, and equations) in the MACRO
+#: mathematical formulation.
 MACRO_ITEMS = dict(
     sector=dict(ix_type="set"),
     mapping_macro_sector=dict(ix_type="set", idx_sets=["sector", "commodity", "level"]),
@@ -371,14 +372,12 @@ class Calculate:
 
     @lru_cache()
     def _gdp0(self):
-        """
-        Derive GDP reference values from "gdp_calibrate" for MACRO calibration.
+        """Derive GDP reference values from "gdp_calibrate" for MACRO calibration.
 
         Returns
         -------
-        pandas Series
+        pandas.Series
             Calculated "gdp0" parameter.
-
         """
         gdp = self.data["gdp_calibrate"]
         gdp0 = gdp.iloc[gdp.index.isin([self.init_year], level="year")]
@@ -526,23 +525,26 @@ class Calculate:
 
     @lru_cache()
     def _bconst(self):
-        """
-        Calculate production function coefficient of different energy sectors ("bcosnt")
-        for MACRO calibration (specified as "prfconst" in GAMS formulation).
+        """Calculate production function coefficient ("bconst").
+
+        This quantity is specified as "prfconst" in the GAMS formulation.
 
         Returns
         -------
-        pandas Series
+        pandas.Series
             Data as initial value for parameter "prfconst".
-
         """
         price_ref = self.data["price_ref"]
         demand_ref = self.data["demand_ref"]
         rho = self._rho()
         gdp0 = self._gdp0()
-        # TODO: automatically get the units here!!
-        bconst = price_ref / 1e3 * (gdp0 / demand_ref) ** (rho - 1)
-        self.data["bconst"] = bconst
+
+        # TODO automatically get the units here
+        # NB(PNK) pandas 1.4.4 automatically drops "year" in the division; pandas 1.5.0
+        # does not. Drop here pre-emptively.
+        tmp = ((gdp0 / demand_ref) ** (rho - 1)).droplevel("year")
+        self.data["bconst"] = price_ref / 1e3 * tmp
+
         return self.data["bconst"]
 
     @lru_cache()
@@ -567,7 +569,7 @@ class Calculate:
         # TODO: automatically get the units here!!
         aconst = ((gdp0 / 1e3) ** rho - partmp) / (k0 / 1e3) ** (rho * kpvs)
         # want the series to only have index of node
-        self.data["aconst"] = aconst.reset_index(level="year", drop=True)
+        self.data["aconst"] = aconst.droplevel("year")
         return self.data["aconst"]
 
 

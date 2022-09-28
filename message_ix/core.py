@@ -444,7 +444,7 @@ class Scenario(ixmp.Scenario):
 
         4. If `ya_args` are given and `tl_only` is :obj:`True` (the default): :math:`y`
            is in the subset of :math:`Y` for which
-           :math:`\text{technical_lifetime}_{n,t,y}` is defined.[1]_
+           :math:`\text{technical_lifetime}_{n,t,y}` is defined. [1]_
         5. (Deprecated) If `in_horizon` is :obj:`True`: :math:`y \geq y_0`, the
            :attr:`.firstmodelyear`.
 
