@@ -2,39 +2,35 @@ Calibrate and tune MESSAGE-MACRO
 ********************************
 
 Demand elasticities are modelled in MESSAGE via an iterative link to MACRO :cite:`Messner2000`. 
-The iterative solution process between MESSAGE and MACRO, referred to as "MESSAGE-MACRO", exchanges information on energy-prices, -demands, and -system costs until the demand responses are such that the two models have reached equilibrium (:cite:`johnson_VRE_2016`, further details can be found :ref:`here <message_doc:macro>`). 
-This combination is activated by calling :meth:`.solve` with the argument `model='MESSAGE-MACRO'`, or using the GAMS :file:`MESSAGE-MACRO_run.gms` script directly (see :ref:`running` for details about these two methods).
+The iterative solution process between MESSAGE and MACRO, referred to as "MESSAGE-MACRO", sends information on "energy prices" and "total system costs" from MESSAGE to MACRO, and "demand" and "GDP" from MACRO to MESSAGE, until the demand responses are such that the two models have reached equilibrium (:cite:`johnson_VRE_2016`, further details can be found :ref:`here <message_doc:macro>`). 
+This linkage between the two models is activated by calling :meth:`.solve` with the argument `model='MESSAGE-MACRO'`, or using the GAMS :file:`MESSAGE-MACRO_run.gms` script directly (see :ref:`running` for details about these two methods).
 
 .. contents::
    :local:
 
-As described in :cite:`johnson_VRE_2016`, this "process is parameterized off of a baseline scenario (which assumes some autonomous rate of energy efficiency improvement, AEEI) and is conducted for all MESSAGE regions simultaneously. Therefore, the demand responses motivated by MACRO are meant to represent the additional (compared to the baseline) energy efficiency improvements and conservation that would occur in each region as a result of higher prices for energy services."
-Prior to initiating MESSAGE-MACRO, the two modules need to be calibrated to each other.
+To solve a scenario in a MESSAGE-MACRO mode, that scenario should be MACRO-calibrated first. As described in :cite:`johnson_VRE_2016`, the calibration process "is parameterized off of a baseline scenario (which assumes some autonomous rate of energy efficiency improvement, AEEI) and is conducted for all MESSAGE regions simultaneously. Therefore, the demand responses motivated by MACRO are meant to represent the additional (compared to the baseline) energy efficiency improvements and conservation that would occur in each region as a result of higher prices for energy services."
 
-In the calibration process, the user defines a reference energy price (`price_ref`) and reference total cost (`cost_ref`) for the energy system that corresponds to a reference value for demand (`demand_ref`) for a base year. Then, using these reference values plus energy prices (`PRICE_COMMODITY`) and total system cost (`COST_NODAL_NET`) from the solution of MESSAGE for a given demand time series (`demand`), the calibration process changes the autonomous rate of energy efficiency improvement (`aeei`) and growth in GDP (`grow`) so that the output of MACRO (`GDP` and `DEMAND`) would converge to an initially specified timeseries trajectory of GDP (`gdp_calibrate`) and demand (`demand`) for a scenario. This is usually a baseline scenario. Without this calibration, the output of MACRO (`GDP` and `DEMAND`) can be different from the initial exogenous assumption for GDP and demand (`gdp_calibrate` and `demand`) for a scenario.
+In the calibration process, the user defines a reference energy price (`price_ref`) and reference total cost (`cost_ref`) for the energy system that corresponds to a reference value for demand (`demand_ref`) for a base year. Then, using these exogenous reference values plus energy prices (`PRICE_COMMODITY`) and total system cost (`COST_NODAL_NET`) from the solution of MESSAGE for a given demand time series (`demand`), the calibration process changes two parameters, namely, the autonomous rate of energy efficiency improvement (`aeei`) and growth in GDP (`grow`), so that the output of MACRO (`GDP` and `DEMAND`) would converge to an initially specified timeseries trajectory of GDP (`gdp_calibrate`) and demand (`demand`), respectively. The scenario used for calibration is usually a baseline scenario, meaning that this scenario will not include any long-term climate policy targets. Without the calibration, the output of MACRO (`GDP` and `DEMAND`) can be different from the initial exogenous assumptions for GDP and demand (`gdp_calibrate` and `demand`) in MESSAGE for a given scenario.
 
-The calibration therefore necessitates a scenario which has already been solved with standalone MESSAGE.
-Ideally, this scenario will be a counterfactual scenario or a reference-scenario, meaning that this scenario will not include any long-term climate policy targets.
-The calibration of the scenario is invoked using the :meth:`.add_macro`.
-
-The calibration will be run for the entire optimization-time horizon i.e., for all time-periods after and including, the `firstmodelyear`.
-It will be necessary to provide the calibration process with calibration data, which amongst other data, specifies data for the last historic time-period in the model i.e., the time-period prior to the `firstmodelyear`, later referred to as the "reference year".
-This "reference year" represents the time-period for which commodity prices and energy system cost are known for a given demand of those commodities.
+The calibration process is invoked using the :meth:`.add_macro` on a (baseline) scenario.
+The calibration will be run for the entire optimization-time horizon, i.e., for all model periods after and including, the `firstmodelyear`.
+The calibration process requires some input data, including reference prices, demand, and total system cost of the last historic period in the model, i.e., the model period prior to the `firstmodelyear`, referred to as the "reference year" in the calibration process.
+This "reference year" represents the model period for which commodity prices and energy system cost are known for a given demand of those commodities.
 This is detailed in the :ref:`next section <macro-input-data>`.
 
 The calibration itself is carried out by the :file:`message_ix/model/MACRO/macro_calibration.gms`.
-In the file, `max_it` is used to specify the number of iterations carried out between MESSAGE and MACRO as part of the calibration process.
-The default value is set to 100 iterations, which has proven to be sufficient for the calibration of MACRO to MESSAGE reference scenario.
-Adjustment of labor productivity growth rates is carried out during even iterations.
-Adjustment of AEEI improvement rates is carried out during odd iterations.
+In this iterative process, `max_it` is used to specify the number of iterations carried out between MESSAGE and MACRO as part of the calibration process.
+The default value is set to 100 iterations, which has proven to be sufficient for the calibration of MACRO to MESSAGE reference scenario for various models.
+Adjustment of GDP growth rates (`grow`) is carried out during even iterations.
+Adjustment of AEEI improvement rates (`aeei`) is carried out during odd iterations.
 
-.. note:: Note, that no actual check is carried out to see if the calibration process has been successful.
+.. note:: Note, that no actual check is carried out to see if the calibration process has been successful at the end of iterations.
 
 The information from the calibration process is logged in :file:`message_ix/model/MACRO_run.lst`.
-Successful calibration of MACRO to MESSAGE can be identified by looking at the reported values for the "PARAMETER growth_correction" for the last "even" iteration, which should be somewhere around 1e-14 to 1e-16 for positive adjustments or -1e-14 to -1e-16 for negative adjustments.
-Likewise, the "PARAMETER aeei_correction" can be checked for the loss "odd" iteration.  
+Successful calibration of MESSAGE to MACRO can be identified by looking at the reported values for the "PARAMETER growth_correction" for the last "even" iteration, which should be somewhere around 1e-14 to 1e-16 for positive adjustments or -1e-14 to -1e-16 for negative adjustments.
+Likewise, the "PARAMETER aeei_correction" can be checked for the last "odd" iteration.  
 Once the calibration process has been completed, the scenario will be populated with :ref:`additional parameters <macro-core-formulation>`.
-As part of the calibration process, final check will automatically be carried out, solving the freshly calibrated scenario in combination with MACRO, ensuring that the convergence criteria is met after the first iteration.
+As part of the calibration process, a final check will automatically be carried out by solving the freshly calibrated scenario in the MESSAGE-MACRO coupled mode, ensuring that the convergence criteria between solution of MESSAGE and MACRO is met after the first iteration.
 
 .. _macro-input-data:
 
