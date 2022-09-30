@@ -23,6 +23,8 @@ Variables
 * solving the model region by region
 * ------------------------------------------------------------------------------
 
+* no check is made to see if a certain convergence criteria is acheived.
+* MAX_ITER will determine the number of iterations after which the calibration is automatically halted.
 FOR (ctr = 1 TO max_it BY 1,
 
 * ------------------------------------------------------------------------------
