@@ -421,7 +421,7 @@ class MESSAGE(GAMSModel):
                 scenario.add_set(set_name, expected)
 
         # Enforcing new indexes for existing set and parameters
-        # TODO: this should ideally done by introducing a new method called
+        # TODO: this should be ideally done by introducing a new method called
         # `reinitiate_items()` that would reinitialize some items with new index sets
         sets = ["map_tec_storage"]
         pars = ["storage_self_discharge", "storage_initial"]
@@ -442,7 +442,6 @@ class MESSAGE(GAMSModel):
                         idx_names=MESSAGE_ITEMS[set_name]["idx_names"],
                     )
                 else:
-                    print(set(df.columns))
                     if tuple(df.columns) == MESSAGE_ITEMS[set_name]["idx_names"]:
                         continue
                     else:
@@ -450,6 +449,7 @@ class MESSAGE(GAMSModel):
                             f"{set_name} requires an updated index sets:",
                             f" {MESSAGE_ITEMS[set_name]['idx_sets']}",
                         )
+
         for par_name in pars:
             try:
                 scenario.init_par(
