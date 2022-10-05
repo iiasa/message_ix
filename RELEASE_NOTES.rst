@@ -19,6 +19,16 @@ All changes
 - Ensure `levelized_cost` are also calculated for technologies with only variable costs (:pull:`653`).
 - Correct calculation of `COST_NODAL_NET` for standalone MESSAGE (:pull:`648`)
 - Account for difference in period-length in equations `NEW_CAPACITY_CONSTRAINT_LO` and `NEW_CAPACITY_CONSTRAINT_UP` (:pull:`654`)
+- Add additional oscillation detection mechanism for macro iterations (:pull:`645`)
+- Extend functionality of storage solutions to include "mode" and temporal level (:pull:`633`).
+
+Migration notes
+---------------
+
+- The index sets in :meth:`.map_tec_storage` will be extended to include "mode" of operation of storage technologies and the temporal level ("lvl_temporal") of a storage container in :mod:`message_ix` 4.0.
+  Therefore, if this set is already populated in a scenario without the indexes of "mode" and "lvl_temporal", the enhanced mathematical equation in GAMS will not work.
+  To resolve this, the user needs to populate :meth:`.map_tec_storage` again, by adding the "mode" of operation for both charger-discharge technologies, and adding "mode" and "lvl_temporal" for the corresponding storage device.
+  Furthermore, parameters "storage_initial" and "storage_self_discharge" should be updated as well by including "mode" for each storage device.
 
 .. _v3.6.0:
 
@@ -41,11 +51,6 @@ Migration notes
 
   This matches fixed behaviour upstream in :mod:`genno` version 1.12 to avoid unintended confusion with keys like ``A:i``: ``i`` (after the first colon) is the name for the sole dimension of a 1-dimensional quantity, whereas ``default`` in ``message::default`` is a tag.
 
-- The index sets in :meth:`.map_tec_storage` are extended to include "mode" of operation and temporal level of a storage container ("lvl_temporal").
-  Therefore, if this set is already populated in a scenario without "mode" and "lvl_temporal", the updated mathematical equation does not work.
-  To resolve this, the user needs to populate this set again, by adding the "mode" of operation for both charger-discharge technologies, and adding "mode" and "lvl_temporal" for the storage device.
-  Furthermore, parameters "storage_initial" and "storage_self_discharge" should be updated as well by including "mode" for each storage device.
-
 All changes
 -----------
 
@@ -53,7 +58,6 @@ All changes
 - New reporting computation :func:`.as_message_df` (:pull:`628`).
 - Extend functionality of :meth:`.vintage_and_active_years`; add aliases :meth:`.yv_ya`, :meth:`.ya`, and :attr:`.y0` (:pull:`572`, :pull:`623`).
 - Add scripts and HOWTO for documentation videos (:pull:`396`).
-- Extend functionality of storage solutions to include "mode" and temporal level (:pull:`633`).
 
 .. _v3.5.0:
 
