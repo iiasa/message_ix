@@ -43,12 +43,12 @@ For an example of such input data files, see the files :file:`message_ix/tests/d
 General configuration sheet
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- ``config``: This configuration sheet specifies MACRO-related nodes and years, and maps MACRO sectors to MESSAGE commodities and levels.
-   The sheet has five columns, each of which is a list of labels/codes for a corresponding :ref:`ixmp set <ixmp:data-model-data>`:
-
-   - "node", "year": these can each have any length, depending on the number of regions and years to be included in the MACRO calibration process.
-   - "sector", "commodity", "level": these 3 columns must have equal lengths.
-     They describe a one-to-one mapping between MACRO sectors (entries in the "sector" column) and MESSAGE commodities and levels (paired entries in the "commodity" and "level" columns).
+  - ``config``: This configuration sheet specifies MACRO-related nodes and years, and maps MACRO sectors to MESSAGE commodities and levels.
+    The sheet has five columns, each of which is a list of labels/codes for a corresponding :ref:`ixmp set <ixmp:data-model-data>`:
+    
+    - "node", "year": these can each have any length, depending on the number of regions and years to be included in the MACRO calibration process.
+    - "sector", "commodity", "level": these 3 columns must have equal lengths.
+      They describe a one-to-one mapping between MACRO sectors (entries in the "sector" column) and MESSAGE commodities and levels (paired entries in the "commodity" and "level" columns).
 
 MACRO parameter sheets
 ~~~~~~~~~~~~~~~~~~~~~~
