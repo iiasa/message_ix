@@ -378,17 +378,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         lines2 = ("{} = {}".format(*kv) for kv in self.cplex_opts.items())
         optfile2.write_text("\n".join(lines2))
 
-        try:
-            result = super().run(scenario)
-        finally:
-            # Remove the optfile regardless of whether the run completed without error.
-            # The file may have been removed already by another run (in a separate
-            # process) that completed before this one.
-            # py37 compat: check for existence instead of using unlink(missing_ok=True)
-            if optfile.exists():
-                optfile.unlink()
-            if optfile2.exists():
-                optfile2.unlink()
+        result = super().run(scenario)
 
         return result
 
