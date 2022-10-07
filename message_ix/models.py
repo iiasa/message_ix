@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 #: Solver options used by :meth:`.Scenario.solve`.
 DEFAULT_CPLEX_OPTIONS = {
     "advind": 0,
-    "lpmethod": 2,
+    "lpmethod": 4,
     "threads": 4,
     "epopt": 1e-6,
 }
