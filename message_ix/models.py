@@ -380,6 +380,10 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
 
         result = super().run(scenario)
 
+        # In previous versions, the `cplex.opt` file(s) were removed at this point
+        # in the workflow. This has been removed due to issues when running
+        # scenarios asynchronously.
+
         return result
 
 
