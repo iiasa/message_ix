@@ -16,22 +16,23 @@ beyond_horizon_lifetime(node,inv_tec,vintage)$( beyond_horizon_lifetime(node,inv
 * Levelized costs excluding fuel (and emissions) costs
 * ------------------------------------
 * For the 'soft' relaxations of the dynamic constraints and the associated penalty factor in the objective function,
-* we need to compute the parameter :math:`levelized\_cost_{n,t,y}`.
+* we need to compute the parameter :math:`levelized\_cost_{n,t,y,h}`.
 *
 * .. math::
-*    levelized\_cost_{n,t,m,y,h} := \
+*    levelized\_cost_{n,t,y,h} := \
 *        & inv\_cost_{n,t,y} \cdot \frac{ interestrate_{y} \cdot \left( 1 + interestrate_{y} \right)^{|y|} }
 *                                      { \left( 1 + interestrate_{y} \right)^{|y|} - 1 } \\
 *        & + fix\_cost_{n,t,y,y} \cdot \frac{ 1 }{ \sum_{h'} duration\_time_{h'} \cdot capacity\_factor_{n,t,y,y,h'} } \\
-*        & + var\_cost_{n,t,y,y,m,h} \\
-*        & + \sum_{t} relation\_cost_{r,n,y} \cdot \Bigg(
-*          & \ relation\_new\_capacity_{r,n,y,t} \cdot \frac{ interestrate_{y} \cdot \left( 1 + interestrate_{y} \right)^{|y|} }
+*        & + \sum_{m} var\_cost_{n,t,y,y,m,h} \\
+*        & + \sum_{r} relation\_cost_{r,n,y} \cdot \Big( \\
+*        & \hspace{2 cm} relation\_new\_capacity_{r,n,y,t} \cdot \frac{ interestrate_{y} \cdot \left( 1 + interestrate_{y} \right)^{|y|} }
 *                                      { \left( 1 + interestrate_{y} \right)^{|y|} - 1 } \\
-*          & + relation\_total\_capacity_{r,n,y,t} \cdot \frac{ 1 }{ \sum_{h'} duration\_time_{h'} \cdot capacity\_factor_{n,t,y,y,h'} } \\
-*          & + \sum_{n^L,m} \ relation\_activity_{r,n,y,n^L,t,y,m} \\
+*        & \hspace{2 cm} + relation\_total\_capacity_{r,n,y,t} \cdot \frac{ 1 }{ \sum_{h'} duration\_time_{h'} \cdot capacity\_factor_{n,t,y,y,h'} } \\
+*        & \hspace{2 cm} + \sum_{n^L,m} \ relation\_activity_{r,n,y,n^L,t,y,m} \\
+*        & \hspace{6 cm} \Big)
 *
 * where :math:`|y| = technical\_lifetime_{n,t,y}`. This formulation implicitly assumes constant fixed
-* and variable costs over time. Also, a fixed relation cost is assumed for activity years over time.
+* and variable costs over time for a given vintage year. Also, a fixed relation cost is assumed for different activity years for a certain relation year.
 *
 * **Warning:**
 * Levelized costs do not include fuel-related and emissions costs.
