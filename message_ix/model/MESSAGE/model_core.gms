@@ -1547,7 +1547,7 @@ SHARE_CONSTRAINT_COMMODITY_LO(shares,node_share,year,time)$( share_commodity_lo(
 *
 * Here, :math:`|y|` is the number of years in period :math:`y`, i.e., :math:`duration\_period_{y}`.
 ***
-NEW_CAPACITY_CONSTRAI/NT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
+NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
         AND is_dynamic_new_capacity_up(node,inv_tec,year) )..
 * actual new capacity
     CAP_NEW(node,inv_tec,year) =L=
