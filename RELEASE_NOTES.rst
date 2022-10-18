@@ -7,7 +7,7 @@ All changes
 - Adjust :meth:`.Scenario.add_macro` calculations for pandas 1.5.0 (:pull:`656`).
 - Add additional oscillation detection mechanism for MACRO iterations (:pull:`645`).
 - Correct calculation of `COST_NODAL_NET` for standalone MESSAGE (:pull:`648`)
-- Account for difference in period-length when calculating `NEW_CAPACITY_CONSTRAINT_LO` and `NEW_CAPACITY_CONSTRAINT_UP` (:pull:`654`)
+- Account for difference in period-length in equations `NEW_CAPACITY_CONSTRAINT_LO` and `NEW_CAPACITY_CONSTRAINT_UP` (:pull:`654`)
 - Add additional oscillation detection mechanism for macro iterations (:pull:`645`)
 
 .. _v3.6.0:

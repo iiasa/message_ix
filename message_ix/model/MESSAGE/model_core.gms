@@ -1547,7 +1547,7 @@ SHARE_CONSTRAINT_COMMODITY_LO(shares,node_share,year,time)$( share_commodity_lo(
 *
 * Here, :math:`|y|` is the number of years in period :math:`y`, i.e., :math:`duration\_period_{y}`.
 ***
-NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
+NEW_CAPACITY_CONSTRAI/NT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
         AND is_dynamic_new_capacity_up(node,inv_tec,year) )..
 * actual new capacity
     CAP_NEW(node,inv_tec,year) =L=
@@ -1576,6 +1576,9 @@ NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * GAMS implementation comment:
 * The sums in the constraint have to be over `year_all2` (not `year2`) to also get the dynamic effect from historical
 * new capacity. If one would sum over `year2`, periods prior to the first model year would be ignored.
+* Furthermore, as `CAP_NEW` is derived from the value in a previous period, any change in the duration of two consecutive
+* model periods needs to be accounted for. This is done by using the ratio of two consecutive model periods as a
+* multiplication factor.
 
 ***
 * .. _equation_new_capacity_soft_constraint_up:
@@ -1643,6 +1646,13 @@ NEW_CAPACITY_CONSTRAINT_LO(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * optional relaxation for calibration and debugging
 %SLACK_CAP_NEW_DYNAMIC_LO% - SLACK_CAP_NEW_DYNAMIC_LO(node,inv_tec,year)
 ;
+
+* GAMS implementation comment:
+* The sums in the constraint have to be over `year_all2` (not `year2`) to also get the dynamic effect from historical
+* new capacity. If one would sum over `year2`, periods prior to the first model year would be ignored.
+* Furthermore, as `CAP_NEW` is derived from the value in a previous period, any change in the duration of two consecutive
+* model periods needs to be accounted for. This is done by using the ratio of two consecutive model periods as a
+* multiplication factor.
 
 ***
 * .. _equation_new_capacity_soft_constraint_lo:
