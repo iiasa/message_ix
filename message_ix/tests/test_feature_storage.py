@@ -1,18 +1,23 @@
-# -*- coding: utf-8 -*-
-"""
-This is a unit test for representing storage in the MESSAGEix model, and
-testing the functionality of storage equations. The workflow is as follows:
-    - building a stylized MESSAGEix model
-    - adding seasonality and modifying parameters for timesteps accordingly
-    - adding storage implementation (dam: storage device, pump: charger,
-                                     turbine: discharger)
-    - testing storage functionality and equations
+"""Test storage representation.
 
-"""
+This is a unit test for representing storage in the MESSAGEix model, and testing the
+functionality of storage equations. The workflow is as follows:
 
+- Build a stylized MESSAGEix model.
+- Add seasonality and modify parameters for timesteps accordingly.
+- Add storage implementation (dam: storage device, pump: charger, turbine: discharger).
+- Test storage functionality and equations.
+"""
+import logging
 from itertools import product
 
+import pandas as pd
+import pytest
+from ixmp.testing import assert_logs
+
 from message_ix import Scenario
+from message_ix.models import MESSAGE
+from message_ix.testing import make_dantzig
 
 
 # A function for generating a simple MESSAGEix model with two technologies
@@ -243,3 +248,55 @@ def test_storage(test_mp):
 
     time_duration = {"a": 0.3, "b": 0.25, "c": 0.25, "d": 0.2}
     storage_setup(test_mp, time_duration, "_unequal_time")
+
+
+def test_structure(caplog, test_mp):
+    """:meth:`MESSAGE.initialize` and :meth:`MESSAGE.enforce` handle old structure."""
+    scen = make_dantzig(test_mp)
+
+    # Item name to use for the tests, a parameter, and its dimensions
+    name = "storage_initial"
+    dims = ["node", "technology", "level", "commodity", "year", "time"]
+    # NB here we cannot use make_df, since that refers to the current dimensionality of
+    #    storage_initial per MESSAGE_ITEMS
+    data = pd.Series(
+        ["topeka", "canning_plant", "supply", "cases", 1963, "year", 1.0, "kg"],
+        index=dims + ["value", "unit"],
+    )
+
+    def prepare(s, with_data=False):
+        """Re-initialize to the former definition, i.e. omitting mode."""
+        with scen.transact():
+            scen.remove_par(name)
+            scen.init_par(name, idx_sets=dims)
+            if with_data:
+                scen.add_par(name, data.to_frame().transpose())
+
+    # Test by calling the MESSAGE model class methods directory. This is not the typical
+    # user behaviour; we just want to avoid a more complex way of doing so.
+
+    # Calling initialize() with no data automatically expands the dimensions
+    prepare(scen)
+    assert "mode" not in scen.idx_sets(name)
+
+    with scen.transact():
+        MESSAGE.initialize(scen)
+
+    assert "mode" in scen.idx_sets(name)
+
+    # Now with data in storage_initial, a warning is raised
+    prepare(scen, with_data=True)
+
+    # Two context managers for the with: block
+    c1 = pytest.warns(UserWarning, match="'storage_initial' has data with dimensions")
+    c2 = assert_logs(caplog, "Existing index sets of 'stora", at_level=logging.WARNING)
+    with c1, c2:
+        with scen.transact():
+            MESSAGE.initialize(scen)
+
+    # …the dimensions are *not* expanded automatically
+    assert "mode" not in scen.idx_sets(name)
+
+    # …and the scenario would not solve
+    with pytest.raises(ValueError, match="'storage_initial' has data with dimensions"):
+        MESSAGE.enforce(scen)
