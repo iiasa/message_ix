@@ -424,7 +424,9 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
     return scen
 
 
-def make_westeros(mp, emissions=False, solve=False, quiet=True):
+def make_westeros(
+    mp, emissions=False, solve=False, quiet=True, model_horizon=[700, 710, 720]
+):
     """Return an :class:`message_ix.Scenario` for the Westeros model.
 
     This is the same model used in the ``westeros_baseline.ipynb`` tutorial.
@@ -444,7 +446,6 @@ def make_westeros(mp, emissions=False, solve=False, quiet=True):
 
     # Sets
     history = [690]
-    model_horizon = [700, 710, 720]
     scen.add_horizon(year=history + model_horizon, firstmodelyear=model_horizon[0])
     year_df = scen.vintage_and_active_years()
     vintage_years, act_years = year_df["year_vtg"], year_df["year_act"]
@@ -476,7 +477,25 @@ def make_westeros(mp, emissions=False, solve=False, quiet=True):
         year=model_horizon,
     )
 
-    gdp_profile = np.array([1.0, 1.5, 1.9])
+    gdp_profile = pd.DataFrame({"years": [700, 710, 720], "values": [1.0, 1.5, 1.9]})
+    missing_years = [y for y in model_horizon if y not in set(gdp_profile.years)]
+    if missing_years:
+        gdp_profile = pd.concat(
+            [
+                gdp_profile,
+                pd.DataFrame(
+                    {"years": missing_years, "values": [np.nan] * len(missing_years)}
+                ),
+            ]
+        )
+        # Interpolate missing years
+        gdp_profile = (
+            gdp_profile.sort_values(by="years")
+            .set_index("years")
+            .interpolate(how="index", limit_direction="both")
+            .reset_index()
+        )
+    gdp_profile = np.array(gdp_profile.set_index("years")["values"])
     demand_per_year = 40 * 12 * 1000 / 8760
     scen.add_par(
         "demand",
