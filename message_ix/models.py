@@ -7,6 +7,7 @@ from warnings import warn
 
 import ixmp.model.gams
 from ixmp import config
+from ixmp.utils import maybe_check_out, maybe_commit
 
 from .macro import MACRO_ITEMS
 
@@ -388,6 +389,9 @@ def _check_structure(scenario):
        `MESSAGE_ITEMS` and the item contains data. Otherwise, the message is an empty
        string.
     """
+    if scenario.has_solution():
+        return
+
     # NB could rename this e.g. _check_structure_0 if there are multiple such methods
     for name in ("storage_initial", "storage_self_discharge", "map_tec_storage"):
         info = MESSAGE_ITEMS[name]
@@ -456,16 +460,20 @@ class MESSAGE(GAMSModel):
         """
         # Check for storage items that may contain incompatible data or need to be
         # re-initialized
+        state = None
         for name, ix_type, N, message in _check_structure(scenario):
             if len(message):
                 warn(message)  # Existing, incompatible data → conspicuous warning
             elif N == 0:
                 # Existing, empty item → remove, even if it has the correct dimensions.
-                # It will be (re)initialized below.
+                state = maybe_check_out(scenario, state)
                 getattr(scenario, f"remove_{ix_type}")(name)
 
         # Initialize the ixmp items for MESSAGE
         cls.initialize_items(scenario, MESSAGE_ITEMS)
+
+        # Commit if anything was removed
+        maybe_commit(scenario, state, f"{cls.__name__}.initialize")
 
 
 class MACRO(GAMSModel):
