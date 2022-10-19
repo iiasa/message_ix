@@ -18,6 +18,7 @@ from ixmp.testing import assert_logs
 from message_ix import Scenario
 from message_ix.models import MESSAGE
 from message_ix.testing import make_dantzig
+from message_ix.util import expand_dims
 
 
 # A function for generating a simple MESSAGEix model with two technologies
@@ -283,6 +284,8 @@ def test_structure(caplog, test_mp):
         MESSAGE.initialize(scen)
 
     assert "mode" in scen.idx_sets(name)
+    # …and enforce() completes without raising an exception
+    MESSAGE.enforce(scen)
 
     # Now with data in storage_initial, a warning is raised
     prepare(scen, with_data=True)
@@ -300,3 +303,10 @@ def test_structure(caplog, test_mp):
     # …and the scenario would not solve
     with pytest.raises(ValueError, match="'storage_initial' has data with dimensions"):
         MESSAGE.enforce(scen)
+
+    # expand_dims() results in the correct dimensionality and complete data
+    expand_dims(scen, name, mode="production")
+    assert "mode" in scen.idx_sets(name)
+
+    # …and enforce() completes without raising an exception
+    MESSAGE.enforce(scen)
