@@ -3,6 +3,7 @@ from collections import ChainMap
 from copy import copy, deepcopy
 from functools import lru_cache
 from pathlib import Path
+from warnings import warn
 
 import ixmp.model.gams
 from ixmp import config
@@ -250,8 +251,6 @@ MESSAGE_ITEMS = {
     "storage_initial": item("par", "n t m l c y h"),
     # Storage losses as a percentage of installed capacity
     "storage_self_discharge": item("par", "n t m l c y h"),
-    "STORAGE": item("var", "n t m l c y h"),
-    "STORAGE_CHARGE": item("var", "n t m l c y h"),
     "subsidy": item("par", "nl type_tec ya"),
     "tax_emission": dict(
         ix_type="par", idx_sets=["node", "type_emission", "type_tec", "type_year"]
@@ -262,10 +261,10 @@ MESSAGE_ITEMS = {
     "time_order": dict(ix_type="par", idx_sets=["lvl_temporal", "time"]),
     "var_cost": item("par", "nl t yv ya m h"),
     #
-    # commented: for both variables and equations, ixmp_source requires that the
+    # commented: for certain variables and equations, ixmp_source requires that the
     # `idx_sets` and `idx_names` parameters be empty, but then internally uses the
     # correct sets and names to initialize.
-    # TODO adjust ixmp_source to accept these values, then uncomment.
+    # TODO adjust JDBCBackend to accept these values (or replace it), then uncomment.
     #
     # Variables
     #
@@ -287,6 +286,9 @@ MESSAGE_ITEMS = {
     # "REL": item("var", "relation nr yr"),
     # # Stock
     # "STOCK": item("var", "n c l y"),
+    #
+    "STORAGE": item("var", "n t m l c y h"),
+    "STORAGE_CHARGE": item("var", "n t m l c y h"),
     #
     # # Equations
     # # Commodity balance
@@ -324,23 +326,6 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         },
         ixmp.model.gams.GAMSModel.defaults,
     )
-
-    @classmethod
-    def initialize(cls, scenario):
-        """Set up *scenario* with required sets and parameters for MESSAGE.
-
-        See Also
-        --------
-        :data:`MESSAGE_ITEMS`
-        """
-        # Initialize the ixmp items
-        cls.initialize_items(scenario, MESSAGE_ITEMS)
-
-    @staticmethod
-    def enforce(scenario):
-        """Enforce data consistency in `scenario`."""
-        # No-op; implemented in MESSAGE sub-class, below
-        # TODO make this an optional method of the ixmp.model.base.Model abstract class
 
     def __init__(self, name=None, **model_options):
         # Update the default options with any user-provided options
@@ -391,6 +376,41 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         return result
 
 
+def _check_structure(scenario):
+    """Check dimensionality of some items related to the storage representation.
+
+    Yields a sequence of 4-tuples:
+
+    1. Item name.
+    2. Item ix_type.
+    3. Number of data points in the item; -1 if it does not exist in `scenario`.
+    4. A warning/error message, *if* the index names/sets do not match those in
+       `MESSAGE_ITEMS` and the item contains data. Otherwise, the message is an empty
+       string.
+    """
+    # NB could rename this e.g. _check_structure_0 if there are multiple such methods
+    for name in ("storage_initial", "storage_self_discharge", "map_tec_storage"):
+        info = MESSAGE_ITEMS[name]
+        message = ""
+
+        try:
+            # Retrieve the index names and data length of the item
+            idx_names = tuple(scenario.idx_names(name))
+            N = len(getattr(scenario, info["ix_type"])(name))
+        except KeyError:
+            N = -1  # Item does not exist
+        else:
+            # Item exists
+            expected_names = info.get("idx_names", info["idx_sets"])
+            if expected_names != idx_names and N > 0:
+                message = (
+                    f"{info['ix_type']} {name!r} has data with dimensions {idx_names!r}"
+                    f" != {expected_names!r} and cannot be solved; try expand_dims()"
+                )
+        finally:
+            yield name, info["ix_type"], N, message
+
+
 class MESSAGE(GAMSModel):
     """Model class for MESSAGE."""
 
@@ -399,6 +419,12 @@ class MESSAGE(GAMSModel):
     @staticmethod
     def enforce(scenario):
         """Enforce data consistency in `scenario`."""
+        # Raise an exception if any of the storage items have incorrect dimensions, i.e.
+        # non-empty error messages
+        messages = list(filter(None, [msg for *_, msg in _check_structure(scenario)]))
+        if messages:
+            raise ValueError("\n".join(messages))
+
         # Check masks ("mapping sets") that indicate which elements of corresponding
         # parameters are active/non-zero. Note that there are other masks currently
         # handled in JDBCBackend. For the moment, this code does not backstop that
@@ -420,60 +446,26 @@ class MESSAGE(GAMSModel):
                 scenario.remove_set(set_name, existing)
                 scenario.add_set(set_name, expected)
 
-        # Enforcing new indexes for existing set and parameters
-        # TODO: this should be ideally done by introducing a new method called
-        # `reinitiate_items()` that would reinitialize some items with new index sets
-        sets = ["map_tec_storage"]
-        pars = ["storage_self_discharge", "storage_initial"]
+    @classmethod
+    def initialize(cls, scenario):
+        """Set up *scenario* with required sets and parameters for MESSAGE.
 
-        scenario.check_out()
-        for set_name in sets:
-            try:
-                scenario.init_set(
-                    set_name, idx_sets=MESSAGE_ITEMS[set_name]["idx_sets"]
-                )
-            except ValueError:
-                df = scenario.set(set_name)
-                if df.empty:
-                    scenario.remove_set(set_name)
-                    scenario.init_set(
-                        set_name,
-                        idx_sets=MESSAGE_ITEMS[set_name]["idx_sets"],
-                        idx_names=MESSAGE_ITEMS[set_name]["idx_names"],
-                    )
-                else:
-                    if tuple(df.columns) == MESSAGE_ITEMS[set_name]["idx_names"]:
-                        continue
-                    else:
-                        raise RuntimeError(
-                            f"{set_name} requires an updated index sets:",
-                            f" {MESSAGE_ITEMS[set_name]['idx_sets']}",
-                        )
+        See Also
+        --------
+        :data:`MESSAGE_ITEMS`
+        """
+        # Check for storage items that may contain incompatible data or need to be
+        # re-initialized
+        for name, ix_type, N, message in _check_structure(scenario):
+            if len(message):
+                warn(message)  # Existing, incompatible data → conspicuous warning
+            elif N == 0:
+                # Existing, empty item → remove, even if it has the correct dimensions.
+                # It will be (re)initialized below.
+                getattr(scenario, f"remove_{ix_type}")(name)
 
-        for par_name in pars:
-            try:
-                scenario.init_par(
-                    par_name, idx_sets=MESSAGE_ITEMS[par_name]["idx_sets"]
-                )
-            except ValueError:
-                df = scenario.par(par_name)
-                if df.empty:
-                    scenario.remove_par(par_name)
-                    scenario.init_par(
-                        par_name,
-                        idx_sets=MESSAGE_ITEMS[par_name]["idx_sets"],
-                    )
-                else:
-                    check = tuple([x for x in df.columns if x not in ["unit", "value"]])
-                    if check == MESSAGE_ITEMS[par_name]["idx_sets"]:
-                        continue
-                    else:
-                        raise RuntimeError(
-                            f"{par_name} requires an updated index sets:"
-                            f" {MESSAGE_ITEMS[par_name]['idx_sets']}!"
-                        )
-
-        scenario.commit("indexes updated")
+        # Initialize the ixmp items for MESSAGE
+        cls.initialize_items(scenario, MESSAGE_ITEMS)
 
 
 class MACRO(GAMSModel):
@@ -529,3 +521,8 @@ class MESSAGE_MACRO(MESSAGE, MACRO):
 
         # Append to the prepared solve_args
         self.solve_args.extend(mm_iter_args)
+
+    @classmethod
+    def initialize(cls, scenario, with_data=False):
+        MESSAGE.initialize(scenario)
+        MACRO.initialize(scenario, with_data)
