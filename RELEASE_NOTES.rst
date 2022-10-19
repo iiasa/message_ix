@@ -9,6 +9,34 @@ Migration notes
   In order to use the previous default `lpmethod`, the user-specific default setting can be set through the user's ixmp configuration file.
   Alternatively, the `lpmethod` can be specified directly as an argument when solving a scenario.
   Both of these configuration methods are further explained :meth:`here <message_ix.models.GAMSModel>`.
+The dimensionality of one set and two parameters (``map_tec_storage``, ``storage_initial``, and ``storage_self_discharge``) are extended to allow repesentation of the mode of operation of storage technologies and the temporal level of storage containers.
+If these items are already populated with data in a Scenario, this data will be incompatible with the MESSAGE GAMS implementation in this release; a :class:`UserWarning` will be emitted when the :class:`.Scenario` is instantiated, and :meth:`~.message_ix.Scenario.solve` will raise a :class:`ValueError`.
+(If these items are empty, their dimensions will be updated automatically.
+New Scenarios are unaffected.)
+
+Users must update data for these items, specifically:
+
+==========================  ============================================
+Existing parameter or set   Dimension(s) to add
+==========================  ============================================
+``map_tec_storage``         ``mode``, ``storage_mode``, ``lvl_temporal``
+``storage_initial``         ``mode``
+``storage_self_discharge``  ``mode``
+==========================  ============================================
+
+For the set ``map_tec_storage``, values for the new dimensions represent, respectively, the ``mode`` of operation for charge/discharge technologies, and the ``storage_mode`` and ``lvl_temporal`` for the corresponding storage device.
+For the two parameters, :func:`.expand_dims` is provided to help:
+
+.. code-block:: python
+
+    from message_ix import Scenario
+    from message_ix.util import expand_dims
+
+    scen, platform = Scenario.from_url("…")
+
+    # Re-use the existing data in `scen`, adding the `mode` dimension
+    expand_dims(scen, "storage_initial", mode="an existing mode")
+
 
 All changes
 -----------
@@ -21,14 +49,6 @@ All changes
 - Account for difference in period-length in equations `NEW_CAPACITY_CONSTRAINT_LO` and `NEW_CAPACITY_CONSTRAINT_UP` (:pull:`654`)
 - Add additional oscillation detection mechanism for macro iterations (:pull:`645`)
 - Extend functionality of storage solutions to include "mode" and temporal level (:pull:`633`).
-
-Migration notes
----------------
-
-- The index sets in :meth:`.map_tec_storage` will be extended to include "mode" of operation of storage technologies and the temporal level ("lvl_temporal") of a storage container in :mod:`message_ix` 4.0.
-  Therefore, if this set is already populated in a scenario without the indexes of "mode" and "lvl_temporal", the enhanced mathematical equation in GAMS will not work.
-  To resolve this, the user needs to populate :meth:`.map_tec_storage` again, by adding the "mode" of operation for both charger-discharge technologies, and adding "mode" and "lvl_temporal" for the corresponding storage device.
-  Furthermore, parameters "storage_initial" and "storage_self_discharge" should be updated as well by including "mode" for each storage device.
 
 .. _v3.6.0:
 
