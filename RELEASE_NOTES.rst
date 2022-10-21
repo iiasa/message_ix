@@ -1,6 +1,14 @@
 Next release
 ============
 
+Migration notes
+---------------
+
+- The default `lpmethod` has been changed from "Dual Simplex" (`lpmethod=2`) to "Barrier" (`lpmethod=4`).
+  In order to use the previous default `lpmethod`, the user-specific default setting can be set through the user's ixmp configuration file.
+  Alternatively, the `lpmethod` can be specified directly as an argument when solving a scenario.
+  Both of these configuration methods are further explained :meth:`here <message_ix.models.GAMSModel>`.
+
 All changes
 -----------
 
