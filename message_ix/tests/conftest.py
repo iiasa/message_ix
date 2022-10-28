@@ -54,7 +54,7 @@ def ureg():
     for unit in "USD", "case":
         try:
             registry.define(f"{unit} = [{unit}]")
-        except pint.DefinitionSyntaxError:
+        except (pint.RedefinitionError, pint.DefinitionSyntaxError):
             # Already defined
             pass
 
