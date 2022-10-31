@@ -19,6 +19,11 @@ def test_NEW_CAPACITY_UP(test_mp, model_horizon):
     the parameter "CAP_NEW" is correctly calculated.
     We check this for the transition from 10 to 5-year timesteps, and from
     5 to 10-year timesteps.
+    The values against which the test results are being compared are based
+    on the assumption that due to the carbon price, the capacity installation
+    of `wind_ppl` is maximized.
+    Hence the values are derived by applying the parameters of `wind_ppl`
+    directly to the `NEW_CAPACITY_BOUND_UP` equation."
     """
     tax_emission = pd.DataFrame(
         {
