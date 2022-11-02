@@ -86,6 +86,8 @@ jobs:
       run: echo "RETICULATE_PYTHON=$pythonLocation" >> $GITHUB_ENV
       shell: bash
 
+    - uses: ts-graphviz/setup-graphviz@v1
+
     - uses: r-lib/actions/setup-r@v2
       id: setup-r
 
@@ -106,8 +108,6 @@ jobs:
       with:
         version: ${{ env.GAMS_VERSION }}
         license: ${{ secrets.GAMS_LICENSE }}
-
-    - uses: ts-graphviz/setup-graphviz@v1
 
     - name: Install ixmp and dependencies
       working-directory: ixmp
