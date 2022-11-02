@@ -42,12 +42,13 @@ jobs:
       run: |
         python -m pip install --upgrade pip wheel
         # Locate pip cache directory
-        echo "::set-output name=cache-dir::$(pip cache dir)"
+        echo "pip-cache-dir=$(pip cache dir)" >> $GITHUB_ENV
+
 
     - name: Cache Python packages
       uses: actions/cache@v3
       with:
-        path: ${{ steps.pip.outputs.cache-dir }}
+        path: ${{ env.pip-cache-dir }}
         key: lint-${{ runner.os }}
 
     - name: Check "black" code style

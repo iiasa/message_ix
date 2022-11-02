@@ -49,14 +49,14 @@ jobs:
       run: |
         python -m pip install --upgrade pip wheel setuptools-scm
         # Locate pip cache directory
-        echo "::set-output name=cache-dir::$(pip cache dir)"
+        echo "pip-cache-dir=$(pip cache dir)" >> $GITHUB_ENV
 
     - name: Cache GAMS installer and Python packages
       uses: actions/cache@v3
       with:
         path: |
           gams
-          ${{ steps.pip.outputs.cache-dir }}
+          ${{ env.pip-cache-dir }}
         key: ubuntu-latest-gams${{ env.GAMS_VERSION }}
 
     - uses: iiasa/actions/setup-gams@main
