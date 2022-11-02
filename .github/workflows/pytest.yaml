@@ -79,7 +79,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip wheel setuptools-scm
         # Locate pip cache directory
-        echo "::set-output name=cache-dir::$(pip cache dir)"
+        echo "pip-cache-dir=$(pip cache dir)" >> $GITHUB_ENV
 
     - name: Set RETICULATE_PYTHON
       # Use the environment variable set by the setup-python action, above.
@@ -96,7 +96,7 @@ jobs:
       with:
         path: |
           gams
-          ${{ steps.pip.outputs.cache-dir }}
+          ${{ env.pip-cache-dir }}
           ${{ env.R_LIBS_USER }}
         key: ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-py${{ matrix.python-version }}-R${{ steps.setup-r.outputs.installed-r-version }}
         restore-keys: |
