@@ -32,10 +32,10 @@ jobs:
         path: message_ix
 
     - uses: actions/setup-python@v4
-      # This should match the "Latest version testable on GitHub Actions"
-      # in pytest.yaml
-      # with:
-      #   python-version: "3.10"
+      with:
+        # If the "Latest version testable on GitHub Actions" in pytest.yaml
+        # is not the latest 3.x stable version, adjust here to match:
+        python-version: "3.10"
 
     - name: Upgrade pip, wheel
       id: pip
@@ -43,7 +43,6 @@ jobs:
         python -m pip install --upgrade pip wheel
         # Locate pip cache directory
         echo "pip-cache-dir=$(pip cache dir)" >> $GITHUB_ENV
-
 
     - name: Cache Python packages
       uses: actions/cache@v3
