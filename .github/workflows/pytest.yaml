@@ -26,15 +26,16 @@ jobs:
         - "3.7"  # Earliest version supported by message_ix
         - "3.8"
         - "3.9"
-        - "3.10"  # Latest release / latest supported by message_ix
-        # - "3.x"  #
+        - "3.10"  # Latest version testable on GitHub Actions
 
-        # For freshy released or development versions of Python, compiled
-        # binary wheels are not available for some dependencies, e.g. llvmlite,
-        # numba, numpy, and/or pandas. Compiling these on the job runner
-        # requires a more elaborate build environment, currently out of scope
-        # for the message_ix project.
-        # - "3.10.0-alpha.1"  # Development version
+        # Below this comment are newly released or development versions of
+        # Python. For these versions, binary wheels are not available for some
+        # dependencies, e.g. llvmlite, numba, numpy, and/or pandas. Compiling
+        # these on the job runner requires a more elaborate build environment,
+        # currently out of scope for the message_ix project.
+
+        # - "3.11"  # Latest release. Pending numba/numba#8304
+        # - "3.12.0-alpha.1"  # Development version
 
       fail-fast: false
 
