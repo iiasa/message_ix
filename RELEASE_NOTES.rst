@@ -1,11 +1,21 @@
 Next release
 ============
 
+Migration notes
+---------------
+
+- The default `lpmethod` has been changed from "Dual Simplex" (`lpmethod=2`) to "Barrier" (`lpmethod=4`).
+  NOTE: this may result in changes to the solution.
+  In order to use the previous default `lpmethod`, the user-specific default setting can be set through the user's ixmp configuration file.
+  Alternatively, the `lpmethod` can be specified directly as an argument when solving a scenario.
+  Both of these configuration methods are further explained :meth:`here <message_ix.models.GAMSModel>`.
+
 All changes
 -----------
 
-- Ensure `levelized_cost` are also calculated for technologies with only variable costs (:pull:`653`)
+- Adjust default `lpmethod` from "Dual Simplex" (2) to "Barrier" (4); do NOT remove `cplex.opt` file(s) after solving workflow completes (:pull:`657`).
 - Adjust :meth:`.Scenario.add_macro` calculations for pandas 1.5.0 (:pull:`656`).
+- Ensure `levelized_cost` are also calculated for technologies with only variable costs (:pull:`653`).
 - Correct calculation of `COST_NODAL_NET` for standalone MESSAGE (:pull:`648`)
 - Add additional oscillation detection mechanism for macro iterations (:pull:`645`)
 
