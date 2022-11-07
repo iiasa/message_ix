@@ -43,6 +43,7 @@ jobs:
         version: ${{ matrix.conda.version }}
 
     # TODO move the following 2 steps into the above action
+    # TODO avoid using the deprecated ::set-output:: command
     - name: Determine shell on current OS
       id: shell
       run: |
