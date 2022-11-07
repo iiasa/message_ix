@@ -46,10 +46,25 @@ def test_add_bound_activity_up(message_test_mp):
 
 
 def test_add_bound_activity_up_all_modes(message_test_mp):
+    # This test specifically has two solutions for which the `OBJ` function is the same
+    # therefore the lpmethod must be set to "2".
+    # lpmethod 2:
+    # "transport_from_seattle" needs to provide "to_chicago" with 300.
+    # the unconstrained example seattle delivers 50 to "to_new_york" and 300
+    # "to_chicago".
+    # additional 275 to "to_new_york" comes from san-diego.
+    # The activity bound for "transport_from_seattle" (see below) below is therefore
+    # set to 325.
+    # lpmehtod 4:
+    # the unconstrained example seattle delivers 300 "to_chicago".
+    # san-diego delivers 325 to "to_new_york"
+    # the resulting bound on activity for seattle, therefore is below what is required
+    # for "to_chicago"
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone()
-    scen.solve(quiet=True)
+    scen.solve(quiet=True, solve_options=dict(lpmethod=2))
 
     # data for act bound
+    print(calculate_activity(scen))
     exp = 0.95 * calculate_activity(scen).sum()
     data = pd.DataFrame(
         {
@@ -69,7 +84,7 @@ def test_add_bound_activity_up_all_modes(message_test_mp):
     clone.check_out()
     clone.add_par("bound_activity_up", data)
     clone.commit("foo")
-    clone.solve(quiet=True)
+    clone.solve(quiet=True, solve_options=dict(lpmethod=2))
     obs = calculate_activity(clone).sum()
     assert np.isclose(obs, exp)
 
