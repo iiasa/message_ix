@@ -1536,12 +1536,13 @@ SHARE_CONSTRAINT_COMMODITY_LO(shares,node_share,year,time)$( share_commodity_lo(
 *
 *  .. math::
 *     CAP\_NEW_{n,t,y}
-*         \leq & ~ initial\_new\_capacity\_up_{n,t,y}
+*         \leq & \Bigg(~ initial\_new\_capacity\_up_{n,t,y}
 *             \cdot \frac{ \Big( 1 + growth\_new\_capacity\_up_{n,t,y} \Big)^{|y|} - 1 }
 *                        { growth\_new\_capacity\_up_{n,t,y} } \\
 *              & + \Big( CAP\_NEW_{n,t,y-1} + historical\_new\_capacity_{n,t,y-1} \Big) \\
 *              & \hspace{2 cm} \cdot \Big( 1 + growth\_new\_capacity\_up_{n,t,y} \Big)^{|y|} \\
-*              & + CAP\_NEW\_UP_{n,t,y} \cdot \Bigg( \Big( 1 + soft\_new\_capacity\_up_{n,t,y}\Big)^{|y|} - 1 \Bigg) \\
+*              & + CAP\_NEW\_UP_{n,t,y} \cdot \Bigg( \Big( 1 + soft\_new\_capacity\_up_{n,t,y}\Big)^{|y|} - 1 \Bigg)\Bigg) \\
+*              & * \frac{|y-1|}{|y|} \\
 *         & \quad \forall \ t \ \in \ T^{INV}
 *
 * Here, :math:`|y|` is the number of years in period :math:`y`, i.e., :math:`duration\_period_{y}`.
@@ -1551,7 +1552,7 @@ NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * actual new capacity
     CAP_NEW(node,inv_tec,year) =L=
 * initial new capacity (compounded over the duration of the period)
-        initial_new_capacity_up(node,inv_tec,year) * (
+        (initial_new_capacity_up(node,inv_tec,year) * (
             ( ( POWER( 1 + growth_new_capacity_up(node,inv_tec,year) , duration_period(year) ) - 1 )
                 / growth_new_capacity_up(node,inv_tec,year) )$( growth_new_capacity_up(node,inv_tec,year) )
               + ( duration_period(year) )$( NOT growth_new_capacity_up(node,inv_tec,year) )
@@ -1565,7 +1566,9 @@ NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * 'soft' relaxation of dynamic constraints
         + ( CAP_NEW_UP(node,inv_tec,year)
             * ( POWER( 1 + soft_new_capacity_up(node,inv_tec,year) , duration_period(year) ) - 1 )
-           )$( soft_new_capacity_up(node,inv_tec,year) )
+           )$( soft_new_capacity_up(node,inv_tec,year) ))
+       * SUM(year_all2$( seq_period(year_all2,year) ),
+            ( duration_period(year_all2) / duration_period(year) ))
 * optional relaxation for calibration and debugging
 %SLACK_CAP_NEW_DYNAMIC_UP% + SLACK_CAP_NEW_DYNAMIC_UP(node,inv_tec,year)
 ;
@@ -1573,6 +1576,9 @@ NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * GAMS implementation comment:
 * The sums in the constraint have to be over `year_all2` (not `year2`) to also get the dynamic effect from historical
 * new capacity. If one would sum over `year2`, periods prior to the first model year would be ignored.
+* Furthermore, as `CAP_NEW` is derived from the value in a previous period, any change in the duration of two consecutive
+* model periods needs to be accounted for. This is done by using the ratio of two consecutive model periods as a
+* multiplication factor.
 
 ***
 * .. _equation_new_capacity_soft_constraint_up:
@@ -1605,12 +1611,13 @@ NEW_CAPACITY_SOFT_CONSTRAINT_UP(node,inv_tec,year)$( soft_new_capacity_up(node,i
 *
 *  .. math::
 *     CAP\_NEW_{n,t,y}
-*         \geq & - initial\_new\_capacity\_lo_{n,t,y}
+*         \geq & \Bigg(- initial\_new\_capacity\_lo_{n,t,y}
 *             \cdot \frac{ \Big( 1 + growth\_new\_capacity\_lo_{n,t,y} \Big)^{|y|} }
 *                        { growth\_new\_capacity\_lo_{n,t,y} } \\
 *              & + \Big( CAP\_NEW_{n,t,y-1} + historical\_new\_capacity_{n,t,y-1} \Big) \\
 *              & \hspace{2 cm} \cdot \Big( 1 + growth\_new\_capacity\_lo_{n,t,y} \Big)^{|y|} \\
-*              & - CAP\_NEW\_LO_{n,t,y} \cdot \Bigg( \Big( 1 + soft\_new\_capacity\_lo_{n,t,y}\Big)^{|y|} - 1 \Bigg) \\
+*              & - CAP\_NEW\_LO_{n,t,y} \cdot \Bigg( \Big( 1 + soft\_new\_capacity\_lo_{n,t,y}\Big)^{|y|} - 1 \Bigg)\Bigg) \\
+*              & * \frac{|y-1|}{|y|} \\
 *         & \quad \forall \ t \ \in \ T^{INV}
 *
 ***
@@ -1619,7 +1626,7 @@ NEW_CAPACITY_CONSTRAINT_LO(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * actual new capacity
     CAP_NEW(node,inv_tec,year) =G=
 * initial new capacity (compounded over the duration of the period)
-        - initial_new_capacity_lo(node,inv_tec,year) * (
+        (- initial_new_capacity_lo(node,inv_tec,year) * (
             ( ( POWER( 1 + growth_new_capacity_lo(node,inv_tec,year) , duration_period(year) ) - 1 )
                 / growth_new_capacity_lo(node,inv_tec,year) )$( growth_new_capacity_lo(node,inv_tec,year) )
               + ( duration_period(year) )$( NOT growth_new_capacity_lo(node,inv_tec,year) )
@@ -1633,10 +1640,19 @@ NEW_CAPACITY_CONSTRAINT_LO(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * 'soft' relaxation of dynamic constraints
         - ( CAP_NEW_LO(node,inv_tec,year)
             * ( POWER( 1 + soft_new_capacity_lo(node,inv_tec,year) , duration_period(year) ) - 1 )
-           )$( soft_new_capacity_lo(node,inv_tec,year) )
+           )$( soft_new_capacity_lo(node,inv_tec,year) ))
+       * SUM(year_all2$( seq_period(year_all2,year) ),
+            ( duration_period(year_all2) / duration_period(year) ))
 * optional relaxation for calibration and debugging
 %SLACK_CAP_NEW_DYNAMIC_LO% - SLACK_CAP_NEW_DYNAMIC_LO(node,inv_tec,year)
 ;
+
+* GAMS implementation comment:
+* The sums in the constraint have to be over `year_all2` (not `year2`) to also get the dynamic effect from historical
+* new capacity. If one would sum over `year2`, periods prior to the first model year would be ignored.
+* Furthermore, as `CAP_NEW` is derived from the value in a previous period, any change in the duration of two consecutive
+* model periods needs to be accounted for. This is done by using the ratio of two consecutive model periods as a
+* multiplication factor.
 
 ***
 * .. _equation_new_capacity_soft_constraint_lo:
