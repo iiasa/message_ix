@@ -26,15 +26,16 @@ jobs:
         - "3.7"  # Earliest version supported by message_ix
         - "3.8"
         - "3.9"
-        - "3.10"  # Latest release / latest supported by message_ix
-        # - "3.x"  #
+        - "3.10"  # Latest version testable on GitHub Actions
 
-        # For freshy released or development versions of Python, compiled
-        # binary wheels are not available for some dependencies, e.g. llvmlite,
-        # numba, numpy, and/or pandas. Compiling these on the job runner
-        # requires a more elaborate build environment, currently out of scope
-        # for the message_ix project.
-        # - "3.10.0-alpha.1"  # Development version
+        # Below this comment are newly released or development versions of
+        # Python. For these versions, binary wheels are not available for some
+        # dependencies, e.g. llvmlite, numba, numpy, and/or pandas. Compiling
+        # these on the job runner requires a more elaborate build environment,
+        # currently out of scope for the message_ix project.
+
+        # - "3.11"  # Latest release. Pending numba/numba#8304
+        # - "3.12.0-alpha.1"  # Development version
 
       fail-fast: false
 
@@ -43,7 +44,7 @@ jobs:
 
     steps:
     - name: Cancel previous runs that have not completed
-      uses: styfle/cancel-workflow-action@0.10.0
+      uses: styfle/cancel-workflow-action@0.11.0
       with:
         access_token: ${{ github.token }}
 
@@ -73,18 +74,18 @@ jobs:
     - uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+        cache: pip
+        cache-dependency-path: "**/setup.cfg"
 
     - name: Upgrade pip, wheel, setuptools-scm
-      id: pip
-      run: |
-        python -m pip install --upgrade pip wheel setuptools-scm
-        # Locate pip cache directory
-        echo "::set-output name=cache-dir::$(pip cache dir)"
+      run: python -m pip install --upgrade pip wheel setuptools-scm
 
     - name: Set RETICULATE_PYTHON
       # Use the environment variable set by the setup-python action, above.
       run: echo "RETICULATE_PYTHON=$pythonLocation" >> $GITHUB_ENV
       shell: bash
+
+    - uses: ts-graphviz/setup-graphviz@v1.1
 
     - uses: r-lib/actions/setup-r@v2
       id: setup-r
@@ -94,11 +95,9 @@ jobs:
       with:
         path: |
           gams
-          ${{ steps.pip.outputs.cache-dir }}
           ${{ env.R_LIBS_USER }}
-        key: ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-py${{ matrix.python-version }}-R${{ steps.setup-r.outputs.installed-r-version }}
+        key: ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-R${{ steps.setup-r.outputs.installed-r-version }}
         restore-keys: |
-          ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-py${{ matrix.python-version }}-
           ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-
           ${{ matrix.os }}-
 
@@ -107,18 +106,13 @@ jobs:
         version: ${{ env.GAMS_VERSION }}
         license: ${{ secrets.GAMS_LICENSE }}
 
-    - uses: ts-graphviz/setup-graphviz@v1
-
     - name: Install ixmp and dependencies
       working-directory: ixmp
       run: pip install .
 
     - name: Install Python package and dependencies
       working-directory: message_ix
-      run: |
-        pip install .[tests]
-        # TEMPORARY work around has2k1/plotnine#619, khaeru/genno#71
-        pip install "matplotlib<3.6.0"
+      run: pip install .[tests]
 
     - name: Install R dependencies and tutorial requirements
       run: |
