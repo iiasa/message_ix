@@ -218,6 +218,7 @@ Parameter
 *
 * .. [#levelizedcost] The parameter ``levelized_cost`` is computed in the GAMS pre-processing under the assumption of
 *    full capacity utilization until the end of the technical lifetime.
+*    As these are calculated in the preprocessing, the reported ``levelized_cost`` in the output GDX-file exclude fuel costs.
 *
 * .. [#construction] The construction time only has an effect on the investment costs; in |MESSAGEix|,
 *    each unit of new-built capacity is available instantaneously at the beginning of the model period.
