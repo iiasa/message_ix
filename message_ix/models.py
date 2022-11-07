@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 #: Solver options used by :meth:`.Scenario.solve`.
 DEFAULT_CPLEX_OPTIONS = {
     "advind": 0,
-    "lpmethod": 2,
+    "lpmethod": 4,
     "threads": 4,
     "epopt": 1e-6,
 }
@@ -378,17 +378,11 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         lines2 = ("{} = {}".format(*kv) for kv in self.cplex_opts.items())
         optfile2.write_text("\n".join(lines2))
 
-        try:
-            result = super().run(scenario)
-        finally:
-            # Remove the optfile regardless of whether the run completed without error.
-            # The file may have been removed already by another run (in a separate
-            # process) that completed before this one.
-            # py37 compat: check for existence instead of using unlink(missing_ok=True)
-            if optfile.exists():
-                optfile.unlink()
-            if optfile2.exists():
-                optfile2.unlink()
+        result = super().run(scenario)
+
+        # In previous versions, the `cplex.opt` file(s) were removed at this point
+        # in the workflow. This has been removed due to issues when running
+        # scenarios asynchronously.
 
         return result
 
