@@ -1,6 +1,6 @@
-import yaml
 import ixmp
 import message_ix
+import yaml
 
 with open("./scenarios.yaml", mode="r") as f:
     d = yaml.safe_load(f)
