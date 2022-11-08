@@ -9,7 +9,7 @@ with open("./scenarios.yaml", mode="r") as f:
 mp = ixmp.Platform("ixmp_dev")
 
 for name, data in d.items():
-    print('Testing', data["model"], data["scenario"])
+    print("Testing", data["model"], data["scenario"])
     try:
         s = message_ix.Scenario(mp, data["model"], data["scenario"])
         scen = s.clone(
