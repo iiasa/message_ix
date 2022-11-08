@@ -258,7 +258,7 @@ MESSAGE_ITEMS = {
     ),
     "tax": item("par", "nl type_tec ya"),
     "technical_lifetime": item("par", "nl t yv"),
-    # Order of sub-annual time steps
+    # Order of sub-annual time slices
     "time_order": dict(ix_type="par", idx_sets=["lvl_temporal", "time"]),
     "var_cost": item("par", "nl t yv ya m h"),
     #

@@ -288,7 +288,7 @@ Equations
     RELATION_CONSTRAINT_LO          lower bound of relations (linear constraints)
     STORAGE_CHANGE                  change in the state of charge of storage
     STORAGE_BALANCE                 balance of the state of charge of storage
-    STORAGE_BALANCE_INIT            balance of the state of charge of storage at sub-annual time steps with initial storage content
+    STORAGE_BALANCE_INIT            balance of the state of charge of storage at sub-annual time slices with initial storage content
     STORAGE_INPUT                   connecting an input commodity to maintain the activity of storage container (not stored commodity)
 ;
 *----------------------------------------------------------------------------------------------------------------------*
@@ -2184,7 +2184,7 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 * storage level. Where:
 *
 * - :math:`t^{C}` is a charging technology and :math:`t^{D}` is the corresponding discharger.
-* - :math:`h-1` is the time step prior to :math:`h`.
+* - :math:`h-1` is the time slice prior to :math:`h`.
 * - :math: `l^{T}` is `lvl_temporal`, i.e., the temporal level at which storage is operating
 *
 *   .. math::

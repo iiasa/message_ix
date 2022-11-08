@@ -370,7 +370,7 @@ Alias(type_tec,type_tec_total);
 Sets
     map_node(node,location)                            mapping of nodes across hierarchy levels (location is in node)
     map_time(time,time2)                               mapping of time periods across hierarchy levels (time2 is in time)
-    map_time_period(year_all,lvl_temporal,time,time2)  mapping of the sequence of sub-annual timesteps
+    map_time_period(year_all,lvl_temporal,time,time2)  mapping of the sequence of sub-annual time slices
 
     map_resource(node,commodity,grade,year_all)  mapping of resources and grades to node over time
     map_ren_grade(node,commodity,grade,year_all) mapping of renewables and grades to node over time
