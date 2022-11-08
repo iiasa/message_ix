@@ -1,5 +1,6 @@
 import ixmp
 import message_ix
+import traceback
 import yaml
 
 with open("./scenarios.yaml", mode="r") as f:
@@ -8,6 +9,7 @@ with open("./scenarios.yaml", mode="r") as f:
 mp = ixmp.Platform("ixmp_dev")
 
 for name, data in d.items():
+    print('Testing', data["model"], data["scenario"])
     try:
         s = message_ix.Scenario(mp, data["model"], data["scenario"])
         scen = s.clone(
@@ -18,6 +20,7 @@ for name, data in d.items():
         data["obs"] = scen.var("OBJ")["lvl"]
     except Exception as e:
         data["obs"] = "Failed with message: " + str(e)
+        print(traceback.format_exc())
 
 with open("./scenarios_obs.yaml", mode="w") as f:
     yaml.safe_dump(d, f)
