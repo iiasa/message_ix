@@ -51,8 +51,8 @@
 * :math:`REL_{r,n,y} \in \mathbb{R}`                       Auxiliary variable for left-hand side of relations (linear constraints)
 * :math:`COMMODITY\_USE_{n,c,l,y} \in \mathbb{R}`          Auxiliary variable for amount of commodity used at specific level
 * :math:`COMMODITY\_BALANCE_{n,c,l,y,h} \in \mathbb{R}`    Auxiliary variable for right-hand side of :ref:`commodity_balance`
-* :math:`STORAGE_{n,t,l,c,y,h} \in \mathbb{R}`             State of charge or content of storage at each sub-annual time slice
-* :math:`STORAGE\_CHARGE_{n,t,l,c,y,h} \in \mathbb{R}`     Charging of storage in each sub-annual time slice (negative for discharging)
+* :math:`STORAGE_{n,t,m,l,c,y,h} \in \mathbb{R}`             State of charge or content of storage at each sub-annual time slice
+* :math:`STORAGE\_CHARGE_{n,t,m,l,c,y,h} \in \mathbb{R}`     Charging of storage in each sub-annual time slice (negative for discharging)
 * ======================================================== ====================================================================================
 *
 * The index :math:`y^V` is the year of construction (vintage) wherever it is necessary to
@@ -2186,9 +2186,10 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 * - :math:`t^{C}` is a charging technology and :math:`t^{D}` is the corresponding discharger.
 * - :math:`h-1` is the time slice prior to :math:`h`.
 * - :math: `l^{T}` is `lvl_temporal`, i.e., the temporal level at which storage is operating
-*
+* - :math: `m^{S}` is `mode` of operation for storage container technology
+
 *   .. math::
-*      STORAGE\_CHARGE_{n,t,l,c,y,h} =
+*      STORAGE\_CHARGE_{n,t,m^s,l,c,y,h} =
 *          \sum_{\substack{n^L,m,h-1 \\ y^V \leq y, (n,t^C,t,l,y) \sim S^{storage}}} output_{n^L,t^C,y^V,y,m,n,c,l,h-1,h}
 *             \cdot & ACT_{n^L,t^C,y^V,y,m,h-1} \\
 *          - \sum_{\substack{n^L,m,c,h-1 \\ y^V \leq y, (n,t^D,t,l,y) \sim S^{storage}}} input_{n^L,t^D,y^V,y,m,n,c,l,h-1,h}
@@ -2222,9 +2223,9 @@ STORAGE_CHANGE(node,storage_tec,mode,level_storage,commodity,year,time)$sum(
 * :math:`\storageinitial_{ntlcyh}`, the content from the previous time slice is not carried over to this time slice.
 *
 * .. math::
-*    \STORAGE_{ntlcyh} =\ & \STORAGECHARGE_{ntlcyh} \\
-*    & + \STORAGE_{ntlcy(h-1)} \cdot (1 - \storageselfdischarge_{ntly(h-1)}) \\
-*    \forall\ & t \in T^{STOR}, l \in L^{STOR}, \storageinitial_{ntlcyh} = 0
+*    \STORAGE_{ntmlcyh} =\ & \STORAGECHARGE_{ntmlcyh} \\
+*    & + \STORAGE_{ntmlcy(h-1)} \cdot (1 - \storageselfdischarge_{ntmly(h-1)}) \\
+*    \forall\ & t \in T^{STOR}, l \in L^{STOR}, \storageinitial_{ntmlcyh} = 0
 ***
 STORAGE_BALANCE(node,storage_tec,mode,level,commodity,year,time2,lvl_temporal)$ (
     SUM((tec,mode2), map_tec_storage(node,tec,mode2,storage_tec,mode,level,commodity,lvl_temporal) )
@@ -2252,8 +2253,8 @@ STORAGE_BALANCE(node,storage_tec,mode,level,commodity,year,time2,lvl_temporal)$ 
 * a fraction of installed capacity of storage device (container) that can be filled initially.
 *
 * .. math::
-*    \STORAGE_{ntlcy(h-1)} \geq &  \storageinitial_{ntlcyh} \cdot duration\_time_{h} \cdot capacity\_factor_{n,t,y^V,y,h} \cdot CAP_{n,t,y^V,y}  \\
-*    \quad \forall \ t \ \in \ T^{INV}, \forall\ & \storageinitial_{ntlcyh} \neq 0
+*    \STORAGE_{ntmlcy(h-1)} \geq &  \storageinitial_{ntmlcyh} \cdot duration\_time_{h} \cdot capacity\_factor_{n,t,y^V,y,h} \cdot CAP_{n,t,y^V,y}  \\
+*    \quad \forall \ t \ \in \ T^{INV}, \forall\ & \storageinitial_{ntmlcyh} \neq 0
 ***
 
 STORAGE_BALANCE_INIT(node,storage_tec,mode,level,commodity,year,time,time2)$ (
@@ -2280,7 +2281,7 @@ STORAGE_BALANCE_INIT(node,storage_tec,mode,level,commodity,year,time,time2)$ (
 * :ref:`equation_storage_change`.
 *
 * .. math::
-*    \STORAGE_{ntlcy^Ah} =\ & \sum_{\{n^Ly^Vh^O \vert K\}} \durationtimerel_{hh^O} \times \ACT_{n^Lty^Vy^Amh^O} \\
+*    \STORAGE_{ntmlcy^Ah} =\ & \sum_{\{n^Ly^Vh^O \vert K\}} \durationtimerel_{hh^O} \times \ACT_{n^Lty^Vy^Amh^O} \\
 *    \forall\ & n,t,l,c,m,y^A,h \vert t \in T^{STOR} \\
 *    K:\ & \input_{n^Lty^Vy^Amn^Oclhh^O} \neq 0
 *
