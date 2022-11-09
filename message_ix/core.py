@@ -419,7 +419,7 @@ class Scenario(ixmp.Scenario):
 
     def vintage_and_active_years(
         self,
-        ya_args: Union[Tuple[str, str], Tuple[str, str, Union[int, str]]] = None,
+        ya_args: Union[Tuple[str, str], Tuple[str, str, Union[int, str]], None] = None,
         tl_only: bool = True,
         **kwargs,
     ) -> pd.DataFrame:
