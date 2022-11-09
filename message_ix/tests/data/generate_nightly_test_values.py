@@ -1,7 +1,9 @@
-import ixmp
-import message_ix
 import traceback
+
+import ixmp
 import yaml
+
+import message_ix
 
 with open("./scenarios.yaml", mode="r") as f:
     d = yaml.safe_load(f)
