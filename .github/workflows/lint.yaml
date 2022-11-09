@@ -11,56 +11,13 @@ on:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
-
-    continue-on-error: true
-
-    steps:
-    - name: Check out ixmp
-      uses: actions/checkout@v3
-      with:
-        repository: iiasa/ixmp
-        # For PRs that depend on an ixmp PR branch, uncomment the following 2
-        # lines and adjust to suit:
-        # repository: USERNAME/ixmp
-        # ref: issue/999
-        path: ixmp
-
-    - name: Check out message_ix
-      uses: actions/checkout@v3
-      with:
-        path: message_ix
-
-    - uses: actions/setup-python@v4
-      with:
-        # If the "Latest version testable on GitHub Actions" in pytest.yaml
-        # is not the latest 3.x stable version, adjust here to match:
-        python-version: "3.10"
-        cache: pip
-        cache-dependency-path: "**/setup.cfg"
-
-    - name: Upgrade pip, wheel
-      run: python -m pip install --upgrade pip wheel
-
-    - name: Check "black" code style
-      working-directory: message_ix
-      run: |
-        pip install black
-        black --check .
-
-    - name: Lint with flake8 & isort
-      working-directory: message_ix
-      run: |
-        pip install flake8 isort
-        flake8 --count --max-complexity=38 --show-source --statistics
-        isort --check-only .
-
-    - name: Check typing with mypy
-      working-directory: message_ix
-      # Point to ixmp code for its type hints, without installing
-      env:
-        MYPYPATH: "../ixmp/"
-      # Also install type stubs and full packages that provide type hints
-      run: |
-        pip install mypy genno sphinx types-pkg_resources types-requests types-PyYAML
-        mypy --show-error-codes .
+    uses: iiasa/actions/.github/workflows/lint.yaml@main
+    with:
+      max-complexity: 38
+      # If the "Latest version testable on GitHub Actions" in pytest.yaml
+      # is not the latest 3.x stable version, adjust here to match:
+      python-version: "3.10"
+      # For PRs that depend on an ixmp PR branch, adjust the URL below
+      type-hint-packages: >-
+        genno sphinx types-pkg_resources types-requests types-PyYAML
+        git+https://github.com/iiasa/ixmp.git@main
