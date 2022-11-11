@@ -13,7 +13,7 @@ beyond_horizon_lifetime(node,inv_tec,vintage)$( map_tec(node,inv_tec,vintage) ) 
 beyond_horizon_lifetime(node,inv_tec,vintage)$( beyond_horizon_lifetime(node,inv_tec,vintage) < 0 ) = 0 ;
 
 ***
-* Levelized costs excluding fuel costs
+* Levelized costs excluding fuel (and emissions) costs
 * ------------------------------------
 * For the 'soft' relaxations of the dynamic constraints and the associated penalty factor in the objective function,
 * we need to compute the parameter :math:`levelized\_cost_{n,t,y}`.
@@ -23,13 +23,18 @@ beyond_horizon_lifetime(node,inv_tec,vintage)$( beyond_horizon_lifetime(node,inv
 *        & inv\_cost_{n,t,y} \cdot \frac{ interestrate_{y} \cdot \left( 1 + interestrate_{y} \right)^{|y|} }
 *                                      { \left( 1 + interestrate_{y} \right)^{|y|} - 1 } \\
 *        & + fix\_cost_{n,t,y,y} \cdot \frac{ 1 }{ \sum_{h'} duration\_time_{h'} \cdot capacity\_factor_{n,t,y,y,h'} } \\
-*        & + var\_cost_{n,t,y,y,m,h}
+*        & + var\_cost_{n,t,y,y,m,h} \\
+*        & + \sum_{t} relation\_cost_{r,n,y} \cdot \Bigg(
+*          & \ relation\_new\_capacity_{r,n,y,t} \cdot \frac{ interestrate_{y} \cdot \left( 1 + interestrate_{y} \right)^{|y|} }
+*                                      { \left( 1 + interestrate_{y} \right)^{|y|} - 1 } \\
+*          & + relation\_total\_capacity_{r,n,y,t} \cdot \frac{ 1 }{ \sum_{h'} duration\_time_{h'} \cdot capacity\_factor_{n,t,y,y,h'} } \\
+*          & + \sum_{n^L,m} \ relation\_activity_{r,n,y,n^L,t,y,m} \\
 *
 * where :math:`|y| = technical\_lifetime_{n,t,y}`. This formulation implicitly assumes constant fixed
-* and variable costs over time.
+* and variable costs over time. Also, a fixed relation cost is assumed for activity years over time.
 *
-* **Warning:** 
-* Levelized capital costs do not include fuel-related costs.
+* **Warning:**
+* Levelized costs do not include fuel-related and emissions costs.
 * All soft relaxations of the dynamic activity constraint are
 * disabled if the levelized costs are negative!
 ***
@@ -51,6 +56,28 @@ levelized_cost(node,tec,year,time)$( map_tec_time(node,tec,year,time)) =
              duration_time(time2) * capacity_factor(node,tec,year,year,time2) )
         )$( fix_cost(node,tec,year,year) ))$(inv_tec(tec))
     + sum(mode$( map_tec_act(node,tec,year,mode,time) ), var_cost(node,tec,year,year,mode,time) )
+
+* Including costs of user-defined relations
+* add relation cost for new capacity
+    + sum(relation,relation_cost(relation,node,year)
+        * ( (relation_new_capacity(relation,node,year,tec)
+            * (
+* compute discounted annualized investment costs if interest rate > 0
+               ( interestrate(year)
+                        * ( 1 + interestrate(year) ) ** technical_lifetime(node,tec,year)
+                        / ( ( 1 + interestrate(year) ) ** technical_lifetime(node,tec,year) - 1 )
+                      )$( interestrate(year) )
+* if interest rate = 0, annualized investment costs are total investment costs divided by technical lifetime
+                    + ( 1 / technical_lifetime(node,tec,year) )$( interestrate(year) eq 0 )
+              )
+* add relation cost for total capacity
+         + (relation_total_capacity(relation,node,year,tec) /
+              sum(time2$( map_tec_time(node,tec,year,time2) ),
+                 duration_time(time2) * capacity_factor(node,tec,year,year,time2) ) )
+             )$(inv_tec(tec) )
+* add relation cost for activity
+         + sum( (mode,node2)$( map_tec_act(node,tec,year,mode,time) ), relation_activity(relation,node2,year,node,tec,year,mode) ) )
+    )
 ;
 
 * the soft relaxations of the dynamic activity constraints are disabled if the levelized costs are negative
