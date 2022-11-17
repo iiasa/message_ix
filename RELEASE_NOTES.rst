@@ -9,33 +9,34 @@ Migration notes
   In order to use the previous default `lpmethod`, the user-specific default setting can be set through the user's ixmp configuration file.
   Alternatively, the `lpmethod` can be specified directly as an argument when solving a scenario.
   Both of these configuration methods are further explained :meth:`here <message_ix.models.GAMSModel>`.
-The dimensionality of one set and two parameters (``map_tec_storage``, ``storage_initial``, and ``storage_self_discharge``) are extended to allow repesentation of the mode of operation of storage technologies and the temporal level of storage containers.
-If these items are already populated with data in a Scenario, this data will be incompatible with the MESSAGE GAMS implementation in this release; a :class:`UserWarning` will be emitted when the :class:`.Scenario` is instantiated, and :meth:`~.message_ix.Scenario.solve` will raise a :class:`ValueError`.
-(If these items are empty, their dimensions will be updated automatically.
-New Scenarios are unaffected.)
 
-Users must update data for these items, specifically:
+- The dimensionality of one set and two parameters (``map_tec_storage``, ``storage_initial``, and ``storage_self_discharge``) are extended to allow repesentation of the mode of operation of storage technologies and the temporal level of storage containers.
+  If these items are already populated with data in a Scenario, this data will be incompatible with the MESSAGE GAMS implementation in this release; a :class:`UserWarning` will be emitted when the :class:`.Scenario` is instantiated, and :meth:`~.message_ix.Scenario.solve` will raise a :class:`ValueError`.
+  (If these items are empty, their dimensions will be updated automatically.
+  New Scenarios are unaffected.)
 
-==========================  ============================================
-Existing parameter or set   Dimension(s) to add
-==========================  ============================================
-``map_tec_storage``         ``mode``, ``storage_mode``, ``lvl_temporal``
-``storage_initial``         ``mode``
-``storage_self_discharge``  ``mode``
-==========================  ============================================
+  Users must update data for these items, specifically:
 
-For the set ``map_tec_storage``, values for the new dimensions represent, respectively, the ``mode`` of operation for charge/discharge technologies, and the ``storage_mode`` and ``lvl_temporal`` for the corresponding storage device.
-For the two parameters, :func:`.expand_dims` is provided to help:
+  ==========================  ============================================
+  Existing parameter or set   Dimension(s) to add
+  ==========================  ============================================
+  ``map_tec_storage``         ``mode``, ``storage_mode``, ``lvl_temporal``
+  ``storage_initial``         ``mode``
+  ``storage_self_discharge``  ``mode``
+  ==========================  ============================================
 
-.. code-block:: python
+  For the set ``map_tec_storage``, values for the new dimensions represent, respectively, the ``mode`` of operation for charge/discharge technologies, and the ``storage_mode`` and ``lvl_temporal`` for the corresponding storage device.
+  For the two parameters, :func:`.expand_dims` is provided to help:
 
-    from message_ix import Scenario
-    from message_ix.util import expand_dims
+  .. code-block:: python
 
-    scen, platform = Scenario.from_url("…")
+      from message_ix import Scenario
+      from message_ix.util import expand_dims
 
-    # Re-use the existing data in `scen`, adding the `mode` dimension
-    expand_dims(scen, "storage_initial", mode="an existing mode")
+      scen, platform = Scenario.from_url("…")
+
+      # Re-use the existing data in `scen`, adding the `mode` dimension
+      expand_dims(scen, "storage_initial", mode="an existing mode")
 
 
 All changes
