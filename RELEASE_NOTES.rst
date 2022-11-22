@@ -13,6 +13,7 @@ Migration notes
 All changes
 -----------
 
+- Correct check for unscaled-infeasibilities to check for `solvestat=4` (:pull:`676`).
 - Adjust default `lpmethod` from "Dual Simplex" (2) to "Barrier" (4); do NOT remove `cplex.opt` file(s) after solving workflow completes (:pull:`657`).
 - Adjust :meth:`.Scenario.add_macro` calculations for pandas 1.5.0 (:pull:`656`).
 - Ensure `levelized_cost` are also calculated for technologies with only variable costs (:pull:`653`).
