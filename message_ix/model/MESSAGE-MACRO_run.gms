@@ -312,7 +312,9 @@ if ( ORD(Iteration) > 1,
 * In the case that the model solves with unscaled infeasibilities, the cplex options file `cplex.op2`
 * will be used which forces the use of `Dual Crossover` when solving with Barrier. This will avoid
 * solving further with unscaled infeasibilities.
-if( MESSAGE_LP.modelstat = 5,
+* When encountering unscaled infeasibilities, modelstat = 1 and solvestat = 4.
+
+if( MESSAGE_LP.solvestat = 4,
    put_utility 'log' /'+++ Detected issues solving with unscaled infeasibilities. Enforcing Dual crossover +++ ' ;
    MESSAGE_LP.optFile = 2;
    report_iteration(iteration, 'unscaled infeasibilities') = 1 ;

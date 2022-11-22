@@ -164,9 +164,9 @@ These changes can be made in two ways:
 Issue 2: MESSAGE solves optimally with unscaled infeasibilities
 ---------------------------------------------------------------
 
-By default, :mod:`message_ix` is configured so that the CPLEX solver runs using the `lpmethod` option set to ``2``, selecting the dual simplex method.
-Solving models the size of MESSAGEix-GLOBIOM takes very long with the dual simplex method—scenarios with stringent constraints can take >10 hours on common hardware.
-With `lpmethod` set to ``4``, selecting the barrier method, the model can solve in under a minute.
+By default, :mod:`message_ix` is configured so that the CPLEX solver runs using the `lpmethod` option set to ``4``, selecting the barrier method.
+Solving models the size of MESSAGEix-GLOBIOM would otherwise take very long with the dual simplex method (`lpmethod` set to ``2``); scenarios with stringent constraints can take >10 hours on common hardware.
+With `lpmethod` set to ``4`` the model can solve in under a minute.
 
 The drawback of using the barrier method is that, after CPLEX has solved, it crosses over to a simplex optimizer for verification.
 As part of this verification step, it may turn out that the CPLEX solution is "optimal with unscaled infeasibilities."
@@ -186,10 +186,13 @@ When this is not possible, there are some workarounds:
    This will result in longer solving times, but will guarantee overcoming the issue.
 
 .. note:: This solution has been implemented as part of the MESSAGE-MACRO iterations process.
-   During the iterations, a check is performed on the solution status (LP status (5)) of MESSAGE.
-   If the solution status is found to show the solution is "optimal with unscaled infeasibilities", then a secondary CPLEX configuration file is used.
+   During the iterations, a check is performed on the solution status of MESSAGE.
+   When solving with unscaled infeasibilities, in GAMS, the `modelstat` will be ``1`` (Optimal) and the `solvestat` will be ``4`` (Terminated by Solver).
+   In this case, a secondary CPLEX configuration file is used for subsequent solving of the MESSAGE model.
    The secondary CPLEX configuration file :file:`message_ix\model\cplex.op2` is a duplicate of :file:`message_ix\model\cplex.opt` with the addition of the argument `barcrossalg = 2`.
    This secondary CPLEX configuration file is generated together with the primary CPLEX configuration file in :file:`message_ix\models.py`.
+   Further information on the status description of GAMS can be found `here <http://www.gamsworld.org/performance/status_codes.htm>`_.
+   These differ from those reported by `CPLEX <https://www.tu-chemnitz.de/mathematik/discrete/manuals/cplex/doc/refman/html/appendixB.html>`_.
 
 3. Adjust CPLEX's convergence criterion, `epopt` (this is distinct from the `convergence_criterion` of the MESSAGE_MACRO algorithm).
    In :mod:`message_ix`, :data:`.DEFAULT_CPLEX_OPTIONS` sets this to ``1e-6`` by default.
