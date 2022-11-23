@@ -33,9 +33,7 @@ INP_DF = pd.DataFrame(
     [_ms + ["DantzigLand", "Demand", "cases", 850.0, 900.0, 950.0]],
     columns=IAMC_IDX + [1962, 1963, 1964],
 )
-TS_DF = pd.concat([HIST_DF, INP_DF], sort=False)
-TS_DF.sort_values(by="variable", inplace=True)
-TS_DF.index = range(len(TS_DF.index))
+TS_DF = pd.concat([HIST_DF, INP_DF], ignore_index=True).sort_values(by="variable")
 
 TS_DF_CLEARED = TS_DF.copy()
 TS_DF_CLEARED.loc[0, 1963] = np.nan

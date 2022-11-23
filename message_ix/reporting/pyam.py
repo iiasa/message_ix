@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Optional
 
 import pandas as pd
 from genno.compat.pyam import util
@@ -6,7 +6,7 @@ from genno.compat.pyam import util
 
 def collapse_message_cols(
     df: pd.DataFrame, var: Optional[str] = None, kind: Optional[str] = None, var_cols=[]
-) -> Callable:
+) -> pd.DataFrame:
     """:func:`.as_pyam` `collapse=...` callback for MESSAGEix quantities.
 
     Wraps :func:`.collapse` with arguments particular to MESSAGEix.

@@ -383,7 +383,10 @@ class Scenario(ixmp.Scenario):
 
         # Add the year set elements and first model year
         year = sorted(year)
-        self.add_set("year", year)
+        # FIXME the type of ixmp.Scenario.add_set() is too restrictive; Sequence[Any]
+        #       should be accepted because the argument is passed through
+        #       ixmp.utils.as_str_list(). Fix upstream.
+        self.add_set("year", year)  # type: ignore
         self.add_cat(
             "year", "firstmodelyear", firstmodelyear or year[0], is_unique=True
         )
