@@ -240,7 +240,7 @@ Utility methods
 ---------------
 
 .. automodule:: message_ix.util
-   :members: make_df
+   :members: expand_dims, make_df
 
 
 Testing utilities

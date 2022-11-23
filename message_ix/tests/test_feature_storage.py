@@ -1,18 +1,24 @@
-# -*- coding: utf-8 -*-
-"""
-This is a unit test for representing storage in the MESSAGEix model, and
-testing the functionality of storage equations. The workflow is as follows:
-    - building a stylized MESSAGEix model
-    - adding seasonality and modifying parameters for timesteps accordingly
-    - adding storage implementation (dam: storage device, pump: charger,
-                                     turbine: discharger)
-    - testing storage functionality and equations
+"""Test storage representation.
 
-"""
+This is a unit test for representing storage in the MESSAGEix model, and testing the
+functionality of storage equations. The workflow is as follows:
 
+- Build a stylized MESSAGEix model.
+- Add seasonality and modify parameters for timesteps accordingly.
+- Add storage implementation (dam: storage device, pump: charger, turbine: discharger).
+- Test storage functionality and equations.
+"""
+import logging
 from itertools import product
 
+import pandas as pd
+import pytest
+from ixmp.testing import assert_logs
+
 from message_ix import Scenario
+from message_ix.models import MESSAGE
+from message_ix.testing import make_dantzig
+from message_ix.util import expand_dims
 
 
 # A function for generating a simple MESSAGEix model with two technologies
@@ -23,13 +29,13 @@ def model_setup(scen, years):
     scen.add_set("year", years)
     scen.add_set("type_year", years)
     scen.add_set("technology", ["wind_ppl", "gas_ppl"])
-    scen.add_set("mode", "mode")
+    scen.add_set("mode", "M1")
     output_specs = ["node", "electr", "level", "year", "year"]
     # Two technologies, one cheaper than the other
     var_cost = {"wind_ppl": 0, "gas_ppl": 2}
     for year, (tec, cost) in product(years, var_cost.items()):
         scen.add_par("demand", ["node", "electr", "level", year, "year"], 1, "GWa")
-        tec_specs = ["node", tec, year, year, "mode"]
+        tec_specs = ["node", tec, year, year, "M1"]
         scen.add_par("output", tec_specs + output_specs, 1, "GWa")
         scen.add_par("var_cost", tec_specs + ["year"], cost, "USD/GWa")
 
@@ -75,7 +81,10 @@ def add_storage_data(scen, time_order):
 
     # Adding mapping for storage and charger/discharger technologies
     for tec in ["pump", "turbine"]:
-        scen.add_set("map_tec_storage", ["node", tec, "dam", "storage", "water"])
+        scen.add_set(
+            "map_tec_storage",
+            ["node", tec, "M1", "dam", "M1", "storage", "water", "season"],
+        )
 
     # Adding time sequence
     for h in time_order.keys():
@@ -97,19 +106,19 @@ def add_storage_data(scen, time_order):
     var_cost = {"dam": 0, "pump": 0.2, "turbine": 0.3}
     stor_tecs = ["dam", "pump", "turbine"]
     for year, h, tec in product(set(scen.set("year")), time_order.keys(), stor_tecs):
-        tec_sp = ["node", tec, year, year, "mode"]
+        tec_sp = ["node", tec, year, year, "M1"]
         scen.add_par("output", tec_sp + output_spec[tec] + [h, h], 1, "GWa")
         scen.add_par("input", tec_sp + input_spec[tec] + [h, h], 1, "GWa")
         scen.add_par("var_cost", tec_sp + [h], var_cost[tec], "USD/GWa")
 
     # Adding storage self-discharge (as %) and initial content
     for year, h in product(set(scen.set("year")), time_order.keys()):
-        storage_spec = ["node", "dam", "storage", "water", year, h]
+        storage_spec = ["node", "dam", "M1", "storage", "water", year, h]
         scen.add_par("storage_self_discharge", storage_spec, 0.05, "%")
 
         # Adding initial content of storage (optional)
-        storage_spec = ["node", "dam", "storage", "water", year, "a"]
-        scen.add_par("storage_initial", storage_spec, 0.08, "GWa")
+        storage_spec = ["node", "dam", "M1", "storage", "water", year, "a"]
+        scen.add_par("storage_initial", storage_spec, 0.5, "%")
 
 
 # Main function for building a model with storage and testing the functionality
@@ -135,7 +144,7 @@ def storage_setup(test_mp, time_duration, comment):
     scen.check_out()
     for h in time_duration.keys():
         scen.add_par(
-            "bound_activity_up", ["node", "wind_ppl", 2020, "mode", h], 0.25, "GWa"
+            "bound_activity_up", ["node", "wind_ppl", 2020, "M1", h], 0.25, "GWa"
         )
     scen.commit("activity bounded")
     scen.solve(case="no_storage_bounded" + comment, quiet=True)
@@ -166,7 +175,11 @@ def storage_setup(test_mp, time_duration, comment):
     df["value"] = 1.2
     scen.add_par("input", df)
     scen.commit("storage needs no separate input")
-    scen.solve(case="with_storage_and_input" + comment, quiet=True)
+    scen.solve(
+        case="with_storage_and_input" + comment,
+        quiet=True,
+        var_list=["STORAGE", "STORAGE_CHARGE"],
+    )
     cost_with_stor = scen.var("OBJ")["lvl"]
     act_with_stor = scen.var("ACT", {"technology": "gas_ppl"})["lvl"].sum()
 
@@ -180,11 +193,10 @@ def storage_setup(test_mp, time_duration, comment):
     # Activity of expensive technology should be lower with storage
     assert act_with_stor < act_no_stor
 
-    # 3. Activity of discharger <= activity of charger + initial content
+    # 3. Activity of discharger <= activity of charger
     act_pump = scen.var("ACT", {"technology": "pump"})["lvl"]
     act_turb = scen.var("ACT", {"technology": "turbine"})["lvl"]
-    initial_content = float(scen.par("storage_initial")["value"])
-    assert act_turb.sum() <= act_pump.sum() + initial_content
+    assert act_turb.sum() <= act_pump.sum()
 
     # 4. Activity of input provider to storage = act of storage * storage input
     for ts in time_duration.keys():
@@ -205,22 +217,21 @@ def storage_setup(test_mp, time_duration, comment):
     assert max_turb <= max_stor * (1 - loss)
 
     # Sixth, testing equations of storage (when added to ixmp variables)
-    if scen.has_var("STORAGE"):
-        # 1. Equality: storage content in the beginning and end is related
-        storage_first = scen.var("STORAGE", {"time": "a"})["lvl"]
-        storage_last = scen.var("STORAGE", {"time": "d"})["lvl"]
-        relation = scen.par("relation_storage", {"time_first": "d", "time_last": "a"})[
-            "value"
-        ][0]
-        assert storage_last >= storage_first * relation
+    if scen.has_var("STORAGE") and not scen.var("STORAGE").empty:
+        # 1. Equality: storage content at the end is equal to the beginning
+        # (i.e., the difference is what is pumped in the first time slice)
+        storage_first = float(scen.var("STORAGE", {"time": "a"})["lvl"])
+        storage_last = float(scen.var("STORAGE", {"time": "d"})["lvl"])
+        pump_first = float(scen.var("ACT", {"technology": "pump", "time": "a"})["lvl"])
+        assert storage_last == storage_first - pump_first
 
         # 2. Storage content should never exceed storage activity
         assert max(scen.var("STORAGE")["lvl"]) <= max_stor
 
         # 3. Commodity balance: charge - discharge - losses = 0
-        change = scen.var("STORAGE_CHARGE").set_index(["year_act", "time"])["lvl"]
+        change = scen.var("STORAGE_CHARGE").set_index(["year", "time"])["lvl"]
         loss = scen.par("storage_self_discharge").set_index(["year", "time"])["value"]
-        assert sum(change[change > 0] * (1 - loss)) == -sum(change[change < 0])
+        assert (change[change > 0] * (1 - loss)).sum() >= -(change[change < 0]).sum()
 
         # 4. Energy balance: storage change + losses = storage content
         storage = scen.var("STORAGE").set_index(["year", "time"])["lvl"]
@@ -238,3 +249,64 @@ def test_storage(test_mp):
 
     time_duration = {"a": 0.3, "b": 0.25, "c": 0.25, "d": 0.2}
     storage_setup(test_mp, time_duration, "_unequal_time")
+
+
+def test_structure(caplog, test_mp):
+    """:meth:`MESSAGE.initialize` and :meth:`MESSAGE.enforce` handle old structure."""
+    scen = make_dantzig(test_mp)
+
+    # Item name to use for the tests, a parameter, and its dimensions
+    name = "storage_initial"
+    dims = ["node", "technology", "level", "commodity", "year", "time"]
+    # NB here we cannot use make_df, since that refers to the current dimensionality of
+    #    storage_initial per MESSAGE_ITEMS
+    data = pd.Series(
+        ["topeka", "canning_plant", "supply", "cases", 1963, "year", 1.0, "kg"],
+        index=dims + ["value", "unit"],
+    )
+
+    def prepare(s, with_data=False):
+        """Re-initialize to the former definition, i.e. omitting mode."""
+        with scen.transact():
+            scen.remove_par(name)
+            scen.init_par(name, idx_sets=dims)
+            if with_data:
+                scen.add_par(name, data.to_frame().transpose())
+
+    # Test by calling the MESSAGE model class methods directory. This is not the typical
+    # user behaviour; we just want to avoid a more complex way of doing so.
+
+    # Calling initialize() with no data automatically expands the dimensions
+    prepare(scen)
+    assert "mode" not in scen.idx_sets(name)
+
+    with scen.transact():
+        MESSAGE.initialize(scen)
+
+    assert "mode" in scen.idx_sets(name)
+    # …and enforce() completes without raising an exception
+    MESSAGE.enforce(scen)
+
+    # Now with data in storage_initial, a warning is raised
+    prepare(scen, with_data=True)
+
+    # Two context managers for the with: block
+    c1 = pytest.warns(UserWarning, match="'storage_initial' has data with dimensions")
+    c2 = assert_logs(caplog, "Existing index sets of 'stora", at_level=logging.WARNING)
+    with c1, c2:
+        with scen.transact():
+            MESSAGE.initialize(scen)
+
+    # …the dimensions are *not* expanded automatically
+    assert "mode" not in scen.idx_sets(name)
+
+    # …and the scenario would not solve
+    with pytest.raises(ValueError, match="'storage_initial' has data with dimensions"):
+        MESSAGE.enforce(scen)
+
+    # expand_dims() results in the correct dimensionality and complete data
+    expand_dims(scen, name, mode="production")
+    assert "mode" in scen.idx_sets(name)
+
+    # …and enforce() completes without raising an exception
+    MESSAGE.enforce(scen)

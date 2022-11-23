@@ -342,7 +342,7 @@ Alias(type_tec,type_tec_total);
 *    * - map_time(time,time2)
 *      - Mapping of time periods across hierarchy levels (time2 is in time)
 *    * - map_time_period(year_all,lvl_temporal,time,time2)
-*      - Mapping of the sequence of sub-annual timesteps (used in :ref:`storage <gams-storage>`)
+*      - Mapping of the sequence of sub-annual timeslices (used in :ref:`storage <gams-storage>`)
 *    * - map_resource(node,commodity,grade,year_all)
 *      - Mapping of resources and grades to node over time
 *    * - map_ren_grade(node,commodity,grade,year_all)
@@ -361,7 +361,7 @@ Alias(type_tec,type_tec_total);
 *      - Mapping of technology to temporal dissagregation (time)
 *    * - map_tec_mode(node,tec,year_all,mode)
 *      - Mapping of technology to modes
-*    * - map_tec_storage(node,tec,tec2,level,commodity)
+*    * - map_tec_storage(node,tec,mode,tec2,mode2,level,commodity,lvl_temporal)
 *      - Mapping of charge-discharge technologies ``tec`` to their storage container ``tec2``, stored ``commodity`` and ``level``.
 *    * - map_time_commodity_storage(node,tec,level,commodity,mode,year_all,time)
 *      - Mapping of storage containers to their input commodity-level (not commodity-level of stored media)
@@ -370,7 +370,7 @@ Alias(type_tec,type_tec_total);
 Sets
     map_node(node,location)                            mapping of nodes across hierarchy levels (location is in node)
     map_time(time,time2)                               mapping of time periods across hierarchy levels (time2 is in time)
-    map_time_period(year_all,lvl_temporal,time,time2)  mapping of the sequence of sub-annual timesteps
+    map_time_period(year_all,lvl_temporal,time,time2)  mapping of the sequence of sub-annual time slices
 
     map_resource(node,commodity,grade,year_all)  mapping of resources and grades to node over time
     map_ren_grade(node,commodity,grade,year_all) mapping of renewables and grades to node over time
@@ -385,7 +385,7 @@ Sets
     map_tec_mode(node,tec,year_all,mode)            mapping of technology to modes
     map_tec_act(node,tec,year_all,mode,time)        mapping of technology to modes AND temporal dissagregation
     map_tec_addon(tec,type_addon)                   mapping of types of add-on technologies to the underlying parent technology
-    map_tec_storage(node,tec,tec2,level,commodity)  mapping of charge-discharging technologies to their respective storage container tec and level-commodity
+    map_tec_storage(node,tec,mode,tec2,mode2,level,commodity,lvl_temporal)  mapping of charge-discharging technologies to their respective storage container tec and level-commodity
 
     map_spatial_hierarchy(lvl_spatial,node,node)    mapping of spatial resolution to nodes (last index is 'parent')
     map_temporal_hierarchy(lvl_temporal,time,time)  mapping of temporal resolution to time (last index is 'parent')

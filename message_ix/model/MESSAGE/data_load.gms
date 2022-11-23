@@ -168,11 +168,11 @@ emission_scaling(type_emission,emission)$( cat_emission(type_emission,emission)
 map_time_commodity_storage(node,tec,level,commodity,mode,year_all,time)$( storage_tec(tec) AND
     SUM( (node2,year_all2,time_act), input(node2,tec,year_all,year_all2,mode,node,commodity,level,time_act,time) ) ) = yes;
 
-* mapping of sequence of sub-annual timesteps in a period and temporal level
+* mapping of sequence of sub-annual time slices in a period and temporal level
 map_time_period(year_all,lvl_temporal,time,time2)$( time_order(lvl_temporal,time) AND
      time_order(lvl_temporal,time) + 1 = time_order(lvl_temporal,time2) ) = yes;
 
-* mapping of sequence of the last sub-annual timestep to the first to create a close the order of timesteps
+* mapping of sequence of the last sub-annual time slice to the first to create a close the order of time slices
 map_time_period(year_all,lvl_temporal,time,time2)$( time_order(lvl_temporal,time) AND
      time_order(lvl_temporal,time) = SMAX(time3,time_order(lvl_temporal,time3) ) AND time_order(lvl_temporal,time2) = 1 ) = yes;
 *----------------------------------------------------------------------------------------------------------------------*

@@ -10,6 +10,35 @@ Migration notes
   Alternatively, the `lpmethod` can be specified directly as an argument when solving a scenario.
   Both of these configuration methods are further explained :meth:`here <message_ix.models.GAMSModel>`.
 
+- The dimensionality of one set and two parameters (``map_tec_storage``, ``storage_initial``, and ``storage_self_discharge``) are extended to allow repesentation of the mode of operation of storage technologies and the temporal level of storage containers.
+  If these items are already populated with data in a Scenario, this data will be incompatible with the MESSAGE GAMS implementation in this release; a :class:`UserWarning` will be emitted when the :class:`.Scenario` is instantiated, and :meth:`~.message_ix.Scenario.solve` will raise a :class:`ValueError`.
+  (If these items are empty, their dimensions will be updated automatically.
+  New Scenarios are unaffected.)
+
+  Users must update data for these items, specifically:
+
+  ==========================  ============================================
+  Existing parameter or set   Dimension(s) to add
+  ==========================  ============================================
+  ``map_tec_storage``         ``mode``, ``storage_mode``, ``lvl_temporal``
+  ``storage_initial``         ``mode``
+  ``storage_self_discharge``  ``mode``
+  ==========================  ============================================
+
+  For the set ``map_tec_storage``, values for the new dimensions represent, respectively, the ``mode`` of operation for charge/discharge technologies, and the ``storage_mode`` and ``lvl_temporal`` for the corresponding storage device.
+  For the two parameters, :func:`.expand_dims` is provided to help:
+
+  .. code-block:: python
+
+      from message_ix import Scenario
+      from message_ix.util import expand_dims
+
+      scen, platform = Scenario.from_url("…")
+
+      # Re-use the existing data in `scen`, adding the `mode` dimension
+      expand_dims(scen, "storage_initial", mode="an existing mode")
+
+
 All changes
 -----------
 
@@ -19,6 +48,7 @@ All changes
 - Ensure `levelized_cost` are also calculated for technologies with only variable costs (:pull:`653`).
 - Correct calculation of `COST_NODAL_NET` for standalone MESSAGE (:pull:`648`)
 - Account for difference in period-length in equations `NEW_CAPACITY_CONSTRAINT_LO` and `NEW_CAPACITY_CONSTRAINT_UP` (:pull:`654`)
+- Extend functionality of storage solutions to include "mode" and temporal level (:pull:`633`).
 
 .. _v3.6.0:
 
@@ -40,7 +70,6 @@ Migration notes
   Code using e.g. ``message:default`` (one colon) should be updated to use the current keys.
 
   This matches fixed behaviour upstream in :mod:`genno` version 1.12 to avoid unintended confusion with keys like ``A:i``: ``i`` (after the first colon) is the name for the sole dimension of a 1-dimensional quantity, whereas ``default`` in ``message::default`` is a tag.
-
 
 All changes
 -----------
