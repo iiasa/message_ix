@@ -137,6 +137,7 @@ All changes
 -----------
 
 - Add a tutorial for Westeros multi-node and different trade possibilities (:pull:`683`).
+- Extend user-defined relations to include the index of time (:pull:`680`).
 - Add additional oscillation detection mechanism for macro iterations (:pull:`645`, :pull:`676`)
 - Adjust default `lpmethod` from "Dual Simplex" (2) to "Barrier" (4); do NOT remove `cplex.opt` file(s) after solving workflow completes (:pull:`657`).
 - Adjust :meth:`.Scenario.add_macro` calculations for pandas 1.5.0 (:pull:`656`).
