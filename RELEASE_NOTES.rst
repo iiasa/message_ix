@@ -103,6 +103,35 @@ Migration notes
       # Re-use the existing data in `scen`, adding the `mode` dimension
       expand_dims(scen, "storage_initial", mode="an existing mode")
 
+- The index sets of user-defined relations are extended to include sub-annual time slices, i.e., index of `time`.
+  This includes sets (``is_relation_upper`` and ``is_relation_lower``) and parameters (``relation_activity``, ``relation_upper``, ``relation_lower``, and ``relation_cost``).
+  If these items are already populated with data in a Scenario, this data will be incompatible with the MESSAGE GAMS implementation in this release; a :class:`UserWarning` will be emitted when the :class:`.Scenario` is instantiated, and :meth:`~.message_ix.Scenario.solve` will raise a :class:`ValueError`.
+  (If these items are empty, their dimensions will be updated automatically, and new Scenarios are unaffected.)
+
+  Data for these items must be updated as follows:
+
+  ==========================  ============================================
+  Existing parameter or set   Dimension to add
+  ==========================  ============================================
+  ``relation_activity``         ``time``
+  ``relation_upper``            ``time``
+  ``relation_lower``            ``time``
+  ``relation_cost``             ``time``
+  ``is_relation_lower``         ``time``
+  ``is_relation_upper``         ``time``
+  ==========================  ============================================
+
+  For extending the dimensionality of these items, :func:`.expand_dims` can help:
+
+  .. code-block:: python
+
+      from message_ix import Scenario
+      from message_ix.util import expand_dims
+
+      scen, platform = Scenario.from_url("…")
+
+      # Re-use the existing data in `scen`, adding the `time` dimension of "year"
+      expand_dims(scen, "relation_activity", time="year")
 
 All changes
 -----------
