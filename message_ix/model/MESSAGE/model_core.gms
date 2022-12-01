@@ -49,7 +49,7 @@
 * :math:`LAND_{n,s,y} \in [0,1]`                           Relative share of land-use scenario (for land-use model emulator)
 * :math:`EMISS_{n,e,\widehat{t},y} \in \mathbb{R}`         Auxiliary variable for aggregate emissions by technology type
 * :math:`REL_{r,n,y} \in \mathbb{R}`                       Auxiliary variable for left-hand side of relations (linear constraints)
-* :math:`REL\_TIME_{r,n,y,h} \in \mathbb{R}`               Auxiliary variable for left-hand side of relations (linear constraints) at each subannual timeslice
+* :math:`REL\_TIME_{r,n,y,h} \in \mathbb{R}`               Auxiliary variable for left-hand side of relations (linear constraints) at each subannual time slice
 * :math:`COMMODITY\_USE_{n,c,l,y} \in \mathbb{R}`          Auxiliary variable for amount of commodity used at specific level
 * :math:`COMMODITY\_BALANCE_{n,c,l,y,h} \in \mathbb{R}`    Auxiliary variable for right-hand side of :ref:`commodity_balance`
 * :math:`STORAGE_{n,t,m,l,c,y,h} \in \mathbb{R}`             State of charge or content of storage at each sub-annual time slice
@@ -229,8 +229,8 @@ Positive variables
     SLACK_LAND_TYPE_LO(node,year_all,land_type)       slack variable for dynamic land type constraint relaxation (downwards)
     SLACK_RELATION_BOUND_UP(relation,node,year_all)   slack variable for upper bound of generic relation
     SLACK_RELATION_BOUND_LO(relation,node,year_all)   slack variable for lower bound of generic relation
-    SLACK_RELATION_BOUND_UP_TIME(relation,node,year_all,time)   slack variable for upper bound of generic relation with subannual timestep
-    SLACK_RELATION_BOUND_LO_TIME(relation,node,year_all,time)   slack variable for lower bound of generic relation with subannual timestep
+    SLACK_RELATION_BOUND_UP_TIME(relation,node,year_all,time)   slack variable for upper bound of generic relation with subannual time slice
+    SLACK_RELATION_BOUND_LO_TIME(relation,node,year_all,time)   slack variable for lower bound of generic relation with subannual time slice
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
@@ -425,7 +425,7 @@ COST_ACCOUNTING_NODAL(node, year)..
 * cost terms associated with linear relations
     + SUM(relation$( relation_cost(relation,node,year) ),
         relation_cost(relation,node,year) * REL(relation,node,year) )
-* cost terms associated with linear relations on sub-annual timeslice level
+* cost terms associated with linear relations at the sub-annual time slice level
     + SUM((relation,time)$( relation_cost(relation,node,year) AND
           (map_relation_time(relation,node,year,time) OR map_relation_year(relation,node,year,time) ) ),
         relation_cost(relation,node,year) * REL_TIME(relation,node,year,time ) )
@@ -2164,10 +2164,10 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 %SLACK_RELATION_BOUND_LO% + SLACK_RELATION_BOUND_LO(relation,node,year)
     =G= relation_lower(relation,node,year) ;
 
-* Section of generic relations (linear constraints) with sub-annual timeslices
+* Section of generic relations (linear constraints) with sub-annual time slices
 * -------------------------------------------------
 *
-* This feature is intended for development and testing only for addressing sub-annual timeslices!
+* This feature is intended for development and testing only for addressing sub-annual time slices!
 *
 * Auxiliary variable for left-hand side
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -2203,7 +2203,7 @@ RELATION_EQUIVALENCE_TIME(relation,node,year,time)$( map_relation_time(relation,
           )
       ) ;
 
-* Linear relations of sub-annual timeslice that is accounted at 'year' level
+* Linear relations of the sub-annual time slice that is accounted at the 'year' level
 RELATION_EQUIVALENCE_YEAR(relation,node,year)$( sum (time, map_relation_year(relation,node,year,time) ) )..
     REL_TIME(relation,node,year,'year')
         =E=
@@ -2221,7 +2221,7 @@ RELATION_EQUIVALENCE_YEAR(relation,node,year)$( sum (time, map_relation_year(rel
       ) ;
 
 ***
-* Upper and lower bounds on user-defined relations with sub-annual timeslices
+* Upper and lower bounds on user-defined relations with sub-annual time slices
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
 * .. _equation_relation_constraint_up_time:

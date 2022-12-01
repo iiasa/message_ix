@@ -415,7 +415,7 @@ Parameters
 *
 * The |MESSAGEix| formulation includes "storage" solutions to model sub-annual, inter-temporal storage of commodities in each period.
 * This feature can be used to model electricity storage (pumped hydro, batteries, compressed air energy storage, etc.), thermal energy storage,
-* demand side management, and in general any technology for storing commodities (gas, hydrogen, water, etc.) over sub-annual timesteps.
+* demand side management, and in general any technology for storing commodities (gas, hydrogen, water, etc.) over sub-annual time slices.
 * The user defines the chronological order of sub-annual time slices by assigning a number to them in parameter ``time_order``.
 * This order is used by storage equations to shift the stored commodity in a correct timeline, e.g., from Jan through to Dec, and not vice versa.
 * The last sub-annual time slice is linked to the first one to close the loop of the year. Parameter ``storage_initial`` is to set an initial amount
@@ -781,7 +781,7 @@ Parameters
     relation_activity(relation,node,year_all,node,tec,year_all,mode) activity factor (multiplier) of generic relation
     relation_upper_time(relation,node,year_all,time)    time-related upper bound of generic relation
     relation_lower_time(relation,node,year_all,time)    time-related lower bound of generic relation
-    relation_activity_time(relation,node,year_all,node,tec,year_all,mode,time) time-related activity factor (multiplier) of generic relation	
+    relation_activity_time(relation,node,year_all,node,tec,year_all,mode,time) time-related activity factor (multiplier) of generic relation
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
