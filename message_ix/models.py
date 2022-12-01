@@ -123,8 +123,8 @@ MESSAGE_ITEMS = {
     "cat_tec": item("set", "type_tec t"),
     "cat_year": item("set", "type_year y"),
     "is_capacity_factor": item("set", "nl t yv ya h"),
-	"is_relation_lower_time": item("set", "relation nr yr h"),
-	"is_relation_upper_time": item("set", "relation nr yr h"),
+    "is_relation_lower_time": item("set", "relation nr yr h"),
+    "is_relation_upper_time": item("set", "relation nr yr h"),
     "level_renewable": dict(ix_type="set", idx_sets=["level"]),
     "level_resource": dict(ix_type="set", idx_sets=["level"]),
     "level_stocks": dict(ix_type="set", idx_sets=["level"]),
@@ -231,14 +231,14 @@ MESSAGE_ITEMS = {
     "ref_new_capacity": item("par", "nl t yv"),
     "ref_relation": item("par", "relation nr yr"),
     "relation_activity": item("par", "relation nr yr nl t ya m"),
-	"relation_activity_time": item("par", "relation nr yr nl t ya m h"),
+    "relation_activity_time": item("par", "relation nr yr nl t ya m h"),
     "relation_cost": item("par", "relation nr yr"),
     "relation_lower": item("par", "relation nr yr"),
-	"relation_lower_time": item("par", "relation nr yr h"),
+    "relation_lower_time": item("par", "relation nr yr h"),
     "relation_new_capacity": item("par", "relation nr yr t"),
     "relation_total_capacity": item("par", "relation nr yr t"),
     "relation_upper": item("par", "relation nr yr"),
-	"relation_upper_time": item("par", "relation nr yr h"),
+    "relation_upper_time": item("par", "relation nr yr h"),
     "reliability_factor": item("par", "n t ya c l h r"),
     "renewable_capacity_factor": item("par", "n c g l y"),
     "renewable_potential": item("par", "n c g l y"),
@@ -439,7 +439,11 @@ class MESSAGE(GAMSModel):
         # handled in JDBCBackend. For the moment, this code does not backstop that
         # behaviour.
         # TODO Extend to handle all masks, e.g. for new backends.
-        for par_name in ("capacity_factor", "relation_lower_time", "relation_upper_time"):
+        for par_name in (
+            "capacity_factor",
+            "relation_lower_time",
+            "relation_upper_time",
+        ):
             # Name of the corresponding set
             set_name = f"is_{par_name}"
 
