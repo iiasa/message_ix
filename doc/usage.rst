@@ -23,6 +23,21 @@ Publications
 The following is a selection of academic publications in which |MESSAGEix| was used to carry out energy systems research.
 For each, the spatial scope/resolution, keywords and specific usage of |MESSAGEix| are described.
 
+Role of energy storage in energy and water security in Central Asia
+-----------------------------------------------------------------------------------
+.. figure:: _static/usage_figures/10.1016-j.est.2022.104587.JPG
+   :width: 250px
+   :align: right
+
+:cite:ct:`Zakeri2022`
+
+- **Spatial**: Regional (Central Asia), multi-country including Kazakhstan, Kyrgyzstan, Tajikistan, Turkmenistan, and Uzbekistan
+- **Keywords**: Energy storage, Seasonal pumped hydropower storage, Water management, Renewable energy systems, Energy policy, Electricity storage, Energy model
+- **Usage**: An energy-water system model of Central Asia with 12 sub-annual time slices for modeling and analyzing the role of energy and water storage solutions.
+- **Data and code**: Data and scripts for building the model are openly available on `Github <https://github.com/iiasa/central-asia-storage>`__
+
+Central Asia has faced major energy and water security challenges. Technic… `Read more → <https://doi.org/10.1016/j.est.2022.104587>`__
+
 Climate mitigation scenarios with persistent COVID-19-related energy demand changes
 -----------------------------------------------------------------------------------
 .. figure:: _static/usage_figures/41560_2021_904.webp
