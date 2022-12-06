@@ -32,7 +32,7 @@ Role of energy storage in energy and water security in Central Asia
 :cite:ct:`Zakeri2022`
 
 - **Spatial**: Regional (Central Asia), multi-country including Kazakhstan, Kyrgyzstan, Tajikistan, Turkmenistan, and Uzbekistan
-- **Keywords**: Energy storage, Seasonal pumped hydropower storage, Water management, Renewable energy systems, Energy policy, Electricity storage, Energy model
+- **Keywords**: Energy storage, seasonal pumped hydropower storage, water management, renewable energy systems, energy policy, electricity storage, energy model
 - **Usage**: An energy-water system model of Central Asia with 12 sub-annual time slices for modeling and analyzing the role of energy and water storage solutions.
 - **Data and code**: Data and scripts for building the model are openly available on `Github <https://github.com/iiasa/central-asia-storage>`__
 
