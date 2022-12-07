@@ -2367,7 +2367,7 @@ STORAGE_BALANCE_INIT(node,storage_tec,mode,level,commodity,year,time,time2)$ (
         AND map_time_period(year,lvl_temporal,time,time2) )
     AND storage_initial(node,storage_tec,mode,level,commodity,year,time2) )..
 * Showing the state of charge of storage at a time slice prior to a time slice that has initial storage content
-    STORAGE(node,storage_tec,mode,level,commodity,year,time) =G=
+    STORAGE(node,storage_tec,mode,level,commodity,year,time) =L=
 * Initial content of storage in the examined time slice as a percentage multiplier in available capacity of storage
         storage_initial(node,storage_tec,mode,level,commodity,year,time2)
         * SUM(vintage$( map_tec_lifetime(node,storage_tec,vintage,year) ), capacity_factor(node,storage_tec,vintage,year,time2)
