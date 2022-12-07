@@ -781,6 +781,7 @@ Parameters
     relation_activity(relation,node,year_all,node,tec,year_all,mode) activity factor (multiplier) of generic relation
     relation_upper_time(relation,node,year_all,time)    time-related upper bound of generic relation
     relation_lower_time(relation,node,year_all,time)    time-related lower bound of generic relation
+    relation_cost_time(relation,node,year_all,time)     cost of investment and activities included in generic relation with sub-annual time slices
     relation_activity_time(relation,node,year_all,node,tec,year_all,mode,time) time-related activity factor (multiplier) of generic relation
 ;
 

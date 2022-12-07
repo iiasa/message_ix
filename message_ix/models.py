@@ -233,6 +233,7 @@ MESSAGE_ITEMS = {
     "relation_activity": item("par", "relation nr yr nl t ya m"),
     "relation_activity_time": item("par", "relation nr yr nl t ya m h"),
     "relation_cost": item("par", "relation nr yr"),
+    "relation_cost_time": item("par", "relation nr yr h"),
     "relation_lower": item("par", "relation nr yr"),
     "relation_lower_time": item("par", "relation nr yr h"),
     "relation_new_capacity": item("par", "relation nr yr t"),
