@@ -428,7 +428,7 @@ COST_ACCOUNTING_NODAL(node, year)..
 * cost terms associated with linear relations at the sub-annual time slice level
     + SUM((relation,time)$( relation_cost(relation,node,year) AND
           (map_relation_time(relation,node,year,time) OR map_relation_year(relation,node,year,time) ) ),
-        relation_cost(relation,node,year) * REL_TIME(relation,node,year,time ) )
+        relation_cost_time(relation,node,year,time) * REL_TIME(relation,node,year,time ) )
 * implementation of slack variables for constraints to aid in debugging
     + SUM((commodity,level,time)$( map_commodity(node,commodity,level,year,time) ), ( 0
 %SLACK_COMMODITY_EQUIVALENCE%   + SLACK_COMMODITY_EQUIVALENCE_UP(node,commodity,level,year,time)

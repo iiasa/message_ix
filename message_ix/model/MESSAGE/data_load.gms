@@ -80,7 +80,7 @@ fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activit
 * storage parameters
 storage_initial, storage_self_discharge, time_order
 * time-related relation parameters and mappings
-is_relation_upper_time, is_relation_lower_time, relation_activity_time, relation_upper_time, relation_lower_time
+is_relation_upper_time, is_relation_lower_time, relation_activity_time, relation_upper_time, relation_lower_time, relation_cost_time
 ;
 
 
