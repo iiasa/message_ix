@@ -56,7 +56,7 @@ tutorials: List[Tuple] = [
     (("westeros", "westeros_addon_technologies"), [], {}),
     (("westeros", "westeros_historical_new_capacity"), [], {}),
     # NB this is the same value as in test_reporter()
-    (("westeros", "westeros_report"), [("len-rep-graph", 13074)], {}),
+    (("westeros", "westeros_report"), [("len-rep-graph", 13082)], {}),
     ((AT, "austria"), [("solve-objective-value", 206321.90625)], {}),
     (
         (AT, "austria_single_policy"),
