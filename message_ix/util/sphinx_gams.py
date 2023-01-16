@@ -3,7 +3,11 @@
 from os import PathLike
 from pathlib import Path
 
-from sphinx.util import status_iterator
+try:
+    from sphinx.util.display import status_iterator
+except ImportError:  # Sphinx < 6.1
+    # TODO remove this clause once message_ix requires Sphinx >= 6.1
+    from sphinx.util import status_iterator  # type: ignore
 
 
 def files(src_dir, target_dir, match="*.gms", ext=".rst"):
