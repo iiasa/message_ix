@@ -86,6 +86,8 @@ jobs:
       shell: bash
 
     - uses: ts-graphviz/setup-graphviz@v1.2.0
+      with:
+        macos-skip-brew-update: true
 
     - uses: r-lib/actions/setup-r@v2
       id: setup-r
