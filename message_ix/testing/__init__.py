@@ -675,7 +675,7 @@ def make_subannual(
     scen.add_set("technology", list(tec_dict.keys()))
 
     # Add "time" and "duration_time" to the model
-    for (h, dur, tmp_lvl, parent) in time_steps:
+    for h, dur, tmp_lvl, parent in time_steps:
         scen.add_set("time", h)
         scen.add_set("time", parent)
         scen.add_set("lvl_temporal", tmp_lvl)

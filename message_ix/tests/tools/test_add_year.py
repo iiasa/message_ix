@@ -20,7 +20,7 @@ def base_scen_mp(test_mp):
     scen.add_set("mode", "mode")
     output_specs = ["node", "comm", "level", "year", "year"]
 
-    for (yr, value) in data.items():
+    for yr, value in data.items():
         scen.add_par("demand", ["node", "comm", "level", yr, "year"], 1, "GWa")
         scen.add_par("technical_lifetime", ["node", "tec", yr], 10, "y")
         tec_specs = ["node", "tec", yr, yr, "mode"]

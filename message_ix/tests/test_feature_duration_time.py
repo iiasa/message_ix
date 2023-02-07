@@ -116,7 +116,7 @@ def model_generator(
             time_pairs = zip(times_in, times_out)
 
         # Configuring data for "time_origin" and "time" in "input"
-        for (h_in, h_act) in time_pairs:
+        for h_in, h_act in time_pairs:
             # "input"
             inp = com_dict[tec]["input"]
             if inp:
@@ -148,6 +148,7 @@ def model_generator(
 # temporal levels ("lvl_temporal")
 # In these tests "demand" is defined in different time slices and one power plant
 # to meet demand, which receives fuel from a supply technology.
+
 
 # Testing one temporal level ("season") and different number of time slices
 def test_season(test_mp, n_time=[4, 12, 50]):
