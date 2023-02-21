@@ -64,6 +64,81 @@ EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
 %AUX_BOUNDS% AUX_ACT_BOUND_UP(node,tec,year_all,year_all2,mode,time)$( ACT.l(node,tec,year_all,year_all2,mode,time) > 0 AND
 %AUX_BOUNDS%    ACT.l(node,tec,year_all,year_all2,mode,time) = %AUX_BOUND_VALUE% ) = yes ;
 
+
+
+elseif %foresight% = -1,
+***
+* Recursive-dynamic and myopic model
+* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* For the myopic and rolling-horizon models, loop over horizons and iteratively solve the model, keeping the decision
+* variables from prior periods fixed.
+* This option is selected by setting the GAMS global variable ``%foresight%`` to a value greater than 0,
+* where the value represents the number of years that the model instance is considering when iterating over the periods
+* of the optimization horizon.
+*
+* Loop over :math:`\hat{y} \in Y`, solving
+*
+* .. math::
+*     \min_x \ OBJ = \sum_{y \in \hat{Y}(\hat{y})} OBJ_y(x_y) \\
+*     \text{s.t. } x_{y'} = x_{y'}^* \quad \forall \ y' < y
+*
+* where :math:`\hat{Y}(\hat{y}) = \{y \in Y | \ |\hat{y}| - |y| < optimization\_horizon \}` and
+* :math:`x_{y'}^*` is the optimal value of :math:`x_{y'}` in iteration :math:`|y'|` of the iterative loop.
+*
+* The advantage of this implementation is that there is no need to 'store' the optimal values of all decision
+* variables in additional reporting parameters - the last model solve automatically includes the results over the
+* entire model horizon and can be imported via the ixmp interface.
+***
+    year(year_all) = no ;
+    year(model_horizon) = yes ;
+    LOOP(year_all$( model_horizon(year_all) ),
+
+*             year(model_horizon) = yes ;
+             year4(year_all2)$((ord(year_all2) < ord(year_all))) = yes ;
+*
+             option threads = 4 ;
+             Solve MESSAGE_LP using LP minimizing OBJ ;
+*            write model status summary
+             status('perfect_foresight','modelstat') = MESSAGE_LP.modelstat ;
+             status('perfect_foresight','solvestat') = MESSAGE_LP.solvestat ;
+             status('perfect_foresight','resUsd')    = MESSAGE_LP.resUsd ;
+             status('perfect_foresight','objEst')    = MESSAGE_LP.objEst ;
+             status('perfect_foresight','objVal')    = MESSAGE_LP.objVal ;
+
+*            write an error message if model did not solve to optimality
+             IF( NOT ( MESSAGE_LP.modelstat = 1 OR MESSAGE_LP.modelstat = 8 ),
+                 put_utility 'log' /'+++ MESSAGEix did not solve to optimality - run is aborted, no output produced! +++ ' ;
+                 ABORT "MESSAGEix did not solve to optimality!"
+             ) ;
+
+*            passing CAP_NEW values to update cap_new2 data for unit and size optimization
+             cap_new2(node,newtec,year_all2) = CAP_NEW.l(node,newtec,year_all2);
+             display cap_new2;
+
+             solve leaningeos using nlp minimizing Object;
+*            passing CapexTec values to update inv_cost data for MESSAGE optimization
+             inv_cost(node,newtec,year_all) = CapexTec.l(node,newtec,year_all);
+
+             Execute_unload 'learningeos.gdx',N_unit,CapexTec,cap_new2, CAP_NEW.l, cap_new2;;
+
+* fix all variables of the current iteration period 'year_all' to the optimal levels
+        EXT.fx(node,commodity,grade,year4) =  EXT.l(node,commodity,grade,year4) ;
+        CAP_NEW.fx(node,tec,year4) = CAP_NEW.l(node,tec,year4) ;
+        CAP.fx(node,tec,year4,year4) = CAP.l(node,tec,year4,year4) ;
+        ACT.fx(node,tec,year4,year4,mode,time) = ACT.l(node,tec,year4,year4,mode,time) ;
+        CAP_NEW_UP.fx(node,tec,year4) = CAP_NEW_UP.l(node,tec,year4) ;
+        CAP_NEW_LO.fx(node,tec,year4) = CAP_NEW_LO.l(node,tec,year4) ;
+        ACT_UP.fx(node,tec,year4,time) = ACT_UP.l(node,tec,year4,time) ;
+        ACT_LO.fx(node,tec,year4,time) = ACT_LO.l(node,tec,year4,time) ;
+
+
+             Display year,year4,year_all,model_horizon,CapexTec.l,hist_length ;
+    ) ; # end of the recursive-dynamic loop for technology cost learning and economy of scale module
+
+
+
+
+
 else
 ***
 * Recursive-dynamic and myopic model
