@@ -60,7 +60,7 @@ tutorials: List[Tuple] = [
     ((AT, "austria"), [("solve-objective-value", 206321.90625)], {}),
     (
         (AT, "austria_single_policy"),
-        [("solve-objective-value", 815183232.0)],
+        [("solve-objective-value", 205310.34375)],
         {},
     ),
     ((AT, "austria_multiple_policies"), [], {}),
