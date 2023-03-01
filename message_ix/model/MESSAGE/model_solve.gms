@@ -168,41 +168,53 @@ else
     LOOP(year_all$( model_horizon(year_all) ),
 
 * include all past periods and future periods including the period where the %foresight% is reached
-        year(year_all) = yes ;
+*             year(year_all) = yes ;
+             year(year_all2)$( ORD(year_all2) < (ORD(year_all) + %foresight%) ) = yes ;
+             year4(year_all2)$((ord(year_all2) < ord(year_all))) = yes ;
 
 * reset the investment cost scaling parameter
-        year(year_all2)$( ORD(year_all2) > ORD(year_all)
-            AND duration_period_sum(year_all,year_all2) < %foresight% ) = yes ;
+*             year(year_all2)$( ORD(year_all2) > ORD(year_all)
+*                 AND duration_period_sum(year_all,year_all2) < %foresight% ) = yes ;
 
-* write a status update and time elapsed to the log file, solve the model
-        put_utility 'log' /'+++ Solve the recursive-dynamic version of MESSAGEix - iteration ' year_all.tl:0 '  +++ ' ;
-        $$INCLUDE includes/aux_computation_time.gms
-        Solve MESSAGE_LP using LP minimizing OBJ ;
 
-* write model status summary
-        status(year_all,'modelstat') = MESSAGE_LP.modelstat ;
-        status(year_all,'solvestat') = MESSAGE_LP.solvestat ;
-        status(year_all,'resUsd')    = MESSAGE_LP.resUsd ;
-        status(year_all,'objEst')    = MESSAGE_LP.objEst ;
-        status(year_all,'objVal')    = MESSAGE_LP.objVal ;
+             option threads = 4 ;
+             Solve MESSAGE_LP using LP minimizing OBJ ;
+*            write model status summary
+             status('perfect_foresight','modelstat') = MESSAGE_LP.modelstat ;
+             status('perfect_foresight','solvestat') = MESSAGE_LP.solvestat ;
+             status('perfect_foresight','resUsd')    = MESSAGE_LP.resUsd ;
+             status('perfect_foresight','objEst')    = MESSAGE_LP.objEst ;
+             status('perfect_foresight','objVal')    = MESSAGE_LP.objVal ;
 
-* write an error message AND ABORT THE SOLVE LOOP if model did not solve to optimality
-        IF( NOT ( MESSAGE_LP.modelstat = 1 OR MESSAGE_LP.modelstat = 8 ),
-            put_utility 'log' /'+++ MESSAGEix did not solve to optimality - run is aborted, no output produced! +++ ' ;
-            ABORT "MESSAGEix did not solve to optimality!"
-        ) ;
+*            write an error message if model did not solve to optimality
+             IF( NOT ( MESSAGE_LP.modelstat = 1 OR MESSAGE_LP.modelstat = 8 ),
+                 put_utility 'log' /'+++ MESSAGEix did not solve to optimality - run is aborted, no output produced! +++ ' ;
+                 ABORT "MESSAGEix did not solve to optimality!"
+             ) ;
 
+             IF(%learningmode% = 1,
+*            passing CAP_NEW values to update cap_new2 data for unit and size optimization
+                 cap_new2(node,newtec,year_all2) = CAP_NEW.l(node,newtec,year_all2);
+                 display cap_new2;
+
+                 solve leaningeos using nlp minimizing Object;
+*            passing CapexTec values to update inv_cost data for MESSAGE optimization
+                 inv_cost(node,newtec,year_all) = CapexTec.l(node,newtec,year_all);
+
+                 Execute_unload 'learningeos.gdx',N_unit,CapexTec,cap_new2, CAP_NEW.l, cap_new2;;
+                 );
 * fix all variables of the current iteration period 'year_all' to the optimal levels
-        EXT.fx(node,commodity,grade,year_all) =  EXT.l(node,commodity,grade,year_all) ;
-        CAP_NEW.fx(node,tec,year_all) = CAP_NEW.l(node,tec,year_all) ;
-        CAP.fx(node,tec,year_all2,year_all)$( map_period(year_all2,year_all) ) = CAP.l(node,tec,year_all,year_all2) ;
-        ACT.fx(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all) )
-            = ACT.l(node,tec,year_all2,year_all,mode,time) ;
-        CAP_NEW_UP.fx(node,tec,year_all) = CAP_NEW_UP.l(node,tec,year_all) ;
-        CAP_NEW_LO.fx(node,tec,year_all) = CAP_NEW_LO.l(node,tec,year_all) ;
-        ACT_UP.fx(node,tec,year_all,time) = ACT_UP.l(node,tec,year_all,time) ;
-        ACT_LO.fx(node,tec,year_all,time) = ACT_LO.l(node,tec,year_all,time) ;
+        EXT.fx(node,commodity,grade,year4) =  EXT.l(node,commodity,grade,year4) ;
+        CAP_NEW.fx(node,tec,year4) = CAP_NEW.l(node,tec,year4) ;
+        CAP.fx(node,tec,year4,year4) = CAP.l(node,tec,year4,year4) ;
+        ACT.fx(node,tec,year4,year4,mode,time) = ACT.l(node,tec,year4,year4,mode,time) ;
+        CAP_NEW_UP.fx(node,tec,year4) = CAP_NEW_UP.l(node,tec,year4) ;
+        CAP_NEW_LO.fx(node,tec,year4) = CAP_NEW_LO.l(node,tec,year4) ;
+        ACT_UP.fx(node,tec,year4,time) = ACT_UP.l(node,tec,year4,time) ;
+        ACT_LO.fx(node,tec,year4,time) = ACT_LO.l(node,tec,year4,time) ;
 
+
+             Display year,year4,year_all,model_horizon,CapexTec.l,hist_length ;
     ) ; # end of the recursive-dynamic loop
 
 ) ; # end of if statement for the selection betwen perfect-foresight or recursive-dynamic model
