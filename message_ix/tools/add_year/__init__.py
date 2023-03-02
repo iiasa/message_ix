@@ -323,8 +323,9 @@ def add_year_set(
         yr_pair.append(["cumulative", yr])
 
     yr_cat = (
-        yr_cat.append(
-            pd.DataFrame(yr_pair, columns=["type_year", "year"]), ignore_index=True
+        pd.concat(
+            [yr_cat, pd.DataFrame(yr_pair, columns=["type_year", "year"])],
+            ignore_index=True,
         )
         .sort_values("year")
         .reset_index(drop=True)
@@ -938,7 +939,7 @@ def interpolate_2d(  # noqa: C901
         else:
             continue
 
-        df2 = df2.append(df_yr)
+        df2 = pd.concat([df2, df_yr])
         df2 = df2.reindex(sorted(df2.columns), axis=1).sort_index()
     # -------------------------------------------------------------------------
     # Forth: final masking based on technical lifetime
