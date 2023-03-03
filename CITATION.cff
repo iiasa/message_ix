@@ -126,7 +126,6 @@ keywords:
   - data visualisation
   - Python package
 license: Apache-2.0
-commit: 139c832a9fc195de97e2b4b911461fb49b6fa455
 version: 3.6.0
 date-released: '2022-08-18'
 references:
