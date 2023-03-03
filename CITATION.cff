@@ -5,7 +5,8 @@ cff-version: 1.2.0
 title: MESSAGEix
 message: >-
   Thank you for using the MESSAGEix framework! Please cite
-  it using the metadata from this file :)
+  the GitHub repository and the MESSAGEix framework manuscript 
+  (https://doi.org/10.1016/j.envsoft.2018.11.012).
 type: software
 authors:
   - given-names: Paul Natsuo
@@ -41,7 +42,7 @@ authors:
     affiliation: IIASA
     orcid: 'https://orcid.org/0000-0002-3051-178X'
   - given-names: Gamze
-    family-names: ' Ünlü'
+    family-names: Ünlü
     affiliation: IIASA
     orcid: 'https://orcid.org/0000-0003-0080-7122'
   - given-names: Miguel Poblete
@@ -54,6 +55,7 @@ authors:
   - given-names: Fridolin
     family-names: Glatter
     affiliation: IIASA
+    orcid: 'https://orcid.org/0009-0007-9452-2473'
   - given-names: Jihoon
     family-names: Min
     affiliation: IIASA
@@ -68,7 +70,7 @@ authors:
   - given-names: Thomas
     family-names: Zipperle
     orcid: 'https://orcid.org/0000-0003-2512-9508'
-  - given-names: 'Nikolay '
+  - given-names: Nikolay
     family-names: Kushin
   - given-names: Alessio
     family-names: Mastrucci
@@ -83,7 +85,7 @@ authors:
 identifiers:
   - type: url
     value: 'https://github.com/iiasa/message_ix'
-    description: Main repository of hte MESSAGEix framework on Github
+    description: Main repository of the MESSAGEix framework on Github
   - type: doi
     value: 10.5281/zenodo.7006303
     description: Zenodo entry
@@ -168,8 +170,7 @@ references:
       family-names: Krey
       affiliation: IIASA
       orcid: 'https://orcid.org/0000-0003-0307-3515'
-    title: "The MESSAGEix Integrated Assessment Model and the ix modeling platform (ixmp): An open framework for 
-integrated and cross-cutting analysis of energy, climate, the environment, and sustainable development"
+    title: "The MESSAGEix Integrated Assessment Model and the ix modeling platform (ixmp): An open framework for integrated and cross-cutting analysis of energy, climate, the environment, and sustainable development"
     doi: "10.1016/j.envsoft.2018.11.012"
     journal: "Environmental Modelling & Software"
     volume: 112
