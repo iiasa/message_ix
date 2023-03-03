@@ -41,7 +41,6 @@ def test_NEW_CAPACITY_UP(test_mp, model_horizon):
 
     # Make changes
     with s.transact("prepare for test"):
-
         # Add tax_emission
         s.add_par("tax_emission", tax_emission)
 

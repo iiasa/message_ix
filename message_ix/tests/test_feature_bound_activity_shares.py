@@ -114,6 +114,7 @@ def test_commodity_share_up(message_test_mp):
     transport_from_san-diego (original: 550). Expected outcome: some increase
     of transport_from_san-diego with some decrease of production in seattle.
     """
+
     # data for share bound
     def calc_share(s):
         a = s.var(

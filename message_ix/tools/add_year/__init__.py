@@ -815,7 +815,6 @@ def interpolate_2d(
 
             j = horizon_new.index(yr)
             if yr - horizon_new[j - 1] >= horizon_new[j - 1] - horizon_new[j - 2]:
-
                 df2[yr].loc[
                     (pd.isna(df2[year_pre].shift(+1)))
                     & (~pd.isna(df2[year_pp].shift(+1)))
@@ -937,7 +936,6 @@ def interpolate_2d(
     # -------------------------------------------------------------------------
     # Forth: final masking based on technical lifetime
     if tec_list and not df_dur.empty:
-
         df3 = (
             df2.loc[df2.index.get_level_values("technology").isin(tec_list), :]
             .copy()

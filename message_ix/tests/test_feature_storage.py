@@ -123,7 +123,6 @@ def add_storage_data(scen, time_order):
 
 # Main function for building a model with storage and testing the functionality
 def storage_setup(test_mp, time_duration, comment):
-
     # First, building a simple model and adding seasonality
     scen = Scenario(test_mp, "no_storage", "standard", version="new")
     model_setup(scen, [2020])
