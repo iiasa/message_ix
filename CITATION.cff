@@ -87,7 +87,7 @@ identifiers:
     value: 'https://github.com/iiasa/message_ix'
     description: Main repository of the MESSAGEix framework on Github
   - type: doi
-    value: 10.5281/zenodo.7006303
+    value: 10.5281/zenodo.4005684
     description: Zenodo entry
 repository-code: 'https://github.com/iiasa/message_ix'
 url: 'https://docs.messageix.org/en/stable/index.html'
@@ -129,7 +129,10 @@ license: Apache-2.0
 version: 3.6.0
 date-released: '2022-08-18'
 references:
-  - authors:
+  - title: "The MESSAGEix Integrated Assessment Model and the ix modeling platform (ixmp): An open framework for integrated and cross-cutting analysis of energy, climate, the environment, and sustainable development"
+    journal: "Environmental Modelling & Software"
+    year: 2019
+    authors:
     - given-names: Daniel
       family-names: Huppmann
       affiliation: IIASA
@@ -169,11 +172,8 @@ references:
       family-names: Krey
       affiliation: IIASA
       orcid: 'https://orcid.org/0000-0003-0307-3515'
-    title: "The MESSAGEix Integrated Assessment Model and the ix modeling platform (ixmp): An open framework for integrated and cross-cutting analysis of energy, climate, the environment, and sustainable development"
     doi: "10.1016/j.envsoft.2018.11.012"
-    journal: "Environmental Modelling & Software"
     volume: 112
-    year: 2019
     month: 2
     start: 143
     end: 156
