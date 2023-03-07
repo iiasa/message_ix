@@ -1,7 +1,7 @@
 $TITLE The MESSAGEix Integrated Assessment Model
 $ONDOLLAR
 $ONTEXT
-
+TEST
    Copyright 2018 IIASA Energy Program
 
    Licensed under the Apache License, Version 2.0 (the "License");
