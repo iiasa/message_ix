@@ -13,6 +13,8 @@ The aim of this request is to ensure good scientific practice and collaborative 
 
 Use the most recent version of |MESSAGEix| from the Github repository.
 Specify clearly which version (e.g. release tag, such as ``v1.1.0``, or commit hash, such as ``26cc08f``) you have used, and whether you have made any modifications to the code.
+To retrieve this information from the command line, use ``git describe --tags``, which will show you the version, number of commits since then, and the hash of your current commit.
+Note that the commit hash does not include the preceeding ``-g``.
 
 Read and understand the file ``LICENSE``; in particular, clause 7 (“Disclaimer of Warranty”), which states:
 
@@ -30,6 +32,9 @@ Cite, at minimum, the following manuscript:
   | *Environmental Modelling & Software* 112:143-156, 2019.
   | doi: `10.1016/j.envsoft.2018.11.012`_
   | electronic pre-print available at `pure.iiasa.ac.at/15157/`_.
+
+You should also cite the software project itself. The data for citing both the manuscript and the software can be found in :doc:`the citation file <CITATION.cff>`.
+You can use `the official cff tools <https://github.com/citation-file-format/citation-file-format#tools-to-work-with-citationcff-files-wrench>` to export the data to BibTeX and other formats.
 
 In addition, you may:
 
