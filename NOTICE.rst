@@ -33,7 +33,7 @@ Cite, at minimum, the following manuscript:
   | doi: `10.1016/j.envsoft.2018.11.012`_
   | electronic pre-print available at `pure.iiasa.ac.at/15157/`_.
 
-You should also cite the software project itself. The data for citing both the manuscript and the software can be found in :doc:`the citation file <CITATION.cff>`.
+You should also cite the software project itself. The data for citing both the manuscript and the software can be found in the citation file :file:`CITATION.cff`.
 You can use `the official cff tools <https://github.com/citation-file-format/citation-file-format#tools-to-work-with-citationcff-files-wrench>`__ to export the data to BibTeX and other formats.
 
 In addition, you may:
