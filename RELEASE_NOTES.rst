@@ -48,7 +48,8 @@ All changes
 - Ensure `levelized_cost` are also calculated for technologies with only variable costs (:pull:`653`).
 - Correct calculation of `COST_NODAL_NET` for standalone MESSAGE (:pull:`648`)
 - Account for difference in period-length in equations `NEW_CAPACITY_CONSTRAINT_LO` and `NEW_CAPACITY_CONSTRAINT_UP` (:pull:`654`)
-- Extend functionality of storage solutions to include "mode" and temporal level (:pull:`633`).
+- Extend functionality of storage solutions to include "mode" and temporal level (:pull:`633`)
+- Introduce a citation file :file:`CITATION.cff` with citation information (:pull:`695`).
 
 .. _v3.6.0:
 
