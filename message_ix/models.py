@@ -161,6 +161,7 @@ MESSAGE_ITEMS = {
     "bound_activity_up": item("par", "nl t ya m h"),
     "bound_emission": item("par", "n type_emission type_tec type_year"),
     "bound_extraction_up": item("par", "n c g y"),
+    "bound_investment_up": item("par", "n y"),
     "bound_new_capacity_lo": item("par", "nl t yv"),
     "bound_new_capacity_up": item("par", "nl t yv"),
     "bound_total_capacity_lo": item("par", "nl t ya"),
@@ -269,6 +270,8 @@ MESSAGE_ITEMS = {
     #
     # Variables
     #
+    # # Investment
+    "INVEST": item("var", "n y"),
     # # Activity
     # "ACT": item("var", "nl t yv ya m h"),
     # # Maintained capacity

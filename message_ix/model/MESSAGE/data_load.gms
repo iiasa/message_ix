@@ -29,7 +29,7 @@ duration_period, duration_time, interestrate,
 resource_volume, resource_cost, is_bound_extraction_up, bound_extraction_up, resource_remaining,
 * technology technical-engineering parameters and economic costs
 input, output, construction_time, technical_lifetime
-capacity_factor, operation_factor, min_utilization_factor, inv_cost, fix_cost, var_cost,
+capacity_factor, operation_factor, min_utilization_factor, inv_cost, fix_cost, var_cost, bound_investment_up
 * upper and lower bounds on new capacity investment, total installed capacity and activity (including mapping sets)
 is_bound_new_capacity_up, is_bound_new_capacity_lo, bound_new_capacity_up, bound_new_capacity_lo,
 is_bound_total_capacity_up, is_bound_total_capacity_lo, bound_total_capacity_up, bound_total_capacity_lo,

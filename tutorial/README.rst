@@ -169,6 +169,12 @@ framework, such as used in global research applications of |MESSAGEix|.
       #. Import and combine data from multiple files to create a new scenario
          (:tut:`westeros/westeros_baseline_using_xlsx_import_part2.ipynb`).
 
+#. Extend the features of :mod:`message_ix` and :mod:`ixmp`:
+
+   #. Extend the GAMS formulation by adding new sets, parameters, variables,
+      and equations, and change the :mod:`message_ix` code accordingly
+	  (:tut:`westeros/westeros_investment.ipynb`).
+
 .. _austria-tutorials:
 
 Austrian energy system

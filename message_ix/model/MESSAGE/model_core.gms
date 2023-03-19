@@ -53,6 +53,7 @@
 * :math:`COMMODITY\_BALANCE_{n,c,l,y,h} \in \mathbb{R}`    Auxiliary variable for right-hand side of :ref:`commodity_balance`
 * :math:`STORAGE_{n,t,m,l,c,y,h} \in \mathbb{R}`             State of charge or content of storage at each sub-annual time slice
 * :math:`STORAGE\_CHARGE_{n,t,m,l,c,y,h} \in \mathbb{R}`     Charging of storage in each sub-annual time slice (negative for discharging)
+* :math:`INVEST_{n,y} \in \mathbb{R}`                      Investment per region over time
 * ======================================================== ====================================================================================
 *
 * The index :math:`y^V` is the year of construction (vintage) wherever it is necessary to
@@ -107,6 +108,8 @@ Positive Variables
     LAND(node,land_scenario,year_all) relative share of land-use scenario
 * content of storage
     STORAGE(node,tec,mode,level,commodity,year_all,time)       state of charge (SoC) of storage at each sub-annual time slice (positive)
+* investment per region and year
+    INVEST(node,year_all)                                     investment per model region and year
 ;
 
 Variables
@@ -290,6 +293,8 @@ Equations
     STORAGE_BALANCE                 balance of the state of charge of storage
     STORAGE_BALANCE_INIT            balance of the state of charge of storage at sub-annual time slices with initial storage content
     STORAGE_INPUT                   connecting an input commodity to maintain the activity of storage container (not stored commodity)
+    INVESTMENT_EQUIVALENCE          investment per node and year
+    INVESTMENT_CONSTRAINT           upper bound on investment per node and year
 ;
 *----------------------------------------------------------------------------------------------------------------------*
 * equation statements                                                                                                  *
@@ -337,10 +342,8 @@ OBJECTIVE..
 *
 * .. math::
 *    COST\_NODAL_{n,y} & = \sum_{c,g} \ resource\_cost_{n,c,g,y} \cdot EXT_{n,c,g,y} \\
-*      & + \sum_{t} \
-*          \bigg( inv\_cost_{n,t,y} \cdot construction\_time\_factor_{n,t,y} \\
-*      & \quad \quad \quad \cdot end\_of\_horizon\_factor_{n,t,y} \cdot CAP\_NEW_{n,t,y} \\[4 pt]
-*      & \quad \quad + \sum_{y^V \leq y} \ fix\_cost_{n,t,y^V,y} \cdot CAP_{n,t,y^V,y} \\
+*      & + INVEST_{n, y} + \sum_{t} \
+*          \bigg( \sum_{y^V \leq y} \ fix\_cost_{n,t,y^V,y} \cdot CAP_{n,t,y^V,y} \\
 *      & \quad \quad + \sum_{\substack{y^V \leq y \\ m,h}} \ var\_cost_{n,t,y^V,y,m,h} \cdot ACT_{n,t,y^V,y,m,h} \\
 *      & \quad \quad + \Big( abs\_cost\_new\_capacity\_soft\_up_{n,t,y} \\
 *      & \quad \quad \quad
@@ -371,10 +374,9 @@ COST_ACCOUNTING_NODAL(node, year)..
     SUM((commodity,grade)$( map_resource(node,commodity,grade,year) ),
          resource_cost(node,commodity,grade,year) * EXT(node,commodity,grade,year) )
 * technology capacity investment, maintainance, operational cost
+    + INVEST(node, year)
     + SUM((tec)$( map_tec(node,tec,year) ),
-            ( inv_cost(node,tec,year) * construction_time_factor(node,tec,year)
-                * end_of_horizon_factor(node,tec,year) * CAP_NEW(node,tec,year)
-            + SUM(vintage$( map_tec_lifetime(node,tec,vintage,year) ),
+            (SUM(vintage$( map_tec_lifetime(node,tec,vintage,year) ),
                 fix_cost(node,tec,vintage,year) * CAP(node,tec,vintage,year) ) )$( inv_tec(tec) )
             + SUM((vintage,mode,time)$( map_tec_lifetime(node,tec,vintage,year) AND map_tec_act(node,tec,year,mode,time) ),
                 var_cost(node,tec,vintage,year,mode,time) * ACT(node,tec,vintage,year,mode,time) )
@@ -447,13 +449,54 @@ COST_ACCOUNTING_NODAL(node, year)..
 %SLACK_RELATION_BOUND_LO% + 1e6 * SLACK_RELATION_BOUND_LO(relation,node,year)$( is_relation_lower(relation,node,year) )
         )
 ;
-
 ***
 * Here, :math:`n^L \in N(n)` are all nodes :math:`n^L` that are sub-nodes of node :math:`n`.
 * The subset of technologies :math:`t \in T(\widehat{t})` are all tecs that belong to category :math:`\widehat{t}`,
 * and similar notation is used for emissions :math:`e \in E`.
 ***
 
+***
+* Regional investment cost accounting
+* ----------------------------------------
+*
+* Accounting of regional investment costs over time
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*
+* .. _equation_investment_equivalence:
+*
+* Equation INVESTMENT_EQUIVALENCE
+* """"""""""""""""""""""""""""""
+*
+* This equation calculates the regional investment costs over time.
+*
+* .. math::
+*  INVEST_{n,y} & = \sum_{t} \
+*          \bigg( inv\_cost_{n,t,y} \cdot construction\_time\_factor_{n,t,y} \\
+*      & \quad \quad \quad \cdot end\_of\_horizon\_factor_{n,t,y} \cdot CAP\_NEW_{n,t,y}) \\
+***
+
+INVESTMENT_EQUIVALENCE(node, year) ..
+    INVEST(node, year) =E= SUM(tec$( map_tec(node,tec,year) ),
+            ( inv_cost(node,tec,year) * construction_time_factor(node,tec,year)
+                * end_of_horizon_factor(node,tec,year) * CAP_NEW(node,tec,year) )$( inv_tec(tec) )
+)
+;
+
+***
+*
+* .. _equation_investment_constraint:
+*
+* Equation INVESTMENT_CONSTRAINT
+* """"""""""""""""""""""""""""""
+*
+* This equation puts an upper bound on the regional investment costs over time.
+*
+* .. math::
+*  INVEST_{n,y} \leq bound\_investment\_up_{n,y} \\
+***
+INVESTMENT_CONSTRAINT(node, year)$(bound_investment_up(node, year) ) ..
+    INVEST(node, year) =L= bound_investment_up(node, year)
+;
 *----------------------------------------------------------------------------------------------------------------------*
 ***
 * .. _section_resource_commodity:
