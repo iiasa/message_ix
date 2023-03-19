@@ -1858,9 +1858,14 @@ EMISSION_EQUIVALENCE(node,emission,type_tec,year)..
 *
 * Equation EMISSION_CONSTRAINT
 * """"""""""""""""""""""""""""
-* This constraint enforces upper bounds on emissions (by emission type). For all bounds that include multiple periods,
-* the parameter :math:`bound\_emission_{n,\widehat{e},\widehat{t},\widehat{y}}` is scaled to represent average annual
-* emissions over all years included in the year-set :math:`\widehat{y}`.
+* This constraint enforces upper bounds on emissions (by emission type), including the possibility to aggregate
+* across different emission species and scale them relateive to each other (e.g., to reflect different emission
+* metrics such as global warming potentials, GWPs). As of release X.Y, the possibility to include scaling metrics
+* that work across multiple periods (e.g., to accommodate implemantation of the GWP* metric that for short-lived
+* emission species applies scaling factors to differences of emissions over time) has been added.
+*
+* For all bounds that include multiple periods, the parameter :math:`bound\_emission_{n,\widehat{e},\widehat{t},\widehat{y}}`
+* is scaled to represent average annual emissions over all years included in the year-set :math:`\widehat{y}`.
 *
 * The formulation includes historical emissions and allows to model constraints ranging over both the model horizon
 * and historical periods.
@@ -1871,6 +1876,9 @@ EMISSION_EQUIVALENCE(node,emission,type_tec,year)..
 *              \begin{array}{l}
 *                  duration\_period_{y'} \cdot emission\_scaling_{\widehat{e},e} \cdot \\
 *                  \Big( EMISS_{n,e,\widehat{t},y'} + \sum_{m} historical\_emission_{n,e,\widehat{t},y'} \Big)
+*                + \sum_{y'' \in (\widehat{y}), y'' \neq y'}
+*                     duration\_period_{y'} \cdot emission\_diff\_scaling_{\widehat{e},e,y', y''} \cdot \\
+*                  \Big( EMISS_{n,e,\widehat{t},y''} + \sum_{m} historical\_emission_{n,e,\widehat{t},y''} \Big)
 *              \end{array}
 *          }
 *        { \sum_{y' \in Y(\widehat{y})} duration\_period_{y'} }
@@ -1882,7 +1890,12 @@ EMISSION_CONSTRAINT(node,type_emission,type_tec,type_year)$is_bound_emission(nod
         duration_period(year_all2) * emission_scaling(type_emission,emission) *
             ( EMISS(node,emission,type_tec,year_all2)$( year(year_all2) )
                 + historical_emission(node,emission,type_tec,year_all2) )
-      )
+      + SUM( (year_all3)$( NOT SAMEAS(year_all2, year_all3) ),
+            duration_period(year_all2) * emission_diff_scaling(type_emission,emission,year_all2,year_all3) *
+                ( EMISS(node,emission,type_tec,year_all3)$( year(year_all3) )
+                    + historical_emission(node,emission,type_tec,year_all3) )
+        )
+    )
     / SUM(year_all2$( cat_year(type_year,year_all2) ), duration_period(year_all2) )
     =L= bound_emission(node,type_emission,type_tec,type_year) ;
 

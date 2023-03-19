@@ -609,19 +609,26 @@ Parameters
 *      - ``node`` | ``emission`` | ``type_tec`` | ``year``
 *    * - emission_scaling [#em_scaling]_
 *      - ``type_emission`` | ``emission``
+*    * - emission_diff_scaling [#em_diff_scaling]_
+*      - ``type_emission`` | ``emission`` | ``year`` | ``year``
 *    * - bound_emission
 *      - ``node`` | ``type_emission`` | ``type_tec`` | ``type_year``
 *    * - tax_emission
 *      - ``node`` | ``type_emission`` | ``type_tec`` | ``type_year``
 *
-* .. [#em_scaling] The parameter ``emission_scaling`` is the scaling factor to harmonize bounds or taxes across types of
-*    emissions. It allows to efficiently aggregate different emissions/pollutants and set bounds or taxes on various categories.
+* .. [#em_scaling] The parameter ``emission_scaling`` is the scaling factor to aggreagte or scale emissions across types of
+*    emissions. It allows to efficiently aggregate different emissions/pollutants (e.g., to represent Gobal Warming Potentials,
+*    GWPs) and set bounds or taxes on various emission categories.
+* .. [#em_diff_scaling] The parameter ``emission_diff_scaling`` is the scaling factor to aggreagte or scale emissions across types
+*    and different model periods which in combination with the parameter ``emission_scaling`` allows representing metrics such
+*    as GWP*.
 *
 ***
 
 Parameters
     historical_emission(node,emission,type_tec,year_all)    historical emissions by technology type (including land)
-    emission_scaling(type_emission,emission)                scaling factor to harmonize bounds or taxes across types
+    emission_scaling(type_emission,emission)                emission scaling factor to aggreagte or scale emissions across types
+    emission_diff_scaling(type_emission,emission,year_all,year_all)      emission scaling factor to aggreagte or scale emissions across types and different model periods
     bound_emission(node,type_emission,type_tec,type_year)   upper bound on emissions
     tax_emission(node,type_emission,type_tec,type_year)     emission tax
 ;
