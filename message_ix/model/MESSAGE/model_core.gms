@@ -587,6 +587,18 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 * while at the renewable level, it is included in the `Equation RENEWABLES_EQUIVALENCE`_,
 * and at the storage level, it is included in the `Equation STORAGE_BALANCE`_.
 ***
+Sets
+map_retirement_induration_period(location,tec,vintage,year_all2,year_all)  mapping set of the if calculation for the capacity retirement flows with lifetime within the duration period
+map_retirement_outduration_period(location,tec,vintage,year_all2,year_all) mapping set of the if calculation for the capacity retirement flows with lifetime outside the duration period
+;
+map_retirement_induration_period(location,tec,vintage,year_all2,year_all)   $ (inv_tec(tec) AND map_tec_lifetime_extended(location,tec,vintage,year_all2)
+                                                                                        AND first_period(year_all) AND seq_period(year_all2,year_all)
+                                                                                        AND (remaining_capacity_extended(location,tec,vintage,year_all) = 0)
+                                                                                        AND NOT map_tec_lifetime_extended(location,tec,vintage,year_all)) = yes;
+map_retirement_outduration_period(location,tec,vintage,year_all2,year_all)  $ (inv_tec(tec) AND map_tec_lifetime_extended(location,tec,vintage,year_all2)
+                                                                                        AND first_period(year_all) AND seq_period(year_all2,year_all)
+                                                                                        AND (remaining_capacity_extended(location,tec,vintage,year_all)< 1)
+                                                                                        AND (remaining_capacity_extended(location,tec,vintage,year_all)>0) ) = yes;
 $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                                                             \
     SUM( (location,tec,vintage,mode,time2)$( map_tec_act(location,tec,year,mode,time2)                                 \
             AND map_tec_lifetime(location,tec,vintage,year) ),                                                         \
@@ -608,9 +620,7 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
 * commodity input and output associated with retirement of technology capacity (via differentials of capacity of successive periods)
 * for first model period (differential with historical remaining capacity)
 * if the end of a lifetime falls within a duration of a model period (remaining capacity in the first year is 0).
-  + SUM( (location,tec,vintage,year_all2)$( inv_tec(tec) AND map_tec_lifetime_extended(location,tec,vintage,year_all2)                  \
-           AND NOT map_tec_lifetime_extended(location,tec,vintage,year) AND first_period(year) AND seq_period(year_all2,year)           \
-           AND (remaining_capacity_extended(location,tec,vintage,year) = 0)                                                               \
+  + SUM( (location,tec,vintage,year_all2)$(map_retirement_induration_period(location,tec,vintage,year_all2,year)                      \
 ),                                                                                                                                      \
 * output by all new capacity of technologies located at 'location' sending to 'node' and 'time' distributed over years of periods
         output_cap_ret(location,tec,vintage,node,commodity,level,time)                                                 \
@@ -621,10 +631,8 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
 * commodity input and output associated with retirement of technology capacity (via differentials of capacity of successive periods)
 * for first model period (differential with historical remaining capacity)
 * if the end of a lifetime doens't fall within a duration of a model period (remaining capacity in the first year is different than 1 or 0).
-  + SUM( (location,tec,vintage,year_all2)$( inv_tec(tec) AND map_tec_lifetime_extended(location,tec,vintage,year_all2)                      \
-           AND first_period(year) AND seq_period(year_all2,year)                                                                             \
-           AND (remaining_capacity_extended(location,tec,vintage,year)< 1) AND (remaining_capacity_extended(location,tec,vintage,year)>0)     \
-),                                                                                                                                             \
+  + SUM( (location,tec,vintage,year_all2)$( map_retirement_outduration_period(location,tec,vintage,year_all2,year)                        \
+),                                                                                                                                         \
 * output by all new capacity of technologies located at 'location' sending to 'node' and 'time' distributed over years of periods
         output_cap_ret(location,tec,vintage,node,commodity,level,time)                                                 \
         *  (historical_new_capacity(node,tec,vintage) * (1 - remaining_capacity_extended(node,tec,vintage,year)))            \
