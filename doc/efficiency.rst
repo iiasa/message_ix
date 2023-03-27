@@ -16,7 +16,7 @@ As an additional benefit, we do not need to define an explicit efficiency parame
 or "main" input and output fuels.  
 
 The recommended approach is illustrated below for multiple examples. 
-The decision variables :math:`\text{CAP\_NEW}`, :math:`\text{CAP}` and :math:`\text{ACT}` as well as all bounds 
+The decision variables :math:`\text{CAP_NEW}`, :math:`\text{CAP}` and :math:`\text{ACT}` as well as all bounds 
 are always understood to be in the same units. All cost parameters also have to be provided 
 in monetary units per these units - there is no "automatic rescaling" done either within the ixmp API
 or in the GAMS implementation pre- or postprocessing.
