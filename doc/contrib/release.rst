@@ -18,7 +18,7 @@ Preliminaries
     and
     `message-ix-feedstock <https://github.com/conda-forge/message-ix-feedstock>`__
     repositories.
-    This means your Github account is listed in the :file:`recipe/meta.yaml`, under the key ``recipe-maintainers:``.
+    This means your Github account is listed in each of them in the :file:`recipe/meta.yaml`, under the key ``recipe-maintainers:``.
 
 - In the below:
 
@@ -45,7 +45,7 @@ For instance, an item marked as deprecated in v2.1 can be removed as of v3.0; an
 
    .. note:: This can be done at any point, and should be done before the release prep begins.
       For instance, a feature marked as deprecated in v2.0 *should* be removed before 3.0 is released.
-      But *may* also be removed from the ``master`` branch *immediately after* 2.0.0 is released.
+      But *may* also be removed from the ``main`` branch *immediately after* 2.0.0 is released.
       This is preferred, because it forces tutorials, user code, etc. to stay ahead of deprecations.
 
 3. (message_ix only) Edit :file:`setup.cfg`, updating the ``install_requires`` line for ixmp as necessary.
@@ -72,12 +72,12 @@ Releasing
 
    - Comment the heading "Next release", and insert below it:
 
-     - A commented "All changes" sub-heading (``---``).
-     - A ReST anchor with the version number.
+     - A commented "All changes" sub-heading (``---``)
+     - A ReST anchor with the version number
      - Another heading (``===``) below it, with the version number and date
 
-   - Add a short text description summarizing the release.
-   - If necessary, add a subsection "Migration notes" explaining to users how to adjust to changes in the release.
+   - Add a short text description summarizing the release
+   - If necessary, add a subsection "Migration notes" explaining to users how to adjust to changes in the release
 
    For example, the top of the file should look like:
 
@@ -121,7 +121,7 @@ Releasing
    Build the docs locally to ensure any ReST markup in these additions renders correctly.
 
 3. Make a commit with a message like “Mark v<version> in release notes”.
-4. Tag the release candidate version, i.e. with a ``rcN`` suffix, and push::
+4. Tag the release candidate version, i.e. with a ``rcN`` suffix where ``N`` is a natural number, and push::
 
    $ git tag vX.Y.ZrcN
    $ git push --tags <upstream> release/X.Y.Z
