@@ -18,7 +18,7 @@ Preliminaries
     and
     `message-ix-feedstock <https://github.com/conda-forge/message-ix-feedstock>`__
     repositories.
-    This means your Github account is listed in each of them in the :file:`recipe/meta.yaml`, under the key ``recipe-maintainers:``.
+    This means your Github account is listed in each of them in the :file:`recipe/meta.yaml`, under the key ``recipe-maintainers:``. For an easy way of achieving that, see `the conda-forge docs <https://conda-forge.org/docs/maintainer/updating_pkgs.html#updating-the-maintainer-list>`__.
 
 - In the below:
 
