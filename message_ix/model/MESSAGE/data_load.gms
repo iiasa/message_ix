@@ -20,12 +20,11 @@ $LOAD balance_equality, time_relative
 $LOAD shares
 $LOAD addon, type_addon, cat_addon, map_tec_addon
 $LOAD storage_tec, level_storage, map_tec_storage
-
+* $LOAD map_retirement, map_retirement_induration_period, map_retirement_outduration_period
 * Version information; conditional load to allow older GDX files
 $ifthen gdxSetType ixmp_version
 $load ixmp_version
 $endif
-
 $GDXIN
 
 Execute_load '%in%'
@@ -130,6 +129,16 @@ rating_unrated('unrated') = no ;
 
 * get assignment of auxiliary parameter for period mappings and duration
 $INCLUDE includes/period_parameter_assignment.gms
+
+* Assign the if conditions related to capacity retirement material flows
+*map_retirement(tec,location,vintage,year_all2,year_all) $ (inv_tec(tec) AND map_tec_lifetime_extended(location,tec,vintage,year_all2)
+*                                                       AND first_period(year_all) AND seq_period(year_all2,year_all)) = yes ;
+*map_retirement_induration_period(tec,location,vintage,year_all2,year_all) $ (map_retirement(tec,location,vintage,year_all2,year_all)
+*                                                                       AND (remaining_capacity_extended(location,tec,vintage,year_all) = 0)
+*                                                                        AND NOT map_tec_lifetime_extended(location,tec,vintage,year_all)) = yes;
+*map_retirement_outduration_period(tec,location,vintage,year_all2,year_all) $ (map_retirement(tec,location,vintage,year_all2,year_all)
+*                                                                          AND (remaining_capacity_extended(location,tec,vintage,year_all)< 1)
+*                                                                          AND (remaining_capacity_extended(location,tec,vintage,year_all)>0) ) = yes;
 
 * compute auxiliary parameters for relative duration of subannual time periods
 duration_time_rel(time,time2)$( map_time(time,time2) ) = duration_time(time2) / duration_time(time) ;
