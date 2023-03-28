@@ -423,6 +423,9 @@ Sets
 
     map_land(node,land_scenario,year_all)            mapping of land-use model emulator scenarios to nodes and years
     map_relation(relation,node,year_all)             mapping of generic (user-defined) relations to nodes and years
+*    map_retirement(tec,location,vintage,year_all2,year_all)                    mapping set of the if calculation for the capacity retirement flows
+*    map_retirement_induration_period(tec,location,vintage,year_all2,year_all)  mapping set of the if calculation for the capacity retirement flows with lifetime within the duration period
+*    map_retirement_outduration_period(tec,location,vintage,year_all2,year_all) mapping set of the if calculation for the capacity retirement flows with lifetime outside the duration period
 
 * Storage
     map_time_commodity_storage(node,tec,level,commodity,mode,year_all,time)  mapping of storage containers to their input commodity-level (not commodity-level of stored media)
