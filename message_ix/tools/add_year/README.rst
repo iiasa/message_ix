@@ -4,7 +4,7 @@ Add model years to an existing Scenario
 Description
 -----------
 
-This tool adds new modeling years to an existing :class:`message_ix.Scenario` (hereafter "reference scenario"). For instance, in a scenario define with::
+This tool adds new modeling years to an existing :class:`message_ix.Scenario` (hereafter "reference scenario"). For instance, in a scenario defined with::
 
     history = [690]
     model_horizon = [700, 710, 720]
@@ -13,7 +13,7 @@ This tool adds new modeling years to an existing :class:`message_ix.Scenario` (h
         firstmodelyear=model_horizon[0]
     )
 
-…additional years can be added after importing the add_year function::
+…additional years can be added after importing the ``add_year function``::
 
     from message_ix.tools.add_year import add_year
     sc_new = message_ix.Scenario(mp, sc_ref.model, sc_ref.scenario,
@@ -26,7 +26,7 @@ At this point, ``sc_new`` will have the years [700, 705, 710, 712, 718, 720, 725
 The tool operates by creating a new empty Scenario (hereafter "new scenario") and:
 
 - Copying all **sets** from the reference scenario, adding new time steps to relevant sets (e.g., adding 2025 between 2020 and 2030 in the set ``year``)
-- Copying all **parameters** from the reference scenario, adding new years to relevant parameters, and calculating missing values for the added years.
+- Copying all **parameters** from the reference scenario, adding new years to relevant parameters, and calculating missing values for the added years
 
 Features
 ~~~~~~~~
