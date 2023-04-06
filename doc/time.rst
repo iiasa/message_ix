@@ -42,7 +42,7 @@ Time slices
 The ``time`` set is used to index parameter dimensions with the names "time", "time_origin", "time_dest", etc.
 These are variously referred to as “(sub-annual) time slices”, “time steps”, or other names.
 Elements in this set are labels for **portions of a single year**.
-The special value ``'year'`` represents the entire year.
+The special value ``'Year'`` represents the entire year.
 
 Since a ``year`` element refers to the representative, final year within a period, using ``year`` and ``time`` together denotes *a portion of that specific year*.
 
@@ -55,22 +55,22 @@ Example 4
 
 Duration of sub-annual time slices
 ----------------------------------
-The duration of each sub-annual time slice should be defined relative to the whole year, with a value between 0 and 1, using parameter ``duration_time``.
+The duration of each sub-annual time slice should be defined relative to the whole year, with a value between 0 and 1, using the parameter ``duration_time``.
 For example, in a model with four seasons with the same length, ``duration_time`` of each season will be 0.25.
 Please note that the duration of time slices does not need to be equal to each other.
 This information is needed to calculate capacity of a technology that is active in different time slices.
-Time slices can be represented at different temporal levels, using sets ``lvl_temporal`` and ``map_temporal_hierarchy``.
-This helps introducing a flexible temporal resolution, e.g., by representing some technologies at finer time resolution while others at ``year``.
+Time slices can be represented at different temporal levels, using the sets ``lvl_temporal`` and ``map_temporal_hierarchy``.
+This helps introducing a flexible temporal resolution, e.g., by representing some technologies at finer time resolution while others at ``Year``.
 When there are more than one temporal levels, e.g., "year", "season", "month", "day", etc., ``duration_time`` is defined for time slices at each **temporal level** separately.
 The sum of ``duration_time`` of time slices at each temporal level must be equal to 1.
 For example, in a model with 4 time slices as "season" and 10 time slices as "day" under each "season", ``duration_time`` of each "season" and "day" can be specified as 0.25 and 0.025, respectively.
 
 By default, the unit of ``ACT`` is treated per year in the GAMS formulation for different time slices.
-This means values reported in time slice "year" and "month" both have the same unit (e.g., GWa).
+This means values reported in time slice "Year" and "month" both have the same unit (e.g., GWa).
 However, the user can report the values across parameters and variables with different units relative to the length of the full year.
-For example, the user can report ``ACT`` in units of "GWa" and "GWh" for time slices of "year" and "hour", respectively, in the same model.
+For example, the user can report ``ACT`` in units of "GWa" and "GWh" for time slices of "Year" and "hour", respectively, in the same model.
 To activate this feature, the parent time slice for which the relative units are desired should be specified by set ``time_relative``.
-This will ensure that parameter ``duration_time_rel``  is effective.
+This will ensure that parameter ``duration_time_rel`` is effective.
 Otherwise, this parameter is filled by value of 1, meaning that the units will be treated uniformly across different sub-annual time slices.
 
 Discounting
