@@ -53,7 +53,7 @@
 *      - ``year``
 *      - Discount factor of the last year in the period [#df_auto]_
 *
-* .. [#duration_time_year] The element 'year' in the set of subannual time slices ``time`` has the value of 1.
+* .. [#duration_time_year] The element 'Year' in the set of subannual time slices ``time`` has the value of 1.
 *    This value is assigned by default when creating a new :class:`ixmp.Scenario` based on the ``MESSAGE`` scheme.
 *
 * .. [#short_dur] The short-hand notation :math:`|y|` is used for the parameters :math:`duration\_period_y`
