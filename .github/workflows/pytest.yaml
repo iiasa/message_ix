@@ -48,17 +48,6 @@ jobs:
     name: ${{ matrix.os }}-py${{ matrix.python-version }}
 
     steps:
-    - name: Check out ixmp
-      uses: actions/checkout@v3
-      with:
-        repository: iiasa/ixmp
-        # For PRs that depend on an ixmp PR branch, uncomment the following 2
-        # lines and adjust to suit:
-        # repository: USERNAME/ixmp
-        # ref: issue/999
-        path: ixmp
-        fetch-depth: ${{ env.depth }}
-
     - name: Check out message_ix
       uses: actions/checkout@v3
       with:
@@ -67,7 +56,6 @@ jobs:
 
     - name: Fetch tags (for setuptools-scm)
       run: |
-        (cd ixmp; git fetch --tags --depth=${{ env.depth }})
         (cd message_ix; git fetch --tags --depth=${{ env.depth }})
       shell: bash
 
@@ -105,13 +93,14 @@ jobs:
         version: ${{ env.GAMS_VERSION }}
         license: ${{ secrets.GAMS_LICENSE }}
 
-    - name: Install ixmp and dependencies
-      working-directory: ixmp
-      run: pip install .
-
     - name: Install Python package and dependencies
       working-directory: message_ix
-      run: pip install .[tests]
+      # By default, the below installs ixmp from the main branch. To run against
+      # other code, e.g. other branches for open PRs), temporarily edit as
+      # appropriate. DO NOT merge such changes to `main`.
+      run: |
+        pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
+        pip install .[tests]
 
     - name: Install R dependencies and tutorial requirements
       run: |
