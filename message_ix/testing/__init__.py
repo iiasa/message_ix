@@ -88,7 +88,8 @@ cfl                  0.0  0.1   10   900
 )
 
 
-def make_austria(mp, solve=False, quiet=True):
+# FIXME reduce complexity from 18 to <=14
+def make_austria(mp, solve=False, quiet=True):  # noqa: C901
     """Return an :class:`message_ix.Scenario` for the Austrian energy system.
 
     This is the same model used in the ``austria.ipynb`` tutorial.

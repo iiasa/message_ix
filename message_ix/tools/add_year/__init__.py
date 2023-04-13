@@ -83,7 +83,10 @@ def unit_uniform(df):
 
 
 # %% III) The main function
-def add_year(
+
+
+# FIXME reduce complexity from 17 to <=14
+def add_year(  # noqa: C901
     sc_ref,
     sc_new,
     years_new,
@@ -530,7 +533,10 @@ def add_year_par(
 
 
 # %% VI) Required functions
-def interpolate_1d(
+
+
+# FIXME reduce complexity from 19 to <=14
+def interpolate_1d(  # noqa: C901
     df,
     yrs_new,
     horizon,
@@ -682,9 +688,10 @@ def interpolate_1d(
 
 
 # %% VI.B) Interpolating parameters with two dimensions related to time
-# TODO this is the most complex piece of code in the message_ix, at a McCabe
-#      complexity of 38 (next nearest: 18). Simplify.
-def interpolate_2d(
+
+
+# FIXME reduce complexity from 38 to <=14
+def interpolate_2d(  # noqa: C901
     df,
     yrs_new,
     horizon,
