@@ -51,13 +51,10 @@ jobs:
     - name: Check out message_ix
       uses: actions/checkout@v3
       with:
-        path: message_ix
         fetch-depth: ${{ env.depth }}
 
     - name: Fetch tags (for setuptools-scm)
-      run: |
-        (cd message_ix; git fetch --tags --depth=${{ env.depth }})
-      shell: bash
+      run: git fetch --tags --depth=${{ env.depth }}
 
     - uses: actions/setup-python@v4
       with:
@@ -94,7 +91,6 @@ jobs:
         license: ${{ secrets.GAMS_LICENSE }}
 
     - name: Install Python package and dependencies
-      working-directory: message_ix
       # By default, the below installs ixmp from the main branch. To run against
       # other code, e.g. other branches for open PRs), temporarily edit as
       # appropriate. DO NOT merge such changes to `main`.
@@ -117,7 +113,6 @@ jobs:
       env:
         # For test_cli.test_dl; see code in message_ix.cli.dl
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      working-directory: message_ix
       # Work around iiasa/ixmp#411
       run: |
         pytest message_ix -m "not nightly" -rA --verbose --cov-report=xml --color=yes || ( [ $? -eq 127 -a "${{ runner.os }}" = "Windows" ] && echo "Spurious exit code 127 from pytest" && exit 0)
@@ -125,10 +120,7 @@ jobs:
 
     - name: Test documentation build using Sphinx
       if: ${{ startsWith(matrix.os, 'ubuntu') }}
-      working-directory: message_ix
       run: make --directory=doc html
 
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v3
-      with:
-        directory: message_ix
