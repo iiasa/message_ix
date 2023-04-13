@@ -18,5 +18,10 @@ jobs:
       python-version: "3.10"
       # For PRs that depend on an ixmp PR branch, adjust the URL below
       type-hint-packages: >-
-        genno sphinx types-requests types-PyYAML
+        asyncssh
+        genno
+        pytest
+        sphinx
+        types-requests
+        types-PyYAML
         git+https://github.com/iiasa/ixmp.git@main
