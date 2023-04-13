@@ -9,6 +9,11 @@ on:
   schedule:
   - cron: "0 5 * * *"
 
+# Cancel previous runs that have not completed
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 env:
   GAMS_VERSION: 25.1.1
   # See description in lint.yml
@@ -43,11 +48,6 @@ jobs:
     name: ${{ matrix.os }}-py${{ matrix.python-version }}
 
     steps:
-    - name: Cancel previous runs that have not completed
-      uses: styfle/cancel-workflow-action@0.11.0
-      with:
-        access_token: ${{ github.token }}
-
     - name: Check out ixmp
       uses: actions/checkout@v3
       with:
