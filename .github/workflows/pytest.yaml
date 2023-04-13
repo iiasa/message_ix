@@ -60,7 +60,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         cache: pip
-        cache-dependency-path: "**/setup.cfg"
+        cache-dependency-path: "**/pyproject.toml"
 
     - name: Set RETICULATE_PYTHON
       # Use the environment variable set by the setup-python action, above.
