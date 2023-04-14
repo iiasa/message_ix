@@ -12,22 +12,23 @@ AT = "Austrian_energy_system"
 W = "westeros"
 
 # Common marks for some test cases
+GHA = "GITHUB_ACTIONS" in os.environ
 MARK = [
     pytest.mark.skipif(
-        condition="GITHUB_ACTIONS" in os.environ and sys.platform == "linux",
-        reason="IR kernel times out on GitHub Actions Ubuntu runners ",
+        condition=GHA and sys.platform == "linux",
+        reason="IR kernel times out on GitHub Actions Ubuntu runners",
     ),
     # This mark does *not* affect macos-latest-py3.9, which must still pass
     pytest.mark.xfail(
-        condition=sys.platform == "darwin" and sys.version_info.minor == 8,
+        condition=GHA and sys.platform == "darwin" and sys.version_info.minor == 8,
         reason="Fails occasionally on GitHub Actions runners for macOS / Python 3.8",
     ),
     pytest.mark.xfail(
-        condition=sys.platform == "win32",
+        condition=GHA and sys.platform == "win32",
         reason="Fails occasionally on GitHub Actions runners for Windows",
     ),
     pytest.mark.xfail(
-        condition="GITHUB_ACTIONS" in os.environ and sys.platform == "darwin",
+        condition=GHA and sys.platform == "darwin",
         reason="Flaky; CellTimeoutError occurs on first executed cell",
     ),
 ]
@@ -86,7 +87,7 @@ TUTORIALS: List[Tuple] = [
     _t("w0", f"{W}_historical_new_capacity"),
     _t("w0", f"{W}_multinode"),
     # NB this is the same value as in test_reporter()
-    _t(None, f"{W}_report", check=[("len-rep-graph", 13074)]),
+    _t(None, f"{W}_report", check=[("len-rep-graph", 13074)], marks=[MARK[2]]),
     _t("at0", "austria", check=[("solve-objective-value", 206321.90625)]),
     _t("at0", "austria_single_policy", check=[("solve-objective-value", 205310.34375)]),
     _t("at0", "austria_multiple_policies"),
