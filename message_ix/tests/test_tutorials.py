@@ -70,8 +70,8 @@ TUTORIALS: List[Tuple] = [
     _t("w0", f"{W}_baseline", check=[("solve-objective-value", 173795.09375)]),
     # NB could also check objective function values in the following tutorials; however,
     #    better to test features directly (not via Jupyter/IPython)
-    _t("w1", f"{W}_baseline_using_xlsx_import_part1"),
-    _t("w1", f"{W}_baseline_using_xlsx_import_part2"),
+    _t("w0", f"{W}_baseline_using_xlsx_import_part1"),
+    _t("w0", f"{W}_baseline_using_xlsx_import_part2"),
     _t("w0", f"{W}_emissions_bounds"),
     _t("w0", f"{W}_emissions_taxes"),
     _t("w0", f"{W}_firm_capacity"),
