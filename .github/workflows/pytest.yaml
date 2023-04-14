@@ -119,7 +119,7 @@ jobs:
           -m "not nightly" \
           -rA --verbose --color=yes --durations=20 \
           --cov-report=xml \
-          --numprocesses=auto || ( [ $? -eq 127 -a "${{ runner.os }}" = "Windows" ] && echo "Spurious exit code 127 from pytest" && exit 0)
+          --numprocesses=auto --dist=loadgroup || ( [ $? -eq 127 -a "${{ runner.os }}" = "Windows" ] && echo "Spurious exit code 127 from pytest" && exit 0)
       shell: bash
 
     - name: Test documentation build using Sphinx
