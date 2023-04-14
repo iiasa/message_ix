@@ -32,6 +32,9 @@ MARK = [
     ),
 ]
 
+# Affects all tests in the file.
+pytestmark = MARK[3]
+
 
 def _t(group: Union[str, None], basename: str, *, check=None, marks=None):
     """Shorthand for defining tutorial test cases.
@@ -117,7 +120,6 @@ def nb_path(request, tutorial_path):
 
 # Parametrize the first 3 arguments using the variables *tutorial* and *ids*.
 # Argument 'nb_path' is indirect so that the above function can modify it.
-@MARK[3]
 @pytest.mark.parametrize("nb_path,checks", TUTORIALS, ids=IDS, indirect=["nb_path"])
 def test_tutorial(nb_path, checks, tmp_path, tmp_env):
     """Test tutorial in the IPython or IR notebook at `nb_path`.
