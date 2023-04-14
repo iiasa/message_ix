@@ -117,7 +117,7 @@ jobs:
       run: |
         pytest message_ix \
           -m "not nightly" \
-          -rA --verbose --color=yes \
+          -rA --verbose --color=yes --durations=20 \
           --cov-report=xml \
           --numprocesses=auto || ( [ $? -eq 127 -a "${{ runner.os }}" = "Windows" ] && echo "Spurious exit code 127 from pytest" && exit 0)
       shell: bash
