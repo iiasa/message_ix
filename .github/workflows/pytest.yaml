@@ -115,7 +115,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # Work around iiasa/ixmp#411
       run: |
-        pytest message_ix -m "not nightly" -rA --verbose --cov-report=xml --color=yes || ( [ $? -eq 127 -a "${{ runner.os }}" = "Windows" ] && echo "Spurious exit code 127 from pytest" && exit 0)
+        pytest message_ix \
+          -m "not nightly" \
+          -rA --verbose --color=yes \
+          --cov-report=xml \
+          --numprocesses=auto || ( [ $? -eq 127 -a "${{ runner.os }}" = "Windows" ] && echo "Spurious exit code 127 from pytest" && exit 0)
       shell: bash
 
     - name: Test documentation build using Sphinx

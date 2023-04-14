@@ -65,6 +65,7 @@ tests = [
   "pyam-iamc >= 0.6",
   "pytest >= 5",
   "pytest-cov",
+  "pytest-xdist",
   "requests",
 ]
 
