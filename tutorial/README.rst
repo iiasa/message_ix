@@ -155,6 +155,9 @@ framework, such as used in global research applications of |MESSAGEix|.
    #. Use parameters to represent the historical characteristics of the energy
       system (:tut:`westeros/westeros_historical_new_capacity.ipynb`).
 
+   #. Modeling of a multi-node energy system and representing trade between nodes
+      (:tut:`westeros/westeros_multinode.ipynb`).
+
 #. Use other features of :mod:`message_ix` and :mod:`ixmp`:
 
    #. ⭐ After the MESSAGE model has solved, use the :mod:`.message_ix.reporting`
