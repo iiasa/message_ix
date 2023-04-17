@@ -751,9 +751,7 @@ def make_subannual(
     # Add operation factor and an arbitrary relation (optional)
     for name, arg in [("operation_factor", operation_factor)]:
         for tec, data in arg.items():
-            df = make_df(
-                name, **common, technology=tec, value=data
-            )
+            df = make_df(name, **common, technology=tec, value=data)
             scen.add_par(name, df)
             # Arbitray relation to create "map_tec_relation". This is for testing
             # average capacity factor, used for calculating "operation_factor"
