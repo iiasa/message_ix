@@ -212,9 +212,45 @@ Parameter
 *    * - emission_factor
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``emission``
 *
+* Input/output mapping related to technology capacities 
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*
+* .. list-table::
+*    :widths: 25 60 55
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index dimensions
+*      - Explanatory comments 
+*    * - input_cap [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` |
+*        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
+*      - relative share of input per unit of capacity
+*    * - output_cap [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` |
+*        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
+*      - relative share of output per unit of capacity
+*    * - input_cap_new [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
+*        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
+*      - relative share of input per unit of new capacity built
+*    * - output_cap_new [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
+*        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
+*      - relative share of output per unit of new capacity built
+*    * - input_cap_ret [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
+*        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
+*      - relative share of input per unit of capacity retired
+*    * - output_cap_ret [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
+*        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
+*      - relative share of output per unit of capacity retired
+*
 * .. [#tecvintage] Fixed and variable cost parameters and technical specifications are indexed over both
 *    the year of construction (vintage) and the year of operation (actual).
 *    This allows to represent changing technology characteristics depending on the age of the plant.
+*    Material flows can also vary based on the vintage and active years.  
 *
 * .. [#levelizedcost] The parameter ``levelized_cost`` is computed in the GAMS pre-processing under the assumption of
 *    full capacity utilization until the end of the technical lifetime.
@@ -237,6 +273,17 @@ Parameters
 * technology input-output mapping and costs parameters
     input(node,tec,vintage,year_all,mode,node,commodity,level,time,time)  relative share of input per unit of activity
     output(node,tec,vintage,year_all,mode,node,commodity,level,time,time) relative share of output per unit of activity
+* +++++
+* commodity input and output associated with construction of capacity
+    input_cap_new(node,tec,vintage,node,commodity,level,time)  relative share of input per unit of new capacity built
+    output_cap_new(node,tec,vintage,node,commodity,level,time) relative share of output per unit of new capacity built
+* commodity input and output associated with retirement of capacity
+    input_cap_ret(node,tec,vintage,node,commodity,level,time)  relative share of input per unit of capacity retired
+    output_cap_ret(node,tec,vintage,node,commodity,level,time) relative share of output per unit of capacity retired
+* commodity input and output associated with operation of capacity at any period
+    input_cap(node,tec,vintage,year_all,node,commodity,level,time)  relative share of input per unit of capacity
+    output_cap(node,tec,vintage,year_all,node,commodity,level,time) relative share of output per unit of capacity
+* +++++
     inv_cost(node,tec,year_all)                         investment costs (per unit of new capacity)
     fix_cost(node,tec,vintage,year_all)                 fixed costs per year (per unit of capacity maintained)
     var_cost(node,tec,vintage,year_all,mode,time)       variable costs of operation (per unit of capacity maintained)
@@ -555,7 +602,8 @@ Parameters
 *
 * Auxiliary investment cost parameters include the remaining technical lifetime at the end of model horizon (``beyond_horizon_lifetime``) in addition to the
 * different scaling factors and multipliers as listed below. These factors account for remaining capacity (``remaining_capacity``) or construction time of new capacity (``construction_time_factor``),
-* the value of investment at the end of model horizon (``end_of_horizon_factor``) or the discount factor of remaining lifetime beyond model horizon (``beyond_horizon_factor``).
+* the value of investment at the end of model horizon (``end_of_horizon_factor``) or the discount factor of remaining lifetime beyond model horizon (``beyond_horizon_factor``). ``remaining_capacity_extended``
+* is defined the same as ``remaining_capacity`` but extended to historical periods as well. 
 *
 * .. list-table::
 *    :widths: 35 50
@@ -566,6 +614,8 @@ Parameters
 *    * - construction_time_factor
 *      - ``node`` | ``tec`` | ``year``
 *    * -  remaining_capacity
+*      - ``node`` | ``tec`` | ``year``
+*    * -  remaining_capacity_extended
 *      - ``node`` | ``tec`` | ``year``
 *    * - end_of_horizon_factor
 *      - ``node`` | ``tec`` | ``year``
@@ -580,6 +630,7 @@ Parameters
 Parameters
     construction_time_factor(node,tec,year_all) scaling factor to account for construction time of new capacity
     remaining_capacity(node,tec,year_all,year_all) scaling factor to account for remaining capacity in period
+    remaining_capacity_extended(node,tec,year_all,year_all) scaling factor to account for remaining capacity in period (including historical years)
     end_of_horizon_factor(node,tec,year_all)    multiplier for value of investment at end of model horizon
     beyond_horizon_lifetime(node,tec,year_all)  remaining technical lifetime at the end of model horizon
     beyond_horizon_factor(node,tec,year_all)    discount factor of remaining lifetime beyond model horizon
