@@ -9,6 +9,7 @@ import os
 import numpy as np
 import pandas as pd
 import math
+from collections import Counter
 # from datetime import datetime as dt
 # from datetime import timedelta as td
 # import matplotlib.pyplot as plt
@@ -326,9 +327,19 @@ class LPdiag:
         # check, if there was at least one N row (the first N row assumed to be the objective)
         assert self.gf_seq != -1, f'objective (goal function) row is undefined.'
 
-        # Finish the MPS processing with the summary of its size
-        print(f'\nFinished processing {self.n_lines} lines of the MPS file {self.fname}.')
-        print(f'LP has: {len(self.row_name)} rows, {len(self.col_name)} cols, {len(self.mat)} non-zeros.')
+        # Finish the MPS processing with the summary of its attributes
+        dens = f'{float(len(self.mat)) / (len(self.row_name) * len(self.col_name)):.2e}'
+        print(f'\nFinished processing {self.n_lines} lines of the MPS file: {self.fname}.')
+        print(f'LP has: {len(self.row_name)} rows, {len(self.col_name)} cols, {len(self.mat)} non-zeros, '
+              f'matrix density = {dens}.')
+        print(f'Numbers of redefined: RHS = {self.n_rhs}, ranges = {self.n_ranges}, bounds = {self.n_bounds}.')
+
+        # TODO: add info on dense rows and cols
+
+        # info on the GF row, RHS, ranges, bounds
+        df = self.mat.loc[self.mat['row'] == self.gf_seq]['val']   # df with values of the GF coefficients.
+        print(f'\nThe GF (objective) row named "{self.seq_row.get(self.gf_seq)[0]}" has {len(df)} elements.')
+        print(f'Distribution of the GF (objective) values:\n{df.describe()}')
 
     def row_att(self, row_seq, row_name, row_type, sec_name, val=0.):
         """Process values defined in ROWS, RHS and RANGES sections and store/update the corresponding row attributes.
@@ -405,16 +416,17 @@ class LPdiag:
 
         # print(f'\nDistribution of non-zero values:\n{self.mat["val"].describe()}')
         print(f'\nDistribution of abs(non-zero) values:\n{self.mat["abs_val"].describe()}')
-        print(f'\nDistribution of log10(values):\n{self.mat["log"].describe()}')
+        print(f'\nDistribution of int(log10(abs(values))):\n{self.mat["log"].describe()}')
         min_logv = self.mat["log"].min()
         max_logv = self.mat["log"].max()
-        print(f'log10 values: min = {min_logv}, max = {max_logv}.')
 
-        # info on the GF row, RHS, ranges, bounds
-        df = self.mat.loc[self.mat['row'] == self.gf_seq]['val']   # df with values of the GF coefficients.
-        print(f'\nThe GF (objective) row named "{self.seq_row.get(self.gf_seq)[0]}" has {len(df)} elements.')
-        print(f'Distribution of the GF (objective) values:\n{df.describe()}')
-        print(f'\nNumbers of defined: RHS = {self.n_rhs}, ranges = {self.n_ranges}, bounds = {self.n_bounds}.')
+        # count numbers of coeffs for each order of magnitude of their value
+        magn_dist = Counter(self.mat['log'])
+        magn_dist = dict(sorted(magn_dist.items()))  # counter (sorted by occurances) --> dict sorted by magnitudes
+        print(f'\nDistribution of int(log10(abs(values))) sorted by magnitudes of values:')
+        print(f'range = [{min_logv}, {max_logv}] (magnitudes with zero-occurences skipped).')
+        for magn in magn_dist:
+            print(f'{magn:3d}: {magn_dist[magn]:7d}')
 
         if lo_tail > up_tail:
             print(f'Overlapping distribution tails ({lo_tail}, {up_tail}) reset to 0.')
@@ -553,4 +565,5 @@ class LPdiag:
         return ret      # the range is formatted as: '[lo_bnd, up_bnd]'
 
     def plot_hist(self):
+        # TODO: might not be needed; therefore the implementation postponed
         """Plot histograms."""
