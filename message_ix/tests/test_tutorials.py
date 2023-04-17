@@ -119,7 +119,7 @@ def nb_path(request, tutorial_path):
     yield tutorial_path.joinpath(*request.param).with_suffix(".ipynb")
 
 
-# Parametrize the first 3 arguments using the variables *tutorial* and *ids*.
+# Parametrize the first 3 arguments using the variables *TUTORIALS* and *IDS*.
 # Argument 'nb_path' is indirect so that the above function can modify it.
 @pytest.mark.parametrize("nb_path,checks", TUTORIALS, ids=IDS, indirect=["nb_path"])
 def test_tutorial(nb_path, checks, tmp_path, tmp_env):
