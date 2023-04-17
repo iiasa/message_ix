@@ -144,10 +144,10 @@ map_rating(node,inv_tec,commodity,level,rating,year_all)$(
 * assign the yearly average capacity factor (used in equation OPERATION_CONSTRAINT)
 capacity_factor(node,tec,year_all2,year_all,'year') =
     sum(time$map_tec_time(node,tec,year_all,time), duration_time(time)
-        * capacity_factor(node,tec,year_all2,year_all,time));
+        * capacity_factor(node,tec,year_all2,year_all,time) );
 
 * update the masking set for capacity factor based on the average values added above
-is_capacity_factor(node,tec,year_all2,year_all,time)$(capacity_factor(node,tec,year_all2,year_all,'year')) = yes;
+is_capacity_factor(node,tec,year_all2,year_all,time)$(capacity_factor(node,tec,year_all2,year_all,'year') ) = yes;
 
 * set the default capacity factor for technologies where no parameter value is provided in the input data
 capacity_factor(node,tec,year_all2,year_all,time)$( map_tec_time(node,tec,year_all,time)
