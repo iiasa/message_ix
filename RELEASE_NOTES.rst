@@ -51,6 +51,7 @@ All changes
 - Account for difference in period-length in equations `NEW_CAPACITY_CONSTRAINT_LO` and `NEW_CAPACITY_CONSTRAINT_UP` (:pull:`654`)
 - Extend functionality of storage solutions to include "mode" and temporal level (:pull:`633`)
 - Introduce a citation file :file:`CITATION.cff` with citation information (:pull:`695`).
+- Correct GAMS for the assignment of "capacity_factor" at "year" (:pull:`705`).
 
 .. _v3.6.0:
 
