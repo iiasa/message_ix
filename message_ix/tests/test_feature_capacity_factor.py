@@ -24,11 +24,14 @@ def check_solution(scen: Scenario) -> None:
         duration = float(scen.par("duration_time", {"time": i[1]})["value"])
         if i[1] != "year":
             cf.loc[i, "duration-corrected"] = cf.loc[i, "value"] * duration
-            act.loc[i, "cf-corrected"] = act.loc[i, "lvl"] / float(
-                cf.loc[i, "duration-corrected"]
-            )
+            if cf.loc[i, "value"] == 0 or duration == 0:
+                act.loc[i, "cf-corrected"] = act.loc[i, "lvl"]
+            else:
+                act.loc[i, "cf-corrected"] = act.loc[i, "lvl"] / float(
+                    cf.loc[i, "duration-corrected"]
+                )
     act = act.fillna(0).reset_index().set_index(["technology"])
-    # CAP = max("ACT" / "duration_time" / "capcity_factor") / "operation_factor"
+    # CAP = max("ACT" / "duration_time" / "capacity_factor") / "operation_factor"
     for i in cap.index:
         # Considering operation factor (if specified)
         if not op_fac.empty:
