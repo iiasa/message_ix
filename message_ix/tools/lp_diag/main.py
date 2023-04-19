@@ -83,6 +83,7 @@ if __name__ == '__main__':
         print('Finished at:', str(tend))
         print(f'Wall-clock execution time: {time_diff.seconds} sec.')
 
-    # TODO: plots of distributions of coeffs
-    # TODO: naive scaling
+    # TODO: plots of distributions of coeffs, if indeed usefull
+    # TODO: naive scaling? might not be informative to due the later preprocessing
     # TODO: conform(?) to the MPS-standard: reject numbers of abs(val): greater than 10^{10} or smaller than 10^{-10}
+    #   to be discussed, if desired; also if it should be exception-error or info
