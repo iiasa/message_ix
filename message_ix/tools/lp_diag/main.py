@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     tstart = dt.now()
     # print('Started at:', str(tstart))
-    wrk_dir = '/Users/marek/Documents/GitHub/marek_iiasa/MCA/LPdiag/'   # should be modified by each user
+    wrk_dir = './'   # might be modified by each user
     os.chdir(wrk_dir)
 
     # small MPSs, for testing the code, posted to Data/mps_tst dir
