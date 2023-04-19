@@ -1,11 +1,12 @@
-This is a temporary place for development of the code for LP-matrix diagnosis
+The lp_diag is a simple tool for diagnosis of LP-matrices basic properties.
+The functionality of lp_diag will be gradually enhanced to meet actual needs
+of message_ix modelers.
 
-The initial version of Mar 2nd, 2023 is very green; if will be gradually
-improved in coming weeks.
-It focuses on processing the matrix and providing its basic characteristics.
-RHS, RANGES and BOUNDS sections are not processed yet.
+The initial version developed in March/April 2023 focuses on processing matrices
+in the MPS format.
+The repo contains small MPSs for testing local installations.
+Large MPSs should not be posted in the repo: they should either be tested
+locally or posted at /t/fricko/for_marek dir.
 
-Please share your comments and report bugs in the marek-iiasa/MCA repository,
-in the Discussions and Issues, respectively.
-Moreover share the MPS-files for testing by posting them in /t/fricko/for_marek
-(seen from PCs as I:\fricko\...).
+Please share your comments and report bugs in the in the Discussions and Issues
+of this repo, respectively.
