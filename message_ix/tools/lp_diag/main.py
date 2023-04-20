@@ -4,24 +4,27 @@ Written by Marek Makowski, ECE Program of IIASA, in March 2023
 Developed in PyCharm, with Python 3.10.4
 """
 
-from lpdiag import *    # LPdiag class for processing and analysis of LP matrices
-import sys		# needed for sys.exit() and redirecting stdout
 import os
+import sys  # needed for sys.exit() and redirecting stdout
+
 # import numpy as np
 # import pandas as pd
 from datetime import datetime as dt
+
+from lpdiag import *  # LPdiag class for processing and analysis of LP matrices
+
 # from datetime import timedelta as td
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """Driver of the LP diagnostics script.
-    
+
     Defines the working space, then controls the flow by executing the desired functions of LPdiag class.
     """
 
     tstart = dt.now()
     # print('Started at:', str(tstart))
-    wrk_dir = './'   # might be modified by each user
+    wrk_dir = "./"  # might be modified by each user
     os.chdir(wrk_dir)
 
     # small MPSs, for testing the code, posted to Data/mps_tst dir
@@ -42,27 +45,29 @@ if __name__ == '__main__':
     # prob_id = 'diet'
     # prob_id = 'jg_korh'
     # prob_id = 'lotfi'
-    data_dir = 'Data/mps/'
+    data_dir = "Data/mps/"
     # prob_id = 'of_led1'
-    prob_id = 'of_baselin'
+    prob_id = "of_baselin"
     fn_mps = data_dir + prob_id
     # repdir = 'Rep_shared/'      # subdirectory for shared reports (included in the git-repo)
-    repdir = 'Rep_tst/'           # subdirectory for test-reports (NOT included in the git-repo)
+    repdir = "Rep_tst/"  # subdirectory for test-reports (NOT included in the git-repo)
 
-    redir_stdo = False      # redirect stdout to the file in repdir
+    redir_stdo = False  # redirect stdout to the file in repdir
     default_stdout = sys.stdout
     if redir_stdo:
-        fn_out = './' + repdir + prob_id + '.txt'   # file for redirected stdout
-        print(f'Stdout redirected to: {fn_out}')
-        f_out = open(fn_out, 'w')
+        fn_out = "./" + repdir + prob_id + ".txt"  # file for redirected stdout
+        print(f"Stdout redirected to: {fn_out}")
+        f_out = open(fn_out, "w")
         sys.stdout = f_out
     else:
         fn_out = None
         f_out = None
 
-    lp = LPdiag(repdir)     # LPdiag ctor
-    lp.rd_mps(fn_mps)       # read MPS, store the matrix in dataFrame
-    lp.stat(lo_tail=-7, up_tail=5)   # statistics of the matrix coefficients, incl. distribution tails
+    lp = LPdiag(repdir)  # LPdiag ctor
+    lp.rd_mps(fn_mps)  # read MPS, store the matrix in dataFrame
+    lp.stat(
+        lo_tail=-7, up_tail=5
+    )  # statistics of the matrix coefficients, incl. distribution tails
     # lp.stat(lo_tail=0, up_tail=0)  # to get numbers of coeffs for each magnitute specify equal/overlapping tails
     lp.out_loc(small=True, thresh=-7, max_rec=100)  # locations of small-value outlayers
     lp.out_loc(small=False, thresh=6, max_rec=500)  # locations of large-value outlayers
@@ -71,17 +76,17 @@ if __name__ == '__main__':
 
     tend = dt.now()
     time_diff = tend - tstart
-    print('\nStarted at: ', str(tstart))
-    print('Finished at:', str(tend))
-    print(f'Wall-clock execution time: {time_diff.seconds} sec.')
+    print("\nStarted at: ", str(tstart))
+    print("Finished at:", str(tend))
+    print(f"Wall-clock execution time: {time_diff.seconds} sec.")
 
     if redir_stdo:  # close the redirected output
         f_out.close()
         sys.stdout = default_stdout
-        print(f'\nRedirected stdout stored in {fn_out}. Now writing to the console.')
-        print('\nStarted at: ', str(tstart))
-        print('Finished at:', str(tend))
-        print(f'Wall-clock execution time: {time_diff.seconds} sec.')
+        print(f"\nRedirected stdout stored in {fn_out}. Now writing to the console.")
+        print("\nStarted at: ", str(tstart))
+        print("Finished at:", str(tend))
+        print(f"Wall-clock execution time: {time_diff.seconds} sec.")
 
     # TODO: plots of distributions of coeffs, if indeed usefull
     # TODO: naive scaling? might not be informative to due the later preprocessing
