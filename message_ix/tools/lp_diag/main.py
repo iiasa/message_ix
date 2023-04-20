@@ -11,7 +11,7 @@ import sys  # needed for sys.exit() and redirecting stdout
 # import pandas as pd
 from datetime import datetime as dt
 
-from lpdiag import *  # LPdiag class for processing and analysis of LP matrices
+from lpdiag import LPdiag  # LPdiag class for processing and analysis of LP matrices
 
 # from datetime import timedelta as td
 
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     # prob_id = 'diet'
     # prob_id = 'jg_korh'
     # prob_id = 'lotfi'
-    data_dir = "Data/mps/"
+    data_dir = "data/mps/"
     # prob_id = 'of_led1'
     prob_id = "of_baselin"
     fn_mps = data_dir + prob_id
