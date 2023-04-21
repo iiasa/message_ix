@@ -52,7 +52,7 @@ if __name__ == "__main__":
     # Retrieve and assign arguments
     args = read_args()
     wrk_dir = args.path or "./"
-    prob_id = args.mps or None
+    prob_id = args.mps or "of_baselin"  # arbitrary selection of default, do change
     redir_stdo = args.save
     try:
         os.chdir(wrk_dir)
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     # of_led1     - posted by Oliver in /t/fricko... on Feb 16, 2023 at 10:39 as: OFR_test_led_barrier.mps
     # of_baselin  - second MPS from Oliver, posted on Feb 16, 2023 at 12:13 as: baseline_barrier.mps
 
-    # data_dir = 'Data/mps_tst/'
+    # data_dir = 'data/mps_tst/'
     # prob_id = 'err_tst'
     # prob_id = 'aez'
     # prob_id = 'diet'
@@ -79,12 +79,12 @@ if __name__ == "__main__":
     # prob_id = 'lotfi'
     data_dir = "data/mps/"
     # prob_id = 'of_led1'
-    prob_id = "of_baselin"
+    # prob_id = "of_baselin"
     fn_mps = data_dir + prob_id
-    # repdir = 'Rep_shared/'      # subdirectory for shared reports (included in the git-repo)
+    # repdir = 'rep_shared/'      # subdirectory for shared reports (included in the git-repo)
     repdir = "rep_tst/"  # subdirectory for test-reports (NOT included in the git-repo)
 
-    redir_stdo = False  # redirect stdout to the file in repdir
+    # redir_stdo = False  # redirect stdout to the file in repdir
     default_stdout = sys.stdout
     if redir_stdo:
         fn_out = "./" + repdir + prob_id + ".txt"  # file for redirected stdout
