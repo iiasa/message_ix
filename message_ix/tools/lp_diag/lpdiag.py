@@ -53,7 +53,8 @@ class LPdiag:
         if not os.path.exists(self.rep_dir):
             os.makedirs(self.rep_dir, mode=0o755)
 
-        # dictionaries for searchable names and its indices (searching very-long lists is prohibitively slow)
+        # dictionaries for searchable names and its indices
+        # (searching very-long lists is prohibitively slow)
         self.row_name = {}  # key: row-name, item: its seq_id
         self.seq_row = {}  # key: row sequence, item: [row-name, lo_bnd, up_bond, type]
         self.col_name = {}  # key: col-name, item: its seq_id
@@ -61,10 +62,14 @@ class LPdiag:
         self.gf_seq = (
             -1
         )  # sequence_no of the goal function (objective) row: equal = -1, if undefined
-        # representation of the LP matrix
+        # representation of the LP matrix:
         self.mat = pd.DataFrame(columns=["row", "col", "val"])  # LP matrix
-        # self.cols = pd.DataFrame(columns=['seq_id', 'name', 'lo_bnd', 'up_bnd'])   # cols attributes
-        # self.rows = pd.DataFrame(columns=['seq_id', 'name', 'type', 'lo_bnd', 'up_bnd'])   # rows attributes
+        # cols attributes:
+        # self.cols = pd.DataFrame(columns=['seq_id', 'name', 'lo_bnd', 'up_bnd'])
+        # rows attributes:
+        # self.rows = pd.DataFrame(
+        #   columns=['seq_id', 'name', 'type', 'lo_bnd', 'up_bnd']
+        # )
 
     def rd_mps(self, fname):  # process the MPS file
         print(f"\nReading MPS-format file {fname}.")
@@ -90,7 +95,8 @@ class LPdiag:
             True,
         ]  # required/optional MPS sections
         row_types = ["N", "E", "G", "L"]  # types of rows
-        # items of the below dictionaries indicate bounds to be modified: 1 - low, 2 - upper, 3 - both
+        # items of the below dictionaries indicate bounds to be modified:
+        # 1 - low, 2 - upper, 3 - both
         bnd_type1 = {"LO": 1, "UP": 2, "FX": 3}  # types of bounds requiring value
         bnd_type2 = {"MI": 1, "PL": 2, "FR": 3}  # types of bounds not requiring value
         bnd_type3 = {
@@ -131,7 +137,10 @@ class LPdiag:
                     if (
                         n_section == 2
                     ):  # columns/matrix (first here because most frequently used)
-                        # print(f'processing line no {n_line}, n_words {n_words}: {line}')
+                        # print(
+                        #     f"processing line no {n_line}, n_words {n_words}:"
+                        #     f" {line}"
+                        # )
                         assert n_words in [
                             3,
                             5,
@@ -155,14 +164,23 @@ class LPdiag:
                             type(val) == float
                         ), f"string  {words[2]} (line {n_line}) is not a number."
                         # add the matrix element to the lists of: seq_row, seq_col, val
-                        # the lists will be converted to self.mat df after all elements will be read
+                        # the lists will be converted to self.mat df after all elements
+                        # will be read
                         seq_row.append(row_seq)
                         seq_col.append(col_seq)
                         vals.append(val)
                         # print(f' matrix element ({row_seq}, {col_seq}) = {val}')
-                        # the next two lines takes far too long for large matrices; thus tmp-store in three lists
-                        # df2 = pd.DataFrame({'row': row_seq, 'col': col_seq, 'val': val}, index=list(range(1)))
-                        # self.mat = pd.concat([self.mat, df2], axis=0, ignore_index=True)
+                        # the next two commands take far too long for large matrices;
+                        # thus tmp-store in three lists
+                        # df2 = pd.DataFrame(
+                        #     {"row": row_seq, "col": col_seq, "val": val},
+                        #     index=list(range(1)),
+                        # )
+                        # self.mat = pd.concat(
+                        #     [self.mat, df2],
+                        #     axis=0,
+                        #     ignore_index=True
+                        # )
                         if (
                             n_words > 3
                         ):  # proccess second matrix element in the same MPS row
@@ -206,13 +224,16 @@ class LPdiag:
                         self.row_name.update(
                             {row_name: row_seq}
                         )  # add to dict of row_names
-                        # store row_{seq, name, type} and the default (to be changed in rhs/ranges) [lo_bnd, upp_bnd]
+                        # store row_{seq, name, type} and the default
+                        # (to be changed in rhs/ranges) [lo_bnd, upp_bnd]
                         self.row_att(row_seq, row_name, row_type, "rows")
                     elif n_section == 3:  # rhs
                         if (
                             self.n_rhs == 0
                         ):  # first RHS record implies RHS/ranges id (might be empty)
-                            # print(f'first rhs line: {n_line}, len {len(line)}: "{line}"')
+                            # print(
+                            #     f"first rhs line: {n_line}, len {len(line)}: '{line}'"
+                            # )
                             if n_words in [3, 5]:
                                 id_rhs = True
                                 self.rhs_id = words[0]
@@ -331,23 +352,31 @@ class LPdiag:
                         if (
                             self.n_bounds == 0
                         ):  # first Bounds record implies bounds id (might be empty)
-                            # print(f'first bound line: {n_line}, len {len(line)}: "{line}"')
+                            # print(
+                            #     f"first bound line: {n_line}, len {len(line)}:"
+                            #     f" '{line}'"
+                            # )
                             if n_words == 4 or (
                                 n_words == 3 and words[0] in ["FR", "MI", "PL"]
                             ):
                                 id_bnd = True
                                 self.bnd_id = words[1]
+                                # number of required words in a line (with/without)
+                                # required value:
                                 n_req_wrd = [
                                     4,
                                     3,
-                                ]  # number of required words in a line (with/without) required value
+                                ]
                                 pos_name = 2  # col-name in words[pos_name]
                             else:
                                 id_bnd = False
                                 self.bnd_id = ""
                                 n_req_wrd = [3, 2]
                                 pos_name = 1  # col-name in words[pos_name]
-                            # print(f'first bound: {id_bnd=}, bnd_id= {self.bnd_id}: {n_req_wrd = }')
+                            # print(
+                            #     f"first bound: {id_bnd=}, bnd_id= {self.bnd_id}:"
+                            #     f" {n_req_wrd = }"
+                            # )
                         assert n_words in n_req_wrd, (
                             f"bounds line {n_line} has {n_words} words, expected"
                             f" {n_req_wrd}."
@@ -376,9 +405,8 @@ class LPdiag:
                                 attr[1] = attr[2] = val
                             else:
                                 attr[at_pos] = val
-                        elif (
-                            typ in bnd_type2
-                        ):  # value not needed; therefore it is neither checked nor processed
+                        elif typ in bnd_type2:  # value not needed;
+                            # therefore it is neither checked nor processed
                             at_pos = bnd_type2.get(typ)
                             if at_pos == 3:  # set both bounds
                                 attr[1] = attr[2] = self.infty
@@ -405,11 +433,18 @@ class LPdiag:
                         )
                     else:
                         raise Exception(f"Unknown section id {n_section}.")
-                else:  # store the content of the last-read section, then process the head of new section
+                else:
+                    # store the content of the last-read section,
+                    # then process the head of new section
                     if n_section == 0:  # PROBLEM
-                        pass  # problem name stored with processing the section head, no more info to be stored
+                        pass
+                        # problem name stored with processing the section head,
+                        # no more info to be stored
                     elif n_section == 1:  # ROWS
-                        # print(f'All read-in data of section {sections[n_section]} processed while read.')
+                        # print(
+                        #     f"All read-in data of section {sections[n_section]}"
+                        #     " processed while read."
+                        # )
                         pass
                     elif n_section == 2:  # COLUMNS
                         # create a df with the matrix coefficients
@@ -447,7 +482,8 @@ class LPdiag:
                             words[0] == sections[next_sect]
                         ), f"expect section {sections[next_sect]} found: {line}."
                         if words[0] == sections[next_sect]:
-                            last_sect = n_section  # store id of the last section found and processed
+                            # store id of the last section found and processed:
+                            last_sect = n_section
                             n_section = next_sect
                             next_sect = n_section + 1
                             if (
@@ -473,7 +509,8 @@ class LPdiag:
                             next_sect = n_section + 1
                         else:  # expected section not found; process the section found
                             try:
-                                # the expected section not used, maybe it is another section
+                                # the expected section not used, maybe it is another
+                                # section:
                                 n_section = sections.index(line)
                             except ValueError:
                                 raise Exception(
@@ -481,7 +518,8 @@ class LPdiag:
                                     f" {n_line})."
                                 )
                             next_sect = n_section + 1
-                        last_sect = n_section  # store id of the last section found (not processed yet)
+                        # store id of the last section found (not processed yet):
+                        last_sect = n_section
                         continue
 
         # check, if the last required section ('ENDATA') was defined
@@ -489,7 +527,8 @@ class LPdiag:
             last_sect == 7
         ), f'The "ENDATA" section is not declared; last section_id = {last_sect}.'
 
-        # check, if there was at least one N row (the first N row assumed to be the objective)
+        # check, if there was at least one N row
+        # (the first N row assumed to be the objective):
         assert self.gf_seq != -1, "objective (goal function) row is undefined."
 
         # Finish the MPS processing with the summary of its attributes
@@ -519,14 +558,16 @@ class LPdiag:
         print(f"Distribution of the GF (objective) values:\n{df.describe()}")
 
     def row_att(self, row_seq, row_name, row_type, sec_name, val=0.0):
-        """Process values defined in ROWS, RHS and RANGES sections and store/update the corresponding row attributes.
+        """Process values defined in ROWS, RHS and RANGES sections and store/update
+        the corresponding row attributes.
 
-        While processing the ROWS section the row attributes are initialized to the default (for the corresponding
-        row type) values.
-        The attributes are updated for optionally defined values in the (also optional) RHS and RANGES sections.
-        The interpretation of the MPS-format (in particular of values in the RANGES section) follows the original
-        MPS standard, see e.g., "Advanced Linear Programming," by Bruce A. Murtagh. or the standard summary
-        at https://lpsolve.sourceforge.net/5.5/mps-format.htm .
+        While processing the ROWS section the row attributes are initialized to the
+        default (for the corresponding row type) values. The attributes are updated for
+        optionally defined values in the (also optional) RHS and RANGES sections. The
+        interpretation of the MPS-format (in particular of values in the RANGES section)
+        follows the original MPS standard, see e.g., "Advanced Linear Programming," by
+        Bruce A. Murtagh. or the standard summary at
+        https://lpsolve.sourceforge.net/5.5/mps-format.htm .
 
         Attributes
         ----------
@@ -537,10 +578,11 @@ class LPdiag:
         row_type: str
             row type (defined in the ROWS section)
         sec_name: str
-            identifies the MPS section: either 'rows' (for initialization) or 'rhs' or 'ranges' (for updates)
+            identifies the MPS section: either 'rows' (for initialization) or 'rhs' or
+            'ranges' (for updates)
         val: float
-            value of the row attribute defining either lo_bnd or up_bnd of the row (the type checked while
-            processing the MPS section
+            value of the row attribute defining either lo_bnd or up_bnd of the row
+            (the type checked while processing the MPS section)
         """
 
         type2bnd = {
@@ -556,7 +598,10 @@ class LPdiag:
         if sec_name == "rows":  # initialize row attributes (used in ROW section)
             low_upp = type2bnd.get(row_type)
             self.seq_row.update({row_seq: [row_name, low_upp[0], low_upp[1], row_type]})
-            # print(f'attributes of row {row_name} initialized in section {sec_name} to {self.seq_row.get(row_seq)}.')
+            # print(
+            #     f"attributes of row {row_name} initialized in section {sec_name} to"
+            #     f"{self.seq_row.get(row_seq)}."
+            # )
         elif sec_name in [
             "rhs",
             "ranges",
@@ -583,14 +628,18 @@ class LPdiag:
                     else:
                         attr[1] = attr[2] - abs(val)
             self.seq_row.update({row_seq: attr})
-            # print(f'attributes of row {row_name} updated in section {sec_name} to {attr}.')
+            # print(
+            #     f"attributes of row {row_name} updated in section {sec_name} to"
+            #     f" {attr}."
+            # )
         else:  # update row attributes (used in RHS and ranges sections)
             raise Exception(f"row_att() should not be called for {sec_name=}.")
 
     def stat(self, lo_tail=-7, up_tail=6):
         """Basic statistics of the matrix coefficients.
 
-        Focus on distributions of magnitudes of non-zero coeff. represented by values of int(log10(abs(coeff))).
+        Focus on distributions of magnitudes of non-zero coeff. represented by values
+        of int(log10(abs(coeff))).
         Additionally, tails (low and upp) of the distributions are reported.
 
         Attributes
@@ -669,14 +718,16 @@ class LPdiag:
         """Locations of outliers, i.e., elements having small/large coeff values.
 
         Locations of outliers (in the term of the matrix coefficient values).
-        The provided ranges of values in the corresponding row/col indicate potential of the simple scaling.
+        The provided ranges of values in the corresponding row/col indicate potential
+        of the simple scaling.
 
         Attributes
         ----------
         small: bool
-            True/False for threshold of either small or large coefficients.
+            True/False for threshold of either small or large coefficients
         thresh: int
-            Magnitude of the threshold (in: int(log10(abs(coeff))), i.e. -7 denotes values < 10^(-6))
+            Magnitude of the threshold (in: int(log10(abs(coeff))), i.e. -7 denotes
+            values < 10^(-6))
         max_rec: int
             Maximum number of processed coefficients
         """
@@ -731,10 +782,15 @@ class LPdiag:
                 f" {df_row_all['log'].count()} (all)-coeff. of magnitudes in"
                 f" [{df_row_all['log'].min()}, {df_row_all['log'].max()}]"
             )
-            # a column may include more than 1 outlier; therefore columns with outliers reported below
-            # df_col = df1.loc[df1['col'] == col_seq]  # df with outliers in the same col
-            # print(f'\tCol {col_name} {self.ent_range(col_seq, False)} has {df_col["log"].count()} '
-            #       f'outlier coeff. of magnitudes in [{df_col["log"].min()}, {df_col["log"].max()}]')
+            # a column may include more than 1 outlier;
+            # therefore columns with outliers reported below:
+            # df with outliers in the same col:
+            # df_col = df1.loc[df1['col'] == col_seq]
+            # print(
+            #     f"\tCol {col_name} {self.ent_range(col_seq, False)} has "
+            #     f"{df_col["log"].count()} outlier coeff. of magnitudes in "
+            #     f"[{df_col["log"].min()}, {df_col["log"].max()}]"
+            # )
         print(
             "\nColumn-wise locations of outlier coefficients in"
             f" {len(col_out)} columns:"
@@ -752,11 +808,13 @@ class LPdiag:
             )
 
     def ent_inf(self, mat_row, by_row=True) -> typing.Tuple[int, str]:
-        """Return info on the entity (either row or col) defining the selected matrix coefficient.
+        """Return info on the entity (either row or col) defining the selected matrix
+        coefficient.
 
-        Each row of the dataFrame contains definition (composed of the row_seq, col_seq, value, log(value))
-        of one matrix coefficient.
-        The function returns seq_id and name of either row or col of the currently considered coeff.
+        Each row of the dataFrame contains the definition (composed of the row_seq,
+        col_seq, value, log(value)) of one matrix coefficient.
+        The function returns seq_id and name of either row or col of the currently
+        considered coeff.
 
         Attributes
         ----------
@@ -767,7 +825,8 @@ class LPdiag:
         """
 
         if by_row:
-            # if seq_row {} not stored, then:  names = [k for k, idx in self.row_name.items() if idx == ent_seq]
+            # if seq_row {} not stored, then:
+            # names = [k for k, idx in self.row_name.items() if idx == ent_seq]
             ent_seq = int(mat_row["row"])
             name = self.seq_row.get(ent_seq)[0]
         else:
@@ -776,10 +835,12 @@ class LPdiag:
         return ent_seq, name
 
     def ent_range(self, seq_id, by_row=True) -> str:
-        """Return formatted string representing ranges of feasible values of either a row or a column.
+        """Return formatted string representing ranges of feasible values of either a
+        row or a column.
 
-        The returned values of ranges are either 'none' (for plus/minus infinity) or int(log10(abs(val))) for
-        other values. Small values, defined as abs(value) < 1e-10, are represented by 0.
+        The returned values of ranges are either 'none' (for plus/minus infinity) or
+        int(log10(abs(val))) for other values. Small values, defined as
+        abs(value) < 1e-10, are represented by 0.
 
         Attributes
         ----------

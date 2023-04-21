@@ -43,7 +43,8 @@ def read_args():
 if __name__ == "__main__":
     """Driver of the LP diagnostics script.
 
-    Defines the working space, then controls the flow by executing the desired functions of LPdiag class.
+    Defines the working space, then controls the flow by executing the desired
+    functions of LPdiag class.
     """
 
     tstart = dt.now()
@@ -66,10 +67,14 @@ if __name__ == "__main__":
     # jg_korh - tiny testing problem
     # lotfi - classical medium size; two matrix elems in a row
 
-    # trouble-makers MPSs, large (over 1G) files, not posted to gitHub, locally in Data/mps dir
-    # all large MPS files should be preferably copied to /t/fricko/for_marek/ (see the Oliver's slack post of Feb 16th)
-    # of_led1     - posted by Oliver in /t/fricko... on Feb 16, 2023 at 10:39 as: OFR_test_led_barrier.mps
-    # of_baselin  - second MPS from Oliver, posted on Feb 16, 2023 at 12:13 as: baseline_barrier.mps
+    # trouble-makers MPSs, large (over 1G) files, not posted to gitHub, locally in
+    # data/mps dir
+    # all large MPS files should be preferably copied to /t/fricko/for_marek/
+    # (see Oliver's slack post of Feb 16th)
+    # of_led1     - posted by Oliver in /t/fricko... on Feb 16, 2023 at 10:39 as:
+    # OFR_test_led_barrier.mps
+    # of_baselin  - second MPS from Oliver, posted on Feb 16, 2023 at 12:13 as:
+    # baseline_barrier.mps
 
     # data_dir = 'data/mps_tst/'
     # prob_id = 'err_tst'
@@ -81,8 +86,8 @@ if __name__ == "__main__":
     # prob_id = 'of_led1'
     # prob_id = "of_baselin"
     fn_mps = data_dir + prob_id
-    # repdir = 'rep_shared/'      # subdirectory for shared reports (included in the git-repo)
-    repdir = "rep_tst/"  # subdirectory for test-reports (NOT included in the git-repo)
+    # repdir = 'rep_shared/'      # subdirectory for shared reports (NOT in git-repo)
+    repdir = "rep_tst/"  # subdirectory for test-reports (NOT in git-repo)
 
     # redir_stdo = False  # redirect stdout to the file in repdir
     default_stdout = sys.stdout
@@ -91,20 +96,21 @@ if __name__ == "__main__":
         print(f"Stdout redirected to: {fn_out}")
         f_out = open(fn_out, "w")
         sys.stdout = f_out
-    else:
-        fn_out = None
-        f_out = None
+    # else: # only use f_out and fn_out where redir_stdo = True anyway
+    #     fn_out = None
+    #     f_out = None
 
     lp = LPdiag(repdir)  # LPdiag ctor
     lp.rd_mps(fn_mps)  # read MPS, store the matrix in dataFrame
     lp.stat(
         lo_tail=-7, up_tail=5
     )  # statistics of the matrix coefficients, incl. distribution tails
-    # lp.stat(lo_tail=0, up_tail=0)  # to get numbers of coeffs for each magnitute specify equal/overlapping tails
-    lp.out_loc(small=True, thresh=-7, max_rec=100)  # locations of small-value outlayers
-    lp.out_loc(small=False, thresh=6, max_rec=500)  # locations of large-value outlayers
-    # lp.out_loc(small=True, thresh=-1, max_rec=100)  # testing (lotfi) small-value outlayers
-    # lp.out_loc(small=False, thresh=2, max_rec=500)  # testing (lotfi) large-value outlayers
+    # to get numbers of coeffs for each magnitute specify equal/overlapping tails:
+    # lp.stat(lo_tail=0, up_tail=0)
+    lp.out_loc(small=True, thresh=-7, max_rec=100)  # locations of small-value outliers
+    lp.out_loc(small=False, thresh=6, max_rec=500)  # locations of large-value outliers
+    # lp.out_loc(small=True, thresh=-1, max_rec=100) # test (lotfi) small-value outliers
+    # lp.out_loc(small=False, thresh=2, max_rec=500) # test (lotfi) large-value outliers
 
     tend = dt.now()
     time_diff = tend - tstart
@@ -122,5 +128,6 @@ if __name__ == "__main__":
 
     # TODO: plots of distributions of coeffs, if indeed usefull
     # TODO: naive scaling? might not be informative to due the later preprocessing
-    # TODO: conform(?) to the MPS-standard: reject numbers of abs(val): greater than 10^{10} or smaller than 10^{-10}
+    # TODO: conform(?) to the MPS-standard: reject numbers of
+    # abs(val): greater than 10^{10} or smaller than 10^{-10}
     #   to be discussed, if desired; also if it should be exception-error or info
