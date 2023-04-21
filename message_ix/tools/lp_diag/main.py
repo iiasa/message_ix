@@ -4,6 +4,7 @@ Written by Marek Makowski, ECE Program of IIASA, in March 2023
 Developed in PyCharm, with Python 3.10.4
 """
 
+import argparse
 import os
 import sys  # needed for sys.exit() and redirecting stdout
 
@@ -16,6 +17,29 @@ from lpdiag import LPdiag  # LPdiag class for processing and analysis of LP matr
 # from datetime import timedelta as td
 
 
+def read_args():
+    descr = """
+    Driver of the LP diagnostics script.
+
+    Example usgae:
+    python main.py --path "message_ix/tools/lp_diag" --mps "test.mps" -s
+
+    """
+
+    parser = argparse.ArgumentParser(
+        description=descr, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    path = "--path : string\n    Working directory of MCA/LPdiag."
+    parser.add_argument("--path", help=path)
+    mps = "--mps : string\n    Name of mps file with extenstion."
+    parser.add_argument("--mps", help=mps)
+    parser.add_argument("-s", "--save", action="store_true")  # on/off flag
+
+    # parse cli
+    args = parser.parse_args()
+    return args
+
+
 if __name__ == "__main__":
     """Driver of the LP diagnostics script.
 
@@ -24,8 +48,16 @@ if __name__ == "__main__":
 
     tstart = dt.now()
     # print('Started at:', str(tstart))
-    wrk_dir = "./"  # might be modified by each user
-    os.chdir(wrk_dir)
+
+    # Retrieve and assign arguments
+    args = read_args()
+    wrk_dir = args.path or "./"
+    prob_id = args.mps or None
+    redir_stdo = args.save
+    try:
+        os.chdir(wrk_dir)
+    except OSError:
+        print("cannot find", wrk_dir)
 
     # small MPSs, for testing the code, posted to Data/mps_tst dir
     # err_tst  - small MPS with various errors for testing the diagnostics
@@ -50,7 +82,7 @@ if __name__ == "__main__":
     prob_id = "of_baselin"
     fn_mps = data_dir + prob_id
     # repdir = 'Rep_shared/'      # subdirectory for shared reports (included in the git-repo)
-    repdir = "Rep_tst/"  # subdirectory for test-reports (NOT included in the git-repo)
+    repdir = "rep_tst/"  # subdirectory for test-reports (NOT included in the git-repo)
 
     redir_stdo = False  # redirect stdout to the file in repdir
     default_stdout = sys.stdout
