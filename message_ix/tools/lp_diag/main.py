@@ -12,7 +12,9 @@ import sys  # needed for sys.exit() and redirecting stdout
 # import pandas as pd
 from datetime import datetime as dt
 
-from lpdiag import LPdiag  # LPdiag class for processing and analysis of LP matrices
+from message_ix.tools.lp_diag import (
+    LPdiag,  # LPdiag class for processing and analysis of LP matrices
+)
 
 # from datetime import timedelta as td
 
