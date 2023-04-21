@@ -1,3 +1,3 @@
-from lp_diag import LPdiag
+from lpdiag import LPdiag
 
 __all__ = ["LPdiag"]
