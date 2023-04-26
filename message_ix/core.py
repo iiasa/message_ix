@@ -713,7 +713,8 @@ class Scenario(ixmp.Scenario):
         calibrate(clone, check_convergence=check_convergence, **kwargs)
         return clone
 
-    def rename(self, name, mapping, keep=False):
+    # FIXME reduce complexity from 18 to <=14
+    def rename(self, name, mapping, keep=False):  # noqa: C901
         """Rename an element in a set
 
         Parameters

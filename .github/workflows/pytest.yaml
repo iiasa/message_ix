@@ -9,6 +9,11 @@ on:
   schedule:
   - cron: "0 5 * * *"
 
+# Cancel previous runs that have not completed
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 env:
   GAMS_VERSION: 25.1.1
   # See description in lint.yml
@@ -43,42 +48,19 @@ jobs:
     name: ${{ matrix.os }}-py${{ matrix.python-version }}
 
     steps:
-    - name: Cancel previous runs that have not completed
-      uses: styfle/cancel-workflow-action@0.11.0
-      with:
-        access_token: ${{ github.token }}
-
-    - name: Check out ixmp
-      uses: actions/checkout@v3
-      with:
-        repository: iiasa/ixmp
-        # For PRs that depend on an ixmp PR branch, uncomment the following 2
-        # lines and adjust to suit:
-        # repository: USERNAME/ixmp
-        # ref: issue/999
-        path: ixmp
-        fetch-depth: ${{ env.depth }}
-
     - name: Check out message_ix
       uses: actions/checkout@v3
       with:
-        path: message_ix
         fetch-depth: ${{ env.depth }}
 
     - name: Fetch tags (for setuptools-scm)
-      run: |
-        (cd ixmp; git fetch --tags --depth=${{ env.depth }})
-        (cd message_ix; git fetch --tags --depth=${{ env.depth }})
-      shell: bash
+      run: git fetch --tags --depth=${{ env.depth }}
 
     - uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
         cache: pip
-        cache-dependency-path: "**/setup.cfg"
-
-    - name: Upgrade pip, wheel, setuptools-scm
-      run: python -m pip install --upgrade pip wheel setuptools-scm
+        cache-dependency-path: "**/pyproject.toml"
 
     - name: Set RETICULATE_PYTHON
       # Use the environment variable set by the setup-python action, above.
@@ -108,13 +90,13 @@ jobs:
         version: ${{ env.GAMS_VERSION }}
         license: ${{ secrets.GAMS_LICENSE }}
 
-    - name: Install ixmp and dependencies
-      working-directory: ixmp
-      run: pip install .
-
     - name: Install Python package and dependencies
-      working-directory: message_ix
-      run: pip install .[tests]
+      # By default, the below installs ixmp from the main branch. To run against
+      # other code, e.g. other branches for open PRs), temporarily edit as
+      # appropriate. DO NOT merge such changes to `main`.
+      run: |
+        pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
+        pip install .[tests]
 
     - name: Install R dependencies and tutorial requirements
       run: |
@@ -131,18 +113,18 @@ jobs:
       env:
         # For test_cli.test_dl; see code in message_ix.cli.dl
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      working-directory: message_ix
       # Work around iiasa/ixmp#411
       run: |
-        pytest message_ix -m "not nightly" -rA --verbose --cov-report=xml --color=yes || ( [ $? -eq 127 -a "${{ runner.os }}" = "Windows" ] && echo "Spurious exit code 127 from pytest" && exit 0)
+        pytest message_ix \
+          -m "not nightly" \
+          -rA --verbose --color=yes --durations=20 \
+          --cov-report=xml \
+          --numprocesses=auto --dist=loadgroup || ( [ $? -eq 127 -a "${{ runner.os }}" = "Windows" ] && echo "Spurious exit code 127 from pytest" && exit 0)
       shell: bash
 
     - name: Test documentation build using Sphinx
       if: ${{ startsWith(matrix.os, 'ubuntu') }}
-      working-directory: message_ix
       run: make --directory=doc html
 
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v3
-      with:
-        directory: message_ix

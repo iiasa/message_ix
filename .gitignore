@@ -50,6 +50,7 @@ prof/
 # Editors and IDEs
 # JetBrains IDEs incl. PyCharm
 /**/.idea
+
 # RStudio
 .Rproj.user
 .vscode

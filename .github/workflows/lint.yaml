@@ -13,11 +13,15 @@ jobs:
   lint:
     uses: iiasa/actions/.github/workflows/lint.yaml@main
     with:
-      max-complexity: 38
       # If the "Latest version testable on GitHub Actions" in pytest.yaml
       # is not the latest 3.x stable version, adjust here to match:
       python-version: "3.10"
       # For PRs that depend on an ixmp PR branch, adjust the URL below
       type-hint-packages: >-
-        genno sphinx types-pkg_resources types-requests types-PyYAML
+        asyncssh
+        genno
+        pytest
+        sphinx
+        types-requests
+        types-PyYAML
         git+https://github.com/iiasa/ixmp.git@main
