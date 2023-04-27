@@ -17,7 +17,7 @@ jobs:
         os: [windows-latest, macos-latest]
         conda:
         - {installer: anaconda, version: 2023.03-1}
-        - {installer: miniconda, version: py39_4.10.3}
+        - {installer: miniconda, version: py310_23.3.1-0}
         extra-deps: ["", "JPype1=1.2.1"]
       fail-fast: false
 
