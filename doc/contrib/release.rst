@@ -48,7 +48,7 @@ For instance, an item marked as deprecated in v2.1 can be removed as of v3.0; an
       But *may* also be removed from the ``main`` branch *immediately after* 2.0.0 is released.
       This is preferred, because it forces tutorials, user code, etc. to stay ahead of deprecations.
 
-3. (message_ix only) Edit :file:`setup.cfg`, updating the ``install_requires`` line for ixmp as necessary.
+3. (message_ix only) Edit :file:`pyproject.toml`, updating the list ``dependencies`` in the ``projects`` section for ixmp as necessary.
 
    Each version of message_ix depends on a minimum version of ixmp.
    message_ix **must not** depend on or use deprecated features of ixmp; it **should** remain compatible with earlier versions of ixmp, where possible.
@@ -162,10 +162,10 @@ Releasing
     A PR should automatically be opened by a bot after the GitHub release (sometimes this takes from 30 minutes to several hours).
 
     1. Confirm that any new dependencies are added.
-       The minimum versions in :file:`meta.yaml` should match the versions in :file:`setup.cfg`.
+       The minimum versions in :file:`meta.yaml` should match the versions in :file:`pyproject.toml`.
     2. Ensure that tests pass and complete any other checklist items.
     3. Merge the PR.
     4. Check that the new package version appears on conda-forge. This may take up to several hours.
 
-11. Announce the release(s) on our mailing list/Google group and/or on Twitter.
+11. Announce the release(s) on the GitHub Discussions pages and/or on Twitter.
     Copy the text from the What's New page of the built documentation.
