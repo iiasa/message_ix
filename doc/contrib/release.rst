@@ -48,7 +48,7 @@ For instance, an item marked as deprecated in v2.1 can be removed as of v3.0; an
       But *may* also be removed from the ``main`` branch *immediately after* 2.0.0 is released.
       This is preferred, because it forces tutorials, user code, etc. to stay ahead of deprecations.
 
-3. (message_ix only) Edit :file:`pyproject.toml`, updating the list ``dependencies`` in the ``projects`` section for ixmp as necessary.
+3. (message_ix only) Edit :file:`pyproject.toml`, updating the list ``dependencies`` in the ``project`` section for ixmp as necessary.
 
    Each version of message_ix depends on a minimum version of ixmp.
    message_ix **must not** depend on or use deprecated features of ixmp; it **should** remain compatible with earlier versions of ixmp, where possible.
