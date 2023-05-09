@@ -143,14 +143,17 @@ map_ren_grade(node,commodity,grade,year_all)$(
 map_rating(node,inv_tec,commodity,level,rating,year_all)$(
     SUM(time, reliability_factor(node,inv_tec,year_all,commodity,level,time,rating) ) ) = yes;
 
-* set the default capacity factor for technologies where no parameter value is provided in the input data
-capacity_factor(node,tec,year_all2,year_all,time)$( map_tec_time(node,tec,year_all,time)
-    AND map_tec_lifetime(node,tec,year_all2,year_all) AND NOT is_capacity_factor(node,tec,year_all2,year_all,time) ) = 1 ;
-
 * assign the yearly average capacity factor (used in equation OPERATION_CONSTRAINT)
 capacity_factor(node,tec,year_all2,year_all,'year') =
     sum(time$map_tec_time(node,tec,year_all,time), duration_time(time)
-        * capacity_factor(node,tec,year_all2,year_all,time) ) ;
+        * capacity_factor(node,tec,year_all2,year_all,time) );
+
+* update the masking set for capacity factor based on the average values added above
+is_capacity_factor(node,tec,year_all2,year_all,time)$(capacity_factor(node,tec,year_all2,year_all,'year') ) = yes;
+
+* set the default capacity factor for technologies where no parameter value is provided in the input data
+capacity_factor(node,tec,year_all2,year_all,time)$( map_tec_time(node,tec,year_all,time)
+    AND map_tec_lifetime(node,tec,year_all2,year_all) AND NOT is_capacity_factor(node,tec,year_all2,year_all,time) ) = 1 ;
 
 * set the default operation factor for technologies where no parameter value is provided in the input data
 operation_factor(node,tec,year_all2,year_all)$( map_tec(node,tec,year_all)

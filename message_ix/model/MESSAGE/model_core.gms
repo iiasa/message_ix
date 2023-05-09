@@ -956,7 +956,7 @@ ADDON_ACTIVITY_LO(node,type_addon,year,mode,time)..
 * System reliability and flexibility requirements
 * -----------------------------------------------
 * This section followi allows to include system-wide reliability and flexility considerations.
-* The current formulation is based on Sullivan et al., 2013 :cite:`sullivan_VRE_2013`.
+* The current formulation is based on Sullivan et al., 2013 :cite:`Sullivan-2013`.
 *
 * Aggregate use of a commodity
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1090,7 +1090,7 @@ FIRM_CAPACITY_PROVISION(node,inv_tec,year,commodity,level,time)$(
 * Equation SYSTEM_RELIABILITY_CONSTRAINT
 * """"""""""""""""""""""""""""""""""""""
 * This constraint ensures that there is sufficient firm (dispatchable) capacity in each period.
-* The formulation is based on Sullivan et al., 2013 :cite:`sullivan_VRE_2013`.
+* The formulation is based on Sullivan et al., 2013 :cite:`Sullivan-2013`.
 *
 *   .. math::
 *      \sum_{t, q \substack{t \in T^{INV} \\ y^V \leq y} } &
@@ -1523,7 +1523,7 @@ SHARE_CONSTRAINT_COMMODITY_LO(shares,node_share,year,time)$( share_commodity_lo(
 * These can be used to model limits on market penetration and/or rates of expansion or phase-out of a technology.
 *
 * The formulation directly includes the option for 'soft' relaxations of dynamic constraints
-* (cf. Keppo and Strubegger, 2010 :cite:`keppo_short_2010`).
+* (cf. Keppo and Strubegger, 2010 :cite:`Keppo-2010`).
 *
 * See also the :ref:`corresponding parameter definitions <section_parameter_dynamic_constraints>`.
 *
@@ -1586,7 +1586,7 @@ NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * Equation NEW_CAPACITY_SOFT_CONSTRAINT_UP
 * """"""""""""""""""""""""""""""""""""""""
 * This constraint ensures that the relaxation of the dynamic constraint on new capacity (investment) does not exceed
-* the level of the investment in the previous period (cf. Keppo and Strubegger, 2010 :cite:`keppo_short_2010`).
+* the level of the investment in the previous period (cf. Keppo and Strubegger, 2010 :cite:`Keppo-2010`).
 *
 *   .. math::
 *      CAP\_NEW\_UP_{n,t,y} \leq \sum_{y-1} CAP\_NEW_{n^L,t,y-1} & \text{if } y \neq 'first\_period' \\

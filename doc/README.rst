@@ -21,16 +21,16 @@ There are a number of guides out there, e.g. on docutils_.
 Building the docs on your local machine
 ---------------------------------------
 
-From the command line, run::
+From the command line, run in `doc/`::
 
     make html
 
 You can then view the site by::
 
     cd build
-    python -m SimpleHTTPServer
+    python -m http.server
 
-and pointing your browser at http://localhost:8000/html/
+and pointing your browser at http://0.0.0.0:8000/_build/html/
 
 
 Read the Docs

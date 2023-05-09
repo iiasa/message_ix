@@ -53,7 +53,7 @@
 *      - ``year``
 *      - Discount factor of the last year in the period [#df_auto]_
 *
-* .. [#duration_time_year] The element 'year' in the set of subannual time slices ``time`` has the value of 1.
+* .. [#duration_time_year] The element 'Year' in the set of subannual time slices ``time`` has the value of 1.
 *    This value is assigned by default when creating a new :class:`ixmp.Scenario` based on the ``MESSAGE`` scheme.
 *
 * .. [#short_dur] The short-hand notation :math:`|y|` is used for the parameters :math:`duration\_period_y`
@@ -150,7 +150,7 @@ Parameter
 *    the final demand including the price response in an iterative `MESSAGE-MACRO` solution.
 *
 * .. [#peakload] The parameters ``peak_load_factor`` (maximum peak load factor for reliability constraint of firm capacity) and
-*    ``reliability_factor`` (reliability of a technology (per rating)) are based on the formulation proposed by Sullivan et al., 2013 :cite:`sullivan_VRE_2013`.
+*    ``reliability_factor`` (reliability of a technology (per rating)) are based on the formulation proposed by Sullivan et al., 2013 :cite:`Sullivan-2013`.
 *    It is used in :ref:`reliability_constraint`.
 *
 ***
@@ -302,7 +302,7 @@ Parameters
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
 * These parameters are used in the :ref:`dynamic constraint equations <dynamic_constraints>` to limit the growth (or decline) of activity or of new capacity in each period, relative to the preceding period.
-* The ``soft_`` parameters control ‘soft’ relaxation of these dynamic constraints, using the method of Keppo and Strubegger (2010) :cite:`keppo_short_2010`.
+* The ``soft_`` parameters control ‘soft’ relaxation of these dynamic constraints, using the method of Keppo and Strubegger (2010) :cite:`Keppo-2010`.
 *
 * The ``growth_`` and ``soft_`` parameters are expressed as *relative annual change* and are unitless.
 * Because these are annual values, are compounded in the :ref:`constraint equations <dynamic_constraints>` by ``duration_period`` (:math:`|y|`) to obtain the relative *inter-period* change.
@@ -455,7 +455,7 @@ Parameters
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
 * The implementation of |MESSAGEix| includes the functionality for 'soft' relaxations of dynamic constraints on
-* new-built capacity and activity (see Keppo and Strubegger, 2010 :cite:`keppo_short_2010`).
+* new-built capacity and activity (see Keppo and Strubegger, 2010 :cite:`Keppo-2010`).
 * Refer to the section :ref:`dynamic_constraints`. Absolute cost and levelized cost multipliers are used
 * for the relaxation of upper and lower bounds.
 *

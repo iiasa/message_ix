@@ -79,9 +79,9 @@ def test_calc_valid_years(westeros_solved):
     data = pd.read_excel(W_DATA_PATH, sheet_name=None, engine="openpyxl")
     # Adding an arbitrary year
     arbitrary_yr = 2021
-    gdp_extra_yr = data["gdp_calibrate"].iloc[0, :].copy()
+    gdp_extra_yr = data["gdp_calibrate"].copy()
     gdp_extra_yr["year"] = arbitrary_yr
-    data["gdp_calibrate"] = data["gdp_calibrate"].append(gdp_extra_yr)
+    data["gdp_calibrate"] = pd.concat([data["gdp_calibrate"], gdp_extra_yr])
     # Check the arbitrary year is not in config
     assert arbitrary_yr not in data["config"]["year"]
     # But it is in gdp_calibrate

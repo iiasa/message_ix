@@ -1,84 +1,109 @@
 import os
 import sys
 from shutil import copyfile
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import numpy as np
 import pytest
 from ixmp.testing import get_cell_output, run_notebook
 
+# Shorthands for tutorial directories/file names.
 AT = "Austrian_energy_system"
+W = "westeros"
 
 # Common marks for some test cases
-mark0 = pytest.mark.skipif(
-    condition="GITHUB_ACTIONS" in os.environ and sys.platform == "linux",
-    reason="IR kernel times out on GitHub Actions Ubuntu runners ",
-)
-
-# This mark does *not* affect macos-latest-py3.9, which must still pass
-mark1 = pytest.mark.xfail(
-    condition=sys.platform == "darwin" and sys.version_info.minor == 8,
-    reason="Fails occasionally on GitHub Actions runners for macOS / Python 3.8",
-)
-
-mark2 = pytest.mark.xfail(
-    condition=sys.platform == "win32",
-    reason="Fails occasionally on GitHub Actions runners for Windows",
-)
-
-# Argument values to parametrize test_tutorial
-#
-# Each item is a 3-tuple:
-# 1. Path fragments under tutorials directory,
-# 2. List containing 0 or more 2-tuples, each:
-#    a. Name or index of cell whose output will contain a certain value, e.g. the
-#       MESSAGE objective function value.
-#    b. Expected value for that cell output.
-# 3. Dictionary with extra keyword arguments to run_notebook().
-tutorials: List[Tuple] = [
-    # IPython kernel
-    (
-        ("westeros", "westeros_baseline"),
-        [("solve-objective-value", 173795.09375)],
-        {},
+GHA = "GITHUB_ACTIONS" in os.environ
+MARK = [
+    pytest.mark.skipif(
+        condition=GHA and sys.platform == "linux",
+        reason="IR kernel times out on GitHub Actions Ubuntu runners",
     ),
+    # This mark does *not* affect macos-latest-py3.9, which must still pass
+    pytest.mark.xfail(
+        condition=GHA and sys.platform == "darwin" and sys.version_info.minor == 8,
+        reason="Fails occasionally on GitHub Actions runners for macOS / Python 3.8",
+    ),
+    pytest.mark.xfail(
+        condition=GHA and sys.platform == "win32",
+        reason="Fails occasionally on GitHub Actions runners for Windows",
+    ),
+    pytest.mark.xfail(
+        condition=GHA and sys.platform == "darwin",
+        reason="Flaky; CellTimeoutError occurs on first executed cell",
+    ),
+]
+
+# Affects all tests in the file.
+pytestmark = MARK[3]
+
+
+def _t(group: Union[str, None], basename: str, *, check=None, marks=None):
+    """Shorthand for defining tutorial test cases.
+
+    Parameters
+    ----------
+    basename : str
+       Base of the file name (without extension).
+    group : str, optional
+       Group ID. When pytest-xdist is used, tests in the same group are run in sequence
+       on the same worker. If one tutorial depends on contents in the temporary test
+       database produced by another tutorial, they should be in the same group.
+    check : list of 2-tuple, optional
+       Each tuple consists of:
+
+       1. Name or index of cell whose output will contain a certain value, e.g. the
+          MESSAGE objective function value.
+       2. Expected value for that cell output.
+    marks : list, optional
+       Any pytest marks applicable to the test.
+    """
+    # Determine the directory containing the notebook
+    dir_ = W if basename.startswith(f"{W}_") else AT
+
+    marks = marks or []
+    if group:
+        # Mark the test as belonging to an xdist group
+        marks.append(pytest.mark.xdist_group(name=group))
+
+    return pytest.param((dir_, basename), check or [], marks=marks)
+
+
+#: Argument values to parametrize :func:`test_tutorial`.
+TUTORIALS: List[Tuple] = [
+    # IPython kernel
+    _t("w0", f"{W}_baseline", check=[("solve-objective-value", 173795.09375)]),
     # NB could also check objective function values in the following tutorials; however,
     #    better to test features directly (not via Jupyter/IPython)
-    (("westeros", "westeros_baseline_using_xlsx_import_part1"), [], {}),
-    (("westeros", "westeros_baseline_using_xlsx_import_part2"), [], {}),
-    (("westeros", "westeros_emissions_bounds"), [], {}),
-    (("westeros", "westeros_emissions_taxes"), [], {}),
-    (("westeros", "westeros_firm_capacity"), [], {}),
-    (("westeros", "westeros_flexible_generation"), [], {}),
-    (("westeros", "westeros_fossil_resource"), [], {}),
-    (("westeros", "westeros_share_constraint"), [], {}),
-    (("westeros", "westeros_soft_constraints"), [], {}),
-    (("westeros", "westeros_addon_technologies"), [], {}),
-    (("westeros", "westeros_historical_new_capacity"), [], {}),
+    _t("w0", f"{W}_baseline_using_xlsx_import_part1"),
+    _t("w0", f"{W}_baseline_using_xlsx_import_part2"),
+    _t("w0", f"{W}_emissions_bounds"),
+    _t("w0", f"{W}_emissions_taxes"),
+    _t("w0", f"{W}_firm_capacity"),
+    _t("w0", f"{W}_flexible_generation"),
+    _t("w0", f"{W}_fossil_resource"),
+    _t("w0", f"{W}_share_constraint"),
+    _t("w0", f"{W}_soft_constraints"),
+    _t("w0", f"{W}_addon_technologies"),
+    _t("w0", f"{W}_historical_new_capacity"),
+    _t("w0", f"{W}_multinode"),
     # NB this is the same value as in test_reporter()
-    (("westeros", "westeros_report"), [("len-rep-graph", 13074)], {}),
-    ((AT, "austria"), [("solve-objective-value", 206321.90625)], {}),
-    (
-        (AT, "austria_single_policy"),
-        [("solve-objective-value", 815183232.0)],
-        {},
-    ),
-    ((AT, "austria_multiple_policies"), [], {}),
-    ((AT, "austria_multiple_policies-answers"), [], {}),
-    ((AT, "austria_load_scenario"), [], {}),
+    _t(None, f"{W}_report", check=[("len-rep-graph", 13074)], marks=[MARK[2]]),
+    _t("at0", "austria", check=[("solve-objective-value", 206321.90625)]),
+    _t("at0", "austria_single_policy", check=[("solve-objective-value", 205310.34375)]),
+    _t("at0", "austria_multiple_policies"),
+    _t("at0", "austria_multiple_policies-answers"),
+    _t("at0", "austria_load_scenario"),
     # R tutorials using the IR Jupyter kernel
-    pytest.param((AT, "R_austria"), [], dict(kernel="IR"), marks=[mark0, mark1, mark2]),
-    pytest.param(
-        (AT, "R_austria_load_scenario"), [], dict(kernel="IR"), marks=[mark0, mark2]
-    ),
+    _t("at1", "R_austria", marks=MARK[:3]),
+    _t("at1", "R_austria_load_scenario", marks=[MARK[0], MARK[2]]),
 ]
 
 # Short, readable IDs for the tests. Use getattr() to unpack the values from
 # pytest.param()
-ids = [getattr(arg, "values", arg)[0][-1] for arg in tutorials]
+IDS = [getattr(arg, "values", arg)[0][-1] for arg in TUTORIALS]
 
-# List of data files required to run tutorials
-data_files = [
+#: List of data files required by "westeros_baseline_using_xlsx_import_part2".
+DATA_FILES = [
     "westeros_baseline_demand.xlsx",
     "westeros_baseline_technology_basic.xlsx",
     "westeros_baseline_technology_constraint.xlsx",
@@ -94,29 +119,28 @@ def nb_path(request, tutorial_path):
     yield tutorial_path.joinpath(*request.param).with_suffix(".ipynb")
 
 
-# Parametrize the first 3 arguments using the variables *tutorial* and *ids*.
+# Parametrize the first 3 arguments using the variables *TUTORIALS* and *IDS*.
 # Argument 'nb_path' is indirect so that the above function can modify it.
-@pytest.mark.xfail(
-    condition="GITHUB_ACTIONS" in os.environ and sys.platform == "darwin",
-    reason="Flaky; CellTimeoutError occurs on first executed cell",
-)
-@pytest.mark.parametrize(
-    "nb_path,cell_values,run_args", tutorials, ids=ids, indirect=["nb_path"]
-)
-def test_tutorial(nb_path, cell_values, run_args, tmp_path, tmp_env):
-    """Test tutorial in the IPython or IR notebook at *fname*.
+@pytest.mark.parametrize("nb_path,checks", TUTORIALS, ids=IDS, indirect=["nb_path"])
+def test_tutorial(nb_path, checks, tmp_path, tmp_env):
+    """Test tutorial in the IPython or IR notebook at `nb_path`.
 
-    If *cell_values* are given, values in the specified cells are tested.
+    If `checks` are given, values in the specified cells are tested.
     """
-    # Copy necessary data files to tmp_path
-    if "westeros_baseline_using_xlsx_import_part2" in nb_path.parts[-1]:
-        for fil in data_files:
-            copyfile(nb_path.parent / fil, tmp_path / fil)
+    if nb_path.name == "westeros_baseline_using_xlsx_import_part2.ipynb":
+        # Copy data files used by this tutorial to `tmp_path`
+        for name in DATA_FILES:
+            copyfile(nb_path.parent / name, tmp_path / name)
+
+    # Determine arguments for run_notebook()
+    args = dict()
+    if nb_path.name.startswith("R_"):
+        args.update(kernel_name="IR")
 
     # The notebook can be run without errors
-    nb, errors = run_notebook(nb_path, tmp_path, tmp_env, **run_args)
+    nb, errors = run_notebook(nb_path, tmp_path, tmp_env, **args)
     assert errors == []
 
-    for cell, value in cell_values:
-        # Cell identified by name or index has a particular value
+    # Cell(s) identified by name or index have a particular value
+    for cell, value in checks:
         assert np.isclose(get_cell_output(nb, cell), value)

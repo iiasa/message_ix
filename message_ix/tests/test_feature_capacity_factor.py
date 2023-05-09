@@ -7,29 +7,42 @@ from message_ix.testing import make_subannual
 
 def check_solution(scen: Scenario) -> None:
     """Perform several assertions about the solution of `scen`."""
-    # Reading "ACT" and "CAP" from the solution
+    # Reading "ACT" and "CAP" from the solution, plus "operation_factor"
     act = scen.var("ACT").set_index(["technology", "time"])
     cap = scen.var("CAP").set_index(["technology"])
+    op_fac = scen.par("operation_factor").set_index(["technology"])
 
-    # 1) ACT is zero when capacity factor is zero
+    # 1) ACT is zero when capacity factor (CF) is zero
     cf = scen.par("capacity_factor").set_index(["technology", "time"])
     cf_zero = cf.loc[cf["value"] == 0]
     for i in cf_zero.index:
         assert act.loc[i, "lvl"] == 0
 
-    # 2) CAP is correctly calculated based on ACT and capacity_factor
-    for i in act.loc[act["lvl"] > 0].index:
-        # Correct ACT based on duration of each time slice
+    # 2) CAP is correctly calculated based on "ACT", CF, and "operation_factor"
+    for i in act.index:
+        # Correct CF based on duration of each time slice
         duration = float(scen.par("duration_time", {"time": i[1]})["value"])
-        act.loc[i, "duration-corrected"] = act.loc[i, "lvl"] / duration
-        # Divide by (non-zero) capacity factor
-        act.loc[i, "cf-corrected"] = act.loc[i, "duration-corrected"] / float(
-            cf.loc[i, "value"]
-        )
+        if i[1] != "year":
+            cf.loc[i, "duration-corrected"] = cf.loc[i, "value"] * duration
+            if cf.loc[i, "value"] == 0 or duration == 0:
+                act.loc[i, "cf-corrected"] = act.loc[i, "lvl"]
+            else:
+                act.loc[i, "cf-corrected"] = act.loc[i, "lvl"] / float(
+                    cf.loc[i, "duration-corrected"]
+                )
     act = act.fillna(0).reset_index().set_index(["technology"])
-    # CAP = max("ACT" / "duration_time" / "capcity_factor")
+    # CAP = max("ACT" / "duration_time" / "capacity_factor") / "operation_factor"
     for i in cap.index:
-        assert max(act.loc[i, "cf-corrected"]) == float(cap.loc[i, "lvl"])
+        # Considering operation factor (if specified)
+        if not op_fac.empty:
+            # Weighted average CF for "year" (for calculating "operation_factor")
+            cf_year = sum(cf["duration-corrected"])
+            # Capacity is related to "operation_factor", when defined, and yearly CF
+            assert sum(act.loc[i, "lvl"]) == round(
+                float(cap.loc[i, "lvl"]) * float(op_fac.loc[i, "value"]) * cf_year, 6
+            )
+        else:
+            assert max(act.loc[i, "cf-corrected"]) == float(cap.loc[i, "lvl"])
 
 
 # Dictionary of technology input/output
@@ -154,5 +167,24 @@ def test_capacity_factor_zero_two(request):
             "solar_pv_ppl": {"day": 0, "night": 0},
             "gas_ppl": {"day": 0.2, "night": 0.2},
         },
+    )
+    check_solution(scen)
+
+
+def test_capacity_factor_average(request):
+    """Weighted average of ``capacity_factor`` for "year" is calculated correctly,
+    based on time slices, when there is no capacity factor defined for "year"."""
+    # Build model and solve
+    scen = make_subannual(
+        request,
+        TD_0,
+        time_steps=[
+            ("summer", 0.5, "season", "year"),
+            ("winter", 0.5, "season", "year"),
+        ],
+        demand={"summer": 2, "winter": 1},
+        capacity_factor={"gas_ppl": {"summer": 0.8, "winter": 0.6}},
+        var_cost={"gas_ppl": {"summer": 0.2, "winter": 0.2}},
+        operation_factor={"gas_ppl": 0.8},
     )
     check_solution(scen)

@@ -42,6 +42,7 @@ Migration notes
 All changes
 -----------
 
+- Add a tutorial for Westeros multi-node and different trade possibilities (:pull:`683`).
 - Add additional oscillation detection mechanism for macro iterations (:pull:`645`, :pull:`676`)
 - Adjust default `lpmethod` from "Dual Simplex" (2) to "Barrier" (4); do NOT remove `cplex.opt` file(s) after solving workflow completes (:pull:`657`).
 - Adjust :meth:`.Scenario.add_macro` calculations for pandas 1.5.0 (:pull:`656`).
@@ -50,6 +51,7 @@ All changes
 - Account for difference in period-length in equations `NEW_CAPACITY_CONSTRAINT_LO` and `NEW_CAPACITY_CONSTRAINT_UP` (:pull:`654`)
 - Extend functionality of storage solutions to include "mode" and temporal level (:pull:`633`)
 - Introduce a citation file :file:`CITATION.cff` with citation information (:pull:`695`).
+- Correct GAMS for the assignment of "capacity_factor" at "year" (:pull:`705`).
 
 .. _v3.6.0:
 

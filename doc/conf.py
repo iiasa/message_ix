@@ -10,18 +10,21 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-from pathlib import Path
+try:
+    from importlib.metadata import version
+except ImportError:  # Python 3.7
+    from importlib_metadata import version
 
-from pkg_resources import get_distribution
+from pathlib import Path
 
 # -- Project information -----------------------------------------------------
 
 project = "MESSAGEix"
-copyright = "2018–2022, IIASA Energy, Climate, and Environment (ECE) Program"
+copyright = "2018–2023, IIASA Energy, Climate, and Environment (ECE) Program"
 author = "MESSAGEix Developers"
 
 # The major project version, used as the replacement for |version|.
-version = get_distribution("message_ix").version
+version = version("message_ix")
 # The full project version, used as the replacement for |release| and e.g. in
 # the HTML templates.
 release = version

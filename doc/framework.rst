@@ -12,13 +12,13 @@ Framework components
 
 .. figure:: _static/ix_components.png
 
-   Components and their interlinkages in the |ixmp| (:cite:`huppmann_messageix_2018`): web-based user interface, scientific
+   Components and their interlinkages in the |ixmp| (:cite:`Huppmann-2018`): web-based user interface, scientific
    programming interface, modeling platform, database backend, implementation
    of the |MESSAGEix| mathematical model formulation.
 
 
 **MESSAGE** is a specific mathematical formulation of a model developed for strategic energy planning and integrated assessment of energy-engineering-economy-environment systems (E4).
-The formulation included in :mod:`message_ix` is a re-implementation and extension of “MESSAGE V” (Messner and Strubegger, 1995 :cite:`messner_users_1995`), the integrated assessment model developed at |IIASA| since the 1980s.
+The formulation included in :mod:`message_ix` is a re-implementation and extension of “MESSAGE V” (Messner and Strubegger, 1995 :cite:`Messner-Strubegger-1995`), the integrated assessment model developed at |IIASA| since the 1980s.
 The optimization model can be linked to the general-equilibrium **MACRO** model to incorporate feedback between prices and demand levels for energy and commodities.
 The :mod:`message_ix` package includes code for both MESSAGE, MACRO, and the MESSAGE-MACRO link.
 These are written in the `GAMS`_ mathematical programming language.
@@ -48,10 +48,10 @@ The framework allows direct and explicit representation of:
 - **Vintaging** of capacity, early retirement and decommissioning of
   technologies.
 - System integration of **variable renewable energy sources** (based on
-  Sullivan et al., 2013 :cite:`sullivan_VRE_2013` and Johnson et al., 2016
-  :cite:`johnson_VRE_2016`).
+  Sullivan et al., 2013 :cite:`Sullivan-2013` and Johnson et al., 2016
+  :cite:`Johnson-2016`).
 - Soft relaxation of **dynamic constraints** on new capacity and activity
-  (Keppo and Strubegger, 2010 :cite:`keppo_short_2010`).
+  (Keppo and Strubegger, 2010 :cite:`Keppo-2010`).
 - **Perfect-foresight** and **dynamic-recursive** (myopic) solution algorithms.
 
 .. _running:

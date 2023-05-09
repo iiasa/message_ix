@@ -88,7 +88,8 @@ cfl                  0.0  0.1   10   900
 )
 
 
-def make_austria(mp, solve=False, quiet=True):
+# FIXME reduce complexity from 18 to <=14
+def make_austria(mp, solve=False, quiet=True):  # noqa: C901
     """Return an :class:`message_ix.Scenario` for the Austrian energy system.
 
     This is the same model used in the ``austria.ipynb`` tutorial.
@@ -618,6 +619,7 @@ def make_subannual(
     capacity={"gas_ppl": {"inv_cost": 0.1, "technical_lifetime": 5}},
     capacity_factor={},
     var_cost={},
+    operation_factor={},
 ):
     """Return an :class:`message_ix.Scenario` with subannual time resolution.
 
@@ -651,6 +653,8 @@ def make_subannual(
         "capacity_factor" with technology as key and "time"/"value" pairs as value.
     var_cost : dict, optional
         "var_cost" with technology as key and "time"/"value" pairs as value.
+    operation_factor : dict, optional
+        "operation_factor" with technology as key and "value" as value.
     """
     # Get the `test_mp` fixture for the requesting test function
     mp = request.getfixturevalue("test_mp")
@@ -688,11 +692,13 @@ def make_subannual(
     common = dict(
         node="node",
         node_loc="node",
+        node_rel="node",
         mode="mode",
         level="level",
         year=y,
         year_vtg=y,
         year_act=y,
+        year_rel=y,
     )
 
     # Define demand; unpack (key, value) pairs into individual pd.DataFrame rows
@@ -741,6 +747,17 @@ def make_subannual(
                 name, **common, technology=tec, time=data.keys(), value=data.values()
             )
             scen.add_par(name, df)
+
+    # Add operation factor and an arbitrary relation (optional)
+    for name, arg in [("operation_factor", operation_factor)]:
+        for tec, data in arg.items():
+            df = make_df(name, **common, technology=tec, value=data)
+            scen.add_par(name, df)
+            # Arbitray relation to create "map_tec_relation". This is for testing
+            # average capacity factor, used for calculating "operation_factor"
+            scen.add_set("relation", "yearly_activity")
+            common.update(relation="yearly_activity", technology=tec, value=1)
+            scen.add_par("relation_activity", make_df("relation_activity", **common))
 
     scen.commit(f"Scenario with subannual time resolution for {request.node.name}")
     scen.solve()

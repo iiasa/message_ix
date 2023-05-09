@@ -16,7 +16,7 @@ As an additional benefit, we do not need to define an explicit efficiency parame
 or "main" input and output fuels.  
 
 The recommended approach is illustrated below for multiple examples. 
-The decision variables :math:`CAP\_NEW`, :math:`CAP` and :math:`ACT` as well as all bounds 
+The decision variables :math:`\text{CAP_NEW}`, :math:`\text{CAP}` and :math:`\text{ACT}` as well as all bounds 
 are always understood to be in the same units. All cost parameters also have to be provided 
 in monetary units per these units - there is no "automatic rescaling" done either within the ixmp API
 or in the GAMS implementation pre- or postprocessing.
@@ -25,15 +25,15 @@ Example 1 - Power plants
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Technical specifications of power plants are commonly stated in terms of electricity generated (output). 
-Therefore, the decision variables should be understood as outputs, with the parameter :math:`output = 1` 
-and parameter :math:`input = \frac{1}{efficiency}`. This may seem counter-intuitive at first, but the clear 
+Therefore, the decision variables should be understood as outputs, with the parameter :math:`\text{output} = 1` 
+and parameter :math:`\text{input} = \frac{1}{\text{efficiency}}`. This may seem counter-intuitive at first, but the clear 
 advantage is that all technical parameters can be immediately related to values found in the literature.
 
 Example 2 - Refineries
 ~~~~~~~~~~~~~~~~~~~~~~
 
 For crude oil refineries, it is more common to scale costs and emissions 
-in terms of crude oil input quantities. Hence, the parameter :math:`input = 1` 
+in terms of crude oil input quantities. Hence, the parameter :math:`\text{input} = 1` 
 and the output parameters (usually for multiple different oil products) 
 should be set accordingly.
 
@@ -42,8 +42,8 @@ The decision variables and bounds are then implicitly understood as input-based.
 An alternative would be to parametrize a refinery based on outputs, but 
 considering that there are multiple outputs (in fixed proportions), 
 the sum of output parameters over all products should be set to 1,
-i.e., :math:`\sum_{c} output_{c} = 1`. The input of crude oil should then 
-include the losses during the refining process,  :math:`input > 1`.
+i.e., :math:`\sum_{c} \text{output}_{c} = 1`. The input of crude oil should then 
+include the losses during the refining process,  :math:`\text{input} > 1`.
  
 Example 3 - Combined power- and heat plants
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -56,11 +56,11 @@ the capacity and activity variables should be understood as electricity generate
 Assuming that such a plant usually has (at least) two modes of operation, these 
 modes could be parametrized as follows:
 
-:math:`input = \frac{1}{efficiency}`
+:math:`\text{input} = \frac{1}{\text{efficiency}}`
 
-:math:`output_{'M1','electricity'} = 1` and :math:`output_{'M1','heat'} = 0.2`
+:math:`\text{output}_{\text{M1},\text{electricity}} = 1` and :math:`\text{output}_{\text{M1},\text{heat}} = 0.2`
 
-:math:`output_{'M2','electricity'} = 0.5` and :math:`output_{'M2','heat'} = 3`.
+:math:`\text{output}_{\text{M2},\text{electricity}} = 0.5` and :math:`\text{output}_{\text{M2}, \text{heat}} = 3`.
 
 Note that the activity level in mode 'M2' has an odd interpretation - the amount 
 of electricity generated if electricity generation were maximized. The sum of outputs 
