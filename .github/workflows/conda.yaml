@@ -16,8 +16,8 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest]
         conda:
-        - {installer: anaconda, version: 2021.05}
-        - {installer: miniconda, version: py39_4.10.3}
+        - {installer: anaconda, version: 2023.03-1}
+        - {installer: miniconda, version: latest}
         extra-deps: ["", "JPype1=1.2.1"]
       fail-fast: false
 
