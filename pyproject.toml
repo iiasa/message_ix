@@ -34,6 +34,7 @@ dependencies = [
   "click",
   'importlib_metadata; python_version < "3.8"',
   "ixmp >= 3.7.0",
+  "genno[pyam]",
   "numpy",
   "pandas >= 1.2",
   "PyYAML",
