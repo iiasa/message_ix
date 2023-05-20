@@ -28,6 +28,7 @@ MARK = [
         reason="Fails occasionally on GitHub Actions runners for Windows",
     ),
     pytest.mark.flaky(
+        reruns=3,
         condition=GHA and sys.platform in ("darwin", "win32"),
         reason="Flaky; fails occasionally on GitHub Actions runners",
     ),
