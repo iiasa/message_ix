@@ -27,9 +27,9 @@ MARK = [
         condition=GHA and sys.platform == "win32",
         reason="Fails occasionally on GitHub Actions runners for Windows",
     ),
-    pytest.mark.xfail(
-        condition=GHA and sys.platform == "darwin",
-        reason="Flaky; CellTimeoutError occurs on first executed cell",
+    pytest.mark.flaky(
+        condition=GHA and sys.platform in ("darwin", "win32"),
+        reason="Flaky; fails occasionally on GitHub Actions runners",
     ),
 ]
 
