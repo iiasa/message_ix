@@ -64,7 +64,7 @@ def test_add_bound_activity_up_all_modes(message_test_mp):
     scen.solve(quiet=True, solve_options=dict(lpmethod=2))
 
     # data for act bound
-    print(calculate_activity(scen))
+    # print(calculate_activity(scen))
     exp = 0.95 * calculate_activity(scen).sum()
     data = pd.DataFrame(
         {

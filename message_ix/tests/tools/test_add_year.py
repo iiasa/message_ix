@@ -124,8 +124,7 @@ def test_add_year_cli(message_ix_cli, base_scen_mp):
     del test_mp, scen_ref
 
     r = message_ix_cli(*cmd)
-    print(r.output, r.exception)
-    assert r.exit_code == 0
+    assert r.exit_code == 0, (r.output, r.exception)
 
     # Re-load the base Scenario
     mp = Platform(name=platform_name)
