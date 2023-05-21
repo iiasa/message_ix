@@ -21,7 +21,7 @@ def check_solution(scen: Scenario) -> None:
     # 2) CAP is correctly calculated based on "ACT", CF, and "operation_factor"
     for i in act.index:
         # Correct CF based on duration of each time slice
-        duration = float(scen.par("duration_time", {"time": i[1]})["value"])
+        duration = scen.par("duration_time", {"time": i[1]}).at[0, "value"]
         if i[1] != "year":
             cf.loc[i, "duration-corrected"] = cf.loc[i, "value"] * duration
             if cf.loc[i, "value"] == 0 or duration == 0:
