@@ -41,9 +41,12 @@ def check_solution(scen: Scenario) -> None:
         act.loc[
             (act["time"] == h) & (act["technology"] == "gas_ppl"),
             "capacity-corrected",
-        ] = act["lvl"] / float(scen.par("duration_time", {"time": h})["value"])
-    assert max(act.loc[act["technology"] == "gas_ppl", "capacity-corrected"]) == float(
-        scen.var("CAP", {"technology": "gas_ppl"})["lvl"]
+        ] = (
+            act["lvl"] / scen.par("duration_time", {"time": h}).at[0, "value"]
+        )
+    assert (
+        max(act.loc[act["technology"] == "gas_ppl", "capacity-corrected"])
+        == scen.var("CAP", {"technology": "gas_ppl"}).at[0, "lvl"]
     )
 
 

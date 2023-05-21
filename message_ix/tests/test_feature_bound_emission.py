@@ -37,7 +37,7 @@ def add_bound_emission(scen, bound, year="cumulative"):
 
 def assert_function(scen, year):
     var_em = scen.var("EMISS", {"node": "node"}).set_index(["year"])["lvl"]
-    bound_em = float(scen.par("bound_emission", {"type_year": year})["value"])
+    bound_em = scen.par("bound_emission", {"type_year": year}).at[0, "value"]
 
     if year == "cumulative":
         duration = scen.par("duration_period").set_index("year")["value"]
