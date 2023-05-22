@@ -12,6 +12,7 @@ import logging
 from itertools import product
 
 import pandas as pd
+import pandas.testing as pdt
 import pytest
 from ixmp.testing import assert_logs
 
@@ -198,11 +199,10 @@ def storage_setup(test_mp, time_duration, comment):
     assert act_turb.sum() <= act_pump.sum()
 
     # 4. Activity of input provider to storage = act of storage * storage input
-    for ts in time_duration.keys():
-        act_cooler = scen.var("ACT", {"technology": "cooler", "time": ts})["lvl"]
-        inp = scen.par("input", {"technology": "dam", "time": ts})["value"]
-        act_stor = scen.var("ACT", {"technology": "dam", "time": ts})["lvl"]
-        assert float(act_cooler) == float(inp) * float(act_stor)
+    act_cooler = scen.var("ACT", {"technology": "cooler"})["lvl"]
+    inp = scen.par("input", {"technology": "dam"})["value"]
+    act_stor = scen.var("ACT", {"technology": "dam"})["lvl"]
+    pdt.assert_series_equal(inp * act_stor, act_cooler, check_names=False)
 
     # 5. Max activity of charger <= max activity of storage
     max_pump = max(act_pump)
@@ -219,9 +219,9 @@ def storage_setup(test_mp, time_duration, comment):
     if scen.has_var("STORAGE") and not scen.var("STORAGE").empty:
         # 1. Equality: storage content at the end is equal to the beginning
         # (i.e., the difference is what is pumped in the first time slice)
-        storage_first = float(scen.var("STORAGE", {"time": "a"})["lvl"])
-        storage_last = float(scen.var("STORAGE", {"time": "d"})["lvl"])
-        pump_first = float(scen.var("ACT", {"technology": "pump", "time": "a"})["lvl"])
+        storage_first = scen.var("STORAGE", {"time": "a"})["lvl"].item()
+        storage_last = scen.var("STORAGE", {"time": "d"})["lvl"].item()
+        pump_first = scen.var("ACT", {"technology": "pump", "time": "a"}).at[0, "lvl"]
         assert storage_last == storage_first - pump_first
 
         # 2. Storage content should never exceed storage activity

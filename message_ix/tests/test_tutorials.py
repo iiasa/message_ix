@@ -14,27 +14,27 @@ W = "westeros"
 # Common marks for some test cases
 GHA = "GITHUB_ACTIONS" in os.environ
 MARK = [
-    pytest.mark.skipif(
+    pytest.mark.skipif(  # 0
         condition=GHA and sys.platform == "linux",
         reason="IR kernel times out on GitHub Actions Ubuntu runners",
     ),
-    # This mark does *not* affect macos-latest-py3.9, which must still pass
-    pytest.mark.xfail(
-        condition=GHA and sys.platform == "darwin" and sys.version_info.minor == 8,
-        reason="Fails occasionally on GitHub Actions runners for macOS / Python 3.8",
-    ),
-    pytest.mark.xfail(
-        condition=GHA and sys.platform == "win32",
-        reason="Fails occasionally on GitHub Actions runners for Windows",
-    ),
-    pytest.mark.xfail(
+    pytest.mark.xfail(  # 1
         condition=GHA and sys.platform == "darwin",
-        reason="Flaky; CellTimeoutError occurs on first executed cell",
+        reason="Always fails on GitHub Action macOS runners",
+    ),
+    pytest.mark.xfail(  # 2
+        condition=sys.version_info.minor >= 11,
+        reason="pyam-iamc does not support Python 3.11; see IAMconsortium/pyam#744",
     ),
 ]
 
-# Affects all tests in the file.
-pytestmark = MARK[3]
+# Affects all tests in the file
+pytestmark = pytest.mark.flaky(
+    reruns=3,
+    rerun_delay=2,
+    condition=GHA,
+    reason="Flaky; fails occasionally on GitHub Actions runners",
+)
 
 
 def _t(group: Union[str, None], basename: str, *, check=None, marks=None):
@@ -87,15 +87,15 @@ TUTORIALS: List[Tuple] = [
     _t("w0", f"{W}_historical_new_capacity"),
     _t("w0", f"{W}_multinode"),
     # NB this is the same value as in test_reporter()
-    _t(None, f"{W}_report", check=[("len-rep-graph", 13074)], marks=[MARK[2]]),
+    _t(None, f"{W}_report", check=[("len-rep-graph", 13074)], marks=MARK[2]),
     _t("at0", "austria", check=[("solve-objective-value", 206321.90625)]),
     _t("at0", "austria_single_policy", check=[("solve-objective-value", 205310.34375)]),
     _t("at0", "austria_multiple_policies"),
     _t("at0", "austria_multiple_policies-answers"),
     _t("at0", "austria_load_scenario"),
     # R tutorials using the IR Jupyter kernel
-    _t("at1", "R_austria", marks=MARK[:3]),
-    _t("at1", "R_austria_load_scenario", marks=[MARK[0], MARK[2]]),
+    _t("at1", "R_austria", marks=[MARK[0], MARK[1]]),
+    _t("at1", "R_austria_load_scenario", marks=[MARK[0], MARK[1]]),
 ]
 
 # Short, readable IDs for the tests. Use getattr() to unpack the values from
@@ -119,6 +119,15 @@ def nb_path(request, tutorial_path):
     yield tutorial_path.joinpath(*request.param).with_suffix(".ipynb")
 
 
+def default_args():
+    """Default arguments for :func:`.run_notebook."""
+    if GHA and sys.platform == "darwin":
+        # Use a longer timeout
+        return dict(timeout=30)
+    else:
+        return dict()
+
+
 # Parametrize the first 3 arguments using the variables *TUTORIALS* and *IDS*.
 # Argument 'nb_path' is indirect so that the above function can modify it.
 @pytest.mark.parametrize("nb_path,checks", TUTORIALS, ids=IDS, indirect=["nb_path"])
@@ -133,7 +142,7 @@ def test_tutorial(nb_path, checks, tmp_path, tmp_env):
             copyfile(nb_path.parent / name, tmp_path / name)
 
     # Determine arguments for run_notebook()
-    args = dict()
+    args = default_args()
     if nb_path.name.startswith("R_"):
         args.update(kernel_name="IR")
 

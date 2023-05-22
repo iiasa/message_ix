@@ -86,7 +86,7 @@ def model_generator(
             scen.add_set("map_temporal_hierarchy", [tmp_lvl, h, p])
 
             # Duration time is relative to the duration of the parent temporal level
-            dur_parent = float(scen.par("duration_time", {"time": p})["value"])
+            dur_parent = scen.par("duration_time", {"time": p}).at[0, "value"]
             scen.add_par("duration_time", [h], dur_parent / number, "-")
 
     # Adding "demand" at a temporal level (total demand divided by the number of

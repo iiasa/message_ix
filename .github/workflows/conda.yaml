@@ -16,8 +16,8 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest]
         conda:
-        - {installer: anaconda, version: 2021.05}
-        - {installer: miniconda, version: py39_4.10.3}
+        - {installer: anaconda, version: 2023.03-1}
+        - {installer: miniconda, version: py310_23.3.1-0}
         extra-deps: ["", "JPype1=1.2.1"]
       fail-fast: false
 
@@ -43,18 +43,18 @@ jobs:
         version: ${{ matrix.conda.version }}
 
     # TODO move the following 2 steps into the above action
-    # TODO avoid using the deprecated ::set-output:: command
     - name: Determine shell on current OS
       id: shell
       run: |
+        import os
         init, profile = {
             "macos": ("bash", "source ~/.bash_profile"),
             "windows": ("powershell", ""),
         }.get("${{ matrix.os }}".split("-")[0])
-        print(f"""
-            ::set-output name=init::{init}
-            ::set-output name=profile::{profile}
-        """)
+
+        with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+            f.write(f"init={init}\n")
+            f.write(f"profile={profile}\n")
       shell: python
 
     - name: Initialize shell for "conda activate"
@@ -68,7 +68,7 @@ jobs:
 
         # Also install pytest and packages required for testing. pip/PyPI
         # supports this via message_ix[testing], but conda does not.
-        conda create --quiet --name testenv message-ix ${{ matrix.extra-deps }} pytest asyncssh sphinx
+        conda create --quiet --name testenv message-ix=3.6.0 ${{ matrix.extra-deps }} pytest asyncssh sphinx
         conda list --name testenv
 
     - name: Check CLI commands and run test
