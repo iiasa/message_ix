@@ -121,7 +121,7 @@ def nb_path(request, tutorial_path):
 
 def default_args():
     """Default arguments for :func:`.run_notebook."""
-    if GHA and sys.platform == "darwin":
+    if GHA and sys.platform in ("darwin", "win32"):
         # Use a longer timeout
         return dict(timeout=30)
     else:
