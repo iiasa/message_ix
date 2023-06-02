@@ -26,6 +26,7 @@ classifiers = [
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
   "Programming Language :: R",
   "Topic :: Scientific/Engineering",
   "Topic :: Scientific/Engineering :: Information Analysis"
@@ -33,7 +34,8 @@ classifiers = [
 dependencies = [
   "click",
   'importlib_metadata; python_version < "3.8"',
-  "ixmp >= 3.5.0",
+  "ixmp >= 3.7.0",
+  "genno[pyam]",
   "numpy",
   "pandas >= 1.2",
   "PyYAML",
@@ -65,6 +67,7 @@ tests = [
   "pyam-iamc >= 0.6",
   "pytest >= 5",
   "pytest-cov",
+  "pytest-rerunfailures",
   "pytest-xdist",
   "requests",
 ]

@@ -489,7 +489,7 @@ def test_excel_read_write(message_test_mp, tmp_path):
     pdt.assert_frame_equal(exp, obs)
 
     assert scen2.has_par("new_par")
-    assert float(scen2.par("new_par")["value"]) == 2
+    assert 2 == scen2.par("new_par").at[0, "value"]
 
     scen2.solve(quiet=True)
     assert np.isclose(scen2.var("OBJ")["lvl"], scen1.var("OBJ")["lvl"])

@@ -161,7 +161,7 @@ SUM(node_active,
 * Equation CAPITAL_CONSTRAINT
 * ---------------------------------
 * The following equation specifies the allocation of total production among current consumption :math:`{C}_{n, y}`, investment into building up capital stock excluding
-* the sectors represented in MESSAGE :math:`{I}_{n, y}` and the MESSAGE system costs :math:`{EC}_{n, y}` which are derived from a previous MESSAGE model run. As described in :cite:`manne_buying_1992`, the first-order
+* the sectors represented in MESSAGE :math:`{I}_{n, y}` and the MESSAGE system costs :math:`{EC}_{n, y}` which are derived from a previous MESSAGE model run. As described in :cite:`Manne-Richels-1992`, the first-order
 * optimality conditions lead to the Ramsey rule for the optimal allocation of savings, investment and consumption over time.
 *
 * .. math:: Y_{n, y} = C_{n, y} + I_{r, y} + {EC}_{n, y} \qquad \forall{n, y}
@@ -293,7 +293,7 @@ EC(node_active, year) =E=
 * Equation TERMINAL_CONDITION
 * ---------------------------------
 * Given the finite time horizon of MACRO, a terminal constraint needs to be applied to ensure that investments are chosen at an appropriate level, i.e. to replace depriciated capital and
-* provide net growth of capital stock beyond MACRO's time horizon :cite:`manne_buying_1992`. The goal is to avoid to the extend possible model artifacts resulting from this finite time horizon
+* provide net growth of capital stock beyond MACRO's time horizon :cite:`Manne-Richels-1992`. The goal is to avoid to the extend possible model artifacts resulting from this finite time horizon
 * cutoff.
 *
 * .. math:: K_{n, y} \cdot  \left( grow_{n, y} + {depr}_n \right) \leq I_{n, y} \qquad \forall{ n, y = last year}

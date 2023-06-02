@@ -54,8 +54,9 @@ def assert_function(scen_ref, scen_new, years_new, yr_test):
     parname = "technical_lifetime"
     ref = scen_ref.par(parname, {"technology": "tec", "year_vtg": [yr_pre, yr_next]})
     value_ref = ref["value"].mean()
-    new = scen_new.par(parname, {"technology": "tec", "year_vtg": yr_test})
-    value_new = float(new["value"])
+    value_new = scen_new.par(parname, {"technology": "tec", "year_vtg": yr_test}).at[
+        0, "value"
+    ]
     assert value_new == pytest.approx(value_ref, rel=1e-04)
 
     # 3. Testing parameter "var_cost" (function interpolate_2d)
@@ -70,12 +71,11 @@ def assert_function(scen_ref, scen_new, years_new, yr_test):
 
     value_ref = ref["value"].mean()
 
-    new = scen_new.par(
+    value_new = scen_new.par(
         "var_cost", {"technology": "tec", "year_act": yr_test, "year_vtg": yr_test}
-    )
+    ).at[0, "value"]
 
     # Asserting if the missing data is generated accurately by interpolation
-    value_new = float(new["value"])
     assert value_new == pytest.approx(value_ref, rel=1e-04)
 
 
@@ -124,8 +124,7 @@ def test_add_year_cli(message_ix_cli, base_scen_mp):
     del test_mp, scen_ref
 
     r = message_ix_cli(*cmd)
-    print(r.output, r.exception)
-    assert r.exit_code == 0
+    assert r.exit_code == 0, (r.output, r.exception)
 
     # Re-load the base Scenario
     mp = Platform(name=platform_name)

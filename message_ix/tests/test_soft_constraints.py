@@ -36,26 +36,22 @@ def test_soft_constraint(test_mp):
     # Ensure that the value for 'ACT_UP' is correct.
     # The value of ACT_UP should be equal to the historical
     # activity of coal_ppl
-    val = float(
-        round(
-            s.par("historical_activity", filters={"technology": "coal_ppl"})["value"], 6
-        )
-    )
-
     exp = pd.DataFrame(
         {
             "node": ["Westeros"],
             "technology": "coal_ppl",
             "year": 700,
             "time": "year",
-            "lvl": val,
+            "lvl": s.par("historical_activity", filters={"technology": "coal_ppl"}).at[
+                0, "value"
+            ],
             "mrg": 0.0,
         }
     )
 
     obs = s.var("ACT_UP")
 
-    pdt.assert_frame_equal(exp, obs, check_dtype=False)
+    pdt.assert_frame_equal(exp, obs, check_dtype=False, rtol=1e-6)
 
     # Ensure that the objective function is the same
     assert np.isclose(s.var("OBJ")["lvl"], 173408.40625)

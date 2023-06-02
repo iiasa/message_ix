@@ -29,7 +29,7 @@ Role of energy storage in energy and water security in Central Asia
    :width: 250px
    :align: right
 
-:cite:ct:`Zakeri2022`
+:cite:ct:`Zakeri-2022`
 
 - **Spatial**: Regional (Central Asia), multi-country including Kazakhstan, Kyrgyzstan, Tajikistan, Turkmenistan, and Uzbekistan
 - **Keywords**: Energy storage, seasonal pumped hydropower storage, water management, renewable energy systems, energy policy, electricity storage, energy model
@@ -44,7 +44,7 @@ Climate mitigation scenarios with persistent COVID-19-related energy demand chan
    :width: 250px
    :align: right
 
-:cite:ct:`Kikstra2021`
+:cite:ct:`Kikstra-2021`
 
 - **Spatial**: Global, :ref:`11-region aggregation <message-ix-models:R11>`
 - **Keywords**: Climate-change mitigation, energy and behaviour, energy supply and demand
@@ -58,7 +58,7 @@ Deep seawater cooling and desalination: Combining seawater air conditioning and 
    :width: 250px
    :align: right
 
-:cite:ct:`HUNT2021103257`
+:cite:ct:`Hunt-2021`
 
 - **Spatial**: Malé, Maldives
 - **Keywords**: Building cooling, industrial cooling, energy efficiency, seawater air conditioning, low temperature thermal desalination, vertical farming
@@ -72,7 +72,7 @@ Energy investment needs for fulfilling the Paris Agreement and achieving the Sus
    :width: 250px
    :align: right
 
-:cite:ct:`McCollum2018`
+:cite:ct:`McCollum-2018`
 
 - **Spatial**: Global
 - **Keywords**: Energy and society, finance, socioeconomic scenarios
@@ -86,7 +86,7 @@ A low energy demand scenario for meeting the 1.5 °C target and sustainable de
    :width: 250px
    :align: right
 
-:cite:ct:`Grubler2018`
+:cite:ct:`Grubler-2018`
 
 - **Spatial**: Global
 - **Keywords**: Energy modelling, socioeconomic scenarios
@@ -110,7 +110,7 @@ d2ix: A Model Input-Data Management and Analysis Tool for MESSAGEix
    :width: 250px
    :align: right
 
-:cite:ct:`d2ix`
+:cite:ct:`Zipperle-Orthofer-2019`
 
 - **Goal**: Manageable, comprehensible, and traceable representation of input data.
 - **Features**: Spreadsheet interface that enables presentation and editing of model input data in a concise form.
