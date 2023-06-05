@@ -9,6 +9,7 @@ __pycache__
 *.pyc
 *.RData*
 *.tmp
+*.swp
 *#
 *~
 #*
