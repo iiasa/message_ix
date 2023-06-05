@@ -8,6 +8,7 @@
 *.pyc
 *.RData*
 *.tmp
+*.swp
 *#
 *~
 #*
