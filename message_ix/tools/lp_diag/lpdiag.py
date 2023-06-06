@@ -42,6 +42,9 @@ class LPdiag:
             "undefined"
         )
         self.pname = "undefined"  # problem name
+        self.id_rhs = False  # True, if rhs_id defined
+        self.id_range = False  # True, if range_id defined
+        self.id_bnd = False  # True, if bnd_id defined
         self.rhs_id = ""  # id of rhs elements
         self.range_id = ""  # id of ranges elements (might differ from rhs_id)
         self.bnd_id = ""  # id of bounds elements
@@ -59,6 +62,11 @@ class LPdiag:
         self.seq_row = {}  # key: row sequence, item: [row-name, lo_bnd, up_bond, type]
         self.col_name = {}  # key: col-name, item: its seq_id
         self.seq_col = {}  # key: col-sequence, item: [col-name, lo_bnd, up_bond]
+        # tmp space for reading COLUMN section of the MPS
+        self.mat_row = []  # row seq_no of the matrix coef.
+        self.mat_col = []  # col seq_no the matrix coef.
+        self.mat_val = []  # matrix coeff.
+        self.col_curr = ""  # current column (initialized to an illegal empty name)
         self.gf_seq = (
             -1
         )  # sequence_no of the goal function (objective) row: equal = -1, if undefined
@@ -94,22 +102,7 @@ class LPdiag:
             False,
             True,
         ]  # required/optional MPS sections
-        row_types = ["N", "E", "G", "L"]  # types of rows
-        # items of the below dictionaries indicate bounds to be modified:
-        # 1 - low, 2 - upper, 3 - both
-        bnd_type1 = {"LO": 1, "UP": 2, "FX": 3}  # types of bounds requiring value
-        bnd_type2 = {"MI": 1, "PL": 2, "FR": 3}  # types of bounds not requiring value
-        bnd_type3 = {
-            "BV": 0,
-            "LI": 0,
-            "UI": 0,
-            "SC": 0,
-        }  # types of bounds legal for int-type vars, not processed yet
 
-        # tmp space for reading sections of the MPS
-        seq_row = []  # row seq_no of the matrix coef.
-        seq_col = []  # col seq_no the matrix coef.
-        vals = []  # matrix coeff.
         # lists are OK only for small and medium problems
         # row_names = []     # names of rows
         # row_types = []     # types of rows
@@ -118,13 +111,9 @@ class LPdiag:
         # wrk vars
         n_section = 0  # seq_no of the currently processed MPS-file section
         next_sect = 0  # seq_no of the next (to be processed) MPS-file section
-        col_curr = ""  # current column (initialized to an illegal empty name)
-        id_rhs = False  # True, if rhs_id defined
-        id_range = False  # True, if range_id defined
-        id_bnd = False  # True, if bnd_id defined
+        last_sect = -1  # last processed section
 
         # process the MPS file
-        last_sect = 0
         with open(self.fname, "r") as reader:
             for n_line, line in enumerate(reader):
                 line = line.rstrip("\n")
@@ -137,294 +126,15 @@ class LPdiag:
                     if (
                         n_section == 2
                     ):  # columns/matrix (first here because most frequently used)
-                        # print(
-                        #     f"processing line no {n_line}, n_words {n_words}:"
-                        #     f" {line}"
-                        # )
-                        assert n_words in [
-                            3,
-                            5,
-                        ], f"matrix element (line {n_line}) has {n_words} words."
-                        col_name = words[0]
-                        if col_name != col_curr:  # new column
-                            assert (
-                                col_name not in self.col_name
-                            ), f"duplicated column name: {col_name} (line {n_line})"
-                            col_seq = len(self.col_name)
-                            self.col_name.update({col_name: col_seq})
-                            self.seq_col.update({col_seq: [col_name, 0.0, self.infty]})
-                            col_curr = col_name
-                        row_name = words[1]
-                        row_seq = self.row_name.get(row_name)
-                        assert (
-                            row_seq is not None
-                        ), f"unknown row name {row_name} (line {n_line})."
-                        val = float(words[2])
-                        assert (
-                            type(val) == float
-                        ), f"string  {words[2]} (line {n_line}) is not a number."
-                        # add the matrix element to the lists of: seq_row, seq_col, val
-                        # the lists will be converted to self.mat df after all elements
-                        # will be read
-                        seq_row.append(row_seq)
-                        seq_col.append(col_seq)
-                        vals.append(val)
-                        # print(f' matrix element ({row_seq}, {col_seq}) = {val}')
-                        # the next two commands take far too long for large matrices;
-                        # thus tmp-store in three lists
-                        # df2 = pd.DataFrame(
-                        #     {"row": row_seq, "col": col_seq, "val": val},
-                        #     index=list(range(1)),
-                        # )
-                        # self.mat = pd.concat(
-                        #     [self.mat, df2],
-                        #     axis=0,
-                        #     ignore_index=True
-                        # )
-                        if (
-                            n_words > 3
-                        ):  # proccess second matrix element in the same MPS row
-                            assert n_words == 5, (
-                                f"line {n_line}) has {n_words} words, five words needed"
-                                " fordefining second element in the same MPS line."
-                            )
-                            row_name = words[3]
-                            row_seq = self.row_name.get(row_name)
-                            assert (
-                                row_seq is not None
-                            ), f"unknown row name {row_name} (line {n_line})."
-                            val = float(words[4])
-                            assert (
-                                type(val) == float
-                            ), f"string  {words[4]} (line {n_line}) is not a number."
-                            seq_row.append(row_seq)
-                            seq_col.append(col_seq)
-                            vals.append(val)
+                        self.add_coeff(words, n_line)  # add the columns with their coefficients
                     elif n_section == 1:  # rows
-                        # print(line)
-                        assert n_words == 2, (
-                            f"row declaration (line {n_line}) has {n_words} words"
-                            " instead of 2."
-                        )
-                        row_type = words[0]
-                        row_name = words[1]
-                        row_seq = len(self.row_name)
-                        assert (
-                            row_type in row_types
-                        ), f"unknown row type {row_type} (line {n_line})."
-                        assert (
-                            row_name not in self.row_name
-                        ), f"duplicated row name: {row_name} (line {n_line})."
-                        if row_type == "N" and self.gf_seq == -1:
-                            self.gf_seq = row_seq
-                            print(
-                                f"Row {row_name} (row_seq = {row_seq}) is the objective"
-                                " (goal function) row."
-                            )
-                        self.row_name.update(
-                            {row_name: row_seq}
-                        )  # add to dict of row_names
-                        # store row_{seq, name, type} and the default
-                        # (to be changed in rhs/ranges) [lo_bnd, upp_bnd]
-                        self.row_att(row_seq, row_name, row_type, "rows")
+                        self.add_row(words, n_line)     # add the row defined by the current MPS line
                     elif n_section == 3:  # rhs
-                        if (
-                            self.n_rhs == 0
-                        ):  # first RHS record implies RHS/ranges id (might be empty)
-                            # print(
-                            #     f"first rhs line: {n_line}, len {len(line)}: '{line}'"
-                            # )
-                            if n_words in [3, 5]:
-                                id_rhs = True
-                                self.rhs_id = words[0]
-                                n_req_wrd = [
-                                    3,
-                                    5,
-                                ]  # number of required words in a line (either 3 or 5)
-                                pos_name = 1  # first row-name in words[pos_name]
-                            else:
-                                id_rhs = False
-                                self.rhs_id = ""
-                                n_req_wrd = [2, 4]
-                                pos_name = 0  # first row-name in words[pos_name]
-                        assert n_words in n_req_wrd, (
-                            f"rhs line {n_line} has {n_words} words, expected"
-                            f" {n_req_wrd}."
-                        )
-                        if id_rhs:  # check id of the RHS entry, if it was defined
-                            assert words[0] == self.rhs_id, (
-                                f"RHS id {words[0]}, line {n_line} differ from"
-                                f"expected: {self.rhs_id}."
-                            )
-                        row_name = words[pos_name]
-                        row_seq = self.row_name.get(row_name)
-                        assert (
-                            row_seq is not None
-                        ), f"unknown RHS row-name {row_name} (line {n_line})."
-                        val = float(words[pos_name + 1])
-                        assert type(val) == float, (
-                            f"RHS value  {words[pos_name + 1]} (line {n_line}) is not a"
-                            " number."
-                        )
-                        attr = self.seq_row.get(
-                            row_seq
-                        )  # [row_name, lo_bnd, up_bnd, row_type]
-                        row_type = attr[3]
-                        self.row_att(row_seq, row_name, row_type, "rhs", val)
-                        self.n_rhs += 1
-                        if n_words == n_req_wrd[1]:  # second pair of rhs defined
-                            row_name = words[pos_name + 2]
-                            row_seq = self.row_name.get(row_name)
-                            assert (
-                                row_seq is not None
-                            ), f"unknown RHS row-name {row_name} (line {n_line})."
-                            val = float(words[pos_name + 3])
-                            assert type(val) == float, (
-                                f"RHS value {words[pos_name + 1]} (line {n_line}) is"
-                                " not a number."
-                            )
-                            attr = self.seq_row.get(
-                                row_seq
-                            )  # [row_name, lo_bnd, up_bnd, row_type]
-                            row_type = attr[3]
-                            self.row_att(row_seq, row_name, row_type, "rhs", val)
-                            self.n_rhs += 1
+                        self.add_rhs(words, n_line)     # add the RHS defined by the current MPS line
                     elif n_section == 4:  # ranges
-                        if (
-                            self.n_rhs == 0
-                        ):  # first RHS record implies RHS/ranges id (might be empty)
-                            if n_words in [3, 5]:
-                                id_range = True
-                                self.range_id = words[0]
-                                n_req_wrd = [
-                                    3,
-                                    5,
-                                ]  # number of required words in a line (either 3 or 5)
-                                pos_name = 1  # first row-name in words[pos_name]
-                            else:
-                                id_range = False
-                                self.rhs_id = ""
-                                n_req_wrd = [2, 4]
-                                pos_name = 0  # first row-name in words[pos_name]
-                        assert n_words in n_req_wrd, (
-                            f"ranges line {n_line} has {n_words} words, expected"
-                            f" {n_req_wrd}."
-                        )
-                        if id_range:  # check id of the ranges' entry, if it was defined
-                            assert words[0] == self.range_id, (
-                                f"Ranges id {words[0]}, line {n_line} differ from"
-                                f" expected: {self.range_id}."
-                            )
-                        row_name = words[pos_name]
-                        row_seq = self.row_name.get(row_name)
-                        assert (
-                            row_seq is not None
-                        ), f"unknown range row-name {row_name} (line {n_line})."
-                        val = float(words[pos_name + 1])
-                        assert type(val) == float, (
-                            f"Range value {words[pos_name + 1]} (line {n_line}) is not"
-                            " a number."
-                        )
-                        attr = self.seq_row.get(
-                            row_seq
-                        )  # [row_name, lo_bnd, up_bnd, row_type]
-                        row_type = attr[3]
-                        self.row_att(row_seq, row_name, row_type, "ranges", val)
-                        self.n_ranges += 1
-                        if n_words == n_req_wrd[1]:  # second pair of ranges defined
-                            row_name = words[pos_name + 2]
-                            row_seq = self.row_name.get(row_name)
-                            assert (
-                                row_seq is not None
-                            ), f"unknown ranges row-name {row_name} (line {n_line})."
-                            val = float(words[pos_name + 3])
-                            assert type(val) == float, (
-                                f"Ranges value {words[pos_name + 1]} (line {n_line}) is"
-                                " nota number."
-                            )
-                            attr = self.seq_row.get(
-                                row_seq
-                            )  # [row_name, lo_bnd, up_bnd, row_type]
-                            row_type = attr[3]
-                            self.row_att(row_seq, row_name, row_type, "ranges", val)
-                            self.n_ranges += 1
+                        self.add_range(words, n_line)  # add the range defined by the current MPS line
                     elif n_section == 5:  # bounds
-                        if (
-                            self.n_bounds == 0
-                        ):  # first Bounds record implies bounds id (might be empty)
-                            # print(
-                            #     f"first bound line: {n_line}, len {len(line)}:"
-                            #     f" '{line}'"
-                            # )
-                            if n_words == 4 or (
-                                n_words == 3 and words[0] in ["FR", "MI", "PL"]
-                            ):
-                                id_bnd = True
-                                self.bnd_id = words[1]
-                                # number of required words in a line (with/without)
-                                # required value:
-                                n_req_wrd = [
-                                    4,
-                                    3,
-                                ]
-                                pos_name = 2  # col-name in words[pos_name]
-                            else:
-                                id_bnd = False
-                                self.bnd_id = ""
-                                n_req_wrd = [3, 2]
-                                pos_name = 1  # col-name in words[pos_name]
-                            # print(
-                            #     f"first bound: {id_bnd=}, bnd_id= {self.bnd_id}:"
-                            #     f" {n_req_wrd = }"
-                            # )
-                        assert n_words in n_req_wrd, (
-                            f"bounds line {n_line} has {n_words} words, expected"
-                            f" {n_req_wrd}."
-                        )
-                        if id_bnd:  # check id of the BOUNDS line, if it was defined
-                            assert words[1] == self.bnd_id, (
-                                f"BOUNDS id {words[1]}, line {n_line} differ from "
-                                f'expected: {self.bnd_id}\n"{line=}".'
-                            )
-                        col_name = words[pos_name]
-                        col_seq = self.col_name.get(col_name)
-                        assert (
-                            col_seq is not None
-                        ), f"unknown BOUNDS col-name {col_name} (line {n_line})."
-                        attr = self.seq_col.get(col_seq)  # [col_name, lo_bnd, up_bnd]
-
-                        typ = words[0]
-                        if typ in bnd_type1:  # bound-types that require a value
-                            val = float(words[pos_name + 1])
-                            assert type(val) == float, (
-                                f"BOUND value {words[pos_name + 1]} (line {n_line})"
-                                "is not a number."
-                            )
-                            at_pos = bnd_type1.get(typ)
-                            if at_pos == 3:  # set both bounds
-                                attr[1] = attr[2] = val
-                            else:
-                                attr[at_pos] = val
-                        elif typ in bnd_type2:  # value not needed;
-                            # therefore it is neither checked nor processed
-                            at_pos = bnd_type2.get(typ)
-                            if at_pos == 3:  # set both bounds
-                                attr[1] = attr[2] = self.infty
-                            else:
-                                attr[at_pos] = self.infty
-                        elif typ in bnd_type3:
-                            raise Exception(
-                                f"Bound type {typ} of integer var. (line {n_line}) not"
-                                " processed yet."
-                            )
-                        else:
-                            raise Exception(
-                                f"Unknown bound type {typ} (line {n_line})."
-                            )
-                        self.seq_col.update(
-                            {col_seq: attr}
-                        )  # store the updated col-attributes
-                        self.n_bounds += 1
+                        self.add_bnd(words, n_line)  # add the bound defined by the current MPS line
                     elif n_section == 6:  # SOS section
                         pass  # SOS section not processed
                     elif n_section == 7:  # end data
@@ -433,70 +143,42 @@ class LPdiag:
                         )
                     else:
                         raise Exception(f"Unknown section id {n_section}.")
-                else:
-                    # store the content of the last-read section,
-                    # then process the head of new section
-                    if n_section == 0:  # PROBLEM
+                else:   # found a new section
+                    if n_section == 0:  # problem-name processed with the section header
                         pass
-                        # problem name stored with processing the section head,
-                        # no more info to be stored
-                    elif n_section == 1:  # ROWS
-                        # print(
-                        #     f"All read-in data of section {sections[n_section]}"
-                        #     " processed while read."
-                        # )
-                        pass
-                    elif n_section == 2:  # COLUMNS
-                        # create a df with the matrix coefficients
-                        self.mat = pd.DataFrame(
-                            {"row": seq_row, "col": seq_col, "val": vals}
-                        )
-                        self.mat["abs_val"] = abs(
-                            self.mat["val"]
-                        )  # add column with absolute values of coeff.
-                        self.mat["log"] = np.log10(self.mat["abs_val"]).astype(
-                            int
-                        )  # add col with int(log10(coeffs))
-                        # print(f'matrix after initialization:\n {self.mat}')
-                    elif n_section == 3:  # RHS
-                        pass  # values of RHS stored in row attributes while reading
-                    elif n_section == 4:  # Ranges
-                        pass  # values of ranges stored in row attributes while reading
-                    elif n_section == 5:  # Bounds
+                    elif n_section <= 5:
+                        # print(f'\tData of section {sections[n_section]} processed.')
                         pass
                     elif n_section == 6:  # SOS
-                        print(
-                            "Warning: values of optional section"
-                            f" {sections[next_sect - 1]} not processed."
-                        )
+                        print(f'WARNING: data of section {sections[n_section]} not processed.')
                     else:
                         raise Exception(
                             f"Should not come here, n_section = {n_section}."
                         )
+
+                    # process the head of new section
                     print(f"Next section found: {line} (line {n_line}).")
                     self.n_lines = n_line
-                    if req_sect[
-                        next_sect
-                    ]:  # required section must be defined in the sequence
-                        assert (
-                            words[0] == sections[next_sect]
-                        ), f"expect section {sections[next_sect]} found: {line}."
-                        if words[0] == sections[next_sect]:
-                            # store id of the last section found and processed:
-                            last_sect = n_section
-                            n_section = next_sect
-                            next_sect = n_section + 1
-                            if (
-                                n_section == 0
-                            ):  # the only section declaration with the content
+                    if req_sect[next_sect]:  # required section must be in the sequence
+                        # assert (
+                        #     words[0] == sections[next_sect]
+                        # ), f"expect section {sections[next_sect]} found: {line}."
+                        if words[0] == sections[next_sect]:  # required section found
+                            if next_sect == 0:  # store the problem name
                                 assert n_words > 1, (
                                     f"problem name undefined: line {n_line} has"
                                     f" {n_words} words."
                                 )
                                 self.pname = words[1]  # store the problem name
-                                print(f"Problem name: {self.pname}.")
-                            continue
+                                print(f"\tProblem name: {self.pname}.")
+                                # TODO: process problem names composed of several words
+                            # update seq_no of sections: processed, found/current and next:
+                            last_sect = n_section
+                            n_section = next_sect
+                            next_sect = n_section + 1
+                            continue    # read next MPS line
                         else:
+                            print(f'expect section {sections[next_sect]} found: {line}.')
                             raise Exception(
                                 f"Required MPS section {sections[n_section]} undefined"
                                 " or misplaced."
@@ -531,6 +213,18 @@ class LPdiag:
         # (the first N row assumed to be the objective):
         assert self.gf_seq != -1, "objective (goal function) row is undefined."
 
+        # create a df with the matrix coefficients
+        self.mat = pd.DataFrame(
+            {"row": self.mat_row, "col": self.mat_row, "val": self.mat_val}
+        )
+        self.mat["abs_val"] = abs(
+            self.mat["val"]
+        )  # add column with absolute values of coeff.
+        self.mat["log"] = np.log10(self.mat["abs_val"]).astype(
+            int
+        )  # add col with int(log10(coeffs))
+        # print(f'matrix after initialization:\n {self.mat}')
+
         # Finish the MPS processing with the summary of its attributes
         dens = f"{float(len(self.mat)) / (len(self.row_name) * len(self.col_name)):.2e}"
         print(
@@ -556,6 +250,383 @@ class LPdiag:
             f" {len(df)} elements."
         )
         print(f"Distribution of the GF (objective) values:\n{df.describe()}")
+
+    def add_row(self, words, n_line):
+        """Process current line of the ROWS section.
+
+        While processing the ROWS section the row attributes are initialized to the
+        default (for the corresponding row type) values. The attributes are updated for
+        optionally defined values in the (also optional) RHS and RANGES sections. The
+        interpretation of the MPS-format (in particular of values in the RANGES section)
+        follows the original MPS standard, see e.g., "Advanced Linear Programming," by
+        Bruce A. Murtagh. or the standard summary at
+        https://lpsolve.sourceforge.net/5.5/mps-format.htm .
+
+        Attributes
+        ----------
+        words: str[]
+            words of the current line
+        n_line: int
+            sequence number of the current MPS line
+        """
+
+        row_types = ["N", "E", "G", "L"]  # types of rows
+        n_words = len(words)
+        assert n_words == 2, (
+            f"row declaration (line {n_line}) has {n_words} words"
+            " instead of 2."
+        )
+        row_type = words[0]
+        row_name = words[1]
+        row_seq = len(self.row_name)
+        assert (
+                row_type in row_types
+        ), f"unknown row type {row_type} (line {n_line})."
+        assert (
+                row_name not in self.row_name
+        ), f"duplicated row name: {row_name} (line {n_line})."
+        if row_type == "N" and self.gf_seq == -1:
+            self.gf_seq = row_seq
+            print(
+                f"\tRow {row_name} (row_seq = {row_seq}) is the objective"
+                " (goal function) row."
+            )
+        self.row_name.update(
+            {row_name: row_seq}
+        )  # add to dict of row_names
+        # store row_{seq, name, type} and the default
+        # (to be changed in rhs/ranges) [lo_bnd, upp_bnd]
+        self.row_att(row_seq, row_name, row_type, "rows")
+
+    def add_coeff(self, words, n_line):
+        """Process current line of the COLUMNS section.
+
+        The section defines both column names and values of the matrix coefficients.
+        One line can have either one or two matrix elements.
+
+        Attributes
+        ----------
+        words: str[]
+            words of the current line
+        n_line: int
+            sequence number of the current MPS line
+        """
+
+        n_words = len(words)
+        # print(
+        #     f"processing line no {n_line}, n_words {n_words}:"
+        #     f" {line}"
+        # )
+        assert n_words in [
+            3,
+            5,
+        ], f"matrix element (line {n_line}) has {n_words} words."
+        col_name = words[0]
+        if col_name != self.col_curr:  # new column
+            assert (
+                    col_name not in self.col_name
+            ), f"duplicated column name: {col_name} (line {n_line})"
+            col_seq = len(self.col_name)
+            self.col_name.update({col_name: col_seq})
+            self.seq_col.update({col_seq: [col_name, 0.0, self.infty]})
+            self.col_curr = col_name
+        else:
+            col_seq = self.col_name.get(col_name)
+        row_name = words[1]
+        row_seq = self.row_name.get(row_name)
+        assert (
+                row_seq is not None
+        ), f"unknown row name {row_name} (line {n_line})."
+        val = float(words[2])
+        assert (
+                type(val) == float
+        ), f"string  {words[2]} (line {n_line}) is not a number."
+        # add the matrix element to the lists of: seq_row, seq_col, val
+        # the lists will be converted to self.mat df after all elements
+        # will be read
+        self.mat_row.append(row_seq)
+        self.mat_col.append(col_seq)
+        self.mat_val.append(val)
+        # print(f' matrix element ({row_seq}, {col_seq}) = {val}')
+        # the next two commands take far too long for large matrices;
+        # thus tmp-store in three lists
+        # df2 = pd.DataFrame(
+        #     {"row": row_seq, "col": col_seq, "val": val},
+        #     index=list(range(1)),
+        # )
+        # self.mat = pd.concat(
+        #     [self.mat, df2],
+        #     axis=0,
+        #     ignore_index=True
+        # )
+
+        # proccess the second matrix element in the same MPS row, if defined
+        if n_words > 3:
+            assert n_words == 5, (
+                f"line {n_line}) has {n_words} words, five words needed"
+                " fordefining second element in the same MPS line."
+            )
+            row_name = words[3]
+            row_seq = self.row_name.get(row_name)
+            assert (
+                    row_seq is not None
+            ), f"unknown row name {row_name} (line {n_line})."
+            val = float(words[4])
+            assert (
+                    type(val) == float
+            ), f"string  {words[4]} (line {n_line}) is not a number."
+            self.mat_row.append(row_seq)
+            self.mat_col.append(col_seq)
+            self.mat_val.append(val)
+
+    def add_rhs(self, words, n_line):
+        """Process current line of the RHS section.
+
+        The section defines both column names and values of the matrix coefficients.
+        One line can have either one or two matrix elements.
+
+        Attributes
+        ----------
+        words: str[]
+            words of the current line
+        n_line: int
+            sequence number of the current MPS line
+        """
+
+        n_words = len(words)
+
+        # first RHS record implies RHS/ranges id (might be empty)
+        if self.n_rhs == 0:
+            # print(f"first rhs line: {n_line}: '{words}'")
+            if n_words in [3, 5]:       # RHS name/id defined
+                self.id_rhs = True
+                self.rhs_id = words[0]
+                print(f'\tId of RHS: {self.rhs_id}')
+            else:
+                self.id_rhs = False
+                self.rhs_id = ""
+                print(f'\tId of RHS: (empty)')
+
+        if self.id_rhs:
+            n_req_wrd = [3, 5]  # number of required words in a line (either 3 or 5)
+            pos_name = 1  # first row-name in words[pos_name]
+        else:
+            n_req_wrd = [2, 4]
+            pos_name = 0  # first row-name in words[pos_name]
+
+        assert n_words in n_req_wrd, (
+            f"rhs line {n_line} has {n_words} words, expected"
+            f" {n_req_wrd}."
+        )
+        if self.id_rhs:  # check id of the RHS entry, if it was defined
+            assert words[0] == self.rhs_id, (
+                f"RHS id {words[0]}, line {n_line} differ from"
+                f"expected: {self.rhs_id}."
+            )
+        row_name = words[pos_name]
+        row_seq = self.row_name.get(row_name)
+        assert (
+                row_seq is not None
+        ), f"unknown RHS row-name {row_name} (line {n_line})."
+        val = float(words[pos_name + 1])
+        assert type(val) == float, (
+            f"RHS value  {words[pos_name + 1]} (line {n_line}) is not a"
+            " number."
+        )
+        attr = self.seq_row.get(
+            row_seq
+        )  # [row_name, lo_bnd, up_bnd, row_type]
+        row_type = attr[3]
+        self.row_att(row_seq, row_name, row_type, "rhs", val)
+        self.n_rhs += 1
+        if n_words == n_req_wrd[1]:  # second pair of rhs defined
+            row_name = words[pos_name + 2]
+            row_seq = self.row_name.get(row_name)
+            assert (
+                    row_seq is not None
+            ), f"unknown RHS row-name {row_name} (line {n_line})."
+            val = float(words[pos_name + 3])
+            assert type(val) == float, (
+                f"RHS value {words[pos_name + 1]} (line {n_line}) is"
+                " not a number."
+            )
+            attr = self.seq_row.get(
+                row_seq
+            )  # [row_name, lo_bnd, up_bnd, row_type]
+            row_type = attr[3]
+            self.row_att(row_seq, row_name, row_type, "rhs", val)
+            self.n_rhs += 1
+
+    def add_range(self, words, n_line):
+        """Process current line of the RANGES section.
+
+        The section defines both column names and values of the matrix coefficients.
+        One line can have either one or two matrix elements.
+
+        Attributes
+        ----------
+        words: str[]
+            words of the current line
+        n_line: int
+            sequence number of the current MPS line
+        """
+
+        n_words = len(words)
+
+        # first ranges record implies ranges id (might be empty)
+        if self.n_ranges == 0:
+            if n_words in [3, 5]:
+                self.id_range = True
+                self.range_id = words[0]
+                print(f'\tId of ranges: {self.range_id}')
+            else:
+                self.id_range = False
+                self.range_id = ""
+                print(f'\tId of ranges: (empty)')
+
+        if self.id_range:
+            n_req_wrd = [3, 5]  # number of required words in a line (either 3 or 5)
+            pos_name = 1  # first row-name in words[pos_name]
+        else:
+            n_req_wrd = [2, 4]
+            pos_name = 0  # first row-name in words[pos_name]
+
+        assert n_words in n_req_wrd, (
+            f"ranges line {n_line} has {n_words} words, expected"
+            f" {n_req_wrd}."
+        )
+        if self.id_range:  # check id of the ranges' entry, if it was defined
+            assert words[0] == self.range_id, (
+                f"Ranges id {words[0]}, line {n_line} differ from"
+                f" expected: {self.range_id}."
+            )
+        row_name = words[pos_name]
+        row_seq = self.row_name.get(row_name)
+        assert (
+                row_seq is not None
+        ), f"unknown range row-name {row_name} (line {n_line})."
+        val = float(words[pos_name + 1])
+        assert type(val) == float, (
+            f"Range value {words[pos_name + 1]} (line {n_line}) is not"
+            " a number."
+        )
+        attr = self.seq_row.get(
+            row_seq
+        )  # [row_name, lo_bnd, up_bnd, row_type]
+        row_type = attr[3]
+        self.row_att(row_seq, row_name, row_type, "ranges", val)
+        self.n_ranges += 1
+        if n_words == n_req_wrd[1]:  # second pair of ranges defined
+            row_name = words[pos_name + 2]
+            row_seq = self.row_name.get(row_name)
+            assert (
+                    row_seq is not None
+            ), f"unknown ranges row-name {row_name} (line {n_line})."
+            val = float(words[pos_name + 3])
+            assert type(val) == float, (
+                f"Ranges value {words[pos_name + 1]} (line {n_line}) is"
+                " nota number."
+            )
+            attr = self.seq_row.get(
+                row_seq
+            )  # [row_name, lo_bnd, up_bnd, row_type]
+            row_type = attr[3]
+            self.row_att(row_seq, row_name, row_type, "ranges", val)
+            self.n_ranges += 1
+
+    def add_bnd(self, words, n_line):
+        """Process current line of the BOUNDS section.
+
+        The section defines both column names and values of the matrix coefficients.
+        One line can have either one or two matrix elements.
+
+        Attributes
+        ----------
+        words: str[]
+            words of the current line
+        n_line: int
+            sequence number of the current MPS line
+        """
+
+        # items of the below dictionaries indicate bounds to be modified:
+        # 1 - low, 2 - upper, 3 - both
+        bnd_type1 = {"LO": 1, "UP": 2, "FX": 3}  # types of bounds requiring value
+        bnd_type2 = {"MI": 1, "PL": 2, "FR": 3}  # types of bounds not requiring value
+        bnd_type3 = {
+            "BV": 0,
+            "LI": 0,
+            "UI": 0,
+            "SC": 0,
+        }  # types of bounds legal for int-type vars, not processed yet
+
+        n_words = len(words)
+
+        # first Bounds record implies bounds id (might be empty)
+        if self.n_bounds == 0:
+            # print(f"first BOUNDS line: {n_line}: '{words}'")
+            if n_words == 4 or (
+                    n_words == 3 and words[0] in ["FR", "MI", "PL"]
+            ):
+                self.id_bnd = True
+                self.bnd_id = words[1]
+                print(f'\tId of BOUNDS: {self.bnd_id}')
+            else:
+                self.id_bnd = False
+                self.bnd_id = ""
+                print(f'\tId of BOUNDS: (empty)')
+
+        # number of required words in a line (with/without) required value:
+        if self.id_bnd:
+            n_req_wrd = [4, 3]
+            pos_name = 2  # col-name in words[pos_name]
+        else:
+            n_req_wrd = [3, 2]
+            pos_name = 1  # col-name in words[pos_name]
+
+        assert n_words in n_req_wrd, (
+            f'bounds line {n_line} has {n_words} words, expected: '
+            f'{n_req_wrd}.'
+        )
+        if self.id_bnd:  # check id of the BOUNDS line, if it was defined
+            assert words[1] == self.bnd_id, (
+                f'BOUNDS id {words[1]}, line {n_line} differ from '
+                f'expected id: {self.bnd_id}.'
+            )
+        col_name = words[pos_name]
+        col_seq = self.col_name.get(col_name)
+        assert (
+                col_seq is not None
+        ), f"unknown BOUNDS col-name {col_name} (line {n_line})."
+        attr = self.seq_col.get(col_seq)  # [col_name, lo_bnd, up_bnd]
+
+        typ = words[0]
+        if typ in bnd_type1:  # bound-types that require a value
+            val = float(words[pos_name + 1])
+            assert type(val) == float, (
+                f"BOUND value {words[pos_name + 1]} (line {n_line})"
+                "is not a number."
+            )
+            at_pos = bnd_type1.get(typ)
+            if at_pos == 3:  # set both bounds
+                attr[1] = attr[2] = val
+            else:
+                attr[at_pos] = val
+        elif typ in bnd_type2:  # value not needed;
+            # therefore it is neither checked nor processed
+            at_pos = bnd_type2.get(typ)
+            if at_pos == 3:  # set both bounds
+                attr[1] = attr[2] = self.infty
+            else:
+                attr[at_pos] = self.infty
+        elif typ in bnd_type3:
+            raise Exception(
+                f"Bound type {typ} of integer var. (line {n_line}) not"
+                " processed yet."
+            )
+        else:
+            raise Exception(f"Unknown bound type {typ} (line {n_line}).")
+        self.seq_col.update({col_seq: attr})  # store the updated col-attributes
+        self.n_bounds += 1
 
     def row_att(self, row_seq, row_name, row_type, sec_name, val=0.0):
         """Process values defined in ROWS, RHS and RANGES sections and store/update
