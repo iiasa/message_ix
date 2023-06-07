@@ -92,16 +92,6 @@ class LPdiag:
             "SOS",
             "ENDATA",
         ]
-        req_sect = [
-            True,
-            True,
-            True,
-            False,
-            False,
-            False,
-            False,
-            True,
-        ]  # required/optional MPS sections
 
         # lists are OK only for small and medium problems
         # row_names = []     # names of rows
@@ -111,7 +101,7 @@ class LPdiag:
         # wrk vars
         n_section = 0  # seq_no of the currently processed MPS-file section
         next_sect = 0  # seq_no of the next (to be processed) MPS-file section
-        last_sect = -1  # last processed section
+        # last_sect = -1  # last processed section
 
         # process the MPS file
         with open(self.fname, "r") as reader:
@@ -121,35 +111,38 @@ class LPdiag:
                 if line[0] == "*" or len(line) == 0:  # skip commented and empty lines
                     continue
                 words = line.split()
-                n_words = len(words)
                 if line[0] == " ":  # continue reading the current MPS section
                     # columns/matrix (first here because most frequently used)
                     if n_section == 2:
                         self.add_coeff(words, n_line)  # add column and its coefficients
                     elif n_section == 1:  # rows
-                        self.add_row(words, n_line)    # add row and its type
+                        self.add_row(words, n_line)  # add row and its type
                     elif n_section == 3:  # rhs
-                        self.add_rhs(words, n_line)    # process RHS
+                        self.add_rhs(words, n_line)  # process RHS
                     elif n_section == 4:  # ranges
                         self.add_range(words, n_line)  # process range
                     elif n_section == 5:  # bounds
                         self.add_bnd(words, n_line)  # process bound
                     elif n_section == 6:  # SOS section
                         pass  # SOS section not processed
-                    elif n_section == 7:  # end data
-                        raise Exception(
-                            "Unexpected execution flow; needs to be explored."
-                        )
+                    # elif n_section == 7:  # end data
+                    #     raise Exception(
+                    #         "Unexpected execution flow; needs to be explored."
+                    #     )
                     else:
-                        raise Exception(f"Unknown section id {n_section}.")
-                else:   # found a new section
+                        print(f"MPS record {n_line}, section id {n_section}.")
+                        raise Exception(
+                            f"MPS line '{line}' (line {n_line}) misplaced,"
+                            f" processing section {sections[n_section]}."
+                        )
+                else:  # found a new section
                     if n_section == 0:  # problem-name processed with the section header
                         pass
                     elif n_section <= 5:
                         # print(f'\tData of section {sections[n_section]} processed.')
                         pass
                     elif n_section == 6:  # SOS
-                        print(f'WARNING: Section {sections[n_section]} not processed.')
+                        print(f"WARNING: Section {sections[n_section]} not processed.")
                     else:
                         raise Exception(
                             f"Should not come here, n_section = {n_section}."
@@ -158,55 +151,69 @@ class LPdiag:
                     # process the head of new section
                     print(f"Next section found: {line} (line {n_line}).")
                     self.n_lines = n_line
-                    if req_sect[next_sect]:  # required section must be in the sequence
-                        # assert (
-                        #     words[0] == sections[next_sect]
-                        # ), f"expect section {sections[next_sect]} found: {line}."
-                        if words[0] == sections[next_sect]:  # required section found
-                            if next_sect == 0:  # store the problem name
-                                assert n_words > 1, (
-                                    f"problem name undefined: line {n_line} has"
-                                    f" {n_words} words."
-                                )
-                                self.pname = words[1]  # store the problem name
-                                print(f"\tProblem name: {self.pname}.")
-                                # TODO: process problem names composed of several words
-                            # update seq_no of sections: processed, found/current, next
-                            last_sect = n_section
-                            n_section = next_sect
-                            next_sect = n_section + 1
-                            continue    # read next MPS line
-                        else:
-                            print(f'section {line} found.')
-                            raise Exception(
-                                f"Required MPS section {sections[n_section]} undefined"
-                                " or misplaced."
-                            )
-                    else:  # is the found section an optional one?
-                        # if (
-                        #     line == sections[next_sect]
-                        # ):  # the expected (optional) section found
-                        #     n_section = next_sect
-                        #     next_sect = n_section + 1
-                        # else:  # expected section not found; process the section found
-                        try:
-                            # the expected section not used, maybe it is another
-                            # section:
-                            n_found = sections.index(line)
-                        except ValueError:
-                            raise Exception(f'Unknown section: {line} (line {n_line}).')
-                        if n_found < next_sect:
-                            pass
-                        next_sect = n_section + 1
-                        # store id of the last section found (not processed yet):
-                        last_sect = n_section
-                        continue
+                    # last_sect = n_section
+                    n_section = self.next_sec(next_sect, words)
+                    next_sect = n_section + 1
+                    # print(f'{n_section = }, {next_sect = }')
+            # end of MPS reading
 
         # check, if the last required section ('ENDATA') was defined
         assert (
-            last_sect == 7
-        ), f'The "ENDATA" section is not declared; last section_id = {last_sect}.'
+            n_section == 7
+        ), f'The "ENDATA" section is not declared; last section_id = {n_section}.'
 
+        self.mps_sum()  # summarize the processed MPS content
+
+    def next_sec(self, n_exp, words):
+        sections = [
+            "NAME",
+            "ROWS",
+            "COLUMNS",
+            "RHS",
+            "RANGES",
+            "BOUNDS",
+            "SOS",
+            "ENDATA",
+        ]
+        # required/optional MPS sections
+        req_sect = [True, True, True, False, False, False, False, True]
+        n_line = self.n_lines
+        n_words = len(words)
+        if req_sect[n_exp]:  # required section must be in the sequence
+            # assert (
+            #     words[0] == sections[next_sect]
+            # ), f"expect section {sections[next_sect]} found: {line}."
+            if words[0] == sections[n_exp]:  # required section found
+                if n_exp == 0:  # store the problem name
+                    assert n_words > 1, (
+                        f"problem name undefined: line {n_line} has"
+                        f" {n_words} words."
+                    )
+                    # print(f"\tProblem name line {words[1:]}.")
+                    if n_words == 2:
+                        self.pname = words[1]  # store the problem name
+                    else:
+                        self.pname = words[1:]  # store the problem name
+                    print(f"\tProblem name: {self.pname}.")
+                    # TODO: check handling problem name composed of several words
+                return n_exp  # n_sections equals to the expected: n_exp
+            else:
+                print(f"section {words} found.")
+                raise Exception(
+                    f"Required MPS section {sections[n_exp]} undefined" " or misplaced."
+                )
+        else:  # the found section does not follow the last processed section
+            try:
+                n_section = sections.index(words[0])
+            except ValueError:
+                raise Exception(f"Unknown section: {words} (line {n_line}).")
+            if n_section < n_exp:
+                raise Exception(
+                    f"Section {words[0]} (line {n_line}) is misplaced or duplicated."
+                )
+            return n_section
+
+    def mps_sum(self):
         # check, if there was at least one N row
         # (the first N row assumed to be the objective):
         assert self.gf_seq != -1, "objective (goal function) row is undefined."
@@ -270,18 +277,15 @@ class LPdiag:
 
         row_types = ["N", "E", "G", "L"]  # types of rows
         n_words = len(words)
-        assert n_words == 2, (
-            f"row declaration (line {n_line}) has {n_words} words"
-            " instead of 2."
-        )
+        assert (
+            n_words == 2
+        ), f"row declaration (line {n_line}) has {n_words} words instead of 2."
         row_type = words[0]
         row_name = words[1]
         row_seq = len(self.row_name)
+        assert row_type in row_types, f"unknown row type {row_type} (line {n_line})."
         assert (
-                row_type in row_types
-        ), f"unknown row type {row_type} (line {n_line})."
-        assert (
-                row_name not in self.row_name
+            row_name not in self.row_name
         ), f"duplicated row name: {row_name} (line {n_line})."
         if row_type == "N" and self.gf_seq == -1:
             self.gf_seq = row_seq
@@ -289,9 +293,7 @@ class LPdiag:
                 f"\tRow {row_name} (row_seq = {row_seq}) is the objective"
                 " (goal function) row."
             )
-        self.row_name.update(
-            {row_name: row_seq}
-        )  # add to dict of row_names
+        self.row_name.update({row_name: row_seq})  # add to dict of row_names
         # store row_{seq, name, type} and the default
         # (to be changed in rhs/ranges) [lo_bnd, upp_bnd]
         self.row_att(row_seq, row_name, row_type, "rows")
@@ -322,7 +324,7 @@ class LPdiag:
         col_name = words[0]
         if col_name != self.col_curr:  # new column
             assert (
-                    col_name not in self.col_name
+                col_name not in self.col_name
             ), f"duplicated column name: {col_name} (line {n_line})"
             col_seq = len(self.col_name)
             self.col_name.update({col_name: col_seq})
@@ -332,12 +334,10 @@ class LPdiag:
             col_seq = self.col_name.get(col_name)
         row_name = words[1]
         row_seq = self.row_name.get(row_name)
-        assert (
-                row_seq is not None
-        ), f"unknown row name {row_name} (line {n_line})."
+        assert row_seq is not None, f"unknown row name {row_name} (line {n_line})."
         val = float(words[2])
         assert (
-                type(val) == float
+            type(val) == float
         ), f"string  {words[2]} (line {n_line}) is not a number."
         # add the matrix element to the lists of: seq_row, seq_col, val
         # the lists will be converted to self.mat df after all elements
@@ -366,12 +366,10 @@ class LPdiag:
             )
             row_name = words[3]
             row_seq = self.row_name.get(row_name)
-            assert (
-                    row_seq is not None
-            ), f"unknown row name {row_name} (line {n_line})."
+            assert row_seq is not None, f"unknown row name {row_name} (line {n_line})."
             val = float(words[4])
             assert (
-                    type(val) == float
+                type(val) == float
             ), f"string  {words[4]} (line {n_line}) is not a number."
             self.mat_row.append(row_seq)
             self.mat_col.append(col_seq)
@@ -396,14 +394,14 @@ class LPdiag:
         # first RHS record implies RHS/ranges id (might be empty)
         if self.n_rhs == 0:
             # print(f"first rhs line: {n_line}: '{words}'")
-            if n_words in [3, 5]:       # RHS name/id defined
+            if n_words in [3, 5]:  # RHS name/id defined
                 self.id_rhs = True
                 self.rhs_id = words[0]
-                print(f'\tId of RHS: {self.rhs_id}')
+                print(f"\tId of RHS: {self.rhs_id}")
             else:
                 self.id_rhs = False
                 self.rhs_id = ""
-                print('\tId of RHS: (empty)')
+                print("\tId of RHS: (empty)")
 
         if self.id_rhs:
             n_req_wrd = [3, 5]  # number of required words in a line (either 3 or 5)
@@ -413,8 +411,7 @@ class LPdiag:
             pos_name = 0  # first row-name in words[pos_name]
 
         assert n_words in n_req_wrd, (
-            f"rhs line {n_line} has {n_words} words, expected"
-            f" {n_req_wrd}."
+            f"rhs line {n_line} has {n_words} words, expected" f" {n_req_wrd}."
         )
         if self.id_rhs:  # check id of the RHS entry, if it was defined
             assert words[0] == self.rhs_id, (
@@ -423,17 +420,12 @@ class LPdiag:
             )
         row_name = words[pos_name]
         row_seq = self.row_name.get(row_name)
-        assert (
-                row_seq is not None
-        ), f"unknown RHS row-name {row_name} (line {n_line})."
+        assert row_seq is not None, f"unknown RHS row-name {row_name} (line {n_line})."
         val = float(words[pos_name + 1])
         assert type(val) == float, (
-            f"RHS value  {words[pos_name + 1]} (line {n_line}) is not a"
-            " number."
+            f"RHS value  {words[pos_name + 1]} (line {n_line}) is not a" " number."
         )
-        attr = self.seq_row.get(
-            row_seq
-        )  # [row_name, lo_bnd, up_bnd, row_type]
+        attr = self.seq_row.get(row_seq)  # [row_name, lo_bnd, up_bnd, row_type]
         row_type = attr[3]
         self.row_att(row_seq, row_name, row_type, "rhs", val)
         self.n_rhs += 1
@@ -441,16 +433,13 @@ class LPdiag:
             row_name = words[pos_name + 2]
             row_seq = self.row_name.get(row_name)
             assert (
-                    row_seq is not None
+                row_seq is not None
             ), f"unknown RHS row-name {row_name} (line {n_line})."
             val = float(words[pos_name + 3])
             assert type(val) == float, (
-                f"RHS value {words[pos_name + 1]} (line {n_line}) is"
-                " not a number."
+                f"RHS value {words[pos_name + 1]} (line {n_line}) is" " not a number."
             )
-            attr = self.seq_row.get(
-                row_seq
-            )  # [row_name, lo_bnd, up_bnd, row_type]
+            attr = self.seq_row.get(row_seq)  # [row_name, lo_bnd, up_bnd, row_type]
             row_type = attr[3]
             self.row_att(row_seq, row_name, row_type, "rhs", val)
             self.n_rhs += 1
@@ -476,11 +465,11 @@ class LPdiag:
             if n_words in [3, 5]:
                 self.id_range = True
                 self.range_id = words[0]
-                print(f'\tId of ranges: {self.range_id}')
+                print(f"\tId of ranges: {self.range_id}")
             else:
                 self.id_range = False
                 self.range_id = ""
-                print('\tId of ranges: (empty)')
+                print("\tId of ranges: (empty)")
 
         if self.id_range:
             n_req_wrd = [3, 5]  # number of required words in a line (either 3 or 5)
@@ -489,10 +478,9 @@ class LPdiag:
             n_req_wrd = [2, 4]
             pos_name = 0  # first row-name in words[pos_name]
 
-        assert n_words in n_req_wrd, (
-            f"ranges line {n_line} has {n_words} words, expected"
-            f" {n_req_wrd}."
-        )
+        assert (
+            n_words in n_req_wrd
+        ), f"ranges line {n_line} has {n_words} words, expected {n_req_wrd}."
         if self.id_range:  # check id of the ranges' entry, if it was defined
             assert words[0] == self.range_id, (
                 f"Ranges id {words[0]}, line {n_line} differ from"
@@ -501,16 +489,13 @@ class LPdiag:
         row_name = words[pos_name]
         row_seq = self.row_name.get(row_name)
         assert (
-                row_seq is not None
+            row_seq is not None
         ), f"unknown range row-name {row_name} (line {n_line})."
         val = float(words[pos_name + 1])
-        assert type(val) == float, (
-            f"Range value {words[pos_name + 1]} (line {n_line}) is not"
-            " a number."
-        )
-        attr = self.seq_row.get(
-            row_seq
-        )  # [row_name, lo_bnd, up_bnd, row_type]
+        assert (
+            type(val) == float
+        ), f"Range value {words[pos_name + 1]} (line {n_line}) is not a number."
+        attr = self.seq_row.get(row_seq)  # [row_name, lo_bnd, up_bnd, row_type]
         row_type = attr[3]
         self.row_att(row_seq, row_name, row_type, "ranges", val)
         self.n_ranges += 1
@@ -518,16 +503,13 @@ class LPdiag:
             row_name = words[pos_name + 2]
             row_seq = self.row_name.get(row_name)
             assert (
-                    row_seq is not None
+                row_seq is not None
             ), f"unknown ranges row-name {row_name} (line {n_line})."
             val = float(words[pos_name + 3])
             assert type(val) == float, (
-                f"Ranges value {words[pos_name + 1]} (line {n_line}) is"
-                " nota number."
+                f"Ranges value {words[pos_name + 1]} (line {n_line}) is" " nota number."
             )
-            attr = self.seq_row.get(
-                row_seq
-            )  # [row_name, lo_bnd, up_bnd, row_type]
+            attr = self.seq_row.get(row_seq)  # [row_name, lo_bnd, up_bnd, row_type]
             row_type = attr[3]
             self.row_att(row_seq, row_name, row_type, "ranges", val)
             self.n_ranges += 1
@@ -562,16 +544,14 @@ class LPdiag:
         # first Bounds record implies bounds id (might be empty)
         if self.n_bounds == 0:
             # print(f"first BOUNDS line: {n_line}: '{words}'")
-            if n_words == 4 or (
-                    n_words == 3 and words[0] in ["FR", "MI", "PL"]
-            ):
+            if n_words == 4 or (n_words == 3 and words[0] in ["FR", "MI", "PL"]):
                 self.id_bnd = True
                 self.bnd_id = words[1]
-                print(f'\tId of BOUNDS: {self.bnd_id}')
+                print(f"\tId of BOUNDS: {self.bnd_id}")
             else:
                 self.id_bnd = False
                 self.bnd_id = ""
-                print('\tId of BOUNDS: (empty)')
+                print("\tId of BOUNDS: (empty)")
 
         # number of required words in a line (with/without) required value:
         if self.id_bnd:
@@ -581,29 +561,27 @@ class LPdiag:
             n_req_wrd = [3, 2]
             pos_name = 1  # col-name in words[pos_name]
 
-        assert n_words in n_req_wrd, (
-            f'bounds line {n_line} has {n_words} words, expected: '
-            f'{n_req_wrd}.'
-        )
+        assert (
+            n_words in n_req_wrd
+        ), f"bounds line {n_line} has {n_words} words, expected: {n_req_wrd}."
         if self.id_bnd:  # check id of the BOUNDS line, if it was defined
             assert words[1] == self.bnd_id, (
-                f'BOUNDS id {words[1]}, line {n_line} differ from '
-                f'expected id: {self.bnd_id}.'
+                f"BOUNDS id {words[1]}, line {n_line} differ from "
+                f"expected id: {self.bnd_id}."
             )
         col_name = words[pos_name]
         col_seq = self.col_name.get(col_name)
         assert (
-                col_seq is not None
+            col_seq is not None
         ), f"unknown BOUNDS col-name {col_name} (line {n_line})."
         attr = self.seq_col.get(col_seq)  # [col_name, lo_bnd, up_bnd]
 
         typ = words[0]
         if typ in bnd_type1:  # bound-types that require a value
             val = float(words[pos_name + 1])
-            assert type(val) == float, (
-                f"BOUND value {words[pos_name + 1]} (line {n_line})"
-                "is not a number."
-            )
+            assert (
+                type(val) == float
+            ), f"BOUND value {words[pos_name + 1]} (line {n_line}) is not a number."
             at_pos = bnd_type1.get(typ)
             if at_pos == 3:  # set both bounds
                 attr[1] = attr[2] = val
