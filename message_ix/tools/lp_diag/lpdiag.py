@@ -123,18 +123,17 @@ class LPdiag:
                 words = line.split()
                 n_words = len(words)
                 if line[0] == " ":  # continue reading the current MPS section
-                    if (
-                        n_section == 2
-                    ):  # columns/matrix (first here because most frequently used)
-                        self.add_coeff(words, n_line)  # add the columns with their coefficients
+                    # columns/matrix (first here because most frequently used)
+                    if n_section == 2:
+                        self.add_coeff(words, n_line)  # add column and its coefficients
                     elif n_section == 1:  # rows
-                        self.add_row(words, n_line)     # add the row defined by the current MPS line
+                        self.add_row(words, n_line)    # add row and its type
                     elif n_section == 3:  # rhs
-                        self.add_rhs(words, n_line)     # add the RHS defined by the current MPS line
+                        self.add_rhs(words, n_line)    # process RHS
                     elif n_section == 4:  # ranges
-                        self.add_range(words, n_line)  # add the range defined by the current MPS line
+                        self.add_range(words, n_line)  # process range
                     elif n_section == 5:  # bounds
-                        self.add_bnd(words, n_line)  # add the bound defined by the current MPS line
+                        self.add_bnd(words, n_line)  # process bound
                     elif n_section == 6:  # SOS section
                         pass  # SOS section not processed
                     elif n_section == 7:  # end data
@@ -150,7 +149,7 @@ class LPdiag:
                         # print(f'\tData of section {sections[n_section]} processed.')
                         pass
                     elif n_section == 6:  # SOS
-                        print(f'WARNING: data of section {sections[n_section]} not processed.')
+                        print(f'WARNING: Section {sections[n_section]} not processed.')
                     else:
                         raise Exception(
                             f"Should not come here, n_section = {n_section}."
@@ -172,34 +171,33 @@ class LPdiag:
                                 self.pname = words[1]  # store the problem name
                                 print(f"\tProblem name: {self.pname}.")
                                 # TODO: process problem names composed of several words
-                            # update seq_no of sections: processed, found/current and next:
+                            # update seq_no of sections: processed, found/current, next
                             last_sect = n_section
                             n_section = next_sect
                             next_sect = n_section + 1
                             continue    # read next MPS line
                         else:
-                            print(f'expect section {sections[next_sect]} found: {line}.')
+                            print(f'section {line} found.')
                             raise Exception(
                                 f"Required MPS section {sections[n_section]} undefined"
                                 " or misplaced."
                             )
-                    else:  # optional section expected
-                        if (
-                            line == sections[next_sect]
-                        ):  # the expected (optional) section found
-                            n_section = next_sect
-                            next_sect = n_section + 1
-                        else:  # expected section not found; process the section found
-                            try:
-                                # the expected section not used, maybe it is another
-                                # section:
-                                n_section = sections.index(line)
-                            except ValueError:
-                                raise Exception(
-                                    f"Unknown section id :{line} (line number ="
-                                    f" {n_line})."
-                                )
-                            next_sect = n_section + 1
+                    else:  # is the found section an optional one?
+                        # if (
+                        #     line == sections[next_sect]
+                        # ):  # the expected (optional) section found
+                        #     n_section = next_sect
+                        #     next_sect = n_section + 1
+                        # else:  # expected section not found; process the section found
+                        try:
+                            # the expected section not used, maybe it is another
+                            # section:
+                            n_found = sections.index(line)
+                        except ValueError:
+                            raise Exception(f'Unknown section: {line} (line {n_line}).')
+                        if n_found < next_sect:
+                            pass
+                        next_sect = n_section + 1
                         # store id of the last section found (not processed yet):
                         last_sect = n_section
                         continue
@@ -405,7 +403,7 @@ class LPdiag:
             else:
                 self.id_rhs = False
                 self.rhs_id = ""
-                print(f'\tId of RHS: (empty)')
+                print('\tId of RHS: (empty)')
 
         if self.id_rhs:
             n_req_wrd = [3, 5]  # number of required words in a line (either 3 or 5)
@@ -482,7 +480,7 @@ class LPdiag:
             else:
                 self.id_range = False
                 self.range_id = ""
-                print(f'\tId of ranges: (empty)')
+                print('\tId of ranges: (empty)')
 
         if self.id_range:
             n_req_wrd = [3, 5]  # number of required words in a line (either 3 or 5)
@@ -573,7 +571,7 @@ class LPdiag:
             else:
                 self.id_bnd = False
                 self.bnd_id = ""
-                print(f'\tId of BOUNDS: (empty)')
+                print('\tId of BOUNDS: (empty)')
 
         # number of required words in a line (with/without) required value:
         if self.id_bnd:
