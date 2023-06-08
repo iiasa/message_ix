@@ -152,7 +152,7 @@ class LPdiag:
                     print(f"Next section found: {line} (line {n_line}).")
                     self.n_lines = n_line
                     # last_sect = n_section
-                    n_section = self.next_sec(next_sect, words)
+                    n_section = self.next_sec(next_sect, words, sections)
                     next_sect = n_section + 1
                     # print(f'{n_section = }, {next_sect = }')
             # end of MPS reading
@@ -164,17 +164,7 @@ class LPdiag:
 
         self.mps_sum()  # summarize the processed MPS content
 
-    def next_sec(self, n_exp, words):
-        sections = [
-            "NAME",
-            "ROWS",
-            "COLUMNS",
-            "RHS",
-            "RANGES",
-            "BOUNDS",
-            "SOS",
-            "ENDATA",
-        ]
+    def next_sec(self, n_exp, words, sections):
         # required/optional MPS sections
         req_sect = [True, True, True, False, False, False, False, True]
         n_line = self.n_lines
@@ -195,7 +185,6 @@ class LPdiag:
                     else:
                         self.pname = words[1:]  # store the problem name
                     print(f"\tProblem name: {self.pname}.")
-                    # TODO: check handling problem name composed of several words
                 return n_exp  # n_sections equals to the expected: n_exp
             else:
                 print(f"section {words} found.")

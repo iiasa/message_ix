@@ -5,7 +5,7 @@ Developed in PyCharm, with Python 3.10.4
 """
 
 import argparse
-import os
+import os  # imported by: from lpdiag import *
 import sys  # needed for sys.exit() and redirecting stdout
 
 # import numpy as np
@@ -104,8 +104,8 @@ if __name__ == "__main__":
         f_out = open(fn_out, "w")
         sys.stdout = f_out
     else:  # defined to avoid warnings (only used when redir_stdo = True
-        fn_out = None
-        f_out = None
+        fn_out = ""
+        f_out = ""
 
     lp = LPdiag(repdir)  # LPdiag ctor
     # lp.rd_mps(fn_mps)  # read MPS, store the matrix in dataFrame
