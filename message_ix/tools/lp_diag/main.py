@@ -103,9 +103,9 @@ if __name__ == "__main__":
         print(f"Stdout redirected to: {fn_out}")
         f_out = open(fn_out, "w")
         sys.stdout = f_out
-    else:  # defined to avoid warnings (only used when redir_stdo = True
-        fn_out = ""
-        f_out = ""
+    else:  # defined to avoid warnings (only used when redir_stdo == True)
+        fn_out = "foo"
+        f_out = open(fn_out, "w")
 
     lp = LPdiag(repdir)  # LPdiag ctor
     # lp.rd_mps(fn_mps)  # read MPS, store the matrix in dataFrame
