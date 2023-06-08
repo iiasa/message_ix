@@ -16,6 +16,7 @@ from message_ix.tools.lp_diag.lpdiag import (
     LPdiag,  # LPdiag class for processing and analysis of LP matrices
 )
 
+# from lpdiag import *
 # from datetime import timedelta as td
 
 
@@ -38,8 +39,8 @@ def read_args():
     parser.add_argument("-s", "--save", action="store_true")  # on/off flag
 
     # parse cli
-    args = parser.parse_args()
-    return args
+    cl_args = parser.parse_args()
+    return cl_args
 
 
 if __name__ == "__main__":
@@ -55,7 +56,11 @@ if __name__ == "__main__":
     # Retrieve and assign arguments
     args = read_args()
     wrk_dir = args.path or "./"
-    prob_id = args.mps or "of_baselin"  # arbitrary selection of default, do change
+    # prob_id = args.mps or "Data/mps_tst/diet"  # default MPS for testing
+    prob_id = args.mps or "Data/mps_tst/aez"  # default MPS for testing
+    # prob_id = args.mps or "Data/mps_tst/err_tst"  # default MPS for testing
+    # prob_id = args.mps or "Data/mps_tst/lotfi"  # default MPS for testing
+    # prob_id = args.mps or "Data/mps/of_led1"  # default MPS for testing
     redir_stdo = args.save
     try:
         os.chdir(wrk_dir)
@@ -84,10 +89,10 @@ if __name__ == "__main__":
     # prob_id = 'diet'
     # prob_id = 'jg_korh'
     # prob_id = 'lotfi'
-    data_dir = "data/mps/"
+    # data_dir = "data/mps/"
     # prob_id = 'of_led1'
     # prob_id = "of_baselin"
-    fn_mps = data_dir + prob_id
+    # fn_mps = data_dir + prob_id
     # repdir = 'rep_shared/'      # subdirectory for shared reports (NOT in git-repo)
     repdir = "rep_tst/"  # subdirectory for test-reports (NOT in git-repo)
 
@@ -98,12 +103,13 @@ if __name__ == "__main__":
         print(f"Stdout redirected to: {fn_out}")
         f_out = open(fn_out, "w")
         sys.stdout = f_out
-    # else: # only use f_out and fn_out where redir_stdo = True anyway
-    #     fn_out = None
-    #     f_out = None
+    else:  # defined to avoid warnings (only used when redir_stdo = True
+        fn_out = None
+        f_out = None
 
     lp = LPdiag(repdir)  # LPdiag ctor
-    lp.rd_mps(fn_mps)  # read MPS, store the matrix in dataFrame
+    # lp.rd_mps(fn_mps)  # read MPS, store the matrix in dataFrame
+    lp.rd_mps(prob_id)  # read MPS, store the matrix in dataFrame
     lp.stat(
         lo_tail=-7, up_tail=5
     )  # statistics of the matrix coefficients, incl. distribution tails
