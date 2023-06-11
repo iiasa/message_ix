@@ -62,13 +62,15 @@ jobs:
 
     - name: Configure conda channels, update, create environment, and install message-ix
       run: |
+        conda install -n base conda-libmamba-solver
+        conda config --set solver libmamba
         conda config --prepend channels conda-forge
         conda config --set channel_priority strict
         conda update -n base -c defaults conda
 
         # Also install pytest and packages required for testing. pip/PyPI
         # supports this via message_ix[testing], but conda does not.
-        conda create --quiet --name testenv message-ix=3.6.0 ${{ matrix.extra-deps }} pytest asyncssh sphinx
+        conda create --quiet --name testenv message-ix ${{ matrix.extra-deps }} pytest asyncssh sphinx
         conda list --name testenv
 
     - name: Check CLI commands and run test
