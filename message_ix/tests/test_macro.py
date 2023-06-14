@@ -34,12 +34,22 @@ class MockScenario:
         extra_region["node"] = "foo"
         df = pd.concat([df, extra_commod, extra_region])
 
+
+@pytest.fixture(scope="session")
+def w_data_path():
+    yield Path(__file__).parent.joinpath("data", "westeros_macro_input.xlsx")
+
         if name == "DEMAND":
             df = df.rename(columns={"sector": "commodity"})
         elif name in ["COST_NODAL_NET", "PRICE_COMMODITY"]:
             df = df.rename(columns={"sector": "commodity", "value": "lvl"})
             df["lvl"] = 1e3
         return df
+
+
+@pytest.fixture(scope="function")
+def w_data(w_data_path):
+    yield pd.read_excel(w_data_path, sheet_name=None, engine="openpyxl")
 
 
 @pytest.fixture(scope="class")
@@ -329,3 +339,11 @@ def test_multiregion_derive_data():
         index=idx,
     )
     pd.testing.assert_series_equal(obs, exp)
+
+
+def test_sector_map(westeros_solved, w_data):
+    """Calibration works when sector and commodity names are mismatched."""
+    for table in "aeei", "config", "demand_ref", "price_ref":
+        w_data[table] = w_data[table].replace({"sector": {"light": "FOO"}})
+
+    westeros_solved.add_macro(w_data, check_convergence=True)
