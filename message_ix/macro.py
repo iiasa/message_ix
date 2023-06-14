@@ -410,7 +410,7 @@ def total_cost(
         sort=True,
     ).set_index(["node", "year"])["value"]
 
-    assert not result.isnull.any(), "NaN values found in total_cost calculation"
+    assert not result.isnull().any(), "NaN values found in total_cost calculation"
 
     return result
 
