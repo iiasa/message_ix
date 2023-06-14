@@ -2,12 +2,15 @@ import logging
 from functools import lru_cache
 from itertools import product
 from pathlib import Path
-from typing import Mapping
+from typing import TYPE_CHECKING, Mapping
 
 import numpy as np
 import pandas as pd
 
 log = logging.getLogger(__name__)
+
+if TYPE_CHECKING:  # pragma: no cover
+    from message_ix.core import Scenario
 
 
 EXPERIMENTAL = """
@@ -239,9 +242,13 @@ class Calculate:
         """
         # Store sets (node, sector, level) and mappings based on configuration
         self.nodes = set(self.data["config"]["node"].dropna())
-        self.sectors = set(self.data["config"]["sector"].dropna())
-        self.levels = set(self.data["config"]["level"].dropna())
-        self.sector_mapping = self.data["config"]
+        self.mapping_macro_sector = mms = (
+            self.data["config"][["sector", "commodity", "level"]]
+            .dropna()
+            .drop_duplicates()
+        )
+        self.sectors = set(mms["sector"].unique())
+        self.levels = set(mms["level"].unique())
 
         # Filter, keeping only years that are included in the model results
         yrs = set(self.data["config"]["year"].dropna())
@@ -573,7 +580,7 @@ class Calculate:
         return self.data["aconst"]
 
 
-def add_model_data(base, clone, data):
+def add_model_data(base: "Scenario", clone: "Scenario", data: Mapping) -> None:
     """Calculate required parameters and add data to `clone`.
 
     Parameters
@@ -608,18 +615,9 @@ def add_model_data(base, clone, data):
     for n in c.nodes:
         clone.add_set("cat_node", ["economy", n])
 
-    # Obtain the mapping data frame inlcuding sector, level and commodity
-    sector_mapping_df = c.sector_mapping[["sector", "commodity", "level"]].dropna()
-
     # Add sectoral set structure
-    # Itearte throguh rows in the mapping data frame
-
-    for i in sector_mapping_df.index:
-        sec = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("sector")]
-        com = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("commodity")]
-        lvl = sector_mapping_df.iloc[i, sector_mapping_df.columns.get_loc("level")]
-        clone.add_set("sector", sec)
-        clone.add_set("mapping_macro_sector", [sec, com, lvl])
+    clone.add_set("sector", c.sectors)
+    clone.add_set("mapping_macro_sector", c.mapping_macro_sector)
 
     # Add parameters
     for name, info in MACRO_ITEMS.items():
