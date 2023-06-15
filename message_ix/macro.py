@@ -210,7 +210,7 @@ def clean_model_data(
     selectors: MutableMapping[Hashable, Iterable[Hashable]] = {}
     for dim, values in (("l", levels), ("n", nodes), ("sector", sectors), ("y", years)):
         if dim in data.dims:
-            selectors[dim] = cast(List[Hashable], values)
+            selectors[dim] = cast(List[Hashable], list(values))
 
     return (
         rename_dims(
