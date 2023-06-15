@@ -1,4 +1,5 @@
 import logging
+from dataclasses import dataclass
 from functools import partial
 from operator import itemgetter
 from pathlib import Path
@@ -12,13 +13,12 @@ from typing import (
     MutableMapping,
     Optional,
     Set,
-    cast,
 )
 
 import numpy as np
 import pandas as pd
 
-from message_ix.reporting import Reporter
+from message_ix.reporting import Key, Reporter
 
 log = logging.getLogger(__name__)
 
@@ -147,12 +147,19 @@ def add_par(scenario: "Scenario", data: "DataFrame", ym1: int, *, name: str) -> 
     scenario.add_par(name, data)
 
 
+@dataclass
+class Structures:
+    """Shorthand class for carrying configured structure information."""
+
+    level: Set[str]
+    node: Set[str]
+    sector: Set[str]
+    #: Model years for which MACRO is calibrated.
+    year: Set[int]
+
+
 def add_structure(
-    scenario: "Scenario",
-    mapping_macro_sector: pd.DataFrame,
-    nodes: List,
-    sectors: List,
-    ym1: int,
+    scenario: "Scenario", mapping_macro_sector: "DataFrame", s: Structures, ym1: int
 ) -> None:
     """Add MACRO structure information to `scenario`."""
     # Remove old initializeyear_macro before adding new one
@@ -166,11 +173,11 @@ def add_structure(
 
     # Add nodal set structure
     scenario.add_set("type_node", "economy")
-    for n in nodes:
+    for n in s.node:
         scenario.add_set("cat_node", ["economy", n])
 
     # Add sectoral set structure
-    scenario.add_set("sector", sectors)
+    scenario.add_set("sector", s.sector)
     scenario.add_set("mapping_macro_sector", mapping_macro_sector)
 
 
@@ -186,13 +193,7 @@ def bconst(demand_ref, gdp0, price_ref, rho) -> "Series":
     return price_ref / 1e3 * tmp
 
 
-def clean_model_data(
-    data: "Quantity",
-    levels: List[str],
-    nodes: List[str],
-    sectors: List[str],
-    years: List[int],
-) -> pd.DataFrame:
+def clean_model_data(data: "Quantity", s: Structures) -> "DataFrame":
     """Clean MESSAGE variable data for calibration of MACRO parameters.
 
     Parameters
@@ -208,16 +209,16 @@ def clean_model_data(
     """
     from genno.computations import rename_dims, select
 
+    names = {"c": "commodity"}
+
     selectors: MutableMapping[Hashable, Iterable[Hashable]] = {}
-    for dim, values in (("l", levels), ("n", nodes), ("sector", sectors), ("y", years)):
+    for dim, kind in ("l", "level"), ("n", "node"), ("sector", "sector"), ("y", "year"):
         if dim in data.dims:
-            selectors[dim] = cast(List[Hashable], list(values))
+            selectors[dim] = list(getattr(s, kind))
+            names[dim] = kind
 
     return (
-        rename_dims(
-            select(data, selectors),
-            {"c": "commodity", "l": "level", "n": "node", "y": "year"},
-        )
+        rename_dims(select(data, selectors), names)
         .to_dataframe()
         .reset_index()
         .rename(columns={data.name: "value"})
@@ -313,15 +314,12 @@ def mapping_macro_sector(config: "DataFrame") -> "DataFrame":
 
 
 def price(
-    model_price: pd.DataFrame,
-    price_ref: pd.DataFrame,
-    mapping_macro_sector: pd.DataFrame,
+    model_price: "DataFrame",
+    price_ref: "DataFrame",
+    mapping_macro_sector: "DataFrame",
+    s: Structures,
     ym1: int,
-    levels: List,
-    nodes: List,
-    sectors: List,
-    years: List,
-) -> pd.DataFrame:
+) -> "DataFrame":
     """Prepare data for the ``price_MESSAGE`` MACRO parameter.
 
     Reads PRICE_COMMODITY from MESSAGEix, validates the data, and combines
@@ -345,10 +343,10 @@ def price(
     data = model_price.merge(mapping_macro_sector, on=["commodity", "level"])
 
     # Check for completeness of nodes, sectors
-    _validate_data(None, data, levels, nodes, sectors, years)
+    _validate_data(None, data, s)
     # Check for completeness of years within nodes and sectors
-    for (n, s), group_df in data.groupby(["node", "sector"]):
-        if set(years) - set(group_df["year"]):
+    for (node, _), group_df in data.groupby(["node", "sector"]):
+        if set(s.year) - set(group_df["year"]):
             error_message = "Missing data for some periods"
         elif np.isclose(group_df["value"], 0).any():
             error_message = "0-price found"
@@ -358,7 +356,7 @@ def price(
         log.info("\n" + data.to_string())
         raise RuntimeError(
             f"{error_message} in MESSAGE variable PRICE_COMMODITY for "
-            f"commodity={group_df.commodity.unique()[0]!r}, node={n!r}."
+            f"commodity={group_df.commodity.unique()[0]!r}, node={node!r}."
         )
 
     # - Use row(s) for reference data for the pre-model period
@@ -417,10 +415,14 @@ def unique_set(column: str, df: "DataFrame") -> Set:
     return set(df[column].dropna().unique())
 
 
-def validate_transform(name: str, df: pd.DataFrame, levels, nodes, sectors, years):
+def validate_transform(
+    name: str, data: Mapping[str, "DataFrame"], s: Structures
+) -> "Series":
     """Validate `df` as input data for `name`, and transform for further calculation."""
-    if isinstance(df, str):
-        raise KeyError(f"Input data is missing entry {name!r}")
+    try:
+        df = data[name]
+    except KeyError:
+        raise KeyError(f"Missing input data table {name!r}")
 
     if name == "config":
         cols = ["node", "sector", "level", "commodity", "year"]
@@ -432,8 +434,8 @@ def validate_transform(name: str, df: pd.DataFrame, levels, nodes, sectors, year
                 raise ValueError(f"Config data for {col!r} is empty")
         return
 
-    # Validate this parameter, retrieving the index columns/dimensions
-    idx = _validate_data(name, df, levels, nodes, sectors, years)
+    # Validate this parameter and retrieve the index columns/dimensions
+    idx = _validate_data(name, df, s)
 
     # Store units of this parameter
     units = df["unit"].unique()
@@ -441,23 +443,16 @@ def validate_transform(name: str, df: pd.DataFrame, levels, nodes, sectors, year
     # self.units[name] = units[0] # FIXME reenable
 
     try:
-        # Discard data beyond `max_macro_year`
-        df = df.query(f"year <= {max(years)}")
-    except Exception:  # pandas.errors.UndefinedVariableError
+        # Discard data beyond the last MACRO year
+        df = df.query(f"year <= {max(s.year)}")
+    except Exception:  # pandas.errors.UndefinedVariableError; no "year" column
         pass
 
-    # Store as pd.Series with multi-index
+    # Series with multi-index
     return df.set_index(idx)["value"]
 
 
-def _validate_data(
-    name: Optional[str],
-    df: pd.DataFrame,
-    levels: List,
-    nodes: List,
-    sectors: List,
-    years: List,
-) -> List:
+def _validate_data(name: Optional[str], df: "DataFrame", s: Structures) -> List:
     """
     Validate the input data for MACRO calibration to ensure the
     format is compatible with MESSAGEix.
@@ -469,14 +464,8 @@ def _validate_data(
         data from Excel, these names are the Excel sheet names.
     df : Pandas DataFrame
         Data of each MACRO calibration parameter.
-    nodes : list
-        List of nodes for MACRO calibration.
-    sectors : list
-        List of sectors for MACRO calibration.
-    levels : list
-        List of levels for MACRO calibration.
-    years : list
-        List of model years for which MACRO calibration is applied.
+    s :
+        Instance of :class:`.Structures`.
 
     Raises
     ------
@@ -502,19 +491,14 @@ def _validate_data(
             raise ValueError(f"Missing expected columns for {name}: {col_diff}")
 
     # check required column values
-    for kind, values in (
-        ("level", levels),
-        ("node", nodes),
-        ("sector", sectors),
-        ("year", years),
-    ):
+    for kind in "level", "node", "sector", "year":
         try:
-            diff = set(values) - set(df[kind])
+            diff = getattr(s, kind) - set(df[kind])
         except KeyError:
             continue
-        else:
-            if diff:
-                raise ValueError(f"Not all {kind}s included in {name} data: {diff}")
+
+        if diff:
+            raise ValueError(f"Not all {kind}s included in {name} data: {diff}")
 
     return cols
 
@@ -707,56 +691,53 @@ def prepare_computer(
 
     # Configuration
     c.add("config::macro", itemgetter("config"), "data")
-    # Structure information derive from `config`
-    c.add("mapping_macro_sector", mapping_macro_sector, "config::macro")
+    # Structure information derived from `config`
+    mms = c.add("mapping_macro_sector", mapping_macro_sector, "config::macro")
+    c.add("level::macro", partial(unique_set, "level"), mms)
     c.add("node::macro", partial(unique_set, "node"), "config::macro")
-    c.add("sector::macro", partial(unique_set, "sector"), "mapping_macro_sector")
-    c.add("level::macro", partial(unique_set, "level"), "mapping_macro_sector")
+    c.add("sector::macro", partial(unique_set, "sector"), mms)
     # Periods in `DEMAND` variable and also in `config`
     c.add("year::macro", macro_periods, "DEMAND:y", "config::macro")
-
-    # Shorthand for l, n, s, y structure information
-    _s = "level::macro node::macro sector::macro year::macro".split()
+    # Collect structure information in a class for easier reference
+    c.add("_s", Structures, *[f"{n}::macro" for n in "level node sector year".split()])
 
     # Collection of keys to run to check input data formats
     checks = []
 
     # Add keys to retrieve, validate, and transform input data
     for name in INPUT_DATA:
-        # Extract a single dataframe from the dict
-        key = c.add(f"{name}::raw", itemgetter(name), "data")
-        # Validate and transform
-        checks.append(c.add(name, partial(validate_transform, name), key, *_s))
+        # Extract a single data frame from the dict, validate, and transform
+        c.add(name, partial(validate_transform, name), "data", "_s")
+        checks.append(name)
 
     # First year in `data` before model horizon; derived from "gdp_calibrate"
     c.add("ym1", ym1, "gdp_calibrate", "year::macro")
     checks.append("ym1")
 
     # Also check config
-    c.add("check config", partial(validate_transform, "config"), "config::macro", *_s)
+    c.add("check config", partial(validate_transform, "config"), "data", "_s")
     checks.append("check config")
 
     # "Clean" data from some MESSAGE variables for use in MACRO calibration functions
     cleaned = {}  # Keys for the cleaned data
     for name in "COST_NODAL_NET", "DEMAND", "PRICE_COMMODITY":
         key = c.full_key(name)
-        cleaned[name] = c.add(key.add_tag("macro"), clean_model_data, key, *_s)
+        assert isinstance(key, Key)
+        cleaned[name] = c.add(key.add_tag("macro"), clean_model_data, key, "_s")
 
     # Main calculation methods. Formerly these were given by Calculate.derive_data().
-    mms = "mapping_macro_sector"  # Shorthand
-
     c.add("grow", growth, "gdp_calibrate")
     c.add("rho", rho, "esub")
     c.add("historical_gdp", gdp0, "gdp_calibrate", "ym1")
     c.add("k0", k0, "historical_gdp", "kgdp")
     c.add("cost_MESSAGE", total_cost, cleaned["COST_NODAL_NET"], "cost_ref", "ym1")
-    mms = "mapping_macro_sector"  # Shorthand
     c.add(
         "price_MESSAGE",
         price,
         cleaned["PRICE_COMMODITY"],
         "price_ref",
         mms,
+        "_s",
         "ym1",
     )
     c.add("demand_MESSAGE", demand, cleaned["DEMAND"], "demand_ref", mms, "ym1")
@@ -781,14 +762,6 @@ def prepare_computer(
     c.add("add data", added)
 
     # Key to add structures to "target"
-    c.add(
-        "add structure",
-        add_structure,
-        "target",
-        "mapping_macro_sector",
-        "node::macro",
-        "sector::macro",
-        "ym1",
-    )
+    c.add("add structure", add_structure, "target", mms, "_s", "ym1")
 
     return c
