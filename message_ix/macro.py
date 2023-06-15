@@ -292,7 +292,7 @@ def k0(gdp0: "Series", kgdp: "Series") -> "Series":
     return kgdp * gdp0
 
 
-def macro_periods(demand: "Quantity", config: pd.DataFrame) -> List[int]:
+def macro_periods(demand: "Quantity", config: "DataFrame") -> Set[int]:
     """Periods ("years") for the MACRO model.
 
     The intersection of those appearing in the `config` data and in the `DEMAND`
@@ -305,7 +305,7 @@ def macro_periods(demand: "Quantity", config: pd.DataFrame) -> List[int]:
             f"No intersection of model periods {model_periods} and config periods "
             f"{config_periods}"
         )
-    return sorted(model_periods & config_periods)
+    return model_periods & config_periods
 
 
 def mapping_macro_sector(config: "DataFrame") -> "DataFrame":
