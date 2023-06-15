@@ -214,7 +214,7 @@ def clean_model_data(data: "Quantity", s: Structures) -> "DataFrame":
     selectors: MutableMapping[Hashable, Iterable[Hashable]] = {}
     for dim, kind in ("l", "level"), ("n", "node"), ("sector", "sector"), ("y", "year"):
         if dim in data.dims:
-            selectors[dim] = list(getattr(s, kind))
+            selectors[dim] = sorted(getattr(s, kind))
             names[dim] = kind
 
     return (
