@@ -184,7 +184,7 @@ def add_structure(
 def bconst(demand_ref, gdp0, price_ref, rho) -> "Series":
     """Calculate production function coefficient.
 
-    This is the MACRO GAMS parameter `prfconst`.
+    This is the MACRO GAMS parameter ``prfconst``.
     """
     # TODO automatically get the units here
     # NB(PNK) pandas 1.4.4 automatically drops "year" in the division; pandas 1.5.0
@@ -483,7 +483,8 @@ def _validate_data(name: Optional[str], df: "DataFrame", s: Structures) -> List:
     else:
         item = name.replace("_ref", "_MESSAGE")
         cols = MACRO_ITEMS[item]["idx_sets"].copy()
-        if name.endswith("_ref"):  # for cost_ref, demand_ref, price_ref
+        # For cost_ref, demand_ref, price_ref, only require one year's data
+        if name.endswith("_ref"):
             cols.remove("year")
 
         col_diff = set(cols + ["unit"]) - set(df.columns)
@@ -542,7 +543,7 @@ def ym1(df: "Series", macro_periods: Collection[int]) -> int:
 
 
 def add_model_data(base: "Scenario", clone: "Scenario", data: Mapping) -> None:
-    """Calculate required parameters and add data to `clone`.
+    """Calculate and add MACRO structure and data to `clone`.
 
     Parameters
     ----------
@@ -551,7 +552,7 @@ def add_model_data(base: "Scenario", clone: "Scenario", data: Mapping) -> None:
     clone : message_ix.Scenario()
         Clone of base scenario for adding calibration parameters.
     data : dict
-        Data of calibration.
+        Data for calibration.
 
     Raises
     ------

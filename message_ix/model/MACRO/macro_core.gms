@@ -1,4 +1,6 @@
 ***
+* .. _macro-core:
+*
 * MACRO core formulation
 * ======================
 *
