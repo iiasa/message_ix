@@ -350,17 +350,18 @@ def price(
     _validate_data(None, data, levels, nodes, sectors, years)
     # Check for completeness of years within nodes and sectors
     for (n, s), group_df in data.groupby(["node", "sector"]):
-        missing_years = set(years) - set(group_df["year"])
-        if missing_years:
-            raise RuntimeError(
-                "Missing data in MESSAGE variable PRICE_COMMODITY for "
-                f"commodity={group_df.commodity.unique()[0]!r}, node={n!r}."
-            )
+        if set(years) - set(group_df["year"]):
+            error_message = "Missing data for some periods"
         elif np.isclose(group_df["value"], 0).any():
-            raise RuntimeError(
-                "0-price found in MESSAGE variable PRICE_COMMODITY for "
-                f"commodity={group_df.commodity.unique()[0]!r}, node={n!r}."
-            )
+            error_message = "0-price found"
+        else:
+            continue
+
+        log.info("\n" + data.to_string())
+        raise RuntimeError(
+            f"{error_message} in MESSAGE variable PRICE_COMMODITY for "
+            f"commodity={group_df.commodity.unique()[0]!r}, node={n!r}."
+        )
 
     # - Use row(s) for reference data for the pre-model period
     # - Set desired index columns
