@@ -24,6 +24,7 @@ log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:  # pragma: no cover
     from genno import Computer, Quantity
+    from pandas import DataFrame, Series
 
     from message_ix.core import Scenario
 
@@ -117,7 +118,7 @@ INPUT_DATA = [
 # Internal calculations and computations (alphabetical order)
 
 
-def aconst(bconst, demand_ref, gdp0, k0, kpvs, rho) -> pd.Series:
+def aconst(bconst, demand_ref, gdp0, k0, kpvs, rho) -> "Series":
     """Calculate production function coefficient of capital and labor.
 
     This is the MACRO GAMS parameter `lakl`.
@@ -129,7 +130,7 @@ def aconst(bconst, demand_ref, gdp0, k0, kpvs, rho) -> pd.Series:
     return aconst.droplevel("year")
 
 
-def add_par(scenario: "Scenario", data: pd.DataFrame, ym1: int, *, name: str) -> None:
+def add_par(scenario: "Scenario", data: "DataFrame", ym1: int, *, name: str) -> None:
     """Add `data` to the `scenario`."""
     # FIXME look up the correct units
     units: Mapping[str, str] = {}
@@ -173,7 +174,7 @@ def add_structure(
     scenario.add_set("mapping_macro_sector", mapping_macro_sector)
 
 
-def bconst(demand_ref, gdp0, price_ref, rho) -> pd.Series:
+def bconst(demand_ref, gdp0, price_ref, rho) -> "Series":
     """Calculate production function coefficient.
 
     This is the MACRO GAMS parameter `prfconst`.
@@ -224,12 +225,11 @@ def clean_model_data(
 
 
 def demand(
-    model_demand: pd.DataFrame,
-    demand_ref: pd.DataFrame,
-    mapping_macro_sector: pd.DataFrame,
+    model_demand: "DataFrame",
+    demand_ref: "DataFrame",
+    mapping_macro_sector: "DataFrame",
     ym1: int,
-    levels: List,
-) -> pd.DataFrame:
+) -> "DataFrame":
     """Prepare data for the ``demand_MESSAGE`` MACRO parameter.
 
     Parameters
@@ -242,8 +242,6 @@ def demand(
         MACRO set of the same name; see :func:`.mapping_macro_sector`.
     ym1 :
         First pre-model period; see :func:`.ym1`.
-    levels :
-        List of level, from configuration.
 
     Returns
     -------
@@ -270,13 +268,13 @@ def demand(
     return result
 
 
-def gdp0(gdp_calibrate, ym1) -> pd.Series:
+def gdp0(gdp_calibrate, ym1) -> "Series":
     """Derive GDP reference values from "gdp_calibrate"."""
     return gdp_calibrate.iloc[gdp_calibrate.index.isin([ym1], level="year")]
 
 
-def growth(gdp_calibrate) -> pd.DataFrame:
-    """Calculate GDP growth rates between model periods (MACRO parameter `grow`)."""
+def growth(gdp_calibrate) -> "DataFrame":
+    """Calculate GDP growth rates between model periods (MACRO parameter ``grow``)."""
     diff = gdp_calibrate.groupby(level="node").diff()
     years = sorted(gdp_calibrate.index.get_level_values("year").unique())
     dt = pd.Series(years, index=pd.Index(years, name="year")).diff()
@@ -285,8 +283,8 @@ def growth(gdp_calibrate) -> pd.DataFrame:
     return growth.dropna()
 
 
-def k0(gdp0: pd.Series, kgdp: pd.Series) -> pd.Series:
-    """Calculate capital in the base period (`k0`).
+def k0(gdp0: "Series", kgdp: "Series") -> "Series":
+    """Calculate capital in the base period (``k0``).
 
     This is the product of the capital to GDP ratio (`kgdp`) and the reference GDP
     (`gdp0`)."""
@@ -309,8 +307,8 @@ def macro_periods(demand: "Quantity", config: pd.DataFrame) -> List[int]:
     return sorted(model_periods & config_periods)
 
 
-def mapping_macro_sector(config) -> pd.DataFrame:
-    """Data for the MACRO parameter `mapping_macro_sector`."""
+def mapping_macro_sector(config: "DataFrame") -> "DataFrame":
+    """Data for the MACRO set ``mapping_macro_sector``."""
     return config[["sector", "commodity", "level"]].dropna().drop_duplicates()
 
 
@@ -375,14 +373,12 @@ def price(
     return result
 
 
-def rho(esub: pd.Series) -> pd.Series:
+def rho(esub: "Series") -> "Series":
     """Calculate "rho" based on "esub", elasticity of substitution."""
     return (esub - 1) / esub
 
 
-def total_cost(
-    model_cost: pd.DataFrame, cost_ref: pd.DataFrame, ym1: int
-) -> pd.DataFrame:
+def total_cost(model_cost: "DataFrame", cost_ref: "DataFrame", ym1: int) -> "DataFrame":
     """
     Extract total systems cost from a solution of MESSAGEix and combine them
     with the cost values for the reference year.
@@ -416,7 +412,7 @@ def total_cost(
     return result
 
 
-def unique_set(column: str, df: pd.DataFrame) -> Set:
+def unique_set(column: str, df: "DataFrame") -> Set:
     """A :class:`set` of the unique elements in `column` of `df`."""
     return set(df[column].dropna().unique())
 
@@ -523,7 +519,7 @@ def _validate_data(
     return cols
 
 
-def ym1(df: pd.Series, macro_periods: Collection[int]) -> int:
+def ym1(df: "Series", macro_periods: Collection[int]) -> int:
     """Period for MACRO initialization.
 
     This is the period before the first period in the model horizon, or "year minus-
@@ -762,11 +758,8 @@ def prepare_computer(
         "price_ref",
         mms,
         "ym1",
-        *_s,
     )
-    c.add(
-        "demand_MESSAGE", demand, cleaned["DEMAND"], "demand_ref", mms, "ym1", "levels"
-    )
+    c.add("demand_MESSAGE", demand, cleaned["DEMAND"], "demand_ref", mms, "ym1")
     c.add("prfconst", bconst, "demand_ref", "historical_gdp", "price_ref", "rho")
     c.add(
         "lakl", aconst, "prfconst", "demand_ref", "historical_gdp", "k0", "kpvs", "rho"
