@@ -14,32 +14,45 @@ from message_ix.testing import SCENARIO, make_dantzig, make_westeros
 
 @pytest.fixture(scope="session")
 def mr_data_path():
+    """Path to the test data file for multi-region, multi-sector tests."""
     yield Path(__file__).parent.joinpath("data", "multiregion_macro_input.xlsx")
 
 
 @pytest.fixture(scope="session")
 def w_data_path():
+    """Path to the test data file for Westeros tests."""
     yield Path(__file__).parent.joinpath("data", "westeros_macro_input.xlsx")
 
 
 @pytest.fixture(scope="function")
 def w_data(w_data_path):
+    """Data from the Westeros test data file."""
     yield pd.read_excel(w_data_path, sheet_name=None, engine="openpyxl")
 
 
-@pytest.fixture(scope="class")
-def westeros_solved(test_mp):
+@pytest.fixture(scope="module")
+def _ws(test_mp):
+    """Reusable fixture with an instance of the Westeros model."""
     yield make_westeros(test_mp, solve=True, quiet=True)
 
 
-@pytest.fixture(scope="class")
-def westeros_not_solved(westeros_solved):
-    yield westeros_solved.clone(keep_solution=False)
+@pytest.fixture
+def westeros_solved(_ws):
+    """Fresh clone of the Westeros model."""
+    yield _ws.clone()
+
+
+@pytest.fixture
+def westeros_not_solved(_ws):
+    """Fresh clone of the Westeros model, without a solution."""
+    yield _ws.clone(keep_solution=False)
+
+
+# Tests
 
 
 def test_calc_valid_data_file(westeros_solved, w_data_path):
-    s = westeros_solved
-    c = macro.prepare_computer(s, data=w_data_path)
+    c = macro.prepare_computer(westeros_solved, data=w_data_path)
     c.get("check all")
 
 
@@ -54,14 +67,13 @@ def test_calc_invalid_data(westeros_solved):
 
 
 def test_calc_valid_data_dict(westeros_solved, w_data):
-    s, data = westeros_solved, w_data
-    c = macro.prepare_computer(s, data=data)
+    c = macro.prepare_computer(westeros_solved, data=w_data)
     c.get("check all")
 
 
 def test_calc_valid_years(westeros_solved, w_data):
     """Select desirable years from a config file in Excel format."""
-    s, data = westeros_solved, w_data
+    data = w_data
 
     # Add an arbitrary year
     arbitrary_yr = 2021
@@ -76,7 +88,7 @@ def test_calc_valid_years(westeros_solved, w_data):
     assert arbitrary_yr in set(data["gdp_calibrate"]["year"])
 
     # And macro does calibration without error
-    s.add_macro(data=data)
+    westeros_solved.add_macro(data=data)
 
 
 def test_calc_no_solution(westeros_not_solved, w_data_path):
@@ -86,8 +98,7 @@ def test_calc_no_solution(westeros_not_solved, w_data_path):
 
 
 def test_config(westeros_solved, w_data_path):
-    s = westeros_solved
-    c = macro.prepare_computer(s, data=w_data_path)
+    c = macro.prepare_computer(westeros_solved, data=w_data_path)
     assert "config::macro" in c.graph
     assert "sector" in c.get("config::macro")
     assert {"Westeros"} == c.get("node::macro")
@@ -96,45 +107,45 @@ def test_config(westeros_solved, w_data_path):
     # Missing columns in config raises an exception
     data = c.get("data")
     data["config"] = data["config"][["node", "sector"]]
-    c = macro.prepare_computer(s, data=data)
+    c = macro.prepare_computer(westeros_solved, data=data)
     with pytest.raises(Exception, match="level"):
         c.get("check all")
 
     # Entirely missing config raises an exception
     data.pop("config")
-    c = macro.prepare_computer(s, data=data)
+    c = macro.prepare_computer(westeros_solved, data=data)
     with pytest.raises(Exception, match="config"):
         c.get("check all")
 
 
 def test_calc_data_missing_par(westeros_solved, w_data):
-    s, data = westeros_solved, w_data
+    data = w_data
 
     data.pop("gdp_calibrate")
 
-    c = macro.prepare_computer(s, data=data)
+    c = macro.prepare_computer(westeros_solved, data=data)
     with pytest.raises(Exception, match="gdp_calibrate"):
         c.get("check all")
 
 
 def test_calc_data_missing_column(westeros_solved, w_data):
-    s, data = westeros_solved, w_data
+    data = w_data
 
     # Drop a column
     data["gdp_calibrate"] = data["gdp_calibrate"].drop("year", axis=1)
 
-    c = macro.prepare_computer(s, data=data)
+    c = macro.prepare_computer(westeros_solved, data=data)
     with pytest.raises(Exception, match="Missing expected columns.*year"):
         c.get("check all")
 
 
 def test_calc_data_missing_datapoint(westeros_solved, w_data):
-    s, data = westeros_solved, w_data
+    data = w_data
 
     # Skip first data point
     data["gdp_calibrate"] = data["gdp_calibrate"][1:]
 
-    c = macro.prepare_computer(s, data=data)
+    c = macro.prepare_computer(westeros_solved, data=data)
     with pytest.raises(Exception, match="Must provide two gdp_calibrate data points"):
         c.get("check all")
 
@@ -169,8 +180,7 @@ def test_calc(westeros_solved, w_data_path, key, test, expected):
 
 # Testing how macro handles zero values in PRICE_COMMODITY
 def test_calc_price_zero(westeros_solved, w_data_path):
-    s = westeros_solved
-    clone = s.clone(scenario="low_demand", keep_solution=False)
+    clone = westeros_solved.clone(scenario="low_demand", keep_solution=False)
     clone.check_out()
     # Lowering demand in the first year
     clone.add_par("demand", ["Westeros", "light", "useful", 700, "year"], 10, "GWa")
