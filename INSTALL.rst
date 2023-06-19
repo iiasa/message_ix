@@ -88,14 +88,19 @@ Using Anaconda
 
     $ conda config --prepend channels conda-forge
 
-7. Create a new conda environment and activate it.
+7. Install and configure the `mamba solver`_, which is faster and more reliable than conda's default solver::
+
+    $ conda install conda-libmamba-solver
+    $ conda config --set solver libmamba 
+
+8. Create a new conda environment and activate it.
    This step is **required** if using Anaconda, but *optional* if using Miniconda.
    This example uses the name ``message_env``, but you can use any name of your choice::
 
     $ conda create --name message_env
     $ conda activate message_env
 
-8. Install the ``message-ix`` package into the current environment (either e.g. ``message_env``, or another name from step 7) [4]_::
+9. Install the ``message-ix`` package into the current environment (either e.g. ``message_env``, or another name from step 7) [4]_::
 
     $ conda install message-ix
 
@@ -110,7 +115,7 @@ Go to the section `Check that installation was successful`_.
 .. [3] The ‘$’ character at the start of these lines indicates that the command text should be entered in the terminal or prompt, depending on the operating system.
    Do not retype the ‘$’ character itself.
 .. [4] Notice that conda uses the hyphen (‘-’) in package names, different from the underscore (‘_’) used in Python when importing the package.
-.. note:: When using Anaconda (not Miniconda), steps (5) through (8) can also be performed using the graphical Anaconda Navigator.
+.. note:: When using Anaconda (not Miniconda), steps (5) through (9) can also be performed using the graphical Anaconda Navigator.
    See the `Anaconda Navigator documentation`_ for how to perform the various steps.
 
 
@@ -125,8 +130,9 @@ If you install Anaconda (step 4, above), then ``pip`` is also usable.
 
 5. Open a command prompt and run::
 
-    $ pip install message_ix
+    $ pip install message_ix[docs,report,tests,tutorial]
 
+   The ``[docs,report,tests,tutorial]`` extra requirements ensure additional dependencies are installed.
 
 From source
 -----------
@@ -144,14 +150,20 @@ From source
     # or:
     $ git clone git@github.com:USER/message_ix.git
 
-7. Open a command prompt in the ``message_ix`` directory and type::
+7. (Conditional) If you cloned your fork, add the main repository as a remote git repository. This will allow keeping up to date with changes there and importing tags, which also needs to be done for the install tests to succeed::
 
-    $ pip install --editable .[docs,reporting,tests,tutorial]
+    $ git remote add upstream git@github.com:iiasa/message_ix.git
+
+    $ git fetch upstream --tags
+
+8. Open a command prompt in the ``message_ix`` directory and type::
+
+    $ pip install --editable .[docs,report,tests,tutorial]
 
    The ``--editable`` flag ensures that changes to the source code are picked up every time :code:`import message_ix` is used in Python code.
-   The ``[docs,reporting,tests,tutorial]`` extra requirements ensure additional dependencies are installed.
+   The ``[docs,report,tests,tutorial]`` extra requirements ensure additional dependencies are installed.
 
-8. (Optional) If you will be using :file:`MESSAGE_master.gms` outside of Python :mod:`message_ix` to run |MESSAGEix|, you will likely modify this file, but will not want to commit these changes to Git.
+9. (Optional) If you will be using :file:`MESSAGE_master.gms` outside of Python :mod:`message_ix` to run |MESSAGEix|, you will likely modify this file, but will not want to commit these changes to Git.
    Set the Git “assume unchanged” bit for this file::
 
     $ git update-index --assume-unchanged message_ix/model/MESSAGE_master.gms
@@ -159,7 +171,7 @@ From source
    To unset the bit, use ``--no-assume-unchanged``.
    See the `Git documentation`_ for more details.
 
-9. (Optional) If installed from source, run the built-in test suite to check that |MESSAGEix| functions correctly on your system::
+10. (Optional) If installed from source, run the built-in test suite to check that |MESSAGEix| functions correctly on your system::
 
     $ pytest
 
@@ -241,7 +253,7 @@ The package `pyam-iamc <https://pypi.org/project/pyam-iamc/>`_ is one of the "re
 These extra dependencies are not installed automatically, but can be installed using::
 
     # If message_ix is installed using pip
-    $ pip install message_ix[reporting]
+    $ pip install message_ix[report]
     # or
     $ pip install pyam-iamc
 
@@ -276,3 +288,4 @@ If you installed this package accidentally, remove it using::
 .. _`IRkernel`: https://irkernel.github.io/installation/
 .. _`these instructions`: https://javatutorial.net/set-java-home-windows-10
 .. _`managing channels`: https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html
+.. _`mamba solver`: https://conda.github.io/conda-libmamba-solver/
