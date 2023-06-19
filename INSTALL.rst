@@ -150,7 +150,8 @@ From source
     # or:
     $ git clone git@github.com:USER/message_ix.git
 
-7. (Conditional) If you cloned your fork, add the main repository as a remote git repository. This will allow keeping up to date with changes there and importing tags, which also needs to be done for the install tests to succeed::
+7. (Conditional) If you cloned your fork, add the main repository as a remote git repository. 
+   This will allow keeping up to date with changes there and importing tags, which also needs to be done for the install tests to succeed::
 
     $ git remote add upstream git@github.com:iiasa/message_ix.git
 
