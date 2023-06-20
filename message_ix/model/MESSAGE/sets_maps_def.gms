@@ -104,7 +104,7 @@ $ONEMPTY
 *
 * .. [#time] The set ``time`` collects all sub-annual temporal units across all levels of temporal disaggregation.
 *    In a ``MESSAGE``-scheme :class:`ixmp.Scenario`, this set always includes an element "year",
-*    and the duration of that element is 1 (:math:`duration\_time_{'year'} = 1`).
+*    and the duration of that element is 1 (:math:`\text{duration_time}_{\text{'year'}} = 1`).
 *
 * .. [#shares] A generic formulation of share constraints is implemented in |MESSAGEix|,
 *    see :ref:`share_constraints`.
@@ -204,13 +204,13 @@ Alias(commodity,commodity2);
 *      - Notation
 *      - Explanatory comments
 *    * - level_resource (level) [#level_res]_
-*      - :math:`l \in L^{RES} \subseteq L`
+*      - :math:`l \in L^{\text{RES}} \subseteq L`
 *      - Levels related to `fossil resources` representation
 *    * - level_renewable (level) [#level_res]_
-*      - :math:`l \in L^{REN} \subseteq L`
+*      - :math:`l \in L^{\text{REN}} \subseteq L`
 *      - Levels related to `renewables` representation
 *    * - level_storage(level)
-*      - :math:`l \in L^{STOR} \subseteq L`
+*      - :math:`l \in L^{\text{STOR}} \subseteq L`
 *      - Subsets of levels on which commodities are :ref:`stored <gams-storage>`; excluded from :ref:`commodity balances <commodity_balance_lt>`.
 *    * - type_node [#type_node]_
 *      - :math:`\widehat{n} \in \widehat{N}`
@@ -225,13 +225,13 @@ Alias(commodity,commodity2);
 *      - :math:`t \in T(\widehat{t})`
 *      - Category mapping between tec types and technologies (all technologies mapped to the category ``type_tec`` :math:`\widehat{t}`)
 *    * - inv_tec (tec) [#inv_tec]_
-*      - :math:`t \in T^{INV} \subseteq T`
+*      - :math:`t \in T^{\text{INV}} \subseteq T`
 *      - Specific subset of investment technologies (all technologies with investment decisions and capacity constraints)
 *    * - renewable_tec (tec) [#renewable_tec]_
-*      - :math:`t \in T^{REN} \subseteq T`
+*      - :math:`t \in T^{\text{REN}} \subseteq T`
 *      - Specific subset of renewable-energy technologies (all technologies which draw their input from the renewable level)
 *    * - storage_tec(tec)
-*      - :math:`t \in T^{STOR} \subseteq T`
+*      - :math:`t \in T^{\text{STOR}} \subseteq T`
 *      - Subset of technologies that are :ref:`storage <gams-storage>` container technologies (reservoirs)
 *    * - addon(tec)
 *      - :math:`t^a \in T^{A} \subseteq T`
@@ -255,7 +255,7 @@ Alias(commodity,commodity2);
 *      - :math:`e \in E(\widehat{e})`
 *      - Category mapping between emission types and emissions (all emissions mapped to the category ``type_emission`` :math:`\widehat{e}`)
 *    * - type_tec_land (type_tec) [#type_tec_land]_
-*      - :math:`\widehat{t} \in \widehat{T}^{LAND} \subseteq \widehat{T}`
+*      - :math:`\widehat{t} \in \widehat{T}^{\text{LAND}} \subseteq \widehat{T}`
 *      - Mapping set of technology types and land use
 *    * - balance_equality (commodity,level)
 *      - :math:`c \in C, l \in L`
