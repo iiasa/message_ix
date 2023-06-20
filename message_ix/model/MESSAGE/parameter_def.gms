@@ -56,7 +56,7 @@
 * .. [#duration_time_year] The element 'Year' in the set of subannual time slices ``time`` has the value of 1.
 *    This value is assigned by default when creating a new :class:`ixmp.Scenario` based on the ``MESSAGE`` scheme.
 *
-* .. [#short_dur] The short-hand notation :math:`|y|` is used for the parameters :math:`duration\_period_y`
+* .. [#short_dur] The short-hand notation :math:`|y|` is used for the parameters :math:`\text{duration_period}_y`
 *    in the mathematical model documentation for exponents.
 *
 * .. [#year_auto] The values for this parameter are computed automatically when exporting a ``MESSAGE``-scheme
@@ -526,7 +526,7 @@ Parameters
 *
 * .. math::
 *    \sum_{m} \text{ACT}_{n,t,y^V,y,m,h} \leq \text{duration_time}_{h} \cdot \text{capacity_factor}_{n,t,y^V,y,h} \\
-*    \cdot \text{CAP}_{n,t,y^V,y} \quad t \ \in \ T^{INV}
+*    \cdot \text{CAP}_{n,t,y^V,y} \quad t \ \in \ T^{\text{INV}}
 *
 * and the historical new capacity with
 *
@@ -817,7 +817,7 @@ Parameters
 *    * - fixed_land
 *      - ``node`` | ``land_scenario`` | ``year``
 *
-* Note that the variable :math:`STOCK\_CHG` is determined implicitly by the :math:`STOCK` variable
+* Note that the variable :math:`\text{STOCK_CHG}` is determined implicitly by the :math:`\text{STOCK}` variable
 * and therefore does not need to be explicitly fixed.
 ***
 
