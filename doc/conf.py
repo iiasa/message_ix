@@ -138,6 +138,8 @@ intersphinx_mapping = {
 
 # -- Options for sphinx.ext.mathjax ----------------------------------------------------
 
+# See https://github.com/iiasa/message_ix/pull/721#pullrequestreview-1497907368:
+# prefer to write \text{} explicitly
 # TODO read at least some of these from message_ix.models
 # TODO complete list
 # TODO also add these to a LaTeX preamble
