@@ -51,7 +51,7 @@ def as_message_df(
         name,
         unit=f"{qty.units:~}",
         value=base["value"],
-        **{k1: base[k2] for k1, k2 in dims.items()},
+        **{k1: base.get(k2) for k1, k2 in dims.items()},
         **common,
     )
     return {name: df} if wrap else df
