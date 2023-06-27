@@ -5,38 +5,48 @@ Developed in PyCharm, with Python 3.10.4
 """
 
 import argparse
-import os  # imported by: from lpdiag import *
+import os
+from os import access, R_OK
+from os.path import isfile
 import sys  # needed for sys.exit() and redirecting stdout
-
-# import numpy as np
-# import pandas as pd
 from datetime import datetime as dt
-
+# from datetime import timedelta as td
+# noinspection PyUnresolvedReferences
 from message_ix.tools.lp_diag.lpdiag import (
     LPdiag,  # LPdiag class for processing and analysis of LP matrices
 )
 
-# from lpdiag import *
-# from datetime import timedelta as td
+"""
+The above import stmt works only in the message-ix editable environment; it is treated as error
+by PyCharm (but it works); therefore, the noinspection option is applied for the statement.
+In other environments the import from message_ix... does not work; therefore, it has to be
+replaced by the below (now commented-out) import statement. The latter, however, mypy flags as error.
+"""
+# from lpdiag import LPdiag
 
 
 def read_args():
     descr = """
-    Driver of the LP diagnostics script.
+    Diagnostics of basic properties of LP Problems represented by the MPS-format.
 
-    Example usgae:
-    python main.py --path "message_ix/tools/lp_diag" --mps "test.mps" -s
+    Examples of usage:
+    python main.py
+    python main.py -h
+    python main.py --mps data/mps_tst/aez --outp foo.txt
 
     """
+    # python main.py --path "message_ix/tools/lp_diag" --mps "test.mps" -s
 
     parser = argparse.ArgumentParser(
         description=descr, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    path = "--path : string\n    Working directory of MCA/LPdiag."
-    parser.add_argument("--path", help=path)
-    mps = "--mps : string\n    Name of mps file with extenstion."
+    wdir = "--wdir : string\n    Working directory."
+    parser.add_argument("--wdir", help=wdir)
+    mps = "--mps : string\n  Name of the MPS file (optionally with path)."
     parser.add_argument("--mps", help=mps)
-    parser.add_argument("-s", "--save", action="store_true")  # on/off flag
+    outp = "--outp : string\n  Redirect output to the named file."
+    parser.add_argument("--outp", help=outp)
+    # parser.add_argument("-s", "--save", action="store_true")  # on/off flag
 
     # parse cli
     cl_args = parser.parse_args()
@@ -50,22 +60,35 @@ if __name__ == "__main__":
     functions of LPdiag class.
     """
 
+    dir1 = os.getcwd()
+    print(f'{dir1 =}')
     tstart = dt.now()
     # print('Started at:', str(tstart))
 
     # Retrieve and assign arguments
     args = read_args()
-    wrk_dir = args.path or "./"
+    dir2 = os.getcwd()
+    print(f'{dir2 =}')
+    w_dir = args.wdir or "."
+    # todo: change Data/mps_tst to: Test_mps, remove other Data
     # prob_id = args.mps or "Data/mps_tst/diet"  # default MPS for testing
     prob_id = args.mps or "Data/mps_tst/aez"  # default MPS for testing
     # prob_id = args.mps or "Data/mps_tst/err_tst"  # default MPS for testing
     # prob_id = args.mps or "Data/mps_tst/lotfi"  # default MPS for testing
     # prob_id = args.mps or "Data/mps/of_led1"  # default MPS for testing
-    redir_stdo = args.save
-    try:
-        os.chdir(wrk_dir)
-    except OSError:
-        print("cannot find", wrk_dir)
+    if len(w_dir) > 1:
+        print(f"Changing work-directory to: {w_dir}.")
+        try:
+            os.chdir(w_dir)
+        except OSError:
+            print(f"Cannot change work-directory to: {w_dir}.")
+    dir3 = os.getcwd()
+    print(f'{dir3 =}')
+    assert isfile(prob_id), (
+        f"MPS file {prob_id} not accessible from the dir:\n'{dir3}'.\n"
+        "Try to use the --wdir command option to set the work-directory."
+    )
+    assert access(prob_id, R_OK), f"MPS file {prob_id} is not readable."
 
     # small MPSs, for testing the code, posted to Data/mps_tst dir
     # err_tst  - small MPS with various errors for testing the diagnostics
@@ -94,25 +117,29 @@ if __name__ == "__main__":
     # prob_id = "of_baselin"
     # fn_mps = data_dir + prob_id
     # repdir = 'rep_shared/'      # subdirectory for shared reports (NOT in git-repo)
-    repdir = "rep_tst/"  # subdirectory for test-reports (NOT in git-repo)
+    # repdir = "rep_tst/"  # subdirectory for test-reports (NOT in git-repo)
+
+    # redir_stdo = args.save
+    fn_outp = args.outp or None  # optional redirection of stdout
 
     # redir_stdo = False  # redirect stdout to the file in repdir
     default_stdout = sys.stdout
-    if redir_stdo:
-        fn_out = "./" + repdir + prob_id + ".txt"  # file for redirected stdout
-        print(f"Stdout redirected to: {fn_out}")
-        f_out = open(fn_out, "w")
+    if fn_outp:
+        # fn_out = "./" + repdir + prob_id + ".txt"  # file for redirected stdout
+        print(f"Stdout redirected to: {fn_outp}")
+        f_out = open(fn_outp, "w")
         sys.stdout = f_out
-    else:  # defined to avoid warnings (only used when redir_stdo == True)
-        fn_out = "foo"
-        f_out = open(fn_out, "w")
+    # else:  # defined to avoid warnings (only used when redir_stdo == True)
+    #     fn_out = "foo"
+    #     f_out = open(fn_out, "w")
 
-    lp = LPdiag(repdir)  # LPdiag ctor
-    # lp.rd_mps(fn_mps)  # read MPS, store the matrix in dataFrame
+    # lp = LPdiag(repdir)  # LPdiag ctor
+    dir4 = os.getcwd()
+    print(f'{dir4 =}')
+
+    lp = LPdiag()  # LPdiag ctor
     lp.rd_mps(prob_id)  # read MPS, store the matrix in dataFrame
-    lp.stat(
-        lo_tail=-7, up_tail=5
-    )  # statistics of the matrix coefficients, incl. distribution tails
+    lp.stat(lo_tail=-7, up_tail=5)  # stats of matrix coeffs, incl. distrib. tails
     # to get numbers of coeffs for each magnitute specify equal/overlapping tails:
     # lp.stat(lo_tail=0, up_tail=0)
     lp.out_loc(small=True, thresh=-7, max_rec=100)  # locations of small-value outliers
@@ -126,16 +153,17 @@ if __name__ == "__main__":
     print("Finished at:", str(tend))
     print(f"Wall-clock execution time: {time_diff.seconds} sec.")
 
-    if redir_stdo:  # close the redirected output
+    if fn_outp:  # close the redirected output
+        # noinspection PyUnboundLocalVariable
         f_out.close()
         sys.stdout = default_stdout
-        print(f"\nRedirected stdout stored in {fn_out}. Now writing to the console.")
+        print(f"\nRedirected stdout stored in {fn_outp}. Now writing to the console.")
         print("\nStarted at: ", str(tstart))
         print("Finished at:", str(tend))
         print(f"Wall-clock execution time: {time_diff.seconds} sec.")
 
     # TODO: plots of distributions of coeffs, if indeed usefull
-    # TODO: naive scaling? might not be informative to due the later preprocessing
-    # TODO: conform(?) to the MPS-standard: reject numbers of
+    # TODO: naive scaling? might not be informative due to the later preprocessing
+    # TODO: conform(?) to the MPS-standard: in particular, reject numbers of
     # abs(val): greater than 10^{10} or smaller than 10^{-10}
     #   to be discussed, if desired; also if it should be exception-error or info

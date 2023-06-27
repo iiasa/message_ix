@@ -4,8 +4,8 @@ Written by Marek Makowski, ECE Program of IIASA, in March 2023
 """
 
 import math
-import os
 
+# import os
 # import sys		# needed for sys.exit()
 import typing
 from collections import Counter
@@ -32,15 +32,11 @@ class LPdiag:
 
     Attributes
     ----------
-    rep_dir : str
-        sub-directory for reports (text and plots)
+
     """
 
-    def __init__(self, rep_dir):
-        self.rep_dir = rep_dir  # subdirectory for reports (text, in future also plots)
-        self.fname = (  # MPS input file (to be defined, if/when rd_mps() is called)
-            "undefined"
-        )
+    def __init__(self):
+        self.fname = "undefined"  # MPS file name, to be defined by rd_mps() call
         self.pname = "undefined"  # problem name
         self.id_rhs = False  # True, if rhs_id defined
         self.id_range = False  # True, if range_id defined
@@ -53,8 +49,8 @@ class LPdiag:
         self.n_rhs = 0  # number of defined RHS
         self.n_ranges = 0  # number of defined ranges
         self.n_bounds = 0  # number of defined bounds
-        if not os.path.exists(self.rep_dir):
-            os.makedirs(self.rep_dir, mode=0o755)
+        # if not os.path.exists(self.rep_dir):
+        #     os.makedirs(self.rep_dir, mode=0o755)
 
         # dictionaries for searchable names and its indices
         # (searching very-long lists is prohibitively slow)
