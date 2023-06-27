@@ -1,8 +1,10 @@
-.. Next release
-.. ============
+Next release
+============
 
-.. All changes
-.. -----------
+All changes
+-----------
+
+- Improve readability of LaTeX equations in docs (:pull:`721`).
 
 .. _v3.7.0:
 
