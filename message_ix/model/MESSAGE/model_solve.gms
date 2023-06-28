@@ -61,7 +61,7 @@ EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
     PRICE_EMISSION.l(node,type_emission,type_tec,year)$( SUM(type_year$( cat_year(type_year,year) ), 1 ) ) =
         SMAX(type_year$( cat_year(type_year,year) ),
                - EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year) )
-             * (df_period("1950")/df_period(year)) * (duration_period(year)/duration_period("1950"))    ;
+             * (sum(year_all$(ord(year_all) = 1), df_period(year_all))/df_period(year)) * (duration_period(year)/(sum(year_all$(ord(year_all) = 1), duration_period(year_all)))) ;
     PRICE_EMISSION.l(node,type_emission,type_tec,year)$(
         PRICE_EMISSION.l(node,type_emission,type_tec,year) = - inf ) = 0 ;
 
