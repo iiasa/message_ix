@@ -131,15 +131,16 @@ Variables
 *
 * Auxiliary variables
 * ^^^^^^^^^^^^^^^^^^^
-* =========================================================================== ======================================================================================================
-* Variable                                                                    Explanatory text
-* =========================================================================== ======================================================================================================
-* :math:`\text{DEMAND}_{n,c,l,y,h} \in \mathbb{R}`                            Demand level (in equilibrium with MACRO integration)
-* :math:`\text{PRICE_COMMODITY}_{n,c,l,y,h} \in \mathbb{R}`                   Commodity price (undiscounted marginals of :ref:`commodity_balance_gt` and :ref:`commodity_balance_lt`)
-* :math:`\text{PRICE_EMISSION}_{n,\widehat{e},\widehat{t},y} \in \mathbb{R}`  Emission price (undiscounted marginals of :ref:`emission_constraint`)
-* :math:`\text{COST_NODAL_NET}_{n,y} \in \mathbb{R}`                          System costs at the node level net of energy trade revenues/cost
-* :math:`\text{GDP}_{n,y} \in \mathbb{R}`                                     Gross domestic product (GDP) in market exchange rates for MACRO reporting
-* =========================================================================== ======================================================================================================
+* ======================================================================================= =======================================================================================================
+* Variable                                                                                Explanatory text
+* ======================================================================================= =======================================================================================================
+* :math:`\text{DEMAND}_{n,c,l,y,h} \in \mathbb{R}`                                        Demand level (in equilibrium with MACRO integration)
+* :math:`\text{EMISSION_CONSTRAINT_RESCALE}_{n,\widehat{e},\widehat{t},y} \in \mathbb{R}` Annual average marginal of :ref:`emission_constraint`
+* :math:`\text{PRICE_COMMODITY}_{n,c,l,y,h} \in \mathbb{R}`                               Commodity price (undiscounted marginals of :ref:`commodity_balance_gt` and :ref:`commodity_balance_lt`)
+* :math:`\text{PRICE_EMISSION}_{n,\widehat{e},\widehat{t},y} \in \mathbb{R}`              Emission price (undiscounted marginals of :ref:`emission_constraint`)
+* :math:`\text{COST_NODAL_NET}_{n,y} \in \mathbb{R}`                                      System costs at the node level net of energy trade revenues/cost
+* :math:`\text{GDP}_{n,y} \in \mathbb{R}`                                                 Gross domestic product (GDP) in market exchange rates for MACRO reporting
+* ======================================================================================= =======================================================================================================
 *
 * .. warning::
 *    Please be aware that transitioning from one period length to another for consecutive periods may result in false values of :math:`\text{PRICE_EMISSION}`. 
@@ -149,6 +150,7 @@ Variables
 Variables
 * auxiliary variables for demand, prices, costs and GDP (for reporting when MESSAGE is run with MACRO)
     DEMAND(node,commodity,level,year_all,time) demand
+    EMISSION_CONSTRAINT_RESCALE(node,type_emission,type_tec,type_year) rescaled of marginals of EMISSION_CONSTRAINT constraint
     PRICE_COMMODITY(node,commodity,level,year_all,time)  commodity price (derived from marginals of COMMODITY_BALANCE constraint)
     PRICE_EMISSION(node,type_emission,type_tec,year_all) emission price (derived from marginals of EMISSION_BOUND constraint)
     COST_NODAL_NET(node,year_all)              system costs at the node level over time including effects of energy trade
