@@ -14,7 +14,7 @@ if (%foresight% = 0,
 * This is the standard option; the GAMS global variable ``%foresight%=0`` by default.
 *
 * .. math::
-*    \min_x \text{OBJ} = \sum_{y \in Y} \text{OBJ}_y(x_y)
+*    \min_x OBJ = \sum_{y \in Y} OBJ_y(x_y)
 ***
 
 * reset year in case it was set by MACRO to include the base year before
@@ -40,11 +40,11 @@ if (%foresight% = 0,
     ) ;
 
 * rescale the dual of the emission constraint to account that the constraint is defined on the average year, not total
-EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
+EMISSION_CONSTRAINT_RESCALE.l(node,type_emission,type_tec,type_year)$(
         EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year) ) =
     EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)
         / SUM(year$( cat_year(type_year,year) ), duration_period(year) )
-        * SUM(year$( map_first_period(type_year,year) ), duration_period(year) / df_period(year) * df_year(year) );
+;
 
 
 * assign auxiliary variables DEMAND, PRICE_COMMODITY and PRICE_EMISSION for integration with MACRO and reporting
@@ -54,8 +54,8 @@ EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
             / df_period(year) ;
     PRICE_EMISSION.l(node,type_emission,type_tec,year)$( SUM(type_year$( cat_year(type_year,year) ), 1 ) ) =
         SMAX(type_year$( cat_year(type_year,year) ),
-               - EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year) )
-            / df_year(year) ;
+               - EMISSION_CONSTRAINT_RESCALE.l(node,type_emission,type_tec,type_year) )
+            / df_period(year) * duration_period(year);
     PRICE_EMISSION.l(node,type_emission,type_tec,year)$(
         PRICE_EMISSION.l(node,type_emission,type_tec,year) = - inf ) = 0 ;
 
@@ -77,10 +77,10 @@ else
 * Loop over :math:`\hat{y} \in Y`, solving
 *
 * .. math::
-*     \min_x \ \text{OBJ} = \sum_{y \in \hat{Y}(\hat{y})} \text{OBJ}_y(x_y) \\
+*     \min_x \ OBJ = \sum_{y \in \hat{Y}(\hat{y})} OBJ_y(x_y) \\
 *     \text{s.t. } x_{y'} = x_{y'}^* \quad \forall \ y' < y
 *
-* where :math:`\hat{Y}(\hat{y}) = \{y \in Y | \ |\hat{y}| - |y| < \text{optimization_horizon} \}` and
+* where :math:`\hat{Y}(\hat{y}) = \{y \in Y | \ |\hat{y}| - |y| < optimization\_horizon \}` and
 * :math:`x_{y'}^*` is the optimal value of :math:`x_{y'}` in iteration :math:`|y'|` of the iterative loop.
 *
 * The advantage of this implementation is that there is no need to 'store' the optimal values of all decision
