@@ -145,6 +145,7 @@ Variables
 Variables
 * auxiliary variables for demand, prices, costs and GDP (for reporting when MESSAGE is run with MACRO)
     DEMAND(node,commodity,level,year_all,time) demand
+    EMISSION_CONSTRAINT_RESCALE(node,type_emission,type_tec,type_year) rescaled of marginals of EMISSION_CONSTRAINT constraint
     PRICE_COMMODITY(node,commodity,level,year_all,time)  commodity price (derived from marginals of COMMODITY_BALANCE constraint)
     PRICE_EMISSION(node,type_emission,type_tec,year_all) emission price (derived from marginals of EMISSION_EQUIVALENCE constraint)
     COST_NODAL_NET(node,year_all)              system costs at the node level over time including effects of energy trade
