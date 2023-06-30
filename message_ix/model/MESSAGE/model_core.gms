@@ -153,6 +153,7 @@ Variables
     EMISSION_CONSTRAINT_RESCALE(node,type_emission,type_tec,type_year) rescaled of marginals of EMISSION_CONSTRAINT constraint
     PRICE_COMMODITY(node,commodity,level,year_all,time)  commodity price (derived from marginals of COMMODITY_BALANCE constraint)
     PRICE_EMISSION(node,type_emission,type_tec,year_all) emission price (derived from marginals of EMISSION_BOUND constraint)
+    PRICE_EMISSION_NEW(node,type_emission,type_tec,year_all) emission price (derived from marginals of EMISSION_EQUIVALENCE constraint)
     COST_NODAL_NET(node,year_all)              system costs at the node level over time including effects of energy trade
     GDP(node,year_all)                         gross domestic product (GDP) in market exchange rates for MACRO reporting
 ;
