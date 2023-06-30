@@ -64,6 +64,7 @@ EMISSION_CONSTRAINT_RESCALE.l(node,type_emission,type_tec,type_year)$(
         ( PRICE_EMISSION.l(node,type_emission,type_tec,year) = eps ) or
         ( PRICE_EMISSION.l(node,type_emission,type_tec,year) = -inf ) ) = 0 ;
 
+
 %AUX_BOUNDS% AUX_ACT_BOUND_LO(node,tec,year_all,year_all2,mode,time)$( ACT.l(node,tec,year_all,year_all2,mode,time) < 0 AND
 %AUX_BOUNDS%    ACT.l(node,tec,year_all,year_all2,mode,time) = -%AUX_BOUND_VALUE% ) = yes ;
 %AUX_BOUNDS% AUX_ACT_BOUND_UP(node,tec,year_all,year_all2,mode,time)$( ACT.l(node,tec,year_all,year_all2,mode,time) > 0 AND
