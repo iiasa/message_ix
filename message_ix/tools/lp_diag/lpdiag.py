@@ -18,10 +18,12 @@ from message_ix.tools.lp_diag.lp_diag import (
 )
 
 """
-The above import stmt works only in the message-ix editable environment; it is treated as error
-by PyCharm (but it works); therefore, the noinspection option is applied for the statement.
-In other environments the import from message_ix... does not work; therefore, it has to be
-replaced by the below (now commented-out) import statement. The latter, however, mypy flags as error.
+The above import stmt works only in the message-ix editable environment; it is treated
+as error by PyCharm (but it works); therefore, the noinspection option is applied for
+this statement.
+In other environments the import from message_ix... does not work; therefore, it has
+to be replaced by the below (now commented-out) import statement. The latter, however,
+mypy flags as error.
 """
 # from lp_diag import LPdiag
 
