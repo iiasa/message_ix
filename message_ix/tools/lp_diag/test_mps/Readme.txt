@@ -1,4 +1,4 @@
-The MPS files for testing:
+Small MPS files provided for testing:
 
 aez  - agro-ecological zones, medium size
 diet - classical small LP 
