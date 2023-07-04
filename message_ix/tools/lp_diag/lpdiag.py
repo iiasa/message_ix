@@ -6,10 +6,10 @@ Developed in PyCharm, with Python 3.10.4
 
 import argparse
 import os
-from os import access, R_OK
-from os.path import isfile
 import sys  # needed for sys.exit() and redirecting stdout
 from datetime import datetime as dt
+from os import R_OK, access
+from os.path import isfile
 
 # from datetime import timedelta as td
 # noinspection PyUnresolvedReferences
