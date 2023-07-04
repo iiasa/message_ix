@@ -73,12 +73,14 @@ if __name__ == "__main__":
     # dir2 = os.getcwd()
     # print(f"{dir2 =}")
     w_dir = args.wdir or "."
-    # prob_id = args.mps or "test_mps/diet"  # default MPS for testing
     prob_id = args.mps or "test_mps/aez"  # default MPS for testing
+    # alternative specs of test-MPS commented below
+    # prob_id = args.mps or "test_mps/diet"  # default MPS for testing
     # prob_id = args.mps or "test_mps/err_tst"  # default MPS for testing
+    # prob_id = args.mps or "test_mps/jg_korh"  # default MPS for testing
     # prob_id = args.mps or "test_mps/lotfi"  # default MPS for testing
-    # prob_id = args.mps or "test_mps/of_led1"  # default MPS for testing
     if len(w_dir) > 1:
+        work_dir = w_dir
         print(f"Changing work-directory to: {w_dir}.")
         try:
             os.chdir(w_dir)
@@ -87,8 +89,8 @@ if __name__ == "__main__":
     # dir3 = os.getcwd()
     # print(f"{dir3 =}")
     assert isfile(prob_id), (
-        f"MPS file {prob_id} not accessible from the dir:\n'{w_dir}'.\n"
-        "Try to use the --wdir command option to set the work-directory."
+        f"MPS file {prob_id} not accessible from the work-directory:\n'{work_dir}'."
+        "\nTry to use the --wdir command option to set the work-directory."
     )
     assert access(prob_id, R_OK), f"MPS file {prob_id} is not readable."
 
