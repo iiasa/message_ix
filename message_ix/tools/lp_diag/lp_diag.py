@@ -701,7 +701,7 @@ class LPdiag:
             "\nDistribution of int(log10(abs(values))) sorted by magnitudes of values:"
         )
         print(
-            f"range = [{min_logv}, {max_logv}] (magnitudes with zero-occurences"
+            f"range = [{min_logv}, {max_logv}] (magnitudes with zero-occurrences"
             " skipped)."
         )
         for magn in magn_dist:
@@ -715,12 +715,12 @@ class LPdiag:
         if lo_tail < min_logv:
             print(
                 f"\nNo log10(values) in the requested low-tail (<= {lo_tail}) of the"
-                " ditribution."
+                " distribution."
             )
         else:
             print(
                 "\nDistribution of log10(values) in the requested low-tail (<="
-                f" {lo_tail}) of the ditribution."
+                f" {lo_tail}) of the distribution."
             )
             print(f'{self.mat.loc[self.mat["log"] <= lo_tail].describe()}')
             for val in [*range(min_logv, lo_tail + 1)]:
@@ -732,12 +732,12 @@ class LPdiag:
         if max_logv < up_tail:
             print(
                 f"\nNo log10(values) in the requested upper-tail (>= {up_tail}) of the"
-                " ditribution."
+                " distribution."
             )
         else:
             print(
                 "\nDistribution of log10(values) in the requested upp-tail (>="
-                f" {up_tail}) of the ditribution."
+                f" {up_tail}) of the distribution."
             )
             print(f'{self.mat.loc[self.mat["log"] >= up_tail].describe()}')
             for val in [*range(up_tail, max_logv + 1)]:
