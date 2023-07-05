@@ -1,4 +1,4 @@
-.. lpDiag documentation master file
+.. lpDiag documentation file
 
 ``lpDiag``: basic diagnostics of the LP programming problems
 ============================================================
@@ -13,20 +13,36 @@ optimization problem.
 
 In this context, the term `outlier` denotes the model entities having values
 in either lower or upper tail of the corresponding value distribution.
-The tails are defined by the corresponding orders of magnitudes.
-The default values are (-6, 6), respectively; they can be redefined,
-if desired.
+The tails are defined by the corresponding orders of magnitudes defined as
+:math:`int(alog(abs(val)))`, where :math:`val` stands for the value of
+the corresponding coefficient.
+The default values of the tails are equal to (-6, 6), respectively;
+they can be redefined, if desired.
+
+The rule of thumb says: the maximum and minimum orders of magnitudes of
+the LP matrix coefficients passed to optimization should differ by at most four.
+``lpDiag`` helps to achieve such a goal by providing info on outliers.
+Such info can be used e.g., for:
+
+- reconsideration of measurement units of the corresponding variables
+  and relations,
+- consideration of replacing `small` (in relations to other coefficients in
+  the same row or column) by zero,
+- splitting the corresponding rows and/or columns,
+- verification of the coefficients' values.
 
 Features
 ^^^^^^^^
 
-The current version provides the following information:
+The current ``lpDiag`` version provides the following information:
 
 - characteristics of the problem (including numbers of rows, columns, non-zero
   coefficients and distributions of their values),
+- distributions of diverse values characterizing the LP matrix,
 - location (row and column) of each outlier,
-- ranges of values of other coefficients in each such row and column, as well as
-  the corresponding bounds (LHS, RHS for rows),
+- ranges of values of other coefficients in each such row or column, as well as
+  the corresponding bounds (LHS, RHS for rows, lower and upper bounds for
+  columns).
 
 The functionality of ``lpDiag`` will be gradually enhanced to meet actual needs
 of the ``message_ix`` modelers.
@@ -39,12 +55,76 @@ We provide several small MPSs for testing local installations, as well
 as becoming familiar with ``lpDiag``.
 Hints on generating MPS files are provided below.
 
+We suggest the following steps for becoming familiar with ``lpDiag`` and
+then use it for analysis of actual MPS files:
+
+- becoming familiar with ``lpDiag``,
+- prepare MPS file,
+- actual analysis.
+
+We outline each of these steps below.
+
+Becoming familiar with ``lpDiag``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Note that ``lpDiag`` should be run at the terminal prompt.
+
+- Navigate to the folder `message_ix/tools/lp_diag`. 
+- For initial testing run the following command, which will run analysis of
+  the default (pre-specified) MPS provided in the test_mps folder.
+  Other provided MPS example can be run by using the ``--mps`` option explained
+  below. ::
+
+	python lpdiag.py
+
+- To display the available ``lpDiag`` options run: ::
+
+	python lpdiag.py -h
+
+The output of the above should read as follows (except of the work_dir line,
+which differs for each local repository): ::
+
+	work_dir: '/Users/marek/Documents/GitHub/marek_iiasa/message_ix/message_ix/tools/lp_diag'.
+	usage: lpdiag.py [-h] [--wdir WDIR] [--mps MPS] [--outp OUTP]
+	Diagnostics of basic properties of LP Problems represented by the MPS-format.
+	Examples of usage:
+	python lpdiag.py
+	python lpdiag.py -h
+	python lpdiag.py --mps test_mps/aez --outp foo.txt
+	options:
+	-h, --help   show this help message and exit
+	--wdir WDIR  --wdir : string Working directory.
+	--mps MPS    --mps : string Name of the MPS file (optionally with path).
+	--outp OUTP  --outp : string Redirect output to the named file.
+
+Comments on the arguments of the above three options:
+
+- WDIR: specification of the desired work-directory (by default the work-directory
+  is the same, in which ``lpDiag`` is located).
+- MPS: name of the MPS file to be analysed; if the file is not located in the
+  work-directory, then the name should include the path to the file (see
+  the example above).
+- OUTP: name of the file to which the output shall be redirected.
+  By default the output is listed to the stdout, i.e., to the terminal window
+  unless the redirection is included in the command.
+  Optionally, the output can be redirected to a specified file.
+  Such redirection can be specified by either using the ``--outp file_name``
+  option, as illustrated by the second example shown above (in the output
+  resulting from using the ``-h`` option),
+  or by including the redirection in the corresponding command, e.g.,: ::
+
+	python lpdiag.py -h > foo.txt
+
+
 Generation of the MPS file in the ``message_ix`` environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The MPS-format is the oldest, and still popular, representation of the LP problems.
-Most modeling environments provide various ways of generation of the MPS file.
-For instance, upon solving a :class:`message_ix scenario` one shall define
+The MPS-format is the oldest but still widely used for specification of
+the LP problems.
+Most modeling environments provide various ways of the MPS file generation.
+
+In the ``message_ix`` environment one can generate the MPS file e.g.,
+upon solving a :class:`message_ix scenario` by defining
 in `scenario.solve()` the `writemps` option together with the desired name of
 the MPS file.
 The MPS file will then be generated and deposited in the `message_ix/message_ix/model`
@@ -57,63 +137,53 @@ Example of specification of the corresponding option::
 	`scenario.solve(solve_options={"writemps": "<file_name>.mps"})`
 
 
-Running ``lpDiag`` within the ``message_ix`` environment
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Actual analysis
+^^^^^^^^^^^^^^^
 
-Navigate to any folder you want to work; it is convenient to copy or link
-to such a folder the MPS file(s) you want to explore.
-If you want to use the provided MPS files, then you find them in
-`message_ix/tools/lp_diag`.
+For actual analysis one needs to specify the corresponding MPS file in
+a command run (still in the directory `message_ix/tools/lp_diag`): ::
 
-One can run ``lpDiag`` from the command line::
+	python lpdiag.py --mps loc/name
 
-	python main.py --path message_ix/tools/lp_diag --mps "<file_name>"
+where `loc` and `name` stand for the path to the directory where the MPS-file is
+located, and `name` stands for the corresponding file-name, respectively.
+Other option(s) can be included in the command, as explained above.
 
-utility on the specified `.mps` file located in the the directory `message_ix/tools/lp_diag`. The
-option `-s` will save the results in a text-file in the subdirectory (`repdir`) of the
-current working directory.
+If the output redirection is desired (e.g., for results to be shared or composed
+of many lines), then run: ::
 
-Running ``lpDiag`` locally
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+	python lpdiag.py --mps loc/name --outp outfile.txt
 
-Exploring results
-^^^^^^^^^^^^^^^^^
-
-Running ``lpDiag``
-^^^^^^^^^^^^^^^^^^
+Extensions in the file names are optional.
+An alternative way of output redirection is explained above.
 
 
-Please share your comments and report bugs in the in the Discussions and Issues
-of this repo, respectively.
+Summary of the provided analysis results
+----------------------------------------
 
-This tool adds new modeling years to an existing :class:`message_ix.Scenario` (hereafter "reference scenario"). For instance, in a scenario define with::
+The results are composed of the following elements:
 
-    history = [690]
-    model_horizon = [700, 710, 720]
-    sc_ref.add_horizon(
-        year=history + model_horizon,
-        firstmodelyear=model_horizon[0]
-    )
+- Info on the work-directory.
+- Info during reading the MPS file:
 
-.. additional years can be added after importing the add_year function::
+	- Should a syntax error occur during reading the file, then the corresponding
+	  exception is thrown with the corresponding details.
+	- Basic info during processing of each MPS section.
+- Basic attributes of the read MPS.
+- Distribution of values of the objective (goal function) coefficients.
+- Distribution of :math:`abs(val)` of the matrix elements.
+- Distribution of values of :math:`int(log10(abs(values)))`.
+- Distribution of values of :math:`int(log10(abs(values)))` sorted by
+  magnitudes of values (magnitudes of zero-occurrences skipped).
+- For each (lower and upper) tail of the matrix coefficient values of the
+  corresponding sub-matrix:
 
-    from message_ix.tools.add_year import add_year
-    sc_new = message_ix.Scenario(mp, sc_ref.model, sc_ref.scenario,
-                                 version='new')
-    add_year(sc_ref, sc_new, [705, 712, 718, 725])
-
-At this point, ``sc_new`` will have the years [700, 705, 710, 712, 718, 720, 725], and original or interpolated data for all these years in all parameters.
-
-
-The tool operates by creating a new empty Scenario (hereafter "new scenario") and:
-
-- Copying all **sets** from the reference scenario, adding new time steps to relevant sets (e.g., adding 2025 between 2020 and 2030 in the set ``year``)
-- Copying all **parameters** from the reference scenario, adding new years to relevant parameters, and calculating missing values for the added years.
-
-Features
-~~~~~~~~
-
-- It can be used for any MESSAGE scenario, from tutorials, country-level, and global models.
-- The new years can be consecutive, between existing years, and/or after the model horizon.
-- The user can define for what regions and parameters the new years should be added. This saves time when adding the new years to only one parameter of the reference scenario, when other parameters have previously been successfully added to the new scenario.
+  - Distributions of diverse values (:math:`value, abs(val), log10(abs(val))`)
+    of the matrix elements.
+  - For each order of magnitude: number of elements
+  - Row-wise location of each outlier with:
+    (1) info on other coefficients in the same row, (2) order of magnitude of the row's LHS and RHS.
+  - Column-wise location of each outlier with:
+    (1) info on other coefficients in the same column, and (2) order of magnitude of the column's lower and upper bounds.
+- The processing start- and end-times.
 
