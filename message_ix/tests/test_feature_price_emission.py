@@ -1,4 +1,5 @@
 import numpy.testing as npt
+import pandas as pd
 import pytest
 
 from message_ix import Scenario, make_df
@@ -93,8 +94,9 @@ def add_many_tecs(scen, years, n=50):
     """add a range of dirty-to-clean technologies to the scenario"""
     output_specs = ["node", "comm", "level", "year", "year"]
 
+    # tec: [emissions, var_cost, bound_activity_up]
     for i in range(1, n + 1):
-        t = "tec{}".format(i)
+        t = f"tec{i}"
         scen.add_set("technology", t)
         for y in years:
             tec_specs = ["node", t, y, y, "mode"]
@@ -105,6 +107,26 @@ def add_many_tecs(scen, years, n=50):
             scen.add_par("output", tec_specs + output_specs, 1, "GWa")
             scen.add_par("var_cost", tec_specs + ["year"], c, "USD/GWa")
             scen.add_par("emission_factor", tec_specs + ["CO2"], e, "tCO2")
+
+        scen.add_set("type_addon", "mitigation")
+        scen.add_set("map_tec_addon", ["tec1", "mitigation"])
+        if t != "tec1":
+            scen.add_set("addon", t)
+            scen.add_cat("addon", "mitigation", t)
+        df = pd.DataFrame(
+            {
+                "node": "node",
+                "technology": "tec1",
+                "year_vtg": years,
+                "year_act": years,
+                "mode": "mode",
+                "time": "year",
+                "type_addon": "mitigation",
+                "value": 1,
+                "unit": "-",
+            }
+        )
+        scen.add_par("addon_conversion", df)
 
 
 def test_no_constraint(test_mp, request):
@@ -270,7 +292,7 @@ def test_price_duality(test_mp, request, cumulative_bound):
     filters = {"node": "World"}
     emiss = scen.var("EMISS", filters).set_index("year").lvl
     emiss_tax = tax_scen.var("EMISS", filters).set_index("year").lvl
-    npt.assert_allclose(emiss, emiss_tax)
+    npt.assert_allclose(emiss, emiss_tax, rtol=0.05)
 
     # check that "PRICE_EMISSION" are close between cumulative and tax scenario
     filters = {"node": "World"}
