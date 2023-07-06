@@ -99,6 +99,20 @@ def add_many_tecs(scen, years, n=50):
     output_specs = ["node", "comm", "level", "year", "year"]
 
     # tec: [emissions, var_cost, bound_activity_up]
+    # tecs = {
+    #     "tec1": [10, 5, 1],
+    #     "tec2": [-1, 10, 0.4],
+    #     "tec3": [-5, 200, 0.3],
+    #     "tec4": [-15, 1200, 0.2],
+    #     "tec5": [-50, 6000, 0.1],
+    # }
+    # tecs = {
+    #     "tec1": [10, 5, 1],
+    #     "tec2": [-10, 10, 0.4],
+    #     "tec3": [-12, 20, 0.3],
+    #     "tec4": [-14, 30, 0.2],
+    #     "tec5": [-16, 40, 0.1],
+    # }
     for i in range(1, n + 1):
         t = f"tec{i}"
         scen.add_set("technology", t)
@@ -111,6 +125,10 @@ def add_many_tecs(scen, years, n=50):
             scen.add_par("output", tec_specs + output_specs, 1, "GWa")
             scen.add_par("var_cost", tec_specs + ["year"], c, "USD/GWa")
             scen.add_par("emission_factor", tec_specs + ["CO2"], e, "tCO2")
+
+            # scen.add_par("var_cost", tec_specs + ["year"], tecs[t][1], "USD/GWa")
+            # scen.add_par("emission_factor", tec_specs + ["co2"], tecs[t][0], "tCO2")
+            # scen.add_par("bound_activity_up", ["node", t, y, "mode", "year"], tecs[t][2], "GWa")
 
         scen.add_set("type_addon", "mitigation")
         scen.add_set("map_tec_addon", ["tec1", "mitigation"])
