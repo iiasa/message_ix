@@ -1,12 +1,12 @@
-.. lpDiag documentation file
+.. LPdiag documentation file
 
-``lpDiag``: basic diagnostics of the LP programming problems
+``LPdiag``: basic diagnostics of the LP programming problems
 ============================================================
 
 Description
 -----------
 
-``lpDiag`` provides basic information about the LP programming problems
+``LPdiag`` provides basic information about the LP programming problems
 defined by corresponding MPS-format files.
 The diagnostics focuses on the implied numerical properties of the underlying
 optimization problem.
@@ -21,7 +21,7 @@ they can be redefined, if desired.
 
 The rule of thumb says: the maximum and minimum orders of magnitudes of
 the LP matrix coefficients passed to optimization should differ by at most four.
-``lpDiag`` helps to achieve such a goal by providing info on outliers.
+``LPdiag`` helps to achieve such a goal by providing info on outliers.
 Such info can be used e.g., for:
 
 - reconsideration of measurement units of the corresponding variables
@@ -34,7 +34,7 @@ Such info can be used e.g., for:
 Features
 ^^^^^^^^
 
-The current ``lpDiag`` version provides the following information:
+The current ``LPdiag`` version provides the following information:
 
 - characteristics of the problem (including numbers of rows, columns, non-zero
   coefficients and distributions of their values),
@@ -44,7 +44,7 @@ The current ``lpDiag`` version provides the following information:
   the corresponding bounds (LHS, RHS for rows, lower and upper bounds for
   columns).
 
-The functionality of ``lpDiag`` will be gradually enhanced to meet actual needs
+The functionality of ``LPdiag`` will be gradually enhanced to meet actual needs
 of the ``message_ix`` modelers.
 
 Usage
@@ -52,22 +52,22 @@ Usage
 
 The tool analyzes provided MPS-format files.
 We provide several small MPSs for testing local installations, as well
-as becoming familiar with ``lpDiag``.
+as becoming familiar with ``LPdiag``.
 Hints on generating MPS files are provided below.
 
-We suggest the following steps for becoming familiar with ``lpDiag`` and
+We suggest the following steps for becoming familiar with ``LPdiag`` and
 then use it for analysis of actual MPS files:
 
-- becoming familiar with ``lpDiag``,
+- becoming familiar with ``LPdiag``,
 - prepare MPS file,
 - actual analysis.
 
 We outline each of these steps below.
 
-Becoming familiar with ``lpDiag``
+Becoming familiar with ``LPdiag``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Note that ``lpDiag`` should be run at the terminal prompt.
+Note that ``LPdiag`` should be run at the terminal prompt.
 
 - Navigate to the folder `message_ix/tools/lp_diag`. 
 - For initial testing run the following command, which will run analysis of
@@ -77,7 +77,7 @@ Note that ``lpDiag`` should be run at the terminal prompt.
 
 	python lpdiag.py
 
-- To display the available ``lpDiag`` options run: ::
+- To display the available ``LPdiag`` options run: ::
 
 	python lpdiag.py -h
 
@@ -100,7 +100,7 @@ which differs for each local repository): ::
 Comments on the arguments of the above three options:
 
 - WDIR: specification of the desired work-directory (by default the work-directory
-  is the same, in which ``lpDiag`` is located).
+  is the same, in which ``LPdiag`` is located).
 - MPS: name of the MPS file to be analysed; if the file is not located in the
   work-directory, then the name should include the path to the file (see
   the example above).
