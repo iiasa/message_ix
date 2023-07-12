@@ -34,7 +34,6 @@ EXPERIMENTAL = """
 
 You are using *experimental*, incomplete features from
 `message_ix.macro`—please exercise caution. Read more:
-- https://github.com/iiasa/message_ix/issues/315
 - https://github.com/iiasa/message_ix/issues/317
 - https://github.com/iiasa/message_ix/issues/318
 - https://github.com/iiasa/message_ix/issues/319
