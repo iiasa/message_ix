@@ -39,6 +39,7 @@ dependencies = [
   "numpy",
   "pandas >= 1.2",
   "PyYAML",
+  "scipy",
 ]
 
 [project.urls]
@@ -96,6 +97,7 @@ module = [
   "matplotlib.*",
   "pandas.*",
   "pyam",
+  "scipy",
   # Indirectly via ixmp; this should be a subset of the list in ixmp's pyproject.toml
   "dask.*",
   "jpype",
