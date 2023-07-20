@@ -128,6 +128,22 @@ def test_calc_data_missing_par(westeros_solved, w_data):
         c.get("check all")
 
 
+def test_calc_data_missing_ref(westeros_solved: Scenario, w_data):
+    """When "price_ref" is missing, the code computes it by extrapolation."""
+    data = w_data
+
+    # NB this doesn't work because extrapolating [511, 162, 161] backwards gives 1134, a
+    #    very high value; MACRO errors
+    # data.pop("cost_ref")
+
+    data.pop("price_ref")
+
+    c = macro.prepare_computer(westeros_solved, data=data)
+    c.get("check all")
+
+    westeros_solved.add_macro(data)
+
+
 def test_calc_data_missing_column(westeros_solved, w_data):
     data = w_data
 
@@ -291,7 +307,6 @@ def mr_scenario(test_mp):
     yield scenario
 
 
-@pytest.mark.skip(reason="mr_scenario fixture incomplete")
 def test_multiregion_valid_data(mr_data_path, mr_scenario):
     """Multi-region, multi-sector input data can be checked."""
     s = mr_scenario
@@ -299,7 +314,6 @@ def test_multiregion_valid_data(mr_data_path, mr_scenario):
     c.get("check all")
 
 
-@pytest.mark.skip(reason="mr_scenario fixture incomplete")
 def test_multiregion_derive_data(mr_data_path, mr_scenario):
     """Multi-region multi-sector data can be computed."""
     s = mr_scenario
