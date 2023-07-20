@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass
 from functools import partial
-from operator import itemgetter
+from operator import itemgetter, mul
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
@@ -114,10 +114,30 @@ INPUT_DATA = [
 ]
 
 
+# Utility methods
+
+
+def _notna(data, where=None):
+    """Raise :class:`RuntimeError` if `data` contains any missing values."""
+    if data.isna().any(axis=None):
+        raise RuntimeError(
+            f"NaN values in {__name__}.{where}:\n"
+            + data[data.isna().any(axis=1)].to_string()
+        )
+    return data
+
+
 # Internal calculations and computations (alphabetical order)
 
 
-def aconst(bconst, demand_ref, gdp0, k0, kpvs, rho) -> "Series":
+def aconst(
+    bconst: "Series",
+    demand_ref: "Series",
+    gdp0: "Series",
+    k0: "Series",
+    kpvs: "Series",
+    rho: "Series",
+) -> "Series":
     """Calculate production function coefficient of capital and labor.
 
     This is the MACRO GAMS parameter `lakl`.
@@ -148,7 +168,7 @@ def add_par(scenario: "Scenario", data: "DataFrame", ym1: int, *, name: str) -> 
 
 @dataclass
 class Structures:
-    """Shorthand class for carrying configured structure information."""
+    """MACRO structure information."""
 
     level: Set[str]
     node: Set[str]
@@ -180,7 +200,9 @@ def add_structure(
     scenario.add_set("mapping_macro_sector", mapping_macro_sector)
 
 
-def bconst(demand_ref, gdp0, price_ref, rho) -> "Series":
+def bconst(
+    demand_ref: "DataFrame", gdp0: "Series", price_ref: "DataFrame", rho: "Series"
+) -> "Series":
     """Calculate production function coefficient.
 
     This is the MACRO GAMS parameter ``prfconst``.
@@ -203,13 +225,14 @@ def clean_model_data(data: "Quantity", s: Structures) -> "DataFrame":
     Returns
     -------
     .DataFrame
-        With full column names and a "value" column. Only the labels in `levels`,
-        `nodes`, `sectors`, and `years` appear in the respective columns.
+        With full column names and a "value" column. Only the labels in `s` (levels,
+        nodes, sectors, and years) appear in the respective dimensions.
     """
     from genno.computations import rename_dims, select
 
     names = {"c": "commodity"}
 
+    # Construct selectors for only the values appearing in `s`
     selectors: MutableMapping[Hashable, Iterable[Hashable]] = {}
     for dim, kind in ("l", "level"), ("n", "node"), ("sector", "sector"), ("y", "year"):
         if dim in data.dims:
@@ -217,10 +240,11 @@ def clean_model_data(data: "Quantity", s: Structures) -> "DataFrame":
             names[dim] = kind
 
     return (
-        rename_dims(select(data, selectors), names)
-        .to_dataframe()
+        select(data, selectors)
+        .pipe(rename_dims, names)
+        .to_series()
+        .rename("value")
         .reset_index()
-        .rename(columns={data.name: "value"})
     )
 
 
@@ -255,21 +279,69 @@ def demand(
     """
     # - Use reference data for the pre-model period
     # - Map `model_demand` from MESSAGE (commodity, level) to MACRO sector
-    result = pd.concat(
-        [
-            demand_ref.reset_index().assign(year=ym1),
-            model_demand.merge(mapping_macro_sector, on=["commodity", "level"]),
-        ],
-        sort=True,
-    ).set_index(["node", "sector", "year"])["value"]
+    return (
+        pd.concat(
+            [
+                demand_ref.reset_index().assign(year=ym1),
+                model_demand.merge(mapping_macro_sector, on=["commodity", "level"]),
+            ],
+            sort=True,
+        )
+        .set_index(["node", "sector", "year"])["value"]
+        .pipe(_notna, "demand")
+    )
 
-    assert not result.isnull().any(), "NaN values found in demand calculation"
 
-    return result
+def extrapolate(
+    model_data: "DataFrame", mapping_macro_sector: "DataFrame", ym1: int
+) -> "Series":
+    """Extrapolate `model_data` to cover period `ym1`.
+
+    The extrapolation is done by fitting y = b * m ** x, i.e. with two parameters b and
+    m. This is identical to the GROWTH() function in Microsoft Excel (
+    https://support.microsoft.com/en-us/office/
+    growth-function-541a91dc-3d5e-437d-b156-21324e68b80d). Data are grouped on all other
+    dimensions, and fitting/extrapolation is performed for each group.
+
+    Returns
+    -------
+    pandas.Series
+        The index does _not_ have a ``year`` dimension; the data are implicitly for
+        `ym1`.
+    """
+    from scipy.optimize import curve_fit
+
+    def f(x, b, m):
+        """Compound growth function to fit."""
+        return b * m**x
+
+    def fitted_intercept(df: pd.DataFrame) -> float:
+        """Fit `f` to the data, with value → x and year → y."""
+        # Shift years so that ym1 = 0
+        (b, m), _ = curve_fit(f, df["year"] - ym1, df["value"])
+        return b  # The intercept at ym1 == b
+
+    # Apply fitted_intercept to grouped data
+    groupby_cols = set(model_data.columns) - {"year", "value"}
+    result = (
+        model_data.groupby(list(groupby_cols)).apply(fitted_intercept).rename("value")
+    )
+
+    # Convert "commodity" and "level" to "sector"
+    if "commodity" in model_data.columns:
+        result = (
+            result.reset_index()
+            .merge(mapping_macro_sector, on=["commodity", "level"])
+            .set_index(list(groupby_cols - {"commodity", "level"} | {"sector"}))[
+                "value"
+            ]
+        )
+
+    return result.pipe(_notna, "extrapolate")
 
 
-def gdp0(gdp_calibrate, ym1) -> "Series":
-    """Derive GDP reference values from "gdp_calibrate"."""
+def gdp0(gdp_calibrate, ym1: int) -> "Series":
+    """Select GDP reference values from "gdp_calibrate"."""
     return gdp_calibrate.iloc[gdp_calibrate.index.isin([ym1], level="year")]
 
 
@@ -283,18 +355,10 @@ def growth(gdp_calibrate) -> "DataFrame":
     return growth.dropna()
 
 
-def k0(gdp0: "Series", kgdp: "Series") -> "Series":
-    """Calculate capital in the base period (``k0``).
-
-    This is the product of the capital to GDP ratio (`kgdp`) and the reference GDP
-    (`gdp0`)."""
-    return kgdp * gdp0
-
-
 def macro_periods(demand: "Quantity", config: "DataFrame") -> Set[int]:
     """Periods ("years") for the MACRO model.
 
-    The intersection of those appearing in the `config` data and in the `DEMAND`
+    The intersection of those appearing in the `config` data and in the ``DEMAND``
     variable of the base scenario.
     """
     model_periods = set(demand.coords["y"].data)
@@ -321,12 +385,8 @@ def price(
 ) -> "DataFrame":
     """Prepare data for the ``price_MESSAGE`` MACRO parameter.
 
-    Reads PRICE_COMMODITY from MESSAGEix, validates the data, and combines
-    the data with a reference price specified for the base year of MACRO.
-
-    Parameters
-    ----------
-    model_price
+    Reads PRICE_COMMODITY from MESSAGEix, validates the data, and combines the data with
+    a reference price specified for the base year of MACRO.
 
     Raises
     ------
@@ -335,7 +395,7 @@ def price(
 
     Returns
     -------
-    price : pandas DataFrame
+    pandas.DataFrame
         Data of price per commodity, region, and level.
     """
     # Map from MESSAGE (commodity, level) to MACRO sector
@@ -361,13 +421,11 @@ def price(
     # - Use row(s) for reference data for the pre-model period
     # - Set desired index columns
     # - Select "value" series, discarding other columns (incl. commodity, level, time)
-    result = pd.concat(
-        [price_ref.reset_index().assign(year=ym1), data], sort=True
-    ).set_index(["node", "sector", "year"])["value"]
-
-    assert not result.isna().any()
-
-    return result
+    return (
+        pd.concat([price_ref.reset_index().assign(year=ym1), data], sort=True)
+        .set_index(["node", "sector", "year"])["value"]
+        .pipe(_notna, "price")
+    )
 
 
 def rho(esub: "Series") -> "Series":
@@ -376,9 +434,7 @@ def rho(esub: "Series") -> "Series":
 
 
 def total_cost(model_cost: "DataFrame", cost_ref: "DataFrame", ym1: int) -> "DataFrame":
-    """
-    Extract total systems cost from a solution of MESSAGEix and combine them
-    with the cost values for the reference year.
+    """Combine `model_cost` and `cost_ref` (reference year) data.
 
     Raises
     ------
@@ -396,17 +452,17 @@ def total_cost(model_cost: "DataFrame", cost_ref: "DataFrame", ym1: int) -> "Dat
     #   FIXME determine if this is necessary and describe why
     # - Set desired index columns.
     # - Select "value" series, discarding other columns.
-    result = pd.concat(
-        [
-            cost_ref.reset_index().assign(year=ym1),
-            model_cost.assign(value=model_cost.value / 1e3),
-        ],
-        sort=True,
-    ).set_index(["node", "year"])["value"]
-
-    assert not result.isnull().any(), "NaN values found in total_cost calculation"
-
-    return result
+    return (
+        pd.concat(
+            [
+                cost_ref.reset_index().assign(year=ym1),
+                model_cost.assign(value=model_cost.value / 1e3),
+            ],
+            sort=True,
+        )
+        .set_index(["node", "year"])["value"]
+        .pipe(_notna, "total_cost")
+    )
 
 
 def unique_set(column: str, df: "DataFrame") -> Set:
@@ -452,9 +508,7 @@ def validate_transform(
 
 
 def _validate_data(name: Optional[str], df: "DataFrame", s: Structures) -> List:
-    """
-    Validate the input data for MACRO calibration to ensure the
-    format is compatible with MESSAGEix.
+    """Validate input `df` against `s` for MACRO parameter `name` calibration .
 
     Parameters
     ----------
@@ -473,24 +527,25 @@ def _validate_data(name: Optional[str], df: "DataFrame", s: Structures) -> List:
 
     Returns
     -------
-    cols : List
-        Index sets of the validated MESSAGEix parameter.
+    list of str
+        Dimensions/index sets of the validated MESSAGEix parameter.
     """
-    # Check required columns
+    # Check required dimensions
     if name is None:
-        cols = []
+        dims: List[str] = []
     else:
         item = name.replace("_ref", "_MESSAGE")
-        cols = MACRO_ITEMS[item]["idx_sets"].copy()
-        # For cost_ref, demand_ref, price_ref, only require one year's data
+        dims = MACRO_ITEMS[item]["idx_sets"].copy()
+        # For cost_ref, demand_ref, price_ref, only require one year's data, without a
+        # "year" dimension
         if name.endswith("_ref"):
-            cols.remove("year")
+            dims.remove("year")
 
-        col_diff = set(cols + ["unit"]) - set(df.columns)
-        if col_diff:
-            raise ValueError(f"Missing expected columns for {name}: {col_diff}")
+        diff = set(dims) - set(df.columns) - {"unit"}
+        if diff:
+            raise ValueError(f"Missing expected columns for {name}: {diff}")
 
-    # check required column values
+    # Check required labels in keys
     for kind in "level", "node", "sector", "year":
         try:
             diff = getattr(s, kind) - set(df[kind])
@@ -500,14 +555,13 @@ def _validate_data(name: Optional[str], df: "DataFrame", s: Structures) -> List:
         if diff:
             raise ValueError(f"Not all {kind}s included in {name} data: {diff}")
 
-    return cols
+    return dims
 
 
 def ym1(df: "Series", macro_periods: Collection[int]) -> int:
-    """Period for MACRO initialization.
+    """Period for MACRO initialization: "year minus-one".
 
-    This is the period before the first period in the model horizon, or "year minus-
-    one".
+    This is the period before the first period in the model horizon.
 
     Parameters
     ----------
@@ -552,11 +606,6 @@ def add_model_data(base: "Scenario", clone: "Scenario", data: Mapping) -> None:
         Clone of base scenario for adding calibration parameters.
     data : dict
         Data for calibration.
-
-    Raises
-    ------
-    type
-        If the data format is not compatible with MESSAGEix parameters.
     """
     c2 = prepare_computer(base, clone, data)
     for k in "add structure", "add data":
@@ -588,50 +637,47 @@ def calibrate(s, check_convergence=True, **kwargs):
 
     """
     # Solve MACRO standalone
-    var_list = ["N_ITER", "MAX_ITER", "aeei_calibrate", "grow_calibrate"]
     gams_args = ["LogOption=2"]  # pass everything to log file
-    s.solve(model="MACRO", var_list=var_list, gams_args=gams_args)
+    s.solve(
+        model="MACRO",
+        var_list=["N_ITER", "MAX_ITER", "aeei_calibrate", "grow_calibrate"],
+        gams_args=gams_args,
+    )
+
     n_iter = s.var("N_ITER")["lvl"]
     max_iter = s.var("MAX_ITER")["lvl"]
-    msg = "MACRO converged after {} of a maximum of {} iterations"
-    log.info(msg.format(n_iter, max_iter))
+    log.info(f"MACRO converged after {n_iter} of a maximum of {max_iter} iterations")
 
     units = s.par("grow")["unit"].unique()
     assert 1 == len(units), "Non-unique units for 'grow'"
 
     # Get out calibrated values
-    aeei = (
-        s.var("aeei_calibrate")
-        .rename(columns={"lvl": "value"})
-        .drop("mrg", axis=1)
-        .assign(unit=units[0])
-    )
-    grow = (
-        s.var("grow_calibrate")
-        .rename(columns={"lvl": "value"})
-        .drop("mrg", axis=1)
-        .assign(unit=units[0])
-    )
+    data = {}
+    for name in "aeei", "grow":
+        data[name] = (
+            s.var(f"{name}_calibrate")
+            .rename(columns={"lvl": "value"})
+            .drop("mrg", axis=1)
+            .assign(unit=units[0])
+        )
 
     # Update calibrated value parameters
     s.remove_solution()
-    s.check_out()
-    s.add_par("aeei", aeei)
-    s.add_par("grow", grow)
-    s.commit("Updating MACRO values after calibration")
+    with s.transact("Update MACRO values after calibration"):
+        s.add_par("aeei", data["aeei"])
+        s.add_par("grow", data["grow"])
     s.set_as_default()
 
-    # test to make sure number of iterations is 1
+    # Test to make sure number of iterations is 1
     if check_convergence:
         test = s.clone(s.model, "test to confirm MACRO converges")
-        var_list = ["N_ITER"]
-        kwargs["gams_args"] = kwargs.get("gams_args", gams_args)
-        test.solve(model="MESSAGE-MACRO", var_list=var_list, **kwargs)
+        kwargs.setdefault("gams_args", gams_args)
+        test.solve(model="MESSAGE-MACRO", var_list=["N_ITER"], **kwargs)
         test.set_as_default()
 
         n_iter = test.var("N_ITER")["lvl"]
         if n_iter > 1:
-            raise RuntimeError(f"Number of iterations after calibration {n_iter} is >1")
+            raise RuntimeError(f"Number of iterations after calibration {n_iter} > 1")
 
     return s
 
@@ -672,6 +718,7 @@ def prepare_computer(
     # "data" key: either literal data, or a task to read it from file
     if isinstance(data, Mapping):
         c.add("data", data)
+        direct_data = True
     else:
         # Handle a file path
         try:
@@ -688,16 +735,20 @@ def prepare_computer(
             partial(pd.read_excel, sheet_name=None, engine="openpyxl"),
             data_path,
         )
+        direct_data = False
 
     # Configuration
     c.add("config::macro", itemgetter("config"), "data")
+
     # Structure information derived from `config`
     mms = c.add("mapping_macro_sector", mapping_macro_sector, "config::macro")
     c.add("level::macro", partial(unique_set, "level"), mms)
     c.add("node::macro", partial(unique_set, "node"), "config::macro")
     c.add("sector::macro", partial(unique_set, "sector"), mms)
+
     # Periods in `DEMAND` variable and also in `config`
     c.add("year::macro", macro_periods, "DEMAND:y", "config::macro")
+
     # Collect structure information in a class for easier reference
     c.add("_s", Structures, *[f"{n}::macro" for n in "level node sector year".split()])
 
@@ -725,11 +776,21 @@ def prepare_computer(
         assert isinstance(key, Key)
         cleaned[name] = c.add(key.add_tag("macro"), clean_model_data, key, "_s")
 
+        # Configuration key for corresponding reference data
+        k_ref = name.split("_")[0].lower() + "_ref"
+
+        # Maybe extrapolate reference data from variable data
+        if direct_data and k_ref not in data:
+            log.info(f"Data for {k_ref} will be extrapolated from {cleaned[name]}")
+            c.add(k_ref, extrapolate, cleaned[name], mms, "ym1")
+
     # Main calculation methods. Formerly these were given by Calculate.derive_data().
     c.add("grow", growth, "gdp_calibrate")
     c.add("rho", rho, "esub")
     c.add("historical_gdp", gdp0, "gdp_calibrate", "ym1")
-    c.add("k0", k0, "historical_gdp", "kgdp")
+    # Capital in the base period (``k0``). This is the product of the capital to GDP
+    # ratio (`kgdp`) and the reference GDP (`historical_gdp`).
+    c.add("k0", mul, "historical_gdp", "kgdp")
     c.add("cost_MESSAGE", total_cost, cleaned["COST_NODAL_NET"], "cost_ref", "ym1")
     c.add(
         "price_MESSAGE",
@@ -755,13 +816,13 @@ def prepare_computer(
             c.add(f"add {name}", partial(add_par, name=name), "target", name, "ym1")
         )
 
-    # Key to run all checks
+    # Run all checks
     c.add("check all", checks)
 
-    # Key to compute and add all data to "target"
+    # Compute and add all data to "target"
     c.add("add data", added)
 
-    # Key to add structures to "target"
+    # Add structures to "target"
     c.add("add structure", add_structure, "target", mms, "_s", "ym1")
 
     return c
