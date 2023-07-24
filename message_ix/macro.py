@@ -50,8 +50,7 @@ UNITS = dict(
     price_MESSAGE="price_ref",
 )
 
-#: All of the ixmp items (sets, parameters, variables, and equations) in the MACRO
-#: mathematical formulation.
+#: ixmp items (sets, parameters, variables, and equations) for MACRO.
 MACRO_ITEMS: Mapping[str, Mapping] = dict(
     sector=dict(ix_type="set"),
     mapping_macro_sector=dict(ix_type="set", idx_sets=["sector", "commodity", "level"]),
@@ -295,18 +294,19 @@ def demand(
 def extrapolate(
     model_data: "DataFrame", mapping_macro_sector: "DataFrame", ym1: int
 ) -> "Series":
-    """Extrapolate `model_data` to cover period `ym1`.
+    r"""Extrapolate `model_data` to cover period `ym1`.
 
-    The extrapolation is done by fitting y = b * m ** x, i.e. with two parameters b and
-    m. This is identical to the GROWTH() function in Microsoft Excel (
-    https://support.microsoft.com/en-us/office/
-    growth-function-541a91dc-3d5e-437d-b156-21324e68b80d). Data are grouped on all other
-    dimensions, and fitting/extrapolation is performed for each group.
+    The extrapolation is done by fitting :math:`y = b \times m ^ x`, i.e. with two
+    parameters `b` and `m`. This is identical to the GROWTH() function in Microsoft
+    Excel (
+    https://support.microsoft.com/en-us/office/growth-function-541a91dc-3d5e-437d-b156-21324e68b80d
+    ). Data are grouped on all other dimensions, and fitting/extrapolation is performed
+    for each group.
 
     Returns
     -------
     pandas.Series
-        The index does _not_ have a ``year`` dimension; the data are implicitly for
+        The index does *not* have a ``year`` dimension; the data are implicitly for
         `ym1`.
     """
     from scipy.optimize import curve_fit
@@ -824,5 +824,8 @@ def prepare_computer(
 
     # Add structures to "target"
     c.add("add structure", add_structure, "target", mms, "_s", "ym1")
+
+    # commented: used to generate the diagram in the documentation
+    # c.visualize("macro-calibrate.svg", key="add data")
 
     return c

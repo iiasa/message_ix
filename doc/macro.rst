@@ -1,35 +1,37 @@
 Calibrate and tune MESSAGE-MACRO
 ********************************
 
-Demand elasticities are modelled in MESSAGE via an iterative link to MACRO :cite:`Messner-Schrattenholzer-2000`.
-The iterative solution process between MESSAGE and MACRO, referred to as "MESSAGE-MACRO", sends information on "energy prices" and "total system costs" from MESSAGE to MACRO, and "demand" and "GDP" from MACRO to MESSAGE, until the demand responses are such that the two models have reached equilibrium (:cite:`Johnson-2016`, further details can be found :ref:`here <message_doc:macro>`).
-This linkage between the two models is activated by calling :meth:`.solve` with the argument `model='MESSAGE-MACRO'`, or using the GAMS :file:`MESSAGE-MACRO_run.gms` script directly (see :ref:`running` for details about these two methods).
+“MESSAGE-MACRO” refers to an iterative algorithm that links MESSAGE and MACRO :cite:`Messner-Schrattenholzer-2000`.
+This algorithm allows to model demand elasticity: MESSAGE solution data on energy prices and total system costs are provided to MACRO, and MACRO solution data on (endogenous) demand and GDP are provided to MESSAGE.
+This process continues until a convergence criterion or “equilibrium” is reached—briefly, that the MACRO demand output varies minimally between two iterations (:cite:`Johnson-2016`, further details can be found :ref:`here <message_doc:macro>`).
+
+The linked models can be activated by calling :meth:`.Scenario.solve` with the argument `model='MESSAGE-MACRO'`, or using the GAMS :file:`MESSAGE-MACRO_run.gms` script directly (see :ref:`running` for details about these two methods).
 
 .. contents::
    :local:
 
-To solve a scenario in a MESSAGE-MACRO mode, that scenario should be MACRO-calibrated first.
+To solve a MESSAGE scenario using MESSAGE-MACRO, it is first necessary to calibrate MACRO.
 As described in :cite:`Johnson-2016`, the calibration process…
 
    is parameterized off of a baseline scenario (which assumes some autonomous rate of energy efficiency improvement, AEEI) and is conducted for all MESSAGE regions simultaneously.
    Therefore, the demand responses motivated by MACRO are meant to represent the additional (compared to the baseline) energy efficiency improvements and conservation that would occur in each region as a result of higher prices for energy services.
 
-In the calibration process, the user defines a reference energy price (`price_ref`) and reference total cost (`cost_ref`) for the energy system that corresponds to a reference value for demand (`demand_ref`) for a base year.
-Then, using these exogenous reference values plus energy prices (`PRICE_COMMODITY`) and total system cost (`COST_NODAL_NET`) from the solution of MESSAGE for a given demand time series (`demand`), the calibration process changes two parameters, namely, the autonomous rate of energy efficiency improvement (`aeei`) and growth in GDP (`grow`), so that the output of MACRO (`GDP` and `DEMAND`) would converge to an initially specified timeseries trajectory of GDP (`gdp_calibrate`) and demand (`demand`), respectively.
-The scenario used for calibration is usually a baseline scenario, meaning that this scenario will not include any long-term climate policy targets.
-Without the calibration, the output of MACRO (`GDP` and `DEMAND`) can be different from the initial exogenous assumptions for GDP and demand (`gdp_calibrate` and `demand`) in MESSAGE for a given scenario.
+In the calibration process, the user provides exogenous, reference energy prices (``price_ref``) and reference total energy system cost (``cost_ref``) that correspond to a reference level of demand (``demand_ref``) in a particular **reference year**—generally, the ‘historic’ period that directly precedes the first period in the MESSAGE model horizon for optimization (``firstmodelyear``).
+This reference year is a period for which commodity prices and energy system cost are known for a given demand of those commodities.
 
-The calibration process is invoked using the :meth:`.add_macro` on a (baseline) scenario.
-The calibration will be run for the entire optimization-time horizon, i.e., for all model periods after and including, the `firstmodelyear`.
-The calibration process requires some input data, including reference prices, demand, and total system cost of the last historic period in the model, i.e., the model period prior to the `firstmodelyear`, referred to as the "reference year" in the calibration process.
-This "reference year" represents the model period for which commodity prices and energy system cost are known for a given demand of those commodities.
+Using these reference values plus energy prices (``PRICE_COMMODITY``) and total system cost (``COST_NODAL_NET``) from the solution of MESSAGE for a given demand time series (``demand``), the calibration process changes two parameters, namely, the autonomous rate of energy efficiency improvement (``aeei``) and growth in GDP (``grow``), such that the output of MACRO (``GDP`` and ``DEMAND``) converges to an initially specified time series trajectory of GDP (``gdp_calibrate``) and demand (``demand``), respectively.
+The scenario used for calibration is usually a baseline scenario, meaning that this scenario does not include any constraints that implement policy targets that affect commodity prices (for instance, long-term climate policy targets).
+Without the calibration, the output of MACRO (``GDP`` and ``DEMAND``) can be different from the initial exogenous assumptions for GDP and demand (``gdp_calibrate`` and ``demand``) in MESSAGE for a given scenario.
+
+The calibration process is invoked using :meth:`.Scenario.add_macro` on a (baseline) scenario and runs for the entire optimization-time horizon, i.e., for all model periods including and after the ``firstmodelyear``.
+As mentioned, the required ``price_ref``, ``cost_ref``, and ``demand_ref`` inputs refer to a period prior to the model horizon.
 This is detailed in the :ref:`next section <macro-input-data>`.
 
 The calibration itself is carried out by the :file:`message_ix/model/MACRO/macro_calibration.gms`.
 In this iterative process, `max_it` is used to specify the number of iterations carried out between MESSAGE and MACRO as part of the calibration process.
 The default value is set to 100 iterations, which has proven to be sufficient for the calibration of MACRO to MESSAGE reference scenario for various models.
-Adjustment of GDP growth rates (`grow`) is carried out during even iterations.
-Adjustment of AEEI improvement rates (`aeei`) is carried out during odd iterations.
+Adjustment of GDP growth rates (``grow``) is carried out during even iterations.
+Adjustment of AEEI improvement rates (``aeei``) is carried out during odd iterations.
 
 .. note:: Note, that no actual check is carried out to see if the calibration process has been successful at the end of iterations.
 
@@ -41,43 +43,51 @@ As part of the calibration process, a final check will automatically be carried 
 
 .. _macro-input-data:
 
-Input data file
-===============
+Input data for calibration
+==========================
 
-The calibration process requires an input data file (Microsoft Excel format), largely built around :ref:`ixmp:excel-data-format`.
-For an example of such input data files, see the files :file:`message_ix/tests/data/*_macro_input.xlsx` included as part of the :mod:`message_ix` test suite; either in your local installation, or `here on GitHub <https://github.com/iiasa/message_ix/tree/main/message_ix/tests/data>`_.
-The input data file includes the following sheets:
+For calibration, :meth:`.Scenario.add_macro` requires input data that can be provided as either:
 
-General configuration sheet
----------------------------
+- a Python :class:`dict` that maps item names to :class:`pandas.DataFrame` objects, or
+- the path to a file in Microsoft Excel format, in which each item is stored as a separate sheet.
 
-- ``config``: This configuration sheet specifies MACRO-related nodes and years, and maps MACRO sectors to MESSAGE commodities and levels.
-  The sheet has five columns, each of which is a list of labels/codes for a corresponding :ref:`ixmp set <ixmp:data-model-data>`:
+  For an example of such input data files, see the files :file:`message_ix/tests/data/*_macro_input.xlsx` included as part of the :mod:`message_ix` test suite; either in your local installation, or `here on GitHub <https://github.com/iiasa/message_ix/tree/main/message_ix/tests/data>`_.
 
-  - "node", "year": these can each have any length, depending on the number of regions and years to be included in the MACRO calibration process.
-  - "sector", "commodity", "level": these 3 columns must have equal lengths.
-    They describe a one-to-one mapping between MACRO sectors (entries in the "sector" column) and MESSAGE commodities and levels (paired entries in the "commodity" and "level" columns).
+This section describes the required contents of each item.
 
-MACRO parameter sheets
-----------------------
+``config``: general configuration
+---------------------------------
 
-The remaining sheets each contain data for one MACRO parameter:
+This table/sheet provides structural information for MACRO calibration and the MESSAGE-MACRO linkage.
+The table has five columns, each of which is a list of labels/codes for a corresponding :ref:`ixmp set <ixmp:data-model-data>`:
 
-- ``price_ref``: prices of MESSAGE commodities in a reference year.
-  These can be obtained from the variable `PRICE_COMMODITY`.
-- ``cost_ref``: total cost of the energy system in the reference year.
-  These can be obtained from the variable `COST_NODAL_NET` and should be divided by a factor of 1000.
-- ``demand_ref``: demand for different commodities in the reference year.
-- ``lotol``: tolerance factor for lower bounds on MACRO variabales.
-- ``esub``: elasticity between capital-labor and energy.
-- ``drate``: social discount rate.
-- ``depr``: annual percent depreciation.
-- ``kpvs``: capital value share parameter.
-- ``kgdp``: initial capital to GDP ratio in base year.
-- ``gdp_calibrate``: trajectory of GDP in optimization years calibrated to energy demand to MESSAGE.
-  Values for at least two periods prior to the `firstmodelyear` are required in order to compute the growth rates in historical years.
-- ``aeei``: annual potential decrease of energy intensity in sector sector.
-- ``MERtoPPP``: conversion factor of GDP from market exchange rates to purchasing power parity.
+- "node", "year": these columns can each have any length, depending on the number of nodes and periods to be included in the MACRO calibration process.
+- "sector", "commodity", "level": these 3 columns must have equal lengths.
+  They describe a one-to-one correspondence between items in the MACRO ``sector`` set (entries in the "sector" column) and MESSAGE ``commodity`` and ``level`` sets (paired entries in the "commodity" and "level" columns).
+
+MACRO parameters
+----------------
+
+The remaining tables/sheets each contain data for one MACRO parameter.
+The required dimensions or symbol of each item are given in the same notation used in the documentation of the :ref:`MACRO core formulation <macro-core>`.
+
+- ``price_ref`` (:math:`n, s`): prices of MACRO sector output in the reference year.
+  These can be constructed from the MESSAGE variable ``PRICE_COMMODITY``, using the ``config`` mapping.
+  If not provided, :mod:`message_ix.macro` will identify the reference year and extrapolate reference values using an exponential function fitted to ``PRICE_COMMODITY`` values; see :func:`.macro.extrapolate`.
+- ``cost_ref`` (:math:`n`): total cost of the energy system in the reference year.
+  These can be constructed from the MESSAGE variable ``COST_NODAL_NET``, including dividing by a factor of 1000.
+  If not provided, :mod:`message_ix.macro` will extrapolate using :func:`.macro.extrapolate`.
+- ``demand_ref`` (:math:`n, s`): demand for MACRO sector output in the reference year.
+- ``lotol`` (:math:`n`): tolerance factor for lower bounds on MACRO variables.
+- ``esub`` (:math:`\epsilon_n`): elasticity of substitution between capital-labor and energy.
+- ``drate`` (:math:`n`): social discount rate.
+- ``depr`` (:math:`\mathrm{depr}_n`): annual percent depreciation.
+- ``kpvs`` (:math:`\alpha_n`): capital value share parameter.
+- ``kgdp`` (:math:`n`): initial capital to GDP ratio in base year.
+- ``gdp_calibrate`` (:math:`n, y`): trajectory of GDP in optimization years calibrated to energy demand to MESSAGE.
+  In order to compute the growth rates in historical years, values are **required** for the reference year *and* one prior period—that is, at least two periods prior to the ``firstmodelyear``.
+- ``aeei`` (:math:`n, s, y`): annual potential decrease of energy intensity in sector sector.
+- ``MERtoPPP`` (:math:`n, y`): conversion factor of GDP from market exchange rates to purchasing power parity.
 
 Numerical issues
 ================
@@ -225,7 +235,6 @@ Code documentation
    :exclude-members: MACRO_ITEMS
 
    The functions :func:`add_model_data` and :func:`calibrate` are used by :meth:`.Scenario.add_macro`.
-
    Others are internal; :func:`prepare_computer` assembles the following functions into a :class:`.genno.Computer` that then executes the necessary calculations to prepare the model data.
 
    .. autosummary::
@@ -237,7 +246,6 @@ Code documentation
       demand
       gdp0
       growth
-      k0
       macro_periods
       mapping_macro_sector
       price
@@ -246,3 +254,9 @@ Code documentation
       unique_set
       validate_transform
       ym1
+
+   The following diagram visualizes the calculation flow:
+
+   .. image:: /_static/macro-calibrate.svg
+      :alt: Diagram of the calculation flow in the calibration of MACRO.
+      :target: ./_static/macro-calibrate.svg

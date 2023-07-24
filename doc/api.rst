@@ -91,7 +91,7 @@ Model classes
    GAMSModel
    DEFAULT_CPLEX_OPTIONS
    MESSAGE_ITEMS
-   MACRO_ITEMS
+   ~message_ix.macro.MACRO_ITEMS
 
 .. autodata:: DEFAULT_CPLEX_OPTIONS
 
