@@ -97,7 +97,7 @@ module = [
   "matplotlib.*",
   "pandas.*",
   "pyam",
-  "scipy",
+  "scipy.*",
   # Indirectly via ixmp; this should be a subset of the list in ixmp's pyproject.toml
   "dask.*",
   "jpype",

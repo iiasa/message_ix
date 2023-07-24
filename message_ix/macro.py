@@ -241,7 +241,7 @@ def clean_model_data(data: "Quantity", s: Structures) -> "DataFrame":
             names[dim] = kind
 
     return (
-        select(data, selectors)
+        select(data, selectors)  # type: ignore [attr-defined]
         .pipe(rename_dims, names)
         .to_series()
         .rename("value")
