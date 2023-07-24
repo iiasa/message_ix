@@ -7,15 +7,15 @@ import pytest
 
 from message_ix import Scenario, macro
 from message_ix.models import MACRO
-from message_ix.testing import SCENARIO, make_dantzig, make_westeros
+from message_ix.reporting import Quantity
+from message_ix.testing import SCENARIO, make_westeros
 
 # Fixtures
 
 
-@pytest.fixture(scope="session")
-def mr_data_path():
+def mr_data_path(n):
     """Path to the test data file for multi-region, multi-sector tests."""
-    yield Path(__file__).parent.joinpath("data", "multiregion_macro_input.xlsx")
+    return Path(__file__).parent.joinpath("data", f"multiregion_macro_input-{n}.xlsx")
 
 
 @pytest.fixture(scope="session")
@@ -299,25 +299,37 @@ def test_calibrate_roundtrip(westeros_solved, w_data_path):
 @pytest.fixture
 def mr_scenario(test_mp):
     """Fixture with a multi-region, multi-sector scenario."""
-    # TODO complete
-    scenario = make_dantzig(test_mp)
+    scenario = make_westeros(test_mp)
     with scenario.transact():
         scenario.add_set("year", [2020, 2030, 2040])
+
     scenario.solve()
     yield scenario
 
 
-def test_multiregion_valid_data(mr_data_path, mr_scenario):
+def test_multiregion_valid_data(mr_scenario):
     """Multi-region, multi-sector input data can be checked."""
     s = mr_scenario
-    c = macro.prepare_computer(s, data=mr_data_path)
+    c = macro.prepare_computer(s, data=mr_data_path("2"))
     c.get("check all")
 
 
-def test_multiregion_derive_data(mr_data_path, mr_scenario):
-    """Multi-region multi-sector data can be computed."""
+def test_multiregion_derive_data(mr_scenario):
     s = mr_scenario
-    c = macro.prepare_computer(s, data=mr_data_path)
+    path = mr_data_path("1")
+    c = macro.prepare_computer(s, data=path)
+
+    # Fake some data; this emulates the behaviour of the MockScenario class formerly
+    # used in this file
+    tmp = (
+        pd.read_excel(path, sheet_name="aeei")
+        .rename(columns={"node": "n", "sector": "c", "year": "y"})
+        .set_index(["n", "c", "y"])
+    )
+    c.add("DEMAND:n-y-c", Quantity(tmp["value"]), sums=True)
+    c.add("COST_NODAL_NET:n-y-c", Quantity(tmp.assign(value=1e3)["value"]), sums=True)
+    c.add("PRICE_COMMODITY:n-y-c", Quantity(tmp.assign(value=1e3)["value"]), sums=True)
+    c.add("ym1", 2020)
 
     c.get("check all")
 
@@ -326,8 +338,8 @@ def test_multiregion_derive_data(mr_data_path, mr_scenario):
 
     # make sure no extraneous data is there
     check = c.get("demand_MESSAGE").reset_index()
-    assert (check["node"].unique() == nodes).all()
-    assert (check["sector"].unique() == sectors).all()
+    assert set(check["node"].unique()) == set(nodes)
+    assert set(check["sector"].unique()) == set(sectors)
 
     obs = c.get("lakl")
     exp = pd.Series(
@@ -343,6 +355,22 @@ def test_multiregion_derive_data(mr_data_path, mr_scenario):
         index=idx,
     )
     pd.testing.assert_series_equal(obs, exp)
+
+
+def test_multiregion_derive_data_2(mr_scenario):
+    """Multi-region multi-sector data can be computed."""
+    s = mr_scenario
+    c = macro.prepare_computer(s, data=mr_data_path("2"))
+
+    c.get("check all")
+
+    nodes = ["Westeros", "Essos"]
+    sectors = ["light"]
+
+    # make sure no extraneous data is there
+    check = c.get("demand_MESSAGE").reset_index()
+    assert set(check["node"].unique()) == set(nodes)
+    assert set(check["sector"].unique()) == set(sectors)
 
 
 def test_sector_map(westeros_solved, w_data):
