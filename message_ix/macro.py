@@ -1,4 +1,5 @@
 import logging
+import os
 from dataclasses import dataclass
 from functools import partial
 from operator import itemgetter, mul
@@ -13,6 +14,7 @@ from typing import (
     MutableMapping,
     Optional,
     Set,
+    Union,
 )
 
 import numpy as np
@@ -595,7 +597,9 @@ def ym1(df: "Series", macro_periods: Collection[int]) -> int:
 # API methods for other code
 
 
-def add_model_data(base: "Scenario", clone: "Scenario", data: Mapping) -> None:
+def add_model_data(
+    base: "Scenario", clone: "Scenario", data: Union[Mapping, os.PathLike]
+) -> None:
     """Calculate and add MACRO structure and data to `clone`.
 
     Parameters
@@ -685,7 +689,7 @@ def calibrate(s, check_convergence=True, **kwargs):
 def prepare_computer(
     base: "Scenario",
     target: Optional["Scenario"] = None,
-    data: Optional[Mapping] = None,
+    data: Union[Mapping, os.PathLike, None] = None,
 ) -> "Computer":
     """Prepare a :class:`.Reporter` to perform MACRO calibration calculations.
 
@@ -718,7 +722,6 @@ def prepare_computer(
     # "data" key: either literal data, or a task to read it from file
     if isinstance(data, Mapping):
         c.add("data", data)
-        direct_data = True
     else:
         # Handle a file path
         try:
@@ -726,6 +729,8 @@ def prepare_computer(
             data_path = Path(data)
         except (AssertionError, TypeError):
             raise TypeError(f"neither a dict nor a valid path: {data}")
+        else:
+            data = dict()
 
         if not data_path.exists() or data_path.suffix != ".xlsx":
             raise ValueError(f"not an Excel data file: {data_path}")
@@ -735,7 +740,6 @@ def prepare_computer(
             partial(pd.read_excel, sheet_name=None, engine="openpyxl"),
             data_path,
         )
-        direct_data = False
 
     # Configuration
     c.add("config::macro", itemgetter("config"), "data")
@@ -780,7 +784,7 @@ def prepare_computer(
         k_ref = name.split("_")[0].lower() + "_ref"
 
         # Maybe extrapolate reference data from variable data
-        if direct_data and k_ref not in data:
+        if len(data) and k_ref not in data:
             log.info(f"Data for {k_ref} will be extrapolated from {cleaned[name]}")
             c.add(k_ref, extrapolate, cleaned[name], mms, "ym1")
 
