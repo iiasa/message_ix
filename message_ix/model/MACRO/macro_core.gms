@@ -1,4 +1,6 @@
 ***
+* .. _macro-core:
+*
 * MACRO core formulation
 * ======================
 *
@@ -110,7 +112,7 @@ Variables
 * ------------------------------------------------------------------------------
 
 EQUATIONS
-    UTILITY_FUNCTION                      Utility funciton (discounted log of consumpiton summed over all projection periods)
+    UTILITY_FUNCTION                      Utility function (discounted log of consumption summed over all projection periods)
     CAPITAL_CONSTRAINT(node, year_all)    Capital constraint
 
     NEW_CAPITAL(node, year_all)           New capital
