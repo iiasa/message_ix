@@ -47,6 +47,7 @@ documentation = "https://docs.messageix.org"
 
 [project.optional-dependencies]
 docs = [
+  "GitPython",
   "message_ix[report]",
   "numpydoc",
   "sphinx >= 4.0",
