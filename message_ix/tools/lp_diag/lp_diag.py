@@ -492,7 +492,7 @@ class LPdiag:
             ), f"unknown ranges row-name {row_name} (line {n_line})."
             val = float(words[pos_name + 3])
             assert type(val) == float, (
-                f"Ranges value {words[pos_name + 1]} (line {n_line}) is" " nota number."
+                f"Ranges value {words[pos_name + 1]} (line {n_line}) is" " not a number."
             )
             attr = self.seq_row.get(row_seq)  # [row_name, lo_bnd, up_bnd, row_type]
             row_type = attr[3]
