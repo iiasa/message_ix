@@ -24,7 +24,7 @@
 message_ix/model/2*/**
 message_ix/model/$gms*
 message_ix/model/MESSAGE_master.gms
-message_ix/model/cplex.opt
+message_ix/model/cplex.op*
 
 # Sphinx
 doc/_build
