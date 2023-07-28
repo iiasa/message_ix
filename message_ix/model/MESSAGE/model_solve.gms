@@ -25,7 +25,7 @@ if (%foresight% = 0,
 * write a status update to the log file, solve the model
     put_utility 'log' /'+++ Solve the perfect-foresight version of MESSAGEix +++ ' ;
     Solve MESSAGE_LP using LP minimizing OBJ ;
-
+    
 * write model status summary
     status('perfect_foresight','modelstat') = MESSAGE_LP.modelstat ;
     status('perfect_foresight','solvestat') = MESSAGE_LP.solvestat ;
@@ -34,7 +34,7 @@ if (%foresight% = 0,
     status('perfect_foresight','objVal')    = MESSAGE_LP.objVal ;
 
 * write an error message if model did not solve to optimality
-    IF( NOT ( MESSAGE_LP.modelstat = 1 OR MESSAGE_LP.modelstat = 8 ),
+    IF( NOT ( MESSAGE_LP.modelstat = 1 OR MESSAGE_LP.modelstat = 8),
         put_utility 'log' /'+++ MESSAGEix did not solve to optimality - run is aborted, no output produced! +++ ' ;
         ABORT "MESSAGEix did not solve to optimality!"
     ) ;
@@ -55,6 +55,16 @@ EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
             / df_period(year) ;
 
 * calculate PRICE_EMISSION based on the marginals of EMISSION_EQUIVALENCE
+$ifthen %landusemode% == "magpie"
+    PRICE_EMISSION.l(node,type_emission,type_tec,year)$( SUM(emission$( cat_emission(type_emission,emission) ),
+         EMISSION_EQUIVALENCE_MAgPIE.m(node,emission,type_tec,year) ) ) =
+        SMAX(emission$( cat_emission(type_emission,emission) ),
+               EMISSION_EQUIVALENCE_MAgPIE.m(node,emission,type_tec,year) / emission_scaling(type_emission,emission) )
+            / df_period(year);
+    PRICE_EMISSION.l(node,type_emission,type_tec,year)$(
+        ( PRICE_EMISSION.l(node,type_emission,type_tec,year) = eps ) or
+        ( PRICE_EMISSION.l(node,type_emission,type_tec,year) = -inf ) ) = 0 ;
+$else
     PRICE_EMISSION.l(node,type_emission,type_tec,year)$( SUM(emission$( cat_emission(type_emission,emission) ),
          EMISSION_EQUIVALENCE.m(node,emission,type_tec,year) ) ) =
         SMAX(emission$( cat_emission(type_emission,emission) ),
@@ -63,7 +73,7 @@ EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
     PRICE_EMISSION.l(node,type_emission,type_tec,year)$(
         ( PRICE_EMISSION.l(node,type_emission,type_tec,year) = eps ) or
         ( PRICE_EMISSION.l(node,type_emission,type_tec,year) = -inf ) ) = 0 ;
-
+$endif
 
 %AUX_BOUNDS% AUX_ACT_BOUND_LO(node,tec,year_all,year_all2,mode,time)$( ACT.l(node,tec,year_all,year_all2,mode,time) < 0 AND
 %AUX_BOUNDS%    ACT.l(node,tec,year_all,year_all2,mode,time) = -%AUX_BOUND_VALUE% ) = yes ;
