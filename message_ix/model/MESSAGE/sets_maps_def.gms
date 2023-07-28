@@ -148,6 +148,8 @@ Sets
     tec             technologies
     mode            modes of operation
     emission        greenhouse gases - pollutants - etc.
+    emission_annual (emission) greenhouse gases - pollutants - etc. from annual inputs
+    emission_cumulative (emission) greenhouse gases - pollutants - etc. from cumulative inputs 
     land_scenario   scenarios of land use (for land-use model emulator)
     land_type       types of land use
     year_all        years (over entire model horizon)
