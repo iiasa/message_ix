@@ -1981,7 +1981,6 @@ LAND_COST_CUMU_DEBT(location, year, year2) $ (model_horizon(year) AND year2.pos 
             - LAND(location, land_scenario, year2) * land_cost(location,land_scenario,year2) ) * df_period(year2) / df_period(year)
         - SUM(year3 $ ( year3.pos < year.pos AND year2.pos < year3.pos ), LAND_COST_DEBT(location, year3, year2) ) ;
 
-
 ***
 * Bound on emissions
 * ^^^^^^^^^^^^^^^^^^
