@@ -81,21 +81,13 @@ fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activit
 storage_initial, storage_self_discharge, time_order
 ;
 
-*----------------------------------------------------------------------------------------------------------------------*
-* Sets derived from input sets                                                                                         *
-*----------------------------------------------------------------------------------------------------------------------*
+emission_cumulative(emission) = no;
+emission_cumulative('TCE_CO2') = yes;
+emission_cumulative('LU_CO2') = yes;
+emission_cumulative('TCE') = yes;
+emission_annual(emission) = yes;
+emission_annual(emission_cumulative) = no;
 
-* 'yes' for any type_tec that is a member of map_shares_commodity_share with any combination of other indices
-type_tec_share(type_tec)$SUM(
-  (shares, ns, n, m, commodity, l),
-  map_shares_commodity_share(shares, ns, n, type_tec, m, commodity, l)
-) = YES;
-
-* Same, except with map_shares_commodity_total
-type_tec_total(type_tec)$SUM(
-  (shares, ns, n, m, commodity, l),
-  map_shares_commodity_total(shares, ns, n, type_tec, m, commodity, l)
-) = YES;
 
 *----------------------------------------------------------------------------------------------------------------------*
 * ensure that each node is mapped to itself                                                                            *
