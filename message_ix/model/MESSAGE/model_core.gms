@@ -120,6 +120,8 @@ Variables
     COST_NODAL(node, year_all)                   system costs at the node level over time
 * auxiliary variable for aggregate emissions by technology type and land-use model emulator
     EMISS(node,emission,type_tec,year_all)       aggregate emissions by technology type and land-use model emulator
+* auxiliary variable for aggregate emissions from land-use model emulator
+    EMISS_LU(node,emission,type_tec,year_all)    aggregate emissions from land-use model emulator
 * auxiliary variable for left-hand side of relations (linear constraints)
     REL(relation,node,year_all)                  auxiliary variable for left-hand side of user-defined relations
 * change in the content of storage device
@@ -280,6 +282,8 @@ Equations
     ACTIVITY_CONSTRAINT_LO          dynamic constraint on the market penetration of a technology activity (lower bound)
     ACTIVITY_SOFT_CONSTRAINT_LO     bound on relaxation of the dynamic constraint on market penetration (lower bound)
     EMISSION_EQUIVALENCE            auxiliary equation to simplify the notation of emissions
+    EMISSION_EQUIVALENCE_AUX_ANNUAL auxiliary equation calculating land-use emissions from annual scenario input
+    EMISSION_EQUIVALENCE_AUX_CUMU   auxiliary equation calculating land-use emissions from cumulative scenario input
     EMISSION_CONSTRAINT             nodal-regional-global constraints on emissions (by category)
     LAND_CONSTRAINT                 constraint on total land use (linear combination of land scenarios adds up to 1)
     DYNAMIC_LAND_SCEN_CONSTRAINT_UP dynamic constraint on land scenario change (upper bound)
@@ -1849,9 +1853,33 @@ EMISSION_EQUIVALENCE(node,emission,type_tec,year)..
             AND map_tec_act(location,tec,year,mode,time) AND map_tec_lifetime(location,tec,vintage,year) ),
         emission_factor(location,tec,vintage,year,mode,emission) * ACT(location,tec,vintage,year,mode,time) )
 * emissions from land use if 'type_tec' is included in the dynamic set 'type_tec_land'
-        + SUM(land_scenario$( type_tec_land(type_tec) ),
-            land_emission(location,land_scenario,year,emission) * LAND(location,land_scenario,year) )
+*       + SUM(land_scenario $( type_tec_land(type_tec) ) ,
+*           land_emission(location,land_scenario,year,emission) * LAND(location,land_scenario,year) )
+        + EMISS_LU(location,emission,type_tec,year) $( type_tec_land(type_tec) )
       ) ;
+
+EMISSION_EQUIVALENCE_AUX_ANNUAL(location,emission,type_tec,year) $ emission_annual(emission)..
+    EMISS_LU(location,emission,type_tec,year)
+    =E=
+* emissions from land use if 'type_tec' is included in the dynamic set 'type_tec_land'
+    SUM(land_scenario ,
+            land_emission(location,land_scenario,year,emission) * LAND(location,land_scenario,year)
+    ) ;
+    
+
+EMISSION_EQUIVALENCE_AUX_CUMU(location,emission,type_tec,year) $ emission_cumulative(emission)..
+    EMISS_LU(location,emission,type_tec,year)
+    =E=
+* emissions from land use if 'type_tec' is included in the dynamic set 'type_tec_land'
+    ( SUM(land_scenario,
+        SUM(year2 $ ( year2.pos <= year.pos ), land_emission(location, land_scenario, year2, emission) * duration_period(year2) ) *
+        LAND(location, land_scenario, year)
+        ) -
+      SUM(year2 $( year2.pos < year.pos ),
+        EMISS_LU(location, emission, type_tec, year2) * duration_period(year2)
+        ) ) /
+      duration_period(year) ;
+
 
 ***
 * Bound on emissions
