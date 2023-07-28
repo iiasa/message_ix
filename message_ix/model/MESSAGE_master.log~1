@@ -1,0 +1,132 @@
+--- Job MESSAGE_master.gms Start 07/10/25 13:56:16 45.5.0 8d95ac18 LEX-LEG x86 64bit/Linux
+--- Applying:
+    /opt/gams/gams45.5_linux_x64_64_sfx/gmsprmun.txt
+--- GAMS Parameters defined
+    Input /home/senguptas/Energy/message_ix/message_ix/model/MESSAGE_master.gms
+    PageSize 0
+    ScrDir /home/senguptas/Energy/message_ix/message_ix/model/225b/
+    SysDir /opt/gams/gams45.5_linux_x64_64_sfx/
+    LogOption 3
+    ErrMsg 1
+    ErrorLog 99
+    IDE 1
+    LstTitleLeftAligned 1
+Licensee: Small MUD - 5 User License                     S230927|0002AP-GEN
+          IIASA, Information and Communication Technologies Dep.      DC216
+          /opt/gams/gams45.5_linux_x64_64_sfx/gamslice.txt
+          License Admin: Melanie Weed-Wenighofer, wenighof@iiasa.ac.at     
+          The maintenance period of the license expired on Dec 20, 2024
+          Please contact GAMS or your distributor for further information
+Processor information: 1 socket(s), 4 core(s), and 8 thread(s) available
+GAMS 45.5.0   Copyright (C) 1987-2023 GAMS Development. All rights reserved
+--- Starting compilation
+--- MESSAGE_master.gms(3) 2 Mb
+--- . copyright.gms(29) 2 Mb
+--- MESSAGE_master.gms(81) 2 Mb
+--- . MESSAGE_run.gms(3) 2 Mb
+--- .. copyright.gms(29) 2 Mb
+--- . MESSAGE_run.gms(30) 2 Mb
+--- .. model_setup.gms(66) 2 Mb
+--- ... auxiliary_settings.gms(37) 2 Mb
+--- .. model_setup.gms(69) 2 Mb
+--- ... version.gms(23) 2 Mb
+--- .. model_setup.gms(70) 2 Mb
+--- ... version_check.gms(7) 2 Mb
+--- GDXin=/home/senguptas/Energy/message_ix/message_ix/model/data/MsgData_MESSAGEix-MAGPIE-R12-MP75BI78-oct24_test_after_cumLU_rebase.gdx
+--- GDX File ($gdxIn) /home/senguptas/Energy/message_ix/message_ix/model/data/MsgData_MESSAGEix-MAGPIE-R12-MP75BI78-oct24_test_after_cumLU_rebase.gdx
+--- ... version_check.gms(24) 3 Mb
+--- .. model_setup.gms(73) 3 Mb
+--- ... sets_maps_def.gms(513) 3 Mb
+--- .. model_setup.gms(74) 3 Mb
+--- ... parameter_def.gms(907) 3 Mb
+--- .. model_setup.gms(77) 3 Mb
+--- ... data_load.gms(9) 3 Mb
+--- GDXin=/home/senguptas/Energy/message_ix/message_ix/model/data/MsgData_MESSAGEix-MAGPIE-R12-MP75BI78-oct24_test_after_cumLU_rebase.gdx
+--- GDX File ($gdxIn) /home/senguptas/Energy/message_ix/message_ix/model/data/MsgData_MESSAGEix-MAGPIE-R12-MP75BI78-oct24_test_after_cumLU_rebase.gdx
+--- ... data_load.gms(25) 31 Mb
+--- Found nested $ifThen within $If statement (line 107).
+--- Use unique tag to ensure correct behavior.
+--- ... data_load.gms(142) 31 Mb
+--- .... period_parameter_assignment.gms(118) 31 Mb
+--- ... data_load.gms(285) 31 Mb
+--- .. model_setup.gms(80) 31 Mb
+--- ... scaling_investment_costs.gms(182) 31 Mb
+--- .. model_setup.gms(86) 31 Mb
+--- ... model_core.gms(2500) 31 Mb
+--- .. model_setup.gms(86) 31 Mb
+--- . MESSAGE_run.gms(36) 31 Mb
+--- .. model_solve.gms(109) 31 Mb
+--- ... aux_computation_time.gms(14) 31 Mb
+--- .. model_solve.gms(175) 31 Mb
+--- . MESSAGE_run.gms(43) 31 Mb
+--- .. reporting.gms(26) 31 Mb
+--- . MESSAGE_run.gms(52) 31 Mb
+--- MESSAGE_master.gms(87) 32 Mb
+--- Starting execution: elapsed 0:00:00.076
+--- MESSAGE_master.gms(1753) 32 Mb
+    +++ Importing data from 'data/MsgData_MESSAGEix-MAGPIE-R12-MP75BI78-oct24_test_after_cumLU_rebase.gdx'... +++
+--- MESSAGE_master.gms(1778) 32 Mb
+--- GDXin=/home/senguptas/Energy/message_ix/message_ix/model/data/MsgData_MESSAGEix-MAGPIE-R12-MP75BI78-oct24_test_after_cumLU_rebase.gdx
+--- MESSAGE_master.gms(1778) 428 Mb
+--- GDX File (execute_load) /home/senguptas/Energy/message_ix/message_ix/model/data/MsgData_MESSAGEix-MAGPIE-R12-MP75BI78-oct24_test_after_cumLU_rebase.gdx
+--- MESSAGE_master.gms(2517) 504 Mb  6 secs
+--- MESSAGE_master.gms(4856) 510 Mb
+    +++ Solve the perfect-foresight version of MESSAGEix +++
+--- Generating LP model MESSAGE_LP
+--- MESSAGE_master.gms(4226) 1110 Mb  4 secs
+--- MESSAGE_master.gms(4301) 1720 Mb  3 secs
+--- MESSAGE_master.gms(4635) 1790 Mb  3 secs
+--- MESSAGE_master.gms(4874) 1801 Mb  3 secs
+---   1,125,579 rows  1,133,561 columns  20,079,247 non-zeroes
+--- Range statistics (absolute non-zero finite values)
+--- RHS       [min, max] : [ 1.956E-36, 6.643E+06] - Zero values observed as well
+--- Bound     [min, max] : [        NA,        NA] - Zero values observed as well
+--- Matrix    [min, max] : [ 9.044E-11, 2.245E+07]
+--- Executing CPLEX (Solvelink=2): elapsed 0:00:33.615
+
+IBM ILOG CPLEX   45.5.0 8d95ac18 Dec 14, 2023          LEG x86 64bit/Linux    
+
+--- GAMS/CPLEX Link licensed for continuous and discrete problems.
+
+Reading parameter(s) from "/home/senguptas/Energy/message_ix/message_ix/model/cplex.opt"
+>>  advind = 0
+>>  lpmethod = 4
+>>  threads = 0
+>>  epopt = 1e-06
+>>  barcrossalg = 2
+Finished reading from "/home/senguptas/Energy/message_ix/message_ix/model/cplex.opt"
+
+--- GMO setup time: 0.00s
+--- Space for names approximately 130.26 Mb
+--- Use option 'names no' to turn use of names off
+--- GMO memory 1186.66 Mb (peak 1190.95 Mb)
+--- Dictionary memory 0.00 Mb
+--- Cplex 22.1.1.0 link memory 34.50 Mb (peak 421.53 Mb)
+--- Starting Cplex
+
+Version identifier: 22.1.1.0 | 2022-11-28 | 9160aff4d
+CPXPARAM_Advance                                 0
+CPXPARAM_LPMethod                                4
+CPXPARAM_MIP_Display                             4
+CPXPARAM_MIP_Pool_Capacity                       0
+CPXPARAM_Barrier_Crossover                       2
+CPXPARAM_Barrier_Limits_Iteration                100000000
+CPXPARAM_TimeLimit                               1000000
+CPXPARAM_MIP_Tolerances_AbsMIPGap                0
+CPXPARAM_MIP_Tolerances_MIPGap                   0
+Row 'NEW_CAPACITY_CONSTRAINT_UP(R12_AFR,wind_ppl,2020)' infeasible, all entries at implied bounds.
+Presolve time = 0.90 sec. (733.76 ticks)
+
+--- LP status (3): infeasible.
+--- Cplex Time: 0.90sec (det. 736.98 ticks)
+
+--- Model has been proven infeasible
+--- Reading solution for model MESSAGE_LP
+--- MESSAGE_master.gms(4874) 1801 Mb  12 secs
+--- Executing after solve: elapsed 0:00:42.863
+--- MESSAGE_master.gms(4856) 1801 Mb
+    +++ MESSAGEix did not solve to optimality - run is aborted, no output produced! +++
+*** Error at line 4886: Execution halted: abort 'MESSAGEix did not solve to optimality!'
+--- MESSAGE_master.gms(4856) 1801 Mb 1 Error
+*** Status: Execution error(s)
+--- Job MESSAGE_master.gms Stop 07/10/25 13:56:59 elapsed 0:00:42.868

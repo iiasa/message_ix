@@ -10,7 +10,7 @@ $ONGLOBAL
 *----------------------------------------------------------------------------------------------------------------------*
 
 ** scenario/case selection - this must match the name of the MsgData_<%%%>.gdx input data file **
-$SETGLOBAL data "<your datafile name here>"
+$SETGLOBAL data "MESSAGEix-MAGPIE-R12-MP75BI78-oct24_test_after_cumLU_rebase"
 
 * MACRO mode. This can take 3 possible values, only 2 of which are usable with this file:
 *
@@ -26,7 +26,7 @@ $IF NOT SET macromode $SETGLOBAL macromode "none"
 $SETGLOBAL foresight "0"
 
 ** add a comment and name extension for model report files (e.g. run-specific info, calibration notes) - optional **
-$SETGLOBAL comment ""
+$SETGLOBAL comment "SLACK"
 
 ** specify optional calibration output **
 $SETGLOBAL calibration ""
@@ -45,12 +45,12 @@ $SETGLOBAL AUX_BOUND_VALUE "1e9"
 * by adding 'slack' variables in the constraints and associated penalty factors in the objective function
 $SETGLOBAL SLACK_COMMODITY_EQUIVALENCE "*"
 
-$SETGLOBAL SLACK_CAP_NEW_BOUND_UP "*"
-$SETGLOBAL SLACK_CAP_NEW_BOUND_LO "*"
-$SETGLOBAL SLACK_CAP_TOTAL_BOUND_UP "*"
-$SETGLOBAL SLACK_CAP_TOTAL_BOUND_LO "*"
-$SETGLOBAL SLACK_CAP_NEW_DYNAMIC_UP "*"
-$SETGLOBAL SLACK_CAP_NEW_DYNAMIC_LO "*"
+$SETGLOBAL SLACK_CAP_NEW_BOUND_UP ""
+$SETGLOBAL SLACK_CAP_NEW_BOUND_LO ""
+$SETGLOBAL SLACK_CAP_TOTAL_BOUND_UP ""
+$SETGLOBAL SLACK_CAP_TOTAL_BOUND_LO ""
+$SETGLOBAL SLACK_CAP_NEW_DYNAMIC_UP ""
+$SETGLOBAL SLACK_CAP_NEW_DYNAMIC_LO ""
 
 $SETGLOBAL SLACK_ACT_BOUND_UP "*"
 $SETGLOBAL SLACK_ACT_BOUND_LO "*"
