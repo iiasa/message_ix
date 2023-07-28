@@ -81,6 +81,13 @@ fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activit
 storage_initial, storage_self_discharge, time_order
 ;
 
+emission_cumulative(emission) = no;
+emission_cumulative('TCE_CO2') = yes;
+emission_cumulative('LU_CO2') = yes;
+emission_cumulative('TCE') = yes;
+emission_annual(emission) = yes;
+emission_annual(emission_cumulative) = no;
+
 
 *----------------------------------------------------------------------------------------------------------------------*
 * ensure that each node is mapped to itself                                                                            *
