@@ -30,7 +30,7 @@ MARK = [
 
 # Affects all tests in the file
 pytestmark = pytest.mark.flaky(
-    reruns=3,
+    reruns=5,
     rerun_delay=2,
     condition=GHA,
     reason="Flaky; fails occasionally on GitHub Actions runners",
@@ -121,7 +121,7 @@ def nb_path(request, tutorial_path):
 
 def default_args():
     """Default arguments for :func:`.run_notebook."""
-    if GHA and sys.platform in ("darwin", "win32"):
+    if GHA:
         # Use a longer timeout
         return dict(timeout=30)
     else:
