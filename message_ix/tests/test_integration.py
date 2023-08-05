@@ -1,3 +1,6 @@
+import os
+import platform
+
 import numpy as np
 import pytest
 from ixmp import Platform
@@ -84,6 +87,12 @@ def assert_multi_db(mp1, mp2):
     assert_frame_equal(scenario_list(mp1), scenario_list(mp2))
 
 
+@pytest.mark.flaky(
+    reruns=5,
+    rerun_delay=2,
+    condition="GITHUB_ACTIONS" in os.environ and platform.system() == "Darwin",
+    reason="Flaky; see iiasa/message_ix#731",
+)
 def test_multi_db_run(tmpdir):
     # create a new instance of the transport problem and solve it
     mp1 = Platform(driver="hsqldb", path=tmpdir / "mp1")
