@@ -22,8 +22,8 @@ sphinx:
 python:
   install:
   - requirements: doc/requirements.txt
+  - requirements: ci/rtd-requirements.txt
   - method: pip
     path: .
     extra_requirements:
       - docs
-      - ci/rtd-requirements.txt
