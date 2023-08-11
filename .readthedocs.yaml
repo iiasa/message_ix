@@ -4,10 +4,9 @@
 # Required
 version: 2
 
-# Build PDF & ePub
+# Build ePub
 formats:
   - epub
-  - pdf
 
 # Set the version of Python and other tools you might need
 build:
