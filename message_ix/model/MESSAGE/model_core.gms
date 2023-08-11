@@ -28,44 +28,44 @@
 *
 * Decision variables
 * ^^^^^^^^^^^^^^^^^^
-* =============================================================== ====================================================================================
-* Variable                                                        Explanatory text
-* =============================================================== ====================================================================================
-* :math:`\text{OBJ} \in \mathbb{R}`                               Objective value of the optimization program
-* :math:`\text{EXT}_{n,c,g,y} \in \mathbb{R}_+`                   Extraction of non-renewable/exhaustible resources from reserves
-* :math:`\text{STOCK}_{n,c,l,y} \in \mathbb{R}_+`                 Quantity in stock (storage) at start of period :math:`y`
-* :math:`\text{STOCK_CHG}_{n,c,l,y,h} \in \mathbb{R}`             Input or output quantity into intertemporal commodity stock (storage)
-* :math:`\text{COST_NODAL}_{n,y} \in \mathbb{R}`                  System costs at the node level over time
-* :math:`\text{REN}_{n,t,c,g,y,h} \in \mathbb{R}_+`               Activity of renewable technologies per grade
-* :math:`\text{CAP_NEW}_{n,t,y} \in \mathbb{R}_+`                 Newly installed capacity (yearly average over period duration)
-* :math:`\text{CAP}_{n,t,y^V,y} \in \mathbb{R}_+`                 Maintained capacity in year :math:`y` of vintage :math:`y^V`
-* :math:`\text{CAP_FIRM}_{n,t,c,l,y,q} \in \mathbb{R}_+`          Capacity counting towards firm (dispatchable)
-* :math:`\text{ACT}_{n,t,y^V,y,m,h} \in \mathbb{R}`               Activity of a technology (by vintage, mode, subannual time)
-* :math:`\text{ACT_RATING}_{n,t,y^V,y,c,l,h,q} \in \mathbb{R}_+`  Auxiliary variable for activity attributed to a particular rating bin [#ACT_RATING]_
-* :math:`\text{CAP_NEW_UP}_{n,t,y} \in \mathbb{R}_+`              Relaxation of upper dynamic constraint on new capacity
-* :math:`\text{CAP_NEW_LO}_{n,t,y} \in \mathbb{R}_+`              Relaxation of lower dynamic constraint on new capacity
-* :math:`\text{ACT_UP}_{n,t,y,h} \in \mathbb{R}_+`                Relaxation of upper dynamic constraint on activity [#ACT_BD]_
-* :math:`\text{ACT_LO}_{n,t,y,h} \in \mathbb{R}_+`                Relaxation of lower dynamic constraint on activity [#ACT_BD]_
-* :math:`\text{LAND}_{n,s,y} \in [0,1]`                           Relative share of land-use scenario (for land-use model emulator)
-* :math:`\text{EMISS}_{n,e,\widehat{t},y} \in \mathbb{R}`         Auxiliary variable for aggregate emissions by technology type
-* :math:`\text{REL}_{r,n,y} \in \mathbb{R}`                       Auxiliary variable for left-hand side of relations (linear constraints)
-* :math:`\text{COMMODITY_USE}_{n,c,l,y} \in \mathbb{R}`           Auxiliary variable for amount of commodity used at specific level
-* :math:`\text{COMMODITY_BALANCE}_{n,c,l,y,h} \in \mathbb{R}`     Auxiliary variable for right-hand side of :ref:`commodity_balance`
-* :math:`\text{STORAGE}_{n,t,m,l,c,y,h} \in \mathbb{R}`           State of charge or content of storage at each sub-annual time slice
-* :math:`\text{STORAGE_CHARGE}_{n,t,m,l,c,y,h} \in \mathbb{R}`    Charging of storage in each sub-annual time slice (negative for discharging)
-* =============================================================== ====================================================================================
+* ================================================================= ====================================================================================
+* Variable                                                          Explanatory text
+* ================================================================= ====================================================================================
+* :math:`\text{OBJ} \in \mathbb{R}`                                 Objective value of the optimization program
+* :math:`\text{EXT}_{n,c,g,y} \in \mathbb{R}_+`                     Extraction of non-renewable/exhaustible resources from reserves
+* :math:`\text{STOCK}_{n,c,l,y} \in \mathbb{R}_+`                   Quantity in stock (storage) at start of period :math:`y`
+* :math:`\text{STOCK\_CHG}_{n,c,l,y,h} \in \mathbb{R}`              Input or output quantity into intertemporal commodity stock (storage)
+* :math:`\text{COST\_NODAL}_{n,y} \in \mathbb{R}`                   System costs at the node level over time
+* :math:`\text{REN}_{n,t,c,g,y,h} \in \mathbb{R}_+`                 Activity of renewable technologies per grade
+* :math:`\text{CAP\_NEW}_{n,t,y} \in \mathbb{R}_+`                  Newly installed capacity (yearly average over period duration)
+* :math:`\text{CAP}_{n,t,y^V,y} \in \mathbb{R}_+`                   Maintained capacity in year :math:`y` of vintage :math:`y^V`
+* :math:`\text{CAP\_FIRM}_{n,t,c,l,y,q} \in \mathbb{R}_+`           Capacity counting towards firm (dispatchable)
+* :math:`\text{ACT}_{n,t,y^V,y,m,h} \in \mathbb{R}`                 Activity of a technology (by vintage, mode, subannual time)
+* :math:`\text{ACT\_RATING}_{n,t,y^V,y,c,l,h,q} \in \mathbb{R}_+`   Auxiliary variable for activity attributed to a particular rating bin [#ACT_RATING]_
+* :math:`\text{CAP\_NEW\_UP}_{n,t,y} \in \mathbb{R}_+`              Relaxation of upper dynamic constraint on new capacity
+* :math:`\text{CAP\_NEW\_LO}_{n,t,y} \in \mathbb{R}_+`              Relaxation of lower dynamic constraint on new capacity
+* :math:`\text{ACT\_UP}_{n,t,y,h} \in \mathbb{R}_+`                 Relaxation of upper dynamic constraint on activity [#ACT_BD]_
+* :math:`\text{ACT\_LO}_{n,t,y,h} \in \mathbb{R}_+`                 Relaxation of lower dynamic constraint on activity [#ACT_BD]_
+* :math:`\text{LAND}_{n,s,y} \in [0,1]`                             Relative share of land-use scenario (for land-use model emulator)
+* :math:`\text{EMISS}_{n,e,\widehat{t},y} \in \mathbb{R}`           Auxiliary variable for aggregate emissions by technology type
+* :math:`\text{REL}_{r,n,y} \in \mathbb{R}`                         Auxiliary variable for left-hand side of relations (linear constraints)
+* :math:`\text{COMMODITY\_USE}_{n,c,l,y} \in \mathbb{R}`            Auxiliary variable for amount of commodity used at specific level
+* :math:`\text{COMMODITY\_BALANCE}_{n,c,l,y,h} \in \mathbb{R}`      Auxiliary variable for right-hand side of :ref:`commodity_balance`
+* :math:`\text{STORAGE}_{n,t,m,l,c,y,h} \in \mathbb{R}`             State of charge or content of storage at each sub-annual time slice
+* :math:`\text{STORAGE\_CHARGE}_{n,t,m,l,c,y,h} \in \mathbb{R}`     Charging of storage in each sub-annual time slice (negative for discharging)
+* ================================================================= ====================================================================================
 *
 * The index :math:`y^V` is the year of construction (vintage) wherever it is necessary to
 * clearly distinguish between year of construction and the year of operation.
 *
 * All decision variables are by year, not by (multi-year) period, except :math:`\text{STOCK}_{n,c,l,y}`.
-* In particular, the new capacity variable :math:`\text{CAP_NEW}_{n,t,y}` has to be multiplied by the number of years
-* in a period :math:`|y| = \text{duration_period}_{y}` to determine the available capacity :math:`\text{CAP}_{n,t,y^V,y}`
+* In particular, the new capacity variable :math:`\text{CAP\_NEW}_{n,t,y}` has to be multiplied by the number of years
+* in a period :math:`|y| = \text{duration\_period}_{y}` to determine the available capacity :math:`\text{CAP}_{n,t,y^V,y}`
 * in subsequent periods (assuming the newly build capacity is not immediately decommissioned):
 *
-* :math:`\text{CAP}_{n,t,y^V,y} = \text{CAP_NEW}_{n,t,y} \cdot \text{duration_period}_{y}`
+* :math:`\text{CAP}_{n,t,y^V,y} = \text{CAP\_NEW}_{n,t,y} \cdot \text{duration\_period}_{y}`
 *
-* :math:`\text{CAP_NEW}_{n,t,y}` is therefore the amount of newly installed capacity *in one year* and
+* :math:`\text{CAP\_NEW}_{n,t,y}` is therefore the amount of newly installed capacity *in one year* and
 * :math:`\text{CAP}_{n,t,y^V,y}` the amount, which is installed at the *end of a (usually multi-year) period*.
 * This formulation gives more flexibility when it comes to using periods of different duration
 * (more intuitive comparison across different periods).
@@ -73,7 +73,7 @@
 * The current model framework allows both input or output normalized formulation.
 * This will affect the parametrization, see Section :ref:`efficiency_output` for more details.
 *
-* .. [#ACT_RATING] The auxiliary variable :math:`\text{ACT_RATING}_{n,t,y^V,y,c,l,h,q}` is defined in terms of input or
+* .. [#ACT_RATING] The auxiliary variable :math:`\text{ACT\_RATING}_{n,t,y^V,y,c,l,h,q}` is defined in terms of input or
 *    output of the technology.
 *
 * .. [#ACT_BD] The dynamic activity constraints are implemented as summed over all modes;
@@ -131,15 +131,15 @@ Variables
 *
 * Auxiliary variables
 * ^^^^^^^^^^^^^^^^^^^
-* =========================================================================== ======================================================================================================
-* Variable                                                                    Explanatory text
-* =========================================================================== ======================================================================================================
-* :math:`\text{DEMAND}_{n,c,l,y,h} \in \mathbb{R}`                            Demand level (in equilibrium with MACRO integration)
-* :math:`\text{PRICE_COMMODITY}_{n,c,l,y,h} \in \mathbb{R}`                   Commodity price (undiscounted marginals of :ref:`commodity_balance_gt` and :ref:`commodity_balance_lt`)
-* :math:`\text{PRICE_EMISSION}_{n,\widehat{e},\widehat{t},y} \in \mathbb{R}`  Emission price (undiscounted marginals of :ref:`emission_constraint`)
-* :math:`\text{COST_NODAL_NET}_{n,y} \in \mathbb{R}`                          System costs at the node level net of energy trade revenues/cost
-* :math:`\text{GDP}_{n,y} \in \mathbb{R}`                                     Gross domestic product (GDP) in market exchange rates for MACRO reporting
-* =========================================================================== ======================================================================================================
+* ============================================================================= ======================================================================================================
+* Variable                                                                      Explanatory text
+* ============================================================================= ======================================================================================================
+* :math:`\text{DEMAND}_{n,c,l,y,h} \in \mathbb{R}`                              Demand level (in equilibrium with MACRO integration)
+* :math:`\text{PRICE\_COMMODITY}_{n,c,l,y,h} \in \mathbb{R}`                    Commodity price (undiscounted marginals of :ref:`commodity_balance_gt` and :ref:`commodity_balance_lt`)
+* :math:`\text{PRICE\_EMISSION}_{n,\widehat{e},\widehat{t},y} \in \mathbb{R}`   Emission price (undiscounted marginals of :ref:`emission_constraint`)
+* :math:`\text{COST\_NODAL\_NET}_{n,y} \in \mathbb{R}`                          System costs at the node level net of energy trade revenues/cost
+* :math:`\text{GDP}_{n,y} \in \mathbb{R}`                                       Gross domestic product (GDP) in market exchange rates for MACRO reporting
+* ============================================================================= ======================================================================================================
 *
 ***
 
@@ -313,7 +313,7 @@ Equations
 * relaxations of dynamic constraints
 *
 * .. math::
-*    \text{OBJ} = \sum_{n,y \in Y^{M}} \text{df_period}_{y} \cdot \text{COST_NODAL}_{n,y}
+*    \text{OBJ} = \sum_{n,y \in Y^{M}} \text{df\_period}_{y} \cdot \text{COST\_NODAL}_{n,y}
 *
 ***
 OBJECTIVE..
@@ -336,33 +336,33 @@ OBJECTIVE..
 * and linear relations.
 *
 * .. math::
-*    \text{COST_NODAL}_{n,y} & = \sum_{c,g} \ \text{resource_cost}_{n,c,g,y} \cdot \text{EXT}_{n,c,g,y} \\
+*    \text{COST\_NODAL}_{n,y} & = \sum_{c,g} \ \text{resource\_cost}_{n,c,g,y} \cdot \text{EXT}_{n,c,g,y} \\
 *      & + \sum_{t} \
-*          \bigg( \text{inv_cost}_{n,t,y} \cdot \text{construction_time_factor}_{n,t,y} \\
-*      & \quad \quad \quad \cdot \text{end_of_horizon_factor}_{n,t,y} \cdot \text{CAP_NEW}_{n,t,y} \\[4 pt]
-*      & \quad \quad + \sum_{y^V \leq y} \ \text{fix_cost}_{n,t,y^V,y} \cdot \text{CAP}_{n,t,y^V,y} \\
-*      & \quad \quad + \sum_{\substack{y^V \leq y \\ m,h}} \ \text{var_cost}_{n,t,y^V,y,m,h} \cdot \text{ACT}_{n,t,y^V,y,m,h} \\
-*      & \quad \quad + \Big( \text{abs_cost_new_capacity_soft_up}_{n,t,y} \\
+*          \bigg( \text{inv\_cost}_{n,t,y} \cdot \text{construction\_time\_factor}_{n,t,y} \\
+*      & \quad \quad \quad \cdot \text{end\_of\_horizon\_factor}_{n,t,y} \cdot \text{CAP\_NEW}_{n,t,y} \\[4 pt]
+*      & \quad \quad + \sum_{y^V \leq y} \ \text{fix\_cost}_{n,t,y^V,y} \cdot \text{CAP}_{n,t,y^V,y} \\
+*      & \quad \quad + \sum_{\substack{y^V \leq y \\ m,h}} \ \text{var\_cost}_{n,t,y^V,y,m,h} \cdot \text{ACT}_{n,t,y^V,y,m,h} \\
+*      & \quad \quad + \Big( \text{abs\_cost\_new\_capacity\_soft\_up}_{n,t,y} \\
 *      & \quad \quad \quad
-*          + \text{level_cost_new_capacity_soft_up}_{n,t,y} \cdot\ \text{inv_cost}_{n,t,y}
-*          \Big) \cdot \text{CAP_NEW_UP}_{n,t,y} \\[4pt]
-*      & \quad \quad + \Big( \text{abs_cost_new_capacity_soft_lo}_{n,t,y} \\
+*          + \text{level\_cost\_new\_capacity\_soft\_up}_{n,t,y} \cdot\ \text{inv\_cost}_{n,t,y}
+*          \Big) \cdot \text{CAP\_NEW\_UP}_{n,t,y} \\[4pt]
+*      & \quad \quad + \Big( \text{abs\_cost\_new\_capacity\_soft\_lo}_{n,t,y} \\
 *      & \quad \quad \quad
-*          + \text{level_cost_new_capacity_soft_lo}_{n,t,y} \cdot\ \text{inv_cost}_{n,t,y}
-*          \Big) \cdot \text{CAP_NEW_LO}_{n,t,y} \\[4pt]
-*      & \quad \quad + \sum_{m,h} \ \Big( \text{abs_cost_activity_soft_up}_{n,t,y,m,h} \\
+*          + \text{level\_cost\_new\_capacity\_soft\_lo}_{n,t,y} \cdot\ \text{inv\_cost}_{n,t,y}
+*          \Big) \cdot \text{CAP\_NEW\_LO}_{n,t,y} \\[4pt]
+*      & \quad \quad + \sum_{m,h} \ \Big( \text{abs\_cost\_activity\_soft\_up}_{n,t,y,m,h} \\
 *      & \quad \quad \quad
-*          + \text{level_cost_activity_soft_up}_{n,t,y,m,h} \cdot\ \text{levelized_cost}_{n,t,y,m,h}
-*          \Big) \cdot \text{ACT_UP}_{n,t,y,h} \\
-*      & \quad \quad + \sum_{m,h} \ \Big( \text{abs_cost_activity_soft_lo}_{n,t,y,m,h} \\
+*          + \text{level\_cost\_activity\_soft\_up}_{n,t,y,m,h} \cdot\ \text{levelized\_cost}_{n,t,y,m,h}
+*          \Big) \cdot \text{ACT\_UP}_{n,t,y,h} \\
+*      & \quad \quad + \sum_{m,h} \ \Big( \text{abs\_cost\_activity\_soft\_lo}_{n,t,y,m,h} \\
 *      & \quad \quad \quad
-*          + \text{level_cost_activity_soft_lo}_{n,t,y,m,h} \cdot\ \text{levelized_cost}_{n,t,y,m,h}
-*          \Big) \cdot \text{ACT_LO}_{n,t,y,h} \bigg) \\
+*          + \text{level\_cost\_activity\_soft\_lo}_{n,t,y,m,h} \cdot\ \text{levelized\_cost}_{n,t,y,m,h}
+*          \Big) \cdot \text{ACT\_LO}_{n,t,y,h} \bigg) \\
 *      & + \sum_{\substack{\widehat{e},\widehat{t} \\ e \in E(\widehat{e})}}
-*            \text{emission_scaling}_{\widehat{e},e} \cdot \ \text{emission_tax}_{n,\widehat{e},\widehat{t},y}
+*            \text{emission\_scaling}_{\widehat{e},e} \cdot \ \text{emission\_tax}_{n,\widehat{e},\widehat{t},y}
 *            \cdot \text{EMISS}_{n,e,\widehat{t},y} \\
-*      & + \sum_{s} \text{land_cost}_{n,s,y} \cdot \text{LAND}_{n,s,y} \\
-*      & + \sum_{r} \text{relation_cost}_{r,n,y} \cdot \text{REL}_{r,n,y}
+*      & + \sum_{s} \text{land\_cost}_{n,s,y} \cdot \text{LAND}_{n,s,y} \\
+*      & + \sum_{r} \text{relation\_cost}_{r,n,y} \cdot \text{REL}_{r,n,y}
 ***
 
 COST_ACCOUNTING_NODAL(node, year)..
@@ -496,7 +496,7 @@ EXTRACTION_EQUIVALENCE(node,commodity,year)..
 * This constraint specifies an upper bound on resource extraction by grade.
 *
 *  .. math::
-*     \text{EXT}_{n,c,g,y} \leq \text{bound_extraction_up}_{n,c,g,y}
+*     \text{EXT}_{n,c,g,y} \leq \text{bound\_extraction\_up}_{n,c,g,y}
 *
 ***
 EXTRACTION_BOUND_UP(node,commodity,grade,year)$( map_resource(node,commodity,grade,year)
@@ -514,9 +514,9 @@ EXTRACTION_BOUND_UP(node,commodity,grade,year)$( map_resource(node,commodity,gra
 *
 *  .. math::
 *     \text{EXT}_{n,c,g,y} \leq
-*     \text{resource_remaining}_{n,c,g,y} \cdot
-*         \Big( & \text{resource_volume}_{n,c,g} \\
-*               & - \sum_{y' < y} \text{duration_period}_{y'} \cdot \text{EXT}_{n,c,g,y'} \Big)
+*     \text{resource\_remaining}_{n,c,g,y} \cdot
+*         \Big( & \text{resource\_volume}_{n,c,g} \\
+*               & - \sum_{y' < y} \text{duration\_period}_{y'} \cdot \text{EXT}_{n,c,g,y'} \Big)
 *
 ***
 RESOURCE_CONSTRAINT(node,commodity,grade,year)$( map_resource(node,commodity,grade,year)
@@ -537,7 +537,7 @@ RESOURCE_CONSTRAINT(node,commodity,grade,year)$( map_resource(node,commodity,gra
 * This constraint ensures that total resource extraction over the model horizon does not exceed the available resources.
 *
 *  .. math::
-*     \sum_{y} \text{duration_period}_{y} \cdot \text{EXT}_{n,c,g,y} \leq  \text{resource_volume}_{n,c,g}
+*     \sum_{y} \text{duration\_period}_{y} \cdot \text{EXT}_{n,c,g,y} \leq  \text{resource\_volume}_{n,c,g}
 *
 ***
 RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,grade,year), 1 ) )..
@@ -552,17 +552,17 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 *
 * Auxiliary COMMODITY_BALANCE
 * """""""""""""""""""""""""""
-* For the commodity balance constraints below, we introduce an auxiliary variable called :math:`\text{COMMODITY_BALANCE}`. This is implemented
+* For the commodity balance constraints below, we introduce an auxiliary variable called :math:`\text{COMMODITY\_BALANCE}`. This is implemented
 * as a GAMS ``$macro`` function.
 *
 *  .. math::
 *     \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} \text{output}_{n^L,t,y^V,y,m,n,c,l,h^A,h}
-*         \cdot \text{duration_time_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,y^V,y,m,h^A} & \\
+*         \cdot \text{duration\_time\_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,y^V,y,m,h^A} & \\
 *     - \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} \text{input}_{n^L,t,y^V,y,m,n,c,l,h^A,h}
-*         \cdot \text{duration_time_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,m,y,h^A} & \\
-*     + \ \text{STOCK_CHG}_{n,c,l,y,h} + \ \sum_s \Big( \text{land_output}_{n,s,y,c,l,h} - \text{land_input}_{n,s,y,c,l,h} \Big) \cdot & \text{LAND}_{n,s,y} \\[4pt]
+*         \cdot \text{duration\_time\_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,m,y,h^A} & \\
+*     + \ \text{STOCK\_CHG}_{n,c,l,y,h} + \ \sum_s \Big( \text{land\_output}_{n,s,y,c,l,h} - \text{land\_input}_{n,s,y,c,l,h} \Big) \cdot & \text{LAND}_{n,s,y} \\[4pt]
 *     - \ \text{demand_fixed}_{n,c,l,y,h}
-*     = \text{COMMODITY_BALANCE}_{n,c,l,y,h} \quad \forall \ l \notin (L^{\text{RES}}, & L^{\text{REN}}, L^{\text{STOR}} \subseteq L)
+*     = \text{COMMODITY\_BALANCE}_{n,c,l,y,h} \quad \forall \ l \notin (L^{\text{RES}}, \& L^{\text{REN}}, L^{\text{STOR}} \subseteq L)
 *
 * The commodity balance constraint at the resource level is included in the `Equation RESOURCE_CONSTRAINT`_,
 * while at the renewable level, it is included in the `Equation RENEWABLES_EQUIVALENCE`_,
@@ -595,7 +595,7 @@ $macro COMMODITY_BALANCE(node,commodity,level,year,time) (                      
 * This constraint ensures that supply is greater or equal than demand for every commodity-level combination.
 *
 *  .. math::
-*     \text{COMMODITY_BALANCE}_{n,c,l,y,h} \geq 0
+*     \text{COMMODITY\_BALANCE}_{n,c,l,y,h} \geq 0
 *
 ***
 COMMODITY_BALANCE_GT(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
@@ -611,11 +611,11 @@ COMMODITY_BALANCE_GT(node,commodity,level,year,time)$( map_commodity(node,commod
 * Equation COMMODITY_BALANCE_LT
 * """""""""""""""""""""""""""""
 * This constraint ensures that the supply is smaller than or equal to the demand for all commodity-level combinations
-* given in the :math:`\text{balance_equality}_{c,l}`. In combination with the constraint above, it ensures that supply
+* given in the :math:`\text{balance\_equality}_{c,l}`. In combination with the constraint above, it ensures that supply
 * is (exactly) equal to demand.
 *
 *  .. math::
-*     \text{COMMODITY_BALANCE}_{n,c,l,y,h} \leq 0
+*     \text{COMMODITY\_BALANCE}_{n,c,l,y,h} \leq 0
 *
 ***
 COMMODITY_BALANCE_LT(node,commodity,level,year,time)$( map_commodity(node,commodity,level,year,time)
@@ -632,11 +632,11 @@ COMMODITY_BALANCE_LT(node,commodity,level,year,time)$( map_commodity(node,commod
 * Equation STOCKS_BALANCE
 * """""""""""""""""""""""
 * This constraint ensures the inter-temporal balance of commodity stocks.
-* The parameter :math:`\text{commodity_stocks}_{n,c,l}` can be used to model exogenous additions to the stock
+* The parameter :math:`\text{commodity\_stocks}_{n,c,l}` can be used to model exogenous additions to the stock
 *
 *  .. math::
-*     \text{STOCK}_{n,c,l,y} + \text{commodity_stock}_{n,c,l,y} =
-*         \text{duration_period}_{y} \cdot & \sum_{h} \text{STOCK_CHG}_{n,c,l,y,h} \\
+*     \text{STOCK}_{n,c,l,y} + \text{commodity\_stock}_{n,c,l,y} =
+*         \text{duration\_period}_{y} \cdot & \sum_{h} \text{STOCK\_CHG}_{n,c,l,y,h} \\
 *                                    & + \text{STOCK}_{n,c,l,y+1}
 *
 ***
@@ -666,11 +666,11 @@ STOCKS_BALANCE(node,commodity,level,year)$( map_stocks(node,commodity,level,year
 * Equation CAPACITY_CONSTRAINT
 * """"""""""""""""""""""""""""
 * This constraint ensures that the actual activity of a technology at a node cannot exceed available (maintained)
-* capacity summed over all vintages, including the technology capacity factor :math:`\text{capacity_factor}_{n,t,y,t}`.
+* capacity summed over all vintages, including the technology capacity factor :math:`\text{capacity\_factor}_{n,t,y,t}`.
 *
 *  .. math::
 *     \sum_{m} \text{ACT}_{n,t,y^V,y,m,h}
-*         \leq \text{duration_time}_{h} \cdot \text{capacity_factor}_{n,t,y^V,y,h} \cdot \text{CAP}_{n,t,y^V,y}
+*         \leq \text{duration\_time}_{h} \cdot \text{capacity\_factor}_{n,t,y^V,y,h} \cdot \text{CAP}_{n,t,y^V,y}
 *         \quad \forall \ t \ \in \ T^{\text{INV}}
 *
 ***
@@ -692,11 +692,11 @@ CAPACITY_CONSTRAINT(node,inv_tec,vintage,year,time)$( map_tec_time(node,inv_tec,
 * as installed capacity in the first model period.
 *
 *   .. math::
-*      \text{CAP}_{n,t,y^V,\text{'first_period'}} & \leq
-*          \text{remaining_capacity}_{n,t,y^V,\text{'first_period'}} \cdot
-*          \text{duration_period}_{y^V} \cdot
-*          \text{historical_new_capacity}_{n,t,y^V} \\
-*      & \text{if } y^V  < \text{'first_period'} \text{ and } |y| - |y^V| < \text{technical_lifetime}_{n,t,y^V}
+*      \text{CAP}_{n,t,y^V,\text{'first\_period'}} & \leq
+*          \text{remaining\_capacity}_{n,t,y^V,\text{'first\_period'}} \cdot
+*          \text{duration\_period}_{y^V} \cdot
+*          \text{historical\_new\_capacity}_{n,t,y^V} \\
+*      & \text{if } y^V  < \text{'first\_period'} \text{ and } |y| - |y^V| < \text{technical\_lifetime}_{n,t,y^V}
 *      \quad \forall \ t \in T^{\text{INV}}
 *
 ***
@@ -716,9 +716,9 @@ CAPACITY_MAINTENANCE_HIST(node,inv_tec,vintage,first_period)$( map_tec_lifetime(
 *
 *   .. math::
 *      \text{CAP}_{n,t,y^V,y^V} =
-*          \text{remaining_capacity}_{n,t,y^V,y^V} \cdot
-*          \text{duration_period}_{y^V} \cdot
-*          \text{CAP_NEW}_{n,t,y^V}
+*          \text{remaining\_capacity}_{n,t,y^V,y^V} \cdot
+*          \text{duration\_period}_{y^V} \cdot
+*          \text{CAP\_NEW}_{n,t,y^V}
 *      \quad \forall \ t \in T^{\text{INV}}
 *
 * The current formulation does not account for construction time in the constraints, but only adds a mark-up
@@ -739,9 +739,9 @@ CAPACITY_MAINTENANCE_NEW(node,inv_tec,vintage,vintage)$( map_tec_lifetime(node,i
 *
 *   .. math::
 *      \text{CAP}_{n,t,y^V,y} & \leq
-*          \text{remaining_capacity}_{n,t,y^V,y} \cdot
+*          \text{remaining\_capacity}_{n,t,y^V,y} \cdot
 *          \text{CAP}_{n,t,y^V,y-1} \\
-*      \quad & \text{if } y > y^V \text{ and } y^V  > \text{'first_period'} \text{ and } |y| - |y^V| < \text{technical_lifetime}_{n,t,y^V}
+*      \quad & \text{if } y > y^V \text{ and } y^V  > \text{'first\_period'} \text{ and } |y| - |y^V| < \text{technical\_lifetime}_{n,t,y^V}
 *      \quad \forall \ t \in T^{\text{INV}}
 *
 ***
@@ -762,10 +762,10 @@ CAPACITY_MAINTENANCE(node,inv_tec,vintage,year)$( map_tec_lifetime(node,inv_tec,
 *
 *   .. math::
 *      \sum_{m,h} \text{ACT}_{n,t,y^V,y,m,h}
-*          \leq \text{operation_factor}_{n,t,y^V,y} \cdot \text{capacity_factor}_{n,t,y^V,y,m,\text{'year'}} \cdot \text{CAP}_{n,t,y^V,y}
+*          \leq \text{operation\_factor}_{n,t,y^V,y} \cdot \text{capacity\_factor}_{n,t,y^V,y,m,\text{'year'}} \cdot \text{CAP}_{n,t,y^V,y}
 *      \quad \forall \ t \in T^{\text{INV}}
 *
-* This constraint is only active if :math:`\text{operation_factor}_{n,t,y^V,y} < 1`.
+* This constraint is only active if :math:`\text{operation\_factor}_{n,t,y^V,y} < 1`.
 ***
 OPERATION_CONSTRAINT(node,inv_tec,vintage,year)$( map_tec_lifetime(node,inv_tec,vintage,year)
         AND operation_factor(node,inv_tec,vintage,year) < 1 )..
@@ -781,10 +781,10 @@ OPERATION_CONSTRAINT(node,inv_tec,vintage,year)$( map_tec_lifetime(node,inv_tec,
 * This constraint provides a lower bound on the total utilization of installed capacity over a year.
 *
 *   .. math::
-*      \sum_{m,h} \text{ACT}_{n,t,y^V,y,m,h} \geq \text{min_utilization_factor}_{n,t,y^V,y} \cdot \text{CAP}_{n,t,y^V,y}
+*      \sum_{m,h} \text{ACT}_{n,t,y^V,y,m,h} \geq \text{min\_utilization\_factor}_{n,t,y^V,y} \cdot \text{CAP}_{n,t,y^V,y}
 *      \quad \forall \ t \in T^{\text{INV}}
 *
-* This constraint is only active if :math:`\text{min_utilization_factor}_{n,t,y^V,y}` is defined.
+* This constraint is only active if :math:`\text{min\_utilization\_factor}_{n,t,y^V,y}` is defined.
 ***
 MIN_UTILIZATION_CONSTRAINT(node,inv_tec,vintage,year)$( map_tec_lifetime(node,inv_tec,vintage,year)
         AND min_utilization_factor(node,inv_tec,vintage,year) )..
@@ -830,7 +830,7 @@ RENEWABLES_EQUIVALENCE(node,renewable_tec,commodity,year,time)$(
 *
 *  .. math::
 *     \sum_{\substack{t,h \\ \ t \in T^{R} \subseteq t }} \text{REN}_{n,t,c,g,y,h}
-*         \leq \sum_{\substack{l \\ l \in L^{R} \subseteq L }} \text{renewable_potential}_{n,c,g,l,y}
+*         \leq \sum_{\substack{l \\ l \in L^{R} \subseteq L }} \text{renewable\_potential}_{n,c,g,l,y}
 *
 ***
 RENEWABLES_POTENTIAL_CONSTRAINT(node,commodity,grade,year)$( map_ren_grade(node,commodity,grade,year) )..
@@ -851,10 +851,10 @@ RENEWABLES_POTENTIAL_CONSTRAINT(node,commodity,grade,year)$( map_ren_grade(node,
 * capacities to provide their full potential.
 *
 *  .. math::
-*     \sum_{y^V, h} & \text{CAP}_{n,t,y^V,y} \cdot \text{operation_factor}_{n,t,y^V,y} \cdot \text{capacity_factor}_{n,t,y^V,y,h} \\
-*        & \quad \geq \sum_{g,h,l} \frac{1}{\text{renewable_capacity_factor}_{n,c,g,l,y}} \cdot \text{REN}_{n,t,c,g,y,h}
+*     \sum_{y^V, h} & \text{CAP}_{n,t,y^V,y} \cdot \text{operation\_factor}_{n,t,y^V,y} \cdot \text{capacity\_factor}_{n,t,y^V,y,h} \\
+*        & \quad \geq \sum_{g,h,l} \frac{1}{\text{renewable\_capacity\_factor}_{n,c,g,l,y}} \cdot \text{REN}_{n,t,c,g,y,h}
 *
-* This constraint is only active if :math:`\text{renewable_capacity_factor}_{n,c,g,l,y}` is defined.
+* This constraint is only active if :math:`\text{renewable\_capacity\_factor}_{n,c,g,l,y}` is defined.
 ***
 RENEWABLES_CAPACITY_REQUIREMENT(node,inv_tec,commodity,year)$(
         SUM( (vintage,mode,time,grade,level_renewable),
@@ -887,8 +887,8 @@ RENEWABLES_CAPACITY_REQUIREMENT(node,inv_tec,commodity,year)$(
 *      \sum_{\substack{t^a, y^V \leq y}} \text{ACT}_{n,t^a,y^V,y,m,h}
 *      \leq
 *      \sum_{\substack{t, y^V \leq y}}
-*          & \text{addon_up}_{n,t,y,m,h,\widehat{t^a}} \cdot
-*          \text{addon_conversion}_{n,t,y^V,y,m,h,\widehat{t^a}} \\
+*          & \text{addon\_up}_{n,t,y,m,h,\widehat{t^a}} \cdot
+*          \text{addon\_conversion}_{n,t,y^V,y,m,h,\widehat{t^a}} \\
 *          & \cdot \text{ACT}_{n,t,y^V,y,m,h} \quad \forall \ t^a \in T^{A}
 *
 ***
@@ -926,8 +926,8 @@ ADDON_ACTIVITY_UP(node,type_addon,year,mode,time)..
 *      \sum_{\substack{t^a, y^V \leq y}} \text{ACT}_{n,t^a,y^V,y,m,h}
 *      \geq
 *      \sum_{\substack{t, y^V \leq y}}
-*          & \text{addon_lo}_{n,t,y,m,h,\widehat{t^a}} \cdot
-*          \text{addon_conversion}_{n,t,y^V,y,m,h,\widehat{t^a}} \\
+*          & \text{addon\_lo}_{n,t,y,m,h,\widehat{t^a}} \cdot
+*          \text{addon\_conversion}_{n,t,y^V,y,m,h,\widehat{t^a}} \\
 *          & \cdot \text{ACT}_{n,t,y^V,y,m,h} \quad \forall \ t^a \in T^{A}
 *
 ***
@@ -967,16 +967,16 @@ ADDON_ACTIVITY_LO(node,type_addon,year,mode,time)..
 *
 * Equation COMMODITY_USE_LEVEL
 * """"""""""""""""""""""""""""
-* This constraint defines the auxiliary variable :math:`\text{COMMODITY_USE}_{n,c,l,y}`, which is used to define
+* This constraint defines the auxiliary variable :math:`\text{COMMODITY\_USE}_{n,c,l,y}`, which is used to define
 * the rating bins and the peak-load that needs to be offset with firm (dispatchable) capacity.
 *
 *   .. math::
-*      \text{COMMODITY_USE}_{n,c,l,y}
+*      \text{COMMODITY\_USE}_{n,c,l,y}
 *      = & \sum_{n^L,t,y^V,m,h} \text{input}_{n^L,t,y^V,y,m,n,c,l,h,h} \\
-*        & \quad    \cdot \text{duration_time_rel}_{h,h} \cdot \text{ACT}_{n^L,t,y^V,y,m,h}
+*        & \quad    \cdot \text{duration\_time\_rel}_{h,h} \cdot \text{ACT}_{n^L,t,y^V,y,m,h}
 *
-* This constraint and the auxiliary variable is only active if :math:`\text{peak_load_factor}_{n,c,l,y,h}` or
-* :math:`\text{flexibility_factor}_{n,t,y^V,y,m,c,l,h,r}` is defined.
+* This constraint and the auxiliary variable is only active if :math:`\text{peak\_load\_factor}_{n,c,l,y,h}` or
+* :math:`\text{flexibility\_factor}_{n,t,y^V,y,m,c,l,h,r}` is defined.
 ***
 COMMODITY_USE_LEVEL(node,commodity,level,year,time)$(
          peak_load_factor(node,commodity,level,year,time) OR
@@ -1005,8 +1005,8 @@ COMMODITY_USE_LEVEL(node,commodity,level,year,time)$(
 * the share of the rating bin in relation to the total commodity use.
 *
 * .. math::
-*    \text{ACT_RATING}_{n,t,y^V,y,c,l,h,q}
-*    \leq \text{rating_bin}_{n,t,y,c,l,h,q} \cdot \text{COMMODITY_USE}_{n,c,l,y}
+*    \text{ACT\_RATING}_{n,t,y^V,y,c,l,h,q}
+*    \leq \text{rating\_bin}_{n,t,y,c,l,h,q} \cdot \text{COMMODITY\_USE}_{n,c,l,y}
 *
 ***
 ACTIVITY_BY_RATING(node,tec,year,commodity,level,time,rating)$(
@@ -1025,10 +1025,10 @@ ACTIVITY_BY_RATING(node,tec,year,commodity,level,time,rating)$(
 * of the technology.
 *
 * .. math::
-*    \sum_q \text{ACT_RATING}_{n,t,y^V,y,c,l,h,q}
+*    \sum_q \text{ACT\_RATING}_{n,t,y^V,y,c,l,h,q}
 *    = \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} &
 *         ( \text{input}_{n^L,t,y^V,y,m,n,c,l,h^A,h} + \text{output}_{n^L,t,y^V,y,m,n,c,l,h^A,h} ) \\
-*      & \quad    \cdot \text{duration_time_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,y^V,y,m,h^A} \\
+*      & \quad    \cdot \text{duration\_time\_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,y^V,y,m,h^A} \\
 *
 ***
 ACTIVITY_RATING_TOTAL(node,tec,vintage,year,commodity,level,time)$(
@@ -1053,23 +1053,23 @@ ACTIVITY_RATING_TOTAL(node,tec,vintage,year,commodity,level,time)$(
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 * The "firm capacity" that a technology can contribute to system reliability depends on its dispatch characteristics.
 * For dispatchable technologies, the total installed capacity counts toward the firm capacity constraint.
-* This is active if the parameter is defined over :math:`\text{reliability_factor}_{n,t,y,c,l,h,\text{'firm'}}`.
+* This is active if the parameter is defined over :math:`\text{reliability\_factor}_{n,t,y,c,l,h,\text{'firm'}}`.
 * For non-dispatchable technologies, or those that do not have explicit investment decisions,
 * the contribution to system reliability is calculated
-* by using the auxiliary variable :math:`\text{ACT_RATING}_{n,t,y^V,y,c,l,h,q}` as a proxy,
-* with the :math:`\text{reliability_factor}_{n,t,y,c,l,h,q}` defined per rating bin :math:`q`.
+* by using the auxiliary variable :math:`\text{ACT\_RATING}_{n,t,y^V,y,c,l,h,q}` as a proxy,
+* with the :math:`\text{reliability\_factor}_{n,t,y,c,l,h,q}` defined per rating bin :math:`q`.
 *
 * .. _equation_firm_capacity_provision:
 *
 * Equation FIRM_CAPACITY_PROVISION
 * """"""""""""""""""""""""""""""""
 * Technologies where the reliability factor is defined with the rating `firm`
-* have an auxiliary variable :math:`\text{CAP_FIRM}_{n,t,c,l,y}`, defined in terms of output.
+* have an auxiliary variable :math:`\text{CAP\_FIRM}_{n,t,c,l,y}`, defined in terms of output.
 *
 *   .. math::
-*      \text{CAP_FIRM}_{n,t,c,l,y}
-*      = \sum_{y^V \leq y} & \text{output}_{n^L,t,y^V,y,m,n,c,l,h^A,h} \cdot \text{duration_time}_h \\
-*        & \quad    \cdot \text{capacity_factor}_{n,t,y^V,y,h} \cdot \text{CAP}_{n,t,y^Y,y}
+*      \text{CAP\_FIRM}_{n,t,c,l,y}
+*      = \sum_{y^V \leq y} & \text{output}_{n^L,t,y^V,y,m,n,c,l,h^A,h} \cdot \text{duration\_time}_h \\
+*        & \quad    \cdot \text{capacity\_factor}_{n,t,y^V,y,h} \cdot \text{CAP}_{n,t,y^Y,y}
 *      \quad \forall \ t \in T^{\text{INV}}
 *
 ***
@@ -1094,14 +1094,14 @@ FIRM_CAPACITY_PROVISION(node,inv_tec,year,commodity,level,time)$(
 *
 *   .. math::
 *      \sum_{t, q \substack{t \in T^{\text{INV}} \\ y^V \leq y} } &
-*          \text{reliability_factor}_{n,t,y,c,l,h,\text{'firm'}}
-*          \cdot \text{CAP_FIRM}_{n,t,c,l,y} \\
+*          \text{reliability\_factor}_{n,t,y,c,l,h,\text{'firm'}}
+*          \cdot \text{CAP\_FIRM}_{n,t,c,l,y} \\
 *      + \sum_{t,q,y^V \leq y} &
-*          \text{reliability_factor}_{n,t,y,c,l,h,q}
-*         \cdot \text{ACT_RATING}_{n,t,y^V,y,c,l,h,q} \\
-*         & \quad \geq \text{peak_load_factor}_{n,c,l,y,h} \cdot \text{COMMODITY_USE}_{n,c,l,y}
+*          \text{reliability\_factor}_{n,t,y,c,l,h,q}
+*         \cdot \text{ACT\_RATING}_{n,t,y^V,y,c,l,h,q} \\
+*         & \quad \geq \text{peak\_load\_factor}_{n,c,l,y,h} \cdot \text{COMMODITY\_USE}_{n,c,l,y}
 *
-* This constraint is only active if :math:`\text{peak_load_factor}_{n,c,l,y,h}` is defined.
+* This constraint is only active if :math:`\text{peak\_load\_factor}_{n,c,l,y,h}` is defined.
 ***
 SYSTEM_RELIABILITY_CONSTRAINT(node,commodity,level,year,time)$( peak_load_factor(node,commodity,level,year,time) )..
     SUM(inv_tec$( reliability_factor(node,inv_tec,year,commodity,level,time,'firm') ),
@@ -1125,15 +1125,15 @@ SYSTEM_RELIABILITY_CONSTRAINT(node,commodity,level,year,time)$( peak_load_factor
 *
 *   .. math::
 *      \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} &
-*          \text{flexibility_factor}_{n^L,t,y^V,y,m,c,l,h,\text{'unrated'}} \\
+*          \text{flexibility\_factor}_{n^L,t,y^V,y,m,c,l,h,\text{'unrated'}} \\
 *      & \quad   \cdot ( \text{output}_{n^L,t,y^V,y,m,n,c,l,h^A,h} + \text{input}_{n^L,t,y^V,y,m,n,c,l,h^A,h} ) \\
-*      & \quad   \cdot \text{duration_time_rel}_{h,h^A}
+*      & \quad   \cdot \text{duration\_time\_rel}_{h,h^A}
 *                \cdot \text{ACT}_{n,t,y^V,y,m,h} \\
 *      + \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} &
-*         \text{flexibility_factor}_{n^L,t,y^V,y,m,c,l,h,1} \\
+*         \text{flexibility\_factor}_{n^L,t,y^V,y,m,c,l,h,1} \\
 *      & \quad   \cdot ( \text{output}_{n^L,t,y^V,y,m,n,c,l,h^A,h} + \text{input}_{n^L,t,y^V,y,m,n,c,l,h^A,h} ) \\
-*      & \quad   \cdot \text{duration_time_rel}_{h,h^A}
-*                \cdot \text{ACT_RATING}_{n,t,y^V,y,c,l,h,q}
+*      & \quad   \cdot \text{duration\_time\_rel}_{h,h^A}
+*                \cdot \text{ACT\_RATING}_{n,t,y^V,y,c,l,h,q}
 *      \geq 0
 *
 ***
@@ -1173,7 +1173,7 @@ ACT.LO(node,tec,vintage,year,mode,time)$sum(
 * This constraint provides upper bounds on new capacity installation.
 *
 *   .. math::
-*      \text{CAP_NEW}_{n,t,y} \leq \text{bound_new_capacity_up}_{n,t,y} \quad \forall \ t \ \in \ T^{\text{INV}}
+*      \text{CAP\_NEW}_{n,t,y} \leq \text{bound\_new\_capacity\_up}_{n,t,y} \quad \forall \ t \ \in \ T^{\text{INV}}
 *
 ***
 NEW_CAPACITY_BOUND_UP(node,inv_tec,year)$( is_bound_new_capacity_up(node,inv_tec,year) )..
@@ -1189,7 +1189,7 @@ NEW_CAPACITY_BOUND_UP(node,inv_tec,year)$( is_bound_new_capacity_up(node,inv_tec
 * This constraint provides lower bounds on new capacity installation.
 *
 *   .. math::
-*      \text{CAP_NEW}_{n,t,y} \geq \text{bound_new_capacity_lo}_{n,t,y} \quad \forall \ t \ \in \ T^{\text{INV}}
+*      \text{CAP\_NEW}_{n,t,y} \geq \text{bound\_new\_capacity\_lo}_{n,t,y} \quad \forall \ t \ \in \ T^{\text{INV}}
 *
 ***
 NEW_CAPACITY_BOUND_LO(node,inv_tec,year)$( is_bound_new_capacity_lo(node,inv_tec,year) )..
@@ -1206,7 +1206,7 @@ NEW_CAPACITY_BOUND_LO(node,inv_tec,year)$( is_bound_new_capacity_lo(node,inv_tec
 * summed over all vintages.
 *
 *   .. math::
-*      \sum_{y^V \leq y} \text{CAP}_{n,t,y,y^V} \leq \text{bound_total_capacity_up}_{n,t,y} \quad \forall \ t \ \in \ T^{\text{INV}}
+*      \sum_{y^V \leq y} \text{CAP}_{n,t,y,y^V} \leq \text{bound\_total\_capacity\_up}_{n,t,y} \quad \forall \ t \ \in \ T^{\text{INV}}
 *
 ***
 TOTAL_CAPACITY_BOUND_UP(node,inv_tec,year)$( is_bound_total_capacity_up(node,inv_tec,year) )..
@@ -1224,7 +1224,7 @@ TOTAL_CAPACITY_BOUND_UP(node,inv_tec,year)$( is_bound_total_capacity_up(node,inv
 * This constraint gives lower bounds on the total installed capacity of a technology.
 *
 *   .. math::
-*      \sum_{y^V \leq y} \text{CAP}_{n,t,y,y^V} \geq \text{bound_total_capacity_lo}_{n,t,y} \quad \forall \ t \ \in \ T^{\text{INV}}
+*      \sum_{y^V \leq y} \text{CAP}_{n,t,y,y^V} \geq \text{bound\_total\_capacity\_lo}_{n,t,y} \quad \forall \ t \ \in \ T^{\text{INV}}
 *
 ***
 TOTAL_CAPACITY_BOUND_LO(node,inv_tec,year)$( is_bound_total_capacity_lo(node,inv_tec,year) )..
@@ -1242,7 +1242,7 @@ TOTAL_CAPACITY_BOUND_LO(node,inv_tec,year)$( is_bound_total_capacity_lo(node,inv
 * This constraint provides upper bounds by mode of a technology activity, summed over all vintages.
 *
 *   .. math::
-*      \sum_{y^V \leq y} \text{ACT}_{n,t,y^V,y,m,h} \leq \text{bound_activity_up}_{n,t,m,y,h}
+*      \sum_{y^V \leq y} \text{ACT}_{n,t,y^V,y,m,h} \leq \text{bound\_activity\_up}_{n,t,m,y,h}
 *
 ***
 ACTIVITY_BOUND_UP(node,tec,year,mode,time)$(
@@ -1265,7 +1265,7 @@ ACTIVITY_BOUND_UP(node,tec,year,mode,time)$(
 * This constraint provides upper bounds of a technology activity across all modes and vintages.
 *
 *   .. math::
-*      \sum_{y^V \leq y, m} \text{ACT}_{n,t,y^V,y,m,h} \leq \text{bound_activity_up}_{n,t,y,'all',h}
+*      \sum_{y^V \leq y, m} \text{ACT}_{n,t,y^V,y,m,h} \leq \text{bound\_activity\_up}_{n,t,y,'all',h}
 *
 ***
 ACTIVITY_BOUND_ALL_MODES_UP(node,tec,year,time)$( is_bound_activity_up(node,tec,year,'all',time) )..
@@ -1287,9 +1287,9 @@ ACTIVITY_BOUND_ALL_MODES_UP(node,tec,year,time)$( is_bound_activity_up(node,tec,
 * all vintages.
 *
 *   .. math::
-*      \sum_{y^V \leq y} \text{ACT}_{n,t,y^V,y,m,h} \geq \text{bound_activity_lo}_{n,t,y,m,h}
+*      \sum_{y^V \leq y} \text{ACT}_{n,t,y^V,y,m,h} \geq \text{bound\_activity\_lo}_{n,t,y,m,h}
 *
-* We assume that :math:`\text{bound_activity_lo}_{n,t,y,m,h} = 0`
+* We assume that :math:`\text{bound\_activity\_lo}_{n,t,y,m,h} = 0`
 * unless explicitly stated otherwise.
 ***
 ACTIVITY_BOUND_LO(node,tec,year,mode,time)$( map_tec_act(node,tec,year,mode,time) )..
@@ -1310,9 +1310,9 @@ ACTIVITY_BOUND_LO(node,tec,year,mode,time)$( map_tec_act(node,tec,year,mode,time
 * This constraint provides lower bounds of a technology activity across all modes and vintages.
 *
 *   .. math::
-*      \sum_{y^V \leq y, m} \text{ACT}_{n,t,y^V,y,m,h} \geq \text{bound_activity_lo}_{n,t,y,'all',h}
+*      \sum_{y^V \leq y, m} \text{ACT}_{n,t,y^V,y,m,h} \geq \text{bound\_activity\_lo}_{n,t,y,'all',h}
 *
-* We assume that :math:`\text{bound_activity_lo}_{n,t,y,'all',h} = 0`
+* We assume that :math:`\text{bound\_activity\_lo}_{n,t,y,'all',h} = 0`
 * unless explicitly stated otherwise.
 ***
 ACTIVITY_BOUND_ALL_MODES_LO(node,tec,year,time)$( bound_activity_lo(node,tec,year,'all',time) )..
@@ -1346,7 +1346,7 @@ ACTIVITY_BOUND_ALL_MODES_LO(node,tec,year,time)$( bound_activity_lo(node,tec,yea
 *
 *   .. math::
 *     \text{ACT}_{n^L,t,y^V,y,m,h^A}
-*     \leq \text{share_mode_up}_{p,n,t,y,m,h} \cdot
+*     \leq \text{share\_mode\_up}_{p,n,t,y,m,h} \cdot
 *     \sum_{m'} \text{ACT}_{n^L,t,y^V,y,m',h^A}
 *
 ***
@@ -1376,7 +1376,7 @@ SHARE_CONSTRAINT_MODE_UP(shares,node,tec,mode,year,time)$(
 *
 *   .. math::
 *     \text{ACT}_{n^L,t,y^V,y,m,h^A}
-*     \geq \text{share_mode_lo}_{p,n,t,y,m,h} \cdot
+*     \geq \text{share\_mode\_lo}_{p,n,t,y,m,h} \cdot
 *     \sum_{m'} \text{ACT}_{n^L,t,y^V,y,m',h^A}
 *
 ***
@@ -1419,14 +1419,14 @@ SHARE_CONSTRAINT_MODE_LO(shares,node,tec,mode,year,time)$(
 *   .. math::
 *      & \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim P^{\text{share}}}}
 *         ( \text{output}_{n^L,t,y^V,y,m,n,c,l,h^A,h} + \text{input}_{n^L,t,y^V,y,m,n,c,l,h^A,h} ) \\
-*      & \quad \cdot \text{duration_time_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,y^V,y,m,h^A} \\
+*      & \quad \cdot \text{duration\_time\_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,y^V,y,m,h^A} \\
 *      & \geq
-*        \text{share_commodity_up}_{p,n,y,h} \cdot
+*        \text{share\_commodity\_up}_{p,n,y,h} \cdot
 *        \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim P^{\text{total}}}}
 *            ( \text{output}_{n^L,t,y^V,y,m,n,c,l,h^A,h} + \text{input}_{n^L,t,y^V,y,m,n,c,l,h^A,h} ) \\
-*      & \quad \cdot \text{duration_time_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,y^V,y,m,h^A}
+*      & \quad \cdot \text{duration\_time\_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,y^V,y,m,h^A}
 *
-* This constraint is only active if :math:`\text{share_commodity_up}_{p,n,y,h}` is defined.
+* This constraint is only active if :math:`\text{share\_commodity\_up}_{p,n,y,h}` is defined.
 ***
 SHARE_CONSTRAINT_COMMODITY_UP(shares,node_share,year,time)$( share_commodity_up(shares,node_share,year,time) )..
 * activity by type_tec_share technologies with map_shares_generic_share entries and a specific mode
@@ -1470,14 +1470,14 @@ SHARE_CONSTRAINT_COMMODITY_UP(shares,node_share,year,time)$( share_commodity_up(
 *   .. math::
 *      & \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim P^{\text{share}}}}
 *         ( \text{output}_{n^L,t,y^V,y,m,n,c,l,h^A,h} + \text{input}_{n^L,t,y^V,y,m,n,c,l,h^A,h} ) \\
-*      & \quad \cdot \text{duration_time_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,y^V,y,m,h^A} \\
+*      & \quad \cdot \text{duration\_time\_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,y^V,y,m,h^A} \\
 *      & \leq
-*        \text{share_commodity_lo}_{p,n,y,h} \cdot
+*        \text{share\_commodity\_lo}_{p,n,y,h} \cdot
 *        \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y, (n,\widehat{t},m,c,l) \sim P^{\text{total}}}}
 *            ( \text{output}_{n^L,t,y^V,y,m,n,c,l,h^A,h} + \text{input}_{n^L,t,y^V,y,m,n,c,l,h^A,h} ) \\
-*      & \quad \cdot \text{duration_time_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,y^V,y,m,h^A}
+*      & \quad \cdot \text{duration\_time\_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,y^V,y,m,h^A}
 *
-* This constraint is only active if :math:`\text{share_commodity_lo}_{p,n,y,h}` is defined.
+* This constraint is only active if :math:`\text{share\_commodity\_lo}_{p,n,y,h}` is defined.
 ***
 SHARE_CONSTRAINT_COMMODITY_LO(shares,node_share,year,time)$( share_commodity_lo(shares,node_share,year,time) )..
 * total input and output by `type_tec_share` technologies mapped to respective commodity, level and node
@@ -1535,17 +1535,17 @@ SHARE_CONSTRAINT_COMMODITY_LO(shares,node_share,year,time)$( share_commodity_lo(
 * annual growth of the existing 'capital stock', and a "soft" relaxation of the upper bound.
 *
 *  .. math::
-*     \text{CAP_NEW}_{n,t,y}
-*         \leq & \Bigg(~ \text{initial_new_capacity_up}_{n,t,y}
-*             \cdot \frac{ \Big( 1 + \text{growth_new_capacity_up}_{n,t,y} \Big)^{|y|} - 1 }
-*                        { \text{growth_new_capacity_up}_{n,t,y} } \\
-*              & + \Big( \text{CAP_NEW}_{n,t,y-1} + \text{historical_new_capacity}_{n,t,y-1} \Big) \\
-*              & \hspace{2 cm} \cdot \Big( 1 + \text{growth_new_capacity_up}_{n,t,y} \Big)^{|y|} \\
-*              & + \text{CAP_NEW_UP}_{n,t,y} \cdot \Bigg( \Big( 1 + \text{soft_new_capacity_up}_{n,t,y}\Big)^{|y|} - 1 \Bigg)\Bigg) \\
+*     \text{CAP\_NEW}_{n,t,y}
+*         \leq & \Bigg(~ \text{initial\_new\_capacity\_up}_{n,t,y}
+*             \cdot \frac{ \Big( 1 + \text{growth\_new\_capacity\_up}_{n,t,y} \Big)^{|y|} - 1 }
+*                        { \text{growth\_new\_capacity\_up}_{n,t,y} } \\
+*              & + \Big( \text{CAP\_NEW}_{n,t,y-1} + \text{historical\_new\_capacity}_{n,t,y-1} \Big) \\
+*              & \hspace{2 cm} \cdot \Big( 1 + \text{growth\_new\_capacity\_up}_{n,t,y} \Big)^{|y|} \\
+*              & + \text{CAP\_NEW\_UP}_{n,t,y} \cdot \Bigg( \Big( 1 + \text{soft\_new\_capacity\_up}_{n,t,y}\Big)^{|y|} - 1 \Bigg)\Bigg) \\
 *              & * \frac{|y-1|}{|y|} \\
 *         & \quad \forall \ t \ \in \ T^{\text{INV}}
 *
-* Here, :math:`|y|` is the number of years in period :math:`y`, i.e., :math:`\text{duration_period}_{y}`.
+* Here, :math:`|y|` is the number of years in period :math:`y`, i.e., :math:`\text{duration\_period}_{y}`.
 ***
 NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
         AND is_dynamic_new_capacity_up(node,inv_tec,year) )..
@@ -1589,8 +1589,8 @@ NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * the level of the investment in the previous period (cf. Keppo and Strubegger, 2010 :cite:`Keppo-2010`).
 *
 *   .. math::
-*      \text{CAP_NEW_UP}_{n,t,y} \leq \sum_{y-1} \text{CAP_NEW}_{n^L,t,y-1} & \text{if } y \neq \text{'first_period'} \\
-*                                + \sum_{y-1} \text{historical_new_capacity}_{n^L,t,y-1} & \text{if } y = \text{'first_period'} \\
+*      \text{CAP\_NEW\_UP}_{n,t,y} \leq \sum_{y-1} \text{CAP\_NEW}_{n^L,t,y-1} & \text{if } y \neq \text{'first\_period'} \\
+*                                + \sum_{y-1} \text{historical\_new\_capacity}_{n^L,t,y-1} & \text{if } y = \text{'first\_period'} \\
 *                           \quad \forall \ t \ \in \ T^{\text{INV}}
 *
 ***
@@ -1610,13 +1610,13 @@ NEW_CAPACITY_SOFT_CONSTRAINT_UP(node,inv_tec,year)$( soft_new_capacity_up(node,i
 * This constraint gives dynamic lower bounds on new capacity.
 *
 *  .. math::
-*     \text{CAP_NEW}_{n,t,y}
-*         \geq & \Bigg(- \text{initial_new_capacity_lo}_{n,t,y}
-*             \cdot \frac{ \Big( 1 + \text{growth_new_capacity_lo}_{n,t,y} \Big)^{|y|} }
-*                        { \text{growth_new_capacity_lo}_{n,t,y} } \\
-*              & + \Big( \text{CAP_NEW}_{n,t,y-1} + \text{historical_new_capacity}_{n,t,y-1} \Big) \\
-*              & \hspace{2 cm} \cdot \Big( 1 + \text{growth_new_capacity_lo}_{n,t,y} \Big)^{|y|} \\
-*              & - \text{CAP_NEW_LO}_{n,t,y} \cdot \Bigg( \Big( 1 + \text{soft_new_capacity_lo}_{n,t,y}\Big)^{|y|} - 1 \Bigg)\Bigg) \\
+*     \text{CAP\_NEW}_{n,t,y}
+*         \geq & \Bigg(- \text{initial\_new\_capacity\_lo}_{n,t,y}
+*             \cdot \frac{ \Big( 1 + \text{growth\_new\_capacity\_lo}_{n,t,y} \Big)^{|y|} }
+*                        { \text{growth\_new\_capacity\_lo}_{n,t,y} } \\
+*              & + \Big( \text{CAP\_NEW}_{n,t,y-1} + \text{historical\_new\_capacity}_{n,t,y-1} \Big) \\
+*              & \hspace{2 cm} \cdot \Big( 1 + \text{growth\_new\_capacity\_lo}_{n,t,y} \Big)^{|y|} \\
+*              & - \text{CAP\_NEW\_LO}_{n,t,y} \cdot \Bigg( \Big( 1 + \text{soft\_new\_capacity\_lo}_{n,t,y}\Big)^{|y|} - 1 \Bigg)\Bigg) \\
 *              & * \frac{|y-1|}{|y|} \\
 *         & \quad \forall \ t \ \in \ T^{\text{INV}}
 *
@@ -1663,8 +1663,8 @@ NEW_CAPACITY_CONSTRAINT_LO(node,inv_tec,year)$( map_tec(node,inv_tec,year)
 * level of the investment in the previous year.
 *
 *   .. math::
-*      \text{CAP_NEW_LO}_{n,t,y} \leq \sum_{y-1} \text{CAP_NEW}_{n^L,t,y-1} & \text{if } y \neq \text{'first_period'} \\
-*                                + \sum_{y-1} \text{historical_new_capacity}_{n^L,t,y-1} & \text{if } y = \text{'first_period'} \\
+*      \text{CAP\_NEW\_LO}_{n,t,y} \leq \sum_{y-1} \text{CAP\_NEW}_{n^L,t,y-1} & \text{if } y \neq \text{'first\_period'} \\
+*                                + \sum_{y-1} \text{historical\_new\_capacity}_{n^L,t,y-1} & \text{if } y = \text{'first\_period'} \\
 *                           \quad \forall \ t \ \in \ T^{\text{INV}}
 *
 ***
@@ -1685,13 +1685,13 @@ NEW_CAPACITY_SOFT_CONSTRAINT_LO(node,inv_tec,year)$( soft_new_capacity_lo(node,i
 *
 *  .. math::
 *     \sum_{y^V \leq y,m} \text{ACT}_{n,t,y^V,y,m,h}
-*         \leq & ~ \text{initial_activity_up}_{n,t,y,h}
-*             \cdot \frac{ \Big( 1 + \text{growth_activity_up}_{n,t,y,h} \Big)^{|y|} - 1 }
-*                        { \text{growth_activity_up}_{n,t,y,h} } \\
+*         \leq & ~ \text{initial\_activity\_up}_{n,t,y,h}
+*             \cdot \frac{ \Big( 1 + \text{growth\_activity\_up}_{n,t,y,h} \Big)^{|y|} - 1 }
+*                        { \text{growth\_activity\_up}_{n,t,y,h} } \\
 *             & + \bigg( \sum_{y^V \leq y-1,m} \text{ACT}_{n,t,y^V,y-1,m,h}
-*                         + \sum_{m} \text{historical_activity}_{n,t,y-1,m,h} \bigg) \\
-*             & \hspace{2 cm} \cdot \Big( 1 + \text{growth_activity_up}_{n,t,y,h} \Big)^{|y|} \\
-*             & + \text{ACT_UP}_{n,t,y,h} \cdot \Bigg( \Big( 1 + \text{soft_activity_up}_{n,t,y,h} \Big)^{|y|} - 1 \Bigg)
+*                         + \sum_{m} \text{historical\_activity}_{n,t,y-1,m,h} \bigg) \\
+*             & \hspace{2 cm} \cdot \Big( 1 + \text{growth\_activity\_up}_{n,t,y,h} \Big)^{|y|} \\
+*             & + \text{ACT\_UP}_{n,t,y,h} \cdot \Bigg( \Big( 1 + \text{soft\_activity\_up}_{n,t,y,h} \Big)^{|y|} - 1 \Bigg)
 *
 ***
 ACTIVITY_CONSTRAINT_UP(node,tec,year,time)$( map_tec_time(node,tec,year,time)
@@ -1731,8 +1731,8 @@ ACTIVITY_CONSTRAINT_UP(node,tec,year,time)$( map_tec_time(node,tec,year,time)
 * level of the activity in the previous period.
 *
 *   .. math::
-*      \text{ACT_UP}_{n,t,y,h} \leq \sum_{y^V \leq y,m,y-1} \text{ACT}_{n^L,t,y^V,y-1,m,h} & \text{if } y \neq \text{'first_period'} \\
-*                             + \sum_{m,y-1} \text{historical_activity}_{n^L,t,y-1,m,h} & \text{if } y = \text{'first_period'}
+*      \text{ACT\_UP}_{n,t,y,h} \leq \sum_{y^V \leq y,m,y-1} \text{ACT}_{n^L,t,y^V,y-1,m,h} & \text{if } y \neq \text{'first\_period'} \\
+*                             + \sum_{m,y-1} \text{historical\_activity}_{n^L,t,y-1,m,h} & \text{if } y = \text{'first\_period'}
 *
 *
 ***
@@ -1752,13 +1752,13 @@ ACTIVITY_SOFT_CONSTRAINT_UP(node,tec,year,time)$( soft_activity_up(node,tec,year
 *
 *  .. math::
 *     \sum_{y^V \leq y,m} \text{ACT}_{n,t,y^V,y,m,h}
-*         \geq & - \text{initial_activity_lo}_{n,t,y,h}
-*             \cdot \frac{ \Big( 1 + \text{growth_activity_lo}_{n,t,y,h} \Big)^{|y|} - 1 }
-*                        { \text{growth_activity_lo}_{n,t,y,h} } \\
+*         \geq & - \text{initial\_activity\_lo}_{n,t,y,h}
+*             \cdot \frac{ \Big( 1 + \text{growth\_activity\_lo}_{n,t,y,h} \Big)^{|y|} - 1 }
+*                        { \text{growth\_activity\_lo}_{n,t,y,h} } \\
 *             & + \bigg( \sum_{y^V \leq y-1,m} \text{ACT}_{n,t,y^V,y-1,m,h}
-*                         + \sum_{m} \text{historical_activity}_{n,t,y-1,m,h} \bigg) \\
-*             & \hspace{2 cm} \cdot \Big( 1 + \text{growth_activity_lo}_{n,t,y,h} \Big)^{|y|} \\
-*             & - \text{ACT_LO}_{n,t,y,h} \cdot \Bigg( \Big( 1 + \text{soft_activity_lo}_{n,t,y,h} \Big)^{|y|} - 1 \Bigg)
+*                         + \sum_{m} \text{historical\_activity}_{n,t,y-1,m,h} \bigg) \\
+*             & \hspace{2 cm} \cdot \Big( 1 + \text{growth\_activity\_lo}_{n,t,y,h} \Big)^{|y|} \\
+*             & - \text{ACT\_LO}_{n,t,y,h} \cdot \Bigg( \Big( 1 + \text{soft\_activity\_lo}_{n,t,y,h} \Big)^{|y|} - 1 \Bigg)
 *
 ***
 ACTIVITY_CONSTRAINT_LO(node,tec,year,time)$( map_tec_time(node,tec,year,time)
@@ -1798,8 +1798,8 @@ ACTIVITY_CONSTRAINT_LO(node,tec,year,time)$( map_tec_time(node,tec,year,time)
 * level of the activity in the previous period.
 *
 *   .. math::
-*      \text{ACT_LO}_{n,t,y,h} \leq \sum_{y^V \leq y,m,y-1} \text{ACT}_{n^L,t,y^V,y-1,m,h} & \text{if } y \neq \text{'first_period'} \\
-*                             + \sum_{m,y-1} \text{historical_activity}_{n^L,t,y-1,m,h} & \text{if } y = \text{'first_period'}
+*      \text{ACT\_LO}_{n,t,y,h} \leq \sum_{y^V \leq y,m,y-1} \text{ACT}_{n^L,t,y^V,y-1,m,h} & \text{if } y \neq \text{'first\_period'} \\
+*                             + \sum_{m,y-1} \text{historical\_activity}_{n^L,t,y-1,m,h} & \text{if } y = \text{'first\_period'}
 *
 ***
 ACTIVITY_SOFT_CONSTRAINT_LO(node,tec,year,time)$( soft_activity_lo(node,tec,year,time) )..
@@ -1832,8 +1832,8 @@ ACTIVITY_SOFT_CONSTRAINT_LO(node,tec,year,time)$( soft_activity_lo(node,tec,year
 *      \text{EMISS}_{n,e,\widehat{t},y} =
 *          \sum_{n^L \in N(n)} \Bigg(
 *              \sum_{t \in T(\widehat{t}),y^V \leq y,m,h }
-*                  \text{emission_factor}_{n^L,t,y^V,y,m,e} \cdot \text{ACT}_{n^L,t,y^V,y,m,h} \\
-*              + \sum_{s} \ \text{land_emission}_{n^L,s,y,e} \cdot \text{LAND}_{n^L,s,y}
+*                  \text{emission\_factor}_{n^L,t,y^V,y,m,e} \cdot \text{ACT}_{n^L,t,y^V,y,m,h} \\
+*              + \sum_{s} \ \text{land\_emission}_{n^L,s,y,e} \cdot \text{LAND}_{n^L,s,y}
 *                   \text{ if } \widehat{t} \in \widehat{T}^{LAND} \Bigg)
 *
 ***
@@ -1859,7 +1859,7 @@ EMISSION_EQUIVALENCE(node,emission,type_tec,year)..
 * Equation EMISSION_CONSTRAINT
 * """"""""""""""""""""""""""""
 * This constraint enforces upper bounds on emissions (by emission type). For all bounds that include multiple periods,
-* the parameter :math:`\text{bound_emission}_{n,\widehat{e},\widehat{t},\widehat{y}}` is scaled to represent average annual
+* the parameter :math:`\text{bound\_emission}_{n,\widehat{e},\widehat{t},\widehat{y}}` is scaled to represent average annual
 * emissions over all years included in the year-set :math:`\widehat{y}`.
 *
 * The formulation includes historical emissions and allows to model constraints ranging over both the model horizon
@@ -1869,12 +1869,12 @@ EMISSION_EQUIVALENCE(node,emission,type_tec,year)..
 *      \frac{
 *          \sum_{y' \in Y(\widehat{y}), e \in E(\widehat{e})}
 *              \begin{array}{l}
-*                  \text{duration_period}_{y'} \cdot \text{emission_scaling}_{\widehat{e},e} \cdot \\
-*                  \Big( \text{EMISS}_{n,e,\widehat{t},y'} + \sum_{m} \text{historical_emission}_{n,e,\widehat{t},y'} \Big)
+*                  \text{duration\_period}_{y'} \cdot \text{emission\_scaling}_{\widehat{e},e} \cdot \\
+*                  \Big( \text{EMISS}_{n,e,\widehat{t},y'} + \sum_{m} \text{historical\_emission}_{n,e,\widehat{t},y'} \Big)
 *              \end{array}
 *          }
-*        { \sum_{y' \in Y(\widehat{y})} \text{duration_period}_{y'} }
-*      \leq \text{bound_emission}_{n,\widehat{e},\widehat{t},\widehat{y}}
+*        { \sum_{y' \in Y(\widehat{y})} \text{duration\_period}_{y'} }
+*      \leq \text{bound\_emission}_{n,\widehat{e},\widehat{t},\widehat{y}}
 *
 ***
 EMISSION_CONSTRAINT(node,type_emission,type_tec,type_year)$is_bound_emission(node,type_emission,type_tec,type_year)..
@@ -1923,11 +1923,11 @@ LAND_CONSTRAINT(node,year)$( SUM(land_scenario$( map_land(node,land_scenario,yea
 *
 *  .. math::
 *     \text{LAND}_{n,s,y}
-*         \leq & \text{initial_land_scen_up}_{n,s,y}
-*             \cdot \frac{ \Big( 1 + \text{growth_land_scen_up}_{n,s,y} \Big)^{|y|} - 1 }
-*                        { \text{growth_land_scen_up}_{n,s,y} } \\
-*              & + \big( \text{LAND}_{n,s,y-1} + \text{historical_land}_{n,s,y-1} \big)
-*                  \cdot \Big( 1 + \text{growth_land_scen_up}_{n,s,y} \Big)^{|y|}
+*         \leq & \text{initial\_land\_scen\_up}_{n,s,y}
+*             \cdot \frac{ \Big( 1 + \text{growth\_land\_scen\_up}_{n,s,y} \Big)^{|y|} - 1 }
+*                        { \text{growth\_land\_scen\_up}_{n,s,y} } \\
+*              & + \big( \text{LAND}_{n,s,y-1} + \text{historical\_land}_{n,s,y-1} \big)
+*                  \cdot \Big( 1 + \text{growth\_land\_scen\_up}_{n,s,y} \Big)^{|y|}
 *
 ***
 DYNAMIC_LAND_SCEN_CONSTRAINT_UP(node,land_scenario,year)$( map_land(node,land_scenario,year)
@@ -1958,11 +1958,11 @@ DYNAMIC_LAND_SCEN_CONSTRAINT_UP(node,land_scenario,year)$( map_land(node,land_sc
 *
 *  .. math::
 *     \text{LAND}_{n,s,y}
-*         \geq & - \text{initial_land_scen_lo}_{n,s,y}
-*             \cdot \frac{ \Big( 1 + \text{growth_land_scen_lo}_{n,s,y} \Big)^{|y|} - 1 }
-*                        { \text{growth_land_scen_lo}_{n,s,y} } \\
-*              & + \big( \text{LAND}_{n,s,y-1} + \text{historical_land}_{n,s,y-1} \big)
-*                  \cdot \Big( 1 + \text{growth_land_scen_lo}_{n,s,y} \Big)^{|y|}
+*         \geq & - \text{initial\_land\_scen\_lo}_{n,s,y}
+*             \cdot \frac{ \Big( 1 + \text{growth\_land\_scen\_lo}_{n,s,y} \Big)^{|y|} - 1 }
+*                        { \text{growth\_land\_scen\_lo}_{n,s,y} } \\
+*              & + \big( \text{LAND}_{n,s,y-1} + \text{historical\_land}_{n,s,y-1} \big)
+*                  \cdot \Big( 1 + \text{growth\_land\_scen\_lo}_{n,s,y} \Big)^{|y|}
 *
 ***
 DYNAMIC_LAND_SCEN_CONSTRAINT_LO(node,land_scenario,year)$( map_land(node,land_scenario,year)
@@ -1995,14 +1995,14 @@ DYNAMIC_LAND_SCEN_CONSTRAINT_LO(node,land_scenario,year)$( map_land(node,land_sc
 * """"""""""""""""""""""""""""""""""""""""
 *
 *  .. math::
-*     \sum_{s \in S} \text{land_use}_{n,s,y,u} &\cdot \text{LAND}_{n,s,y}
-*         \leq \text{initial_land_up}_{n,y,u}
-*             \cdot \frac{ \Big( 1 + \text{growth_land_up}_{n,y,u} \Big)^{|y|} - 1 }
-*                        { \text{growth_land_up}_{n,y,u} } \\
-*              & + \Big( \sum_{s \in S} \big( \text{land_use}_{n,s,y-1,u}
-*                          + \text{dynamic_land_up}_{n,s,y-1,u} \big) \\
-*                            & \quad \quad \cdot \big( \text{LAND}_{n,s,y-1} + \text{historical_land}_{n,s,y-1} \big) \Big) \\
-*                            & \quad \cdot \Big( 1 + \text{growth_land_up}_{n,y,u} \Big)^{|y|}
+*     \sum_{s \in S} \text{land\_use}_{n,s,y,u} &\cdot \text{LAND}_{n,s,y}
+*         \leq \text{initial\_land\_up}_{n,y,u}
+*             \cdot \frac{ \Big( 1 + \text{growth\_land\_up}_{n,y,u} \Big)^{|y|} - 1 }
+*                        { \text{growth\_land\_up}_{n,y,u} } \\
+*              & + \Big( \sum_{s \in S} \big( \text{land\_use}_{n,s,y-1,u}
+*                          + \text{dynamic\_land\_up}_{n,s,y-1,u} \big) \\
+*                            & \quad \quad \cdot \big( \text{LAND}_{n,s,y-1} + \text{historical\_land}_{n,s,y-1} \big) \Big) \\
+*                            & \quad \cdot \Big( 1 + \text{growth\_land\_up}_{n,y,u} \Big)^{|y|}
 *
 ***
 DYNAMIC_LAND_TYPE_CONSTRAINT_UP(node,year,land_type)$( is_dynamic_land_up(node,year,land_type) )..
@@ -2036,14 +2036,14 @@ DYNAMIC_LAND_TYPE_CONSTRAINT_UP(node,year,land_type)$( is_dynamic_land_up(node,y
 * """"""""""""""""""""""""""""""""""""""""
 *
 *  .. math::
-*     \sum_{s \in S} \text{land_use}_{n,s,y,u} &\cdot \text{LAND}_{n,s,y}
-*         \geq - \text{initial_land_lo}_{n,y,u}
-*             \cdot \frac{ \Big( 1 + \text{growth_land_lo}_{n,y,u} \Big)^{|y|} - 1 }
-*                        { \text{growth_land_lo}_{n,y,u} } \\
-*              & + \Big( \sum_{s \in S} \big( \text{land_use}_{n,s,y-1,u}
-*                          + \text{dynamic_land_lo}_{n,s,y-1,u} \big) \\
-*                            & \quad \quad \cdot \big( \text{LAND}_{n,s,y-1} + \text{historical_land}_{n,s,y-1} \big) \Big) \\
-*                            & \quad \cdot \Big( 1 + \text{growth_land_lo}_{n,y,u} \Big)^{|y|}
+*     \sum_{s \in S} \text{land\_use}_{n,s,y,u} &\cdot \text{LAND}_{n,s,y}
+*         \geq - \text{initial\_land\_lo}_{n,y,u}
+*             \cdot \frac{ \Big( 1 + \text{growth\_land\_lo}_{n,y,u} \Big)^{|y|} - 1 }
+*                        { \text{growth\_land\_lo}_{n,y,u} } \\
+*              & + \Big( \sum_{s \in S} \big( \text{land\_use}_{n,s,y-1,u}
+*                          + \text{dynamic\_land\_lo}_{n,s,y-1,u} \big) \\
+*                            & \quad \quad \cdot \big( \text{LAND}_{n,s,y-1} + \text{historical\_land}_{n,s,y-1} \big) \Big) \\
+*                            & \quad \cdot \Big( 1 + \text{growth\_land\_lo}_{n,y,u} \Big)^{|y|}
 *
 ***
 DYNAMIC_LAND_TYPE_CONSTRAINT_LO(node,year,land_type)$( is_dynamic_land_lo(node,year,land_type) )..
@@ -2089,13 +2089,13 @@ DYNAMIC_LAND_TYPE_CONSTRAINT_LO(node,year,land_type)$( is_dynamic_land_lo(node,y
 * """""""""""""""""""""""""""""
 *   .. math::
 *      \text{REL}_{r,n,y} = \sum_{t} \Bigg(
-*          & \ \text{relation_new_capacity}_{r,n,y,t} \cdot \text{CAP_NEW}_{n,t,y} \\[4 pt]
-*          & + \text{relation_total_capacity}_{r,n,y,t} \cdot \sum_{y^V \leq y} \ \text{CAP}_{n,t,y^V,y} \\
-*          & + \sum_{n^L,y',m,h} \ \text{relation_activity}_{r,n,y,n^L,t,y',m} \\
+*          & \ \text{relation\_new\_capacity}_{r,n,y,t} \cdot \text{CAP\_NEW}_{n,t,y} \\[4 pt]
+*          & + \text{relation\_total\_capacity}_{r,n,y,t} \cdot \sum_{y^V \leq y} \ \text{CAP}_{n,t,y^V,y} \\
+*          & + \sum_{n^L,y',m,h} \ \text{relation\_activity}_{r,n,y,n^L,t,y',m} \\
 *          & \quad \quad \cdot \Big( \sum_{y^V \leq y'} \text{ACT}_{n^L,t,y^V,y',m,h}
-*                              + \text{historical_activity}_{n^L,t,y',m,h} \Big) \Bigg)
+*                              + \text{historical\_activity}_{n^L,t,y',m,h} \Big) \Bigg)
 *
-* The parameter :math:`\text{historical_new_capacity}_{r,n,y}` is not included here, because relations can only be active
+* The parameter :math:`\text{historical\_new\_capacity}_{r,n,y}` is not included here, because relations can only be active
 * in periods included in the model horizon and there is no "writing" of capacity relation factors across periods.
 ***
 
@@ -2124,7 +2124,7 @@ RELATION_EQUIVALENCE(relation,node,year)..
 * Equation RELATION_CONSTRAINT_UP
 * """""""""""""""""""""""""""""""
 *   .. math::
-*      \text{REL}_{r,n,y} \leq \text{relation_upper}_{r,n,y}
+*      \text{REL}_{r,n,y} \leq \text{relation\_upper}_{r,n,y}
 ***
 RELATION_CONSTRAINT_UP(relation,node,year)$( is_relation_upper(relation,node,year) )..
     REL(relation,node,year)
@@ -2137,7 +2137,7 @@ RELATION_CONSTRAINT_UP(relation,node,year)$( is_relation_upper(relation,node,yea
 * Equation RELATION_CONSTRAINT_LO
 * """""""""""""""""""""""""""""""
 *   .. math::
-*      \text{REL}_{r,n,y} \geq \text{relation_lower}_{r,n,y}
+*      \text{REL}_{r,n,y} \geq \text{relation\_lower}_{r,n,y}
 ***
 RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,year) )..
     REL(relation,node,year)
@@ -2189,11 +2189,11 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
 * - :math:`m^{S}` is `mode` of operation for storage container technology
 
 *   .. math::
-*      \text{STORAGE_CHARGE}_{n,t,m^s,l,c,y,h} =
+*      \text{STORAGE\_CHARGE}_{n,t,m^s,l,c,y,h} =
 *          \sum_{\substack{n^L,m,h-1 \\ y^V \leq y, (n,t^C,t,l,y) \sim S^{\text{storage}}}} \text{output}_{n^L,t^C,y^V,y,m,n,c,l,h-1,h}
 *             \cdot & \text{ACT}_{n^L,t^C,y^V,y,m,h-1} \\
 *          - \sum_{\substack{n^L,m,c,h-1 \\ y^V \leq y, (n,t^D,t,l,y) \sim S^{\text{storage}}}} \text{input}_{n^L,t^D,y^V,y,m,n,c,l,h-1,h}
-*              \cdot \text{ACT}_{n^L,t^D,y^V,y,m,h-1} \quad \forall \ t \in T^{\text{STOR}}, & \forall \ l \in L^{\text{STOR}}
+*              \cdot \text{ACT}_{n^L,t^D,y^V,y,m,h-1} \quad \forall \ t \in T^{\text{STOR}}, \& \forall \ l \in L^{\text{STOR}}
 ***
 STORAGE_CHANGE(node,storage_tec,mode,level_storage,commodity,year,time)$sum(
                (tec,mode2,lvl_temporal), map_tec_storage(node,tec,mode2,storage_tec,mode,level_storage,commodity,lvl_temporal) ) ..
@@ -2224,8 +2224,8 @@ STORAGE_CHANGE(node,storage_tec,mode,level_storage,commodity,year,time)$sum(
 *
 * .. math::
 *    \STORAGE_{ntmlcyh} =\ & \STORAGECHARGE_{ntmlcyh} \\
-*    & + \STORAGE_{ntmlcy(h-1)} \cdot (1 - \storageselfdischarge_{ntmly(h-1)}) \\
-*    \forall\ & t \in T^{\text{STOR}}, l \in L^{\text{STOR}}, \storageinitial_{ntmlcyh} = 0
+*    \& + \STORAGE_{ntmlcy(h-1)} \cdot (1 - \storageselfdischarge_{ntmly(h-1)}) \\
+*    \forall\ \& t \in T^{\text{STOR}}, l \in L^{\text{STOR}}, \storageinitial_{ntmlcyh} = 0
 ***
 STORAGE_BALANCE(node,storage_tec,mode,level,commodity,year,time2,lvl_temporal)$ (
     SUM((tec,mode2), map_tec_storage(node,tec,mode2,storage_tec,mode,level,commodity,lvl_temporal) )
@@ -2253,7 +2253,7 @@ STORAGE_BALANCE(node,storage_tec,mode,level,commodity,year,time2,lvl_temporal)$ 
 * a fraction of installed capacity of storage device (container) that can be filled initially.
 *
 * .. math::
-*    \STORAGE_{ntmlcy(h-1)} \geq &  \storageinitial_{ntmlcyh} \cdot \text{duration_time}_{h} \cdot \text{capacity_factor}_{n,t,y^V,y,h} \cdot \text{CAP}_{n,t,y^V,y}  \\
+*    \STORAGE_{ntmlcy(h-1)} \geq &  \storageinitial_{ntmlcyh} \cdot \text{duration\_time}_{h} \cdot \text{capacity\_factor}_{n,t,y^V,y,h} \cdot \text{CAP}_{n,t,y^V,y}  \\
 *    \quad \forall \ t \ \in \ T^{\text{INV}}, \forall\ & \storageinitial_{ntmlcyh} \neq 0
 ***
 

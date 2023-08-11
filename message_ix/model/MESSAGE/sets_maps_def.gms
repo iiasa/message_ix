@@ -104,7 +104,7 @@ $ONEMPTY
 *
 * .. [#time] The set ``time`` collects all sub-annual temporal units across all levels of temporal disaggregation.
 *    In a ``MESSAGE``-scheme :class:`ixmp.Scenario`, this set always includes an element "year",
-*    and the duration of that element is 1 (:math:`\text{duration_time}_{\text{'year'}} = 1`).
+*    and the duration of that element is 1 (:math:`\text{duration\_time}_{\text{'year'}} = 1`).
 *
 * .. [#shares] A generic formulation of share constraints is implemented in |MESSAGEix|,
 *    see :ref:`share_constraints`.
@@ -209,7 +209,7 @@ Alias(commodity,commodity2);
 *    * - level_renewable (level) [#level_res]_
 *      - :math:`l \in L^{\text{REN}} \subseteq L`
 *      - Levels related to `renewables` representation
-*    * - level_storage(level)
+*    * - level_storage (level)
 *      - :math:`l \in L^{\text{STOR}} \subseteq L`
 *      - Subsets of levels on which commodities are :ref:`stored <gams-storage>`; excluded from :ref:`commodity balances <commodity_balance_lt>`.
 *    * - type_node [#type_node]_

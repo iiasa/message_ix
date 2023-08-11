@@ -16,16 +16,16 @@ beyond_horizon_lifetime(node,inv_tec,vintage)$( beyond_horizon_lifetime(node,inv
 * Levelized costs excluding fuel costs
 * ------------------------------------
 * For the 'soft' relaxations of the dynamic constraints and the associated penalty factor in the objective function,
-* we need to compute the parameter :math:`\text{levelized_cost}_{n,t,y}`.
+* we need to compute the parameter :math:`\text{levelized\_cost}_{n,t,y}`.
 *
 * .. math::
-*    \text{levelized_cost}_{n,t,m,y,h} := \
-*        & \text{inv_cost}_{n,t,y} \cdot \frac{ \text{interestrate}_{y} \cdot \left( 1 + \text{interestrate}_{y} \right)^{|y|} }
+*    \text{levelized\_cost}_{n,t,m,y,h} := \
+*        & \text{inv\_cost}_{n,t,y} \cdot \frac{ \text{interestrate}_{y} \cdot \left( 1 + \text{interestrate}_{y} \right)^{|y|} }
 *                                      { \left( 1 + \text{interestrate}_{y} \right)^{|y|} - 1 } \\
-*        & + \text{fix_cost}_{n,t,y,y} \cdot \frac{ 1 }{ \sum_{h'} \text{duration_time}_{h'} \cdot \text{capacity_factor}_{n,t,y,y,h'} } \\
-*        & + \text{var_cost}_{n,t,y,y,m,h}
+*        & + \text{fix\_cost}_{n,t,y,y} \cdot \frac{ 1 }{ \sum_{h'} \text{duration\_time}_{h'} \cdot \text{capacity\_factor}_{n,t,y,y,h'} } \\
+*        & + \text{var\_cost}_{n,t,y,y,m,h}
 *
-* where :math:`|y| = \text{technical_lifetime}_{n,t,y}`. This formulation implicitly assumes constant fixed
+* where :math:`|y| = \text{technical\_lifetime}_{n,t,y}`. This formulation implicitly assumes constant fixed
 * and variable costs over time.
 *
 * **Warning:** 
@@ -68,9 +68,9 @@ loop((node,tec,year,time)$( levelized_cost(node,tec,year,time) < 0
 * investment costs have to be scaled up accordingly to account for the higher capital costs.
 *
 * .. math::
-*    \text{construction_time_factor}_{n,t,y} = \left( 1 + \text{interestrate}_y \right)^{|y|}
+*    \text{construction\_time\_factor}_{n,t,y} = \left( 1 + \text{interestrate}_y \right)^{|y|}
 *
-* where :math:`|y| = \text{construction_time}_{n,t,y}`. If no construction time is specified, the default value of the
+* where :math:`|y| = \text{construction\_time}_{n,t,y}`. If no construction time is specified, the default value of the
 * investment cost scaling factor defaults to 1. The model assumes that the construction time only plays a role
 * for the investment costs, i.e., each unit of new-built capacity is available instantaneously.
 *
@@ -89,45 +89,45 @@ construction_time_factor(node,inv_tec,year)$( map_tec(node,inv_tec,year) AND con
 * Investment costs beyond the model horizon
 * -----------------------------------------
 * If the technical lifetime of a technology exceeds the model horizon :math:`Y^{\text{model}}`, the model has to add
-* a scaling factor to the investment costs (:math:`\text{end_of_horizon_factor}_{n,t,y}`). Assuming a constant
+* a scaling factor to the investment costs (:math:`\text{end\_of\_horizon\_factor}_{n,t,y}`). Assuming a constant
 * stream of revenue (marginal value of the capacity constraint), this can be computed by annualizing investment costs
 * from the condition that in an optimal solution, the investment costs must equal the discounted future revenues,
-* if the investment variable :math:`\text{CAP_NEW}_{n,t,y} > 0`:
+* if the investment variable :math:`\text{CAP\_NEW}_{n,t,y} > 0`:
 *
 * .. math::
-*    \text{inv_cost}_{n,t,y^V} = \sum_{y \in Y^{\text{lifetime}}_{n,t,y^V}} \text{df_year}_{y} \cdot \beta_{n,t},
+*    \text{inv\_cost}_{n,t,y^V} = \sum_{y \in Y^{\text{lifetime}}_{n,t,y^V}} \text{df\_year}_{y} \cdot \beta_{n,t},
 *
 * Here, :math:`\beta_{n,t} > 0` is the dual variable to the capacity constraint (assumed constant over future periods)
 * and :math:`Y^{\text{lifetime}}_{n,t,y^V}` is the set of periods in the lifetime of a plant built in period :math:`y^V`.
-* Then, the scaling factor :math:`\text{end_of_horizon_factor}_{n,t,y^V}` can be derived as follows:
+* Then, the scaling factor :math:`\text{end\_of\_horizon\_factor}_{n,t,y^V}` can be derived as follows:
 *
 * .. math::
-*    \text{end_of_horizon_factor}_{n,t,y^V} :=
-*    \frac{\sum_{y \in Y^{\text{lifetime}}_{n,t,y^V} \cap Y^{\text{model}}} \text{df_year}_{y} }
-*        {\sum_{y' \in Y^{\text{lifetime}}_{n,t,y^V}} \text{df_year}_{y'} + \text{beyond_horizon_factor}_{n,t,y^V} }
+*    \text{end\_of\_horizon\_factor}_{n,t,y^V} :=
+*    \frac{\sum_{y \in Y^{\text{lifetime}}_{n,t,y^V} \cap Y^{\text{model}}} \text{df\_year}_{y} }
+*        {\sum_{y' \in Y^{\text{lifetime}}_{n,t,y^V}} \text{df\_year}_{y'} + \text{beyond\_horizon\_factor}_{n,t,y^V} }
 *    \in (0,1],
 *
-* where the parameter :math:`\text{beyond_horizon_factor}_{n,t,y^V}` accounts for the discount factor beyond the
+* where the parameter :math:`\text{beyond\_horizon\_factor}_{n,t,y^V}` accounts for the discount factor beyond the
 * overall model horizon (the set :math:`Y` in contrast to the set :math:`Y^{\text{model}} \subseteq Y` of the periods
 * included in the current model iteration (see the page on the recursive-dynamic model solution approach).
 *
 * .. math::
-*    \text{beyond_horizon_lifetime}_{n,t,y^V} :=  \max \Big\{ 0,
-*        \text{economic_lifetime}_{n,t,y^V} - \sum_{y' \geq y^V} \text{duration_period}_{y'} \Big\}
+*    \text{beyond\_horizon\_lifetime}_{n,t,y^V} :=  \max \Big\{ 0,
+*        \text{economic\_lifetime}_{n,t,y^V} - \sum_{y' \geq y^V} \text{duration\_period}_{y'} \Big\}
 *
 * .. math::
-*    \text{beyond_horizon_factor}_{n,t,y^V} :=
-*        \text{df_year}_{\widehat{y}} \cdot \frac{1}{ \left( 1 + \text{interestrate}_{\widehat{y}} \right)^{|\widehat{y}|} }
+*    \text{beyond\_horizon\_factor}_{n,t,y^V} :=
+*        \text{df\_year}_{\widehat{y}} \cdot \frac{1}{ \left( 1 + \text{interestrate}_{\widehat{y}} \right)^{|\widehat{y}|} }
 *        \cdot \frac{ 1 - \left( \frac{1}{1 + \text{interestrate}_{\widehat{y}}} \right)^{|\widetilde{y}|}}
 *                   { 1 - \frac{1}{1 + \text{interestrate}_{\widehat{y}}}}
 *
 * where :math:`\widehat{y}` is the last period included in the overall model horizon,
-* :math:`|\widehat{y}| = \text{duration_period}_{\widehat{y}}`
-* and :math:`|\widetilde{y}| = \text{beyond_horizon_lifetime}_{n,t,y^V}`.
+* :math:`|\widehat{y}| = \text{duration\_period}_{\widehat{y}}`
+* and :math:`|\widetilde{y}| = \text{beyond\_horizon\_lifetime}_{n,t,y^V}`.
 *
 * If the interest rate is zero, i.e., :math:`\text{interestrate}_{\widehat{y}} = 0`,
-* the parameter :math:`\text{beyond_horizon_factor}_{n,t,y^V}` equals the remaining technical lifetime
-* beyond the model horizon and the parameter :math:`\text{end_of_horizon_factor}_{n,t,y^V}` equals
+* the parameter :math:`\text{beyond\_horizon\_factor}_{n,t,y^V}` equals the remaining technical lifetime
+* beyond the model horizon and the parameter :math:`\text{end\_of\_horizon\_factor}_{n,t,y^V}` equals
 * the share of technical lifetime within the model horizon.
 ***
 
@@ -164,7 +164,7 @@ end_of_horizon_factor(node,inv_tec,vintage)$( map_tec(node,inv_tec,vintage) ) =
 * Remaining installed capacity
 * ----------------------------
 * The model has to take into account that the technical lifetime of a technology may not coincide with the cumulative
-* period duration. Therefore, the model introduces the parameter :math:`\text{remaining_capacity}_{n,t,y^V,y}`
+* period duration. Therefore, the model introduces the parameter :math:`\text{remaining\_capacity}_{n,t,y^V,y}`
 * as a factor of remaining technical lifetime in the last period of operation divided by the duration of that period.
 *
 ***

@@ -160,6 +160,10 @@ storage_self_discharge"""
 mathjax3_config = dict(
     tex=dict(
         macros={k.replace("_", ""): r"\text{" + k + "}" for k in text_macros.split()},
+        packages={"[+]": ["textmacros"]},
+    ),
+    loader=dict(
+        load=["[tex]/textmacros"],
     ),
 )
 
