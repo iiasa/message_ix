@@ -35,12 +35,11 @@ Each layer of this “stack” builds on the features in the level below:
      - —
 
 These features are accessible through :class:`.Reporter`, which can produce multiple **reports** from one or more Scenarios.
-A report is identified by a **key** (usually a string), and may…
+A report and the quantities that enter it is identified by a **key**, and may…
 
 - perform arbitrarily complex calculations while intelligently handling units;
-- read and make use of data that is ‘exogenous’ to (not included in) a
-  Scenario;
-- produce output as Python or R objects (in code), or to files or databases;
+- read and make use of data that is ‘exogenous’ to (not included in) a Scenario;
+- produce output as Python or R objects (in code), or write to files or databases;
 - calculate only a requested subset of quantities; and
 - much, much more!
 
@@ -62,7 +61,7 @@ In :mod:`message_ix.reporting`:
 - For example, the |MESSAGEix| parameter ``resource_cost``, defined with the dimensions (node `n`, commodity `c`, grade `g`, year `y`) is identified by the key ``resource_cost:n-c-g-y``.
   When summed across the grade/`g` dimension, it has dimensions `n`, `c`, `y` and is identified by the key ``resource_cost:n-c-y``.
 - :meth:`.Reporter.from_scenario` automatically sets up keys and tasks (such as ``resource_cost:n-c-g-y``) that simply retrieve raw/unprocessed data from a :class:`~message_ix.Scenario` and return it as a :any:`genno.Quantity`.
-- Computations are defined as functions in modules including:
+- Operators are defined as functions in modules including:
   :mod:`message_ix.reporting.computations`,
   :mod:`ixmp.reporting.computations`, and
   :mod:`genno.computations`.
@@ -114,7 +113,7 @@ The method :meth:`.Reporter.add` can be used to add *arbitrary* Python code that
     rep.get("custom")
 
 In this example, the function ``my_custom_report()`` *could* run to thousands of lines; read to and write from multiple files; invoke other programs or Python scripts; etc.
-In order to take advantage of the performance-optimizing features of the Reporter, such calculations can instead be composed from atomic (i.e. small, indivisible) computations.
+In order to take advantage of the performance-optimizing features of the Reporter, such calculations can instead be composed from atomic (i.e. small, indivisible) operators or functions.
 See the :mod:`genno` documentation for more.
 
 API reference
@@ -254,13 +253,13 @@ These automatic contents are prepared using:
    :members: ComputationError, Key, KeyExistsError, MissingKeyError, Quantity, configure
 
 
-Computations
-------------
+Operators
+---------
 
 .. automodule:: message_ix.reporting.computations
    :members:
 
-   :mod:`message_ix.reporting` provides a small number of computations.
+   :mod:`message_ix.reporting` provides a small number of operators.
    Two of these (:func:`.plot_cumulative` and :func:`.stacked_bar`) are currently only used in the tutorials to produce simple plots; for more flexible plotting, :mod:`genno.compat.plotnine` is recommended instead.
 
    .. autosummary::
@@ -269,7 +268,7 @@ Computations
       plot_cumulative
       stacked_bar
 
-   Other computations are provided by :mod:`ixmp.reporting`:
+   Other operators are provided by :mod:`ixmp.reporting`:
 
    .. autosummary::
       ~ixmp.reporting.computations.data_for_quantity
@@ -277,7 +276,8 @@ Computations
       ~ixmp.reporting.computations.store_ts
       ~ixmp.reporting.computations.update_scenario
 
-   …and by :mod:`genno.computations` and its compatibility modules. See the package documentation for details.
+   …and by :mod:`genno.computations` and its compatibility modules.
+   See the package documentation for details.
 
    .. autosummary::
       ~genno.compat.plotnine.Plot
