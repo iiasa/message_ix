@@ -196,7 +196,7 @@ def get_tasks() -> Sequence[Tuple[Tuple, Mapping]]:
         # Callback function to further collapse other columns into IAMC columns
         collapse_cb = partial(collapse_message_cols, **collapse_kw)
 
-        put("convert_pyam", qty, "pyam", rename=rename, collapse=collapse_cb)
+        put("as_pyam", qty, "pyam", rename=rename, collapse=collapse_cb)
 
     # Standard reports
     for group, pyam_keys in REPORTS.items():
