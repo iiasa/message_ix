@@ -146,11 +146,14 @@ Their documentation is repeated below for convenience.
    configure
 
 
-:meth:`ixmp.Reporter.from_scenario <ixmp.reporting.Reporter.from_scenario>` automatically adds keys based on the contents of the :class:`.Scenario` argument.
+:meth:`ixmp.Reporter.from_scenario <ixmp.reporting.Reporter.from_scenario>` automatically adds keys based on the contents of the :class:`.Scenario` argument;
+that is, every :mod:`ixmp` set, parameter, variable, and equation available in the Scenario.
 :meth:`message_ix.Reporter.from_scenario <.Reporter.from_scenario>` extends this to add additional keys for derived quantities specific to the MESSAGEix model framework.
 These include:
 
-- ``out`` - ``output`` × ``ACT``; that is, the product of ``output`` (output efficiency) and ``ACT`` (activity)
+.. tip:: Use :meth:`~.Computer.full_key` to retrieve the full-dimensionality :class:`Key` for any of these quantities.
+
+- ``out``          = ``output`` × ``ACT``; that is, the product of ``output`` (output efficiency) and ``ACT`` (activity)
 - ``out_hist``     = ``output`` × ``ref_activity`` (historical reference activity)
 - ``in``           = ``input`` × ``ACT``
 - ``in_hist``      = ``input`` × ``ref_activity``
@@ -158,11 +161,11 @@ These include:
 - ``emi_hist``     = ``emission_factor`` × ``ref_activity``
 - ``inv``          = ``inv_cost`` × ``CAP_NEW``
 - ``inv_hist``     = ``inv_cost`` × ``ref_new_capacity``
-- ``fom``          = ``fix_cost`` × ``CAP``
+- ``fom``          = ``fix_cost`` × ``CAP``; the name refers to "Fixed Operation and Maintenance costs"
 - ``fom_hist``     = ``fix_cost`` × ``ref_capacity``
-- ``vom``          = ``var_cost`` × ``ACT``
+- ``vom``          = ``var_cost`` × ``ACT``; "Variable Operation and Maintenance costs"
 - ``vom_hist``     = ``var_cost`` × ``ref_activity``
-- ``tom``          = ``fom`` + ``vom``
+- ``tom``          = ``fom`` + ``vom``; "Total Operation and Maintenance costs"
 - ``land_out``     = ``land_output`` × ``LAND``
 - ``land_use_qty`` = ``land_use`` × ``LAND``
 - ``land_emi``     = ``land_emission`` × ``LAND``
@@ -173,8 +176,6 @@ These include:
 - ``addon out``    = ``output`` × ``addon ACT``
 - ``addon potential`` = ``addon up`` × ``addon ACT``, the maximum potential activity by add-on technology.
 - ``price emission``, the model variable ``PRICE_EMISSION`` broadcast across emission species (`e`) *and* technologies (`t`) rather than types (`type_emission`, `type_tec`).
-
-.. tip:: Use :meth:`~.Computer.full_key` to retrieve the full-dimensionality :class:`Key` for any of these quantities.
 
 Other added keys include:
 
@@ -216,17 +217,13 @@ These automatic contents are prepared using:
 
    .. autosummary::
       add
-      add_file
-      add_product
       add_queue
       add_single
-      aggregate
       apply
       check_keys
       configure
-      convert_pyam
       describe
-      disaggregate
+      eval
       finalize
       from_scenario
       full_key
@@ -236,6 +233,13 @@ These automatic contents are prepared using:
       set_filters
       visualize
       write
+
+   .. autosummary::
+      add_file
+      add_product
+      aggregate
+      convert_pyam
+      disaggregate
 
 
 .. autodata:: DERIVED
@@ -273,7 +277,7 @@ Computations
       ~ixmp.reporting.computations.store_ts
       ~ixmp.reporting.computations.update_scenario
 
-   …and by :mod:`genno.computation` and its compatibility modules. See the package documentation for details.
+   …and by :mod:`genno.computations` and its compatibility modules. See the package documentation for details.
 
    .. autosummary::
       ~genno.compat.plotnine.Plot
@@ -284,21 +288,26 @@ Computations
       ~genno.computations.broadcast_map
       ~genno.computations.combine
       ~genno.computations.concat
-      ~genno.computations.disaggregate_shares
       ~genno.computations.div
+      ~genno.computations.drop_vars
       ~genno.computations.group_sum
       ~genno.computations.index_to
       ~genno.computations.interpolate
       ~genno.computations.load_file
       ~genno.computations.mul
       ~genno.computations.pow
-      ~genno.computations.ratio
       ~genno.computations.relabel
       ~genno.computations.rename_dims
+      ~genno.computations.round
       ~genno.computations.select
+      ~genno.computations.sub
       ~genno.computations.sum
       ~genno.computations.write_report
 
+   .. autosummary::
+      ~genno.computations.disaggregate_shares
+      ~genno.computations.product
+      ~genno.computations.ratio
 
 Utilities
 ---------
