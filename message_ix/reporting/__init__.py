@@ -1,5 +1,6 @@
 import logging
 from functools import lru_cache, partial
+from operator import itemgetter
 from typing import Mapping, Sequence, Tuple, Union, cast
 
 import genno
@@ -92,6 +93,8 @@ PRODUCTS = (
 DERIVED = [
     # Each entry is ('full key', (computation tuple,)). Full keys are not inferred and
     # must be given explicitly.
+    ("y::model", ("model_periods", "y", "cat_year")),
+    ("y0", (itemgetter(0), "y::model")),
     ("tom:nl-t-yv-ya", (genno.computations.add, "fom:nl-t-yv-ya", "vom:nl-t-yv-ya")),
     # Broadcast from type_addon to technology_addon
     (

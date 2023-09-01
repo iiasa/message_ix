@@ -1,4 +1,4 @@
-from typing import Mapping, Union
+from typing import List, Mapping, Union
 
 import pandas as pd
 from ixmp.reporting import Quantity
@@ -7,6 +7,7 @@ from message_ix.util import make_df
 
 __all__ = [
     "as_message_df",
+    "model_periods",
     "plot_cumulative",
     "stacked_bar",
 ]
@@ -55,6 +56,17 @@ def as_message_df(
         **common,
     )
     return {name: df} if wrap else df
+
+
+def model_periods(y: List[int], cat_year: pd.DataFrame) -> List[int]:
+    """Return the elements of `y` beyond the firstmodelyear of `cat_year`."""
+    return list(
+        filter(
+            lambda year: cat_year.query("type_year == 'firstmodelyear'")["year"].item()
+            <= year,
+            y,
+        )
+    )
 
 
 def plot_cumulative(x, y, labels):
