@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 import pyam
+import pytest
 import xarray as xr
 from genno import Quantity
 from genno.testing import assert_qty_equal
@@ -145,7 +146,7 @@ def test_reporter_from_westeros(test_mp):
     assert_allclose(obs, exp)
 
 
-def test_reporter_convert_pyam(caplog, tmp_path, dantzig_reporter):
+def test_reporter_as_pyam(caplog, tmp_path, dantzig_reporter):
     caplog.set_level(logging.INFO)
 
     rep = dantzig_reporter
@@ -181,7 +182,9 @@ def test_reporter_convert_pyam(caplog, tmp_path, dantzig_reporter):
         return df.drop(["t", "m"], axis=1)
 
     # Use the convenience function to add the node
-    key2 = rep.convert_pyam(ACT, "iamc", rename=rename, collapse=add_tm)
+    with pytest.warns(DeprecationWarning):
+        key2 = rep.convert_pyam(ACT, "iamc", rename=rename, collapse=add_tm)
+    key2 = rep.add("as_pyam", ACT, "iamc", rename=rename, collapse=add_tm)
 
     # Keys of added node(s) are returned
     assert ACT.name + "::iamc" == key2
@@ -223,8 +226,16 @@ def test_reporter_convert_pyam(caplog, tmp_path, dantzig_reporter):
 
     # Use a name map to replace variable names
     replacements = {re.escape("Activity|canning_plant|production"): "Foo"}
-    key3 = rep.convert_pyam(
-        ACT, rename=rename, replace=dict(variable=replacements), collapse=add_tm
+    with pytest.warns(DeprecationWarning):
+        key3 = rep.convert_pyam(
+            ACT, rename=rename, replace=dict(variable=replacements), collapse=add_tm
+        )
+    key3 = rep.add(
+        "as_pyam",
+        ACT,
+        rename=rename,
+        replace=dict(variable=replacements),
+        collapse=add_tm,
     )
     df3 = rep.get(key3).as_pandas()
 
@@ -236,16 +247,24 @@ def test_reporter_convert_pyam(caplog, tmp_path, dantzig_reporter):
 
     # Now convert variable cost
     cb = partial(add_tm, name="Variable cost")
-    key4 = rep.convert_pyam("var_cost", rename=rename, collapse=cb)
+    with pytest.warns(DeprecationWarning):
+        key4 = rep.convert_pyam("var_cost", rename=rename, collapse=cb)
+    key4 = rep.add("as_pyam", "var_cost", rename=rename, collapse=cb)
+
     df4 = rep.get(key4).as_pandas().drop(["model", "scenario"], axis=1)
 
     # Results have the expected units
     assert all(df4["unit"] == "USD / case")
 
     # Also change units
-    key5 = rep.convert_pyam(
-        "var_cost", rename=rename, collapse=cb, unit="centiUSD / case"
+    with pytest.warns(DeprecationWarning):
+        key5 = rep.convert_pyam(
+            "var_cost", rename=rename, collapse=cb, unit="centiUSD / case"
+        )
+    key5 = rep.add(
+        "as_pyam", "var_cost", rename=rename, collapse=cb, unit="centiUSD / case"
     )
+
     df5 = rep.get(key5).as_pandas().drop(["model", "scenario"], axis=1)
 
     # Results have the expected units
