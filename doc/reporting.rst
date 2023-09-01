@@ -179,8 +179,11 @@ These include:
 Other added keys include:
 
 - :mod:`message_ix` adds the standard short symbols for |MESSAGEix| dimensions (sets) based on :data:`DIMS`.
-  Each of these is also available in a Reporter: for example ``rep.get("n")`` returns a list with the elements of the |MESSAGEix| set named "node".
-  These keys can be used as input
+  Each of these is also available in a Reporter: for example :py:`rep.get("n")` returns a list with the elements of the |MESSAGEix| set named "node";
+  :py:`rep.get("t")` returns the elements of the set "technology", and so on.
+  These keys can be used as input to other computations.
+- ``y0`` = the ``firstmodelyear`` or :math:`y_0` (:class:`int`).
+- ``y::model`` = only the periods in the `year` set (``y``) that are equal to or greater than ``y0``.
 
 .. _default-reports:
 
@@ -258,6 +261,7 @@ Computations
 
    .. autosummary::
       as_message_df
+      model_periods
       plot_cumulative
       stacked_bar
 
