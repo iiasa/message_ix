@@ -22,10 +22,6 @@ MARK = [
         condition=GHA and sys.platform == "darwin",
         reason="Always fails on GitHub Action macOS runners",
     ),
-    pytest.mark.xfail(  # 2
-        condition=sys.version_info.minor >= 11,
-        reason="pyam-iamc does not support Python 3.11; see IAMconsortium/pyam#744",
-    ),
 ]
 
 # Affects all tests in the file
@@ -87,7 +83,7 @@ TUTORIALS: List[Tuple] = [
     _t("w0", f"{W}_historical_new_capacity"),
     _t("w0", f"{W}_multinode"),
     # NB this is the same value as in test_reporter()
-    _t(None, f"{W}_report", check=[("len-rep-graph", 13074)], marks=MARK[2]),
+    _t(None, f"{W}_report", check=[("len-rep-graph", 13076)]),
     _t("at0", "austria", check=[("solve-objective-value", 206321.90625)]),
     _t("at0", "austria_single_policy", check=[("solve-objective-value", 205310.34375)]),
     _t("at0", "austria_multiple_policies"),

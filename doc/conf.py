@@ -73,6 +73,8 @@ rst_prolog = r"""
 
 .. role:: underline
 
+.. role:: py(code)
+   :language: python
 """  # noqa: E501
 
 # -- Options for HTML output ----------------------------------------------
