@@ -141,4 +141,10 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
+
+    - name: Force recreation of pre-commit virtual environment for mypy
+      if: github.event_name == 'schedule'  # Comment this line to run on a PR
+      run: gh cache delete $(gh cache list -L 999 | cut -f2 | grep pre-commit)
+      env: { GH_TOKEN: "${{ github.token }}" }
+
     - uses: pre-commit/action@v3.0.0
