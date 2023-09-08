@@ -132,3 +132,13 @@ jobs:
 
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v3
+
+  pre-commit:
+    name: Code quality
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+    - uses: pre-commit/action@v3.0.0
