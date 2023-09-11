@@ -2165,6 +2165,39 @@ DYNAMIC_LAND_TYPE_CONSTRAINT_LO(node,year,land_type)$( is_dynamic_land_lo(node,y
 %SLACK_LAND_TYPE_LO% - SLACK_LAND_TYPE_LO(node,year,land_type)
 ;
 
+
+***
+*
+* To ensure correct replication of MAgPIE behavior, the following constraint ensures that 
+* land-use intensity cannot decrease over time
+*
+* .. _equation_tau_constraint:
+*
+* Equation TAU_CONSTRAINT
+* """"""""""""""""""""""""""""""""""""""""
+*
+*  .. math::
+*     \sum_{s \in S} \text{land_output Tau}_{n,s,y,l,h} &\cdot \text{LAND}_{n,s,y}
+*         \geq \sum_{s \in S} \big( \text{land_output Tau}_{n,s,y-1,l,h}
+*                            & \quad \quad \cdot \big( \text{LAND}_{n,s,y-1} + \text{historical_land}_{n,s,y-1} \big) \big) 
+*
+***
+
+
+TAU_CONSTRAINT(node, year, level, time) .. 
+   SUM(land_scenario$( map_land(node,land_scenario,year) ),
+        land_output(node, land_scenario, year, "Landuse intensity indicator Tau", level, time) 
+          * LAND(node, land_scenario, year)
+        ) =G=
+    SUM((year_all2)$( seq_period(year_all2,year) ),
+        SUM(land_scenario$( map_land(node,land_scenario,year) ),
+            land_output(node, land_scenario, year_all2, "Landuse intensity indicator Tau", level, time) 
+              * ( LAND(node, land_scenario, year_all2) $ ( model_horizon(year_all2) ) 
+                  + historical_land(node,land_scenario,year_all2) )
+            )
+      )
+;
+
 *----------------------------------------------------------------------------------------------------------------------*
 ***
 * .. _section_of_generic_relations:
