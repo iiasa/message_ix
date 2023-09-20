@@ -290,6 +290,7 @@ Equations
     DYNAMIC_LAND_SCEN_CONSTRAINT_LO dynamic constraint on land scenario change (lower bound)
     DYNAMIC_LAND_TYPE_CONSTRAINT_UP dynamic constraint on land-use change (upper bound)
     DYNAMIC_LAND_TYPE_CONSTRAINT_LO dynamic constraint on land-use change (lower bound)
+    PRIMARY_FOREST_CONSTRAINT       constraint on primary-forest growth (primary forest may not grow)
     TAU_CONSTRAINT                  constraint on land-use intensity growth (regional tau is not allowed to shrink)
     RELATION_EQUIVALENCE            auxiliary equation to simplify the implementation of relations
     RELATION_CONSTRAINT_UP          upper bound of relations (linear constraints)
@@ -2100,6 +2101,19 @@ DYNAMIC_LAND_TYPE_CONSTRAINT_LO(node,year,land_type)$( is_dynamic_land_lo(node,y
           )
 * optional relaxation for calibration and debugging
 %SLACK_LAND_TYPE_LO% - SLACK_LAND_TYPE_LO(node,year,land_type)
+;
+
+PRIMARY_FOREST_CONSTRAINT(node, year, level, time) .. 
+   SUM(land_scenario$( map_land(node,land_scenario,year) ),
+        land_output(node, land_scenario, year, "Land Cover|Forest|Forest old|Primary forest", level, time) 
+          * LAND(node, land_scenario, year)
+        ) =L=
+    SUM((year_all2)$( seq_period(year_all2,year) ),
+        SUM(land_scenario$( map_land(node,land_scenario,year) ),
+            land_output(node, land_scenario, year_all2, "Land Cover|Forest|Forest old|Primary forest", level, time) 
+              * LAND(node, land_scenario, year_all2)
+            )
+      )
 ;
 
 
