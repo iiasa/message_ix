@@ -2108,7 +2108,8 @@ PRIMARY_FOREST_CONSTRAINT(node, year, level, time) ..
     SUM((year_all2)$( seq_period(year_all2,year) ),
         SUM(land_scenario$( map_land(node,land_scenario,year) ),
             land_output(node, land_scenario, year_all2, "Land Cover|Forest|Forest old|Primary forest", level, time) 
-              * LAND(node, land_scenario, year_all2)
+              * ( LAND(node, land_scenario, year_all2) $ ( model_horizon(year_all2) ) 
+                  + historical_land(node,land_scenario,year_all2) )
             )
       )
 ;
@@ -2122,7 +2123,8 @@ TAU_CONSTRAINT(node, year, level, time) ..
     SUM((year_all2)$( seq_period(year_all2,year) ),
         SUM(land_scenario$( map_land(node,land_scenario,year) ),
             land_output(node, land_scenario, year_all2, "Landuse intensity indicator Tau", level, time) 
-              * LAND(node, land_scenario, year_all2)
+              * ( LAND(node, land_scenario, year_all2) $ ( model_horizon(year_all2) ) 
+                  + historical_land(node,land_scenario,year_all2) )
             )
       )
 ;
