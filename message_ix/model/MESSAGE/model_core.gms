@@ -290,7 +290,7 @@ Equations
     DYNAMIC_LAND_SCEN_CONSTRAINT_LO dynamic constraint on land scenario change (lower bound)
     DYNAMIC_LAND_TYPE_CONSTRAINT_UP dynamic constraint on land-use change (upper bound)
     DYNAMIC_LAND_TYPE_CONSTRAINT_LO dynamic constraint on land-use change (lower bound)
-*    TAU_CONSTRAINT                  constraint on land-use intensity growth (regional tau is not allowed to shrink)
+    TAU_CONSTRAINT                  constraint on land-use intensity growth (regional tau is not allowed to shrink)
     RELATION_EQUIVALENCE            auxiliary equation to simplify the implementation of relations
     RELATION_CONSTRAINT_UP          upper bound of relations (linear constraints)
     RELATION_CONSTRAINT_LO          lower bound of relations (linear constraints)
@@ -2103,18 +2103,18 @@ DYNAMIC_LAND_TYPE_CONSTRAINT_LO(node,year,land_type)$( is_dynamic_land_lo(node,y
 ;
 
 
-*TAU_CONSTRAINT(node, year, level, time) .. 
-*   SUM(land_scenario$( map_land(node,land_scenario,year) ),
-*        land_output(node, land_scenario, year, "Landuse intensity indicator Tau", level, time) 
-*          * LAND(node, land_scenario, year)
-*        ) =G=
-*    SUM((year_all2)$( seq_period(year_all2,year) ),
-*        SUM(land_scenario$( map_land(node,land_scenario,year) ),
-*            land_output(node, land_scenario, year_all2, "Landuse intensity indicator Tau", level, time) 
-*              * LAND(node, land_scenario, year_all2)
-*            )
-*      )
-*;
+TAU_CONSTRAINT(node, year, level, time) .. 
+   SUM(land_scenario$( map_land(node,land_scenario,year) ),
+        land_output(node, land_scenario, year, "Landuse intensity indicator Tau", level, time) 
+          * LAND(node, land_scenario, year)
+        ) =G=
+    SUM((year_all2)$( seq_period(year_all2,year) ),
+        SUM(land_scenario$( map_land(node,land_scenario,year) ),
+            land_output(node, land_scenario, year_all2, "Landuse intensity indicator Tau", level, time) 
+              * LAND(node, land_scenario, year_all2)
+            )
+      )
+;
 
 
 *----------------------------------------------------------------------------------------------------------------------*
