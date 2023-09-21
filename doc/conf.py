@@ -11,9 +11,9 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 try:
-    from importlib.metadata import version
+    from importlib.metadata import version as get_version
 except ImportError:  # Python 3.7
-    from importlib_metadata import version
+    from importlib_metadata import version as get_version
 
 from pathlib import Path
 
@@ -24,7 +24,7 @@ copyright = "2018–2023, IIASA Energy, Climate, and Environment (ECE) Program"
 author = "MESSAGEix Developers"
 
 # The major project version, used as the replacement for |version|.
-version = version("message_ix")
+version = get_version("message_ix")
 # The full project version, used as the replacement for |release| and e.g. in
 # the HTML templates.
 release = version
@@ -46,6 +46,7 @@ extensions = [
     "sphinxcontrib.bibtex",
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
+    "ixmp.utils.sphinx_linkcode_github",
     "message_ix.util.sphinx_gams",
 ]
 
@@ -72,6 +73,8 @@ rst_prolog = r"""
 
 .. role:: underline
 
+.. role:: py(code)
+   :language: python
 """  # noqa: E501
 
 # -- Options for HTML output ----------------------------------------------
@@ -136,8 +139,14 @@ intersphinx_mapping = {
     "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
 }
 
+# -- Options for sphinx.ext.linkcode / ixmp.utils.sphinx_linkcode_github ---------------
+
+linkcode_github_repo_slug = "iiasa/message_ix"
+
 # -- Options for sphinx.ext.mathjax ----------------------------------------------------
 
+# See https://github.com/iiasa/message_ix/pull/721#pullrequestreview-1497907368:
+# prefer to write \text{} explicitly
 # TODO read at least some of these from message_ix.models
 # TODO complete list
 # TODO also add these to a LaTeX preamble

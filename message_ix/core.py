@@ -1,4 +1,5 @@
 import logging
+import os
 from collections.abc import Mapping
 from functools import lru_cache
 from itertools import chain, product
@@ -675,15 +676,22 @@ class Scenario(ixmp.Scenario):
         """
         super().solve(model=model, solve_options=solve_options, **kwargs)
 
-    def add_macro(self, data, scenario=None, check_convergence=True, **kwargs):
+    def add_macro(
+        self,
+        data: Union[Mapping, os.PathLike],
+        scenario=None,
+        check_convergence=True,
+        **kwargs,
+    ):
         """
         Add MACRO parametrization to the Scenario and calibrate.
         Notice: existing MACRO calibration data will be overwritten by running this.
 
         Parameters
         ----------
-        data : dict (str -> DataFrame or Series)
-            Dictionary of required data for MACRO calibration.
+        data : dict (str -> pandas.DataFrame) or path-like.
+            Dictionary of required data for MACRO calibration or path to a file
+            containing the data.
         scenario : string, optional, default: None.
             Scenario name for calibrated MESSAGEix scenario.
         check_convergence : bool, optional, default: True.

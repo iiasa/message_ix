@@ -1,6 +1,18 @@
+import os
+import platform
+
 import numpy.testing as npt
+import pytest
 
 from message_ix import Scenario
+
+FLAKY = pytest.mark.flaky(
+    reruns=5,
+    rerun_delay=2,
+    condition="GITHUB_ACTIONS" in os.environ and platform.system() == "Darwin",
+    reason="Flaky; see iiasa/message_ix#731",
+)
+
 
 MODEL = "test_emissions_price"
 
@@ -74,6 +86,7 @@ def test_no_constraint(test_mp):
     assert scen.var("PRICE_EMISSION").empty
 
 
+@FLAKY
 def test_cumulative_equidistant(test_mp):
     scen = Scenario(test_mp, MODEL, "cum_equidistant", version="new")
     years = [2020, 2030, 2040]
@@ -110,6 +123,7 @@ def test_per_period_equidistant(test_mp):
     npt.assert_allclose(scen.var("PRICE_EMISSION")["lvl"], [1] * 3)
 
 
+@FLAKY
 def test_cumulative_variable_periodlength(test_mp):
     scen = Scenario(test_mp, MODEL, "cum_equidistant", version="new")
     years = [2020, 2025, 2030, 2040]
@@ -128,6 +142,7 @@ def test_cumulative_variable_periodlength(test_mp):
     npt.assert_allclose(obs, [1.05 ** (y - years[0]) for y in years])
 
 
+@FLAKY
 def test_per_period_variable_periodlength(test_mp):
     scen = Scenario(test_mp, MODEL, "cum_equidistant", version="new")
     years = [2020, 2025, 2030, 2040]
@@ -146,6 +161,7 @@ def test_per_period_variable_periodlength(test_mp):
     npt.assert_allclose(scen.var("PRICE_EMISSION")["lvl"].values, [1] * 4)
 
 
+@FLAKY
 def test_custom_type_variable_periodlength(test_mp):
     scen = Scenario(test_mp, MODEL, "cum_equidistant", version="new")
     years = [2020, 2025, 2030, 2040, 2050]

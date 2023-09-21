@@ -35,12 +35,11 @@ Each layer of this “stack” builds on the features in the level below:
      - —
 
 These features are accessible through :class:`.Reporter`, which can produce multiple **reports** from one or more Scenarios.
-A report is identified by a **key** (usually a string), and may…
+A report and the quantities that enter it is identified by a **key**, and may…
 
 - perform arbitrarily complex calculations while intelligently handling units;
-- read and make use of data that is ‘exogenous’ to (not included in) a
-  Scenario;
-- produce output as Python or R objects (in code), or to files or databases;
+- read and make use of data that is ‘exogenous’ to (not included in) a Scenario;
+- produce output as Python or R objects (in code), or write to files or databases;
 - calculate only a requested subset of quantities; and
 - much, much more!
 
@@ -62,7 +61,7 @@ In :mod:`message_ix.reporting`:
 - For example, the |MESSAGEix| parameter ``resource_cost``, defined with the dimensions (node `n`, commodity `c`, grade `g`, year `y`) is identified by the key ``resource_cost:n-c-g-y``.
   When summed across the grade/`g` dimension, it has dimensions `n`, `c`, `y` and is identified by the key ``resource_cost:n-c-y``.
 - :meth:`.Reporter.from_scenario` automatically sets up keys and tasks (such as ``resource_cost:n-c-g-y``) that simply retrieve raw/unprocessed data from a :class:`~message_ix.Scenario` and return it as a :any:`genno.Quantity`.
-- Computations are defined as functions in modules including:
+- Operators are defined as functions in modules including:
   :mod:`message_ix.reporting.computations`,
   :mod:`ixmp.reporting.computations`, and
   :mod:`genno.computations`.
@@ -114,7 +113,7 @@ The method :meth:`.Reporter.add` can be used to add *arbitrary* Python code that
     rep.get("custom")
 
 In this example, the function ``my_custom_report()`` *could* run to thousands of lines; read to and write from multiple files; invoke other programs or Python scripts; etc.
-In order to take advantage of the performance-optimizing features of the Reporter, such calculations can instead be composed from atomic (i.e. small, indivisible) computations.
+In order to take advantage of the performance-optimizing features of the Reporter, such calculations can instead be composed from atomic (i.e. small, indivisible) operators or functions.
 See the :mod:`genno` documentation for more.
 
 API reference
@@ -146,11 +145,14 @@ Their documentation is repeated below for convenience.
    configure
 
 
-:meth:`ixmp.Reporter.from_scenario <ixmp.reporting.Reporter.from_scenario>` automatically adds keys based on the contents of the :class:`.Scenario` argument.
+:meth:`ixmp.Reporter.from_scenario <ixmp.reporting.Reporter.from_scenario>` automatically adds keys based on the contents of the :class:`.Scenario` argument;
+that is, every :mod:`ixmp` set, parameter, variable, and equation available in the Scenario.
 :meth:`message_ix.Reporter.from_scenario <.Reporter.from_scenario>` extends this to add additional keys for derived quantities specific to the MESSAGEix model framework.
 These include:
 
-- ``out`` - ``output`` × ``ACT``; that is, the product of ``output`` (output efficiency) and ``ACT`` (activity)
+.. tip:: Use :meth:`~.Computer.full_key` to retrieve the full-dimensionality :class:`Key` for any of these quantities.
+
+- ``out``          = ``output`` × ``ACT``; that is, the product of ``output`` (output efficiency) and ``ACT`` (activity)
 - ``out_hist``     = ``output`` × ``ref_activity`` (historical reference activity)
 - ``in``           = ``input`` × ``ACT``
 - ``in_hist``      = ``input`` × ``ref_activity``
@@ -158,11 +160,11 @@ These include:
 - ``emi_hist``     = ``emission_factor`` × ``ref_activity``
 - ``inv``          = ``inv_cost`` × ``CAP_NEW``
 - ``inv_hist``     = ``inv_cost`` × ``ref_new_capacity``
-- ``fom``          = ``fix_cost`` × ``CAP``
+- ``fom``          = ``fix_cost`` × ``CAP``; the name refers to "Fixed Operation and Maintenance costs"
 - ``fom_hist``     = ``fix_cost`` × ``ref_capacity``
-- ``vom``          = ``var_cost`` × ``ACT``
+- ``vom``          = ``var_cost`` × ``ACT``; "Variable Operation and Maintenance costs"
 - ``vom_hist``     = ``var_cost`` × ``ref_activity``
-- ``tom``          = ``fom`` + ``vom``
+- ``tom``          = ``fom`` + ``vom``; "Total Operation and Maintenance costs"
 - ``land_out``     = ``land_output`` × ``LAND``
 - ``land_use_qty`` = ``land_use`` × ``LAND``
 - ``land_emi``     = ``land_emission`` × ``LAND``
@@ -174,13 +176,14 @@ These include:
 - ``addon potential`` = ``addon up`` × ``addon ACT``, the maximum potential activity by add-on technology.
 - ``price emission``, the model variable ``PRICE_EMISSION`` broadcast across emission species (`e`) *and* technologies (`t`) rather than types (`type_emission`, `type_tec`).
 
-.. tip:: Use :meth:`~.Computer.full_key` to retrieve the full-dimensionality :class:`Key` for any of these quantities.
-
 Other added keys include:
 
 - :mod:`message_ix` adds the standard short symbols for |MESSAGEix| dimensions (sets) based on :data:`DIMS`.
-  Each of these is also available in a Reporter: for example ``rep.get("n")`` returns a list with the elements of the |MESSAGEix| set named "node".
-  These keys can be used as input
+  Each of these is also available in a Reporter: for example :py:`rep.get("n")` returns a list with the elements of the |MESSAGEix| set named "node";
+  :py:`rep.get("t")` returns the elements of the set "technology", and so on.
+  These keys can be used as input to other computations.
+- ``y0`` = the ``firstmodelyear`` or :math:`y_0` (:class:`int`).
+- ``y::model`` = only the periods in the `year` set (``y``) that are equal to or greater than ``y0``.
 
 .. _default-reports:
 
@@ -213,17 +216,13 @@ These automatic contents are prepared using:
 
    .. autosummary::
       add
-      add_file
-      add_product
       add_queue
       add_single
-      aggregate
       apply
       check_keys
       configure
-      convert_pyam
       describe
-      disaggregate
+      eval
       finalize
       from_scenario
       full_key
@@ -233,6 +232,13 @@ These automatic contents are prepared using:
       set_filters
       visualize
       write
+
+   .. autosummary::
+      add_file
+      add_product
+      aggregate
+      convert_pyam
+      disaggregate
 
 
 .. autodata:: DERIVED
@@ -247,21 +253,22 @@ These automatic contents are prepared using:
    :members: ComputationError, Key, KeyExistsError, MissingKeyError, Quantity, configure
 
 
-Computations
-------------
+Operators
+---------
 
 .. automodule:: message_ix.reporting.computations
    :members:
 
-   :mod:`message_ix.reporting` provides a small number of computations.
+   :mod:`message_ix.reporting` provides a small number of operators.
    Two of these (:func:`.plot_cumulative` and :func:`.stacked_bar`) are currently only used in the tutorials to produce simple plots; for more flexible plotting, :mod:`genno.compat.plotnine` is recommended instead.
 
    .. autosummary::
       as_message_df
+      model_periods
       plot_cumulative
       stacked_bar
 
-   Other computations are provided by :mod:`ixmp.reporting`:
+   Other operators are provided by :mod:`ixmp.reporting`:
 
    .. autosummary::
       ~ixmp.reporting.computations.data_for_quantity
@@ -269,7 +276,8 @@ Computations
       ~ixmp.reporting.computations.store_ts
       ~ixmp.reporting.computations.update_scenario
 
-   …and by :mod:`genno.computation` and its compatibility modules. See the package documentation for details.
+   …and by :mod:`genno.computations` and its compatibility modules.
+   See the package documentation for details.
 
    .. autosummary::
       ~genno.compat.plotnine.Plot
@@ -280,21 +288,26 @@ Computations
       ~genno.computations.broadcast_map
       ~genno.computations.combine
       ~genno.computations.concat
-      ~genno.computations.disaggregate_shares
       ~genno.computations.div
+      ~genno.computations.drop_vars
       ~genno.computations.group_sum
       ~genno.computations.index_to
       ~genno.computations.interpolate
       ~genno.computations.load_file
       ~genno.computations.mul
       ~genno.computations.pow
-      ~genno.computations.ratio
       ~genno.computations.relabel
       ~genno.computations.rename_dims
+      ~genno.computations.round
       ~genno.computations.select
+      ~genno.computations.sub
       ~genno.computations.sum
       ~genno.computations.write_report
 
+   .. autosummary::
+      ~genno.computations.disaggregate_shares
+      ~genno.computations.product
+      ~genno.computations.ratio
 
 Utilities
 ---------

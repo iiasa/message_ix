@@ -5,12 +5,10 @@ requires = ["build", "setuptools-scm"]
 dynamic = ["version"]
 name = "message_ix"
 description = "The MESSAGEix integrated assessment model framework"
-authors = [
-  {name = "IIASA Energy, Climate, and Environment (ECE) Program"},
-]
+authors = [{ name = "IIASA Energy, Climate, and Environment (ECE) Program" }]
 maintainers = [
-  {name = "Paul Natsuo Kishimoto", email = "mail@paul.kishimoto.name"},
-  {name = "Fridolin Glatter", email = "glatter@iiasa.ac.at"},
+  { name = "Paul Natsuo Kishimoto", email = "mail@paul.kishimoto.name" },
+  { name = "Fridolin Glatter", email = "glatter@iiasa.ac.at" },
 ]
 readme = "README.md"
 classifiers = [
@@ -22,23 +20,23 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.7",
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: R",
   "Topic :: Scientific/Engineering",
-  "Topic :: Scientific/Engineering :: Information Analysis"
+  "Topic :: Scientific/Engineering :: Information Analysis",
 ]
+requires-python = ">=3.8"
 dependencies = [
   "click",
-  'importlib_metadata; python_version < "3.8"',
   "ixmp >= 3.7.0",
-  "genno[pyam]",
+  "genno[pyam] >= 1.18.1",
   "numpy",
   "pandas >= 1.2",
   "PyYAML",
+  "scipy",
 ]
 
 [project.urls]
@@ -48,17 +46,14 @@ documentation = "https://docs.messageix.org"
 
 [project.optional-dependencies]
 docs = [
+  "GitPython",
   "message_ix[report]",
   "numpydoc",
   "sphinx >= 4.0",
   "sphinx_rtd_theme",
   "sphinxcontrib-bibtex",
 ]
-tutorial = [
-  "jupyter",
-  "matplotlib",
-  "message_ix[report]",
-]
+tutorial = ["jupyter", "matplotlib", "message_ix[report]"]
 report = ["ixmp[report]"]
 tests = [
   "asyncssh",
@@ -86,9 +81,7 @@ omit = [
 profile = "black"
 
 [tool.mypy]
-exclude = [
-  "doc/",
-]
+exclude = ["doc/"]
 
 [[tool.mypy.overrides]]
 # Packages/modules for which no type hints are available.
@@ -96,6 +89,7 @@ module = [
   "matplotlib.*",
   "pandas.*",
   "pyam",
+  "scipy.*",
   # Indirectly via ixmp; this should be a subset of the list in ixmp's pyproject.toml
   "dask.*",
   "jpype",

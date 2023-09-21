@@ -1,8 +1,20 @@
+import os
+import platform
+
 import numpy as np
 import pandas as pd
+import pytest
 
 from message_ix import Scenario
 from message_ix.testing import SCENARIO
+
+FLAKY = pytest.mark.flaky(
+    reruns=5,
+    rerun_delay=2,
+    condition="GITHUB_ACTIONS" in os.environ and platform.system() == "Darwin",
+    reason="Flaky; see iiasa/message_ix#731",
+)
+
 
 # First model year of the Dantzig scenario
 _year = 1963
@@ -45,6 +57,7 @@ def test_add_bound_activity_up(message_test_mp):
     assert new_obj >= orig_obj
 
 
+@FLAKY
 def test_add_bound_activity_up_all_modes(message_test_mp):
     # This test specifically has two solutions for which the `OBJ` function is the same
     # therefore the lpmethod must be set to "2".
@@ -228,7 +241,8 @@ def test_commodity_share_up(message_test_mp):
     assert new_obj >= orig_obj
 
 
-def test_share_commodity_lo(message_test_mp):
+@FLAKY
+def test_commodity_share_lo(message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone()
     scen.solve(quiet=True)
 
@@ -344,6 +358,7 @@ def test_add_share_mode_up(message_test_mp):
     assert new_obj >= orig_obj
 
 
+@FLAKY
 def test_add_share_mode_lo(message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone()
     scen.solve(quiet=True)

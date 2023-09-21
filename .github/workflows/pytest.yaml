@@ -28,8 +28,7 @@ jobs:
         - ubuntu-latest
         - windows-latest
         python-version:
-        - "3.7"  # Earliest version supported by message_ix
-        - "3.8"
+        - "3.8"   # Earliest version supported by message_ix
         - "3.9"
         - "3.10"
         - "3.11"  # Latest version supported by message_ix
@@ -124,6 +123,11 @@ jobs:
 
     - name: Test documentation build using Sphinx
       if: ${{ startsWith(matrix.os, 'ubuntu') }}
+      env:
+        # For pull_request triggers, GitHub creates a temporary merge commit
+        # with a hash that does not match the head of the branch. Tell it which
+        # branch to use.
+        SPHINXOPTS: -D linkcode_github_remote_head=${{ github.head_ref }}
       run: make --directory=doc html
 
     - name: Upload test coverage to Codecov.io
