@@ -2,6 +2,7 @@ import os
 
 from message_ix.tools.lp_diag.lp_diag import LPdiag
 
+
 def test_aez():
     """Test reading of aez.mps file
 
