@@ -2,19 +2,6 @@ import os
 
 from message_ix.tools.lp_diag.lp_diag import LPdiag
 
-file = os.path.join(os.getcwd(), "message_ix", "tools", "lp_diag", "test_mps", "lotfi")
-lp = LPdiag()
-lp.rd_mps(file)  # read MPS, store the matrix in dataFrame
-lp.mps_sum()
-
-lp.mat.shape
-lp.n_lines
-len(lp.row_name)
-len(lp.col_name)
-dens = f"{float(len(lp.mat)) / (len(lp.row_name) * len(lp.col_name)):.2e}"
-dens
-
-
 def test_aez():
     """Test reading of aez.mps file
 
