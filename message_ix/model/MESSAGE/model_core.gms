@@ -110,9 +110,14 @@ Positive Variables
 * content of storage
     STORAGE(node,tec,mode,level,commodity,year_all,time)       state of charge (SoC) of storage at each sub-annual time slice (positive)
 
-    LAND_COST_DYN(node,year_all)                     dynamically calculated cost from the land-use emulator
+*    LAND_COST_DYN(node,year_all)                     dynamically calculated cost from the land-use emulator
+    LAND_COST_NEW(node, year_all)     Land cost including debt from scenario switching
+    LAND_COST_DEBT(node, year_all,year_all2) Land cost debt from scenario switching 
     EMISS_LU_AUX(node,emission,type_tec,year_all)    positive emissions overshoot of historic emissions compared to chosen land scenario mix
 ;
+
+
+
 
 
 Variables
@@ -303,6 +308,8 @@ Equations
 *    LAND_COST_CUMU                  dynamic land-cost calculation
 *    LAND_COST_CUMU_BIO              dynamic land-cost calculation helper for BIO price 
 *    LAND_COST_CUMU_GHG              dynamic land-cost calculation helper for GHG price
+    LAND_COST_CUMU                   land cost including debt from scenario switching                                 
+    LAND_COST_CUMU_AUX               land cost debt from scenario switching
     LAND_CONSTRAINT                 constraint on total land use (linear combination of land scenarios adds up to 1)
 *    LAND_FILL_BIO                   mapping land-use scenario to biomass land-use scenario
 *    LAND_FILL_GHG_ZERO              mapping biomass land-use scenario to G000 land-use scenario
@@ -437,9 +444,10 @@ COST_ACCOUNTING_NODAL(node, year)..
         * tax_emission(node,type_emission,type_tec,type_year)
         * EMISS(node,emission,type_tec,year) )
 * cost terms from land-use model emulator (only includes valid node-land_scenario-year combinations)
-    + SUM(land_scenario$( land_cost(node,land_scenario,year) ),
-        land_cost(node,land_scenario,year) * LAND(node,land_scenario,year) )
-*    + LAND_COST_DYN(node,year)  
+*    + SUM(land_scenario$( land_cost(node,land_scenario,year) ),
+*        land_cost(node,land_scenario,year) * LAND(node,land_scenario,year) )
+*    + LAND_COST_DYN(node,year)
+    + LAND_COST_NEW(node, year)
 * cost terms associated with linear relations
     + SUM(relation$( relation_cost(relation,node,year) ),
         relation_cost(relation,node,year) * REL(relation,node,year) )
@@ -1910,7 +1918,7 @@ EMISSION_EQUIVALENCE(node,emission,type_tec,year)$(
 * emissions from land use if 'type_tec' is included in the dynamic set 'type_tec_land'
 *       + SUM(land_scenario $( type_tec_land(type_tec) ) ,
 *           land_emission(location,land_scenario,year,emission) * LAND(location,land_scenario,year) )
-        + EMISS_LU(location,emission,type_tec,year) $( type_tec_land(type_tec) )
+        + EMISS_LU(location,emission,type_tec,year) $ ( type_tec_land(type_tec) )
       ) ;
 
 EMISSION_EQUIVALENCE_AUX_ANNUAL(location,emission,type_tec,year) $ emission_annual(emission)..
@@ -1963,6 +1971,25 @@ EMISSION_EQUIVALENCE_AUX_CUMU_AUX(location,emission,type_tec,year) $ emission_cu
 *         EMISS_LU(location, emission, type_tec, year2) * duration_period(year2)
 *         ) ) /
 *       duration_period(year) ;
+
+LAND_COST_CUMU(location, year)$( model_horizon(year) )..
+       LAND_COST_NEW(location, year) =E=
+       SUM(land_scenario$( land_cost(location,land_scenario,year) ),
+       land_cost(location,land_scenario,year) * LAND(location,land_scenario,year) )
+       + SUM(year2, 
+            LAND_COST_DEBT(location, year, year2)
+            * df_period(year2) / df_period(year)
+            ) ; 
+
+LAND_COST_CUMU_AUX(location, year, year2) $ (model_horizon(year) AND year2.pos < year.pos)..
+        LAND_COST_DEBT(location, year, year2) $ ( year2.pos < year.pos ) =G=
+        SUM(land_scenario$( land_cost(location,land_scenario,year) ),
+            LAND(location, land_scenario, year) * land_cost(location,land_scenario,year2)
+            - LAND(location, land_scenario, year2) * land_cost(location,land_scenario,year2) )
+        - SUM(year3 $ ( year3.pos < year.pos AND year2.pos < year3.pos ), LAND_COST_DEBT(location, year3, year2) ) ;
+
+* LAND_COST_DEBT.UP(location, year, year2) = 0;
+* LAND_COST_DEBT.UP(location, year, year2)$( year2.pos < year.pos ) = INF;
 
 
 * LAND_COST_CUMU(location, year)$( model_horizon(year) )..
