@@ -112,9 +112,14 @@ Positive Variables
 * content of storage
     STORAGE(node,tec,mode,level,commodity,year_all,time)       state of charge (SoC) of storage at each sub-annual time slice (positive)
 
-    LAND_COST_DYN(node,year_all)                     dynamically calculated cost from the land-use emulator
+*    LAND_COST_DYN(node,year_all)                     dynamically calculated cost from the land-use emulator
+    LAND_COST_NEW(node, year_all)     Land cost including debt from scenario switching
+    LAND_COST_DEBT(node, year_all,year_all2) Land cost debt from scenario switching 
     EMISS_LU_AUX(node,emission,type_tec,year_all)    positive emissions overshoot of historic emissions compared to chosen land scenario mix
 ;
+
+
+
 
 
 Variables
