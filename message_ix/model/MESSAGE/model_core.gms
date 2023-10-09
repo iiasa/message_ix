@@ -111,9 +111,14 @@ Positive Variables
 * content of storage
     STORAGE(node,tec,mode,level,commodity,year_all,time)       state of charge (SoC) of storage at each sub-annual time slice (positive)
 
-    LAND_COST_DYN(node,year_all)                     dynamically calculated cost from the land-use emulator
+*    LAND_COST_DYN(node,year_all)                     dynamically calculated cost from the land-use emulator
+    LAND_COST_NEW(node, year_all)     Land cost including debt from scenario switching
+    LAND_COST_DEBT(node, year_all,year_all2) Land cost debt from scenario switching 
     EMISS_LU_AUX(node,emission,type_tec,year_all)    positive emissions overshoot of historic emissions compared to chosen land scenario mix
 ;
+
+
+
 
 
 Variables
@@ -2029,6 +2034,25 @@ LAND_COST_CUMU_DEBT(location, year, year2) $ (model_horizon(year) AND year2.pos 
 *         EMISS_LU(location, emission, type_tec, year2) * duration_period(year2)
 *         ) ) /
 *       duration_period(year) ;
+
+LAND_COST_CUMU(location, year)$( model_horizon(year) )..
+       LAND_COST_NEW(location, year) =E=
+       SUM(land_scenario$( land_cost(location,land_scenario,year) ),
+       land_cost(location,land_scenario,year) * LAND(location,land_scenario,year) )
+       + SUM(year2, 
+            LAND_COST_DEBT(location, year, year2)
+            * df_period(year2) / df_period(year)
+            ) ; 
+
+LAND_COST_CUMU_AUX(location, year, year2) $ (model_horizon(year) AND year2.pos < year.pos)..
+        LAND_COST_DEBT(location, year, year2) $ ( year2.pos < year.pos ) =G=
+        SUM(land_scenario$( land_cost(location,land_scenario,year) ),
+            LAND(location, land_scenario, year) * land_cost(location,land_scenario,year2)
+            - LAND(location, land_scenario, year2) * land_cost(location,land_scenario,year2) )
+        - SUM(year3 $ ( year3.pos < year.pos AND year2.pos < year3.pos ), LAND_COST_DEBT(location, year3, year2) ) ;
+
+* LAND_COST_DEBT.UP(location, year, year2) = 0;
+* LAND_COST_DEBT.UP(location, year, year2)$( year2.pos < year.pos ) = INF;
 
 
 * LAND_COST_CUMU(location, year)$( model_horizon(year) )..
