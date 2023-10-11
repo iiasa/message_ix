@@ -1,7 +1,7 @@
 # Input file for pip-compile 
 # Only specify the packages necessary for [docs]
 
-gitpython==3.1.34
+gitpython==3.1.37
 numpydoc==1.5.0
 sphinx==6.2.1
 sphinx-rtd-theme==1.2.2
