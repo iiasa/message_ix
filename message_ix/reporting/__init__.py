@@ -10,9 +10,9 @@ from ixmp.reporting import (
     KeyExistsError,
     MissingKeyError,
     Quantity,
+    configure,
 )
 from ixmp.reporting import Reporter as IXMPReporter
-from ixmp.reporting import configure
 
 from .pyam import collapse_message_cols
 

@@ -513,7 +513,7 @@ def make_westeros(
     grid_efficiency = 0.9
     common.update(unit="-")
 
-    for name, tec, c, l, value in [
+    for name, tec, c, L, value in [
         ("input", "bulb", "electricity", "final", 1.0),
         ("output", "bulb", "light", "useful", 1.0),
         ("input", "grid", "electricity", "secondary", 1.0),
@@ -523,7 +523,7 @@ def make_westeros(
     ]:
         scen.add_par(
             name,
-            make_df(name, **common, technology=tec, commodity=c, level=l, value=value),
+            make_df(name, **common, technology=tec, commodity=c, level=L, value=value),
         )
 
     name = "capacity_factor"
