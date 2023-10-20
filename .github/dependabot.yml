@@ -1,0 +1,16 @@
+version: 2 
+updates: 
+  - package-ecosystem: "pip" 
+    directory: "/" 
+    schedule: 
+      interval: "weekly" 
+    # Add assignees 
+    assignees: 
+      - "glatterf42" 
+      - "khaeru" 
+    # Specify labels 
+    labels: 
+      - "dependencies" 
+    # Add reviewers: 
+      - "glatterf42" 
+      - "khaeru" 
