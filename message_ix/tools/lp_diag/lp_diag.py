@@ -320,10 +320,10 @@ class LPdiag:
         row_name = words[1]
         row_seq = self.row_name.get(row_name)
         assert row_seq is not None, f"unknown row name {row_name} (line {n_line})."
-        val = float(words[2])
-        assert (
-            type(val) is float
-        ), f"string  {words[2]} (line {n_line}) is not a number."
+        try:
+            val = float(words[2])
+        except ValueError:
+            print(f"string {words[2]} (line {n_line}) is not a number.")
         # add the matrix element to the lists of: seq_row, seq_col, val
         # the lists will be converted to self.mat df after all elements
         # will be read
@@ -352,10 +352,10 @@ class LPdiag:
             row_name = words[3]
             row_seq = self.row_name.get(row_name)
             assert row_seq is not None, f"unknown row name {row_name} (line {n_line})."
-            val = float(words[4])
-            assert (
-                type(val) is float
-            ), f"string  {words[4]} (line {n_line}) is not a number."
+            try:
+                val = float(words[4])
+            except ValueError:
+                print(f"string {words[4]} (line {n_line}) is not a number.")
             self.mat_row.append(row_seq)
             self.mat_col.append(col_seq)
             self.mat_val.append(val)
@@ -406,10 +406,12 @@ class LPdiag:
         row_name = words[pos_name]
         row_seq = self.row_name.get(row_name)
         assert row_seq is not None, f"unknown RHS row-name {row_name} (line {n_line})."
-        val = float(words[pos_name + 1])
-        assert type(val) is float, (
-            f"RHS value  {words[pos_name + 1]} (line {n_line}) is not a" " number."
-        )
+        try:
+            val = float(words[pos_name + 1])
+        except ValueError:
+            print(
+                f"RHS value {words[pos_name + 1]} (line {n_line}) is not a number."
+            )
         attr = self.seq_row.get(row_seq)  # [row_name, lo_bnd, up_bnd, row_type]
         row_type = attr[3]
         self.row_att(row_seq, row_name, row_type, "rhs", val)
@@ -420,10 +422,12 @@ class LPdiag:
             assert (
                 row_seq is not None
             ), f"unknown RHS row-name {row_name} (line {n_line})."
-            val = float(words[pos_name + 3])
-            assert type(val) is float, (
-                f"RHS value {words[pos_name + 1]} (line {n_line}) is" " not a number."
-            )
+            try:
+                val = float(words[pos_name + 3])
+            except ValueError:
+                print(
+                    f"RHS value {words[pos_name + 3]} (line {n_line}) is not a number."
+                )
             attr = self.seq_row.get(row_seq)  # [row_name, lo_bnd, up_bnd, row_type]
             row_type = attr[3]
             self.row_att(row_seq, row_name, row_type, "rhs", val)
@@ -476,10 +480,12 @@ class LPdiag:
         assert (
             row_seq is not None
         ), f"unknown range row-name {row_name} (line {n_line})."
-        val = float(words[pos_name + 1])
-        assert (
-            type(val) is float
-        ), f"Range value {words[pos_name + 1]} (line {n_line}) is not a number."
+        try:
+            val = float(words[pos_name + 1])
+        except ValueError:
+            print(
+                f"Range value {words[pos_name + 1]} (line {n_line}) is not a number."
+            )
         attr = self.seq_row.get(row_seq)  # [row_name, lo_bnd, up_bnd, row_type]
         row_type = attr[3]
         self.row_att(row_seq, row_name, row_type, "ranges", val)
@@ -490,11 +496,12 @@ class LPdiag:
             assert (
                 row_seq is not None
             ), f"unknown ranges row-name {row_name} (line {n_line})."
-            val = float(words[pos_name + 3])
-            assert type(val) is float, (
-                f"Ranges value {words[pos_name + 1]} (line {n_line}) is"
-                " not a number."
-            )
+            try:
+                val = float(words[pos_name + 3])
+            except ValueError:
+                print(
+                    f"Range value {words[pos_name + 3]} (line {n_line}) is not a number."
+                )
             attr = self.seq_row.get(row_seq)  # [row_name, lo_bnd, up_bnd, row_type]
             row_type = attr[3]
             self.row_att(row_seq, row_name, row_type, "ranges", val)
@@ -564,10 +571,12 @@ class LPdiag:
 
         typ = words[0]
         if typ in bnd_type1:  # bound-types that require a value
-            val = float(words[pos_name + 1])
-            assert (
-                type(val) is float
-            ), f"BOUND value {words[pos_name + 1]} (line {n_line}) is not a number."
+            try:
+                val = float(words[pos_name + 1])
+            except ValueError:
+                print(
+                    f"BOUND value {words[pos_name + 1]} (line {n_line}) is not a number."
+                )
             at_pos = bnd_type1.get(typ)
             if at_pos == 3:  # set both bounds
                 attr[1] = attr[2] = val
@@ -895,7 +904,7 @@ class LPdiag:
             if val == self.infty:  # used for both infinites (positive and negative)
                 s.append(self.infty)
             else:
-                if type(val) is int:
+                if isinstance(val, int):
                     val = float(val)
                 if abs(val) < 1e-10:
                     s.append("0")  # same string for int and float zeros
