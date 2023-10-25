@@ -496,7 +496,8 @@ class LPdiag:
                 val = float(words[pos_name + 3])
             except ValueError:
                 print(
-                    f"Range value {words[pos_name + 3]} (line {n_line}) is not a number."
+                    f"Range value {words[pos_name + 3]} (line {n_line}) is not a "
+                    "number."
                 )
             attr = self.seq_row.get(row_seq)  # [row_name, lo_bnd, up_bnd, row_type]
             row_type = attr[3]
@@ -571,7 +572,8 @@ class LPdiag:
                 val = float(words[pos_name + 1])
             except ValueError:
                 print(
-                    f"BOUND value {words[pos_name + 1]} (line {n_line}) is not a number."
+                    f"BOUND value {words[pos_name + 1]} (line {n_line}) is not a "
+                    "number."
                 )
             at_pos = bnd_type1.get(typ)
             if at_pos == 3:  # set both bounds
