@@ -409,9 +409,7 @@ class LPdiag:
         try:
             val = float(words[pos_name + 1])
         except ValueError:
-            print(
-                f"RHS value {words[pos_name + 1]} (line {n_line}) is not a number."
-            )
+            print(f"RHS value {words[pos_name + 1]} (line {n_line}) is not a number.")
         attr = self.seq_row.get(row_seq)  # [row_name, lo_bnd, up_bnd, row_type]
         row_type = attr[3]
         self.row_att(row_seq, row_name, row_type, "rhs", val)
@@ -483,9 +481,7 @@ class LPdiag:
         try:
             val = float(words[pos_name + 1])
         except ValueError:
-            print(
-                f"Range value {words[pos_name + 1]} (line {n_line}) is not a number."
-            )
+            print(f"Range value {words[pos_name + 1]} (line {n_line}) is not a number.")
         attr = self.seq_row.get(row_seq)  # [row_name, lo_bnd, up_bnd, row_type]
         row_type = attr[3]
         self.row_att(row_seq, row_name, row_type, "ranges", val)
