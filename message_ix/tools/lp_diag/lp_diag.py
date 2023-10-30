@@ -322,8 +322,10 @@ class LPdiag:
         assert row_seq is not None, f"unknown row name {row_name} (line {n_line})."
         try:
             val = float(words[2])
-        except ValueError:
-            print(f"string {words[2]} (line {n_line}) is not a number.")
+        except ValueError as e:
+            raise ValueError(
+                f"string {words[2]} (line {n_line}) is not a number."
+            ) from e
         # add the matrix element to the lists of: seq_row, seq_col, val
         # the lists will be converted to self.mat df after all elements
         # will be read
@@ -354,8 +356,10 @@ class LPdiag:
             assert row_seq is not None, f"unknown row name {row_name} (line {n_line})."
             try:
                 val = float(words[4])
-            except ValueError:
-                print(f"string {words[4]} (line {n_line}) is not a number.")
+            except ValueError as e:
+                raise ValueError(
+                    f"string {words[4]} (line {n_line}) is not a number."
+                ) from e
             self.mat_row.append(row_seq)
             self.mat_col.append(col_seq)
             self.mat_val.append(val)
@@ -408,8 +412,10 @@ class LPdiag:
         assert row_seq is not None, f"unknown RHS row-name {row_name} (line {n_line})."
         try:
             val = float(words[pos_name + 1])
-        except ValueError:
-            print(f"RHS value {words[pos_name + 1]} (line {n_line}) is not a number.")
+        except ValueError as e:
+            raise ValueError(
+                f"RHS value {words[pos_name + 1]} (line {n_line}) is not a number."
+            ) from e
         attr = self.seq_row.get(row_seq)  # [row_name, lo_bnd, up_bnd, row_type]
         row_type = attr[3]
         self.row_att(row_seq, row_name, row_type, "rhs", val)
@@ -422,10 +428,10 @@ class LPdiag:
             ), f"unknown RHS row-name {row_name} (line {n_line})."
             try:
                 val = float(words[pos_name + 3])
-            except ValueError:
-                print(
+            except ValueError as e:
+                raise ValueError(
                     f"RHS value {words[pos_name + 3]} (line {n_line}) is not a number."
-                )
+                ) from e
             attr = self.seq_row.get(row_seq)  # [row_name, lo_bnd, up_bnd, row_type]
             row_type = attr[3]
             self.row_att(row_seq, row_name, row_type, "rhs", val)
@@ -480,8 +486,10 @@ class LPdiag:
         ), f"unknown range row-name {row_name} (line {n_line})."
         try:
             val = float(words[pos_name + 1])
-        except ValueError:
-            print(f"Range value {words[pos_name + 1]} (line {n_line}) is not a number.")
+        except ValueError as e:
+            raise ValueError(
+                f"Range value {words[pos_name + 1]} (line {n_line}) is not a number."
+            ) from e
         attr = self.seq_row.get(row_seq)  # [row_name, lo_bnd, up_bnd, row_type]
         row_type = attr[3]
         self.row_att(row_seq, row_name, row_type, "ranges", val)
@@ -494,11 +502,11 @@ class LPdiag:
             ), f"unknown ranges row-name {row_name} (line {n_line})."
             try:
                 val = float(words[pos_name + 3])
-            except ValueError:
-                print(
+            except ValueError as e:
+                raise ValueError(
                     f"Range value {words[pos_name + 3]} (line {n_line}) is not a "
                     "number."
-                )
+                ) from e
             attr = self.seq_row.get(row_seq)  # [row_name, lo_bnd, up_bnd, row_type]
             row_type = attr[3]
             self.row_att(row_seq, row_name, row_type, "ranges", val)
@@ -917,4 +925,4 @@ class LPdiag:
     def plot_hist(self):
         """Plot histograms."""
         # todo: might not be needed; therefore the implementation postponed
-        pass
+        ...

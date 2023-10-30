@@ -28,7 +28,7 @@ mypy flags as error.
 # from lp_diag import LPdiag
 
 
-def read_args():
+def read_args(args):
     descr = """
     Diagnostics of basic properties of LP Problems represented by the MPS-format.
 
@@ -52,11 +52,11 @@ def read_args():
     # parser.add_argument("-s", "--save", action="store_true")  # on/off flag
 
     # parse cli
-    cl_args = parser.parse_args()
+    cl_args = parser.parse_args(args)
     return cl_args
 
 
-if __name__ == "__main__":
+def main(argv=None):
     """Driver of the LP diagnostics provided by LPdiag class.
 
     Defines the working space, then controls the flow by executing the desired
@@ -68,16 +68,15 @@ if __name__ == "__main__":
     tstart = dt.now()
 
     # Retrieve and assign arguments
-    args = read_args()
+    args = read_args(argv)
     w_dir = args.wdir or "."
     prob_id = args.mps or "test_mps/aez"  # default MPS for testing
     # alternative specs of test-MPS commented below
     # prob_id = args.mps or "test_mps/diet"  # default MPS for testing
-    # prob_id = args.mps or "test_mps/err_tst"  # default MPS for testing
+    # prob_id = args.mps or "test_mps/errors/err_tst"  # default MPS for testing
     # prob_id = args.mps or "test_mps/jg_korh"  # default MPS for testing
     # prob_id = args.mps or "test_mps/lotfi"  # default MPS for testing
     if len(w_dir) > 1:
-        work_dir = w_dir
         print(f"Changing work-directory to: {w_dir}.")
         try:
             os.chdir(w_dir)
@@ -95,7 +94,7 @@ if __name__ == "__main__":
     # baseline_barrier.mps
 
     # small MPSs, for testing the code, posted to 'test_mps' subdirectory:
-    # err_tst  - small MPS with various errors for testing the diagnostics
+    # errors/err_tst  - small MPS with various errors for testing the diagnostics
     # aez  - agro-ecological zones, medium size; two matrix elems in a row
     # diet - classical small LP
     # jg_korh - tiny testing problem
@@ -129,6 +128,10 @@ if __name__ == "__main__":
         sys.stdout = default_stdout
         print(f"\nRedirected stdout stored in {fn_outp}. Now writing to the console.")
 
+    # Change directory back to work_dir
+    if len(w_dir) > 1:
+        os.chdir(work_dir)
+
     tend = dt.now()
     time_diff = tend - tstart
     print("\nStarted at: ", str(tstart))
@@ -139,3 +142,7 @@ if __name__ == "__main__":
     #  in particular, range of values: 10^{-10} < abs(val) < 10^{10}
     # todo: naive scaling? might not be informative due to the later preprocessing
     # todo: plots of distributions of coeffs, if indeed useful
+
+
+if __name__ == "__main__":
+    sys.exit(main())

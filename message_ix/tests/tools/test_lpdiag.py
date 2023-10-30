@@ -1,8 +1,25 @@
 import os
 
+# import runpy
 import pytest
 
 from message_ix.tools.lp_diag.lp_diag import LPdiag
+from message_ix.tools.lp_diag.lpdiag import main
+
+
+def test_lpdiag():
+    """Test lpdiag.main() script."""
+    # Specify path to lpdiag.py script
+    path = os.path.join(os.getcwd(), "message_ix", "tools", "lp_diag")
+    # file = os.path.join(os.getcwd(), "message_ix", "tools", "lp_diag", "lpdiag.py")
+    # runpy.run_path(file, run_name="__main__")
+
+    with pytest.raises(OSError):
+        main(["--wdir", "/surely this dir cannot/exist/"])
+
+    main(
+        ["--wdir", path, "--mps", "test_mps/diet", "--outp", "test_mps/diet_output.txt"]
+    )
 
 
 def test_aez():
@@ -149,12 +166,269 @@ def test_error_cases():
 
     # Read in the err_tst.mps file
     file = os.path.join(
-        os.getcwd(), "message_ix", "tools", "lp_diag", "test_mps", "err_tst"
+        os.getcwd(), "message_ix", "tools", "lp_diag", "test_mps", "errors", "err_tst"
     )
     lp = LPdiag()
 
     # Read MPS, store the matrix in dataFrame
     with pytest.raises(AssertionError):
+        lp.read_mps(file)
+
+    # Read in wrong required section order file
+    file = os.path.join(
+        os.getcwd(),
+        "message_ix",
+        "tools",
+        "lp_diag",
+        "test_mps",
+        "errors",
+        "sections_required_order",
+    )
+    lp = LPdiag()
+
+    with pytest.raises(NameError):
+        lp.read_mps(file)
+
+    # Read in unknown section file
+    file = os.path.join(
+        os.getcwd(),
+        "message_ix",
+        "tools",
+        "lp_diag",
+        "test_mps",
+        "errors",
+        "sections_unknown",
+    )
+    lp = LPdiag()
+
+    with pytest.raises(ValueError):
+        lp.read_mps(file)
+
+    # Read in wrong optional section order file
+    file = os.path.join(
+        os.getcwd(),
+        "message_ix",
+        "tools",
+        "lp_diag",
+        "test_mps",
+        "errors",
+        "sections_optional_order",
+    )
+    lp = LPdiag()
+
+    with pytest.raises(AttributeError):
+        lp.read_mps(file)
+
+    # Read in all sections file
+    file = os.path.join(
+        os.getcwd(),
+        "message_ix",
+        "tools",
+        "lp_diag",
+        "test_mps",
+        "errors",
+        "sections_all",
+    )
+    lp = LPdiag()
+
+    # The first one when going through section-content lines
+    with pytest.raises(RuntimeError):
+        lp.read_mps(file)
+
+    # Read in too many sections file
+    file = os.path.join(
+        os.getcwd(),
+        "message_ix",
+        "tools",
+        "lp_diag",
+        "test_mps",
+        "errors",
+        "sections_too_many",
+    )
+    lp = LPdiag()
+
+    # The second one when going through section definition lines
+    with pytest.raises(RuntimeError):
+        lp.read_mps(file)
+
+    # Read in short string coefficient file
+    file = os.path.join(
+        os.getcwd(),
+        "message_ix",
+        "tools",
+        "lp_diag",
+        "test_mps",
+        "errors",
+        "coefficient_string_short",
+    )
+    lp = LPdiag()
+
+    with pytest.raises(ValueError):
+        lp.read_mps(file)
+
+    # Read in long string coefficient file
+    file = os.path.join(
+        os.getcwd(),
+        "message_ix",
+        "tools",
+        "lp_diag",
+        "test_mps",
+        "errors",
+        "coefficient_string_long",
+    )
+    lp = LPdiag()
+
+    with pytest.raises(ValueError):
+        lp.read_mps(file)
+
+    # Read in short string rhs file
+    file = os.path.join(
+        os.getcwd(),
+        "message_ix",
+        "tools",
+        "lp_diag",
+        "test_mps",
+        "errors",
+        "rhs_string_short",
+    )
+    lp = LPdiag()
+
+    with pytest.raises(ValueError):
+        lp.read_mps(file)
+
+    # Read in long string rhs file
+    file = os.path.join(
+        os.getcwd(),
+        "message_ix",
+        "tools",
+        "lp_diag",
+        "test_mps",
+        "errors",
+        "rhs_string_long",
+    )
+    lp = LPdiag()
+
+    with pytest.raises(ValueError):
+        lp.read_mps(file)
+
+    # Read in too short rhs file
+    file = os.path.join(
+        os.getcwd(),
+        "message_ix",
+        "tools",
+        "lp_diag",
+        "test_mps",
+        "errors",
+        "rhs_too_short",
+    )
+    lp = LPdiag()
+
+    with pytest.raises(AssertionError):
+        lp.read_mps(file)
+
+    # Read in short string ranges file
+    file = os.path.join(
+        os.getcwd(),
+        "message_ix",
+        "tools",
+        "lp_diag",
+        "test_mps",
+        "errors",
+        "ranges_string_short",
+    )
+    lp = LPdiag()
+
+    with pytest.raises(ValueError):
+        lp.read_mps(file)
+
+    # Read in long string ranges file
+    file = os.path.join(
+        os.getcwd(),
+        "message_ix",
+        "tools",
+        "lp_diag",
+        "test_mps",
+        "errors",
+        "ranges_string_long",
+    )
+    lp = LPdiag()
+
+    with pytest.raises(ValueError):
+        lp.read_mps(file)
+
+    # Read in too short ranges file
+    file = os.path.join(
+        os.getcwd(),
+        "message_ix",
+        "tools",
+        "lp_diag",
+        "test_mps",
+        "errors",
+        "ranges_too_short",
+    )
+    lp = LPdiag()
+
+    with pytest.raises(AssertionError):
+        lp.read_mps(file)
+
+    # Read in short string bounds file
+    file = os.path.join(
+        os.getcwd(),
+        "message_ix",
+        "tools",
+        "lp_diag",
+        "test_mps",
+        "errors",
+        "bounds_string_short",
+    )
+    lp = LPdiag()
+
+    with pytest.raises(ValueError):
+        lp.read_mps(file)
+
+    # Read in too short bounds file
+    file = os.path.join(
+        os.getcwd(),
+        "message_ix",
+        "tools",
+        "lp_diag",
+        "test_mps",
+        "errors",
+        "bounds_too_short",
+    )
+    lp = LPdiag()
+
+    with pytest.raises(AssertionError):
+        lp.read_mps(file)
+
+    # Read in not-required type bounds file
+    file = os.path.join(
+        os.getcwd(),
+        "message_ix",
+        "tools",
+        "lp_diag",
+        "test_mps",
+        "errors",
+        "bounds_type_not_needed",
+    )
+    lp = LPdiag()
+
+    with pytest.raises(TypeError):
+        lp.read_mps(file)
+
+    # Read in unknown type bounds file
+    file = os.path.join(
+        os.getcwd(),
+        "message_ix",
+        "tools",
+        "lp_diag",
+        "test_mps",
+        "errors",
+        "bounds_unknown_type",
+    )
+    lp = LPdiag()
+
+    with pytest.raises(TypeError):
         lp.read_mps(file)
 
 
