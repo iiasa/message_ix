@@ -701,9 +701,9 @@ class LPdiag:
         max_logv = self.mat["log"].max()
 
         # count numbers of coeffs for each order of magnitude of their value
-        magn_dist = Counter(self.mat["log"])
-        magn_dist = dict(
-            sorted(magn_dist.items())
+        distribution_magnitude_counter = Counter(self.mat["log"])
+        distribution_magnitudes = dict(
+            sorted(distribution_magnitude_counter.items())
         )  # counter (sorted by occurances) --> dict sorted by magnitudes
         print(
             "\nDistribution of int(log10(abs(values))) sorted by magnitudes of values:"
@@ -712,8 +712,8 @@ class LPdiag:
             f"range = [{min_logv}, {max_logv}] (magnitudes with zero-occurrences"
             " skipped)."
         )
-        for magn in magn_dist:
-            print(f"{magn:3d}: {magn_dist[magn]:7d}")
+        for magn in distribution_magnitudes:
+            print(f"{magn:3d}: {distribution_magnitudes[magn]:7d}")
 
         if lo_tail > up_tail:
             print(f"Overlapping distribution tails ({lo_tail}, {up_tail}) reset to 0.")
