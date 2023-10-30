@@ -66,12 +66,9 @@ if __name__ == "__main__":
     work_dir = os.getcwd()
     print(f"work_dir: '{work_dir}'.")
     tstart = dt.now()
-    # print('Started at:', str(tstart))
 
     # Retrieve and assign arguments
     args = read_args()
-    # dir2 = os.getcwd()
-    # print(f"{dir2 =}")
     w_dir = args.wdir or "."
     prob_id = args.mps or "test_mps/aez"  # default MPS for testing
     # alternative specs of test-MPS commented below
@@ -84,10 +81,8 @@ if __name__ == "__main__":
         print(f"Changing work-directory to: {w_dir}.")
         try:
             os.chdir(w_dir)
-        except OSError:
-            print(f"Cannot change work-directory to: {w_dir}.")
-    # dir3 = os.getcwd()
-    # print(f"{dir3 =}")
+        except OSError as e:
+            raise OSError(f"Cannot change work-directory to: {w_dir}.") from e
     assert isfile(prob_id), (
         f"MPS file {prob_id} not accessible from the work-directory:\n'{work_dir}'."
         "\nTry to use the --wdir command option to set the work-directory."
@@ -95,7 +90,7 @@ if __name__ == "__main__":
     assert access(prob_id, R_OK), f"MPS file {prob_id} is not readable."
 
     # large (1+ GB) MPSs files, shall not be posted to gitHub.
-    # app was tested on two (1+ GB) MPSs posted by Oliver in /t/fricko on Feb 16, 2023:
+    # app was tested on two (1+ GB) MPSs posted by OFR in /t/fricko on Feb 16, 2023:
     # OFR_test_led_barrier.mps
     # baseline_barrier.mps
 
@@ -110,23 +105,29 @@ if __name__ == "__main__":
 
     default_stdout = sys.stdout
     if fn_outp:
-        # fn_out = "./" + repdir + prob_id + ".txt"  # file for redirected stdout
         print(f"Stdout redirected to: {fn_outp}")
         f_out = open(fn_outp, "w")
         sys.stdout = f_out
-    # else:  # defined to avoid warnings (only used when redir_stdo == True)
-    #     fn_out = "foo"
-    #     f_out = open(fn_out, "w")
 
     lp = LPdiag()  # LPdiag ctor
-    lp.rd_mps(prob_id)  # read MPS, store the matrix in dataFrame
-    lp.stat(lo_tail=-7, up_tail=5)  # stats of matrix coeffs, incl. distrib. tails
-    # to get numbers of coeffs for each magnitute specify equal/overlapping tails:
-    # lp.stat(lo_tail=0, up_tail=0)
-    lp.out_loc(small=True, thresh=-7, max_rec=100)  # locations of small-value outliers
-    lp.out_loc(small=False, thresh=6, max_rec=500)  # locations of large-value outliers
-    # lp.out_loc(small=True, thresh=-1, max_rec=100) # test (lotfi) small-value outliers
-    # lp.out_loc(small=False, thresh=2, max_rec=500) # test (lotfi) large-value outliers
+    lp.read_mps(prob_id)  # read MPS, store the matrix in dataFrame
+    lp.print_statistics(
+        lo_tail=-7, up_tail=5
+    )  # stats of matrix coeffs, incl. distrib. tails
+    # To get numbers of coeffs for each magnitute specify equal/overlapping tails:
+    # lp.print_statistics(lo_tail=0, up_tail=0)
+    lp.locate_outliers(
+        small=True, thresh=-7, max_rec=100
+    )  # locations of small-value outliers
+    lp.locate_outliers(
+        small=False, thresh=6, max_rec=500
+    )  # locations of large-value outliers
+
+    if fn_outp:  # close the redirected output
+        # noinspection PyUnboundLocalVariable
+        f_out.close()
+        sys.stdout = default_stdout
+        print(f"\nRedirected stdout stored in {fn_outp}. Now writing to the console.")
 
     tend = dt.now()
     time_diff = tend - tstart
@@ -134,16 +135,7 @@ if __name__ == "__main__":
     print("Finished at:", str(tend))
     print(f"Wall-clock execution time: {time_diff.seconds} sec.")
 
-    if fn_outp:  # close the redirected output
-        # noinspection PyUnboundLocalVariable
-        f_out.close()
-        sys.stdout = default_stdout
-        print(f"\nRedirected stdout stored in {fn_outp}. Now writing to the console.")
-        print("\nStarted at: ", str(tstart))
-        print("Finished at:", str(tend))
-        print(f"Wall-clock execution time: {time_diff.seconds} sec.")
-
     # todo: TBD, if the MPS-standard should be observed; should it cause error or info
     #  in particular, range of values: 10^{-10} < abs(val) < 10^{10}
     # todo: naive scaling? might not be informative due to the later preprocessing
-    # todo: plots of distributions of coeffs, if indeed usefull
+    # todo: plots of distributions of coeffs, if indeed useful

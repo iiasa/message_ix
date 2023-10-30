@@ -36,7 +36,7 @@ class LPdiag:
     """
 
     def __init__(self):
-        self.fname = "undefined"  # MPS file name, to be defined by rd_mps() call
+        self.fname = "undefined"  # MPS file name, to be defined by read_mps() call
         self.pname = "undefined"  # problem name
         self.id_rhs = False  # True, if rhs_id defined
         self.id_range = False  # True, if range_id defined
@@ -75,7 +75,7 @@ class LPdiag:
         #   columns=['seq_id', 'name', 'type', 'lo_bnd', 'up_bnd']
         # )
 
-    def rd_mps(self, fname):  # process the MPS file
+    def read_mps(self, fname):  # process the MPS file
         print(f"\nReading MPS-format file {fname}.")
         self.fname = fname
         sections = [
@@ -122,12 +122,12 @@ class LPdiag:
                     elif n_section == 6:  # SOS section
                         pass  # SOS section not processed
                     # elif n_section == 7:  # end data
-                    #     raise Exception(
+                    #     raise RunTimeError(
                     #         "Unexpected execution flow; needs to be explored."
                     #     )
                     else:
                         print(f"MPS record {n_line}, section id {n_section}.")
-                        raise Exception(
+                        raise RuntimeError(
                             f"MPS line '{line}' (line {n_line}) misplaced,"
                             f" processing section {sections[n_section]}."
                         )
@@ -140,7 +140,7 @@ class LPdiag:
                     elif n_section == 6:  # SOS
                         print(f"WARNING: Section {sections[n_section]} not processed.")
                     else:
-                        raise Exception(
+                        raise RuntimeError(
                             f"Should not come here, n_section = {n_section}."
                         )
 
@@ -184,16 +184,16 @@ class LPdiag:
                 return n_exp  # n_sections equals to the expected: n_exp
             else:
                 print(f"section {words} found.")
-                raise Exception(
-                    f"Required MPS section {sections[n_exp]} undefined" " or misplaced."
+                raise NameError(
+                    f"Required MPS section {sections[n_exp]} undefined or misplaced."
                 )
         else:  # the found section does not follow the last processed section
             try:
                 n_section = sections.index(words[0])
-            except ValueError:
-                raise Exception(f"Unknown section: {words} (line {n_line}).")
+            except ValueError as e:
+                raise ValueError(f"Unknown section: {words} (line {n_line}).") from e
             if n_section < n_exp:
-                raise Exception(
+                raise AttributeError(
                     f"Section {words[0]} (line {n_line}) is misplaced or duplicated."
                 )
             return n_section
@@ -570,11 +570,11 @@ class LPdiag:
         if typ in bnd_type1:  # bound-types that require a value
             try:
                 val = float(words[pos_name + 1])
-            except ValueError:
-                print(
+            except ValueError as e:
+                raise ValueError(
                     f"BOUND value {words[pos_name + 1]} (line {n_line}) is not a "
                     "number."
-                )
+                ) from e
             at_pos = bnd_type1.get(typ)
             if at_pos == 3:  # set both bounds
                 attr[1] = attr[2] = val
@@ -588,12 +588,12 @@ class LPdiag:
             else:
                 attr[at_pos] = self.infty
         elif typ in bnd_type3:
-            raise Exception(
+            raise TypeError(
                 f"Bound type {typ} of integer var. (line {n_line}) not"
                 " processed yet."
             )
         else:
-            raise Exception(f"Unknown bound type {typ} (line {n_line}).")
+            raise TypeError(f"Unknown bound type {typ} (line {n_line}).")
         self.seq_col.update({col_seq: attr})  # store the updated col-attributes
         self.n_bounds += 1
 
@@ -673,9 +673,9 @@ class LPdiag:
             #     f" {attr}."
             # )
         else:  # update row attributes (used in RHS and ranges sections)
-            raise Exception(f"row_att() should not be called for {sec_name=}.")
+            raise SyntaxError(f"row_att() should not be called for {sec_name=}.")
 
-    def stat(self, lo_tail=-7, up_tail=6):
+    def print_statistics(self, lo_tail: int = -7, up_tail: int = 6):
         """Basic statistics of the matrix coefficients.
 
         Focus on distributions of magnitudes of non-zero coeff. represented by values
@@ -754,7 +754,7 @@ class LPdiag:
                     f" {self.mat.loc[self.mat['log'] == val]['log'].count()}"
                 )
 
-    def out_loc(self, small=True, thresh=-7, max_rec=500):
+    def locate_outliers(self, small: bool = True, thresh: int = -7, max_rec: int = 500):
         """Locations of outliers, i.e., elements having small/large coeff values.
 
         Locations of outliers (in the term of the matrix coefficient values).
@@ -789,14 +789,14 @@ class LPdiag:
         )  # sort the df with outliers ascending seq_id of rows
         df1.reset_index()
         col_out = []  # col_seq of outliers' cols
-        for n_rows, (indx, row) in enumerate(df1.iterrows()):
+        for n_rows, (_, row) in enumerate(df1.iterrows()):
             assert (
                 n_rows < max_rec
             ), "To process all requested coeffs modify the safety limit assertion."
-            row_seq, row_name = self.ent_inf(
+            row_seq, row_name = self.get_entity_info(
                 row, True
             )  # row seq_id and name of the current coeff.
-            col_seq, col_name = self.ent_inf(
+            col_seq, col_name = self.get_entity_info(
                 row, False
             )  # col seq_id and name of the current coeff.
             if col_seq not in col_out:
@@ -813,12 +813,12 @@ class LPdiag:
             ]  # df with all elements
             # print(f'matrix elements in the same row:\n{df_row}')
             print(
-                f"\tRow {row_name} {self.ent_range(row_seq, True)} has"
+                f"\tRow {row_name} {self.get_entity_range(row_seq, True)} has"
                 f" {df_row_out['log'].count()} outlier-coeff. of magnitudes in"
                 f" [{df_row_out['log'].min()}, {df_row_out['log'].max()}]"
             )
             print(
-                f"\tRow {row_name} {self.ent_range(row_seq, True)} has"
+                f"\tRow {row_name} {self.get_entity_range(row_seq, True)} has"
                 f" {df_row_all['log'].count()} (all)-coeff. of magnitudes in"
                 f" [{df_row_all['log'].min()}, {df_row_all['log'].max()}]"
             )
@@ -827,7 +827,7 @@ class LPdiag:
             # df with outliers in the same col:
             # df_col = df1.loc[df1['col'] == col_seq]
             # print(
-            #     f"\tCol {col_name} {self.ent_range(col_seq, False)} has "
+            #     f"\tCol {col_name} {self.get_entity_range(col_seq, False)} has "
             #     f"{df_col["log"].count()} outlier coeff. of magnitudes in "
             #     f"[{df_col["log"].min()}, {df_col["log"].max()}]"
             # )
@@ -842,12 +842,14 @@ class LPdiag:
                 self.mat["col"] == col_seq
             ]  # df with elements in the same col
             print(
-                f"\tCol {col_name} {self.ent_range(col_seq, False)} has"
+                f"\tCol {col_name} {self.get_entity_range(col_seq, False)} has"
                 f" {df_col['log'].count()} coeff. of magnitudes in"
                 f" [{df_col['log'].min()}, {df_col['log'].max()}]"
             )
 
-    def ent_inf(self, mat_row, by_row=True) -> typing.Tuple[int, str]:
+    def get_entity_info(
+        self, mat_row: pd.Series, by_row: bool = True
+    ) -> typing.Tuple[int, str]:
         """Return info on the entity (either row or col) defining the selected matrix
         coefficient.
 
@@ -874,7 +876,7 @@ class LPdiag:
             name = self.seq_col.get(ent_seq)[0]
         return ent_seq, name
 
-    def ent_range(self, seq_id, by_row=True) -> str:
+    def get_entity_range(self, seq_id: int, by_row: bool = True) -> str:
         """Return formatted string representing ranges of feasible values of either a
         row or a column.
 
@@ -915,3 +917,4 @@ class LPdiag:
     def plot_hist(self):
         """Plot histograms."""
         # todo: might not be needed; therefore the implementation postponed
+        pass
