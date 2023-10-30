@@ -1,6 +1,5 @@
 import os
 
-# import runpy
 import pytest
 
 from message_ix.tools.lp_diag.lp_diag import LPdiag
@@ -9,10 +8,7 @@ from message_ix.tools.lp_diag.lpdiag import main
 
 def test_lpdiag():
     """Test lpdiag.main() script."""
-    # Specify path to lpdiag.py script
     path = os.path.join(os.getcwd(), "message_ix", "tools", "lp_diag")
-    # file = os.path.join(os.getcwd(), "message_ix", "tools", "lp_diag", "lpdiag.py")
-    # runpy.run_path(file, run_name="__main__")
 
     with pytest.raises(OSError):
         main(["--wdir", "/surely this dir cannot/exist/"])

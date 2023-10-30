@@ -83,6 +83,9 @@ omit = [
   "message_ix/testing/nightly.py",
 ]
 
+[tool.coverage.report]
+exclude_also = ["if __name__ == '__main__':"]
+
 [tool.mypy]
 exclude = ["doc/"]
 
