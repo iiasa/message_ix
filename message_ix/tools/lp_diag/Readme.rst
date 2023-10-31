@@ -11,12 +11,12 @@ defined by corresponding MPS-format files.
 The diagnostics focuses on the implied numerical properties of the underlying
 optimization problem.
 
-In this context, the term `outlier` denotes the model entities having values
+In this context, the term ``outlier`` denotes the model entities having values
 in either lower or upper tail of the corresponding value distribution.
 The tails are defined by the corresponding orders of magnitudes defined as
-:math:`int(alog(abs(val)))`, where :math:`val` stands for the value of
+:math:`int(alog(abs(val)))`, where ``val`` stands for the value of
 the corresponding coefficient.
-The default values of the tails are equal to (-6, 6), respectively;
+The default values of the tails are equal to :math:`(-6, 6)`, respectively;
 they can be redefined, if desired.
 
 The rule of thumb says: the maximum and minimum orders of magnitudes of
@@ -27,7 +27,7 @@ Such info can be used e.g., for:
 - reconsideration of measurement units of the corresponding variables
   and relations,
 - consideration of replacing `small` (in relations to other coefficients in
-  the same row or column) by zero,
+  the same row or column) elements by zero,
 - splitting the corresponding rows and/or columns,
 - verification of the coefficients' values.
 
@@ -69,7 +69,7 @@ Becoming familiar with ``LPdiag``
 
 Note that ``LPdiag`` should be run at the terminal prompt.
 
-- Navigate to the folder `message_ix/tools/lp_diag`. 
+- Navigate to the folder ``message_ix/tools/lp_diag``. 
 - For initial testing run the following command, which will run analysis of
   the default (pre-specified) MPS provided in the test_mps folder.
   Other provided MPS example can be run by using the ``--mps`` option explained
@@ -120,33 +120,31 @@ Generation of the MPS file in the ``message_ix`` environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The MPS-format is the oldest but still widely used for specification of
-the LP problems.
-Most modeling environments provide various ways of the MPS file generation.
+the LP problems. Most modeling environments provide various ways of the MPS file 
+generation.
 
-In the ``message_ix`` environment one can generate the MPS file e.g.,
-upon solving a :class:`message_ix scenario` by defining
-in `scenario.solve()` the `writemps` option together with the desired name of
-the MPS file.
-The MPS file will then be generated and deposited in the `message_ix/message_ix/model`
-folder.
-Details are available in the GAMS-Documentation:
-https://www.gams.com/latest/docs/S_CPLEX.html#CPLEXwritemps
+In the ``message_ix`` environment one can generate the MPS file e.g., upon 
+solving a :class:`message_ix scenario` by defining in 
+:meth:`message_ix.Scenario.solve` the ``writemps`` option together with the 
+desired name of the MPS file. The MPS file will then be generated and deposited 
+in the ``message_ix/message_ix/model`` folder. Details are available in the 
+`GAMS-Documentation <https://www.gams.com/latest/docs/S_CPLEX.html#CPLEXwritemps>`__
 
 Example of specification of the corresponding option::
 
-	`scenario.solve(solve_options={"writemps": "<file_name>.mps"})`
+	scenario.solve(solve_options={"writemps": "<file_name>.mps"})
 
 
 Actual analysis
 ^^^^^^^^^^^^^^^
 
 For actual analysis one needs to specify the corresponding MPS file in
-a command run (still in the directory `message_ix/tools/lp_diag`): ::
+a command run (still in the directory ``message_ix/tools/lp_diag``): ::
 
 	python lpdiag.py --mps loc/name
 
-where `loc` and `name` stand for the path to the directory where the MPS-file is
-located, and `name` stands for the corresponding file-name, respectively.
+where ``loc`` and ``name`` stand for the path to the directory where the MPS-file is
+located, and ``name`` stands for the corresponding file-name, respectively.
 Other option(s) can be included in the command, as explained above.
 
 If the output redirection is desired (e.g., for results to be shared or composed
