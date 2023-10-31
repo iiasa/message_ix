@@ -11,6 +11,7 @@ updates:
     # Specify labels 
     labels: 
       - "dependencies" 
-    # Add reviewers: 
+    # Add reviewers:
+    reviewers: 
       - "glatterf42" 
       - "khaeru" 
