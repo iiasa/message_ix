@@ -4,6 +4,14 @@ updates:
     directory: "/" 
     schedule: 
       interval: "weekly" 
+    groups:
+      # Specify a name for the group, which will be used in pull request titles
+      # and branch names
+      all-dependencies:
+        # Define patterns to include dependencies in the group (based on
+        # dependency name)
+        patterns:
+          - "*" # All dependencies in the package-ecosystem
     # Add assignees 
     assignees: 
       - "glatterf42" 
@@ -15,3 +23,4 @@ updates:
     reviewers: 
       - "glatterf42" 
       - "khaeru" 
+    
