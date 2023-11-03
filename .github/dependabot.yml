@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: "pip" 
     directory: "/" 
     schedule: 
-      interval: "weekly" 
+      interval: "monthly" 
     groups:
       # Specify a name for the group, which will be used in pull request titles
       # and branch names
