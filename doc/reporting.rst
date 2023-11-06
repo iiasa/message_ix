@@ -284,7 +284,7 @@ Operators
       ~genno.computations.add
       ~genno.computations.aggregate
       ~genno.computations.apply_units
-      ~genno.compat.pyam.computations.as_pyam
+      ~genno.compat.pyam.operator.as_pyam
       ~genno.computations.broadcast_map
       ~genno.computations.combine
       ~genno.computations.concat
