@@ -1,0 +1,69 @@
+
+Reading MPS-format file test_mps/diet.
+Next section found: NAME          diet (line 0).
+	Problem name: diet.
+Next section found: ROWS (line 1).
+	Row R0005 (row_seq = 4) is the objective (goal function) row.
+Next section found: COLUMNS (line 7).
+Next section found: RHS (line 47).
+	Id of RHS: B
+Next section found: RANGES (line 52).
+	Id of ranges: RANGE
+Next section found: BOUNDS (line 57).
+	Id of BOUNDS: BOUND
+Next section found: ENDATA (line 66).
+
+Finished processing 66 lines of the MPS file: test_mps/diet.
+LP has: 5 rows, 8 cols, 39 non-zeros, matrix density = 9.75e-01.
+Numbers of redefined: RHS = 4, ranges = 4, bounds = 8.
+
+The GF (objective) row named "R0005" has 8 elements.
+Distribution of the GF (objective) values:
+count    8.000000
+mean     2.415000
+std      0.465219
+min      1.890000
+25%      1.990000
+50%      2.390000
+75%      2.665000
+max      3.190000
+Name: val, dtype: float64
+
+Distribution of abs(non-zero) values:
+count    39.000000
+mean     19.751795
+std      17.385694
+min       1.890000
+25%       9.000000
+50%      15.000000
+75%      25.000000
+max      70.000000
+Name: abs_val, dtype: float64
+
+Distribution of int(log10(abs(values))):
+count    39.000000
+mean      0.743590
+std       0.442359
+min       0.000000
+25%       0.500000
+50%       1.000000
+75%       1.000000
+max       1.000000
+Name: log, dtype: float64
+
+Distribution of int(log10(abs(values))) sorted by magnitudes of values:
+range = [0, 1] (magnitudes with zero-occurrences skipped).
+  0:      10
+  1:      29
+
+No log10(values) in the requested low-tail (<= -7) of the distribution.
+
+No log10(values) in the requested upper-tail (>= 5) of the distribution.
+
+Row-wise locations of 0 outliers (coeff. with values of log10(values) <= -7).
+
+Column-wise locations of outlier coefficients in 0 columns:
+
+Row-wise locations of 0 outliers (coeff. with values of log10(values) >= 6).
+
+Column-wise locations of outlier coefficients in 0 columns:

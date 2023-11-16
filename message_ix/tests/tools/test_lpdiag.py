@@ -8,14 +8,12 @@ from message_ix.tools.lp_diag.lpdiag import main
 
 def test_lpdiag():
     """Test lpdiag.main() script."""
-    path = os.path.join(os.getcwd(), "message_ix", "tools", "lp_diag")
+    path = os.path.join(os.getcwd(), "message_ix", "tests", "data", "lp_diag")
 
     with pytest.raises(OSError):
         main(["--wdir", "/surely this dir cannot/exist/"])
 
-    main(
-        ["--wdir", path, "--mps", "test_mps/diet", "--outp", "test_mps/diet_output.txt"]
-    )
+    main(["--wdir", path, "--mps", "diet", "--outp", "diet_output.txt"])
 
 
 def test_aez():
@@ -24,9 +22,7 @@ def test_aez():
     Check that the number of lines, rows and columns are correct"""
 
     # Read in the default MPS file for testing (aez.mps in test_mps folder)
-    file = os.path.join(
-        os.getcwd(), "message_ix", "tools", "lp_diag", "test_mps", "aez"
-    )
+    file = os.path.join(os.getcwd(), "message_ix", "tests", "data", "lp_diag", "aez")
     lp = LPdiag()
 
     # Read MPS, store the matrix in dataFrame
@@ -58,9 +54,7 @@ def test_diet():
     Check that the number of lines, rows and columns are correct"""
 
     # Read in the diet.mps file
-    file = os.path.join(
-        os.getcwd(), "message_ix", "tools", "lp_diag", "test_mps", "diet"
-    )
+    file = os.path.join(os.getcwd(), "message_ix", "tests", "data", "lp_diag", "diet")
     lp = LPdiag()
 
     # Read MPS, store the matrix in dataFrame
@@ -93,7 +87,7 @@ def test_jg_korh():
 
     # Read in the diet.mps file
     file = os.path.join(
-        os.getcwd(), "message_ix", "tools", "lp_diag", "test_mps", "jg_korh"
+        os.getcwd(), "message_ix", "tests", "data", "lp_diag", "jg_korh"
     )
     lp = LPdiag()
 
@@ -126,9 +120,7 @@ def test_lotfi():
     Check that the number of lines, rows and columns are correct"""
 
     # Read in the diet.mps file
-    file = os.path.join(
-        os.getcwd(), "message_ix", "tools", "lp_diag", "test_mps", "lotfi"
-    )
+    file = os.path.join(os.getcwd(), "message_ix", "tests", "data", "lp_diag", "lotfi")
     lp = LPdiag()
 
     # Read MPS, store the matrix in dataFrame
@@ -162,7 +154,7 @@ def test_error_cases():
 
     # Read in the err_tst.mps file
     file = os.path.join(
-        os.getcwd(), "message_ix", "tools", "lp_diag", "test_mps", "errors", "err_tst"
+        os.getcwd(), "message_ix", "tests", "data", "lp_diag", "error_err_tst"
     )
     lp = LPdiag()
 
@@ -174,11 +166,10 @@ def test_error_cases():
     file = os.path.join(
         os.getcwd(),
         "message_ix",
-        "tools",
+        "tests",
+        "data",
         "lp_diag",
-        "test_mps",
-        "errors",
-        "sections_required_order",
+        "error_sections_required_order",
     )
     lp = LPdiag()
 
@@ -189,11 +180,10 @@ def test_error_cases():
     file = os.path.join(
         os.getcwd(),
         "message_ix",
-        "tools",
+        "tests",
+        "data",
         "lp_diag",
-        "test_mps",
-        "errors",
-        "sections_unknown",
+        "error_sections_unknown",
     )
     lp = LPdiag()
 
@@ -204,11 +194,10 @@ def test_error_cases():
     file = os.path.join(
         os.getcwd(),
         "message_ix",
-        "tools",
+        "tests",
+        "data",
         "lp_diag",
-        "test_mps",
-        "errors",
-        "sections_optional_order",
+        "error_sections_optional_order",
     )
     lp = LPdiag()
 
@@ -219,11 +208,10 @@ def test_error_cases():
     file = os.path.join(
         os.getcwd(),
         "message_ix",
-        "tools",
+        "tests",
+        "data",
         "lp_diag",
-        "test_mps",
-        "errors",
-        "sections_all",
+        "error_sections_all",
     )
     lp = LPdiag()
 
@@ -235,11 +223,10 @@ def test_error_cases():
     file = os.path.join(
         os.getcwd(),
         "message_ix",
-        "tools",
+        "tests",
+        "data",
         "lp_diag",
-        "test_mps",
-        "errors",
-        "sections_too_many",
+        "error_sections_too_many",
     )
     lp = LPdiag()
 
@@ -251,11 +238,10 @@ def test_error_cases():
     file = os.path.join(
         os.getcwd(),
         "message_ix",
-        "tools",
+        "tests",
+        "data",
         "lp_diag",
-        "test_mps",
-        "errors",
-        "coefficient_string_short",
+        "error_coefficient_string_short",
     )
     lp = LPdiag()
 
@@ -266,11 +252,10 @@ def test_error_cases():
     file = os.path.join(
         os.getcwd(),
         "message_ix",
-        "tools",
+        "tests",
+        "data",
         "lp_diag",
-        "test_mps",
-        "errors",
-        "coefficient_string_long",
+        "error_coefficient_string_long",
     )
     lp = LPdiag()
 
@@ -281,11 +266,10 @@ def test_error_cases():
     file = os.path.join(
         os.getcwd(),
         "message_ix",
-        "tools",
+        "tests",
+        "data",
         "lp_diag",
-        "test_mps",
-        "errors",
-        "rhs_string_short",
+        "error_rhs_string_short",
     )
     lp = LPdiag()
 
@@ -296,11 +280,10 @@ def test_error_cases():
     file = os.path.join(
         os.getcwd(),
         "message_ix",
-        "tools",
+        "tests",
+        "data",
         "lp_diag",
-        "test_mps",
-        "errors",
-        "rhs_string_long",
+        "error_rhs_string_long",
     )
     lp = LPdiag()
 
@@ -311,11 +294,10 @@ def test_error_cases():
     file = os.path.join(
         os.getcwd(),
         "message_ix",
-        "tools",
+        "tests",
+        "data",
         "lp_diag",
-        "test_mps",
-        "errors",
-        "rhs_too_short",
+        "error_rhs_too_short",
     )
     lp = LPdiag()
 
@@ -326,11 +308,10 @@ def test_error_cases():
     file = os.path.join(
         os.getcwd(),
         "message_ix",
-        "tools",
+        "tests",
+        "data",
         "lp_diag",
-        "test_mps",
-        "errors",
-        "ranges_string_short",
+        "error_ranges_string_short",
     )
     lp = LPdiag()
 
@@ -341,11 +322,10 @@ def test_error_cases():
     file = os.path.join(
         os.getcwd(),
         "message_ix",
-        "tools",
+        "tests",
+        "data",
         "lp_diag",
-        "test_mps",
-        "errors",
-        "ranges_string_long",
+        "error_ranges_string_long",
     )
     lp = LPdiag()
 
@@ -356,11 +336,10 @@ def test_error_cases():
     file = os.path.join(
         os.getcwd(),
         "message_ix",
-        "tools",
+        "tests",
+        "data",
         "lp_diag",
-        "test_mps",
-        "errors",
-        "ranges_too_short",
+        "error_ranges_too_short",
     )
     lp = LPdiag()
 
@@ -371,11 +350,10 @@ def test_error_cases():
     file = os.path.join(
         os.getcwd(),
         "message_ix",
-        "tools",
+        "tests",
+        "data",
         "lp_diag",
-        "test_mps",
-        "errors",
-        "bounds_string_short",
+        "error_bounds_string_short",
     )
     lp = LPdiag()
 
@@ -386,11 +364,10 @@ def test_error_cases():
     file = os.path.join(
         os.getcwd(),
         "message_ix",
-        "tools",
+        "tests",
+        "data",
         "lp_diag",
-        "test_mps",
-        "errors",
-        "bounds_too_short",
+        "error_bounds_too_short",
     )
     lp = LPdiag()
 
@@ -401,11 +378,10 @@ def test_error_cases():
     file = os.path.join(
         os.getcwd(),
         "message_ix",
-        "tools",
+        "tests",
+        "data",
         "lp_diag",
-        "test_mps",
-        "errors",
-        "bounds_type_not_needed",
+        "error_bounds_type_not_needed",
     )
     lp = LPdiag()
 
@@ -416,11 +392,10 @@ def test_error_cases():
     file = os.path.join(
         os.getcwd(),
         "message_ix",
-        "tools",
+        "tests",
+        "data",
         "lp_diag",
-        "test_mps",
-        "errors",
-        "bounds_unknown_type",
+        "error_bounds_unknown_type",
     )
     lp = LPdiag()
 
@@ -433,7 +408,7 @@ def test_lpdiag_print_statistics():
 
     # Read in the diet.mps file
     file = os.path.join(
-        os.getcwd(), "message_ix", "tools", "lp_diag", "test_mps", "jg_korh"
+        os.getcwd(), "message_ix", "tests", "data", "lp_diag", "jg_korh"
     )
     lp = LPdiag()
 
@@ -454,9 +429,7 @@ def test_lpdiag_locate_outliers():
     """Test locating outliers."""
 
     # Read in the diet.mps file
-    file = os.path.join(
-        os.getcwd(), "message_ix", "tools", "lp_diag", "test_mps", "lotfi"
-    )
+    file = os.path.join(os.getcwd(), "message_ix", "tests", "data", "lp_diag", "lotfi")
     lp = LPdiag()
 
     # Read MPS, store the matrix in dataFrame
