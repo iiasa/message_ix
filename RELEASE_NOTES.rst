@@ -6,6 +6,7 @@ All changes
 
 - Drop support for Python 3.7, which `reached end-of-life on 2023-06-27 <https://peps.python.org/pep-0537/#lifespan>`__ (:pull:`738`).
   :mod:`message_ix` now requires Python version 3.8 or greater.
+- Rename :mod:`message_ix.report`.
 - New reporting operator :func:`.model_periods` and automatic keys ``y::model`` and ``y0`` (:pull:`738`).
 - Improve readability of LaTeX equations in docs (:pull:`721`).
 - Bugfix: :meth:`.Scenario.add_macro` would not correctly handle configuration that mapped a MESSAGE (commodity, level) to MACRO sector when the commodity and sector names were different (:pull:`719`).
@@ -85,7 +86,7 @@ Migration notes
 
      df = scen.vintage_and_active_years().query(f"{scen.y0} <= year_vtg")
 
-- The :ref:`default reports <default-reports>` (tables in IAMC format) available in a :class:`~message_ix.reporting.Reporter` have changed keys to e.g. ``message::default`` with **two** colons.
+- The :ref:`default reports <default-reports>` (tables in IAMC format) available in a :class:`.Reporter` have changed keys to e.g. ``message::default`` with **two** colons.
   Code using e.g. ``message:default`` (one colon) should be updated to use the current keys.
 
   This matches fixed behaviour upstream in :mod:`genno` version 1.12 to avoid unintended confusion with keys like ``A:i``: ``i`` (after the first colon) is the name for the sole dimension of a 1-dimensional quantity, whereas ``default`` in ``message::default`` is a tag.
@@ -173,7 +174,7 @@ All changes
 - Expand documentation :doc:`install` for installing GAMS under macOS (:pull:`460`).
 - Add new Westeros :doc:`tutorial <tutorials>` on add-on technologies (:pull:`365`).
 - Expand documentation of :ref:`dynamic constraint parameters <section_parameter_dynamic_constraints>` (:pull:`454`).
-- Adjust :mod:`message_ix.reporting` to use :mod:`genno` / :mod:`ixmp.reporting` changes in `ixmp PR #397 <https://github.com/iiasa/ixmp/pull/397>`_ (:pull:`441`).
+- Adjust :mod:`message_ix.report` to use :mod:`genno` / :mod:`ixmp.report` changes in `ixmp PR #397 <https://github.com/iiasa/ixmp/pull/397>`_ (:pull:`441`).
 
 
 v3.2.0 (2021-01-24)
@@ -194,7 +195,7 @@ Migration notes
 All changes
 -----------
 
-- :pull:`407`: Use :mod:`.reporting` in tutorials; add :mod:`.util.tutorial` for shorthand code used to streamline tutorials.
+- :pull:`407`: Use :mod:`.report` in tutorials; add :mod:`.util.tutorial` for shorthand code used to streamline tutorials.
 - :pull:`407`: Make :class:`.Reporter` a top-level class.
 - :pull:`415`: Improve :func:`.make_df` to generate empty, partially-, or fully-filled data frames with the correct columns for any MESSAGE or MACRO parameter.
 - :pull:`415`: Make complete lists of :data:`.MESSAGE_ITEMS`, :data:`.MACRO_ITEMS` and their dimensions accessible through the Python API.
@@ -314,7 +315,7 @@ All changes
 - :pull:`187`: Test for cumulative bound on emissions.
 - :pull:`182`: Fix cross-platform cloning.
 - :pull:`178`: Bugfix of the ``PRICE_EMISSION`` variable in models with non-equidistant period durations.
-- :pull:`176`: Add :mod:`message_ix.reporting` module.
+- :pull:`176`: Add :mod:`message_ix.report` module.
 - :pull:`173`: The meth:`~.Scenario.solve` command now takes additional arguments when solving with CPLEX. The cplex.opt file is now generated on the fly during the solve command and removed after successfully solving.
 - :pull:`172`: Add option to set ``COMMODITY_BALANCE`` to equality.
 - :pull:`154`: Enable documentation build on ReadTheDocs.

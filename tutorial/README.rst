@@ -160,7 +160,7 @@ framework, such as used in global research applications of |MESSAGEix|.
 
 #. Use other features of :mod:`message_ix` and :mod:`ixmp`:
 
-   #. ⭐ After the MESSAGE model has solved, use the :mod:`.message_ix.reporting`
+   #. ⭐ After the MESSAGE model has solved, use the :mod:`.message_ix.report`
       module to ‘report’ results, e.g. do post-processing, plotting, and other
       calculations (:tut:`westeros/westeros_report.ipynb`).
 

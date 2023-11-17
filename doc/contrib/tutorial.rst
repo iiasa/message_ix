@@ -49,7 +49,7 @@ Generally, a tutorial should have the following elements or sections.
 
 - Modeling results and visualizations:
 
-  - Model outputs and post-processing calculations in tutorials should demonstrate usage of the :doc:`message_ix.reporting module </reporting>`.
+  - Model outputs and post-processing calculations in tutorials should demonstrate usage of the :doc:`message_ix.report module </reporting>`.
   - Plots to depict results should use `pyam <https://github.com/IAMconsortium/pyam/>`_.
   - Include a brief discussion of insights from the results, in line with the learning objectives.
 

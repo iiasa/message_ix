@@ -230,7 +230,7 @@ class Reporter(IXMPReporter):
 
         Returns
         -------
-        message_ix.reporting.Reporter
+        message_ix.Reporter
             A reporter for `scenario`.
         """
         solved = scenario.has_solution()

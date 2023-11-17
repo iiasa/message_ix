@@ -137,7 +137,7 @@ def stacked_bar(qty, dims=["nl", "t", "ya"], units="", title="", cf=1.0, stacked
 
     Parameters
     ----------
-    qty : ixmp.reporting.Quantity
+    qty : Quantity
         Data to plot.
     dims : 3-tuple of str
         Dimensions for, respectively:
