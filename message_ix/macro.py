@@ -20,7 +20,7 @@ from typing import (
 import numpy as np
 import pandas as pd
 
-from message_ix.reporting import Key, Reporter
+from message_ix.report import Key, Reporter
 
 log = logging.getLogger(__name__)
 

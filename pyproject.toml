@@ -94,6 +94,7 @@ module = [
   # TEMPORARY pending adjustment for iiasa/ixmp#500
   "ixmp.reporting",
   "ixmp.utils",
+  "message_ix.reporting",
 ]
 ignore_missing_imports = true
 
