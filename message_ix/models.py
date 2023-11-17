@@ -1,6 +1,6 @@
 import logging
 from collections import ChainMap
-from copy import copy, deepcopy
+from copy import copy
 from functools import lru_cache
 from pathlib import Path
 from warnings import warn
@@ -348,7 +348,6 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
            produce unexpected results.
         """
         # Ensure the data in `scenario` is consistent with the MESSAGE formulation
-        # TODO move this call to ixmp.model.base.Model.run(); remove here
         self.enforce(scenario)
 
         # If two runs are kicked off simultaneously  with the same self.model_dir, then
@@ -499,14 +498,8 @@ class MACRO(GAMSModel):
         # NB some scenarios already have these items. This method simply adds any
         #    missing items.
 
-        # FIXME the Java code under the JDBCBackend (ixmp_source) refuses to initialize
-        #       these items with specified idx_sets—even if the sets are correct.
-        items = deepcopy(MACRO_ITEMS)
-        for name in "C", "COST_NODAL", "COST_NODAL_NET", "DEMAND", "GDP", "I":
-            items[name].pop("idx_sets")
-
         # Initialize the ixmp items
-        cls.initialize_items(scenario, items)
+        cls.initialize_items(scenario, MACRO_ITEMS)
 
 
 class MESSAGE_MACRO(MESSAGE, MACRO):
