@@ -1,7 +1,7 @@
 from typing import List, Mapping, Union
 
 import pandas as pd
-from ixmp.reporting import Quantity
+from ixmp.report import Quantity
 
 from message_ix.util import make_df
 

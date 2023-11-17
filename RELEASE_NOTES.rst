@@ -10,7 +10,7 @@ All changes
 - Improve readability of LaTeX equations in docs (:pull:`721`).
 - Bugfix: :meth:`.Scenario.add_macro` would not correctly handle configuration that mapped a MESSAGE (commodity, level) to MACRO sector when the commodity and sector names were different (:pull:`719`).
 - Expand :doc:`macro` documentation, particularly code documentation (:issue:`315`, :pull:`719`).
-- Bugfix: :func:`.computations.as_message_df` would error if a particular dimension was supplied via the `common` argument but not present in `qty` (:pull:`719`).
+- Bugfix: :func:`.operator.as_message_df` would error if a particular dimension was supplied via the `common` argument but not present in `qty` (:pull:`719`).
 
 .. _v3.7.0:
 

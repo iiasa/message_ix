@@ -229,7 +229,7 @@ def clean_model_data(data: "Quantity", s: Structures) -> "DataFrame":
         With full column names and a "value" column. Only the labels in `s` (levels,
         nodes, sectors, and years) appear in the respective dimensions.
     """
-    from genno.computations import rename_dims, select
+    from genno.operator import rename_dims, select
 
     names = {"c": "commodity"}
 

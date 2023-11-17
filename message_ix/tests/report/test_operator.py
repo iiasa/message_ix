@@ -5,10 +5,10 @@ import pandas as pd
 import pyam
 from dask.core import literal
 from genno.testing import random_qty
-from ixmp.reporting import Quantity
+from ixmp.report import Quantity
 
 from message_ix import Scenario
-from message_ix.reporting import Reporter, computations
+from message_ix.report import Reporter, operator
 from message_ix.testing import SCENARIO
 
 
@@ -23,7 +23,7 @@ def test_as_message_df(test_mp):
     )
 
     # Can be called directly
-    result0 = computations.as_message_df(q, *args, wrap=False)
+    result0 = operator.as_message_df(q, *args, wrap=False)
     assert not result0.isna().any().any()
     # Values appear with the correct indices
     assert (
@@ -40,7 +40,7 @@ def test_as_message_df(test_mp):
     result1 = r.get("q::ixmp")
     assert not result1["demand"].isna().any().any()
 
-    # Works together with ixmp.reporting.computations.update_scenario
+    # Works together with ixmp.report.operator.update_scenario
 
     # Prepare a Scenario
     s = Scenario(test_mp, "m", "s", version="new")
@@ -57,9 +57,9 @@ def test_as_message_df(test_mp):
     r.add("scenario", s)
 
     # Convert with wrap=False
-    r.add("q::ixmp", partial(computations.as_message_df, wrap=False), key, *args)
+    r.add("q::ixmp", partial(operator.as_message_df, wrap=False), key, *args)
     # Add a task to update the scenario
-    us = r.get_comp("update_scenario")
+    us = r.get_operator("update_scenario")
     key = r.add("add q", partial(us, params=["demand"]), "scenario", "q::ixmp")
 
     # No data in "demand" parameter
@@ -80,7 +80,7 @@ def test_as_pyam(message_test_mp):
     qty = rep.get(rep.full_key("ACT"))
 
     # Call as_pyam() with an empty quantity
-    as_pyam = rep.get_comp("as_pyam")
+    as_pyam = rep.get_operator("as_pyam")
     p = as_pyam(scen, qty[0:0], rename=dict(nl="region", ya="year"))
     assert isinstance(p, pyam.IamDataFrame)
 
@@ -112,7 +112,7 @@ def test_plot_cumulative(tmp_path):
     )
     y.index.names = ["n", "g", "y"]
 
-    result = computations.plot_cumulative(
+    result = operator.plot_cumulative(
         Quantity(x, units="GW a"),
         Quantity(y, units="mole / kW a"),
         labels=("Fossil supply", "Resource volume", "Cost"),
@@ -132,5 +132,5 @@ def test_stacked_bar():
     )
     data.index.names = ["r", "t", "year"]
 
-    result = computations.stacked_bar(Quantity(data), dims=["r", "t", "year"])
+    result = operator.stacked_bar(Quantity(data), dims=["r", "t", "year"])
     assert isinstance(result, matplotlib.axes.Axes)

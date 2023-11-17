@@ -199,7 +199,7 @@ sector model, with several fossil and renewable power plant types.
 Code reference
 ==============
 
-The module :mod:`message_ix.util.tutorial` contains some helper code used to simplify the tutorials; see also :func:`.reporting.computations.stacked_bar`.
+The module :mod:`message_ix.util.tutorial` contains some helper code used to simplify the tutorials; see also :func:`.report.operator.stacked_bar`.
 
 .. currentmodule:: message_ix.util.tutorial
 

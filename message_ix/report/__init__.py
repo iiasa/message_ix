@@ -4,7 +4,7 @@ from operator import itemgetter
 from typing import Mapping, Sequence, Tuple, Union, cast
 
 import genno
-from ixmp.reporting import (
+from ixmp.report import (
     ComputationError,
     Key,
     KeyExistsError,
@@ -12,7 +12,7 @@ from ixmp.reporting import (
     Quantity,
     configure,
 )
-from ixmp.reporting import Reporter as IXMPReporter
+from ixmp.report import Reporter as IXMPReporter
 
 from .pyam import collapse_message_cols
 
@@ -69,7 +69,7 @@ configure(
     rename_dims=DIMS.copy(),
 )
 
-#: Automatic quantities that are the :meth:`~computations.product` of two others.
+#: Automatic quantities that are the :meth:`~operator.mul` of two others.
 PRODUCTS = (
     # Each entry is ('output key', ('quantities', 'to', 'multiply')). Full keys are
     # inferred automatically, by add_product().
@@ -95,12 +95,12 @@ DERIVED = [
     # must be given explicitly.
     ("y::model", ("model_periods", "y", "cat_year")),
     ("y0", (itemgetter(0), "y::model")),
-    ("tom:nl-t-yv-ya", (genno.computations.add, "fom:nl-t-yv-ya", "vom:nl-t-yv-ya")),
+    ("tom:nl-t-yv-ya", (genno.operator.add, "fom:nl-t-yv-ya", "vom:nl-t-yv-ya")),
     # Broadcast from type_addon to technology_addon
     (
         "addon conversion:nl-t-yv-ya-m-h-ta",
         (
-            partial(genno.computations.broadcast_map, rename={"n": "nl"}),
+            partial(genno.operator.broadcast_map, rename={"n": "nl"}),
             "addon_conversion:n-t-yv-ya-m-h-type_addon",
             "map_addon",
         ),
@@ -108,7 +108,7 @@ DERIVED = [
     (
         "addon up:nl-t-ya-m-h-ta",
         (
-            partial(genno.computations.broadcast_map, rename={"n": "nl"}),
+            partial(genno.operator.broadcast_map, rename={"n": "nl"}),
             "addon_up:n-t-ya-m-h-type_addon",
             "map_addon",
         ),
@@ -117,9 +117,9 @@ DERIVED = [
     (
         "price emission:n-e-t-y",
         (
-            genno.computations.broadcast_map,
+            genno.operator.broadcast_map,
             (
-                genno.computations.broadcast_map,
+                genno.operator.broadcast_map,
                 "PRICE_EMISSION:n-type_emission-type_tec-y",
                 "map_emission",
             ),
@@ -128,8 +128,7 @@ DERIVED = [
     ),
 ]
 
-#: Quantities to automatically convert to IAMC format using
-#: :meth:`~computations.as_pyam`.
+#: Quantities to automatically convert to IAMC format using :meth:`~operator.as_pyam`.
 PYAM_CONVERT = [
     ("out:nl-t-ya-m-nd-c-l", "ya", dict(kind="ene", var="out")),
     ("in:nl-t-ya-m-no-c-l", "ya", dict(kind="ene", var="in")),
@@ -143,8 +142,7 @@ PYAM_CONVERT = [
 ]
 
 
-#: Automatic reports that :meth:`~computations.concat` quantities converted to IAMC
-#: format.
+#: Automatic reports that :meth:`~operator.concat` quantities converted to IAMC format.
 REPORTS = {
     "message::system": ["out::pyam", "in::pyam", "CAP::pyam", "CAP_NEW::pyam"],
     "message::costs": ["inv::pyam", "fom::pyam", "vom::pyam", "tom::pyam"],
@@ -217,9 +215,9 @@ class Reporter(IXMPReporter):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Append message_ix.reporting.computations to the modules in which the Computer
-        # will look up computations names.
-        self.require_compat("message_ix.reporting.computations")
+        # Append message_ix.report.operator to the modules in which the Computer will
+        # look up operator names.
+        self.require_compat("message_ix.report.operator")
 
     @classmethod
     def from_scenario(cls, scenario, **kwargs) -> "Reporter":
