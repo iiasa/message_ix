@@ -46,7 +46,7 @@ extensions = [
     "sphinxcontrib.bibtex",
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
-    "ixmp.utils.sphinx_linkcode_github",
+    "ixmp.util.sphinx_linkcode_github",
     "message_ix.util.sphinx_gams",
 ]
 
@@ -139,7 +139,7 @@ intersphinx_mapping = {
     "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
 }
 
-# -- Options for sphinx.ext.linkcode / ixmp.utils.sphinx_linkcode_github ---------------
+# -- Options for sphinx.ext.linkcode / ixmp.util.sphinx_linkcode_github ----------------
 
 linkcode_github_repo_slug = "iiasa/message_ix"
 

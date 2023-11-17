@@ -9,7 +9,7 @@ from warnings import warn
 import ixmp
 import numpy as np
 import pandas as pd
-from ixmp.utils import as_str_list
+from ixmp.util import as_str_list
 
 log = logging.getLogger(__name__)
 

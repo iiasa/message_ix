@@ -7,7 +7,7 @@ from warnings import warn
 
 import ixmp.model.gams
 from ixmp import config
-from ixmp.utils import maybe_check_out, maybe_commit
+from ixmp.util import maybe_check_out, maybe_commit
 
 from .macro import MACRO_ITEMS
 
