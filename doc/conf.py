@@ -4,20 +4,15 @@
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-# -- Path setup --------------------------------------------------------------
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-
-try:
-    from importlib.metadata import version as get_version
-except ImportError:  # Python 3.7
-    from importlib_metadata import version as get_version
-
+import re
+from importlib.metadata import version as get_version
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-# -- Project information -----------------------------------------------------
+if TYPE_CHECKING:
+    import sphinx
+
+# -- Project information ---------------------------------------------------------------
 
 project = "MESSAGEix"
 copyright = "2018–2023, IIASA Energy, Climate, and Environment (ECE) Program"
@@ -77,7 +72,27 @@ rst_prolog = r"""
    :language: python
 """  # noqa: E501
 
-# -- Options for HTML output ----------------------------------------------
+
+def setup(app: "sphinx.application.Sphinx") -> None:
+    """Sphinx setup hook."""
+
+    expr = re.compile("docstring of (ixmp|genno)")
+
+    def warn_missing_reference(app: "sphinx.application.Sphinx", domain, node) -> bool:
+        """Silently discard unresolved references internal to upstream code.
+
+        When base classes in upstream (genno, ixmp) packages are inherited in
+        message_ix, Sphinx cannot properly resolve relative references within docstrings
+        of methods of the former.
+        """
+        # Return True without doing anything to silently discard the warning. Anything
+        # else, return False to allow other Sphinx hook implementations to handle.
+        return expr.search(node.source or "") is not None
+
+    app.connect("warn-missing-reference", warn_missing_reference)
+
+
+# -- Options for HTML output -----------------------------------------------------------
 
 # A list of CSS files.
 html_css_files = ["custom.css"]
