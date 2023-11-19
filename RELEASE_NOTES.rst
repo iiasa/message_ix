@@ -243,7 +243,7 @@ All changes
 - :pull:`190`: Add generic mathematical formulation of :ref:`technologies that store commodities <gams-storage>`, such as water and energy.
 - :pull:`343`, :pull:`345`: Accept :class:`.MESSAGE_MACRO` iteration control parameters through :meth:`.solve`; document how to tune these to avoid numerical issues.
 - :pull:`340`: Allow cplex.opt to be used by `message_ix` from multiple processes.
-- :pull:`328`: Expand automatic reporting of emissions prices and mapping sets; improve robustness of :meth:`Reporter.convert_pyam`.
+- :pull:`328`: Expand automatic reporting of emissions prices and mapping sets; improve robustness of :func:`.Reporter.convert_pyam <genno.compat.pyam.operator.add_as_pyam>`.
 - :pull:`321`: Move :meth:`.Scenario.to_excel`, :meth:`.read_excel` to :class:`ixmp.Scenario`; they continue to work with :class:`message_ix.Scenario`.
 - :pull:`323`: Add `units`, `replace_vars` arguments to :meth:`.Reporter.convert_pyam`.
 - :pull:`308`: Expand automatic reporting of add-on technologies.

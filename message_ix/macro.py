@@ -24,8 +24,10 @@ from message_ix.report import Key, Reporter
 
 log = logging.getLogger(__name__)
 
-if TYPE_CHECKING:  # pragma: no cover
-    from genno import Computer, Quantity
+if TYPE_CHECKING:
+    import genno
+    import pandas
+    from genno import Quantity
     from pandas import DataFrame, Series
 
     from message_ix.core import Scenario
@@ -150,7 +152,9 @@ def aconst(
     return aconst.droplevel("year")
 
 
-def add_par(scenario: "Scenario", data: "DataFrame", ym1: int, *, name: str) -> None:
+def add_par(
+    scenario: "Scenario", data: "pandas.DataFrame", ym1: int, *, name: str
+) -> None:
     """Add `data` to the `scenario`."""
     # FIXME look up the correct units
     units: Mapping[str, str] = {}
@@ -179,7 +183,10 @@ class Structures:
 
 
 def add_structure(
-    scenario: "Scenario", mapping_macro_sector: "DataFrame", s: Structures, ym1: int
+    scenario: "Scenario",
+    mapping_macro_sector: "pandas.DataFrame",
+    s: Structures,
+    ym1: int,
 ) -> None:
     """Add MACRO structure information to `scenario`."""
     # Remove old initializeyear_macro before adding new one
@@ -220,12 +227,12 @@ def clean_model_data(data: "Quantity", s: Structures) -> "DataFrame":
 
     Parameters
     ----------
-    data : .Quantity
+    data : genno.Quantity
         With short dimension names (c, l, n, y), etc.
 
     Returns
     -------
-    .DataFrame
+    pandas.DataFrame
         With full column names and a "value" column. Only the labels in `s` (levels,
         nodes, sectors, and years) appear in the respective dimensions.
     """
@@ -445,7 +452,7 @@ def total_cost(model_cost: "DataFrame", cost_ref: "DataFrame", ym1: int) -> "Dat
 
     Returns
     -------
-    total_cost : pandas DataFrame
+    pandas.DataFrame
         Total cost of the system.
 
     """
@@ -604,9 +611,9 @@ def add_model_data(
 
     Parameters
     ----------
-    base : message_ix.Scenario()
+    base : .Scenario
         Base scenario with a solution.
-    clone : message_ix.Scenario()
+    clone : .Scenario
         Clone of base scenario for adding calibration parameters.
     data : dict
         Data for calibration.
@@ -617,17 +624,17 @@ def add_model_data(
         c2.get(k)
 
 
-def calibrate(s, check_convergence=True, **kwargs):
+def calibrate(s, check_convergence: bool = True, **kwargs):
     """Calibrate a MESSAGEix scenario to parameters of MACRO.
 
     Parameters
     ----------
-    s : message_ix.Scenario()
+    s : .Scenario
         MESSAGEix scenario with calibration data.
-    check_convergence : bool, optional, default: True
+    check_convergence : bool, optional
         Test is MACRO-calibrated scenario converges in one iteration.
-    **kwargs : keyword arguments
-        To be passed to message_ix.Scenario.solve().
+    **kwargs :
+        Keyword arguments passed to meth:`message_ix.Scenario.solve`.
 
     Raises
     ------
@@ -690,7 +697,7 @@ def prepare_computer(
     base: "Scenario",
     target: Optional["Scenario"] = None,
     data: Union[Mapping, os.PathLike, None] = None,
-) -> "Computer":
+) -> "genno.Computer":
     """Prepare a :class:`.Reporter` to perform MACRO calibration calculations.
 
     Parameters
@@ -699,16 +706,19 @@ def prepare_computer(
         Must have a stored solution.
     target : message_ix.Scenario
         Scenario to which to add computed data.
-    data : dict (str -> pd.DataFrame) or os.PathLike
-        If :class:`.PathLike`, the path to an Excel file containing parameter data, one
-        per sheet. If :class:`dict`, a dictionary mapping parameter names to data
-        frames.
+    data : dict or os.PathLike
+        If :class:`~os.PathLike`, the path to an Excel file containing parameter data,
+        one per sheet. If :class:`dict`, a mapping from parameter names to data frames.
 
     Raises
     ------
     ValueError
-        if any of the require parameters for MACRO calibration
-        (:data:`VERIFY_INPUT_DATA`) is missing.
+        if any of the require parameters for MACRO calibration (:data:`INPUT_DATA`) is
+        missing.
+
+    See also
+    --------
+    :ref:`macro-input-data`
     """
 
     if not base.has_solution():

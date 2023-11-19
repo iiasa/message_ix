@@ -26,7 +26,7 @@ Each layer of this “stack” builds on the features in the level below:
    * - ``ixmp``
      - Optimization models & data
      - :class:`~ixmp.Scenario` with sets, parameters, variables
-     - :class:`~ixmp.Reporter` auto-populated with sets etc.
+     - :class:`~ixmp.report.Reporter` auto-populated with sets etc.
    * - ``genno``
      - Structured calculations
      - :class:`~genno.Computer`,
@@ -56,7 +56,7 @@ Concepts
 See :doc:`genno:usage` in the genno documentation for an introduction to concepts including **quantity**, **key**, **computation**, **task**, **graph**, and **operator**.
 In :mod:`message_ix.report`:
 
-- The :class:`.message_ix.Reporter` class is an extended version of the :class:`genno.Computer` class.
+- The :class:`.Reporter` class is an extended version of the :class:`genno.Computer` class.
 - :mod:`ixmp` parameters, scalars, equations, and time-series data all become quantities for the purpose of reporting.
 - For example, the |MESSAGEix| parameter ``resource_cost``, defined with the dimensions (node `n`, commodity `c`, grade `g`, year `y`) is identified by the key ``resource_cost:n-c-g-y``.
   When summed across the grade/`g` dimension, it has dimensions `n`, `c`, `y` and is identified by the key ``resource_cost:n-c-y``.
@@ -72,7 +72,7 @@ Usage
 
 A |MESSAGEix| reporting workflow has the following steps:
 
-1. Obtain a :class:`.Scenario` object from an :class:`.Platform`.
+1. Obtain a :class:`.Scenario` object from an :class:`~ixmp.Platform`.
 2. Use :meth:`.Reporter.from_scenario` to prepare a Reporter object with many calculations automatically prepared.
 3. (optionally) Use the built-in features of :class:`.Reporter` to describe additional calculations.
 4. Use :meth:`.get` 1 or more times to execute tasks, including all the calculations on which they depend:
@@ -89,7 +89,7 @@ A |MESSAGEix| reporting workflow has the following steps:
 
 Note that keys and tasks are **described** in steps (2–3), but they are not **executed** until :meth:`.get` is called—or the results of one task are required by another.
 This design allows the Reporter to skip unneeded (and potentially slow) computations and deliver good performance.
-The Reporter's :attr:`Computer.graph` may contain thousands of tasks for retrieving model quantities and calculating derived quantities, but a particular call to :meth:`.get` may only execute a few of these.
+The Reporter's :attr:`~genno.Computer.graph` may contain thousands of tasks for retrieving model quantities and calculating derived quantities, but a particular call to :meth:`.get` may only execute a few of these.
 
 
 Customization
@@ -135,6 +135,7 @@ Top-level classes and functions
 The following objects from :mod:`genno` may also be imported from :mod:`message_ix.report`.
 Their documentation is repeated below for convenience.
 
+.. currentmodule:: genno
 .. autosummary::
 
    ComputationError
@@ -143,14 +144,14 @@ Their documentation is repeated below for convenience.
    MissingKeyError
    Quantity
    configure
+.. currentmodule:: message_ix.report
 
-
-:meth:`ixmp.Reporter.from_scenario <ixmp.reporting.Reporter.from_scenario>` automatically adds keys based on the contents of the :class:`.Scenario` argument;
+:meth:`ixmp.Reporter.from_scenario <ixmp.report.Reporter.from_scenario>` automatically adds keys based on the contents of the :class:`.Scenario` argument;
 that is, every :mod:`ixmp` set, parameter, variable, and equation available in the Scenario.
 :meth:`message_ix.Reporter.from_scenario <.Reporter.from_scenario>` extends this to add additional keys for derived quantities specific to the MESSAGEix model framework.
 These include:
 
-.. tip:: Use :meth:`~.Computer.full_key` to retrieve the full-dimensionality :class:`Key` for any of these quantities.
+.. tip:: Use :meth:`~genno.Computer.full_key` to retrieve the full-dimensionality :class:`~genno.Key` for any of these quantities.
 
 - ``out``          = ``output`` × ``ACT``; that is, the product of ``output`` (output efficiency) and ``ACT`` (activity)
 - ``out_hist``     = ``output`` × ``ref_activity`` (historical reference activity)
@@ -187,7 +188,7 @@ Other added keys include:
 
 .. _default-reports:
 
-- Computations to convert internal :func:`Quantity` data format to the IAMC data format, i.e. as :class:`pyam.IamDataFrame` objects.
+- Computations to convert internal :class:`~genno.Quantity` data format to the IAMC data format, specifically as :class:`pyam.IamDataFrame` objects.
   These include:
 
   - ``<name>::pyam`` for most of the above derived quantities.
@@ -263,12 +264,13 @@ Operators
    Two of these (:func:`.plot_cumulative` and :func:`.stacked_bar`) are currently only used in the tutorials to produce simple plots; for more flexible plotting, :mod:`genno.compat.plotnine` is recommended instead.
 
    .. autosummary::
+
       as_message_df
       model_periods
       plot_cumulative
       stacked_bar
 
-   Other operators are provided by :mod:`ixmp.reporting`:
+   Other operators are provided by :mod:`ixmp.report`:
 
    .. autosummary::
       ~ixmp.report.operator.data_for_quantity

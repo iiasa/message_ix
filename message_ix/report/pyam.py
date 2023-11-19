@@ -7,9 +7,10 @@ from genno.compat.pyam import util
 def collapse_message_cols(
     df: pd.DataFrame, var: Optional[str] = None, kind: Optional[str] = None, var_cols=[]
 ) -> Callable:
-    """:func:`.as_pyam` `collapse=...` callback for MESSAGEix quantities.
+    """:mod:`genno.compat.pyam` `collapse=...` callback for MESSAGEix quantities.
 
-    Wraps :func:`.collapse` with arguments particular to MESSAGEix.
+    Wraps :func:`~genno.compat.pyam.util.collapse` with arguments particular to
+    MESSAGEix.
 
     Parameters
     ----------

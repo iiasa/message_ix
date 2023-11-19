@@ -31,10 +31,12 @@ The full API is also available from R; see :doc:`rmessageix`.
 
 .. currentmodule:: message_ix
 
+.. automodule:: message_ix
+
 ``message_ix`` package
 ----------------------
 
-|MESSAGEix| models are created using the :py:class:`message_ix.Scenario` class. Several utility methods are also provided in the module :py:mod:`message_ix.utils`.
+|MESSAGEix| models are created using the :py:class:`message_ix.Scenario` class. Several utility methods are also provided in the module :py:mod:`message_ix.util`.
 
 .. autoclass:: message_ix.Scenario
    :members:
@@ -248,3 +250,6 @@ Testing utilities
 
 .. automodule:: message_ix.testing
    :members: make_dantzig, make_westeros
+
+.. automodule:: message_ix.testing.nightly
+   :members:

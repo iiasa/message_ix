@@ -69,7 +69,7 @@ configure(
     rename_dims=DIMS.copy(),
 )
 
-#: Automatic quantities that are the :meth:`~operator.mul` of two others.
+#: Automatic quantities that are the :func:`~genno.operator.mul` of two others.
 PRODUCTS = (
     # Each entry is ('output key', ('quantities', 'to', 'multiply')). Full keys are
     # inferred automatically, by add_product().
@@ -128,7 +128,8 @@ DERIVED = [
     ),
 ]
 
-#: Quantities to automatically convert to IAMC format using :meth:`~operator.as_pyam`.
+#: Quantities to automatically convert to IAMC format using
+#: :func:`~genno.compat.pyam.operator.as_pyam`.
 PYAM_CONVERT = [
     ("out:nl-t-ya-m-nd-c-l", "ya", dict(kind="ene", var="out")),
     ("in:nl-t-ya-m-no-c-l", "ya", dict(kind="ene", var="in")),
@@ -142,7 +143,8 @@ PYAM_CONVERT = [
 ]
 
 
-#: Automatic reports that :meth:`~operator.concat` quantities converted to IAMC format.
+#: Automatic reports that :func:`~genno.operator.concat` quantities converted to IAMC
+#: format.
 REPORTS = {
     "message::system": ["out::pyam", "in::pyam", "CAP::pyam", "CAP_NEW::pyam"],
     "message::costs": ["inv::pyam", "fom::pyam", "vom::pyam", "tom::pyam"],
@@ -150,10 +152,11 @@ REPORTS = {
 }
 
 
-#: MESSAGE mapping sets, converted to reporting quantities via :meth:`~.map_as_qty`.
+#: MESSAGE mapping sets, converted to reporting quantities via
+#: :func:`~ixmp.report.operator.map_as_qty`.
 #:
 #: For instance, the mapping set ``cat_addon`` is available at the reporting key
-#: ``map_addon``, which produces a :class:`.Quantity` with the two dimensions
+#: ``map_addon``, which produces a :class:`genno.Quantity` with the two dimensions
 #: ``type_addon`` and ``ta`` (short form of ``technology_addon``). This Quantity
 #: contains the value 1 at every valid (type_addon, ta) location, and 0 elsewhere.
 MAPPING_SETS = [
@@ -257,8 +260,9 @@ class Reporter(IXMPReporter):
 
         Parameters
         ----------
-        fail_action : “raise” or logging level
-            Passed to the `fail` argument of :meth:`.Reporter.add_queue`.
+        fail_action : "raise" or int
+            :mod:`logging` level or level name, passed to the `fail` argument of
+            :meth:`.Reporter.add_queue`.
         """
         # Ensure that genno.compat.pyam is usable
         self.require_compat("pyam")

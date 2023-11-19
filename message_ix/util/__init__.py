@@ -88,7 +88,7 @@ def make_df(name, **data):
     Parameters
     ----------
     name : str
-        Name of a parameter listed in :data:`MESSAGE_ITEMS` or :data:`MACRO_ITEMS`.
+        Name of a parameter listed in :data:`.MESSAGE_ITEMS` or :data:`.MACRO_ITEMS`.
     data : optional
         Contents for dimensions of the parameter, its 'value', or 'unit'. Other keys are
         ignored.
