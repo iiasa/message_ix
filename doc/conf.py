@@ -53,20 +53,19 @@ exclude_patterns = ["_build", "README.rst"]
 # A string of reStructuredText that will be included at the beginning of every source
 # file that is read.
 rst_prolog = r"""
+.. role:: py(code)
+   :language: python
+
+.. role:: strike
+.. role:: underline
+
 .. |MESSAGEix| replace:: MESSAGE\ :emphasis:`ix`
-
 .. |ixmp| replace:: :emphasis:`ix` modeling platform
-
 .. |IIASA| raw:: html
 
    <abbr title="International Institute for Applied Systems Analysis">IIASA</abbr>
 
-.. role:: strike
-
-.. role:: underline
-
-.. role:: py(code)
-   :language: python
+.. |KeyLike| replace:: :obj:`~genno.core.key.KeyLike`
 """  # noqa: E501
 
 
@@ -127,16 +126,30 @@ extlinks = {
     "tut": (f"https://github.com/iiasa/message_ix/blob/{gh_ref}/tutorial/%s", None),
 }
 
+# -- Options for sphinx.ext.intersphinx ------------------------------------------------
 
-# -- Options for sphinx.ext.intersphinx ---------------------------------------
+
+def local_inv(name: str, *parts: str) -> str:
+    """Construct the path to a local intersphinx inventory."""
+
+    from importlib.util import find_spec
+
+    spec = find_spec(name)
+    if spec is None:
+        return None
+
+    if 0 == len(parts):
+        parts = ("doc", "_build", "html")
+    return str(Path(spec.origin).parents[1].joinpath(*parts, "objects.inv"))
+
 
 intersphinx_mapping = {
     "dask": ("https://docs.dask.org/en/stable/", None),
-    "genno": ("https://genno.readthedocs.io/en/latest", None),
-    "ixmp": ("https://docs.messageix.org/projects/ixmp/en/latest/", None),
-    # For a local build, uncomment and use the following line with a path to
-    # the directory containing built HTML documentation for ixmp:
-    # 'ixmp': ('/home/user/path-to-ixmp/doc/build/html', None),
+    "genno": ("https://genno.readthedocs.io/en/latest", (local_inv("genno"), None)),
+    "ixmp": (
+        "https://docs.messageix.org/projects/ixmp/en/latest/",
+        (local_inv("ixmp"), None),
+    ),
     "message-ix-models": (
         "https://docs.messageix.org/projects/models/en/latest/",
         None,
@@ -147,6 +160,7 @@ intersphinx_mapping = {
     "pyam": ("https://pyam-iamc.readthedocs.io/en/stable/", None),
     "python": ("https://docs.python.org/3/", None),
     "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
+    "xarray": ("https://xarray.pydata.org/en/stable/", None),
 }
 
 # -- Options for sphinx.ext.linkcode / ixmp.util.sphinx_linkcode_github ----------------
@@ -175,7 +189,22 @@ mathjax3_config = dict(
     ),
 )
 
-# -- Options for sphinx.ext.todo ----------------------------------------------
+# -- Options for sphinx.ext.napoleon ---------------------------------------------------
+
+napoleon_preprocess_types = True
+napoleon_type_aliases = {
+    # Standard library
+    "callable": ":ref:`callable <python:callable-types>`",
+    "iterable": ":class:`collections.abc.Iterable`",
+    "mapping": ":class:`collections.abc.Mapping`",
+    "sequence": ":class:`collections.abc.Sequence`",
+    # Upstream
+    "DataFrame": "pandas.DataFrame",
+    "Series": "pandas.Series",
+    "Quantity": "genno.Quantity",
+}
+
+# -- Options for sphinx.ext.todo -------------------------------------------------------
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
