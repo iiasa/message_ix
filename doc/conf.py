@@ -20,16 +20,13 @@ author = "MESSAGEix Developers"
 
 # The major project version, used as the replacement for |version|.
 version = get_version("message_ix")
-# The full project version, used as the replacement for |release| and e.g. in
-# the HTML templates.
+# The full project version, used as the replacement for |release| and in HTML templates.
 release = version
 
+# -- General configuration -------------------------------------------------------------
 
-# -- General configuration ----------------------------------------------------
-
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
+# Add any Sphinx extension module names here, as strings. They can be extensions coming
+# with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
@@ -48,13 +45,13 @@ extensions = [
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
+# List of patterns, relative to source directory, that match files and directories to
+# ignore when looking for source files. This pattern also affects html_static_path and
+# html_extra_path.
 exclude_patterns = ["_build", "README.rst"]
 
-# A string of reStructuredText that will be included at the beginning of every
-# source file that is read.
+# A string of reStructuredText that will be included at the beginning of every source
+# file that is read.
 rst_prolog = r"""
 .. |MESSAGEix| replace:: MESSAGE\ :emphasis:`ix`
 
@@ -99,26 +96,24 @@ html_css_files = ["custom.css"]
 
 html_favicon = "_static/messageix-favicon.svg"
 
-# The name of an image file (relative to this directory) to place at the top
-# of the sidebar.
+# The name of an image file (relative to this directory) to place at the top of the
+# sidebar.
 html_logo = "_static/combined-logo-white.svg"
 
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
+# Add any paths that contain custom static files (such as style sheets) here, relative
+# to this directory. They are copied after the builtin static files, so a file named
+# "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
+# The theme to use for HTML and HTML Help pages.
 html_theme = "sphinx_rtd_theme"
 
 html_theme_options = {"logo_only": True}
 
-# -- Options for LaTeX output -------------------------------------------------
+# -- Options for LaTeX output ----------------------------------------------------------
 
 # The LaTeX engine to build the docs.
 latex_engine = "lualatex"
-
 
 # -- Options for sphinx.ext.extlinks ---------------------------------------------------
 
@@ -185,11 +180,9 @@ mathjax3_config = dict(
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
 
-
-# -- Options for sphinxcontrib.bibtex -----------------------------------------
+# -- Options for sphinxcontrib.bibtex --------------------------------------------------
 
 bibtex_bibfiles = ["references.bib"]
-
 
 # -- Options for message_ix.util.sphinx_gams -------------------------------------------
 
