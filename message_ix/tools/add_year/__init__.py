@@ -25,7 +25,7 @@ def intpol(y1, y2, x1, x2, x):
 
     Parameters
     ----------
-    y1, y2 : float or pd.Series
+    y1, y2 : float or pandas.Series
     x1, x2, x : int
     """
     if x2 == x1 and y2 != y1:
@@ -43,8 +43,9 @@ def slice_df(df, idx, level, locator, value):
 
     Parameters
     ----------
-    df : pd.DataFrame
-    idx : list of indices
+    df : pandas.DataFrame
+    idx : list of str
+       Columns to set as index.
     level: str
     locator : list
     value : int or str

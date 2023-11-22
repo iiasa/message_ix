@@ -51,15 +51,15 @@ Decide which part of the |MESSAGEix| software stack is the appropriate location 
 :mod:`ixmp`
    Contributions not specific to |MESSAGEix| model framework, e.g. that could be used for other, non-MESSAGE models.
 
-   :mod:`ixmp_source`
+   `ixmp_source <https://github.com/iiasa/ixmp_source>`__ (closed source)
       Java / JDBC backend for ``ixmp``.
 
 :mod:`message_ix`
    Contributions not specific to *any particular MESSAGEix* model instance.
    Additions to ``message_ix`` should be usable in any MESSAGE-scheme model.
 
-:mod:`message_data` or :mod:`message_doc`
-   Contributions to the MESSAGE-GLOBIOM family of models, including the global model; and its documentation, respectively.
+:mod:`message_ix_models`
+   Contributions to the MESSAGE-GLOBIOM family of models, including the global model, and its documentation.
 
 
 2. Fork, branch, and open a pull request

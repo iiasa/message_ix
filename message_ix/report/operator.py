@@ -1,7 +1,7 @@
 from typing import List, Mapping, Union
 
 import pandas as pd
-from ixmp.reporting import Quantity
+from ixmp.report import Quantity
 
 from message_ix.util import make_df
 
@@ -16,7 +16,7 @@ __all__ = [
 def as_message_df(
     qty: Quantity, name: str, dims: Mapping, common: Mapping, wrap: bool = True
 ) -> Union[pd.DataFrame, dict]:
-    """Convert `qty` to an :mod:`ixmp.add_par`-ready data frame using :func:`make_df`.
+    """Convert `qty` to an :meth:`.add_par`-ready data frame using :func:`.make_df`.
 
     The resulting data frame has:
 
@@ -27,13 +27,13 @@ def as_message_df(
 
     Parameters
     ----------
-    qty : :class:`.genno.Quantity`
+    qty : genno.Quantity
     name : str
         Name of the :ref:`MESSAGEix parameter <parameter_def>` to prepare.
-    dims : mapping (str → str)
-        Each key corresponds to a dimension of the target parameter `name`, e.g.
-        "node_loc"; the label corresponds to a dimension of `qty`, e.g. "nl".
-    common : mapping (str → Any)
+    dims : mapping
+        Each key corresponds to a dimension of the target parameter `name`, for instance
+        "node_loc"; the label corresponds to a dimension of `qty`, for instance "nl".
+    common : mapping
         Each key corresponds to a dimension of the target parameter; values are used
         literally, as if passed to :func:`.make_df`.
     wrap : bool, optional
@@ -41,8 +41,9 @@ def as_message_df(
 
     Returns
     -------
-    length-1 :class:`dict` of `name` → pandas.DataFrame
-        if `wrap` is :data:`True`, the default; or
+    dict
+        if `wrap` is :data:`True` (the default): length 1, mapping from `name` to
+        :class:`pandas.DataFrame` containing the converted data.
     pandas.DataFrame
         if `wrap` is :data:`False`.
     """
@@ -137,9 +138,9 @@ def stacked_bar(qty, dims=["nl", "t", "ya"], units="", title="", cf=1.0, stacked
 
     Parameters
     ----------
-    qty : ixmp.reporting.Quantity
+    qty : Quantity
         Data to plot.
-    dims : 3-tuple of str
+    dims : tuple of str
         Dimensions for, respectively:
 
         1. The node/region.

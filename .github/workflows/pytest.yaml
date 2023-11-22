@@ -32,6 +32,7 @@ jobs:
         - "3.9"
         - "3.10"
         - "3.11"  # Latest version supported by message_ix
+        # - "3.12"  # Pending JPype support; see iiasa/ixmp#501
 
         # Below this comment are newly released or development versions of
         # Python. For these versions, binary wheels are not available for some
@@ -39,7 +40,7 @@ jobs:
         # these on the job runner requires a more elaborate build environment,
         # currently out of scope for the message_ix project.
 
-        # - "3.12.0-alpha.1"  # Development version
+        # - "3.13.0-alpha.1"  # Development version
 
       fail-fast: false
 
@@ -121,15 +122,6 @@ jobs:
           --numprocesses=auto --dist=loadgroup || ( [ $? -eq 127 -a "${{ runner.os }}" = "Windows" ] && echo "Spurious exit code 127 from pytest" && exit 0)
       shell: bash
 
-    - name: Test documentation build using Sphinx
-      if: ${{ startsWith(matrix.os, 'ubuntu') }}
-      env:
-        # For pull_request triggers, GitHub creates a temporary merge commit
-        # with a hash that does not match the head of the branch. Tell it which
-        # branch to use.
-        SPHINXOPTS: -D linkcode_github_remote_head=${{ github.head_ref }}
-      run: make --directory=doc html
-
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v3
 
@@ -141,6 +133,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
+      with:  # Same as the "Latest version supported by message_ix", above
+        python-version: "3.11"
 
     - name: Force recreation of pre-commit virtual environment for mypy
       if: github.event_name == 'schedule'  # Comment this line to run on a PR

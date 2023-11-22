@@ -9,7 +9,7 @@ from warnings import warn
 import ixmp
 import numpy as np
 import pandas as pd
-from ixmp.utils import as_str_list
+from ixmp.util import as_str_list
 
 log = logging.getLogger(__name__)
 
@@ -101,19 +101,19 @@ class Scenario(ixmp.Scenario):
     def equ(self, name, filters=None):
         """Return equation data.
 
-        Same as :meth:`ixmp.Scenario.equ`, except columns indexed by the
-        |MESSAGEix| set ``year`` are returned with :obj:`int` dtype.
+        Same as :meth:`ixmp.Scenario.equ`, except columns indexed by the |MESSAGEix| set
+        ``year`` are returned with :obj:`int` dtype.
 
         Parameters
         ----------
         name : str
             Name of the equation.
-        filters : dict (str -> list of str), optional
-            Filters for the dimensions of the equation.
+        filters : dict, optional
+            Filters for the dimensions of the equation. See :meth:`.ixmp.Scenario.equ`.
 
         Returns
         -------
-        pd.DataFrame
+        pandas.DataFrame
             Filtered elements of the equation.
         """
         # Call ixmp.Scenario.equ(), then convert 'year'-indexed columns to ints
@@ -122,19 +122,19 @@ class Scenario(ixmp.Scenario):
     def par(self, name, filters=None):
         """Return parameter data.
 
-        Same as :meth:`ixmp.Scenario.par`, except columns indexed by the
-        |MESSAGEix| set ``year`` are returned with :obj:`int` dtype.
+        Same as :meth:`ixmp.Scenario.par`, except columns indexed by the |MESSAGEix| set
+        ``year`` are returned with :obj:`int` dtype.
 
         Parameters
         ----------
         name : str
             Name of the parameter.
-        filters : dict (str -> list of str), optional
-            Filters for the dimensions of the parameter.
+        filters : dict, optional
+            Filters for the dimensions of the parameter. See :meth:`.ixmp.Scenario.par`.
 
         Returns
         -------
-        pd.DataFrame
+        pandas.DataFrame
             Filtered elements of the parameter.
         """
         return self._year_as_int(name, super().par(name, filters))
@@ -142,45 +142,43 @@ class Scenario(ixmp.Scenario):
     def set(self, name, filters=None):
         """Return elements of a set.
 
-        Same as :meth:`ixmp.Scenario.set`, except columns for multi-dimensional
-        sets indexed by the |MESSAGEix| set ``year`` are returned with
-        :obj:`int` dtype.
+        Same as :meth:`ixmp.Scenario.set`, except columns for multi-dimensional sets
+        indexed by the |MESSAGEix| set ``year`` are returned with :obj:`int` dtype.
 
         Parameters
         ----------
         name : str
             Name of the set.
-        filters : dict (str -> list of str), optional
-            Mapping of `dimension_name` → `elements`, where `dimension_name`
-            is one of the `idx_names` given when the set was initialized (see
-            :meth:`init_set`), and `elements` is an iterable of labels to
-            include in the return value.
+        filters : dict, optional
+            Mapping of `dimension_name` → `elements`, where `dimension_name` is one of
+            the `idx_names` given when the set was initialized (see :meth:`init_set`),
+            and `elements` is an iterable of labels to include in the return value.
 
         Returns
         -------
-        pd.Series
-            If *name* is an index set.
-        pd.DataFrame
-            If *name* is a set defined over one or more other, index sets.
+        pandas.Series
+            If `name` is an index set.
+        pandas.DataFrame
+            If `name` is a set defined over one or more other, index sets.
         """
         return self._year_as_int(name, super().set(name, filters))
 
     def var(self, name, filters=None):
         """Return variable data.
 
-        Same as :meth:`ixmp.Scenario.var`, except columns indexed by the
-        |MESSAGEix| set ``year`` are returned with :obj:`int` dtype.
+        Same as :meth:`ixmp.Scenario.var`, except columns indexed by the |MESSAGEix| set
+        ``year`` are returned with :obj:`int` dtype.
 
         Parameters
         ----------
         name : str
             Name of the variable.
-        filters : dict (str -> list of str), optional
-            Filters for the dimensions of the variable.
+        filters : dict, optional
+            Filters for the dimensions of the variable. See :meth:`.ixmp.Scenario.var`.
 
         Returns
         -------
-        pd.DataFrame
+        pandas.DataFrame
             Filtered elements of the variable.
         """
         return self._year_as_int(name, super().var(name, filters))
@@ -454,10 +452,11 @@ class Scenario(ixmp.Scenario):
 
         Parameters
         ----------
-        ya_args : tuple of (node, technology) or (node, technology, year_vtg), optional
-            Supplied directly to :meth:`years_active`. If the third element is omitted,
-            :meth:`years_active` is called repeatedly, once for each vintage for which a
-            technical lifetime value is set (condition (3)).
+        ya_args : tuple, optional
+            Either length 2 (`node`, `technology`) or length 3 (`node`, `technology`,
+            `year_vtg`). Supplied directly to :meth:`years_active`. If the third element
+            is omitted, :meth:`years_active` is called repeatedly, once for each vintage
+            for which a technical lifetime value is set (condition (3)).
         tl_only : bool, optional
             Condition (4), above.
         in_horizon : bool, optional
@@ -640,16 +639,16 @@ class Scenario(ixmp.Scenario):
         Parameters
         ----------
         keep_solution : bool, optional
-            If :py:const:`True`, include all timeseries data and the solution
-            (vars and equs) from the source Scenario in the clone.
-            Otherwise, only timeseries data marked as `meta=True` (see
-            :meth:`TimeSeries.add_timeseries`) or prior to `first_model_year`
-            (see :meth:`TimeSeries.add_timeseries`) are cloned.
+            If :any:`True`, include all time series and model solution
+            (variable and equation) data from the current Scenario in the clone.
+            Otherwise, only time series data marked as :py:`meta=True` (see
+            :meth:`ixmp.TimeSeries.add_timeseries`) or prior to `first_model_year`
+            (see :meth:`ixmp.TimeSeries.add_timeseries`) are cloned.
         shift_first_model_year: int, optional
-            If given, the values of the solution are transfered to parameters
-            `historical_*`, parameter `resource_volume` is updated, and the
-            `first_model_year` is shifted. The solution is then discarded,
-            see :meth:`TimeSeries.remove_solution`.
+            If given, certain values of the model solution are transferred to
+            correspondin gparameters ``historical_*``, parameter ``resource_volume`` is
+            updated, and the `first_model_year` is shifted. The solution is then
+            discarded (:meth:`~.ixmp.Scenario.remove_solution`).
         """
         # Call the parent method
         return super().clone(*args, **kwargs)
@@ -666,13 +665,12 @@ class Scenario(ixmp.Scenario):
         ----------
         model : 'MESSAGE' or 'MACRO' or 'MESSAGE-MACRO', optional
             Model to solve.
-        solve_options : dict (str -> str), optional
-            Name to value mapping to use for GAMS CPLEX solver options file.
+        solve_options : dict, optional
+            Mapping of (`option` → `value`) to use for GAMS CPLEX solver options file.
             See the :class:`.MESSAGE` class and :obj:`.DEFAULT_CPLEX_OPTIONS`.
-        kwargs
-            Many other options control the execution of the underlying GAMS
-            code; see the :class:`.MESSAGE_MACRO` class and
-            :class:`.GAMSModel`.
+        kwargs :
+            Other options control the execution of the underlying GAMS code; see the
+            :class:`.MESSAGE_MACRO` class and :class:`.GAMSModel`.
         """
         super().solve(model=model, solve_options=solve_options, **kwargs)
 
@@ -683,21 +681,27 @@ class Scenario(ixmp.Scenario):
         check_convergence=True,
         **kwargs,
     ):
-        """
-        Add MACRO parametrization to the Scenario and calibrate.
-        Notice: existing MACRO calibration data will be overwritten by running this.
+        """Add MACRO parametrization to the Scenario and calibrate.
+
+        .. note:: This method causes existing MACRO calibration data to be overwritten.
 
         Parameters
         ----------
-        data : dict (str -> pandas.DataFrame) or path-like.
-            Dictionary of required data for MACRO calibration or path to a file
-            containing the data.
-        scenario : string, optional, default: None.
-            Scenario name for calibrated MESSAGEix scenario.
-        check_convergence : bool, optional, default: True.
-            The calibrated scenario solves in one iteration.
+        data : dict or os.PathLike
+            Dictionary of required data for MACRO calibration (mapping :class:`str` to
+            :class:`pandas.DataFrame`) or path to a file containing the data.
+        scenario : str, optional
+            Scenario name for calibrated Scenario. If not given, the name of `scenario`
+            with " macro" appended.
+        check_convergence : bool, optional
+            Confirm that the calibrated scenario solves in one iteration.
         kwargs
             Solve options when solving the calibrated scenario.
+
+        Returns
+        -------
+        .Scenario
+            A clone of `scenario` with MACRO calibrated.
 
         See also
         --------

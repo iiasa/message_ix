@@ -31,10 +31,12 @@ The full API is also available from R; see :doc:`rmessageix`.
 
 .. currentmodule:: message_ix
 
+.. automodule:: message_ix
+
 ``message_ix`` package
 ----------------------
 
-|MESSAGEix| models are created using the :py:class:`message_ix.Scenario` class. Several utility methods are also provided in the module :py:mod:`message_ix.utils`.
+|MESSAGEix| models are created using the :py:class:`message_ix.Scenario` class. Several utility methods are also provided in the module :py:mod:`message_ix.util`.
 
 .. autoclass:: message_ix.Scenario
    :members:
@@ -90,8 +92,8 @@ Model classes
    MESSAGE_MACRO
    GAMSModel
    DEFAULT_CPLEX_OPTIONS
-   MESSAGE_ITEMS
-   ~message_ix.macro.MACRO_ITEMS
+   Item
+   ItemType
 
 .. autodata:: DEFAULT_CPLEX_OPTIONS
 
@@ -195,12 +197,23 @@ Model classes
    :exclude-members: defaults
    :show-inheritance:
 
+   .. autoattribute:: items
+      :no-value:
+
+      Keys are the names of items (sets, parameters, variables, and equations); values are :class:`.Item` instances.
+      These include all items listed in the MESSAGE mathematical specification, i.e. :ref:`sets_maps_def` and :ref:`parameter_def`.
+
 .. autoclass:: MACRO
    :members:
+   :exclude-members: items
    :show-inheritance:
+
+   .. autoattribute:: items
+      :no-value:
 
 .. autoclass:: MESSAGE_MACRO
    :members:
+   :exclude-members: items
    :show-inheritance:
 
    MESSAGE_MACRO solves the MESSAGE and MACRO models iteratively, connecting changes in technology activity and resource demands (from MESSAGE) to changes in final demands and prices (from MACRO).
@@ -218,21 +231,14 @@ Model classes
 
    .. seealso:: :meth:`.Scenario.add_macro`
 
-.. autodata:: MESSAGE_ITEMS
-   :annotation: = dict(…)
+   .. autoattribute:: items
+      :no-value:
 
-   Keys are the names of items (sets, parameters, variables, and equations); values are :class:`dict` specifying their type and dimensionality, with keys 'ix_type', 'idx_sets', and in some cases 'idx_names'.
-   These include all items listed in the MESSAGE mathematical specification, i.e. :ref:`sets_maps_def` and :ref:`parameter_def`.
-
-   .. seealso:: :meth:`.MESSAGE.initialize`, :data:`.MACRO_ITEMS`
+.. autodata:: DIMS
+.. autoclass:: Item
+   :members:
 
 .. currentmodule:: message_ix.macro
-
-.. autodata:: MACRO_ITEMS
-   :annotation: = dict(…)
-
-   .. seealso:: :data:`.MESSAGE_ITEMS`
-
 
 .. _utils:
 
@@ -248,3 +254,6 @@ Testing utilities
 
 .. automodule:: message_ix.testing
    :members: make_dantzig, make_westeros
+
+.. automodule:: message_ix.testing.nightly
+   :members:

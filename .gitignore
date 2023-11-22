@@ -1,4 +1,5 @@
 # Python, R, etc.
+__pycache__
 *-checkpoint.ipynb
 *.bak
 *.dat
@@ -38,11 +39,12 @@ dist
 .cache/**
 tests/data/nightly
 
-# pytest and related
+# Python tooling, pytest, etc.
 .benchmarks
 .coverage*
 .mypy_cache
 .pytest_cache
+.ruff_cache
 coverage.xml
 htmlcov
 prof/

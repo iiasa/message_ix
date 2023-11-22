@@ -52,8 +52,8 @@ GAMS (required)
 Graphviz (optional)
 -------------------
 
-:meth:`.reporting.Reporter.visualize` uses `Graphviz`_, a program for graph visualization.
-Installing message_ix causes the python :mod:`graphviz` package to be installed.
+:meth:`.Reporter.visualize` uses `Graphviz`_, a program for graph visualization.
+Installing message_ix causes the `graphviz <https://graphviz.readthedocs.io>`__ Python package to be installed.
 If you want to use :meth:`.visualize` or run the test suite, the Graphviz program itself must also be installed; otherwise it is **optional**.
 
 If you install MESSAGEix `Using Anaconda`_, Graphviz is installed automatically via `its conda-forge package`_.
@@ -91,7 +91,7 @@ Using Anaconda
 7. Install and configure the `mamba solver`_, which is faster and more reliable than conda's default solver::
 
     $ conda install conda-libmamba-solver
-    $ conda config --set solver libmamba 
+    $ conda config --set solver libmamba
 
 8. Create a new conda environment and activate it.
    This step is **required** if using Anaconda, but *optional* if using Miniconda.
@@ -150,7 +150,7 @@ From source
     # or:
     $ git clone git@github.com:USER/message_ix.git
 
-7. (Conditional) If you cloned your fork, add the main repository as a remote git repository. 
+7. (Conditional) If you cloned your fork, add the main repository as a remote git repository.
    This will allow keeping up to date with changes there and importing tags, which also needs to be done for the install tests to succeed::
 
     $ git remote add upstream git@github.com:iiasa/message_ix.git
@@ -235,7 +235,7 @@ Common issues
 “No JVM shared library file (jvm.dll) found”
 --------------------------------------------
 
-Error messages like this when running ``message-ix --platform=default list`` or when creating a :class:`.Platform` object (e.g. :code:`ixmp.Platform()` in Python) indicate that :mod:`message_ix` (via :mod:`ixmp` and JPype) cannot find Java on your machine, in particular the Java Virtual Machine (JVM).
+Error messages like this when running ``message-ix --platform=default list`` or when creating a :class:`ixmp.Platform` object (for instance, :py:`ixmp.Platform()` in Python) indicate that :mod:`message_ix` (via :mod:`ixmp` and JPype) cannot find Java on your machine, in particular the Java Virtual Machine (JVM).
 There are multiple ways to resolve this issue:
 
 1. If you have installed Java manually, ensure that the ``JAVA_HOME`` environment variable is set system-wide; see for example `these instructions`_ for Windows users.
@@ -250,7 +250,7 @@ To check which JVM will be used by ixmp, run the following in any prompt or term
 “No module named 'pyam'”
 ------------------------
 
-The package `pyam-iamc <https://pypi.org/project/pyam-iamc/>`_ is one of the "reporting" extra dependencies of :mod:`message_ix`.
+The package `pyam-iamc <https://pypi.org/project/pyam-iamc/>`_ is one of the "report" extra dependencies of :mod:`message_ix`.
 These extra dependencies are not installed automatically, but can be installed using::
 
     # If message_ix is installed using pip

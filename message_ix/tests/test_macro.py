@@ -9,7 +9,7 @@ import pytest
 
 from message_ix import Scenario, macro
 from message_ix.models import MACRO
-from message_ix.reporting import Quantity
+from message_ix.report import Quantity
 from message_ix.testing import SCENARIO, make_westeros
 
 FLAKY = pytest.mark.flaky(

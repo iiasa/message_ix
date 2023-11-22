@@ -70,6 +70,12 @@ tests = [
 [project.scripts]
 message-ix = "message_ix.cli:main"
 
+[tool.coverage.report]
+exclude_also = [
+  # Imports only used by type checkers
+  "if TYPE_CHECKING:",
+]
+
 [tool.coverage.run]
 omit = [
   "message_ix/model/*",

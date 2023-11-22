@@ -258,7 +258,7 @@ def test_structure(caplog, test_mp):
     name = "storage_initial"
     dims = ["node", "technology", "level", "commodity", "year", "time"]
     # NB here we cannot use make_df, since that refers to the current dimensionality of
-    #    storage_initial per MESSAGE_ITEMS
+    #    storage_initial via MESSAGE.items
     data = pd.Series(
         ["topeka", "canning_plant", "supply", "cases", 1963, "year", 1.0, "kg"],
         index=dims + ["value", "unit"],

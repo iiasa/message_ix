@@ -232,7 +232,6 @@ Code documentation
 
 .. automodule:: message_ix.macro
    :members:
-   :exclude-members: MACRO_ITEMS
 
    The functions :func:`add_model_data` and :func:`calibrate` are used by :meth:`.Scenario.add_macro`.
    Others are internal; :func:`prepare_computer` assembles the following functions into a :class:`.genno.Computer` that then executes the necessary calculations to prepare the model data.

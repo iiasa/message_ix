@@ -9,13 +9,13 @@ import pytest
 import xarray as xr
 from genno import Quantity
 from genno.testing import assert_qty_equal
-from ixmp.reporting import Reporter as ixmp_Reporter
+from ixmp.report import Reporter as ixmp_Reporter
 from ixmp.testing import assert_logs
 from numpy.testing import assert_allclose
 from pandas.testing import assert_frame_equal, assert_series_equal
 
 from message_ix import Scenario
-from message_ix.reporting import Reporter, configure
+from message_ix.report import Reporter, configure
 from message_ix.testing import SCENARIO, make_dantzig, make_westeros
 
 
@@ -52,13 +52,13 @@ def test_reporter_from_scenario(message_test_mp):
     rep = Reporter.from_scenario(scen)
 
     # Number of quantities available in a rudimentary MESSAGEix Scenario
-    assert len(rep.graph["all"]) == 125
+    assert 268 == len(rep.graph["all"])
 
     # Quantities have short dimension names
-    assert "demand:n-c-l-y-h" in rep
+    assert "demand:n-c-l-y-h" in rep, sorted(rep.graph)
 
     # Aggregates are available
-    assert "demand:n-l-h" in rep
+    assert "demand:n-l-h" in rep, sorted(rep.graph)
 
     # Quantities contain expected data
     dims = dict(coords=["chicago new-york topeka".split()], dims=["n"])
@@ -70,11 +70,11 @@ def test_reporter_from_scenario(message_test_mp):
     assert_qty_equal(obs, demand, check_attrs=False)
 
     # ixmp.Reporter pre-populated with only model quantities and aggregates
-    assert len(rep_ix.graph) == 5609
+    assert 6462 == len(rep_ix.graph)
 
     # message_ix.Reporter pre-populated with additional, derived quantities
     # This is the same value as in test_tutorials.py
-    assert len(rep.graph) == 13076
+    assert 13724 == len(rep.graph)
 
     # Derived quantities have expected dimensions
     vom_key = rep.full_key("vom")
@@ -84,8 +84,8 @@ def test_reporter_from_scenario(message_test_mp):
     # …and expected values
     var_cost = rep.get(rep.full_key("var_cost"))
     ACT = rep.get(rep.full_key("ACT"))
-    product = rep.get_comp("product")
-    vom = product(var_cost, ACT)
+    mul = rep.get_operator("mul")
+    vom = mul(var_cost, ACT)
     # check_attrs false because `vom` multiply above does not add units
     assert_qty_equal(vom, rep.get(vom_key))
 
@@ -150,7 +150,7 @@ def test_reporter_as_pyam(caplog, tmp_path, dantzig_reporter):
     caplog.set_level(logging.INFO)
 
     rep = dantzig_reporter
-    as_pyam = rep.get_comp("as_pyam")
+    as_pyam = rep.get_operator("as_pyam")
 
     # Key for 'ACT' variable at full resolution
     ACT = rep.full_key("ACT")
