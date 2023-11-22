@@ -268,32 +268,31 @@ MESSAGE_ITEMS = {
     # TODO adjust JDBCBackend to accept these values (or replace it), then uncomment.
     #
     # Variables
-    #
-    # # Activity
-    # "ACT": item("var", "nl t yv ya m h"),
-    # # Maintained capacity
-    # "CAP": item("var", "nl t yv ya"),
-    # # New capacity
-    # "CAP_NEW": item("var", "nl t yv"),
-    # # Emissions
-    # "EMISS": item("var", "n e type_tec y"),
-    # # Extraction
-    # "EXT": item("var", "n c g y"),
-    # # Land scenario share
-    # "LAND": item("var", "n land_scenario y"),
-    # # Objective (scalar)
-    # "OBJ": dict(ix_type="var", idx_sets=[]),
-    # # Relation (lhs)
-    # "REL": item("var", "relation nr yr"),
-    # # Stock
-    # "STOCK": item("var", "n c l y"),
+    # Activity
+    "ACT": item("var", "nl t yv ya m h"),
+    # Maintained capacity
+    "CAP": item("var", "nl t yv ya"),
+    # New capacity
+    "CAP_NEW": item("var", "nl t yv"),
+    # Emissions
+    "EMISS": item("var", "n e type_tec y"),
+    # Extraction
+    "EXT": item("var", "n c g y"),
+    # Land scenario share
+    "LAND": item("var", "n land_scenario y"),
+    # Objective (scalar)
+    "OBJ": dict(ix_type="var", idx_sets=[]),
+    # Relation (lhs)
+    "REL": item("var", "relation nr yr"),
+    # Stock
+    "STOCK": item("var", "n c l y"),
     #
     "STORAGE": item("var", "n t m l c y h"),
     "STORAGE_CHARGE": item("var", "n t m l c y h"),
     #
-    # # Equations
-    # # Commodity balance
-    # "RESOURCE_HORIZON": item("equ", "n c g"),
+    # Equations
+    # Commodity balance
+    "RESOURCE_HORIZON": item("equ", "n c g"),
 }
 
 
