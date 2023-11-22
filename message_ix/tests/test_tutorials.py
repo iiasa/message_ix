@@ -83,7 +83,7 @@ TUTORIALS: List[Tuple] = [
     _t("w0", f"{W}_historical_new_capacity"),
     _t("w0", f"{W}_multinode"),
     # NB this is the same value as in test_reporter()
-    _t(None, f"{W}_report", check=[("len-rep-graph", 13076)]),
+    _t(None, f"{W}_report", check=[("len-rep-graph", 13724)]),
     _t("at0", "austria", check=[("solve-objective-value", 206321.90625)]),
     _t("at0", "austria_single_policy", check=[("solve-objective-value", 205310.34375)]),
     _t("at0", "austria_multiple_policies"),
