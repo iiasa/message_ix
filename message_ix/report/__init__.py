@@ -1,9 +1,9 @@
 import logging
 from functools import lru_cache, partial
 from operator import itemgetter
-from typing import Mapping, Sequence, Tuple, Union, cast
+from typing import List, Mapping, Tuple, Union, cast
 
-import genno
+from genno.operator import broadcast_map
 from ixmp.report import (
     ComputationError,
     Key,
@@ -39,145 +39,145 @@ configure(
     rename_dims={full: short for short, (_, full) in _ABBREV.items() if full != short},
 )
 
-#: Automatic quantities that are the :func:`~genno.operator.mul` of two others.
-PRODUCTS = (
-    # Each entry is ('output key', ('quantities', 'to', 'multiply')). Full keys are
-    # inferred automatically, by add_product().
-    ("out", ("output", "ACT")),
-    ("in", ("input", "ACT")),
-    ("rel", ("relation_activity", "ACT")),
-    ("emi", ("emission_factor", "ACT")),
-    ("inv", ("inv_cost", "CAP_NEW")),
-    ("fom", ("fix_cost", "CAP")),
-    ("vom", ("var_cost", "ACT")),
-    ("land_out", ("land_output", "LAND")),
-    ("land_use_qty", ("land_use", "LAND")),  # TODO: better name!
-    ("land_emi", ("land_emission", "LAND")),
-    ("addon ACT", ("addon conversion", "ACT")),
-    ("addon in", ("input", "addon ACT")),
-    ("addon out", ("output", "addon ACT")),
-    ("addon potential", ("addon up", "addon ACT")),
-)
-
-#: Automatic quantities derived by other calculations.
-DERIVED = [
-    # Each entry is ('full key', (computation tuple,)). Full keys are not inferred and
-    # must be given explicitly.
-    ("y::model", ("model_periods", "y", "cat_year")),
-    ("y0", (itemgetter(0), "y::model")),
-    ("tom:nl-t-yv-ya", (genno.operator.add, "fom:nl-t-yv-ya", "vom:nl-t-yv-ya")),
+#: Common reporting tasks. These include:
+#:
+#: 1. MESSAGE mapping sets, converted to reporting quantities via
+#:    :func:`~ixmp.report.operator.map_as_qty`.
+#:
+#:    For instance, the mapping set ``cat_addon`` is available at the reporting key
+#:    ``map_addon``, which produces a :class:`genno.Quantity` with the two dimensions
+#:    ``type_addon`` and ``ta`` (short form of ``technology_addon``). This Quantity
+#:    contains the value 1 at every valid (type_addon, ta) location, and 0 elsewhere.
+#: 2. Simple products of 2 or mode quantities.
+#: 3. Other derived quantities.
+TASKS0: Tuple[Tuple, ...] = (
+    # Mapping sets
+    ("map_addon", "map_as_qty", "cat_addon", "t"),
+    ("map_emission", "map_as_qty", "cat_emission", "e"),
+    ("map_tec", "map_as_qty", "cat_tec", "t"),
+    ("map_year", "map_as_qty", "cat_year", "y"),
+    #
+    # Products
+    ("out", "mul", "output", "ACT"),
+    ("in", "mul", "input", "ACT"),
+    ("rel", "mul", "relation_activity", "ACT"),
+    ("emi", "mul", "emission_factor", "ACT"),
+    ("inv", "mul", "inv_cost", "CAP_NEW"),
+    ("fom", "mul", "fix_cost", "CAP"),
+    ("vom", "mul", "var_cost", "ACT"),
+    ("land_out", "mul", "land_output", "LAND"),
+    ("land_use_qty", "mul", "land_use", "LAND"),  # TODO: better name!
+    ("land_emi", "mul", "land_emission", "LAND"),
+    #
+    # Others
+    ("y::model", "model_periods", "y", "cat_year"),
+    ("y0", itemgetter(0), "y::model"),
+    # NB Cannot use the full dimensions of `fom` and `vom`` here, as they are not
+    #    matched, resulting in null indices in `tom`.
+    ("tom", "add", "fom:nl-t-yv-ya", "vom:nl-t-yv-ya"),
     # Broadcast from type_addon to technology_addon
     (
-        "addon conversion:nl-t-yv-ya-m-h-ta",
         (
-            partial(genno.operator.broadcast_map, rename={"n": "nl"}),
+            "addon conversion:nl-t-yv-ya-m-h-ta",
+            broadcast_map,
             "addon_conversion:n-t-yv-ya-m-h-type_addon",
             "map_addon",
         ),
+        dict(rename={"n": "nl"}),
     ),
+    ("addon ACT", "mul", "addon conversion", "ACT"),
+    ("addon in", "mul", "input", "addon ACT"),
+    ("addon out", "mul", "output", "addon ACT"),
     (
-        "addon up:nl-t-ya-m-h-ta",
         (
-            partial(genno.operator.broadcast_map, rename={"n": "nl"}),
+            "addon up:nl-t-ya-m-h-ta",
+            broadcast_map,
             "addon_up:n-t-ya-m-h-type_addon",
             "map_addon",
         ),
+        dict(rename={"n": "nl"}),
     ),
+    ("addon potential", "mul", "addon up", "addon ACT"),
     # Double broadcast over type_emission, then type_tec, in a nested task
     (
         "price emission:n-e-t-y",
-        (
-            genno.operator.broadcast_map,
-            (
-                genno.operator.broadcast_map,
-                "PRICE_EMISSION:n-type_emission-type_tec-y",
-                "map_emission",
-            ),
-            "map_tec",
-        ),
+        broadcast_map,
+        (broadcast_map, "PRICE_EMISSION:n-type_emission-type_tec-y", "map_emission"),
+        "map_tec",
     ),
-]
+)
 
 #: Quantities to automatically convert to IAMC format using
 #: :func:`~genno.compat.pyam.operator.as_pyam`.
 PYAM_CONVERT = [
-    ("out:nl-t-ya-m-nd-c-l", "ya", dict(kind="ene", var="out")),
-    ("in:nl-t-ya-m-no-c-l", "ya", dict(kind="ene", var="in")),
-    ("CAP:nl-t-ya", "ya", dict(var="capacity")),
-    ("CAP_NEW:nl-t-yv", "yv", dict(var="new capacity")),
-    ("inv:nl-t-yv", "yv", dict(var="inv cost")),
-    ("fom:nl-t-ya", "ya", dict(var="fom cost")),
-    ("vom:nl-t-ya", "ya", dict(var="vom cost")),
-    ("tom:nl-t-ya", "ya", dict(var="total om cost")),
-    ("emi:nl-t-ya-m-e", "ya", dict(kind="emi", var="emis")),
+    ("out:nl-t-ya-m-nd-c-l", dict(kind="ene", var="out")),
+    ("in:nl-t-ya-m-no-c-l", dict(kind="ene", var="in")),
+    ("CAP:nl-t-ya", dict(var="capacity")),
+    ("CAP_NEW:nl-t-yv", dict(var="new capacity")),
+    ("inv:nl-t-yv", dict(var="inv cost")),
+    ("fom:nl-t-ya", dict(var="fom cost")),
+    ("vom:nl-t-ya", dict(var="vom cost")),
+    ("tom:nl-t-ya", dict(var="total om cost")),
+    ("emi:nl-t-ya-m-e", dict(kind="emi", var="emis")),
 ]
-
 
 #: Automatic reports that :func:`~genno.operator.concat` quantities converted to IAMC
 #: format.
-REPORTS = {
-    "message::system": ["out::pyam", "in::pyam", "CAP::pyam", "CAP_NEW::pyam"],
-    "message::costs": ["inv::pyam", "fom::pyam", "vom::pyam", "tom::pyam"],
-    "message::emissions": ["emi::pyam"],
-}
-
-
-#: MESSAGE mapping sets, converted to reporting quantities via
-#: :func:`~ixmp.report.operator.map_as_qty`.
-#:
-#: For instance, the mapping set ``cat_addon`` is available at the reporting key
-#: ``map_addon``, which produces a :class:`genno.Quantity` with the two dimensions
-#: ``type_addon`` and ``ta`` (short form of ``technology_addon``). This Quantity
-#: contains the value 1 at every valid (type_addon, ta) location, and 0 elsewhere.
-MAPPING_SETS = [
-    ("addon", "t"),  # Mapping name, and full target set
-    ("emission", "e"),
-    # 'node',  # Automatic addition fails because 'map_node' is defined explicitly
-    ("tec", "t"),
-    ("year", "y"),
-]
+TASKS1 = (
+    (
+        "message::system",
+        "concat",
+        "out::pyam",
+        "in::pyam",
+        "CAP::pyam",
+        "CAP_NEW::pyam",
+    ),
+    ("message::costs", "concat", "inv::pyam", "fom::pyam", "vom::pyam", "tom::pyam"),
+    ("message::emissions", "concat", "emi::pyam"),
+    (
+        "message::default",
+        "concat",
+        "message::system",
+        "message::costs",
+        "message::emissions",
+    ),
+)
 
 
 @lru_cache(1)
-def get_tasks() -> Sequence[Tuple[Tuple, Mapping]]:
+def get_tasks() -> List[Tuple[Tuple, Mapping]]:
     """Return a list of tasks describing MESSAGE reporting calculations."""
     # Assemble queue of items to add. Each element is a 2-tuple of (positional, keyword)
     # arguments for Reporter.add()
-    to_add = []
+    to_add: List[Tuple[Tuple, Mapping]] = []
 
-    # Helper to add elements to the queue
-    def put(*args, **kwargs):
-        to_add.append((args, kwargs))
+    strict = dict(strict=True)
 
-    # Quantities that represent mapping sets
-    for name, full_set in MAPPING_SETS:
-        put("map_as_qty", f"map_{name}", f"cat_{name}", full_set, strict=True)
+    for t in TASKS0:
+        if len(t) == 2 and isinstance(t[1], dict):
+            # (args, kwargs) → update kwargs with strict
+            t[1].update(strict)
+            to_add.append(cast(Tuple[Tuple, Mapping], t))
+        else:
+            # args only → use strict as kwargs
+            to_add.append((t, strict))
 
-    # Product quantities
-    for name, quantities in PRODUCTS:
-        put("product", name, *quantities)
+    # Conversions to IAMC data structure and pyam objects
 
-    # Derived quantities
-    for key, args in DERIVED:
-        put(key, *args, strict=True, sums=True)
-
-    # Conversions to IAMC-format (pyam) objects
-    for qty, year_dim, collapse_kw in PYAM_CONVERT:
-        # Standard renaming from dimensions to column names
-        rename = dict(n="region", nl="region")
-        # Column to set as year or time dimension
-        rename[year_dim] = "year" if year_dim.lower().startswith("y") else "time"
+    for qty, collapse_kw in PYAM_CONVERT:
+        # Column to set as year dimension + standard renames from MESSAGE to IAMC dims
+        rename = {
+            next(filter(lambda d: d.startswith("y"), Key(qty).dims)): "year",
+            "n": "region",
+            "nl": "region",
+        }
         # Callback function to further collapse other columns into IAMC columns
-        collapse_cb = partial(collapse_message_cols, **collapse_kw)
+        cb = partial(collapse_message_cols, **collapse_kw)
 
-        put("as_pyam", qty, "pyam", rename=rename, collapse=collapse_cb)
+        to_add.append(((qty, "as_pyam", "pyam"), dict(rename=rename, collapse=cb)))
 
     # Standard reports
-    for group, pyam_keys in REPORTS.items():
-        put("concat", group, *pyam_keys, strict=True)
-
-    # Add all standard reporting to the default message node
-    put("concat", "message::default", *REPORTS.keys(), strict=True)
+    to_add.extend((t, strict) for t in TASKS1)
 
     return to_add
 
@@ -237,9 +237,5 @@ class Reporter(IXMPReporter):
         # Ensure that genno.compat.pyam is usable
         self.require_compat("pyam")
 
-        # Use a queue pattern via Reporter.add_queue(). This is more forgiving; e.g.
-        # 'addon ACT' from PRODUCTS depends on 'addon conversion::full'; but the latter
-        # is added to the queue later (from DERIVED). Using strict=True in the various
-        # add() calls means that that this will raise an exception; so the failed item
-        # is re-appended to the queue and tried at most 1 more time later.
-        self.add_queue(get_tasks(), max_tries=2, fail=fail_action)
+        # Use a queue pattern via Reporter.add_queue()
+        self.add_queue(get_tasks(), fail=fail_action)
