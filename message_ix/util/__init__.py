@@ -199,7 +199,7 @@ def expand_dims(scenario: Scenario, name, **data):
 
     This function is for use when an existing parameter `name` has dimensions that are a
     subset of those that would be created by :func:`make_df`, i.e. those given by
-    :data:`.MESSAGE_ITEMS`.
+    :attr:`.MESSAGE.items`.
 
     This can occur when the underlying structure of MESSAGE and the model core is
     enhanced by adding dimensions to existing parameters. Existing scenario data in
@@ -212,7 +212,7 @@ def expand_dims(scenario: Scenario, name, **data):
        :func:`make_df`. The result must be a data frame with no empty values; in other
        words, `data` must include all the dimensions to be added to `name`.
     3. Re-initializes the parameter `name` on `scenario`, with the dimensions given by
-       :data:`.MESSAGE_ITEMS`.
+       :attr:`.MESSAGE.items`.
     4. Adds the expanded data.
 
     The modifications (steps 3 and 4) are wrapped using :meth:`.transact`.

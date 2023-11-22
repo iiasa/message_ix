@@ -18,6 +18,7 @@ All changes
 - Rename :mod:`message_ix.report` (:pull:`761`).
 - New reporting operator :func:`.model_periods` and automatic keys ``y::model`` and ``y0`` (:pull:`738`).
 - Improve readability of LaTeX equations in docs (:pull:`721`).
+- Replace :py:`MESSAGE_ITEMS` and :py:`MACRO_ITEMS` with :attr:`.MESSAGE.items` and :attr:`MACRO.items`, respectively (:pull:`761`).
 - Bugfix: :meth:`.Scenario.add_macro` would not correctly handle configuration that mapped a MESSAGE (commodity, level) to MACRO sector when the commodity and sector names were different (:pull:`719`).
 - Expand :doc:`macro` documentation, particularly code documentation (:issue:`315`, :pull:`719`).
 - Bugfix: :func:`.operator.as_message_df` would error if a particular dimension was supplied via the `common` argument but not present in `qty` (:pull:`719`).
@@ -207,7 +208,7 @@ All changes
 - :pull:`407`: Use :mod:`.report` in tutorials; add :mod:`.util.tutorial` for shorthand code used to streamline tutorials.
 - :pull:`407`: Make :class:`.Reporter` a top-level class.
 - :pull:`415`: Improve :func:`.make_df` to generate empty, partially-, or fully-filled data frames with the correct columns for any MESSAGE or MACRO parameter.
-- :pull:`415`: Make complete lists of :data:`.MESSAGE_ITEMS`, :data:`.MACRO_ITEMS` and their dimensions accessible through the Python API.
+- :pull:`415`: Make complete lists of :attr:`.MESSAGE_ITEMS` <.MESSAGE.items>, :attr:`.MACRO_ITEMS <.MACRO.items>` and their dimensions accessible through the Python API.
 - :pull:`421`: Fix discounting from forward-looking to backward-looking and provide an explanation of the period structure and discounting in documentation of :doc:`time`.
 
 

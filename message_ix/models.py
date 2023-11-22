@@ -4,7 +4,7 @@ from copy import copy
 from dataclasses import InitVar, dataclass, field
 from functools import partial
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from typing import Mapping, MutableMapping, Optional, Tuple
 from warnings import warn
 
 import ixmp.model.gams
@@ -64,15 +64,16 @@ class Item:
     #: Name of the item.
     name: str
 
-    #: Type of the item, for instance :attr:`ixmp.ItemType.PAR`.
+    #: Type of the item, for instance :attr:`ItemType.PAR <ixmp.backend.ItemType.PAR>`.
     type: ItemType
 
     #: String expression for :attr:`coords` and :attr:`dims`. Split on spaces and parsed
-    #: using :data:`_ABBREV` so that, for instance, a fragment "yv" results in an entry
-    #: for "year" in :attr:`coords`, and "year_vtg" in :attr:`dims`.
+    #: using :data:`_ABBREV` so that, for instance, "nl yv" results in entries for
+    #: for "node", "year" in :attr:`coords`, and "node_loc", "year_vtg" in :attr:`dims`.
     expr: InitVar[str] = ""
 
     #: Coordinates of the item; that is, the names of sets that index its dimensions.
+    #: The same set name may be repeated if it indexes multiple dimensions.
     coords: Tuple[str, ...] = field(default_factory=tuple)
 
     #: Dimensions of the item.
@@ -95,10 +96,22 @@ class Item:
 
     @property
     def ix_type(self) -> str:
+        """Lower-case string form of :attr:`type`: "equ", "par", "set", or "var".
+
+        Read-only.
+        """
         return str(self.type.name).lower()
 
     def to_dict(self) -> dict:
-        """Return the :class:`dict` representation used internally in :mod:`ixmp`."""
+        """Return the :class:`dict` representation used internally in :mod:`ixmp`.
+
+        This has the keys:
+
+        - :py:`ix_type`: same as :attr:`ix_type`.
+        - :py:`idx_sets`: same as :attr:`coords`.
+        - :py:`idx_names`: same as :attr:`dims`, but only included if these are (a)
+          non-empty and (b) different from :attr:`coords`.
+        """
         result = dict(ix_type=self.ix_type, idx_sets=self.coords)
         if self.dims:
             result.update(idx_names=self.dims)
@@ -153,7 +166,9 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         ixmp.model.gams.GAMSModel.defaults,
     )
 
-    items: Dict[str, Item]
+    #: Mapping from model item (equation, parameter, set, or variable) names to
+    #: :class:`.Item` describing the item.
+    items: Mapping[str, Item]
 
     def __init__(self, name=None, **model_options):
         # Update the default options with any user-provided options
@@ -212,8 +227,8 @@ def _check_structure(scenario):
     2. Item ix_type.
     3. Number of data points in the item; -1 if it does not exist in `scenario`.
     4. A warning/error message, *if* the index names/sets do not match those in
-       `MESSAGE_ITEMS` and the item contains data. Otherwise, the message is an empty
-       string.
+       :attr:`.MESSAGE.items` and the item contains data. Otherwise, the message is an
+       empty string.
     """
     if scenario.has_solution():
         return
@@ -245,7 +260,9 @@ class MESSAGE(GAMSModel):
     """Model class for MESSAGE."""
 
     name = "MESSAGE"
-    items = dict()
+
+    #: All equations, parameters, sets, and variables in the MESSAGE formulation.
+    items: MutableMapping[str, Item] = dict()
 
     @staticmethod
     def enforce(scenario):
@@ -279,11 +296,11 @@ class MESSAGE(GAMSModel):
 
     @classmethod
     def initialize(cls, scenario):
-        """Set up *scenario* with required sets and parameters for MESSAGE.
+        """Set up `scenario` with required sets and parameters for MESSAGE.
 
         See Also
         --------
-        :data:`MESSAGE_ITEMS`
+        :attr:`items`
         """
         # Check for storage items that may contain incompatible data or need to be
         # re-initialized
@@ -878,7 +895,9 @@ class MACRO(GAMSModel):
     """Model class for MACRO."""
 
     name = "MACRO"
-    items = dict()
+
+    #: All equations, parameters, sets, and variables in the MACRO formulation.
+    items: MutableMapping[str, Item] = dict()
 
     #: MACRO uses the GAMS ``break;`` statement, and thus requires GAMS 24.8.1 or later.
     GAMS_min_version = "24.8.1"
@@ -960,6 +979,8 @@ class MESSAGE_MACRO(MESSAGE, MACRO):
     """Model class for MESSAGE_MACRO."""
 
     name = "MESSAGE-MACRO"
+    #: All equations, parameters, sets, and variables in the MESSAGE-MACRO formulation.
+    items = ChainMap(MESSAGE.items, MACRO.items)
 
     def __init__(self, *args, **kwargs):
         # Remove M-M iteration options from kwargs and convert to GAMS command-line
