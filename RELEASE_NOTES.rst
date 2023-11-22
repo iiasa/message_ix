@@ -1,12 +1,21 @@
 Next release
 ============
 
+Migration notes
+---------------
+Update code that imports from the following modules:
+
+- :py:`message_ix.reporting` → use :py:`message_ix.report`.
+- :py:`message_ix.reporting.computations` → use :py:`message_ix.report.operator`.
+
+Code that imports from the old locations will continue to work, but will raise :class:`DeprecationWarning`.
+
 All changes
 -----------
 
 - Drop support for Python 3.7, which `reached end-of-life on 2023-06-27 <https://peps.python.org/pep-0537/#lifespan>`__ (:pull:`738`).
   :mod:`message_ix` now requires Python version 3.8 or greater.
-- Rename :mod:`message_ix.report`.
+- Rename :mod:`message_ix.report` (:pull:`761`).
 - New reporting operator :func:`.model_periods` and automatic keys ``y::model`` and ``y0`` (:pull:`738`).
 - Improve readability of LaTeX equations in docs (:pull:`721`).
 - Bugfix: :meth:`.Scenario.add_macro` would not correctly handle configuration that mapped a MESSAGE (commodity, level) to MACRO sector when the commodity and sector names were different (:pull:`719`).
