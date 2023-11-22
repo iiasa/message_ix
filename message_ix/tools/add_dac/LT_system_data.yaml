@@ -1,0 +1,68 @@
+# DAC specific parameters
+LT_DAC:
+  relation_activity :
+    value: 1
+    unit: '-'  
+DAC_mpen:
+  relation_activity :
+    value: 1
+    unit: '-'  
+
+# model specific data
+model_data:
+  LT_DAC:
+    relation_activity:
+      relation:
+        DAC_mpen_c: 1
+        CO2_Emission: -1
+        dacco2_trans_disp: -1
+      node_rel:
+        Westeros: 1
+      year_rel:
+        rate: 0
+      node_loc:
+        R11_AFR: 1
+        R11_CPA: 1
+        R11_EEU: 1
+        R11_FSU: 1
+        R11_GLB: 1
+        R11_LAM: 1
+        R11_MEA: 1
+        R11_NAM: 1
+        R11_PAO: 1
+        R11_PAS: 1
+        R11_SAS: 1
+        R11_WEU: 1
+      year_act:
+        rate: 0
+      mode:
+        M1: 1
+
+  DAC_mpen:
+    relation_activity:
+      relation:
+        DAC_mpen_c: -1
+      node_rel:
+        Westeros: 1
+      year_rel:
+        rate: 0
+      node_loc:
+        R11_AFR: 1
+        R11_CPA: 1
+        R11_EEU: 1
+        R11_FSU: 1
+        R11_GLB: 1
+        R11_LAM: 1
+        R11_MEA: 1
+        R11_NAM: 1
+        R11_PAO: 1
+        R11_PAS: 1
+        R11_SAS: 1
+        R11_WEU: 1
+      year_act:
+        rate: 0
+      mode:
+        M1: 1
+
+
+  first_active_year: 700

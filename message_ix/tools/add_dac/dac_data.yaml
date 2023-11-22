@@ -1,0 +1,86 @@
+# DAC specific parameters
+dacco2_tr_dis:
+  var_cost: 
+    value: 1
+    unit: $/kWa
+  output:
+    value: 0
+    unit: '-'
+  emission_factor:
+    value: 1
+    unit: tCO2/kWa
+  soft_activity_lo :
+    value: 0.5
+    unit: '-'
+  soft_activity_up :
+    value: 0.5
+    unit: '-'
+
+DAC_mpen:
+  soft_activity_up :
+    value: 0.5
+    unit: '-'
+  initial_activity_up :
+    value: 0.5
+    unit: '-'
+  
+  
+  
+
+# model specific data
+model_data:
+  dacco2_tr_dis:
+    var_cost:
+      node_loc:
+        Westeros: 1
+      year_vtg:
+        rate: -0.05
+      year_act:
+        rate: 0.03
+      mode:
+        standard: 1
+      time:
+        year: 1
+    output:
+      commodity:
+        electricity: 1
+      level:
+        final: 1
+    emission_factor:
+      mode:
+        standard: 1
+      emission:
+        CO2: -20
+        CH4: 0
+    soft_activity_lo :
+      node_loc:
+        Westeros: 1
+      year_act:
+        rate: 0.0
+      time:
+        year: 1
+    soft_activity_up :
+      node_loc:
+        Westeros: 1
+      year_act:
+        rate: 0.0
+      time:
+        year: 1
+  DAC_mpen:
+    soft_activity_up :
+      node_loc:
+        Westeros: 1
+      year_act:
+        rate: 0.0
+      time:
+        year: 1
+    initial_activity_up :
+      node_loc:
+        Westeros: 1
+      year_act:
+        rate: 0.0
+      time:
+        year: 1
+    
+
+  first_active_year: 700
