@@ -22,9 +22,11 @@ DEFAULT_CPLEX_OPTIONS = {
     "epopt": 1e-6,
 }
 
-# Abbreviations for index sets and index names; the same used in the inline
-# documentation of the GAMS code.
-_ABBREV = {
+#: Common dimension name abbreviations mapped to tuples with:
+#:
+#: 1. the respective coordinate/index set, and
+#: 2. the full dimension name.
+DIMS = {
     "c": ("commodity", "commodity"),
     "e": ("emission", "emission"),
     "g": ("grade", "grade"),
@@ -71,7 +73,7 @@ class Item:
     type: ItemType
 
     #: String expression for :attr:`coords` and :attr:`dims`. Split on spaces and parsed
-    #: using :data:`_ABBREV` so that, for instance, "nl yv" results in entries for
+    #: using :data:`DIMS` so that, for instance, "nl yv" results in entries for
     #: for "node", "year" in :attr:`coords`, and "node_loc", "year_vtg" in :attr:`dims`.
     expr: InitVar[str] = ""
 
@@ -91,7 +93,7 @@ class Item:
 
         # Split on spaces. For each dimension, use an abbreviation (if one) exists, else
         # the set name for both coords and dims
-        self.coords, self.dims = zip(*[_ABBREV.get(d, (d, d)) for d in expr.split()])
+        self.coords, self.dims = zip(*[DIMS.get(d, (d, d)) for d in expr.split()])
 
         if self.dims == self.coords:
             # No distinct dimension names; don't store these

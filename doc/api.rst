@@ -234,6 +234,7 @@ Model classes
    .. autoattribute:: items
       :no-value:
 
+.. autodata:: DIMS
 .. autoclass:: Item
    :members:
 

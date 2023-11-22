@@ -179,7 +179,7 @@ These include:
 
 Other added keys include:
 
-- :mod:`message_ix` adds the standard short symbols for |MESSAGEix| dimensions (sets) based on :data:`DIMS`.
+- :mod:`message_ix` adds the standard short symbols for |MESSAGEix| dimensions (sets) based on :data:`.models.DIMS`.
   Each of these is also available in a Reporter: for example :py:`rep.get("n")` returns a list with the elements of the |MESSAGEix| set named "node";
   :py:`rep.get("t")` returns the elements of the set "technology", and so on.
   These keys can be used as input to other computations.
@@ -196,19 +196,16 @@ Other added keys include:
   - ``CAP_NEW::pyam`` (from ``CAP_NEW``)
 
 - ``map_<name>`` as "one-hot" or indicator quantities for the respective |MESSAGEix| mapping sets ``cat_<name>``.
-- Standard reports ``message::system``, ``message::costs``, and ``message::emissions`` per :data:`REPORTS`.
+- Standard reports ``message::system``, ``message::costs``, and ``message::emissions`` per :data:`TASKS1`.
 - The report ``message::default``, collecting all of the above reports.
 
 These automatic contents are prepared using:
 
 .. autosummary::
 
-   DERIVED
-   DIMS
-   MAPPING_SETS
-   PRODUCTS
+   TASKS0
    PYAM_CONVERT
-   REPORTS
+   TASKS1
 
 .. autoclass:: Reporter
    :show-inheritance:
@@ -242,12 +239,9 @@ These automatic contents are prepared using:
       disaggregate
 
 
-.. autodata:: DERIVED
-.. autodata:: DIMS
-.. autodata:: MAPPING_SETS
-.. autodata:: PRODUCTS
+.. autodata:: TASKS0
 .. autodata:: PYAM_CONVERT
-.. autodata:: REPORTS
+.. autodata:: TASKS1
 
 .. automodule:: message_ix.report
    :noindex:

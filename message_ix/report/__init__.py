@@ -14,7 +14,7 @@ from ixmp.report import (
 )
 from ixmp.report import Reporter as IXMPReporter
 
-from message_ix.models import _ABBREV
+from message_ix.models import DIMS
 
 from .pyam import collapse_message_cols
 
@@ -35,8 +35,8 @@ log = logging.getLogger(__name__)
 configure(
     # Units appearing in MESSAGEix test data
     units={"define": "y = year"},
-    # Short names for dimensions
-    rename_dims={full: short for short, (_, full) in _ABBREV.items() if full != short},
+    # Short names for dimensions, where they differ from the full name
+    rename_dims={full: short for short, (_, full) in DIMS.items() if full != short},
 )
 
 #: Common reporting tasks. These include:

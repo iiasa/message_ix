@@ -7,7 +7,7 @@
 import re
 from importlib.metadata import version as get_version
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     import sphinx
@@ -49,6 +49,8 @@ templates_path = ["_templates"]
 # ignore when looking for source files. This pattern also affects html_static_path and
 # html_extra_path.
 exclude_patterns = ["_build", "README.rst"]
+
+nitpicky = True
 
 # A string of reStructuredText that will be included at the beginning of every source
 # file that is read.
@@ -129,7 +131,7 @@ extlinks = {
 # -- Options for sphinx.ext.intersphinx ------------------------------------------------
 
 
-def local_inv(name: str, *parts: str) -> str:
+def local_inv(name: str, *parts: str) -> Optional[str]:
     """Construct the path to a local intersphinx inventory."""
 
     from importlib.util import find_spec
