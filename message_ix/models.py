@@ -3,6 +3,7 @@ from collections import ChainMap
 from copy import copy
 from functools import lru_cache
 from pathlib import Path
+from typing import Optional
 from warnings import warn
 
 import ixmp.model.gams
@@ -51,7 +52,7 @@ _ABBREV = {
 
 
 @lru_cache()
-def item(ix_type, expr):
+def item(ix_type, expr, description: Optional[str] = None):
     """Return a dict with idx_sets and idx_names, given a string `expr`.
 
     Used only to build `MESSAGE_ITEMS`, below. The following are equivalent::
@@ -63,9 +64,12 @@ def item(ix_type, expr):
     ...     idx_names=["node_loc", "technology", "year_act"]
     ... )
     """
-    # Split expr on spaces. For each dimension, use an abbreviation (if one) exists,
-    # else the set name for both idx_sets and idx_names
-    sets, names = zip(*[_ABBREV.get(dim, (dim, dim)) for dim in expr.split()])
+    if len(expr):
+        # Split expr on spaces. For each dimension, use an abbreviation (if one) exists,
+        # else the set name for both idx_sets and idx_names
+        sets, names = zip(*[_ABBREV.get(dim, (dim, dim)) for dim in expr.split()])
+    else:
+        sets, names = tuple(), tuple()
 
     # Assemble the result
     result = dict(ix_type=ix_type, idx_sets=sets)
@@ -262,37 +266,372 @@ MESSAGE_ITEMS = {
     "time_order": dict(ix_type="par", idx_sets=["lvl_temporal", "time"]),
     "var_cost": item("par", "nl t yv ya m h"),
     #
-    # commented: for certain variables and equations, ixmp_source requires that the
-    # `idx_sets` and `idx_names` parameters be empty, but then internally uses the
-    # correct sets and names to initialize.
-    # TODO adjust JDBCBackend to accept these values (or replace it), then uncomment.
-    #
     # Variables
-    # Activity
-    "ACT": item("var", "nl t yv ya m h"),
-    # Maintained capacity
-    "CAP": item("var", "nl t yv ya"),
-    # New capacity
-    "CAP_NEW": item("var", "nl t yv"),
-    # Emissions
-    "EMISS": item("var", "n e type_tec y"),
-    # Extraction
-    "EXT": item("var", "n c g y"),
-    # Land scenario share
-    "LAND": item("var", "n land_scenario y"),
-    # Objective (scalar)
-    "OBJ": dict(ix_type="var", idx_sets=[]),
-    # Relation (lhs)
-    "REL": item("var", "relation nr yr"),
-    # Stock
-    "STOCK": item("var", "n c l y"),
-    #
-    "STORAGE": item("var", "n t m l c y h"),
-    "STORAGE_CHARGE": item("var", "n t m l c y h"),
+    "ACT_LO": item(
+        "var",
+        "n t y h",
+        "relaxation variable for dynamic constraints on activity (downwards)",
+    ),
+    "ACT_RATING": item("var", "n t yv ya c l h r", ""),
+    "ACT_UP": item(
+        "var",
+        "n t y h",
+        "relaxation variable for dynamic constraints on activity (upwards)",
+    ),
+    "ACT": item("var", "nl t yv ya m h", "Activity of technology"),
+    "CAP_FIRM": item(
+        "var", "n t c l y", "capacity counting towards system reliability constraints"
+    ),
+    "CAP_NEW_LO": item(
+        "var",
+        "n t y",
+        "relaxation variable for dynamic constraints on new capacity (downwards)",
+    ),
+    "CAP_NEW_UP": item(
+        "var",
+        "n t y",
+        "relaxation variable for dynamic constraints on new capacity (upwards)",
+    ),
+    "CAP_NEW": item("var", "nl t yv", "New capacity"),
+    "CAP": item("var", "nl t yv ya", "Total installed capacity"),
+    "COMMODITY_USE": item(
+        "var",
+        "n c l y",
+        "total amount of a commodity & level that was used or consumed",
+    ),
+    "COST_NODAL_NET": item(
+        "var",
+        "n y",
+        "system costs at the node level over time including effects of energy trade",
+    ),
+    "COST_NODAL": item("var", "n y", "system costs at the node level over time"),
+    "DEMAND": item("var", "n c l y h", "demand"),
+    "EMISS": item("var", "n e type_tec y", "Aggregate emissions by technology type"),
+    "EXT": item("var", "n c g y", "Extraction of fossil resources"),
+    "GDP": item(
+        "var",
+        "n y",
+        "gross domestic product (GDP) in market exchange rates for MACRO reporting",
+    ),
+    "LAND": item("var", "n land_scenario y", "Share of given land-use scenario"),
+    "OBJ": item("var", "", "Objective value of the optimisation problem (scalar)"),
+    "PRICE_COMMODITY": item(
+        "var",
+        "n c l y h",
+        "commodity price (derived from marginals of COMMODITY_BALANCE constraint)",
+    ),
+    "PRICE_EMISSION": item(
+        "var",
+        "n type_emission type_tec y",
+        "emission price (derived from marginals of EMISSION_BOUND constraint)",
+    ),
+    "REL": item(
+        "var",
+        "relation nr yr",
+        "Auxiliary variable for left-hand side of user-defined relations",
+    ),
+    "REN": item(
+        "var",
+        "n t c g y h",
+        "activity of renewables specified per renewables grade",
+    ),
+    "SLACK_ACT_BOUND_LO": item(
+        "var", "n t y m h", "slack variable for lower bound on activity"
+    ),
+    "SLACK_ACT_BOUND_UP": item(
+        "var", "n t y m h", "slack variable for upper bound on activity"
+    ),
+    "SLACK_ACT_DYNAMIC_LO": item(
+        "var",
+        "n t y h",
+        "slack variable for dynamic activity constraint relaxation (downwards)",
+    ),
+    "SLACK_ACT_DYNAMIC_UP": item(
+        "var",
+        "n t y h",
+        "slack variable for dynamic activity constraint relaxation (upwards)",
+    ),
+    "SLACK_CAP_NEW_BOUND_LO": item(
+        "var", "n t y", "slack variable for bound on new capacity (downwards)"
+    ),
+    "SLACK_CAP_NEW_BOUND_UP": item(
+        "var", "n t y", "slack variable for bound on new capacity (upwards)"
+    ),
+    "SLACK_CAP_NEW_DYNAMIC_LO": item(
+        "var", "n t y", "slack variable for dynamic new capacity constraint (downwards)"
+    ),
+    "SLACK_CAP_NEW_DYNAMIC_UP": item(
+        "var", "n t y", "slack variable for dynamic new capacity constraint (upwards)"
+    ),
+    "SLACK_CAP_TOTAL_BOUND_LO": item(
+        "var", "n t y", "slack variable for lower bound on total installed capacity"
+    ),
+    "SLACK_CAP_TOTAL_BOUND_UP": item(
+        "var", "n t y", "slack variable for upper bound on total installed capacity"
+    ),
+    "SLACK_COMMODITY_EQUIVALENCE_LO": item(
+        "var", "n c l y h", "slack variable for commodity balance (downwards)"
+    ),
+    "SLACK_COMMODITY_EQUIVALENCE_UP": item(
+        "var", "n c l y h", "slack variable for commodity balance (upwards)"
+    ),
+    "SLACK_LAND_SCEN_LO": item(
+        "var",
+        "n land_scenario y",
+        "slack variable for dynamic land scenario constraint relaxation (downwards)",
+    ),
+    "SLACK_LAND_SCEN_UP": item(
+        "var",
+        "n land_scenario y",
+        "slack variable for dynamic land scenario constraint relaxation (upwards)",
+    ),
+    "SLACK_LAND_TYPE_LO": item(
+        "var",
+        "n y land_type",
+        "slack variable for dynamic land type constraint relaxation (downwards)",
+    ),
+    "SLACK_LAND_TYPE_UP": item(
+        "var",
+        "n y land_type",
+        "slack variable for dynamic land type constraint relaxation (upwards)",
+    ),
+    "SLACK_RELATION_BOUND_LO": item(
+        "var", "relation n y", "slack variable for lower bound of generic relation"
+    ),
+    "SLACK_RELATION_BOUND_UP": item(
+        "var", "relation n y", "slack variable for upper bound of generic relation"
+    ),
+    "STOCK_CHG": item(
+        "var", "n c l y h", "annual input into and output from stocks of commodities"
+    ),
+    "STOCK": item("var", "n c l y", "Total quantity in intertemporal stock (storage)"),
+    "STORAGE_CHARGE": item(
+        "var",
+        "n t m l c y h",
+        "charging of storage in each time slice (negative for discharge)",
+    ),
+    "STORAGE": item(
+        "var",
+        "n t m l c y h",
+        "state of charge (SoC) of storage at each sub-annual time slice (positive)",
+    ),
     #
     # Equations
-    # Commodity balance
-    "RESOURCE_HORIZON": item("equ", "n c g"),
+    "ACTIVITY_BOUND_ALL_MODES_LO": item(
+        "equ", "n t y h", "Lower bound on activity summed over all vintages and modes"
+    ),
+    "ACTIVITY_BOUND_ALL_MODES_UP": item(
+        "equ", "n t y h", "Upper bound on activity summed over all vintages and modes"
+    ),
+    "ACTIVITY_BOUND_LO": item(
+        "equ", "", "Lower bound on activity summed over all vintages"
+    ),
+    "ACTIVITY_BOUND_UP": item(
+        "equ", "", "Upper bound on activity summed over all vintages"
+    ),
+    "ACTIVITY_BY_RATING": item(
+        "equ",
+        "",
+        "Constraint on auxiliary rating-specific activity variable by rating bin",
+    ),
+    "ACTIVITY_CONSTRAINT_LO": item(
+        "equ",
+        "",
+        "Dynamic constraint on the market penetration of a technology activity"
+        " (lower bound)",
+    ),
+    "ACTIVITY_CONSTRAINT_UP": item(
+        "equ",
+        "",
+        "Dynamic constraint on the market penetration of a technology activity"
+        " (upper bound)",
+    ),
+    "ACTIVITY_RATING_TOTAL": item("equ", "", "Equivalence of `ACT_RATING` to `ACT`"),
+    "ACTIVITY_SOFT_CONSTRAINT_LO": item(
+        "equ",
+        "",
+        "Bound on relaxation of the dynamic constraint on market penetration"
+        " (lower bound)",
+    ),
+    "ACTIVITY_SOFT_CONSTRAINT_UP": item(
+        "equ",
+        "",
+        "Bound on relaxation of the dynamic constraint on market penetration"
+        " (upper bound)",
+    ),
+    "ADDON_ACTIVITY_LO": item("equ", "", "Addon technology activity lower constraint"),
+    "ADDON_ACTIVITY_UP": item("equ", "", "Addon-technology activity upper constraint"),
+    "CAPACITY_CONSTRAINT": item(
+        "equ", "", "Capacity constraint for technology (by sub-annual time slice)"
+    ),
+    "CAPACITY_MAINTENANCE_HIST": item(
+        "equ",
+        "",
+        "Constraint for capacity maintenance  historical installation (built before "
+        "start of model horizon)",
+    ),
+    "CAPACITY_MAINTENANCE_NEW": item(
+        "equ",
+        "",
+        "Constraint for capacity maintenance of new capacity built in the current "
+        "period (vintage == year)",
+    ),
+    "CAPACITY_MAINTENANCE": item(
+        "equ", "", "Constraint for capacity maintenance over the technical lifetime"
+    ),
+    # Already exists
+    # "COMMODITY_BALANCE_GT": item(
+    #     "equ", "", "Commodity supply greater than or equal demand"
+    # ),
+    "COMMODITY_BALANCE_LT": item(
+        "equ", "", "Commodity supply lower than or equal demand"
+    ),
+    "COMMODITY_USE_LEVEL": item(
+        "equ",
+        "",
+        "Aggregate use of commodity by level as defined by total input into "
+        "technologies",
+    ),
+    "COST_ACCOUNTING_NODAL": item("equ", "", "Cost accounting at node level over time"),
+    "DYNAMIC_LAND_SCEN_CONSTRAINT_LO": item(
+        "equ", "", "Dynamic constraint on land scenario change (lower bound)"
+    ),
+    "DYNAMIC_LAND_SCEN_CONSTRAINT_UP": item(
+        "equ", "", "Dynamic constraint on land scenario change (upper bound)"
+    ),
+    "DYNAMIC_LAND_TYPE_CONSTRAINT_LO": item(
+        "equ", "", "Dynamic constraint on land-use change (lower bound)"
+    ),
+    "DYNAMIC_LAND_TYPE_CONSTRAINT_UP": item(
+        "equ", "", "Dynamic constraint on land-use change (upper bound)"
+    ),
+    "EMISSION_CONSTRAINT": item(
+        "equ", "", "Nodal-regional-global constraints on emissions (by category)"
+    ),
+    "EMISSION_EQUIVALENCE": item(
+        "equ", "", "Auxiliary equation to simplify the notation of emissions"
+    ),
+    "EXTRACTION_BOUND_UP": item("equ", "", "Upper bound on extraction (by grade)"),
+    "EXTRACTION_EQUIVALENCE": item(
+        "equ", "", "Auxiliary equation to simplify the resource extraction formulation"
+    ),
+    "FIRM_CAPACITY_PROVISION": item(
+        "equ",
+        "",
+        "Contribution of dispatchable technologies to auxiliary firm-capacity variable",
+    ),
+    "LAND_CONSTRAINT": item(
+        "equ",
+        "",
+        "Constraint on total land use (partial sum of `LAND` on `land_scenario` is 1)",
+    ),
+    "MIN_UTILIZATION_CONSTRAINT": item(
+        "equ",
+        "",
+        "Constraint for minimum yearly operation (aggregated over the course of a "
+        "year)",
+    ),
+    "NEW_CAPACITY_BOUND_LO": item(
+        "equ", "", "Lower bound on technology capacity investment"
+    ),
+    "NEW_CAPACITY_BOUND_UP": item(
+        "equ", "", "Upper bound on technology capacity investment"
+    ),
+    "NEW_CAPACITY_CONSTRAINT_LO": item(
+        "equ", "", "Dynamic constraint on capacity investment (lower bound)"
+    ),
+    "NEW_CAPACITY_CONSTRAINT_UP": item(
+        "equ",
+        "",
+        "Dynamic constraint for capacity investment (learning and spillovers upper "
+        "bound)",
+    ),
+    "NEW_CAPACITY_SOFT_CONSTRAINT_LO": item(
+        "equ",
+        "",
+        "Bound on soft relaxation of dynamic new capacity constraints (downwards)",
+    ),
+    "NEW_CAPACITY_SOFT_CONSTRAINT_UP": item(
+        "equ",
+        "",
+        "Bound on soft relaxation of dynamic new capacity constraints (upwards)",
+    ),
+    "OBJECTIVE": item("equ", "", "Objective value of the optimisation problem"),
+    "OPERATION_CONSTRAINT": item(
+        "equ",
+        "",
+        "Constraint on maximum yearly operation (scheduled down-time for maintenance)",
+    ),
+    "RELATION_CONSTRAINT_LO": item(
+        "equ", "", "Lower bound of relations (linear constraints)"
+    ),
+    "RELATION_CONSTRAINT_UP": item(
+        "equ", "", "Upper bound of relations (linear constraints)"
+    ),
+    "RELATION_EQUIVALENCE": item(
+        "equ", "", "Auxiliary equation to simplify the implementation of relations"
+    ),
+    "RENEWABLES_CAPACITY_REQUIREMENT": item(
+        "equ",
+        "",
+        "Lower bound on required overcapacity when using lower grade potentials",
+    ),
+    "RENEWABLES_EQUIVALENCE": item(
+        "equ", "", "Equation to define the renewables extraction"
+    ),
+    "RENEWABLES_POTENTIAL_CONSTRAINT": item(
+        "equ", "", "Constraint on renewable resource potential"
+    ),
+    "RESOURCE_CONSTRAINT": item(
+        "equ",
+        "",
+        "Constraint on resources remaining in each period (maximum extraction per "
+        "period)",
+    ),
+    "RESOURCE_HORIZON": item(
+        "equ",
+        "n c g",
+        "Constraint on extraction over entire model horizon (resource volume in place)",
+    ),
+    "SHARE_CONSTRAINT_COMMODITY_LO": item(
+        "equ", "", "Lower bounds on share constraints for commodities"
+    ),
+    "SHARE_CONSTRAINT_COMMODITY_UP": item(
+        "equ", "", "Upper bounds on share constraints for commodities"
+    ),
+    "SHARE_CONSTRAINT_MODE_LO": item(
+        "equ", "", "Lower bounds on share constraints for modes of a given technology"
+    ),
+    "SHARE_CONSTRAINT_MODE_UP": item(
+        "equ", "", "Upper bounds on share constraints for modes of a given technology"
+    ),
+    "STOCKS_BALANCE": item("equ", "", "Commodity inter-temporal balance of stocks"),
+    "STORAGE_BALANCE_INIT": item(
+        "equ",
+        "",
+        "Balance of the state of charge of storage at sub-annual time slices with "
+        "initial storage content",
+    ),
+    "STORAGE_BALANCE": item("equ", "", "Balance of the state of charge of storage"),
+    "STORAGE_CHANGE": item("equ", "", "Change in the state of charge of storage"),
+    "STORAGE_INPUT": item(
+        "equ",
+        "",
+        "Connecting an input commodity to maintain the activity of storage container "
+        "(not stored commodity)",
+    ),
+    "SYSTEM_FLEXIBILITY_CONSTRAINT": item(
+        "equ", "", "Constraint on total system flexibility"
+    ),
+    "SYSTEM_RELIABILITY_CONSTRAINT": item(
+        "equ", "", "Constraint on total system reliability (firm capacity)"
+    ),
+    "TOTAL_CAPACITY_BOUND_LO": item(
+        "equ", "", "Lower bound on total installed capacity"
+    ),
+    "TOTAL_CAPACITY_BOUND_UP": item(
+        "equ", "", "Upper bound on total installed capacity"
+    ),
 }
 
 
