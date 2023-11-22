@@ -3,14 +3,14 @@ from collections import defaultdict
 import ixmp
 import pytest
 
-from message_ix.models import MESSAGE, MESSAGE_ITEMS, MESSAGE_MACRO
+from message_ix.models import MESSAGE, MESSAGE_MACRO
 
 
 def test_initialize(test_mp):
     # Expected numbers of items by type
     exp = defaultdict(list)
-    for name, spec in MESSAGE_ITEMS.items():
-        exp[spec["ix_type"]].append(name)
+    for name, spec in MESSAGE.items.items():
+        exp[str(spec.type.name).lower()].append(name)
 
     # Use ixmp.Scenario to avoid invoking ixmp_source/Java code that
     # automatically populates empty scenarios

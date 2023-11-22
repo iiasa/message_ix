@@ -15,7 +15,6 @@ def test_soft_constraint(test_mp):
     df = s.par("growth_activity_up")
     df.value = 0.05
     s.add_par("growth_activity_up", df)
-    s.init_var("ACT_UP", ["node", "technology", "year", "time"])
 
     # Add soft constraints for 'coal_ppl'
     df = pd.DataFrame(

@@ -93,9 +93,13 @@ class Item:
             # No distinct dimension names; don't store these
             self.dims = tuple()
 
+    @property
+    def ix_type(self) -> str:
+        return str(self.type.name).lower()
+
     def to_dict(self) -> dict:
         """Return the :class:`dict` representation used internally in :mod:`ixmp`."""
-        result = dict(ix_type=str(self.type.name).lower(), idx_sets=self.coords)
+        result = dict(ix_type=self.ix_type, idx_sets=self.coords)
         if self.dims:
             result.update(idx_names=self.dims)
         return result
@@ -216,25 +220,25 @@ def _check_structure(scenario):
 
     # NB could rename this e.g. _check_structure_0 if there are multiple such methods
     for name in ("storage_initial", "storage_self_discharge", "map_tec_storage"):
-        info = MESSAGE_ITEMS[name]
+        info = MESSAGE.items[name]
         message = ""
 
         try:
             # Retrieve the index names and data length of the item
             idx_names = tuple(scenario.idx_names(name))
-            N = len(getattr(scenario, info["ix_type"])(name))
+            N = len(getattr(scenario, info.ix_type)(name))
         except KeyError:
             N = -1  # Item does not exist
         else:
             # Item exists
-            expected_names = info.get("idx_names", info["idx_sets"])
+            expected_names = info.dims or info.coords
             if expected_names != idx_names and N > 0:
                 message = (
-                    f"{info['ix_type']} {name!r} has data with dimensions {idx_names!r}"
+                    f"{info.ix_type} {name!r} has data with dimensions {idx_names!r}"
                     f" != {expected_names!r} and cannot be solved; try expand_dims()"
                 )
         finally:
-            yield name, info["ix_type"], N, message
+            yield name, info.ix_type, N, message
 
 
 class MESSAGE(GAMSModel):

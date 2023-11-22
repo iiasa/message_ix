@@ -4,6 +4,7 @@ from collections import ChainMap, defaultdict
 from collections.abc import Mapping
 
 import pandas as pd
+from ixmp.backend import ItemType
 from pandas.api.types import is_scalar
 
 from message_ix.core import Scenario
@@ -113,14 +114,14 @@ def make_df(name, **data):
     except KeyError:
         raise ValueError(f"{repr(name)} is not a MESSAGE or MACRO parameter")
 
-    if info["ix_type"] != "par":
-        raise ValueError(f"{repr(name)} is {info['ix_type']}, not par")
+    if info.type != ItemType.PAR:
+        raise ValueError(f"{repr(name)} is {info.type}, not a parameter")
 
     # Index names, if not given explicitly, are the same as the index sets
-    idx_names = info.get("idx_names", info["idx_sets"])
+    dims = info.dims or info.coords
 
     # Columns for the resulting data frame
-    columns = list(idx_names) + ["value", "unit"]
+    columns = list(dims) + ["value", "unit"]
 
     # Default values for every column
     data = ChainMap(data, defaultdict(lambda: None))
