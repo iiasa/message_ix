@@ -54,52 +54,6 @@ UNITS = dict(
     price_MESSAGE="price_ref",
 )
 
-#: ixmp items (sets, parameters, variables, and equations) for MACRO.
-MACRO_ITEMS: Mapping[str, Mapping] = dict(
-    sector=dict(ix_type="set"),
-    mapping_macro_sector=dict(ix_type="set", idx_sets=["sector", "commodity", "level"]),
-    MERtoPPP=dict(ix_type="par", idx_sets=["node", "year"]),
-    aeei=dict(ix_type="par", idx_sets=["node", "sector", "year"]),
-    cost_MESSAGE=dict(ix_type="par", idx_sets=["node", "year"]),
-    demand_MESSAGE=dict(ix_type="par", idx_sets=["node", "sector", "year"]),
-    depr=dict(ix_type="par", idx_sets=["node"]),
-    drate=dict(ix_type="par", idx_sets=["node"]),
-    esub=dict(ix_type="par", idx_sets=["node"]),
-    gdp_calibrate=dict(ix_type="par", idx_sets=["node", "year"]),
-    grow=dict(ix_type="par", idx_sets=["node", "year"]),
-    historical_gdp=dict(ix_type="par", idx_sets=["node", "year"]),
-    kgdp=dict(ix_type="par", idx_sets=["node"]),
-    kpvs=dict(ix_type="par", idx_sets=["node"]),
-    lakl=dict(ix_type="par", idx_sets=["node"]),
-    lotol=dict(ix_type="par", idx_sets=["node"]),
-    prfconst=dict(ix_type="par", idx_sets=["node", "sector"]),
-    price_MESSAGE=dict(ix_type="par", idx_sets=["node", "sector", "year"]),
-    # Total consumption
-    C=dict(ix_type="var", idx_sets=["node", "year"]),
-    COST_NODAL=dict(ix_type="var", idx_sets=["node", "year"]),
-    # Net of trade and emissions costs
-    COST_NODAL_NET=dict(ix_type="var", idx_sets=["node", "year"]),
-    DEMAND=dict(ix_type="var", idx_sets=["node", "commodity", "level", "year", "time"]),
-    EC=dict(ix_type="var", idx_sets=["node", "year"]),
-    GDP=dict(ix_type="var", idx_sets=["node", "year"]),
-    # Total investment
-    I=dict(ix_type="var", idx_sets=["node", "year"]),  # noqa: E741
-    K=dict(ix_type="var", idx_sets=["node", "year"]),
-    KN=dict(ix_type="var", idx_sets=["node", "year"]),
-    MAX_ITER=dict(ix_type="var", idx_sets=None),
-    N_ITER=dict(ix_type="var", idx_sets=None),
-    NEWENE=dict(ix_type="var", idx_sets=["node", "sector", "year"]),
-    PHYSENE=dict(ix_type="var", idx_sets=["node", "sector", "year"]),
-    PRICE=dict(ix_type="var", idx_sets=["node", "commodity", "level", "year", "time"]),
-    PRODENE=dict(ix_type="var", idx_sets=["node", "sector", "year"]),
-    UTILITY=dict(ix_type="var", idx_sets=None),
-    Y=dict(ix_type="var", idx_sets=["node", "year"]),
-    YN=dict(ix_type="var", idx_sets=["node", "year"]),
-    aeei_calibrate=dict(ix_type="var", idx_sets=["node", "sector", "year"]),
-    grow_calibrate=dict(ix_type="var", idx_sets=["node", "year"]),
-    COST_ACCOUNTING_NODAL=dict(ix_type="equ", idx_sets=["node", "year"]),
-)
-
 #: MACRO calibration parameters to be verified when reading the input data.
 INPUT_DATA = [
     "aeei",
@@ -539,12 +493,16 @@ def _validate_data(name: Optional[str], df: "DataFrame", s: Structures) -> List:
     list of str
         Dimensions/index sets of the validated MESSAGEix parameter.
     """
+    from .models import MACRO
+
     # Check required dimensions
     if name is None:
         dims: List[str] = []
     else:
-        item = name.replace("_ref", "_MESSAGE")
-        dims = MACRO_ITEMS[item]["idx_sets"].copy()
+        item_name = name.replace("_ref", "_MESSAGE")
+        item = MACRO.items[item_name]
+        dims = list(item.dims or item.coords)
+
         # For cost_ref, demand_ref, price_ref, only require one year's data, without a
         # "year" dimension
         if name.endswith("_ref"):
@@ -720,6 +678,9 @@ def prepare_computer(
     --------
     :ref:`macro-input-data`
     """
+    from ixmp.backend import ItemType
+
+    from .models import MACRO
 
     if not base.has_solution():
         raise RuntimeError("Scenario must have a solution to add MACRO")
@@ -825,7 +786,8 @@ def prepare_computer(
     # from the input (also appearing in VERIFY_INPUT_DATA); others are from calculations
     # above.
     added = []  # List of keys for tasks that add data
-    for name, info in filter(lambda i: i[1]["ix_type"] == "par", MACRO_ITEMS.items()):
+    for item in filter(lambda i: i.type == ItemType.PAR, MACRO.items.values()):
+        name = item.name
         added.append(
             c.add(f"add {name}", partial(add_par, name=name), "target", name, "ym1")
         )

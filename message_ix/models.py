@@ -12,8 +12,6 @@ from ixmp import config
 from ixmp.backend import ItemType
 from ixmp.util import maybe_check_out, maybe_commit
 
-from .macro import MACRO_ITEMS
-
 log = logging.getLogger(__name__)
 
 #: Solver options used by :meth:`.Scenario.solve`.
@@ -865,19 +863,18 @@ equ("TOTAL_CAPACITY_BOUND_LO", "", "Lower bound on total installed capacity")
 equ("TOTAL_CAPACITY_BOUND_UP", "", "Upper bound on total installed capacity")
 
 
-#: ixmp items (sets, parameters, variables, and equations) for MESSAGE.
+#: ixmp items (sets, parameters, variables, and equations) for :class:`.MESSAGE`.
 #:
 #: .. deprecated:: 3.8.0
 #:    Access the model class attribute :attr:`MESSAGE.items` instead.
 MESSAGE_ITEMS = {k: v.to_dict() for k, v in MESSAGE.items.items()}
-
-assert 252 == len(MESSAGE_ITEMS), len(MESSAGE_ITEMS)
 
 
 class MACRO(GAMSModel):
     """Model class for MACRO."""
 
     name = "MACRO"
+    items = dict()
 
     #: MACRO uses the GAMS ``break;`` statement, and thus requires GAMS 24.8.1 or later.
     GAMS_min_version = "24.8.1"
@@ -897,8 +894,62 @@ class MACRO(GAMSModel):
         # NB some scenarios already have these items. This method simply adds any
         #    missing items.
 
-        # Initialize the ixmp items
-        cls.initialize_items(scenario, MACRO_ITEMS)
+        # Initialize the ixmp items for MACRO
+        cls.initialize_items(scenario, {k: v.to_dict() for k, v in cls.items.items()})
+
+
+equ = partial(_item_shorthand, MACRO, ItemType.EQU)
+par = partial(_item_shorthand, MACRO, ItemType.PAR)
+_set = partial(_item_shorthand, MACRO, ItemType.SET)
+var = partial(_item_shorthand, MACRO, ItemType.VAR)
+
+
+#: ixmp items (sets, parameters, variables, and equations) for MACRO.
+_set("sector")
+_set("mapping_macro_sector", "sector c l")
+par("MERtoPPP", "n y")
+par("aeei", "n sector y")
+par("cost_MESSAGE", "n y")
+par("demand_MESSAGE", "n sector y")
+par("depr", "node")
+par("drate", "node")
+par("esub", "node")
+par("gdp_calibrate", "n y")
+par("grow", "n y")
+par("historical_gdp", "n y")
+par("kgdp", "node")
+par("kpvs", "node")
+par("lakl", "node")
+par("lotol", "node")
+par("prfconst", "n sector")
+par("price_MESSAGE", "n sector y")
+var("C", "n y", "Total consumption")
+var("COST_NODAL", "n y")
+var("COST_NODAL_NET", "n y", "Net of trade and emissions cost")
+var("DEMAND", "n c l y h")
+var("EC", "n y")
+var("GDP", "n y")
+var("I", "n y", "Total investment")
+var("K", "n y")
+var("KN", "n y")
+var("MAX_ITER", "")
+var("N_ITER", "")
+var("NEWENE", "n sector y")
+var("PHYSENE", "n sector y")
+var("PRICE", "n c l y h")
+var("PRODENE", "n sector y")
+var("UTILITY", "")
+var("Y", "n y")
+var("YN", "n y")
+var("aeei_calibrate", "n sector y")
+var("grow_calibrate", "n y")
+equ("COST_ACCOUNTING_NODAL", "n y")
+
+#: ixmp items (sets, parameters, variables, and equations) for :class:`.MACRO`.
+#:
+#: .. deprecated:: 3.8.0
+#:    Access the model class attribute :attr:`MACRO.items` instead.
+MACRO_ITEMS = {k: v.to_dict() for k, v in MACRO.items.items()}
 
 
 class MESSAGE_MACRO(MESSAGE, MACRO):

@@ -7,8 +7,7 @@ import pandas as pd
 from pandas.api.types import is_scalar
 
 from message_ix.core import Scenario
-from message_ix.macro import MACRO_ITEMS
-from message_ix.models import MESSAGE, MESSAGE_ITEMS
+from message_ix.models import MACRO, MESSAGE
 
 
 def make_df(name, **data):
@@ -88,7 +87,7 @@ def make_df(name, **data):
     Parameters
     ----------
     name : str
-        Name of a parameter listed in :data:`.MESSAGE_ITEMS` or :data:`.MACRO_ITEMS`.
+        Name of a parameter listed in :attr:`.MESSAGE.items` or :attr:`.MACRO.items`.
     data : optional
         Contents for dimensions of the parameter, its 'value', or 'unit'. Other keys are
         ignored.
@@ -110,7 +109,7 @@ def make_df(name, **data):
 
     # Get parameter information
     try:
-        info = ChainMap(MESSAGE_ITEMS, MACRO_ITEMS)[name]
+        info = ChainMap(MESSAGE.items, MACRO.items)[name]
     except KeyError:
         raise ValueError(f"{repr(name)} is not a MESSAGE or MACRO parameter")
 
@@ -228,7 +227,7 @@ def expand_dims(scenario: Scenario, name, **data):
     with scenario.transact(f"expand_dims({name}, …)"):
         # Remove the parameter entirely, and re-initialize
         scenario.remove_par(name)
-        MESSAGE.initialize_items(scenario, {name: MESSAGE_ITEMS[name]})
+        MESSAGE.initialize_items(scenario, {name: MESSAGE.items[name].to_dict()})
 
         # Add the expanded data
         scenario.add_par(name, new_data)
