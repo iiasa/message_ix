@@ -14,6 +14,8 @@ from ixmp.report import (
 )
 from ixmp.report import Reporter as IXMPReporter
 
+from message_ix.models import _ABBREV
+
 from .pyam import collapse_message_cols
 
 __all__ = [
@@ -29,44 +31,12 @@ __all__ = [
 
 log = logging.getLogger(__name__)
 
-#: Short names for dimensions (sets) in the |MESSAGEix| framework.
-DIMS = dict(
-    # As defined in the documentation
-    commodity="c",
-    emission="e",
-    grade="g",
-    land_scenario="s",
-    land_type="u",
-    level="l",
-    mode="m",
-    node="n",
-    rating="q",
-    relation="r",
-    technology="t",
-    time="h",
-    year="y",
-    # Aliases
-    node_dest="nd",
-    node_loc="nl",
-    node_origin="no",
-    node_rel="nr",
-    node_share="ns",
-    time_dest="hd",
-    time_origin="ho",
-    year_act="ya",
-    year_vtg="yv",
-    year_rel="yr",
-    # Created by reporting
-    technology_addon="ta",
-    technology_primary="tp",
-)
-
 # Configure genno for message_ix.
 configure(
     # Units appearing in MESSAGEix test data
     units={"define": "y = year"},
     # Short names for dimensions
-    rename_dims=DIMS.copy(),
+    rename_dims={full: short for short, (_, full) in _ABBREV.items() if full != short},
 )
 
 #: Automatic quantities that are the :func:`~genno.operator.mul` of two others.

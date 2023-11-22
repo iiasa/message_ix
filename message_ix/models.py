@@ -28,6 +28,9 @@ _ABBREV = {
     "c": ("commodity", "commodity"),
     "e": ("emission", "emission"),
     "g": ("grade", "grade"),
+    "h": ("time", "time"),
+    "hd": ("time", "time_dest"),
+    "ho": ("time", "time_origin"),
     "l": ("level", "level"),
     "m": ("mode", "mode"),
     "ms": ("mode", "storage_mode"),
@@ -35,18 +38,18 @@ _ABBREV = {
     "nd": ("node", "node_dest"),
     "nl": ("node", "node_loc"),
     "no": ("node", "node_origin"),
+    "node_parent": ("node", "node_parent"),
     "nr": ("node", "node_rel"),
     "ns": ("node", "node_share"),
-    "node_parent": ("node", "node_parent"),
-    "r": ("rating", "rating"),
-    "s": ("shares", "shares"),
+    "q": ("rating", "rating"),
+    "r": ("relation", "relation"),
+    "s": ("land_scenario", "land_scenario"),
     "t": ("technology", "technology"),
-    "ts": ("technology", "storage_tec"),
-    "technology_addon": ("technology", "technology_addon"),
-    "h": ("time", "time"),
-    "hd": ("time", "time_dest"),
-    "ho": ("time", "time_origin"),
+    "ta": ("technology", "technology_addon"),
     "time_parent": ("time", "time_parent"),
+    "tp": ("technology", "technology_primary"),
+    "ts": ("technology", "storage_tec"),
+    "u": ("land_type", "land_type"),
     "y": ("year", "year"),
     "ya": ("year", "year_act"),
     "yr": ("year", "year_rel"),
@@ -341,7 +344,7 @@ _set("node")
 _set("rating")
 _set("relation")
 _set("shares")
-_set("storage_tec", description="Storage reservoir techology")
+_set("storage_tec", description="Storage reservoir technology")
 _set("technology")
 _set("time")
 _set("time_relative")
@@ -356,10 +359,10 @@ _set("year")
 # Indexed sets
 _set("addon", "t")
 # _set("balance_equality", "c l")
-_set("cat_addon", "type_addon technology_addon")
+_set("cat_addon", "type_addon ta")
 _set("cat_emission", "type_emission e")
 _set("cat_node", "type_node n")
-_set("cat_relation", "type_relation relation")
+_set("cat_relation", "type_relation r")
 _set("cat_tec", "type_tec t")
 _set("cat_year", "type_year y")
 _set("is_capacity_factor", "nl t yv ya h")
@@ -367,8 +370,8 @@ _set("level_renewable", "l")
 _set("level_resource", "l")
 _set("level_stocks", "l")
 _set("map_node", "node_parent n")
-_set("map_shares_commodity_share", "s ns n type_tec m c l")
-_set("map_shares_commodity_total", "s ns n type_tec m c l")
+_set("map_shares_commodity_share", "shares ns n type_tec m c l")
+_set("map_shares_commodity_total", "shares ns n type_tec m c l")
 _set("map_spatial_hierarchy", "lvl_spatial n node_parent")
 _set("map_tec_addon", "t type_addon")
 _set(
@@ -400,50 +403,50 @@ par("capacity_factor", "nl t yv ya h")
 par("commodity_stock", "n c l y")
 par("construction_time", "nl t yv")
 par("demand", "n c l y h")
-par("duration_period", "year")
-par("duration_time", "time")
-par("dynamic_land_lo", "n land_scenario y land_type")
-par("dynamic_land_up", "n land_scenario y land_type")
+par("duration_period", "y")
+par("duration_time", "h")
+par("dynamic_land_lo", "n s y u")
+par("dynamic_land_up", "n s y u")
 par("emission_factor", "nl t yv ya m e")
 par("emission_scaling", "type_emission e")
 par("fix_cost", "nl t yv ya")
 par("fixed_activity", "nl t yv ya m h")
 par("fixed_capacity", "nl t yv ya")
 par("fixed_extraction", "n c g y")
-par("fixed_land", "n land_scenario y")
+par("fixed_land", "n s y")
 par("fixed_new_capacity", "nl t yv")
 par("fixed_stock", "n c l y")
-par("flexibility_factor", "nl t yv ya m c l h r")
+par("flexibility_factor", "nl t yv ya m c l h q")
 par("growth_activity_lo", "nl t ya h")
 par("growth_activity_up", "nl t ya h")
-par("growth_land_lo", "n y land_type")
-par("growth_land_scen_lo", "n land_scenario y")
-par("growth_land_scen_up", "n land_scenario y")
-par("growth_land_up", "n y land_type")
+par("growth_land_lo", "n y u")
+par("growth_land_scen_lo", "n s y")
+par("growth_land_scen_up", "n s y")
+par("growth_land_up", "n y u")
 par("growth_new_capacity_lo", "nl t yv")
 par("growth_new_capacity_up", "nl t yv")
 par("historical_activity", "nl t ya m h")
 par("historical_emission", "n type_emission type_tec type_year")
 par("historical_extraction", "n c g y")
 par("historical_gdp", "n y")
-par("historical_land", "n land_scenario y")
+par("historical_land", "n s y")
 par("historical_new_capacity", "nl t yv")
 par("initial_activity_lo", "nl t ya h")
 par("initial_activity_up", "nl t ya h")
-par("initial_land_lo", "n y land_type")
-par("initial_land_scen_lo", "n land_scenario y")
-par("initial_land_scen_up", "n land_scenario y")
-par("initial_land_up", "n y land_type")
+par("initial_land_lo", "n y u")
+par("initial_land_scen_lo", "n s y")
+par("initial_land_scen_up", "n s y")
+par("initial_land_up", "n y u")
 par("initial_new_capacity_lo", "nl t yv")
 par("initial_new_capacity_up", "nl t yv")
 par("input", "nl t yv ya m no c l h ho")
 par("interestrate", "year")
 par("inv_cost", "nl t yv")
-par("land_cost", "n land_scenario y")
-par("land_emission", "n land_scenario y e")
-par("land_input", "n land_scenario y c l h")
-par("land_output", "n land_scenario y c l h")
-par("land_use", "n land_scenario y land_type")
+par("land_cost", "n s y")
+par("land_emission", "n s y e")
+par("land_input", "n s y c l h")
+par("land_output", "n s y c l h")
+par("land_use", "n s y u")
 par("level_cost_activity_soft_lo", "nl t ya h")
 par("level_cost_activity_soft_up", "nl t ya h")
 par("level_cost_new_capacity_soft_lo", "nl t yv")
@@ -452,27 +455,27 @@ par("min_utilization_factor", "nl t yv ya")
 par("operation_factor", "nl t yv ya")
 par("output", "nl t yv ya m nd c l h hd")
 par("peak_load_factor", "n c l y h")
-par("rating_bin", "n t ya c l h r")
+par("rating_bin", "n t ya c l h q")
 par("ref_activity", "nl t ya m h")
 par("ref_extraction", "n c g y")
 par("ref_new_capacity", "nl t yv")
-par("ref_relation", "relation nr yr")
-par("relation_activity", "relation nr yr nl t ya m")
-par("relation_cost", "relation nr yr")
-par("relation_lower", "relation nr yr")
-par("relation_new_capacity", "relation nr yr t")
-par("relation_total_capacity", "relation nr yr t")
-par("relation_upper", "relation nr yr")
-par("reliability_factor", "n t ya c l h r")
+par("ref_relation", "r nr yr")
+par("relation_activity", "r nr yr nl t ya m")
+par("relation_cost", "r nr yr")
+par("relation_lower", "r nr yr")
+par("relation_new_capacity", "r nr yr t")
+par("relation_total_capacity", "r nr yr t")
+par("relation_upper", "r nr yr")
+par("reliability_factor", "n t ya c l h q")
 par("renewable_capacity_factor", "n c g l y")
 par("renewable_potential", "n c g l y")
 par("resource_cost", "n c g y")
 par("resource_remaining", "n c g y")
 par("resource_volume", "n c g")
-par("share_commodity_lo", "s ns ya h")
-par("share_commodity_up", "s ns ya h")
-par("share_mode_lo", "s ns t m ya h")
-par("share_mode_up", "s ns t m ya h")
+par("share_commodity_lo", "shares ns ya h")
+par("share_commodity_up", "shares ns ya h")
+par("share_mode_lo", "shares ns t m ya h")
+par("share_mode_up", "shares ns t m ya h")
 par("soft_activity_lo", "nl t ya h")
 par("soft_activity_up", "nl t ya h")
 par("soft_new_capacity_lo", "nl t yv")
@@ -498,7 +501,7 @@ var(
 )
 var(
     "ACT_RATING",
-    "n t yv ya c l h r",
+    "n t yv ya c l h q",
     "Auxiliary variable for distributing total activity of a technology to a number of"
     " 'rating bins'",
 )
@@ -540,7 +543,7 @@ var(
     "n y",
     "Gross domestic product (GDP) in market exchange rates for MACRO reporting",
 )
-var("LAND", "n land_scenario y", "Share of given land-use scenario")
+var("LAND", "n s y", "Share of given land-use scenario")
 var("OBJ", "", "Objective value of the optimisation problem (scalar)")
 var(
     "PRICE_COMMODITY",
@@ -554,7 +557,7 @@ var(
 )
 var(
     "REL",
-    "relation nr yr",
+    "r nr yr",
     "Auxiliary variable for left-hand side of user-defined relations",
 )
 var(
@@ -616,32 +619,32 @@ var(
 )
 var(
     "SLACK_LAND_SCEN_LO",
-    "n land_scenario y",
+    "n s y",
     "Slack variable for dynamic land scenario constraint relaxation (downwards)",
 )
 var(
     "SLACK_LAND_SCEN_UP",
-    "n land_scenario y",
+    "n s y",
     "Slack variable for dynamic land scenario constraint relaxation (upwards)",
 )
 var(
     "SLACK_LAND_TYPE_LO",
-    "n y land_type",
+    "n y u",
     "Slack variable for dynamic land type constraint relaxation (downwards)",
 )
 var(
     "SLACK_LAND_TYPE_UP",
-    "n y land_type",
+    "n y u",
     "Slack variable for dynamic land type constraint relaxation (upwards)",
 )
 var(
     "SLACK_RELATION_BOUND_LO",
-    "relation n y",
+    "r n y",
     "Slack variable for lower bound of generic relation",
 )
 var(
     "SLACK_RELATION_BOUND_UP",
-    "relation n y",
+    "r n y",
     "Slack variable for upper bound of generic relation",
 )
 var("STOCK_CHG", "n c l y h", "Annual input into and output from stocks of commodities")
