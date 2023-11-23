@@ -205,7 +205,7 @@ class LPdiag:
 
         # create a df with the matrix coefficients
         self.mat = pd.DataFrame(
-            {"row": self.mat_row, "col": self.mat_row, "val": self.mat_val}
+            {"row": self.mat_row, "col": self.mat_col, "val": self.mat_val}
         )
         self.mat["abs_val"] = abs(
             self.mat["val"]
