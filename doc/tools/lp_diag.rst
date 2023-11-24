@@ -1,10 +1,13 @@
-.. LPdiag documentation file
+.. currentmodule:: message_ix.tools.lp_diag
 
-``LPdiag``: basic diagnostics of the LP programming problems
-============================================================
+:mod:`.lp_diag`: basic diagnostics of linear program (LP) problems
+******************************************************************
+
+.. contents::
+   :local:
 
 Description
------------
+===========
 
 ``LPdiag`` provides basic information about the LP programming problems
 defined by corresponding MPS-format files.
@@ -32,7 +35,7 @@ Such info can be used e.g., for:
 - verification of the coefficients' values.
 
 Features
-^^^^^^^^
+--------
 
 The current ``LPdiag`` version provides the following information:
 
@@ -48,23 +51,23 @@ The functionality of ``LPdiag`` will be gradually enhanced to meet actual needs
 of the ``message_ix`` modelers.
 
 Usage
------
+=====
 
 The tool analyzes provided MPS-format files.
-We provide several small MPS files for testing local installations in 
-:file:`message_ix/tests/data/lp_diag/`, as well as becoming familiar with 
-``LPdiag``. 
+We provide several small MPS files for testing local installations in
+:file:`message_ix/tests/data/lp_diag/`, as well as becoming familiar with
+``LPdiag``.
 The small MPS files are structured as follows:
 
 - ``aez``: agro-ecological zones, medium size
-- ``diet``: classical small LP  
-- ``jg_korh``: tiny testing problem 
+- ``diet``: classical small LP
+- ``jg_korh``: tiny testing problem
 - ``lotfi``: classical medium size
 - ``errors_*``: various MPS-specs testing errors handling
 
 
-Hints on generating MPS files are provided below. Feel free to store arbitrary 
-large MPS files in :file:`message_ix/tools/lp_diag/data/mps/`, but note that 
+Hints on generating MPS files are provided below. Feel free to store arbitrary
+large MPS files in :file:`message_ix/tools/lp_diag/data/mps/`, but note that
 these should not be committed to GitHub.
 
 We suggest the following steps for becoming familiar with ``LPdiag`` and
@@ -77,11 +80,11 @@ then use it for analysis of actual MPS files:
 We outline each of these steps below.
 
 Becoming familiar with ``LPdiag``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------------
 
 Note that ``LPdiag`` should be run at the terminal prompt.
 
-- Navigate to the folder ``message_ix/tools/lp_diag``. 
+- Navigate to the folder ``message_ix/tools/lp_diag``.
 - For initial testing run the following command, which will run analysis of
   the default (pre-specified) MPS provided in the test_mps folder.
   Other provided MPS example can be run by using the ``--mps`` option explained
@@ -128,18 +131,18 @@ Comments on the arguments of the above three options:
 	python lpdiag.py -h > foo.txt
 
 
-Generation of the MPS file in the ``message_ix`` environment
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Generation of the MPS file in the :mod:`message_ix`` environment
+----------------------------------------------------------------
 
 The MPS-format is the oldest but still widely used for specification of
-the LP problems. Most modeling environments provide various ways of the MPS file 
+the LP problems. Most modeling environments provide various ways of the MPS file
 generation.
 
-In the ``message_ix`` environment one can generate the MPS file e.g., upon 
-solving a :class:`message_ix scenario` by defining in 
-:meth:`message_ix.Scenario.solve` the ``writemps`` option together with the 
-desired name of the MPS file. The MPS file will then be generated and deposited 
-in the ``message_ix/message_ix/model`` folder. Details are available in the 
+In the ``message_ix`` environment one can generate the MPS file e.g., upon
+solving a :class:`message_ix.Scenario` by defining in
+:meth:`message_ix.Scenario.solve` the ``writemps`` option together with the
+desired name of the MPS file. The MPS file will then be generated and deposited
+in the ``message_ix/message_ix/model`` folder. Details are available in the
 `GAMS-Documentation <https://www.gams.com/latest/docs/S_CPLEX.html#CPLEXwritemps>`__
 
 Example of specification of the corresponding option::
@@ -148,7 +151,7 @@ Example of specification of the corresponding option::
 
 
 Actual analysis
-^^^^^^^^^^^^^^^
+---------------
 
 For actual analysis one needs to specify the corresponding MPS file in
 a command run (still in the directory ``message_ix/tools/lp_diag``): ::
@@ -169,7 +172,7 @@ An alternative way of output redirection is explained above.
 
 
 Summary of the provided analysis results
-----------------------------------------
+========================================
 
 The results are composed of the following elements:
 
@@ -198,3 +201,8 @@ The results are composed of the following elements:
 - The processing start- and end-times.
 
 
+API reference
+=============
+
+.. automodule:: message_ix.tools.lp_diag
+   :members:
