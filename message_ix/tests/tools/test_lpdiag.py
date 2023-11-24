@@ -1,7 +1,7 @@
 import pytest
 
+from message_ix.tools.lp_diag import LPdiag
 from message_ix.tools.lp_diag.cli import main
-from message_ix.tools.lp_diag.lp_diag import LPdiag
 
 
 def test_lpdiag(test_data_path):

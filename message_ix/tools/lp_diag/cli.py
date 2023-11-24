@@ -13,9 +13,8 @@ from os.path import isfile
 
 # from datetime import timedelta as td
 # noinspection PyUnresolvedReferences
-from message_ix.tools.lp_diag.lp_diag import (
-    LPdiag,  # LPdiag class for processing and analysis of LP matrices
-)
+# LPdiag class for processing and analysis of LP matrices
+from . import LPdiag
 
 """
 The above import stmt works only in the message-ix editable environment; it is treated
