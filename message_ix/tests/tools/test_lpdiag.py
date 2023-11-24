@@ -1,14 +1,12 @@
-import os
-
 import pytest
 
 from message_ix.tools.lp_diag.lp_diag import LPdiag
 from message_ix.tools.lp_diag.lpdiag import main
 
 
-def test_lpdiag():
+def test_lpdiag(test_data_path):
     """Test lpdiag.main() script."""
-    path = os.path.join(os.getcwd(), "message_ix", "tests", "data", "lp_diag")
+    path = str(test_data_path.joinpath("lp_diag"))
 
     with pytest.raises(OSError):
         main(["--wdir", "/surely this dir cannot/exist/"])
@@ -16,15 +14,13 @@ def test_lpdiag():
     main(["--wdir", path, "--mps", "diet.mps", "--outp", "diet_output.txt"])
 
 
-def test_aez():
+def test_aez(test_data_path):
     """Test reading of aez.mps file
 
     Check that the number of lines, rows and columns are correct"""
 
     # Read in the default MPS file for testing (aez.mps in test_mps folder)
-    file = os.path.join(
-        os.getcwd(), "message_ix", "tests", "data", "lp_diag", "aez.mps"
-    )
+    file = test_data_path.joinpath("lp_diag", "aez.mps")
     lp = LPdiag()
 
     # Read MPS, store the matrix in dataFrame
@@ -50,15 +46,13 @@ def test_aez():
     assert lp.gf_seq != -1
 
 
-def test_diet():
+def test_diet(test_data_path):
     """Test reading of diet.mps file
 
     Check that the number of lines, rows and columns are correct"""
 
     # Read in the diet.mps file
-    file = os.path.join(
-        os.getcwd(), "message_ix", "tests", "data", "lp_diag", "diet.mps"
-    )
+    file = test_data_path.joinpath("lp_diag", "diet.mps")
     lp = LPdiag()
 
     # Read MPS, store the matrix in dataFrame
@@ -84,15 +78,13 @@ def test_diet():
     assert lp.gf_seq != -1
 
 
-def test_jg_korh():
+def test_jg_korh(test_data_path):
     """Test reading of jg_korh.mps file
 
     Check that the number of lines, rows and columns are correct"""
 
     # Read in the diet.mps file
-    file = os.path.join(
-        os.getcwd(), "message_ix", "tests", "data", "lp_diag", "jg_korh.mps"
-    )
+    file = test_data_path.joinpath("lp_diag", "jg_korh.mps")
     lp = LPdiag()
 
     # Read MPS, store the matrix in dataFrame
@@ -118,15 +110,13 @@ def test_jg_korh():
     assert lp.gf_seq != -1
 
 
-def test_lotfi():
+def test_lotfi(test_data_path):
     """Test reading of lotfi.mps file
 
     Check that the number of lines, rows and columns are correct"""
 
     # Read in the diet.mps file
-    file = os.path.join(
-        os.getcwd(), "message_ix", "tests", "data", "lp_diag", "lotfi.mps"
-    )
+    file = test_data_path.joinpath("lp_diag", "lotfi.mps")
     lp = LPdiag()
 
     # Read MPS, store the matrix in dataFrame
@@ -155,13 +145,11 @@ def test_lotfi():
 # TODO: continue expanding tests
 # Mostly, this means calling the last functions defined in lp_diag.py, but some
 # lines also require special edge cases (mps files defined with 6 and 7 sections)
-def test_error_cases():
+def test_error_cases(test_data_path):
     """Test error cases"""
 
     # Read in the err_tst.mps file
-    file = os.path.join(
-        os.getcwd(), "message_ix", "tests", "data", "lp_diag", "error_err_tst.mps"
-    )
+    file = test_data_path.joinpath("lp_diag", "error_err_tst.mps")
     lp = LPdiag()
 
     # Read MPS, store the matrix in dataFrame
@@ -169,56 +157,28 @@ def test_error_cases():
         lp.read_mps(file)
 
     # Read in wrong required section order file
-    file = os.path.join(
-        os.getcwd(),
-        "message_ix",
-        "tests",
-        "data",
-        "lp_diag",
-        "error_sections_required_order.mps",
-    )
+    file = test_data_path.joinpath("lp_diag", "error_sections_required_order.mps")
     lp = LPdiag()
 
     with pytest.raises(NameError):
         lp.read_mps(file)
 
     # Read in unknown section file
-    file = os.path.join(
-        os.getcwd(),
-        "message_ix",
-        "tests",
-        "data",
-        "lp_diag",
-        "error_sections_unknown.mps",
-    )
+    file = test_data_path.joinpath("lp_diag", "error_sections_unknown.mps")
     lp = LPdiag()
 
     with pytest.raises(ValueError):
         lp.read_mps(file)
 
     # Read in wrong optional section order file
-    file = os.path.join(
-        os.getcwd(),
-        "message_ix",
-        "tests",
-        "data",
-        "lp_diag",
-        "error_sections_optional_order.mps",
-    )
+    file = test_data_path.joinpath("lp_diag", "error_sections_optional_order.mps")
     lp = LPdiag()
 
     with pytest.raises(AttributeError):
         lp.read_mps(file)
 
     # Read in all sections file
-    file = os.path.join(
-        os.getcwd(),
-        "message_ix",
-        "tests",
-        "data",
-        "lp_diag",
-        "error_sections_all.mps",
-    )
+    file = test_data_path.joinpath("lp_diag", "error_sections_all.mps")
     lp = LPdiag()
 
     # The first one when going through section-content lines
@@ -226,14 +186,7 @@ def test_error_cases():
         lp.read_mps(file)
 
     # Read in too many sections file
-    file = os.path.join(
-        os.getcwd(),
-        "message_ix",
-        "tests",
-        "data",
-        "lp_diag",
-        "error_sections_too_many.mps",
-    )
+    file = test_data_path.joinpath("lp_diag", "error_sections_too_many.mps")
     lp = LPdiag()
 
     # The second one when going through section definition lines
@@ -241,181 +194,95 @@ def test_error_cases():
         lp.read_mps(file)
 
     # Read in short string coefficient file
-    file = os.path.join(
-        os.getcwd(),
-        "message_ix",
-        "tests",
-        "data",
-        "lp_diag",
-        "error_coefficient_string_short.mps",
-    )
+    file = test_data_path.joinpath("lp_diag", "error_coefficient_string_short.mps")
     lp = LPdiag()
 
     with pytest.raises(ValueError):
         lp.read_mps(file)
 
     # Read in long string coefficient file
-    file = os.path.join(
-        os.getcwd(),
-        "message_ix",
-        "tests",
-        "data",
-        "lp_diag",
-        "error_coefficient_string_long.mps",
-    )
+    file = test_data_path.joinpath("lp_diag", "error_coefficient_string_long.mps")
     lp = LPdiag()
 
     with pytest.raises(ValueError):
         lp.read_mps(file)
 
     # Read in short string rhs file
-    file = os.path.join(
-        os.getcwd(),
-        "message_ix",
-        "tests",
-        "data",
-        "lp_diag",
-        "error_rhs_string_short.mps",
-    )
+    file = test_data_path.joinpath("lp_diag", "error_rhs_string_short.mps")
     lp = LPdiag()
 
     with pytest.raises(ValueError):
         lp.read_mps(file)
 
     # Read in long string rhs file
-    file = os.path.join(
-        os.getcwd(),
-        "message_ix",
-        "tests",
-        "data",
-        "lp_diag",
-        "error_rhs_string_long.mps",
-    )
+    file = test_data_path.joinpath("lp_diag", "error_rhs_string_long.mps")
     lp = LPdiag()
 
     with pytest.raises(ValueError):
         lp.read_mps(file)
 
     # Read in too short rhs file
-    file = os.path.join(
-        os.getcwd(),
-        "message_ix",
-        "tests",
-        "data",
-        "lp_diag",
-        "error_rhs_too_short.mps",
-    )
+    file = test_data_path.joinpath("lp_diag", "error_rhs_too_short.mps")
     lp = LPdiag()
 
     with pytest.raises(AssertionError):
         lp.read_mps(file)
 
     # Read in short string ranges file
-    file = os.path.join(
-        os.getcwd(),
-        "message_ix",
-        "tests",
-        "data",
-        "lp_diag",
-        "error_ranges_string_short.mps",
-    )
+    file = test_data_path.joinpath("lp_diag", "error_ranges_string_short.mps")
     lp = LPdiag()
 
     with pytest.raises(ValueError):
         lp.read_mps(file)
 
     # Read in long string ranges file
-    file = os.path.join(
-        os.getcwd(),
-        "message_ix",
-        "tests",
-        "data",
-        "lp_diag",
-        "error_ranges_string_long.mps",
-    )
+    file = test_data_path.joinpath("lp_diag", "error_ranges_string_long.mps")
     lp = LPdiag()
 
     with pytest.raises(ValueError):
         lp.read_mps(file)
 
     # Read in too short ranges file
-    file = os.path.join(
-        os.getcwd(),
-        "message_ix",
-        "tests",
-        "data",
-        "lp_diag",
-        "error_ranges_too_short.mps",
-    )
+    file = test_data_path.joinpath("lp_diag", "error_ranges_too_short.mps")
     lp = LPdiag()
 
     with pytest.raises(AssertionError):
         lp.read_mps(file)
 
     # Read in short string bounds file
-    file = os.path.join(
-        os.getcwd(),
-        "message_ix",
-        "tests",
-        "data",
-        "lp_diag",
-        "error_bounds_string_short.mps",
-    )
+    file = test_data_path.joinpath("lp_diag", "error_bounds_string_short.mps")
     lp = LPdiag()
 
     with pytest.raises(ValueError):
         lp.read_mps(file)
 
     # Read in too short bounds file
-    file = os.path.join(
-        os.getcwd(),
-        "message_ix",
-        "tests",
-        "data",
-        "lp_diag",
-        "error_bounds_too_short.mps",
-    )
+    file = test_data_path.joinpath("lp_diag", "error_bounds_too_short.mps")
     lp = LPdiag()
 
     with pytest.raises(AssertionError):
         lp.read_mps(file)
 
     # Read in not-required type bounds file
-    file = os.path.join(
-        os.getcwd(),
-        "message_ix",
-        "tests",
-        "data",
-        "lp_diag",
-        "error_bounds_type_not_needed.mps",
-    )
+    file = test_data_path.joinpath("lp_diag", "error_bounds_type_not_needed.mps")
     lp = LPdiag()
 
     with pytest.raises(TypeError):
         lp.read_mps(file)
 
     # Read in unknown type bounds file
-    file = os.path.join(
-        os.getcwd(),
-        "message_ix",
-        "tests",
-        "data",
-        "lp_diag",
-        "error_bounds_unknown_type.mps",
-    )
+    file = test_data_path.joinpath("lp_diag", "error_bounds_unknown_type.mps")
     lp = LPdiag()
 
     with pytest.raises(TypeError):
         lp.read_mps(file)
 
 
-def test_lpdiag_print_statistics():
+def test_lpdiag_print_statistics(test_data_path):
     """Test auxiliary stat function."""
 
     # Read in the diet.mps file
-    file = os.path.join(
-        os.getcwd(), "message_ix", "tests", "data", "lp_diag", "jg_korh.mps"
-    )
+    file = test_data_path.joinpath("lp_diag", "jg_korh.mps")
     lp = LPdiag()
 
     # Read MPS, store the matrix in dataFrame
@@ -431,13 +298,11 @@ def test_lpdiag_print_statistics():
     assert lp.mat.shape == (10, 5)
 
 
-def test_lpdiag_locate_outliers():
+def test_lpdiag_locate_outliers(test_data_path):
     """Test locating outliers."""
 
     # Read in the diet.mps file
-    file = os.path.join(
-        os.getcwd(), "message_ix", "tests", "data", "lp_diag", "lotfi.mps"
-    )
+    file = test_data_path.joinpath("lp_diag", "lotfi.mps")
     lp = LPdiag()
 
     # Read MPS, store the matrix in dataFrame
