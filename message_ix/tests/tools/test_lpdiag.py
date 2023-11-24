@@ -142,140 +142,57 @@ def test_lotfi(test_data_path):
     assert lp.gf_seq != -1
 
 
-# TODO: continue expanding tests
-# Mostly, this means calling the last functions defined in lp_diag.py, but some
-# lines also require special edge cases (mps files defined with 6 and 7 sections)
-def test_error_cases(test_data_path):
+# TODO Continue expanding these tests. Mostly, this means calling the last functions
+#      defined in lp_diag.py, but some lines also require special edge cases (mps files
+#      defined with 6 and 7 sections)
+@pytest.mark.parametrize(
+    "filename, exception",
+    (
+        ("error_err_tst.mps", AssertionError),
+        # Required sections are in the wrong order
+        ("error_sections_required_order.mps", NameError),
+        # Unknown section
+        ("error_sections_unknown.mps", ValueError),
+        # Optional sections are in the wrong order
+        ("error_sections_optional_order.mps", AttributeError),
+        # File with all sections, error when going through section-content lines
+        ("error_sections_all.mps", RuntimeError),
+        # File with too many sections, error when going through section definition lines
+        ("error_sections_too_many.mps", RuntimeError),
+        # String coefficients too short
+        ("error_coefficient_string_short.mps", ValueError),
+        # String coefficients too long
+        ("error_coefficient_string_long.mps", ValueError),
+        # RHS string too short
+        ("error_rhs_string_short.mps", ValueError),
+        # RHS string too long
+        ("error_rhs_string_long.mps", ValueError),
+        # RHS too short
+        ("error_rhs_too_short.mps", AssertionError),
+        # String ranges too short
+        ("error_ranges_string_short.mps", ValueError),
+        # String ranges too long
+        ("error_ranges_string_long.mps", ValueError),
+        # Ranges too show
+        ("error_ranges_too_short.mps", AssertionError),
+        # String bounds too short
+        ("error_bounds_string_short.mps", ValueError),
+        # Bounds too short
+        ("error_bounds_too_short.mps", AssertionError),
+        # Bounds type not required
+        ("error_bounds_type_not_needed.mps", TypeError),
+        # Bounds of unknown type
+        ("error_bounds_unknown_type.mps", TypeError),
+    ),
+)
+def test_error_cases(test_data_path, filename, exception) -> None:
     """Test error cases"""
 
-    # Read in the err_tst.mps file
-    file = test_data_path.joinpath("lp_diag", "error_err_tst.mps")
     lp = LPdiag()
 
-    # Read MPS, store the matrix in dataFrame
-    with pytest.raises(AssertionError):
-        lp.read_mps(file)
-
-    # Read in wrong required section order file
-    file = test_data_path.joinpath("lp_diag", "error_sections_required_order.mps")
-    lp = LPdiag()
-
-    with pytest.raises(NameError):
-        lp.read_mps(file)
-
-    # Read in unknown section file
-    file = test_data_path.joinpath("lp_diag", "error_sections_unknown.mps")
-    lp = LPdiag()
-
-    with pytest.raises(ValueError):
-        lp.read_mps(file)
-
-    # Read in wrong optional section order file
-    file = test_data_path.joinpath("lp_diag", "error_sections_optional_order.mps")
-    lp = LPdiag()
-
-    with pytest.raises(AttributeError):
-        lp.read_mps(file)
-
-    # Read in all sections file
-    file = test_data_path.joinpath("lp_diag", "error_sections_all.mps")
-    lp = LPdiag()
-
-    # The first one when going through section-content lines
-    with pytest.raises(RuntimeError):
-        lp.read_mps(file)
-
-    # Read in too many sections file
-    file = test_data_path.joinpath("lp_diag", "error_sections_too_many.mps")
-    lp = LPdiag()
-
-    # The second one when going through section definition lines
-    with pytest.raises(RuntimeError):
-        lp.read_mps(file)
-
-    # Read in short string coefficient file
-    file = test_data_path.joinpath("lp_diag", "error_coefficient_string_short.mps")
-    lp = LPdiag()
-
-    with pytest.raises(ValueError):
-        lp.read_mps(file)
-
-    # Read in long string coefficient file
-    file = test_data_path.joinpath("lp_diag", "error_coefficient_string_long.mps")
-    lp = LPdiag()
-
-    with pytest.raises(ValueError):
-        lp.read_mps(file)
-
-    # Read in short string rhs file
-    file = test_data_path.joinpath("lp_diag", "error_rhs_string_short.mps")
-    lp = LPdiag()
-
-    with pytest.raises(ValueError):
-        lp.read_mps(file)
-
-    # Read in long string rhs file
-    file = test_data_path.joinpath("lp_diag", "error_rhs_string_long.mps")
-    lp = LPdiag()
-
-    with pytest.raises(ValueError):
-        lp.read_mps(file)
-
-    # Read in too short rhs file
-    file = test_data_path.joinpath("lp_diag", "error_rhs_too_short.mps")
-    lp = LPdiag()
-
-    with pytest.raises(AssertionError):
-        lp.read_mps(file)
-
-    # Read in short string ranges file
-    file = test_data_path.joinpath("lp_diag", "error_ranges_string_short.mps")
-    lp = LPdiag()
-
-    with pytest.raises(ValueError):
-        lp.read_mps(file)
-
-    # Read in long string ranges file
-    file = test_data_path.joinpath("lp_diag", "error_ranges_string_long.mps")
-    lp = LPdiag()
-
-    with pytest.raises(ValueError):
-        lp.read_mps(file)
-
-    # Read in too short ranges file
-    file = test_data_path.joinpath("lp_diag", "error_ranges_too_short.mps")
-    lp = LPdiag()
-
-    with pytest.raises(AssertionError):
-        lp.read_mps(file)
-
-    # Read in short string bounds file
-    file = test_data_path.joinpath("lp_diag", "error_bounds_string_short.mps")
-    lp = LPdiag()
-
-    with pytest.raises(ValueError):
-        lp.read_mps(file)
-
-    # Read in too short bounds file
-    file = test_data_path.joinpath("lp_diag", "error_bounds_too_short.mps")
-    lp = LPdiag()
-
-    with pytest.raises(AssertionError):
-        lp.read_mps(file)
-
-    # Read in not-required type bounds file
-    file = test_data_path.joinpath("lp_diag", "error_bounds_type_not_needed.mps")
-    lp = LPdiag()
-
-    with pytest.raises(TypeError):
-        lp.read_mps(file)
-
-    # Read in unknown type bounds file
-    file = test_data_path.joinpath("lp_diag", "error_bounds_unknown_type.mps")
-    lp = LPdiag()
-
-    with pytest.raises(TypeError):
-        lp.read_mps(file)
+    # The expected `exception` is raised when reading the MPS file with `filename`
+    with pytest.raises(exception):
+        lp.read_mps(test_data_path.joinpath("lp_diag", filename))
 
 
 def test_lpdiag_print_statistics(test_data_path):
