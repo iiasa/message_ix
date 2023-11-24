@@ -1,38 +1,22 @@
-"""
-Prototype of simple analysis of the MPS-format file
-Written by Marek Makowski, ECE Program of IIASA, in March 2023
-"""
+"""Analyse MPS-format files."""
+# Written by Marek Makowski, ECE Program of IIASA, in March 2023.
 
 import math
-
-# import os
-# import sys		# needed for sys.exit()
 import typing
 from collections import Counter
+from typing import List
 
 import numpy as np
 import pandas as pd
 
-# from datetime import datetime as dt
-# from datetime import timedelta as td
-# import matplotlib.pyplot as plt
-# from matplotlib import cm
-# from matplotlib import colors
-# from matplotlib.ticker import LinearLocator    # needed for ax.set_major_locator
-# import seaborn as sns
-# # sns.set()   # settings for seaborn plotting style
-
 
 class LPdiag:
-    """Process the MPS-format input file and provide its basic diagnotics.
+    """Process the MPS-format input file and provide its basic diagnostics.
 
-    The diagnostics currently includes:
+    The diagnostics currently include:
+
     - handling formal errors of the MPS file
     - basic statistics of the matrix coefficients.
-
-    Attributes
-    ----------
-
     """
 
     def __init__(self):
@@ -75,7 +59,8 @@ class LPdiag:
         #   columns=['seq_id', 'name', 'type', 'lo_bnd', 'up_bnd']
         # )
 
-    def read_mps(self, fname):  # process the MPS file
+    def read_mps(self, fname):
+        """Process the MPS file."""
         print(f"\nReading MPS-format file {fname}.")
         self.fname = fname
         sections = [
@@ -241,7 +226,7 @@ class LPdiag:
         )
         print(f"Distribution of the GF (objective) values:\n{df.describe()}")
 
-    def add_row(self, words, n_line):
+    def add_row(self, words: List[str], n_line: int):
         """Process current line of the ROWS section.
 
         While processing the ROWS section the row attributes are initialized to the
@@ -252,12 +237,12 @@ class LPdiag:
         Bruce A. Murtagh. or the standard summary at
         https://lpsolve.sourceforge.net/5.5/mps-format.htm .
 
-        Attributes
+        Parameters
         ----------
-        words: str[]
-            words of the current line
-        n_line: int
-            sequence number of the current MPS line
+        words : str
+            Words of the current line.
+        n_line : int
+            Sequence number of the current MPS line.
         """
 
         row_types = ["N", "E", "G", "L"]  # types of rows
@@ -283,18 +268,18 @@ class LPdiag:
         # (to be changed in rhs/ranges) [lo_bnd, upp_bnd]
         self.row_att(row_seq, row_name, row_type, "rows")
 
-    def add_coeff(self, words, n_line):
+    def add_coeff(self, words: List[str], n_line: int):
         """Process current line of the COLUMNS section.
 
         The section defines both column names and values of the matrix coefficients.
         One line can have either one or two matrix elements.
 
-        Attributes
+        Parameters
         ----------
-        words: str[]
-            words of the current line
-        n_line: int
-            sequence number of the current MPS line
+        words : str
+            Words of the current line.
+        n_line : int
+            Sequence number of the current MPS line.
         """
 
         n_words = len(words)
@@ -348,8 +333,8 @@ class LPdiag:
         # proccess the second matrix element in the same MPS row, if defined
         if n_words > 3:
             assert n_words == 5, (
-                f"line {n_line}) has {n_words} words, five words needed"
-                " fordefining second element in the same MPS line."
+                f"line {n_line}) has {n_words} words, five words needed for defining "
+                "second element in the same MPS line."
             )
             row_name = words[3]
             row_seq = self.row_name.get(row_name)
@@ -364,18 +349,18 @@ class LPdiag:
             self.mat_col.append(col_seq)
             self.mat_val.append(val)
 
-    def add_rhs(self, words, n_line):
+    def add_rhs(self, words: List[str], n_line: int):
         """Process current line of the RHS section.
 
         The section defines both column names and values of the matrix coefficients.
         One line can have either one or two matrix elements.
 
-        Attributes
+        Parameters
         ----------
-        words: str[]
-            words of the current line
-        n_line: int
-            sequence number of the current MPS line
+        words : str
+            Words of the current line.
+        n_line : int
+            Sequence number of the current MPS line.
         """
 
         n_words = len(words)
@@ -437,18 +422,18 @@ class LPdiag:
             self.row_att(row_seq, row_name, row_type, "rhs", val)
             self.n_rhs += 1
 
-    def add_range(self, words, n_line):
+    def add_range(self, words: str, n_line: int):
         """Process current line of the RANGES section.
 
         The section defines both column names and values of the matrix coefficients.
         One line can have either one or two matrix elements.
 
-        Attributes
+        Parameters
         ----------
-        words: str[]
-            words of the current line
-        n_line: int
-            sequence number of the current MPS line
+        words : str
+            Words of the current line.
+        n_line : int
+            Sequence number of the current MPS line.
         """
 
         n_words = len(words)
@@ -512,18 +497,18 @@ class LPdiag:
             self.row_att(row_seq, row_name, row_type, "ranges", val)
             self.n_ranges += 1
 
-    def add_bnd(self, words, n_line):
+    def add_bnd(self, words: List[str], n_line: int):
         """Process current line of the BOUNDS section.
 
         The section defines both column names and values of the matrix coefficients.
         One line can have either one or two matrix elements.
 
-        Attributes
+        Parameters
         ----------
-        words: str[]
-            words of the current line
-        n_line: int
-            sequence number of the current MPS line
+        words : str
+            Words of the current line.
+        n_line : int
+            Sequence number of the current MPS line.
         """
 
         # items of the below dictionaries indicate bounds to be modified:
@@ -605,9 +590,17 @@ class LPdiag:
         self.seq_col.update({col_seq: attr})  # store the updated col-attributes
         self.n_bounds += 1
 
-    def row_att(self, row_seq, row_name, row_type, sec_name, val=0.0):
-        """Process values defined in ROWS, RHS and RANGES sections and store/update
-        the corresponding row attributes.
+    def row_att(
+        self,
+        row_seq: int,
+        row_name: str,
+        row_type: str,
+        sec_name: str,
+        val: float = 0.0,
+    ):
+        """Process values defined in ROWS, RHS and RANGES sections
+
+        The corresponding row attributes are stored or updated.
 
         While processing the ROWS section the row attributes are initialized to the
         default (for the corresponding row type) values. The attributes are updated for
@@ -617,20 +610,20 @@ class LPdiag:
         Bruce A. Murtagh. or the standard summary at
         https://lpsolve.sourceforge.net/5.5/mps-format.htm .
 
-        Attributes
+        Parameters
         ----------
-        row_seq: int
-            position of row in dictionaries and the matrix df
-        row_name: str
-            row name (defined in the ROWS section)
-        row_type: str
-            row type (defined in the ROWS section)
-        sec_name: str
-            identifies the MPS section: either 'rows' (for initialization) or 'rhs' or
-            'ranges' (for updates)
+        row_seq : int
+            Position of row in dictionaries and the matrix df.
+        row_name : str
+            Row name (defined in the ROWS section).
+        row_type : str
+            Row type (defined in the ROWS section).
+        sec_name : str
+            Identifies the MPS section: either 'rows' (for initialization) or 'rhs' or
+            'ranges' (for updates).
         val: float
-            value of the row attribute defining either lo_bnd or up_bnd of the row
-            (the type checked while processing the MPS section)
+            Value of the row attribute defining either lo_bnd or up_bnd of the row
+            (the type checked while processing the MPS section).
         """
 
         type2bnd = {
@@ -644,7 +637,7 @@ class LPdiag:
         ), f"{row_seq=} should be equal to: {self.row_name.get(row_name)}."
         assert row_type in type2bnd, f"undefined row type {row_type=} for {row_name=}."
         if sec_name == "rows":  # initialize row attributes (used in ROW section)
-            low_upp = type2bnd.get(row_type)
+            low_upp = type2bnd[row_type]
             self.seq_row.update({row_seq: [row_name, low_upp[0], low_upp[1], row_type]})
             # print(
             #     f"attributes of row {row_name} initialized in section {sec_name} to"
@@ -686,16 +679,16 @@ class LPdiag:
     def print_statistics(self, lo_tail: int = -7, up_tail: int = 6):
         """Basic statistics of the matrix coefficients.
 
-        Focus on distributions of magnitudes of non-zero coeff. represented by values
-        of int(log10(abs(coeff))).
-        Additionally, tails (low and upp) of the distributions are reported.
+        Focus on distributions of magnitudes of non-zero coefficients represented by
+        values of int(log10(abs(coeff))). Additionally, tails (low and upp) of the
+        distributions are reported.
 
-        Attributes
+        Parameters
         ----------
         lo_tail: int
-            Magnitude order of the low-tail (-7 denotes values < 10^(-6))
+            Magnitude order of the low-tail (-7 denotes values < 10^(-6)).
         up_tail: int
-            Magnitude order of the upper-tail (6 denotes values >= 10^6)
+            Magnitude order of the upper-tail (6 denotes values >= 10^6).
         """
 
         # print(f'\nDistribution of non-zero values:\n{self.mat["val"].describe()}')
@@ -763,21 +756,21 @@ class LPdiag:
                 )
 
     def locate_outliers(self, small: bool = True, thresh: int = -7, max_rec: int = 500):
-        """Locations of outliers, i.e., elements having small/large coeff values.
+        """Locations of outliers, i.e., elements having small/large coefficient values.
 
-        Locations of outliers (in the term of the matrix coefficient values).
-        The provided ranges of values in the corresponding row/col indicate potential
-        of the simple scaling.
+        Locations of outliers (in the term of the matrix coefficient values). The
+        provided ranges of values in the corresponding row/col indicate potential of the
+        simple scaling.
 
-        Attributes
+        Parameters
         ----------
-        small: bool
+        small : bool
             True/False for threshold of either small or large coefficients
-        thresh: int
+        thresh : int
             Magnitude of the threshold (in: int(log10(abs(coeff))), i.e. -7 denotes
-            values < 10^(-6))
-        max_rec: int
-            Maximum number of processed coefficients
+            values < 10^(-6)).
+        max_rec : int
+            Maximum number of processed coefficients.
         """
 
         if small:  # sub-matrix composed of only small-value outliers
@@ -858,20 +851,18 @@ class LPdiag:
     def get_entity_info(
         self, mat_row: pd.Series, by_row: bool = True
     ) -> typing.Tuple[int, str]:
-        """Return info on the entity (either row or col) defining the selected matrix
-        coefficient.
+        """Return info on the entity (row or col) defining the given matrix coefficient.
 
         Each row of the dataFrame contains the definition (composed of the row_seq,
-        col_seq, value, log(value)) of one matrix coefficient.
-        The function returns seq_id and name of either row or col of the currently
-        considered coeff.
+        col_seq, value, log(value)) of one matrix coefficient. The function returns
+        seq_id and name of either row or col of the currently considered coeff.
 
-        Attributes
+        Parameters
         ----------
-        mat_row: dataFrame row
-            record of the df with the data of currently processed element
-        by_row: bool
-            True/False for returning the seq_id and name of the corresponding row/col
+        mat_row : pandas.Series
+            Record of the df with the data of currently processed element.
+        by_row : bool
+            True/False for returning the seq_id and name of the corresponding row/col.
         """
 
         if by_row:
@@ -885,18 +876,17 @@ class LPdiag:
         return ent_seq, name
 
     def get_entity_range(self, seq_id: int, by_row: bool = True) -> str:
-        """Return formatted string representing ranges of feasible values of either a
-        row or a column.
+        """Return formatted ranges of feasible values of either a row or a column.
 
         The returned values of ranges are either 'none' (for plus/minus infinity) or
         int(log10(abs(val))) for other values. Small values, defined as
         abs(value) < 1e-10, are represented by 0.
 
-        Attributes
+        Parameters
         ----------
-        seq_id: int
-            sequence number of either row or col.
-        by_row: bool
+        seq_id : int
+            Sequence number of either row or col.
+        by_row : bool
             True/False for returning the seq_id and name of the corresponding row/col.
         """
 
@@ -923,6 +913,8 @@ class LPdiag:
         return ret  # the range is formatted as: '[lo_bnd, up_bnd]'
 
     def plot_hist(self):
-        """Plot histograms."""
-        # todo: might not be needed; therefore the implementation postponed
-        ...
+        """Plot histograms.
+
+        .. note:: Not implemented.
+        """
+        raise NotImplementedError

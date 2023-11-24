@@ -1,8 +1,7 @@
-"""Command-line interface to :mod:`.lp_diag`.
-
-Written by Marek Makowski, ECE Program of IIASA, in March 2023.
-Developed in PyCharm, with Python 3.10.4.
-"""
+"""Command-line interface to :mod:`.lp_diag`."""
+# Written by Marek Makowski, ECE Program of IIASA, in March 2023.
+# Developed in PyCharm, with Python 3.10.4.
+#
 # large (1+ GB) MPSs files, shall not be posted to gitHub.
 # app was tested on two (1+ GB) MPSs posted by OFR in /t/fricko on Feb 16, 2023:
 # OFR_test_led_barrier.mps
