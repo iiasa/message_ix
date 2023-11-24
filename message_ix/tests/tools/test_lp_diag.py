@@ -1,17 +1,29 @@
 import pytest
 
 from message_ix.tools.lp_diag import LPdiag
-from message_ix.tools.lp_diag.cli import main
 
 
-def test_lpdiag(test_data_path):
+def test_cli(tmp_path, message_ix_cli, test_data_path):
     """Test lpdiag.main() script."""
-    path = str(test_data_path.joinpath("lp_diag"))
 
-    with pytest.raises(OSError):
-        main(["--wdir", "/surely this dir cannot/exist/"])
+    p = str(test_data_path.joinpath("lp_diag"))
+    outp = tmp_path.joinpath("diet_output.txt")
 
-    main(["--wdir", path, "--mps", "diet.mps", "--outp", "diet_output.txt"])
+    # Command runs without error
+    result = message_ix_cli(
+        "lp-diag", "--wdir", p, "--mps", "diet.mps", "--outp", str(outp)
+    )
+    # Console output shows the output file path
+    assert "Stdout redirected to" in result.output
+
+    # Output file was created, contains the output
+    assert outp.exists()
+    assert "Reading MPS-format file" in outp.read_text()
+
+    # Invalid --wdir
+    result = message_ix_cli("lp-diag", "--wdir", "/surely this dir cannot/exist/")
+    assert 2 == result.exit_code
+    assert "Path '/surely this dir cannot/exist/' does not exist" in result.output
 
 
 def test_aez(test_data_path):
