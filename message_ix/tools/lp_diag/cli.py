@@ -32,7 +32,8 @@ import click
     "--mps",
     "prob_id",
     type=click.Path(path_type=Path),
-    default="test_mps/aez",  # Default MPS for testing
+    # Default MPS for testing
+    default=Path(__file__).parents[2].joinpath("tests", "data", "lp_diag", "aez.mps"),
     help="MPS file name or path.",
 )
 @click.option(
@@ -78,9 +79,13 @@ def main(w_dir: Path, prob_id: Path, fn_outp: Optional[Path], lo_tail, up_tail) 
         # NB click.Path(exists=True) ensures this directory, if given, exists
         os.chdir(w_dir)
 
-    # Check the existence and accessibility of the MPS file
-    mps_path = Path.cwd().joinpath(prob_id)
+    if not prob_id.is_absolute():
+        # Resolve a relative path or bare file name relative to the working directory
+        mps_path = Path.cwd().joinpath(prob_id)
+    else:
+        mps_path = prob_id
 
+    # Check the existence and accessibility of the MPS file
     if not mps_path.is_file():
         raise click.ClickException(
             f"MPS file {prob_id} not accessible from {Path.cwd()}\n"
