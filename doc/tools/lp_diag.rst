@@ -74,24 +74,25 @@ Note that ``LPdiag`` should be run at the terminal prompt.
 
 - To display the available ``LPdiag`` options run::
 
-	message-ix lp-diag --help
+    $ message-ix lp-diag --help
+    Usage: message-ix lp-diag [OPTIONS]
 
-The output of the above should read as follows (except of the work_dir line, which differs for each local repository)::
+      Diagnostics of basic properties of LP problems stored in the MPS format.
 
-	work_dir: '/Users/marek/Documents/GitHub/marek_iiasa/message_ix/message_ix/tools/lp_diag'.
-	usage: lpdiag.py [-h] [--wdir WDIR] [--mps MPS] [--outp OUTP]
-	Diagnostics of basic properties of LP Problems represented by the MPS-format.
-	Examples of usage:
-	message-ix lp-diag
-	message-ix lp-diag -h
-	message-ix lp-diag --mps test_mps/aez --outp foo.txt
-	options:
-	-h, --help   show this help message and exit
-	--wdir WDIR  --wdir : string Working directory.
-	--mps MPS    --mps : string Name of the MPS file (optionally with path).
-	--outp OUTP  --outp : string Redirect output to the named file.
+      Examples:
+        message-ix lp-diag
+        message-ix lp-diag --help
+        message-ix lp-diag --mps aez.mps --outp foo.txt
 
-Comments on the arguments of the above three options:
+    Options:
+      --wdir PATH            Working directory.
+      --mps PATH             MPS file name or path.
+      -L, --lo-tail INTEGER  Magnitude order of the lower tail (default: -7).
+      -U, --up-tail INTEGER  Magnitude order of the upper tail (default: 5).
+      --outp PATH            Path for file output.
+      --help                 Show this message and exit.
+
+Further details about the optional parameters:
 
 - :program:`--wdir`: specification of the desired work-directory (by default the work-directory is the same, in which ``LPdiag`` is located).
 - :program:`--mps`: name of the MPS file to be analysed; if the file is not located in the work-directory, then the name should include the path to the file (see the example above).
@@ -101,6 +102,11 @@ Comments on the arguments of the above three options:
   Such redirection can be specified by either using the ``--outp file_name`` option, as illustrated by the second example shown above (in the output resulting from using the ``-h`` option), or by including the redirection in the corresponding command, e.g.,::
 
 	message-ix lp-diag -h > foo.txt
+
+- :program:`--lo-tail`, :program:`--up-tail`: These are passed to :meth:`.LPdiag.print_statistics`.
+   To obtain the numbers of coefficients at every magnitude in the MPS file, specify equal or overlapping values::
+
+    message-ix lp-diag -L 0 -U 0 --mps file.mps
 
 
 Generation of the MPS file in the :mod:`message_ix` environment

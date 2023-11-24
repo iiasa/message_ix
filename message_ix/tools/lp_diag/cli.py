@@ -33,21 +33,31 @@ import click
     "prob_id",
     type=click.Path(path_type=Path),
     default="test_mps/aez",  # Default MPS for testing
-    # commented: Alternate specs of test-MPS commented below
-    # default="test_mps/diet"
-    # default="test_mps/errors/err_tst"
-    # default="test_mps/jg_korh"
-    # default="test_mps/lotfi"
     help="MPS file name or path.",
 )
-@click.option("--outp", "fn_outp", help="Path for file output.")
-def main(w_dir: Path, prob_id: Path, fn_outp: Optional[Path]) -> None:
-    """Diagnostics of basic properties of LP Problems represented by the MPS-format.
+@click.option(
+    "--lo-tail",
+    "-L",
+    type=int,
+    default=-7,
+    help="Magnitude order of the lower tail (default: -7).",
+)
+@click.option(
+    "--up-tail",
+    "-U",
+    type=int,
+    default=-5,
+    help="Magnitude order of the upper tail (default: 5).",
+)
+@click.option("--outp", "fn_outp", metavar="PATH", help="Path for file output.")
+def main(w_dir: Path, prob_id: Path, fn_outp: Optional[Path], lo_tail, up_tail) -> None:
+    """Diagnostics of basic properties of LP problems stored in the MPS format.
 
+    \b
     Examples:
-    message-ix lp-diag
-    message-ix lp-diag -h
-    message-ix lp-diag --mps test_mps/aez --outp foo.txt
+      message-ix lp-diag
+      message-ix lp-diag --help
+      message-ix lp-diag --mps test_mps/aez --outp foo.txt
     """
     # This function is a driver of the LP diagnostics provided by LPdiag class. It
     # defines the working space, then controls the flow by executing the desired methods
@@ -92,15 +102,15 @@ def main(w_dir: Path, prob_id: Path, fn_outp: Optional[Path]) -> None:
     lp.read_mps(mps_path)
 
     # Print statistics of matrix coefficients including distribution tails
-    lp.print_statistics(lo_tail=-7, up_tail=5)
-
-    # To get numbers of coeffs for each magnitude specify equal/overlapping tails
-    # lp.print_statistics(lo_tail=0, up_tail=0)
+    lp.print_statistics(lo_tail=lo_tail, up_tail=up_tail)
 
     # Locations of small-value outliers
-    lp.locate_outliers(small=True, thresh=-7, max_rec=100)
+    lp.locate_outliers(small=True, thresh=lo_tail, max_rec=100)
     # Locations of large-value outliers
-    lp.locate_outliers(small=False, thresh=6, max_rec=500)
+    # NB(PNK) This thresh was hard-coded as 6, versus print_statistics(…, up_tail=5)
+    #         above. Assuming these represent sane defaults reached through testing,
+    #         keep the difference of +1.
+    lp.locate_outliers(small=False, thresh=up_tail + 1, max_rec=500)
 
     if f_out:
         # Close the redirected output
