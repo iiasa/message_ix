@@ -2,17 +2,9 @@
 # Written by Marek Makowski, ECE Program of IIASA, in March 2023.
 # Developed in PyCharm, with Python 3.10.4.
 #
-# large (1+ GB) MPSs files, shall not be posted to gitHub.
 # app was tested on two (1+ GB) MPSs posted by OFR in /t/fricko on Feb 16, 2023:
 # OFR_test_led_barrier.mps
 # baseline_barrier.mps
-#
-# small MPSs, for testing the code, posted to 'test_mps' subdirectory:
-# errors/err_tst  - small MPS with various errors for testing the diagnostics
-# aez  - agro-ecological zones, medium size; two matrix elems in a row
-# diet - classical small LP
-# jg_korh - tiny testing problem
-# lotfi - classical medium size; two matrix elems in a row
 #
 # TODO TBD, if the MPS-standard should be observed; should it cause error or info in
 #      particular, range of values: 10^{-10} < abs(val) < 10^{10}
