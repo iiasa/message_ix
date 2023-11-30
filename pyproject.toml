@@ -74,6 +74,7 @@ message-ix = "message_ix.cli:main"
 exclude_also = [
   # Imports only used by type checkers
   "if TYPE_CHECKING:",
+  "if __name__ == '__main__':",
 ]
 
 [tool.coverage.run]

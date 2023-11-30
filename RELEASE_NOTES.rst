@@ -13,6 +13,7 @@ Code that imports from the old locations will continue to work, but will raise :
 All changes
 -----------
 
+- Add the :doc:`LPdiag tool <tools/lpdiag>` to diagnose and analyze numerical issues in linear programming (LP) problems stored in MPS-format files (:pull:`704`).
 - Drop support for Python 3.7, which `reached end-of-life on 2023-06-27 <https://peps.python.org/pep-0537/#lifespan>`__ (:pull:`738`).
   :mod:`message_ix` now requires Python version 3.8 or greater.
 - Rename :mod:`message_ix.report` (:pull:`761`).

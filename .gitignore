@@ -9,6 +9,7 @@ __pycache__
 *.pyc
 *.RData*
 *.tmp
+*.swp
 *#
 *~
 #*
@@ -59,3 +60,7 @@ prof/
 
 # macOS
 .DS_Store
+
+# LPdiag
+message_ix/tests/data/lp_diag/diet_output.txt
+message_ix/tools/lp_diag/data/mps/*
