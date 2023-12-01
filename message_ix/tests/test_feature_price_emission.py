@@ -98,7 +98,8 @@ def add_many_tecs(scen, years, n=50):
     """add a range of dirty-to-clean technologies to the scenario"""
     output_specs = ["node", "comm", "level", "year", "year"]
 
-    # tec: [emissions, var_cost, bound_activity_up]
+    # Add some hardcoded tecs for temporary testing
+    # tec: [emission_factor, var_cost, bound_activity_up]
     # tecs = {
     #     "tec1": [10, 5, 1],
     #     "tec2": [-1, 10, 0.4],
@@ -106,29 +107,36 @@ def add_many_tecs(scen, years, n=50):
     #     "tec4": [-15, 1200, 0.2],
     #     "tec5": [-50, 6000, 0.1],
     # }
-    # tecs = {
-    #     "tec1": [10, 5, 1],
-    #     "tec2": [-10, 10, 0.4],
-    #     "tec3": [-12, 20, 0.3],
-    #     "tec4": [-14, 30, 0.2],
-    #     "tec5": [-16, 40, 0.1],
-    # }
-    for i in range(1, n + 1):
-        t = f"tec{i}"
+    tecs = {
+        "tec1": [10, 5, 1],
+        "tec2": [-10, 10, 0.4],
+        "tec3": [-12, 20, 0.3],
+        "tec4": [-14, 30, 0.2],
+        "tec5": [-16, 40, 0.1],
+    }
+    # This is the original and we want to convert back to it after testing:
+    # for i in range(1, n + 1):
+    #     t = f"tec{i}"
+    # -----------------
+    for t in tecs:
         scen.add_set("technology", t)
         for y in years:
             tec_specs = ["node", t, y, y, "mode"]
-            # variable costs grow quadratically over technologies
-            # to get rid of the curse of linearity
-            c = (10 * i / n) ** 2 * (1.045) ** (y - years[0])
-            e = 1 - i / n
+            # This is the original, convert back after testing:
+            # # variable costs grow quadratically over technologies
+            # # to get rid of the curse of linearity
+            # c = (10 * i / n) ** 2 * (1.045) ** (y - years[0])
+            # e = 1 - i / n
+            # scen.add_par("var_cost", tec_specs + ["year"], c, "USD/GWa")
+            # scen.add_par("emission_factor", tec_specs + ["co2"], e, "tCO2")
+            # -------------
             scen.add_par("output", tec_specs + output_specs, 1, "GWa")
-            scen.add_par("var_cost", tec_specs + ["year"], c, "USD/GWa")
-            scen.add_par("emission_factor", tec_specs + ["CO2"], e, "tCO2")
 
-            # scen.add_par("var_cost", tec_specs + ["year"], tecs[t][1], "USD/GWa")
-            # scen.add_par("emission_factor", tec_specs + ["co2"], tecs[t][0], "tCO2")
-            # scen.add_par("bound_activity_up", ["node", t, y, "mode", "year"], tecs[t][2], "GWa")
+            scen.add_par("var_cost", tec_specs + ["year"], tecs[t][1], "USD/GWa")
+            scen.add_par("emission_factor", tec_specs + ["CO2"], tecs[t][0], "tCO2")
+            scen.add_par(
+                "bound_activity_up", ["node", t, y, "mode", "year"], tecs[t][2], "GWa"
+            )
 
         scen.add_set("type_addon", "mitigation")
         scen.add_set("map_tec_addon", ["tec1", "mitigation"])
