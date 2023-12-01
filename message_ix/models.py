@@ -4,7 +4,7 @@ from copy import copy
 from dataclasses import InitVar, dataclass, field
 from functools import partial
 from pathlib import Path
-from typing import Mapping, MutableMapping, Optional, Tuple
+from typing import MutableMapping, Optional, Tuple
 from warnings import warn
 
 import ixmp.model.gams
@@ -175,7 +175,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
 
     #: Mapping from model item (equation, parameter, set, or variable) names to
     #: :class:`.Item` describing the item.
-    items: Mapping[str, Item]
+    items: MutableMapping[str, Item]
 
     def __init__(self, name=None, **model_options):
         # Update the default options with any user-provided options
@@ -407,6 +407,8 @@ par("capacity_factor", "nl t yv ya h")
 par("commodity_stock", "n c l y")
 par("construction_time", "nl t yv")
 par("demand", "n c l y h")
+par("df_year", "y")
+par("df_period", "y")
 par("duration_period", "y")
 par("duration_time", "h")
 par("dynamic_land_lo", "n s y u")
@@ -455,6 +457,7 @@ par("level_cost_activity_soft_lo", "nl t ya h")
 par("level_cost_activity_soft_up", "nl t ya h")
 par("level_cost_new_capacity_soft_lo", "nl t yv")
 par("level_cost_new_capacity_soft_up", "nl t yv")
+par("levelized_cost", "n t y h")
 par("min_utilization_factor", "nl t yv ya")
 par("operation_factor", "nl t yv ya")
 par("output", "nl t yv ya m nd c l h hd")
@@ -558,6 +561,11 @@ var(
     "PRICE_EMISSION",
     "n type_emission type_tec y",
     "Emission price (derived from marginals of EMISSION_BOUND constraint)",
+)
+var(
+    "PRICE_EMISSION_NEW",
+    "n type_emission type_tec y",
+    "TEMPORARY test for Emission price fix",
 )
 var(
     "REL",
@@ -768,7 +776,7 @@ equ(
 )
 equ(
     "EMISSION_EQUIVALENCE",
-    "",
+    "n e type_tec y",
     "Auxiliary equation to simplify the notation of emissions",
 )
 equ("EXTRACTION_BOUND_UP", "", "Upper bound on extraction (by grade)")
