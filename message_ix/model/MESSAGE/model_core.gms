@@ -116,6 +116,7 @@ Positive Variables
     LAND_COST_NEW(node, year_all)     Land cost including debt from scenario switching
     LAND_COST_DEBT(node, year_all,year_all2) Land cost debt from scenario switching 
     EMISS_LU_AUX(node,emission,type_tec,year_all)    positive emissions overshoot of historic emissions compared to chosen land scenario mix
+    EMISS_LU_AUX2(node,emission,type_tec,year_all,year_all2)    positive emissions overshoot of historic emissions compared to chosen land scenario mix
 ;
 
 
@@ -303,6 +304,7 @@ Equations
     EMISSION_EQUIVALENCE_AUX_ANNUAL auxiliary equation calculating land-use emissions from annual scenario input
     EMISSION_EQUIVALENCE_AUX_CUMU   auxiliary equation calculating land-use emissions from cumulative scenario input
     EMISSION_EQUIVALENCE_AUX_CUMU_AUX auxiliary equation calculating the land-use emissions overshoot if positive compared to historic scenario mix
+    EMISSION_EQUIVALENCE_AUX_CUMU_AUX2 auxiliary equation calculating the land-use emissions overshoot if positive compared to historic scenario mix
     EMISSION_CONSTRAINT             nodal-regional-global constraints on emissions (by category)
     LAND_COST_CUMU                  land cost including debt from scenario switching                                 
     LAND_COST_CUMU_DEBT             land cost debt from scenario switching
@@ -1959,7 +1961,9 @@ EMISSION_EQUIVALENCE_AUX_CUMU(location,emission,type_tec,year) $ emission_cumula
     =E=
     SUM(land_scenario ,
             land_emission(location,land_scenario,year,emission) * LAND(location,land_scenario,year) )
-    + EMISS_LU_AUX(location,emission,type_tec,year) ;
+*    + EMISS_LU_AUX(location,emission,type_tec,year) 
+    + SUM(year2, EMISS_LU_AUX2(location,emission,type_tec,year, year2) )
+    ;
     
 * emissions from land use if 'type_tec' is included in the dynamic set 'type_tec_land'
 *    ( SUM(land_scenario,
