@@ -114,6 +114,7 @@ Positive Variables
     LAND_COST_NEW(node, year_all)     Land cost including debt from scenario switching
     LAND_COST_DEBT(node, year_all,year_all2) Land cost debt from scenario switching 
     EMISS_LU_AUX(node,emission,type_tec,year_all)    positive emissions overshoot of historic emissions compared to chosen land scenario mix
+    EMISS_LU_AUX2(node,emission,type_tec,year_all,year_all2)    positive emissions overshoot of historic emissions compared to chosen land scenario mix
 ;
 
 
@@ -303,6 +304,7 @@ Equations
     EMISSION_EQUIVALENCE_AUX_CUMU   auxiliary equation calculating land-use emissions from cumulative scenario input
 *    EMISSION_EQUIVALENCE_AUX_ZERO   auxiliary equation calculating the land-use emissions baseline from cumulative scenario input
     EMISSION_EQUIVALENCE_AUX_CUMU_AUX auxiliary equation calculating the land-use emissions overshoot if positive compared to historic scenario mix
+    EMISSION_EQUIVALENCE_AUX_CUMU_AUX2 auxiliary equation calculating the land-use emissions overshoot if positive compared to historic scenario mix
     EMISSION_CONSTRAINT             nodal-regional-global constraints on emissions (by category)
 *    LAND_CHECK_EMISS                fill LU_GHG check variable
 *    LAND_CHECK_EMISS_ZERO           fill LU_GHG check variable for emissions baseline
@@ -310,7 +312,7 @@ Equations
 *    LAND_COST_CUMU_BIO              dynamic land-cost calculation helper for BIO price 
 *    LAND_COST_CUMU_GHG              dynamic land-cost calculation helper for GHG price
     LAND_COST_CUMU                   land cost including debt from scenario switching                                 
-    LAND_COST_CUMU_AUX               land cost debt from scenario switching
+    LAND_COST_CUMU_DEBT               land cost debt from scenario switching
     LAND_CONSTRAINT                 constraint on total land use (linear combination of land scenarios adds up to 1)
 *    LAND_FILL_BIO                   mapping land-use scenario to biomass land-use scenario
 *    LAND_FILL_GHG_ZERO              mapping biomass land-use scenario to G000 land-use scenario
@@ -1904,7 +1906,9 @@ EMISSION_EQUIVALENCE_AUX_CUMU(location,emission,type_tec,year) $ emission_cumula
     =E=
     SUM(land_scenario ,
             land_emission(location,land_scenario,year,emission) * LAND(location,land_scenario,year) )
-    + EMISS_LU_AUX(location,emission,type_tec,year) ;
+*    + EMISS_LU_AUX(location,emission,type_tec,year) 
+    + SUM(year2, EMISS_LU_AUX2(location,emission,type_tec,year, year2) )
+    ;
     
 * emissions from land use if 'type_tec' is included in the dynamic set 'type_tec_land'
 *    ( SUM(land_scenario,
@@ -1930,6 +1934,15 @@ EMISSION_EQUIVALENCE_AUX_CUMU_AUX(location,emission,type_tec,year) $ emission_cu
       duration_period(year) ;
 
 
+EMISSION_EQUIVALENCE_AUX_CUMU_AUX2(location,emission,type_tec,year,year2) $ (emission_cumulative(emission) AND model_horizon(year) AND year2.pos < year.pos)..
+    EMISS_LU_AUX2(location,emission,type_tec,year,year2) $ ( year2.pos < year.pos ) 
+    =G=
+    SUM(land_scenario,
+            LAND(location, land_scenario, year) * land_emission(location, land_scenario, year2, emission)
+            - LAND(location, land_scenario, year2) * land_emission(location, land_scenario, year2, emission) )
+        - SUM(year3 $ ( year3.pos < year.pos AND year2.pos < year3.pos ), EMISS_LU_AUX2(location, emission,type_tec, year3, year2) ) ;
+
+
 * EMISSION_EQUIVALENCE_AUX_ZERO(location,emission,type_tec,year) $ emission_cumulative(emission)..
 *      EMISS_LU_ZERO(location,emission,type_tec,year) =E=
 *      ( SUM(land_scenario_ghg_zero,
@@ -1947,14 +1960,13 @@ LAND_COST_CUMU(location, year)$( model_horizon(year) )..
        land_cost(location,land_scenario,year) * LAND(location,land_scenario,year) )
        + SUM(year2, 
             LAND_COST_DEBT(location, year, year2)
-            * df_period(year2) / df_period(year)
             ) ; 
 
-LAND_COST_CUMU_AUX(location, year, year2) $ (model_horizon(year) AND year2.pos < year.pos)..
+LAND_COST_CUMU_DEBT(location, year, year2) $ (model_horizon(year) AND year2.pos < year.pos)..
         LAND_COST_DEBT(location, year, year2) $ ( year2.pos < year.pos ) =G=
         SUM(land_scenario$( land_cost(location,land_scenario,year) ),
             LAND(location, land_scenario, year) * land_cost(location,land_scenario,year2)
-            - LAND(location, land_scenario, year2) * land_cost(location,land_scenario,year2) )
+            - LAND(location, land_scenario, year2) * land_cost(location,land_scenario,year2) ) * df_period(year2) / df_period(year)
         - SUM(year3 $ ( year3.pos < year.pos AND year2.pos < year3.pos ), LAND_COST_DEBT(location, year3, year2) ) ;
 
 * LAND_COST_DEBT.UP(location, year, year2) = 0;
