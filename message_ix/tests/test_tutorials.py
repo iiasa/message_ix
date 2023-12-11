@@ -25,12 +25,15 @@ MARK = [
 ]
 
 # Affects all tests in the file
-pytestmark = pytest.mark.flaky(
-    reruns=5,
-    rerun_delay=2,
-    condition=GHA,
-    reason="Flaky; fails occasionally on GitHub Actions runners",
-)
+pytestmark = [
+    pytest.mark.tutorial,
+    pytest.mark.flaky(
+        reruns=5,
+        rerun_delay=2,
+        condition=GHA,
+        reason="Flaky; fails occasionally on GitHub Actions runners",
+    ),
+]
 
 
 def _t(group: Union[str, None], basename: str, *, check=None, marks=None):
