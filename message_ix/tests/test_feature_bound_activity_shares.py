@@ -1,5 +1,4 @@
 import os
-import platform
 
 import numpy as np
 import pandas as pd
@@ -11,7 +10,7 @@ from message_ix.testing import SCENARIO
 FLAKY = pytest.mark.flaky(
     reruns=5,
     rerun_delay=2,
-    condition="GITHUB_ACTIONS" in os.environ and platform.system() == "Darwin",
+    condition="GITHUB_ACTIONS" in os.environ,
     reason="Flaky; see iiasa/message_ix#731",
 )
 
