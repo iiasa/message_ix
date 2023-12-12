@@ -137,6 +137,7 @@ def test_tutorial(caplog, nb_path, checks, tmp_path, tmp_env):
     If `checks` are given, values in the specified cells are tested.
     """
     caplog.set_level(logging.INFO, "traitlets")
+    tmp_env.update(PYDEVD_DISABLE_FILE_VALIDATION="1")
 
     if nb_path.name == "westeros_baseline_using_xlsx_import_part2.ipynb":
         # Copy data files used by this tutorial to `tmp_path`
