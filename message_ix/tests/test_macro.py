@@ -42,19 +42,21 @@ def w_data(w_data_path):
 @pytest.fixture(scope="module")
 def _ws(test_mp):
     """Reusable fixture with an instance of the Westeros model."""
-    yield make_westeros(test_mp, solve=True, quiet=True)
+    scenario = make_westeros(test_mp, quiet=True).clone(scenario="test_macro")
+    scenario.solve()
+    yield scenario
 
 
 @pytest.fixture
-def westeros_solved(_ws):
+def westeros_solved(request, _ws):
     """Fresh clone of the Westeros model."""
-    yield _ws.clone()
+    yield _ws.clone(scenario=request.node.name)
 
 
 @pytest.fixture
-def westeros_not_solved(_ws):
+def westeros_not_solved(request, _ws):
     """Fresh clone of the Westeros model, without a solution."""
-    yield _ws.clone(keep_solution=False)
+    yield _ws.clone(scenario=request.node.name, keep_solution=False)
 
 
 # Tests
