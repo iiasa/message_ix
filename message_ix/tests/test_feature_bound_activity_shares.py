@@ -23,8 +23,10 @@ def calculate_activity(scen, tec="transport_from_seattle"):
     return scen.var("ACT").groupby(["technology", "mode"])["lvl"].sum().loc[tec]
 
 
-def test_add_bound_activity_up(message_test_mp):
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone()
+def test_add_bound_activity_up(request, message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
+        scenario=request.node.name
+    )
     scen.solve(quiet=True)
 
     # data for act bound
@@ -57,7 +59,7 @@ def test_add_bound_activity_up(message_test_mp):
 
 
 @FLAKY
-def test_add_bound_activity_up_all_modes(message_test_mp):
+def test_add_bound_activity_up_all_modes(request, message_test_mp):
     # This test specifically has two solutions for which the `OBJ` function is the same
     # therefore the lpmethod must be set to "2".
     # lpmethod 2:
@@ -72,7 +74,9 @@ def test_add_bound_activity_up_all_modes(message_test_mp):
     # san-diego delivers 325 to "to_new_york"
     # the resulting bound on activity for seattle, therefore is below what is required
     # for "to_chicago"
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone()
+    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
+        scenario=request.node.name
+    )
     scen.solve(quiet=True, solve_options=dict(lpmethod=2))
 
     # data for act bound
@@ -105,7 +109,7 @@ def test_add_bound_activity_up_all_modes(message_test_mp):
     assert new_obj >= orig_obj
 
 
-def test_commodity_share_up(message_test_mp):
+def test_commodity_share_up(request, message_test_mp):
     """Origial Solution
     ----------------
 
@@ -173,7 +177,9 @@ def test_commodity_share_up(message_test_mp):
         )
 
     # initial data
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone()
+    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
+        scenario=request.node.name
+    )
     scen.solve(quiet=True)
     exp = 0.5
 
@@ -241,8 +247,10 @@ def test_commodity_share_up(message_test_mp):
 
 
 @FLAKY
-def test_commodity_share_lo(message_test_mp):
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone()
+def test_commodity_share_lo(request, message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
+        scenario=request.node.name
+    )
     scen.solve(quiet=True)
 
     # data for share bound
@@ -315,8 +323,10 @@ def test_commodity_share_lo(message_test_mp):
     assert new_obj >= orig_obj
 
 
-def test_add_share_mode_up(message_test_mp):
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone()
+def test_add_share_mode_up(request, message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
+        scenario=request.node.name
+    )
     scen.solve(quiet=True)
 
     # data for share bound
@@ -358,8 +368,10 @@ def test_add_share_mode_up(message_test_mp):
 
 
 @FLAKY
-def test_add_share_mode_lo(message_test_mp):
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone()
+def test_add_share_mode_lo(request, message_test_mp):
+    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
+        scenario=request.node.name
+    )
     scen.solve(quiet=True)
 
     # data for share bound
