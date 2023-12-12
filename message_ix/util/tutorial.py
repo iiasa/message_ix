@@ -47,7 +47,7 @@ def prepare_plots(rep: Reporter, input_costs="$/GWa") -> None:
     # Add one node to the reporter for each plot
     for title, func, key_str, units in PLOTS:
         # Convert the string to a Key object so as to reference its .dims
-        key = Key.from_str_or_key(key_str)
+        key = Key(key_str)
 
         # Operation for the reporter
         comp = partial(
