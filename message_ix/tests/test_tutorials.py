@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 from shutil import copyfile
@@ -130,11 +131,13 @@ def default_args():
 # Parametrize the first 3 arguments using the variables *TUTORIALS* and *IDS*.
 # Argument 'nb_path' is indirect so that the above function can modify it.
 @pytest.mark.parametrize("nb_path,checks", TUTORIALS, ids=IDS, indirect=["nb_path"])
-def test_tutorial(nb_path, checks, tmp_path, tmp_env):
+def test_tutorial(caplog, nb_path, checks, tmp_path, tmp_env):
     """Test tutorial in the IPython or IR notebook at `nb_path`.
 
     If `checks` are given, values in the specified cells are tested.
     """
+    caplog.set_level(logging.INFO, "traitlets")
+
     if nb_path.name == "westeros_baseline_using_xlsx_import_part2.ipynb":
         # Copy data files used by this tutorial to `tmp_path`
         for name in DATA_FILES:
