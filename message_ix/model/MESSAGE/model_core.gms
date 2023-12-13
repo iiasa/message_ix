@@ -141,6 +141,9 @@ Variables
 * :math:`\text{GDP}_{n,y} \in \mathbb{R}`                                     Gross domestic product (GDP) in market exchange rates for MACRO reporting
 * =========================================================================== ======================================================================================================
 *
+* .. warning::
+*    Please be aware that transitioning from one period length to another for consecutive periods may result in false values of :math:`\text{PRICE_EMISSION}`. 
+*    Please see `this issue <https://github.com/iiasa/message_ix/issues/723>`_ for further information. We are currently working on a fix.
 ***
 
 Variables
