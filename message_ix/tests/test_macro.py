@@ -117,7 +117,7 @@ def test_config(westeros_solved, w_data_path):
 
     # Missing columns in config raises an exception
     data = c.get("data")
-    data["config"] = data["config"][["node", "sector"]]
+    data["config"] = data["config"][["node", "sector", "commodity", "year"]]
     c = macro.prepare_computer(westeros_solved, data=data)
     with pytest.raises(Exception, match="level"):
         c.get("check all")
