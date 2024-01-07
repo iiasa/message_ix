@@ -145,6 +145,7 @@ TASKS1 = (
         "message::costs",
         "message::emissions",
     ),
+    ("message::sankey", "concat", "out::pyam", "in::pyam"),
 )
 
 
