@@ -253,7 +253,7 @@ def test_init(message_test_mp):
 @FLAKY
 def test_add_model_data(westeros_solved, w_data_path):
     base = westeros_solved
-    clone = base.clone("foo", "bar", keep_solution=False)
+    clone = base.clone(scenario=f"{base.scenario} cloned", keep_solution=False)
     clone.check_out()
     MACRO.initialize(clone)
     macro.add_model_data(base, clone, w_data_path)
