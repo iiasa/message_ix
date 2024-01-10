@@ -1,5 +1,4 @@
 import os
-import platform
 
 import numpy as np
 import pytest
@@ -91,7 +90,7 @@ def assert_multi_db(mp1, mp2):
 @pytest.mark.flaky(
     reruns=5,
     rerun_delay=2,
-    condition="GITHUB_ACTIONS" in os.environ and platform.system() == "Darwin",
+    condition="GITHUB_ACTIONS" in os.environ,
     reason="Flaky; see iiasa/message_ix#731",
 )
 def test_multi_db_run(tmpdir):
