@@ -9,7 +9,7 @@ from typing import Optional
 import pandas as pd
 from ixmp.backend import ItemType
 from pandas.api.types import is_scalar
-from pyam.utils import get_variable_components as gvc
+from pyam.str import get_variable_components as gvc
 
 from message_ix.core import Scenario
 from message_ix.models import MACRO, MESSAGE
@@ -317,21 +317,17 @@ def expand_dims(scenario: Scenario, name, **data):
         # Add the expanded data
         scenario.add_par(name, new_data)
 
-def sankey_mapper(df, year, region, flows_not_needed=[], variables_not_needed = []):
 
-    df_filtered = df.filter(
-                          region=region+'*',
-                          year=year)
+def sankey_mapper(df, year, region, flows_not_needed=[], variables_not_needed=[]):
+    df_filtered = df.filter(region=region + "*", year=year)
 
     mapping = {}
-    for var in df_filtered['variable']:
-        if gvc(var, 0) == 'in':
-            mapping[var] = (gvc(var, [1,2], join=True), gvc(var, [3,4], join=True))
-        if gvc(var, 0) == 'out':
-            mapping[var] = (gvc(var, [3,4], join=True), gvc(var, [1,2], join=True))
-        
+    for var in df_filtered["variable"]:
+        if gvc(var, 0) == "in":
+            mapping[var] = (gvc(var, [1, 2], join=True), gvc(var, [3, 4], join=True))
+        if gvc(var, 0) == "out":
+            mapping[var] = (gvc(var, [3, 4], join=True), gvc(var, [1, 2], join=True))
 
-    
     for k in mapping.keys():
         for flow in flows_not_needed:
             if flow in k:
