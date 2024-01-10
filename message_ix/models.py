@@ -70,7 +70,7 @@ class Item:
     name: str
 
     #: Type of the item, for instance :attr:`ItemType.PAR <ixmp.backend.ItemType.PAR>`.
-    type: ItemType
+    type: "ixmp.backend.ItemType"
 
     #: String expression for :attr:`coords` and :attr:`dims`. Split on spaces and parsed
     #: using :data:`DIMS` so that, for instance, "nl yv" results in entries for
