@@ -62,8 +62,10 @@ def ureg():
 
 
 @pytest.fixture
-def dantzig_reporter(message_test_mp, ureg):
-    scen = message_ix.Scenario(message_test_mp, **SCENARIO["dantzig"])
+def dantzig_reporter(request, message_test_mp, ureg):
+    scen = message_ix.Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
+        scenario=request.node.name
+    )
 
     if not scen.has_solution():
         scen.solve(quiet=True)
