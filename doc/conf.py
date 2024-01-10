@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 # -- Project information ---------------------------------------------------------------
 
 project = "MESSAGEix"
-copyright = "2018–2023, IIASA Energy, Climate, and Environment (ECE) Program"
+copyright = "2018–2024, IIASA Energy, Climate, and Environment (ECE) Program"
 author = "MESSAGEix Developers"
 
 # The major project version, used as the replacement for |version|.
