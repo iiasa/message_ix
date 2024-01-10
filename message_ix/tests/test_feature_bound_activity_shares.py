@@ -96,7 +96,7 @@ def test_add_bound_activity_up_all_modes(request, message_test_mp):
     )
 
     # test limiting all modes
-    clone = scen.clone("foo", "baz", keep_solution=False)
+    clone = scen.clone(scenario=f"{scen.scenario} cloned", keep_solution=False)
     clone.check_out()
     clone.add_par("bound_activity_up", data)
     clone.commit("foo")
@@ -383,7 +383,7 @@ def test_add_share_mode_lo(request, message_test_mp):
     exp = 1.05 * calc_share(scen)
 
     # add share constraints
-    clone = scen.clone("foo", "baz", keep_solution=False)
+    clone = scen.clone(scenario=f"{scen.scenario} cloned", keep_solution=False)
     clone.check_out()
     clone.add_set("shares", "test-share")
     clone.add_par(
