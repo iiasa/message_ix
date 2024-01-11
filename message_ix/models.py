@@ -70,7 +70,7 @@ class Item:
     name: str
 
     #: Type of the item, for instance :attr:`ItemType.PAR <ixmp.backend.ItemType.PAR>`.
-    type: ItemType
+    type: "ixmp.backend.ItemType"
 
     #: String expression for :attr:`coords` and :attr:`dims`. Split on spaces and parsed
     #: using :data:`DIMS` so that, for instance, "nl yv" results in entries for
@@ -167,6 +167,8 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
             # Disable the feature to put input/output GDX files, list files, etc. in a
             # temporary directory
             "use_temp_dir": False,
+            # Record versions of message_ix and ixmp in GDX I/O files
+            "record_version_packages": ("message_ix", "ixmp"),
         },
         ixmp.model.gams.GAMSModel.defaults,
     )

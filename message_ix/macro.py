@@ -639,7 +639,7 @@ def calibrate(s, check_convergence: bool = True, **kwargs):
 
     # Test to make sure number of iterations is 1
     if check_convergence:
-        test = s.clone(s.model, "test to confirm MACRO converges")
+        test = s.clone(scenario=f"{s.scenario} test to confirm MACRO converges")
         kwargs.setdefault("gams_args", gams_args)
         test.solve(model="MESSAGE-MACRO", var_list=["N_ITER"], **kwargs)
         test.set_as_default()

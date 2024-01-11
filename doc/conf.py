@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 # -- Project information ---------------------------------------------------------------
 
 project = "MESSAGEix"
-copyright = "2018–2023, IIASA Energy, Climate, and Environment (ECE) Program"
+copyright = "2018–2024, IIASA Energy, Climate, and Environment (ECE) Program"
 author = "MESSAGEix Developers"
 
 # The major project version, used as the replacement for |version|.
@@ -159,6 +159,7 @@ intersphinx_mapping = {
     "message_doc": ("https://docs.messageix.org/projects/global/en/latest/", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
     "pint": ("https://pint.readthedocs.io/en/stable/", None),
+    "plotnine": ("https://plotnine.readthedocs.io/en/stable", None),
     "pyam": ("https://pyam-iamc.readthedocs.io/en/stable/", None),
     "python": ("https://docs.python.org/3/", None),
     "sphinx": ("https://www.sphinx-doc.org/en/master/", None),

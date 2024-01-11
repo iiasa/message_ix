@@ -8,7 +8,13 @@ import message_ix
 from message_ix import config
 
 
-def test_copy_model(message_ix_cli, tmp_path, tmp_env):
+def test_copy_model(monkeypatch, message_ix_cli, tmp_path, tmp_env):
+    # Use Pytest monkeypatch fixture; this ensures the original value is restored at the
+    # end of the test
+    monkeypatch.setattr(
+        config.values, "message_model_dir", config.get("message model dir")
+    )
+
     r = message_ix_cli("copy-model", str(tmp_path))
     assert r.exit_code == 0
 

@@ -20,6 +20,12 @@ $LOAD balance_equality, time_relative
 $LOAD shares
 $LOAD addon, type_addon, cat_addon, map_tec_addon
 $LOAD storage_tec, level_storage, map_tec_storage
+
+* Version information; conditional load to allow older GDX files
+$ifthen gdxSetType ixmp_version
+$load ixmp_version
+$endif
+
 $GDXIN
 
 Execute_load '%in%'
