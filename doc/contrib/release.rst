@@ -66,7 +66,7 @@ Releasing
 
 1. Create a new branch::
 
-    $ git checkout -v release/X.Y.Z
+    $ git checkout -b release/X.Y.Z
 
 2. Edit :file:`RELEASE_NOTES.rst`:
 
@@ -129,8 +129,8 @@ Releasing
 5. Open a PR with the title “Release vX.Y.Z” using this branch.
    Check:
 
-   - at https://github.com/iiasa/message_ix/actions/workflows/publish.yaml (or `ixmp <https://github.com/iiasa/ixmp/actions/workflows/publish.yaml>`__) that the workflow completes: the package builds successfully and is published to TestPyPI.
-   - at https://test.pypi.org/project/message-ix/ (or `ixmp <https://test.pypi.org/project/ixmp/>`__) that:
+   - at https://github.com/iiasa/message_ix/actions/workflows/publish.yaml (or `ixmp <https://github.com/iiasa/ixmp/actions/workflows/publish.yaml>`__) that the workflow completes: the package builds successfully and is published to PyPI.
+   - at https://pypi.org/project/message-ix/ (or `ixmp <https://pypi.org/project/ixmp/>`__) that:
 
      - The package can be downloaded, installed and run.
      - The README is rendered correctly.
@@ -143,11 +143,11 @@ Releasing
 7. (optional) Tag the release itself and push::
 
     $ git tag v<version>
-    $ git push --tags origin main
+    $ git push --tags <upstream> main
 
    This step (but *not* step (4)) can be performed directly on GitHub; see (8), next.
 
-8. Visit https://github.com/iiasa/message-ix/releases (or `ixmp <https://github.com/iiasa/ixmp/releases>`__) and mark the new release: either using the pushed tag from (8), or by creating the tag and release simultaneously.
+8. Visit https://github.com/iiasa/message-ix/releases (or `ixmp <https://github.com/iiasa/ixmp/releases>`__) and mark the new release: either using the pushed tag from (7), or by creating the tag and release simultaneously.
 
    For the description, provide a link to the section in the “What's New” page of the documentation that corresponds to the new release, using the anchor added in (3), above.
    For example:
