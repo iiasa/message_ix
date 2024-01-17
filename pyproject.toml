@@ -33,7 +33,7 @@ requires-python = ">=3.8"
 dependencies = [
   "click",
   "ixmp >= 3.8.0",
-  "genno[pyam] >= 1.18.1",
+  "genno[pyam] >= 1.20",
   "numpy",
   "pandas >= 1.2",
   "PyYAML",
