@@ -4,7 +4,7 @@ Next release
 All changes
 -----------
 
-- Increase minimum requirement for genno dependency to 1.20 (:pull:`783`)
+- Increase minimum requirement for genno dependency to 1.20 (:pull:`783`).
 
 .. _v3.8.0:
 
