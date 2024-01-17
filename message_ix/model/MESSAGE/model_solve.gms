@@ -80,7 +80,7 @@ else
 *     \min_x \ \text{OBJ} = \sum_{y \in \hat{Y}(\hat{y})} \text{OBJ}_y(x_y) \\
 *     \text{s.t. } x_{y'} = x_{y'}^* \quad \forall \ y' < y
 *
-* where :math:`\hat{Y}(\hat{y}) = \{y \in Y | \ |\hat{y}| - |y| < \text{optimization_horizon} \}` and
+* where :math:`\hat{Y}(\hat{y}) = \{y \in Y | \ |\hat{y}| - |y| < \text{optimization\_horizon} \}` and
 * :math:`x_{y'}^*` is the optimal value of :math:`x_{y'}` in iteration :math:`|y'|` of the iterative loop.
 *
 * The advantage of this implementation is that there is no need to 'store' the optimal values of all decision
