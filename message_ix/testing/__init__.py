@@ -272,7 +272,14 @@ def make_austria(mp, solve=False, quiet=True):  # noqa: C901
     return scen
 
 
-def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
+def make_dantzig(
+    mp,
+    solve=False,
+    multi_year=False,
+    *,
+    request: Optional["pytest.FixtureRequest"] = None,
+    **solve_opts,
+):
     """Return an :class:`message_ix.Scenario` for Dantzig's canning problem.
 
     Parameters
@@ -291,10 +298,15 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
     mp.add_region("DantzigLand", "country")
 
     # initialize a new (empty) instance of an `ixmp.Scenario`
+    if request:
+        scenario_name = request.node.name
+    else:
+        scenario_name = "multi-year" if multi_year else "standard"
+
     scen = Scenario(
         mp,
         model=SCENARIO["dantzig"]["model"],
-        scenario="multi-year" if multi_year else "standard",
+        scenario=scenario_name,
         annotation="Dantzig's canning problem as a MESSAGE-scheme Scenario",
         version="new",
     )
