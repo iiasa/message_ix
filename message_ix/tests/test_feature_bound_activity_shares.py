@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from message_ix import Scenario
-from message_ix.testing import SCENARIO
+from message_ix import Scenario, make_df
+from message_ix.testing import SCENARIO, make_dantzig
 
 FLAKY = pytest.mark.flaky(
     reruns=5,
@@ -24,31 +24,28 @@ def calculate_activity(scen, tec="transport_from_seattle"):
 
 
 def test_add_bound_activity_up(request, message_test_mp):
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
-        scenario=request.node.name
-    )
-    scen.solve(quiet=True)
+    scen = make_dantzig(message_test_mp, solve=True, request=request)
 
     # data for act bound
     exp = 0.5 * calculate_activity(scen).sum()
-    data = pd.DataFrame(
-        {
-            "node_loc": "seattle",
-            "technology": "transport_from_seattle",
-            "year_act": _year,
-            "time": "year",
-            "unit": "cases",
-            "mode": "to_chicago",
-            "value": exp,
-        },
-        index=[0],
+    name = "bound_activity_up"
+    data = make_df(
+        name,
+        node_loc="seattle",
+        technology="transport_from_seattle",
+        year_act=_year,
+        time="year",
+        unit="cases",
+        mode="to_chicago",
+        value=exp,
     )
 
     # test limiting one mode
-    clone = scen.clone("foo", "bar", keep_solution=False)
-    clone.check_out()
-    clone.add_par("bound_activity_up", data)
-    clone.commit("foo")
+    clone = scen.clone(scenario=f"{scen.scenario} cloned", keep_solution=False)
+
+    with clone.transact():
+        clone.add_par("bound_activity_up", data)
+
     clone.solve(quiet=True)
     obs = calculate_activity(clone).loc["to_chicago"]
     assert np.isclose(obs, exp)
@@ -60,46 +57,52 @@ def test_add_bound_activity_up(request, message_test_mp):
 
 @FLAKY
 def test_add_bound_activity_up_all_modes(request, message_test_mp):
-    # This test specifically has two solutions for which the `OBJ` function is the same
-    # therefore the lpmethod must be set to "2".
-    # lpmethod 2:
-    # "transport_from_seattle" needs to provide "to_chicago" with 300.
-    # the unconstrained example seattle delivers 50 to "to_new_york" and 300
-    # "to_chicago".
-    # additional 275 to "to_new_york" comes from san-diego.
-    # The activity bound for "transport_from_seattle" (see below) below is therefore
-    # set to 325.
-    # lpmehtod 4:
-    # the unconstrained example seattle delivers 300 "to_chicago".
-    # san-diego delivers 325 to "to_new_york"
-    # the resulting bound on activity for seattle, therefore is below what is required
-    # for "to_chicago"
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
-        scenario=request.node.name
+    """
+
+    This test specifically has two solutions for which the `OBJ` function is the same
+    therefore the lpmethod must be set to "2".
+
+    With lpmethod=2:
+
+    - "transport_from_seattle" needs to provide "to_chicago" with 300.
+    - in the unconstrained example seattle delivers 50 to "to_new_york" and 300
+      "to_chicago".
+    - additional 275 to "to_new_york" comes from san-diego.
+    - the activity bound for "transport_from_seattle" (see below) below is therefore
+      set to 325.
+
+    With  lpmethod=4:
+
+    - the unconstrained example seattle delivers 300 "to_chicago".
+    - san-diego delivers 325 to "to_new_york"
+    - the resulting bound on activity for seattle, therefore is below what is required
+      for "to_chicago".
+    """
+    scen = make_dantzig(
+        message_test_mp, solve=True, request=request, solve_options=dict(lpmethod=2)
     )
-    scen.solve(quiet=True, solve_options=dict(lpmethod=2))
 
     # data for act bound
     # print(calculate_activity(scen))
     exp = 0.95 * calculate_activity(scen).sum()
-    data = pd.DataFrame(
-        {
-            "node_loc": "seattle",
-            "technology": "transport_from_seattle",
-            "year_act": _year,
-            "time": "year",
-            "unit": "cases",
-            "mode": "all",
-            "value": exp,
-        },
-        index=[0],
+    name = "bound_activity_up"
+    data = make_df(
+        name,
+        node_loc="seattle",
+        technology="transport_from_seattle",
+        year_act=_year,
+        time="year",
+        unit="cases",
+        mode="all",
+        value=exp,
     )
 
     # test limiting all modes
     clone = scen.clone(scenario=f"{scen.scenario} cloned", keep_solution=False)
-    clone.check_out()
-    clone.add_par("bound_activity_up", data)
-    clone.commit("foo")
+
+    with clone.transact():
+        clone.add_par(name, data)
+
     clone.solve(quiet=True, solve_options=dict(lpmethod=2))
     obs = calculate_activity(clone).sum()
     assert np.isclose(obs, exp)
@@ -177,10 +180,8 @@ def test_commodity_share_up(request, message_test_mp):
         )
 
     # initial data
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
-        scenario=request.node.name
-    )
-    scen.solve(quiet=True)
+    scen = make_dantzig(message_test_mp, solve=True, request=request)
+
     exp = 0.5
 
     # check shares orig, should be bigger than expected bound
