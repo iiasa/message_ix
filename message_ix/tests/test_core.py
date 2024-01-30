@@ -188,7 +188,7 @@ def test_add_horizon(test_mp, args, kwargs, exp):
 
     # Call completes successfully
     if isinstance(args[0], dict):
-        if "data" in args[0].keys():
+        if "data" in kwargs.keys():
             scen.add_horizon(*args, **kwargs)
         else:
             with pytest.warns(
