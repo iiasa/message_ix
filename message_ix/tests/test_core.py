@@ -187,18 +187,15 @@ def test_add_horizon(test_mp, args, kwargs, exp):
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
 
     # Call completes successfully
-    if isinstance(args[0], dict):
-        if "data" in kwargs.keys():
+    if isinstance(args[0], dict) and "data" not in kwargs:
+        with pytest.warns(
+            DeprecationWarning,
+            match=(
+                r"dict\(\) argument to add_horizon\(\); use year= and "
+                "firstmodelyear="
+            ),
+        ):
             scen.add_horizon(*args, **kwargs)
-        else:
-            with pytest.warns(
-                DeprecationWarning,
-                match=(
-                    r"dict\(\) argument to add_horizon\(\); use year= and "
-                    "firstmodelyear="
-                ),
-            ):
-                scen.add_horizon(*args, **kwargs)
     else:
         scen.add_horizon(*args, **kwargs)
 
