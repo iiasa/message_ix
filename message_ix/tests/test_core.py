@@ -187,7 +187,7 @@ def test_add_horizon(test_mp, args, kwargs, exp):
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
 
     # Call completes successfully
-    if isinstance(args[0], dict):
+    if isinstance(args[0], dict) and "data" not in kwargs:
         with pytest.warns(
             DeprecationWarning,
             match=(

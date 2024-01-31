@@ -47,14 +47,14 @@ jobs:
 
     steps:
     - name: Check out message_ix
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: ${{ env.depth }}
 
     - name: Fetch tags (for setuptools-scm)
       run: git fetch --tags --depth=${{ env.depth }}
 
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
         cache: pip
@@ -85,6 +85,8 @@ jobs:
       run: |
         pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
         pip install .[tests]
+        # TEMPORARY work around iiasa/message_ix#788
+        pip install "genno<1.23"
 
     - name: Run test suite using pytest
       env:
@@ -116,11 +118,11 @@ jobs:
 
     steps:
     - name: Check out message_ix
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: ${{ env.depth }}
 
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: "3.11"
         cache: pip
@@ -191,8 +193,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
       with:  # Same as the "Latest version supported by message_ix", above
         python-version: "3.11"
 
