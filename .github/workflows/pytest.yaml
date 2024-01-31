@@ -85,6 +85,8 @@ jobs:
       run: |
         pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
         pip install .[tests]
+        # TEMPORARY work around iiasa/message_ix#788
+        pip install "genno<1.23"
 
     - name: Run test suite using pytest
       env:
