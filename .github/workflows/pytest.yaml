@@ -130,7 +130,7 @@ jobs:
 
     - name: Set RETICULATE_PYTHON
       # Use the environment variable set by the setup-python action, above.
-      run: echo "RETICULATE_PYTHON=$pythonLocation" >> $GITHUB_ENV
+      run: echo "RETICULATE_PYTHON=$pythonLocation" >> "$GITHUB_ENV"
       shell: bash
 
     - uses: ts-graphviz/setup-graphviz@v1.2.0
