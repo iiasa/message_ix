@@ -65,7 +65,7 @@ jobs:
         macos-skip-brew-update: true
 
     - name: Cache GAMS installer and R packages
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           gams
@@ -85,8 +85,6 @@ jobs:
       run: |
         pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
         pip install .[tests]
-        # TEMPORARY work around iiasa/message_ix#788
-        pip install "genno<1.23"
 
     - name: Run test suite using pytest
       env:
@@ -101,7 +99,9 @@ jobs:
       shell: bash
 
     - name: Upload test coverage to Codecov.io
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   tutorials:
     strategy:
@@ -141,7 +141,7 @@ jobs:
       id: setup-r
 
     - name: Cache GAMS installer and R packages
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           gams
@@ -185,7 +185,9 @@ jobs:
       shell: bash
 
     - name: Upload test coverage to Codecov.io
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   pre-commit:
     name: Code quality
