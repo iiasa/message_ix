@@ -50,7 +50,7 @@ jobs:
       run: python -m pip install --upgrade pip setuptools-scm wheel
 
     - name: Cache GAMS installer and Python packages
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: gams
         key: ubuntu-latest-gams${{ env.GAMS_VERSION }}
