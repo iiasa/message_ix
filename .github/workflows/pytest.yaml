@@ -188,8 +188,8 @@ jobs:
 
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v4
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }} # required
 
   pre-commit:
     name: Code quality
