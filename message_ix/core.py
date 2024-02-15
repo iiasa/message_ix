@@ -751,8 +751,12 @@ class Scenario(ixmp.Scenario):
             if isinstance(ix_set, pd.DataFrame):
                 if name in self.idx_sets(item) and not ix_set.empty:
                     for key, value in mapping.items():
-                        columns = [x for x in self.idx_names(item) if
-                                   self.idx_sets(item)[self.idx_names(item).index(x)] == name]
+                        columns = [
+                            x
+                            for x in self.idx_names(item)
+                            if self.idx_sets(item)[self.idx_names(item).index(x)]
+                            == name
+                        ]
                         for col in columns:
                             df = ix_set[ix_set[col] == key]
                             if not df.empty:
@@ -768,8 +772,11 @@ class Scenario(ixmp.Scenario):
             if name not in self.idx_sets(item):
                 continue
             for key, value in mapping.items():
-                columns = [x for x in self.idx_names(item) if
-                           self.idx_sets(item)[self.idx_names(item).index(x)] == name]
+                columns = [
+                    x
+                    for x in self.idx_names(item)
+                    if self.idx_sets(item)[self.idx_names(item).index(x)] == name
+                ]
                 for col in columns:
                     df = self.par(item, filters={col: [key]})
                     if not df.empty:
