@@ -2,12 +2,13 @@ from pathlib import Path
 from subprocess import run
 
 import ixmp
-import message_ix
 import numpy as np
 import numpy.testing as npt
 import pandas as pd
 import pandas.testing as pdt
 import pytest
+
+import message_ix
 from message_ix import Scenario
 from message_ix.testing import SCENARIO, make_dantzig, make_westeros
 
