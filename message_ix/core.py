@@ -749,12 +749,15 @@ class Scenario(ixmp.Scenario):
         for item in self.set_list():
             ix_set = self.set(item)
             if isinstance(ix_set, pd.DataFrame):
-                if name in ix_set.columns and not ix_set.empty:
+                if name in self.idx_sets(item) and not ix_set.empty:
                     for key, value in mapping.items():
-                        df = ix_set[ix_set[name] == key]
-                        if not df.empty:
-                            df[name] = value
-                            self.add_set(item, df)
+                        columns = [x for x in self.idx_names(item) if
+                                   self.idx_sets(item)[self.idx_names(item).index(x)] == name]
+                        for col in columns:
+                            df = ix_set[ix_set[col] == key]
+                            if not df.empty:
+                                df[columns] = df[columns].replace({key: value})
+                                self.add_set(item, df)
             elif ix_set.isin(keys).any():  # ix_set is pd.Series
                 for key, value in mapping.items():
                     if ix_set.isin([key]).any():
@@ -762,13 +765,16 @@ class Scenario(ixmp.Scenario):
 
         # search for from_tech in pars and replace
         for item in self.par_list():
-            if name not in self.idx_names(item):
+            if name not in self.idx_sets(item):
                 continue
             for key, value in mapping.items():
-                df = self.par(item, filters={name: [key]})
-                if not df.empty:
-                    df[name] = value
-                    self.add_par(item, df)
+                columns = [x for x in self.idx_names(item) if
+                           self.idx_sets(item)[self.idx_names(item).index(x)] == name]
+                for col in columns:
+                    df = self.par(item, filters={col: [key]})
+                    if not df.empty:
+                        df[columns] = df[columns].replace({key: value})
+                        self.add_par(item, df)
 
         # this removes all instances of from_tech in the model
         if not keep:
