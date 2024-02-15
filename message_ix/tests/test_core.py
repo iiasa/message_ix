@@ -20,12 +20,15 @@ def dantzig_message_scenario(message_test_mp):
 
 class TestScenario:
     testdata = [
-        ("technology", "coal_ppl", "coal_powerplant"),
-        ("node", "Westeros", "Tessos"),
+        ("technology", "coal_ppl", "coal_powerplant", False),
+        ("node", "Westeros", "Tessos", False),
+        ("node", "Westeros", "Tessos", True),
     ]
 
-    @pytest.mark.parametrize("set_name, old, new", testdata)
-    def test_rename(self, test_mp, set_name: str, old: str, new: str) -> None:
+    @pytest.mark.parametrize("set_name, old, new, keep", testdata)
+    def test_rename(
+        self, test_mp, set_name: str, old: str, new: str, keep: bool
+    ) -> None:
         # Create a Westeros scenario instance and solve it
         scen_ref = make_westeros(test_mp, quiet=True)
         scen_ref.solve()
@@ -36,15 +39,20 @@ class TestScenario:
         # Rename members of a message_ix.set from an "old" name to a "new" name
         scen.check_out()
         scen.add_set(set_name, new)
-        scen.rename(set_name, {old: new})
+        scen.rename(set_name, {old: new}, keep)
 
         # Check if the new member has been added to that set
         assert new in set(scen.set(set_name))
 
         # Check if the scenario solves and the objective function remains the same
         scen.solve()
-        # Check if OBJ value is the same
-        assert scen_ref.var("OBJ")["lvl"] == scen.var("OBJ")["lvl"]
+
+        if not keep:
+            # Check if OBJ value remains unchanged when old is removed (keep=False)
+            assert scen.var("OBJ")["lvl"] == scen_ref.var("OBJ")["lvl"]
+        elif set_name == "node":
+            # Check if OBJ value is as twice when old "node" is kept (keep=True)
+            assert scen.var("OBJ")["lvl"] == scen_ref.var("OBJ")["lvl"] * 2
 
     def test_solve(self, dantzig_message_scenario):
         s = dantzig_message_scenario
