@@ -2,15 +2,14 @@ from pathlib import Path
 from subprocess import run
 
 import ixmp
+import message_ix
 import numpy as np
 import numpy.testing as npt
 import pandas as pd
 import pandas.testing as pdt
 import pytest
-
-import message_ix
 from message_ix import Scenario
-from message_ix.testing import SCENARIO, make_dantzig
+from message_ix.testing import SCENARIO, make_dantzig, make_westeros
 
 
 @pytest.fixture
@@ -19,6 +18,33 @@ def dantzig_message_scenario(message_test_mp):
 
 
 class TestScenario:
+    testdata = [
+        ("technology", "coal_ppl", "coal_powerplant"),
+        ("node", "Westeros", "Tessos"),
+    ]
+
+    @pytest.mark.parametrize("set_name, old, new", testdata)
+    def test_rename(self, test_mp, set_name: str, old: str, new: str) -> None:
+        # Create a Westeros scenario instance and solve it
+        scen_ref = make_westeros(test_mp, quiet=True)
+        scen_ref.solve()
+
+        # Clone the scenario to do renaming and tests
+        scen = scen_ref.clone(keep_solution=False)
+
+        # Rename members of a message_ix.set from an "old" name to a "new" name
+        scen.check_out()
+        scen.add_set(set_name, new)
+        scen.rename(set_name, {old: new})
+
+        # Check if the new member has been added to that set
+        assert new in set(scen.set(set_name))
+
+        # Check if the scenario solves and the objective function remains the same
+        scen.solve()
+        # Check if OBJ value is the same
+        assert scen_ref.var("OBJ")["lvl"] == scen.var("OBJ")["lvl"]
+
     def test_solve(self, dantzig_message_scenario):
         s = dantzig_message_scenario
 
