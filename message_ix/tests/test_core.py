@@ -21,16 +21,16 @@ def dantzig_message_scenario(message_test_mp):
 class TestScenario:
     testdata = [
         ("technology", "coal_ppl", "coal_powerplant", False),
-        ("node", "Westeros", "Tessos", False),
-        ("node", "Westeros", "Tessos", True),
+        ("node", "Westeros", "Essos", False),
+        ("node", "Westeros", "Essos", True),
     ]
 
     @pytest.mark.parametrize("set_name, old, new, keep", testdata)
     def test_rename(
-        self, test_mp, set_name: str, old: str, new: str, keep: bool
+        self, test_mp, set_name: str, old: str, new: str, keep: bool, request
     ) -> None:
         # Create a Westeros scenario instance and solve it
-        scen_ref = make_westeros(test_mp, quiet=True)
+        scen_ref = make_westeros(test_mp, quiet=True, request=request)
         scen_ref.solve()
 
         # Clone the scenario to do renaming and tests
