@@ -19,14 +19,15 @@ def dantzig_message_scenario(message_test_mp):
 
 
 class TestScenario:
-    testdata = [
-        ("technology", "coal_ppl", "coal_powerplant", False),
-        ("node", "Westeros", "Essos", False),
-        ("node", "Westeros", "Essos", True),
-    ]
-
-    @pytest.mark.parametrize("set_name, old, new, keep", testdata)
-    def test_rename(
+    @pytest.mark.parametrize(
+        "set_name, old, new, keep",
+        (
+            ("technology", "coal_ppl", "coal_powerplant", False),
+            ("node", "Westeros", "Essos", False),
+            ("node", "Westeros", "Essos", True),
+        ),
+    )
+    def test_rename0(
         self, test_mp, set_name: str, old: str, new: str, keep: bool, request
     ) -> None:
         # Create a Westeros scenario instance and solve it
@@ -46,14 +47,32 @@ class TestScenario:
         # Check if the scenario solves and the objective function remains the same
         scen.solve(quiet=True)
 
-        if not keep:
-            # Check if "old" is removed (keep=False)
-            assert old not in set(scen.set(set_name))
-            # Check if OBJ value remains unchanged when "old" is removed (keep=False)
-            assert scen.var("OBJ")["lvl"] == scen_ref.var("OBJ")["lvl"]
-        elif set_name == "node":
-            # Check if OBJ value is twice as high when "old" node is kept (keep=True)
-            assert scen.var("OBJ")["lvl"] == scen_ref.var("OBJ")["lvl"] * 2
+        # Check if "old" is removed (keep=False)
+        assert keep == (old in set(scen.set(set_name)))
+
+        # Check if OBJ value remains unchanged when "old" is removed (keep=False); or
+        # twice as high when "old" note is kept (keep=True)
+        exp = scen_ref.var("OBJ")["lvl"] * (1 + int(keep and set_name == "node"))
+        assert exp == scen.var("OBJ")["lvl"]
+
+    @pytest.mark.parametrize("check_out", (True, False))
+    @pytest.mark.parametrize("keep", (True, False))
+    def test_rename1(self, request, dantzig_message_scenario, check_out, keep):
+        scen = dantzig_message_scenario
+        assert scen.par("output")["technology"].isin(["canning_plant"]).any()
+
+        clone = scen.clone(scenario=request.node.name)
+
+        if check_out:
+            clone.check_out()
+
+        clone.rename("technology", {"canning_plant": "foo_bar"}, keep=keep)
+
+        assert keep == clone.par("output")["technology"].isin(["canning_plant"]).any()
+        assert clone.par("output")["technology"].isin(["foo_bar"]).any()
+
+        clone.solve(quiet=True)
+        assert np.isclose(clone.var("OBJ")["lvl"], 153.675)
 
     def test_solve(self, dantzig_message_scenario):
         s = dantzig_message_scenario
@@ -488,31 +507,6 @@ def test_new_timeseries_long_name64plus(message_test_mp):
     )
     scen.add_timeseries(df)
     scen.commit("importing a testing timeseries")
-
-
-def test_rename_technology(dantzig_message_scenario):
-    scen = dantzig_message_scenario
-    assert scen.par("output")["technology"].isin(["canning_plant"]).any()
-
-    clone = scen.clone("foo", "bar")
-    clone.rename("technology", {"canning_plant": "foo_bar"})
-    assert not clone.par("output")["technology"].isin(["canning_plant"]).any()
-    assert clone.par("output")["technology"].isin(["foo_bar"]).any()
-    clone.solve(quiet=True)
-    assert np.isclose(clone.var("OBJ")["lvl"], 153.675)
-
-
-def test_rename_technology_no_rm(dantzig_message_scenario):
-    scen = dantzig_message_scenario
-    assert scen.par("output")["technology"].isin(["canning_plant"]).any()
-
-    clone = scen.clone("foo", "bar")
-    # also test if already checked out
-    clone.check_out()
-
-    clone.rename("technology", {"canning_plant": "foo_bar"}, keep=True)
-    assert clone.par("output")["technology"].isin(["canning_plant"]).any()
-    assert clone.par("output")["technology"].isin(["foo_bar"]).any()
 
 
 def test_excel_read_write(message_test_mp, tmp_path):
