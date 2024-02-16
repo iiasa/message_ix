@@ -48,10 +48,12 @@ class TestScenario:
         scen.solve()
 
         if not keep:
-            # Check if OBJ value remains unchanged when old is removed (keep=False)
+            # Check if "old" is removed (keep=False)
+            assert old not in set(scen.set(set_name))
+            # Check if OBJ value remains unchanged when "old" is removed (keep=False)
             assert scen.var("OBJ")["lvl"] == scen_ref.var("OBJ")["lvl"]
         elif set_name == "node":
-            # Check if OBJ value is as twice when old "node" is kept (keep=True)
+            # Check if OBJ value is as twice when "old" node is kept (keep=True)
             assert scen.var("OBJ")["lvl"] == scen_ref.var("OBJ")["lvl"] * 2
 
     def test_solve(self, dantzig_message_scenario):
