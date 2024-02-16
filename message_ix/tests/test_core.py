@@ -25,6 +25,23 @@ class TestScenario:
             ("technology", "coal_ppl", "coal_powerplant", False),
             ("node", "Westeros", "Essos", False),
             ("node", "Westeros", "Essos", True),
+            # "year" dimensions: integer instead of string values; model is infeasible
+            # (GAMS error)
+            pytest.param("year", 700, 701, False, marks=pytest.mark.xfail),
+            # Indexed set, doesn't work
+            pytest.param("cat_year", "foo", "bar", False, marks=pytest.mark.xfail),
+            # Name of a parameter, not a set
+            pytest.param(
+                "bound_activity_up",
+                "",
+                "",
+                False,
+                marks=pytest.mark.xfail(raises=KeyError),
+            ),
+            # Not a name of any item
+            pytest.param(
+                "foo", "", "", False, marks=pytest.mark.xfail(raises=KeyError)
+            ),
         ),
     )
     def test_rename0(
@@ -38,7 +55,6 @@ class TestScenario:
 
         # Rename members of a message_ix.set from an "old" name to a "new" name
         scen.check_out()
-        scen.add_set(set_name, new)
         scen.rename(set_name, {old: new}, keep)
 
         # Check if the new member has been added to that set

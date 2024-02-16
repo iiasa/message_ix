@@ -727,14 +727,20 @@ class Scenario(ixmp.Scenario):
         return clone
 
     def rename(self, name: str, mapping: Mapping[str, str], keep: bool = False) -> None:
-        """Rename an element in a set.
+        """Rename elements in the set `name` and transform data indexed by old name(s).
 
-        Data in all parameters indexed by the set `name` is also modified.
+        - All new set element names per `mapping` are added to the set `name`, if not
+          already present.
+        - Data in all sets and parameters indexed by the set `name` is also either
+          duplicated (if :py:`keep=True`) or replaced (if :py:`keep=False`) with mapped
+          keys.
 
         Parameters
         ----------
         name : str
-            Name of the set to change, for instance :py:`"technology"`.
+            Name of the set to change, for instance :py:`"technology"`. Note that
+            renaming the "year" set may require further adjustments for a feasible
+            scenario.
         mapping : dict
             Mapping from old/current to new set element names.
         keep : bool, optional
@@ -742,6 +748,14 @@ class Scenario(ixmp.Scenario):
             entirely from the Scenario.
             If :any:`True`, old/current set elements *and* all parameter data indexed by
             them is retained.
+
+        Raises
+        ------
+        KeyError
+            if `name` is the name of a different kind of item (for instance, a
+            parameter) or of no known item.
+        ValueError
+            if `name` is a set indexed by 1 or more others.
         """
         commit = maybe_check_out(self)
 
