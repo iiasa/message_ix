@@ -2,14 +2,15 @@ import logging
 import os
 from collections.abc import Mapping
 from functools import lru_cache
-from itertools import chain, product
-from typing import Iterable, List, Optional, Tuple, Union
+from itertools import chain, product, zip_longest
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 from warnings import warn
 
 import ixmp
 import numpy as np
 import pandas as pd
-from ixmp.util import as_str_list
+from ixmp.backend import ItemType
+from ixmp.util import as_str_list, maybe_check_out, maybe_commit
 
 log = logging.getLogger(__name__)
 
@@ -725,69 +726,71 @@ class Scenario(ixmp.Scenario):
         calibrate(clone, check_convergence=check_convergence, **kwargs)
         return clone
 
-    # FIXME reduce complexity from 18 to <=14
-    def rename(self, name, mapping, keep=False):  # noqa: C901
-        """Rename an element in a set
+    def rename(self, name: str, mapping: Mapping[str, str], keep: bool = False) -> None:
+        """Rename an element in a set.
+
+        Data in all parameters indexed by the set `name` is also modified.
 
         Parameters
         ----------
         name : str
-            name of the set to change (e.g., 'technology')
-        mapping : str
-            mapping of old (current) to new set element names
-        keep : bool, optional, default: False
-            keep the old values in the model
+            Name of the set to change, for instance :py:`"technology"`.
+        mapping : dict
+            Mapping from old/current to new set element names.
+        keep : bool, optional
+            If :any:`False` (the default), old/current set element names are removed
+            entirely from the Scenario.
+            If :any:`True`, old/current set elements *and* all parameter data indexed by
+            them is retained.
         """
-        try:
-            self.check_out()
-            commit = True
-        except RuntimeError:
-            commit = False
-        keys = list(mapping.keys())
+        commit = maybe_check_out(self)
 
-        # search for from_tech in sets and replace
-        for item in self.set_list():
-            ix_set = self.set(item)
-            if isinstance(ix_set, pd.DataFrame):
-                if name in self.idx_sets(item) and not ix_set.empty:
-                    for key, value in mapping.items():
-                        columns = [
-                            x
-                            for x in self.idx_names(item)
-                            if self.idx_sets(item)[self.idx_names(item).index(x)]
-                            == name
-                        ]
-                        for col in columns:
-                            df = ix_set[ix_set[col] == key]
-                            if not df.empty:
-                                df[columns] = df[columns].replace({key: value})
-                                self.add_set(item, df)
-            elif ix_set.isin(keys).any():  # ix_set is pd.Series
-                for key, value in mapping.items():
-                    if ix_set.isin([key]).any():
-                        self.add_set(item, value)
+        # - Iterate over tuples of (item_name, ix_type); only those indexed by `name`.
+        # - First the set itself; then all other sets; then all parameters.
+        kw: Dict[str, Any] = dict(indexed_by=name, par_data=False)
+        for item_name, ix_type in chain(
+            [(name, "set")],
+            zip_longest(self.items(ItemType.SET, **kw), [], fillvalue="set"),
+            zip_longest(self.items(ItemType.PAR, **kw), [], fillvalue="par"),
+        ):
+            # Identify some index names of this set; only those where the corresponding
+            # index set is `name`
+            names = [
+                n
+                for (s, n) in zip(self.idx_sets(item_name), self.idx_names(item_name))
+                if s == name
+            ]
 
-        # search for from_tech in pars and replace
-        for item in self.par_list():
-            if name not in self.idx_sets(item):
-                continue
-            for key, value in mapping.items():
-                columns = [
-                    x
-                    for x in self.idx_names(item)
-                    if self.idx_sets(item)[self.idx_names(item).index(x)] == name
-                ]
-                for col in columns:
-                    df = self.par(item, filters={col: [key]})
-                    if not df.empty:
-                        df[columns] = df[columns].replace({key: value})
-                        self.add_par(item, df)
+            # Construct filters for add_{par,set} and an argument for pd.*.replace()
+            if len(names) == 0:
+                # This is the set `name` itself → data will be pd.Series
+                filters = None
+                to_replace: Mapping[str, Union[str, Mapping]] = mapping
+            else:
+                # An indexed set or parameter → data will be pd.DataFrame
+                # Filters: only the values to be replaced
+                filters = {n: mapping.keys() for n in names}
+                # Replacements:
+                # - First level keys: column names (=index names)
+                # - Second-level keys and values: `mapping`, the replacement(s) to be
+                #   made.
+                to_replace = {n: mapping for n in names}
 
-        # this removes all instances of from_tech in the model
+            f_retrieve = getattr(self, ix_type)  # .par() or .set()
+            f_add = getattr(self, f"add_{ix_type}")  # .add_par() or .add_set()
+
+            # Retrieve the data, perform the replacements
+            renamed = f_retrieve(item_name, filters=filters).replace(to_replace)
+
+            if not len(renamed):
+                continue  # Nothing modified
+
+            # Update
+            log.info(f"{len(renamed)} values/elements in {ix_type} {item_name!r}")
+            f_add(item_name, renamed)
+
         if not keep:
-            for key in keys:
-                self.remove_set(name, key)
+            # Remove all instances of the original elements from the scenario
+            self.remove_set(name, list(mapping.keys()))
 
-        # commit
-        if commit:
-            self.commit("Renamed {} using mapping {}".format(name, mapping))
+        maybe_commit(self, commit, f"Rename {name!r} using mapping {mapping}")
