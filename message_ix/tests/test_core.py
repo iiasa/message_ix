@@ -53,7 +53,7 @@ class TestScenario:
             # Check if OBJ value remains unchanged when "old" is removed (keep=False)
             assert scen.var("OBJ")["lvl"] == scen_ref.var("OBJ")["lvl"]
         elif set_name == "node":
-            # Check if OBJ value is as twice when "old" node is kept (keep=True)
+            # Check if OBJ value is twice as high when "old" node is kept (keep=True)
             assert scen.var("OBJ")["lvl"] == scen_ref.var("OBJ")["lvl"] * 2
 
     def test_solve(self, dantzig_message_scenario):
