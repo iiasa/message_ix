@@ -30,8 +30,7 @@ class TestScenario:
         self, test_mp, set_name: str, old: str, new: str, keep: bool, request
     ) -> None:
         # Create a Westeros scenario instance and solve it
-        scen_ref = make_westeros(test_mp, quiet=True, request=request)
-        scen_ref.solve()
+        scen_ref = make_westeros(test_mp, quiet=True, solve=True, request=request)
 
         # Clone the scenario to do renaming and tests
         scen = scen_ref.clone(keep_solution=False)
@@ -45,7 +44,7 @@ class TestScenario:
         assert new in set(scen.set(set_name))
 
         # Check if the scenario solves and the objective function remains the same
-        scen.solve()
+        scen.solve(quiet=True)
 
         if not keep:
             # Check if "old" is removed (keep=False)
