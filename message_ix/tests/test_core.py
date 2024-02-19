@@ -90,6 +90,24 @@ class TestScenario:
         clone.solve(quiet=True)
         assert np.isclose(clone.var("OBJ")["lvl"], 153.675)
 
+    def test_rename2(self, request, dantzig_message_scenario):
+        """Test :meth:`.rename` for parameters with 2+ indexes for the same set."""
+        scen = dantzig_message_scenario
+
+        # Counts of unique combinations of (node_loc, node_dest)
+        vc_pre = scen.par("output")[["node_loc", "node_dest"]].value_counts()
+        assert 1 == vc_pre[("seattle", "new-york")]
+
+        # Rename
+        scen.rename("node", {"seattle": "redmond", "new-york": "brooklyn"})
+
+        # Same number of unique combinations
+        vc_post = scen.par("output")[["node_loc", "node_dest"]].value_counts()
+        assert len(vc_pre) == len(vc_post)
+
+        # Values are renamed when appearing in either of the sets indexed by `node`
+        assert 1 == vc_post[("redmond", "brooklyn")]
+
     def test_solve(self, dantzig_message_scenario):
         s = dantzig_message_scenario
 
