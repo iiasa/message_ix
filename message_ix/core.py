@@ -1,8 +1,8 @@
 import logging
 import os
-from functools import lru_cache
+from functools import lru_cache, partial
 from itertools import chain, product, zip_longest
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Tuple, Union
+from typing import Iterable, List, Mapping, Optional, Tuple, Union
 from warnings import warn
 
 import ixmp
@@ -758,13 +758,15 @@ class Scenario(ixmp.Scenario):
         """
         commit = maybe_check_out(self)
 
+        # Add the new value(s) to the set itself
+        self.add_set(name, self.set(name).replace(mapping))
+
         # - Iterate over tuples of (item_name, ix_type); only those indexed by `name`.
-        # - First the set itself; then all other sets; then all parameters.
-        kw: Dict[str, Any] = dict(indexed_by=name, par_data=False)
+        # - First all sets indexed sets; then all parameters.
+        items = partial(self.items, indexed_by=name, par_data=False)
         for item_name, ix_type in chain(
-            [(name, "set")],
-            zip_longest(self.items(ItemType.SET, **kw), [], fillvalue="set"),
-            zip_longest(self.items(ItemType.PAR, **kw), [], fillvalue="par"),
+            zip_longest(items(ItemType.SET), [], fillvalue="set"),
+            zip_longest(items(ItemType.PAR), [], fillvalue="par"),
         ):
             # Identify some index names of this set; only those where the corresponding
             # index set is `name`
@@ -774,26 +776,22 @@ class Scenario(ixmp.Scenario):
                 if s == name
             ]
 
-            # Construct filters for add_{par,set} and an argument for pd.*.replace()
-            if len(names) == 0:
-                # This is the set `name` itself → data will be pd.Series
-                filters = None
-                to_replace: Mapping[str, Union[str, Mapping]] = mapping
-            else:
-                # An indexed set or parameter → data will be pd.DataFrame
-                # Filters: only the values to be replaced
-                filters = {n: mapping.keys() for n in names}
-                # Replacements:
-                # - First level keys: column names (=index names)
-                # - Second-level keys and values: `mapping`, the replacement(s) to be
-                #   made.
-                to_replace = {n: mapping for n in names}
-
+            # Scenario methods to retrieve and add data
             f_retrieve = getattr(self, ix_type)  # .par() or .set()
             f_add = getattr(self, f"add_{ix_type}")  # .add_par() or .add_set()
 
-            # Retrieve the data, perform the replacements
-            renamed = f_retrieve(item_name, filters=filters).replace(to_replace)
+            # Replacements:
+            # - First level keys: column names (=index names).
+            # - Second-level keys and values: `mapping`, the replacement(s) to be made.
+            to_replace = {n: mapping for n in names}
+
+            # - Call f_retrieve once for each dimension indexed by `name`; filter
+            #   elements in (only) that dimension for only values to be replaced.
+            # - Concatenate to a single data frame.
+            # - Perform replacement.
+            renamed = pd.concat(
+                [f_retrieve(item_name, filters={n: mapping}) for n in names]
+            ).replace(to_replace)
 
             if not len(renamed):
                 continue  # Nothing modified
