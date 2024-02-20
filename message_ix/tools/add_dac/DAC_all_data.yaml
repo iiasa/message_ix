@@ -2,13 +2,13 @@
 LT_DAC:
   inv_cost: 
     value: 1245.5
-    unit: '-' #$/tCO2
+    unit: USD/GWa # USD/(tC/yr)
   fix_cost: 
     value: 160.7
-    unit: '-' #$/tCO2a
+    unit: USD/GWa # USD/(tC/yr)/yr
   input:
     value: 1
-    unit: '-'
+    unit: GWa
   capacity_factor:
     value: 0.913
     unit: '-'
@@ -32,18 +32,18 @@ LT_DAC:
     unit: '-'
   relation_activity :
     value: 1
-    unit: '-'  
+    unit: Mt C/yr  
 
 HT_DAC:
   inv_cost: 
     value: 1663.5
-    unit: '-' #$/tCO2
+    unit: USD/GWa # USD/(tC/yr)
   fix_cost: 
     value: 244.5
-    unit: '-' #$/tCO2a
+    unit: USD/GWa # USD/(tC/yr)/yr
   input:
     value: 1
-    unit: '-'
+    unit: GWa
   capacity_factor:
     value: 0.913
     unit: '-'
@@ -67,7 +67,7 @@ HT_DAC:
     unit: '-'
   relation_activity :
     value: 1
-    unit: '-'  
+    unit: Mt C/yr  
 
 dacco2_tr_dis:
   var_cost: 
@@ -78,7 +78,7 @@ dacco2_tr_dis:
     unit: '-'
   emission_factor:
     value: 1
-    unit: '-' #tCO2/tCO2a
+    unit: Mt C/yr
   capacity_factor:
     value: 1
     unit: '-'
@@ -107,7 +107,7 @@ DAC_mpen:
     unit: '-'
   relation_activity :
     value: 1
-    unit: '-'  
+    unit: Mt C/yr  
 
 
 # model specific data
@@ -115,158 +115,168 @@ model_data:
   LT_DAC: 
     inv_cost:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_vtg:
         rate: -0.01
     fix_cost:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_vtg:
         rate: 0
       year_act:
         rate: 0
     input:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       mode:
         M1: 1
       commodity:
         electr: 1
       level:
-        secondary: 0.54
+        final: 0.54
     capacity_factor:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
     technical_lifetime:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
     construction_time:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
     abs_cost_activity_soft_up:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0.0
       time:
         year: 1
     growth_activity_lo:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0.0
       time:
         year: 1
     level_cost_activity_soft_lo :
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0.0
       time:
         year: 1
     level_cost_activity_soft_up :
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0.0
       time:
@@ -281,17 +291,18 @@ model_data:
       year_rel:
         rate: 0
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0
       mode:
@@ -300,158 +311,168 @@ model_data:
   HT_DAC: 
     inv_cost:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_vtg:
         rate: -0.02
     fix_cost:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_vtg:
         rate: 0
       year_act:
         rate: 0
     input:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       mode:
         M1: 1
       commodity:
         electr: 1
       level:
-        secondary: 1.13
+        final: 1.13
     capacity_factor:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
     technical_lifetime:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
     construction_time:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
     abs_cost_activity_soft_up:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0.0
       time:
         year: 1
     growth_activity_lo:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0.0
       time:
         year: 1
     level_cost_activity_soft_lo :
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0.0
       time:
         year: 1
     level_cost_activity_soft_up :
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0.0
       time:
@@ -466,17 +487,18 @@ model_data:
       year_rel:
         rate: 0
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0
       mode:
@@ -485,17 +507,18 @@ model_data:
   dacco2_tr_dis:
     var_cost:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_vtg:
         rate: 0
       year_act:
@@ -506,17 +529,18 @@ model_data:
         year: 1
     output:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       mode:
         M1: 1
       commodity:
@@ -525,98 +549,104 @@ model_data:
         secondary: 1
     emission_factor:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       mode:
         M1: 1
       emission:
         CO2_storage: 1
     capacity_factor:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
     soft_activity_lo :
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0.0
       time:
         year: 1
     soft_activity_up :
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0.0
       time:
         year: 1
     level_cost_activity_soft_lo :
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0.0
       time:
         year: 1
     level_cost_activity_soft_up :
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0.0
       time:
@@ -625,51 +655,54 @@ model_data:
   DAC_mpen:
     growth_activity_up:
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0.0
       time:
         year: 1
     soft_activity_up :
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0.0
       time:
         year: 1
     initial_activity_up :
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0.0
       time:
@@ -680,17 +713,18 @@ model_data:
       year_rel:
         rate: 0
       node_loc:
-        R11_AFR: 1
-        R11_CPA: 1
-        R11_EEU: 1
-        R11_FSU: 1
-        R11_LAM: 1
-        R11_MEA: 1
-        R11_NAM: 1
-        R11_PAO: 1
-        R11_PAS: 1
-        R11_SAS: 1
-        R11_WEU: 1
+        R12_AFR: 1
+        R12_EEU: 1
+        R12_LAM: 1
+        R12_MEA: 1
+        R12_NAM: 1
+        R12_SAS: 1
+        R12_WEU: 1
+        R12_FSU: 1
+        R12_PAO: 1
+        R12_PAS: 1
+        R12_CHN: 1
+        R12_RCPA: 1
       year_act:
         rate: 0
       mode:

@@ -1,135 +1,123 @@
 # Generic technology database
 DACCS:
-  inv_cost: 
-    value: 2500
+  year_init: 700
+  inv_cost:
     unit: $/kW
+    value: 2500
+    node_loc:
+      Westeros: 1
+    year_vtg:
+      rate: -0.05
   fix_cost: 
+    unit: $/kWa
     value: 10
-    unit: $/kWa
+    node_loc:
+      Westeros: 1
+    year_vtg:
+      rate: -0.05
+    year_act:
+      rate: 0.03
   var_cost: 
-    value: 1
     unit: $/kWa
+    value: 1
+    node_loc:
+      Westeros: 1
+    year_vtg:
+      rate: -0.05
+    year_act:
+      rate: 0.03
+    mode:
+      standard: 1
+    time:
+      year: 1
   emission_factor:
-    value: 1
     unit: tCO2/kWa
+    value: 1
+    mode:
+      standard: 1
+    emission:
+      CO2: -20
+      CH4: 0
+    node_loc:
+      Westeros: 1
+      Easteros: 1
   input:
-    value: 1
     unit: '-'
+    value: 1
+    node_loc:
+      Westeros: 1
+    commodity:
+      electricity: 1
+    level:
+      final: 1
   output:
+    unit: '-'
     value: 0
-    unit: '-'
+    node_loc:
+      Westeros: 1
+    commodity:
+      electricity: 0
+    level:
+      final: 0
   capacity_factor:
+    unit: '-'
     value: 1
-    unit: '-'
+    node_loc:
+      Westeros: 1
   technical_lifetime:
+    unit: y
     value: 20
-    unit: y
   construction_time:
-    value: 5
     unit: y
+    value: 5
   growth_new_capacity_up:
-    value: 0.5
     unit: '-'
+    value: 0.5
   initial_new_capacity_up: 
-    value: 0.5
     unit: GW
+    value: 0.5
   abs_cost_activity_soft_up:
-    value: 0.5
     unit: '-'
+    value: 0.5
+    node_loc:
+      Westeros: 1
+    year_act:
+      rate: 0.0
+    time:
+      year: 1
   growth_activity_lo:
-    value: 0.5
     unit: '-'
+    value: 0.5
+    node_loc:
+      Westeros: 1
+    year_act:
+      rate: 0.0
+    time:
+      year: 1
   growth_activity_up:
-    value: 0.5
     unit: '-'
+    value: 0.5
+    node_loc:
+      Westeros: 1
+    year_act:
+      rate: 0.0
+    time:
+      year: 1
   level_cost_activity_soft_lo :
-    value: 0.5
     unit: '-'
+    value: 0.5
+    node_loc:
+      Westeros: 1
+    year_act:
+      rate: 0.0
+    time:
+      year: 1
   level_cost_activity_soft_up :
-    value: 0.5
     unit: '-'
-
-# model specific data
-model_data:
-  DACCS: 
-    inv_cost:
-      node_loc:
-        Westeros: 1
-      year_vtg:
-        rate: -0.05
-    fix_cost:
-      node_loc:
-        Westeros: 1
-      year_vtg:
-        rate: -0.05
-      year_act:
-        rate: 0.03
-    var_cost:
-      node_loc:
-        Westeros: 1
-      year_vtg:
-        rate: -0.05
-      year_act:
-        rate: 0.03
-      mode:
-        standard: 1
-      time:
-        year: 1
-    emission_factor:
-      mode:
-        standard: 1
-      emission:
-        CO2: -20
-        CH4: 0
-    input:
-      node_loc:
-        Westeros: 1
-      commodity:
-        electricity: 1
-      level:
-        final: 1
-    output:
-      node_loc:
-        Westeros: 1
-      commodity:
-        electricity: 0
-      level:
-        final: 0
-    abs_cost_activity_soft_up:
-      node_loc:
-        Westeros: 1
-      year_act:
-        rate: 0.0
-      time:
-        year: 1
-    growth_activity_lo:
-      node_loc:
-        Westeros: 1
-      year_act:
-        rate: 0.0
-      time:
-        year: 1
-    growth_activity_up:
-      node_loc:
-        Westeros: 1
-      year_act:
-        rate: 0.0
-      time:
-        year: 1
-    level_cost_activity_soft_lo :
-      node_loc:
-        Westeros: 1
-      year_act:
-        rate: 0.0
-      time:
-        year: 1
-    level_cost_activity_soft_up :
-      node_loc:
-        Westeros: 1
-      year_act:
-        rate: 0.0
-      time:
-        year: 1
-    
-
-  first_active_year: 700
+    value: 0.5
+    node_loc:
+      Westeros: 1
+    year_act:
+      rate: 0.0
+    time:
+      year: 1
