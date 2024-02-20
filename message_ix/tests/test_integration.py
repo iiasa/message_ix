@@ -105,8 +105,6 @@ def scenario_list(mp):
 
 
 def assert_multi_db(mp1, mp2):
-    print(scenario_list(mp1))
-    print(scenario_list(mp2))
     assert_frame_equal(scenario_list(mp1), scenario_list(mp2))
 
 
