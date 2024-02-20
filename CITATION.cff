@@ -8,90 +8,94 @@ message: >-
   the GitHub repository and the MESSAGEix framework manuscript 
   (https://doi.org/10.1016/j.envsoft.2018.11.012).
 type: software
+version: 3.8.0
+# Format: "yyyy-mm-dd"
+date-released: "2024-01-12"
 authors:
   - given-names: Paul Natsuo
     family-names: Kishimoto
     affiliation: IIASA
-    orcid: 'https://orcid.org/0000-0002-8578-753X'
+    orcid: "https://orcid.org/0000-0002-8578-753X"
   - given-names: Laura
     family-names: Wienpahl
+    orcid: "https://orcid.org/0000-0003-2049-8531"
   - given-names: Behnam
     family-names: Zakeri
     affiliation: IIASA
-    orcid: 'https://orcid.org/0000-0001-9647-2878'
+    orcid: "https://orcid.org/0000-0001-9647-2878"
   - given-names: Francesco
     family-names: Lovat
-    orcid: 'https://orcid.org/0000-0002-4331-980X'
+    orcid: "https://orcid.org/0000-0002-4331-980X"
   - given-names: Oliver
     family-names: Fricko
     affiliation: IIASA
-    orcid: 'https://orcid.org/0000-0002-6835-9883'
+    orcid: "https://orcid.org/0000-0002-6835-9883"
   - given-names: Matthew J.
     family-names: Gidden
     affiliation: IIASA
-    orcid: 'https://orcid.org/0000-0003-0687-414X'
+    orcid: "https://orcid.org/0000-0003-0687-414X"
   - given-names: Daniel
     family-names: Huppmann
     affiliation: IIASA
-    orcid: 'https://orcid.org/0000-0002-7729-7389'
+    orcid: "https://orcid.org/0000-0002-7729-7389"
   - given-names: Volker
     family-names: Krey
     affiliation: IIASA
-    orcid: 'https://orcid.org/0000-0003-0307-3515'
+    orcid: "https://orcid.org/0000-0003-0307-3515"
   - given-names: Adriano
     family-names: Vinca
     affiliation: IIASA
-    orcid: 'https://orcid.org/0000-0002-3051-178X'
+    orcid: "https://orcid.org/0000-0002-3051-178X"
   - given-names: Gamze
     family-names: Ünlü
     affiliation: IIASA
-    orcid: 'https://orcid.org/0000-0003-0080-7122'
+    orcid: "https://orcid.org/0000-0003-0080-7122"
   - given-names: Miguel Poblete
     family-names: Cazenave
     affiliation: IIASA
+    orcid: "https://orcid.org/0000-0001-8280-910X"
   - given-names: Jarmo S.
     family-names: Kikstra
     affiliation: IIASA
-    orcid: 'https://orcid.org/0000-0001-9405-1228'
+    orcid: "https://orcid.org/0000-0001-9405-1228"
   - given-names: Fridolin
     family-names: Glatter
     affiliation: IIASA
-    orcid: 'https://orcid.org/0009-0007-9452-2473'
+    orcid: "https://orcid.org/0009-0007-9452-2473"
   - given-names: Jihoon
     family-names: Min
     affiliation: IIASA
-    orcid: 'https://orcid.org/0000-0002-0020-1174'
+    orcid: "https://orcid.org/0000-0002-0020-1174"
   - given-names: Jan
     family-names: Steinhauser
     affiliation: IIASA
-    orcid: 'https://orcid.org/0000-0002-5989-6855'
+    orcid: "https://orcid.org/0000-0002-5989-6855"
   - given-names: Clara
     family-names: Orthofer
-    orcid: 'https://orcid.org/0000-0002-7049-7791'
+    orcid: "https://orcid.org/0000-0002-7049-7791"
   - given-names: Thomas
     family-names: Zipperle
-    orcid: 'https://orcid.org/0000-0003-2512-9508'
+    orcid: "https://orcid.org/0000-0003-2512-9508"
   - given-names: Nikolay
     family-names: Kushin
   - given-names: Alessio
     family-names: Mastrucci
     affiliation: IIASA
-    orcid: 'https://orcid.org/0000-0002-5611-7780'
+    orcid: "https://orcid.org/0000-0002-5611-7780"
   - given-names: Michael
     family-names: Pimmer
   - given-names: Peter
     family-names: Kolp
-    affiliation: IIASA
-    orcid: 'https://orcid.org/0000-0003-0122-2839'
+    orcid: "https://orcid.org/0000-0003-0122-2839"
 identifiers:
   - type: url
-    value: 'https://github.com/iiasa/message_ix'
-    description: Main repository of the MESSAGEix framework on Github
+    value: "https://github.com/iiasa/message_ix"
+    description: "Main repository of the MESSAGEix framework on Github"
   - type: doi
     value: 10.5281/zenodo.4005684
-    description: Zenodo entry
-repository-code: 'https://github.com/iiasa/message_ix'
-url: 'https://docs.messageix.org/en/stable/index.html'
+    description: "Zenodo entry"
+repository-code: "https://github.com/iiasa/message_ix"
+url: "https://docs.messageix.org/en/stable/index.html"
 abstract: >-
   MESSAGEix is a versatile, dynamic, model framework for
   energy-engineering-economy-environment (E4) systems
@@ -119,14 +123,15 @@ abstract: >-
   (ixmp), which provides data warehouse features for
   high-powered numerical scenario analysis.
 keywords:
-  - integrated assessment
-  - energy systems
-  - macro-energy
+  - "integrated assessment"
+  - "energy systems"
+  - "macro-energy"
   - modelling
-  - scenario analysis
-  - data visualisation
-  - Python package
+  - "scenario analysis"
+  - "data visualisation"
+  - "Python package"
 license: Apache-2.0
+doi: 10.5281/zenodo.4005684
 references:
   - title: "The MESSAGEix Integrated Assessment Model and the ix modeling platform (ixmp): An open framework for integrated and cross-cutting analysis of energy, climate, the environment, and sustainable development"
     journal: "Environmental Modelling & Software"
@@ -135,22 +140,21 @@ references:
     - given-names: Daniel
       family-names: Huppmann
       affiliation: IIASA
-      orcid: 'https://orcid.org/0000-0002-7729-7389'
+      orcid: "https://orcid.org/0000-0002-7729-7389"
     - given-names: Matthew J.
       family-names: Gidden
       affiliation: IIASA
-      orcid: 'https://orcid.org/0000-0003-0687-414X'
+      orcid: "https://orcid.org/0000-0003-0687-414X"
     - given-names: Oliver
       family-names: Fricko
       affiliation: IIASA
-      orcid: 'https://orcid.org/0000-0002-6835-9883'
+      orcid: "https://orcid.org/0000-0002-6835-9883"
     - given-names: Peter
       family-names: Kolp
-      affiliation: IIASA
-      orcid: 'https://orcid.org/0000-0003-0122-2839'
+      orcid: "https://orcid.org/0000-0003-0122-2839"
     - given-names: Clara
       family-names: Orthofer
-      orcid: 'https://orcid.org/0000-0002-7049-7791'
+      orcid: "https://orcid.org/0000-0002-7049-7791"
     - given-names: Michael
       family-names: Pimmer
     - given-names: Nikolay
@@ -158,19 +162,19 @@ references:
     - given-names: Adriano
       family-names: Vinca
       affiliation: IIASA
-      orcid: 'https://orcid.org/0000-0002-3051-178X'
+      orcid: "https://orcid.org/0000-0002-3051-178X"
     - given-names: Alessio
       family-names: Mastrucci
       affiliation: IIASA
-      orcid: 'https://orcid.org/0000-0002-5611-7780'
+      orcid: "https://orcid.org/0000-0002-5611-7780"
     - given-names: Keywan
       family-names: Riahi
       affiliation: IIASA
-      orcid: 'https://orcid.org/0000-0001-7193-3498'
+      orcid: "https://orcid.org/0000-0001-7193-3498"
     - given-names: Volker
       family-names: Krey
       affiliation: IIASA
-      orcid: 'https://orcid.org/0000-0003-0307-3515'
+      orcid: "https://orcid.org/0000-0003-0307-3515"
     doi: "10.1016/j.envsoft.2018.11.012"
     url: "pure.iiasa.ac.at/15157/"
     volume: 112
