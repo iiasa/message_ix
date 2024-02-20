@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 import pytest
 from ixmp import Platform
@@ -132,7 +134,7 @@ def test_multi_db_run(tmpdir, request):
 
     # reopen the connection to the second platform and reload scenario
     _mp2 = Platform(driver="hsqldb", path=tmpdir / "mp2")
-    to_be_loaded = SCENARIO["dantzig"]
+    to_be_loaded = copy.deepcopy(SCENARIO["dantzig"])
     to_be_loaded["scenario"] = request.node.name
     scen2 = Scenario(_mp2, **to_be_loaded)
     assert_multi_db(mp1, _mp2)
