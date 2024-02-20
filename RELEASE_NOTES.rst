@@ -4,6 +4,7 @@ Next release
 All changes
 -----------
 
+- Bug fix: :meth:`.Scenario.rename` would not rename keys where the index set and index name differed (:issue:`601`, :pull:`791`).
 - Increase minimum requirement for genno dependency to 1.20 (:pull:`783`).
 
 .. _v3.8.0:
