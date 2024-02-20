@@ -18,16 +18,21 @@ def test_run_clone(tmpdir, request):
     scen = make_dantzig(mp, solve=True, request=request)
     assert np.isclose(scen.var("OBJ")["lvl"], 153.675)
     assert scen.firstmodelyear == 1963
-    expected = TS_DF.assign(scenario=request.node.name)
-    assert_frame_equal(scen.timeseries(iamc=True), expected)
+    expected = TS_DF.copy()
+    assert_frame_equal(
+        scen.timeseries(iamc=True), expected.assign(scenario=request.node.name)
+    )
 
     # cloning with `keep_solution=True` keeps all timeseries and the solution
     # (same behaviour as `ixmp.Scenario`)
     scen2 = scen.clone(scenario=request.node.name + "_clone", keep_solution=True)
     assert np.isclose(scen2.var("OBJ")["lvl"], 153.675)
     assert scen2.firstmodelyear == 1963
-    expected = TS_DF.assign(scenario=request.node.name + "_clone")
-    assert_frame_equal(scen2.timeseries(iamc=True), expected)
+    expected = TS_DF.copy()
+    assert_frame_equal(
+        scen2.timeseries(iamc=True),
+        expected.assign(scenario=request.node.name + "_clone"),
+    )
 
     # cloning with `keep_solution=False` drops the solution and only keeps
     # timeseries set as `meta=True` or prior to the first model year
@@ -35,8 +40,11 @@ def test_run_clone(tmpdir, request):
     scen3 = scen.clone(scenario=request.node.name + "_clone_2", keep_solution=False)
     assert np.isnan(scen3.var("OBJ")["lvl"])
     assert scen3.firstmodelyear == 1963
-    expected = TS_DF_CLEARED.assign(scenario=request.node.name + "_clone_2")
-    assert_frame_equal(scen3.timeseries(iamc=True), expected)
+    expected = TS_DF_CLEARED.copy()
+    assert_frame_equal(
+        scen3.timeseries(iamc=True),
+        expected.assign(scenario=request.node.name + "_clone_2"),
+    )
 
 
 def test_run_remove_solution(test_mp, request):
@@ -58,9 +66,10 @@ def test_run_remove_solution(test_mp, request):
     # before first model year (DIFFERENT behaviour from `ixmp.Scenario`)
     scen.remove_solution()
     assert scen.firstmodelyear == 1963
+    expected = TS_DF_CLEARED.copy()
     assert_frame_equal(
         scen.timeseries(iamc=True),
-        TS_DF_CLEARED.assign(scenario=request.node.name + name),
+        expected.assign(scenario=request.node.name + name),
     )
 
 
@@ -135,7 +144,8 @@ def test_multi_db_run(tmpdir, request):
     assert np.isclose(scen2.var("OBJ")["lvl"], 153.675)
     assert_frame_equal(scen1.var("ACT"), scen2.var("ACT"))
 
+    expected = TS_DF.copy()
     # check that custom unit, region and timeseries are migrated correctly
     assert_frame_equal(
-        scen2.timeseries(iamc=True), TS_DF.assign(scenario=request.node.name)
+        scen2.timeseries(iamc=True), expected.assign(scenario=request.node.name)
     )
