@@ -13,7 +13,10 @@ def calculate_activity(scen, tec="transport_from_seattle"):
 
 
 def test_add_bound_activity_up(request, message_test_mp):
-    scen = make_dantzig(message_test_mp, solve=True, request=request)
+    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
+        scenario=request.node.name
+    )
+    scen.solve(quiet=True)
 
     # data for act bound
     exp = 0.5 * calculate_activity(scen).sum()
@@ -66,9 +69,10 @@ def test_add_bound_activity_up_all_modes(request, message_test_mp):
     - the resulting bound on activity for seattle, therefore is below what is required
       for "to_chicago".
     """
-    scen = make_dantzig(
-        message_test_mp, solve=True, request=request, solve_options=dict(lpmethod=2)
+    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
+        scenario=request.node.name
     )
+    scen.solve(quiet=True, solve_options=dict(lpmethod=2))
 
     # data for act bound
     # print(calculate_activity(scen))
