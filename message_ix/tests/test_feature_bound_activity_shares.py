@@ -1,19 +1,8 @@
-import os
-
 import numpy as np
 import pandas as pd
-import pytest
 
 from message_ix import Scenario, make_df
 from message_ix.testing import SCENARIO, make_dantzig
-
-FLAKY = pytest.mark.flaky(
-    reruns=5,
-    rerun_delay=2,
-    condition="GITHUB_ACTIONS" in os.environ,
-    reason="Flaky; see iiasa/message_ix#731",
-)
-
 
 # First model year of the Dantzig scenario
 _year = 1963
@@ -55,7 +44,6 @@ def test_add_bound_activity_up(request, message_test_mp):
     assert new_obj >= orig_obj
 
 
-@FLAKY
 def test_add_bound_activity_up_all_modes(request, message_test_mp):
     """
 
@@ -247,12 +235,10 @@ def test_commodity_share_up(request, message_test_mp):
     assert new_obj >= orig_obj
 
 
-@FLAKY
 def test_commodity_share_lo(request, message_test_mp):
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
-        scenario=request.node.name
+    scen = make_dantzig(
+        message_test_mp, solve=True, request=request, solve_options=dict(quiet=True)
     )
-    scen.solve(quiet=True)
 
     # data for share bound
     def calc_share(s):
@@ -264,57 +250,58 @@ def test_commodity_share_lo(request, message_test_mp):
 
     # add share constraints
     clone = scen.clone(scenario="share_commodity_lo", keep_solution=False)
-    clone.check_out()
-    clone.add_cat("technology", "share", "transport_from_seattle")
-    clone.add_cat(
-        "technology", "total", ["transport_from_seattle", "transport_from_san-diego"]
-    )
-    clone.add_set("shares", "test-share")
-    clone.add_set(
-        "map_shares_commodity_share",
-        pd.DataFrame(
-            {
-                "shares": "test-share",
-                "node_share": "new-york",
-                "node": "new-york",
-                "type_tec": "share",
-                "mode": "all",
-                "commodity": "cases",
-                "level": "consumption",
-            },
-            index=[0],
-        ),
-    )
-    clone.add_set(
-        "map_shares_commodity_total",
-        pd.DataFrame(
-            {
-                "shares": "test-share",
-                "node_share": "new-york",
-                "node": "new-york",
-                "type_tec": "total",
-                "mode": "all",
-                "commodity": "cases",
-                "level": "consumption",
-            },
-            index=[0],
-        ),
-    )
-    clone.add_par(
-        "share_commodity_lo",
-        pd.DataFrame(
-            {
-                "shares": "test-share",
-                "node_share": "new-york",
-                "year_act": _year,
-                "time": "year",
-                "unit": "cases",
-                "value": exp,
-            },
-            index=[0],
-        ),
-    )
-    clone.commit("foo")
+    with clone.transact():
+        clone.add_cat("technology", "share", "transport_from_seattle")
+        clone.add_cat(
+            "technology",
+            "total",
+            ["transport_from_seattle", "transport_from_san-diego"],
+        )
+        clone.add_set("shares", "test-share")
+        clone.add_set(
+            "map_shares_commodity_share",
+            pd.DataFrame(
+                {
+                    "shares": "test-share",
+                    "node_share": "new-york",
+                    "node": "new-york",
+                    "type_tec": "share",
+                    "mode": "all",
+                    "commodity": "cases",
+                    "level": "consumption",
+                },
+                index=[0],
+            ),
+        )
+        clone.add_set(
+            "map_shares_commodity_total",
+            pd.DataFrame(
+                {
+                    "shares": "test-share",
+                    "node_share": "new-york",
+                    "node": "new-york",
+                    "type_tec": "total",
+                    "mode": "all",
+                    "commodity": "cases",
+                    "level": "consumption",
+                },
+                index=[0],
+            ),
+        )
+        clone.add_par(
+            "share_commodity_lo",
+            pd.DataFrame(
+                {
+                    "shares": "test-share",
+                    "node_share": "new-york",
+                    "year_act": _year,
+                    "time": "year",
+                    "unit": "cases",
+                    "value": exp,
+                },
+                index=[0],
+            ),
+        )
     clone.solve(quiet=True)
     obs = calc_share(clone)
     assert np.isclose(obs, exp)
@@ -368,12 +355,10 @@ def test_add_share_mode_up(request, message_test_mp):
     assert new_obj >= orig_obj
 
 
-@FLAKY
 def test_add_share_mode_lo(request, message_test_mp):
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
-        scenario=request.node.name
+    scen = make_dantzig(
+        message_test_mp, solve=True, request=request, solve_options=dict(quiet=True)
     )
-    scen.solve(quiet=True)
 
     # data for share bound
     def calc_share(s):
@@ -385,25 +370,24 @@ def test_add_share_mode_lo(request, message_test_mp):
 
     # add share constraints
     clone = scen.clone(scenario=f"{scen.scenario} cloned", keep_solution=False)
-    clone.check_out()
-    clone.add_set("shares", "test-share")
-    clone.add_par(
-        "share_mode_lo",
-        pd.DataFrame(
-            {
-                "shares": "test-share",
-                "node_share": "san-diego",
-                "technology": "transport_from_san-diego",
-                "mode": "to_new-york",
-                "year_act": _year,
-                "time": "year",
-                "unit": "cases",
-                "value": exp,
-            },
-            index=[0],
-        ),
-    )
-    clone.commit("foo")
+    with clone.transact():
+        clone.add_set("shares", "test-share")
+        clone.add_par(
+            "share_mode_lo",
+            pd.DataFrame(
+                {
+                    "shares": "test-share",
+                    "node_share": "san-diego",
+                    "technology": "transport_from_san-diego",
+                    "mode": "to_new-york",
+                    "year_act": _year,
+                    "time": "year",
+                    "unit": "cases",
+                    "value": exp,
+                },
+                index=[0],
+            ),
+        )
     clone.solve(quiet=True)
 
     obs = calc_share(clone)

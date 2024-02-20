@@ -6,28 +6,30 @@ from message_ix.tools.add_year import add_year
 
 
 @pytest.fixture
-def base_scen_mp(test_mp):
-    scen = Scenario(test_mp, "model", "standard", version="new")
+def base_scen_mp(test_mp, request):
+    scen = Scenario(
+        test_mp, "model", scenario=request.node.name + "_standard", version="new"
+    )
 
     data = {2020: 1, 2030: 2, 2040: 3}
 
     years = sorted(list(set(data.keys())))
-    scen.add_set("node", "node")
-    scen.add_set("commodity", "comm")
-    scen.add_set("level", "level")
-    scen.add_set("year", years)
-    scen.add_set("technology", "tec")
-    scen.add_set("mode", "mode")
-    output_specs = ["node", "comm", "level", "year", "year"]
+    with scen.transact(message="initialize test model"):
+        scen.add_set("node", "node")
+        scen.add_set("commodity", "comm")
+        scen.add_set("level", "level")
+        scen.add_set("year", years)
+        scen.add_set("technology", "tec")
+        scen.add_set("mode", "mode")
+        output_specs = ["node", "comm", "level", "year", "year"]
 
-    for yr, value in data.items():
-        scen.add_par("demand", ["node", "comm", "level", yr, "year"], 1, "GWa")
-        scen.add_par("technical_lifetime", ["node", "tec", yr], 10, "y")
-        tec_specs = ["node", "tec", yr, yr, "mode"]
-        scen.add_par("output", tec_specs + output_specs, 1, "-")
-        scen.add_par("var_cost", tec_specs + ["year"], value, "USD/GWa")
+        for yr, value in data.items():
+            scen.add_par("demand", ["node", "comm", "level", yr, "year"], 1, "GWa")
+            scen.add_par("technical_lifetime", ["node", "tec", yr], 10, "y")
+            tec_specs = ["node", "tec", yr, yr, "mode"]
+            scen.add_par("output", tec_specs + output_specs, 1, "-")
+            scen.add_par("var_cost", tec_specs + ["year"], value, "USD/GWa")
 
-    scen.commit("initialize test model")
     scen.solve(case="original_years", quiet=True)
 
     yield scen, test_mp

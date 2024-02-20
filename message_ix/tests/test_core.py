@@ -90,7 +90,7 @@ class TestScenario:
         clone.solve(quiet=True)
         assert np.isclose(clone.var("OBJ")["lvl"], 153.675)
 
-    def test_rename2(self, request, dantzig_message_scenario):
+    def test_rename2(self, dantzig_message_scenario):
         """Test :meth:`.rename` for parameters with 2+ indexes for the same set."""
         scen = dantzig_message_scenario
 
@@ -543,20 +543,20 @@ def test_new_timeseries_long_name64plus(message_test_mp):
     scen.commit("importing a testing timeseries")
 
 
-def test_excel_read_write(message_test_mp, tmp_path):
+def test_excel_read_write(message_test_mp, tmp_path, request):
     # Path to temporary file
-    tmp_path /= "excel_read_write.xlsx"
+    tmp_path /= request.node.name + "_excel_read_write.xlsx"
     # Convert to string to ensure this can be handled
     fname = str(tmp_path)
 
     scen1 = Scenario(message_test_mp, **SCENARIO["dantzig"])
-    scen1 = scen1.clone(keep_solution=False)
-    scen1.check_out()
-    scen1.init_set("new_set")
-    scen1.add_set("new_set", "member")
-    scen1.init_par("new_par", idx_sets=["new_set"])
-    scen1.add_par("new_par", "member", 2, "-")
-    scen1.commit("new set and parameter added.")
+    scen1 = make_dantzig(mp=message_test_mp, request=request)
+    scen1 = scen1.clone(scenario=request.node.name + "_clone", keep_solution=False)
+    with scen1.transact(message="new set and parameter added."):
+        scen1.init_set("new_set")
+        scen1.add_set("new_set", "member")
+        scen1.init_par("new_par", idx_sets=["new_set"])
+        scen1.add_par("new_par", "member", 2, "-")
 
     # Writing to Excel without solving
     scen1.to_excel(fname)
