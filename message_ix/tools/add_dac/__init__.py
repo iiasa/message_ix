@@ -101,7 +101,7 @@ def generate_df(
                     "year_vtg": tech_data[tec]["year_vtg"],
                     "year_act": tech_data[tec]["year_act"],
                 }
-            elif "year_vtg" in par_idx[tech][name]:
+            elif "year_vtg" in par_idx[tec][name]:
                 kwargs = {"year_vtg": sorted(set(tech_data[tec]["year_vtg"]))}
             else:
                 kwargs = {"year_act": sorted(set(tech_data[tec]["year_act"]))}
@@ -126,6 +126,7 @@ def generate_df(
                     "technology",
                     "year_vtg",
                     "year_act",
+                    "year_rel",
                     "node_origin",
                     "node_dest",
                     "time_origin",
@@ -276,6 +277,17 @@ def add_dac(scenario, filepath=""):
 
     # year_df = scenario.vintage_and_active_years()
     # vintage_years, act_years = year_df["year_vtg"], year_df["year_act"]
+    if "CO2_storage" not in scenario.set("emission"):
+        scenario.add_set("emission", "CO2_storage")
+    if "co2_storage_pot" not in scenario.set("type_emission"):
+        scenario.add_set("type_emission", "co2_storage_pot")
+    if "co2_potential" not in scenario.set("type_tec"):
+        scenario.add_set("type_tec", "co2_potential")
+    if "dacco2_tr_dis" not in scenario.set("technology"):
+        scenario.add_set("technology", "dacco2_tr_dis")
+
+    scenario.add_set("cat_emission", ["co2_storage_pot", "CO2_storage"])
+    scenario.add_set("cat_tec", ["co2_potential", "dacco2_tr_dis"])
 
     # Reading new technology database
     if not filepath:
@@ -306,22 +318,35 @@ def add_dac(scenario, filepath=""):
 
     # Adding parameters by technology and name
     for tec, val in data.items():
+        if tec not in set(scenario.set("technology")):
+            scenario.add_set("technology", tec)
+
         for name in val.keys():
+            if tech_data[tec][name]["par_name"] == "relation_activity":
+                if tech_data[tec][name]["relation"][0] not in set(
+                    scenario.set("relation")
+                ):
+                    scenario.add_set("relation", tech_data[tec][name]["relation"][0])
             scenario.add_par(tech_data[tec][name]["par_name"], data[tec][name])
 
     # Adding other requirements
-    node_loc = [e for e in scenario.set("node") if e not in ["World", "R12_GLB"]]
+    n_nodes = np.int32(len(scenario.set("node")) - 2)  # excluding 'World' and 'RXX_GLB'
+    reg_exception = ["World", f"R{n_nodes}_GLB"]
+    node_loc = [e for e in scenario.set("node") if e not in reg_exception]
     year_act = [e for e in scenario.set("year") if e >= 2025]
 
     # Creating dataframe for CO2_Emission_Global_Total relation
+    # TODO: next verion should be able to check RXX_GLB
+    # according to regional config used by the scenario
+
     CO2_global_par = []
-    for tech in ["LT_DAC", "HT_DAC"]:
+    for tech in set(tech_data.keys()) - set(["dacco2_tr_dis", "DAC_mpen"]):
         for reg in node_loc:
             CO2_global_par.append(
                 make_df(
                     "relation_activity",
                     relation="CO2_Emission_Global_Total",
-                    node_rel="R12_GLB",
+                    node_rel=f"R{n_nodes}_GLB",
                     year_rel=year_act,
                     node_loc=reg,
                     technology=tech,
@@ -341,11 +366,3 @@ def add_dac(scenario, filepath=""):
     # emission_list = ["CO2_storage"]
     # type_tec_list = ["co2_potential"]
     # technology_list = ["dacco2_tr_dis"]
-
-    if "co2_storage_pot" not in scenario.set("type_emission"):
-        scenario.add_set("type_emission", "co2_storage_pot")
-    if "co2_potential" not in scenario.set("type_tec"):
-        scenario.add_set("type_tec", "co2_potential")
-
-    scenario.add_set("cat_emission", ["co2_storage_pot", "CO2_storage"])
-    scenario.add_set("cat_tec", ["co2_potential", "dacco2_tr_dis"])
