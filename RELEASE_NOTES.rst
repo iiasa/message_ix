@@ -4,6 +4,7 @@ Next release
 All changes
 -----------
 
+- :func:`.make_df` can create partly-filled :class:`DataFrames <pandas.DataFrame>` for indexed sets; not only parameters (:pull:`784`).
 - Bug fix: :meth:`.Scenario.rename` would not rename keys where the index set and index name differed (:issue:`601`, :pull:`791`).
 - Increase minimum requirement for genno dependency to 1.20 (:pull:`783`).
 
