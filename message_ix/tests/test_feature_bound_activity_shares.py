@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 
 from message_ix import Scenario, make_df
 from message_ix.testing import make_dantzig
@@ -129,42 +128,40 @@ def test_commodity_share_up(request, test_mp):
         b = calculate_activity(s, tec="transport_from_san-diego").sum()
         return a / b
 
+    common = dict(shares="test-share", node_share="seattle")
+
     # common operations for both subtests
     def add_data(s, map_df):
-        s.add_cat("technology", "share", "canning_plant")
-        s.add_cat("technology", "total", "transport_from_san-diego")
+        with s.transact("Add share_commodity_up"):
+            s.add_cat("technology", "share", "canning_plant")
+            s.add_cat("technology", "total", "transport_from_san-diego")
 
-        s.add_set("shares", "test-share")
-        s.add_set(
-            "map_shares_commodity_share",
-            pd.DataFrame(
-                {
-                    "shares": "test-share",
-                    "node_share": "seattle",
-                    "node": "seattle",
-                    "type_tec": "share",
-                    "mode": "production",
-                    "commodity": "cases",
-                    "level": "supply",
-                },
-                index=[0],
-            ),
-        )
-        s.add_set("map_shares_commodity_total", map_df)
-        s.add_par(
-            "share_commodity_up",
-            pd.DataFrame(
-                {
-                    "shares": "test-share",
-                    "node_share": "seattle",
-                    "year_act": _year,
-                    "time": "year",
-                    "unit": "%",
-                    "value": 0.5,
-                },
-                index=[0],
-            ),
-        )
+            s.add_set("shares", "test-share")
+
+            s.add_set(
+                "map_shares_commodity_share",
+                make_df(
+                    "map_shares_commodity_share",
+                    **common,
+                    node="seattle",
+                    type_tec="share",
+                    mode="production",
+                    commodity="cases",
+                    level="supply",
+                ),
+            )
+            s.add_set("map_shares_commodity_total", map_df)
+            s.add_par(
+                "share_commodity_up",
+                make_df(
+                    "share_commodity_up",
+                    **common,
+                    year_act=_year,
+                    time="year",
+                    unit="%",
+                    value=0.5,
+                ),
+            )
 
     # initial data
     scen = make_dantzig(test_mp, solve=True, request=request)
@@ -176,21 +173,17 @@ def test_commodity_share_up(request, test_mp):
     assert orig > exp
 
     # add share constraints for modes explicitly
-    map_df = pd.DataFrame(
-        {
-            "shares": "test-share",
-            "node_share": "seattle",
-            "node": "san-diego",
-            "type_tec": "total",
-            "mode": ["to_new-york", "to_chicago", "to_topeka"],
-            "commodity": "cases",
-            "level": "supply",
-        }
+    map_df = make_df(
+        "map_shares_commodity_total",
+        **common,
+        node="san-diego",
+        type_tec="total",
+        mode=["to_new-york", "to_chicago", "to_topeka"],
+        commodity="cases",
+        level="supply",
     )
     clone = scen.clone(scenario=f"{scen.scenario} share_mode_list", keep_solution=False)
-    clone.check_out()
     add_data(clone, map_df)
-    clone.commit("foo")
     clone.solve(quiet=True)
 
     # check shares new, should be lower than expected bound
@@ -203,24 +196,11 @@ def test_commodity_share_up(request, test_mp):
     assert new_obj >= orig_obj
 
     # add share constraints with mode == 'all'
-    map_df2 = pd.DataFrame(
-        {
-            "shares": "test-share",
-            "node_share": "seattle",
-            "node": "san-diego",
-            "type_tec": "total",
-            "mode": "all",
-            "commodity": "cases",
-            "level": "supply",
-        },
-        index=[0],
-    )
+    map_df2 = map_df.assign(mode="all")
     clone2 = scen.clone(
         scenario=f"{scen.scenario} share_all_modes", keep_solution=False
     )
-    clone2.check_out()
     add_data(clone2, map_df2)
-    clone2.commit("foo")
     clone2.solve(quiet=True)
 
     # check shares new, should be lower than expected bound
@@ -264,11 +244,11 @@ def test_commodity_share_lo(request, test_mp):
             ("total", ["transport_from_seattle", "transport_from_san-diego"]),
         ):
             clone.add_cat("technology", tt, members)
+            name = f"map_shares_commodity_{tt}"
             clone.add_set(
-                f"map_shares_commodity_{tt}",
-                pd.DataFrame(
-                    dict(type_tec=tt, commodity="cases", level="consumption", **common),
-                    index=[0],
+                name,
+                make_df(
+                    name, **common, type_tec=tt, commodity="cases", level="consumption"
                 ),
             )
 
@@ -304,25 +284,24 @@ def test_add_share_mode_up(request, test_mp):
 
     # add share constraints
     clone = scen.clone(scenario=f"{scen.scenario} share_mode_up", keep_solution=False)
-    clone.check_out()
-    clone.add_set("shares", "test-share")
-    clone.add_par(
-        "share_mode_up",
-        pd.DataFrame(
-            {
-                "shares": "test-share",
-                "node_share": "seattle",
-                "technology": "transport_from_seattle",
-                "mode": "to_chicago",
-                "year_act": _year,
-                "time": "year",
-                "unit": "cases",
-                "value": exp,
-            },
-            index=[0],
-        ),
-    )
-    clone.commit("foo")
+
+    with clone.transact("Add share_mode_up"):
+        clone.add_set("shares", "test-share")
+        clone.add_par(
+            "share_mode_up",
+            make_df(
+                "share_mode_up",
+                shares="test-share",
+                node_share="seattle",
+                technology="transport_from_seattle",
+                mode="to_chicago",
+                year_act=_year,
+                time="year",
+                unit="cases",
+                value=exp,
+            ),
+        )
+
     clone.solve(quiet=True)
     obs = calc_share(clone)
     assert np.isclose(obs, exp)
@@ -349,20 +328,19 @@ def test_add_share_mode_lo(request, test_mp):
         clone.add_set("shares", "test-share")
         clone.add_par(
             "share_mode_lo",
-            pd.DataFrame(
-                {
-                    "shares": "test-share",
-                    "node_share": "san-diego",
-                    "technology": "transport_from_san-diego",
-                    "mode": "to_new-york",
-                    "year_act": _year,
-                    "time": "year",
-                    "unit": "cases",
-                    "value": exp,
-                },
-                index=[0],
+            make_df(
+                "share_mode_lo",
+                shares="test-share",
+                node_share="san-diego",
+                technology="transport_from_san-diego",
+                mode="to_new-york",
+                year_act=_year,
+                time="year",
+                unit="cases",
+                value=exp,
             ),
         )
+
     clone.solve(quiet=True)
 
     obs = calc_share(clone)
