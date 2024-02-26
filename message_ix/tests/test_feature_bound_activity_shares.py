@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 from message_ix import Scenario, make_df
-from message_ix.testing import SCENARIO, make_dantzig
+from message_ix.testing import make_dantzig
 
 # First model year of the Dantzig scenario
 _year = 1963
@@ -12,11 +12,8 @@ def calculate_activity(scen, tec="transport_from_seattle"):
     return scen.var("ACT").groupby(["technology", "mode"])["lvl"].sum().loc[tec]
 
 
-def test_add_bound_activity_up(request, message_test_mp):
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
-        scenario=request.node.name
-    )
-    scen.solve(quiet=True)
+def test_add_bound_activity_up(request, test_mp):
+    scen = make_dantzig(test_mp, request=request, solve=True, quiet=True)
 
     # data for act bound
     exp = 0.5 * calculate_activity(scen).sum()
@@ -47,7 +44,7 @@ def test_add_bound_activity_up(request, message_test_mp):
     assert new_obj >= orig_obj
 
 
-def test_add_bound_activity_up_all_modes(request, message_test_mp):
+def test_add_bound_activity_up_all_modes(request, test_mp):
     """
 
     This test specifically has two solutions for which the `OBJ` function is the same
@@ -69,9 +66,7 @@ def test_add_bound_activity_up_all_modes(request, message_test_mp):
     - the resulting bound on activity for seattle, therefore is below what is required
       for "to_chicago".
     """
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
-        scenario=request.node.name
-    )
+    scen = make_dantzig(test_mp, request=request, solve=False, quiet=True)
     scen.solve(quiet=True, solve_options=dict(lpmethod=2))
 
     # data for act bound
@@ -104,8 +99,8 @@ def test_add_bound_activity_up_all_modes(request, message_test_mp):
     assert new_obj >= orig_obj
 
 
-def test_commodity_share_up(request, message_test_mp):
-    """Origial Solution
+def test_commodity_share_up(request, test_mp):
+    """Original Solution
     ----------------
 
          lvl         mode    mrg   node_loc                technology
@@ -172,7 +167,7 @@ def test_commodity_share_up(request, message_test_mp):
         )
 
     # initial data
-    scen = make_dantzig(message_test_mp, solve=True, request=request)
+    scen = make_dantzig(test_mp, solve=True, request=request)
 
     exp = 0.5
 
@@ -192,7 +187,7 @@ def test_commodity_share_up(request, message_test_mp):
             "level": "supply",
         }
     )
-    clone = scen.clone(scenario="share_mode_list", keep_solution=False)
+    clone = scen.clone(scenario=f"{scen.scenario} share_mode_list", keep_solution=False)
     clone.check_out()
     add_data(clone, map_df)
     clone.commit("foo")
@@ -220,7 +215,9 @@ def test_commodity_share_up(request, message_test_mp):
         },
         index=[0],
     )
-    clone2 = scen.clone(scenario="share_all_modes", keep_solution=False)
+    clone2 = scen.clone(
+        scenario=f"{scen.scenario} share_all_modes", keep_solution=False
+    )
     clone2.check_out()
     add_data(clone2, map_df2)
     clone2.commit("foo")
@@ -239,8 +236,8 @@ def test_commodity_share_up(request, message_test_mp):
     assert new_obj >= orig_obj
 
 
-def test_commodity_share_lo(request, message_test_mp):
-    scen = make_dantzig(message_test_mp, request=request, solve=True, quiet=True)
+def test_commodity_share_lo(request, test_mp):
+    scen = make_dantzig(test_mp, request=request, solve=True, quiet=True)
 
     # data for share bound
     def calc_share(s: Scenario) -> float:
@@ -294,11 +291,8 @@ def test_commodity_share_lo(request, message_test_mp):
     assert clone.var("OBJ")["lvl"] >= scen.var("OBJ")["lvl"]
 
 
-def test_add_share_mode_up(request, message_test_mp):
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
-        scenario=request.node.name
-    )
-    scen.solve(quiet=True)
+def test_add_share_mode_up(request, test_mp):
+    scen = make_dantzig(test_mp, request=request, solve=True, quiet=True)
 
     # data for share bound
     def calc_share(s):
@@ -309,7 +303,7 @@ def test_add_share_mode_up(request, message_test_mp):
     exp = 0.95 * calc_share(scen)
 
     # add share constraints
-    clone = scen.clone(scenario="share_mode_up", keep_solution=False)
+    clone = scen.clone(scenario=f"{scen.scenario} share_mode_up", keep_solution=False)
     clone.check_out()
     clone.add_set("shares", "test-share")
     clone.add_par(
@@ -338,10 +332,8 @@ def test_add_share_mode_up(request, message_test_mp):
     assert new_obj >= orig_obj
 
 
-def test_add_share_mode_lo(request, message_test_mp):
-    scen = make_dantzig(
-        message_test_mp, solve=True, request=request, solve_options=dict(quiet=True)
-    )
+def test_add_share_mode_lo(request, test_mp):
+    scen = make_dantzig(test_mp, solve=True, request=request, quiet=True)
 
     # data for share bound
     def calc_share(s):
