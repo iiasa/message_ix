@@ -12,11 +12,14 @@ from message_ix.models import MACRO, MESSAGE
 
 
 def make_df(name, **data):
-    """Return a data frame for parameter `name` filled with `data`.
+    """Return a data frame for parameter or indexed set `name` filled with `data`.
 
-    :func:`make_df` always returns a data frame with the columns required by
-    :meth:`.add_par`: the dimensions of the parameter `name`, plus 'value' and
-    'unit'. Columns not listed in `data` are left empty.
+    :func:`make_df` always returns a data frame with the columns required by either:
+    - :meth:`.add_par`: the dimensions of the parameter `name`, plus 'value' and
+      'unit'.
+    - :meth:`.add_set`: the dimensions of the indexed set `name`.
+
+    Columns not listed in `data` are left empty.
 
     The `data` keyword arguments can be passed in many ways; see the
     :ref:`python:tut-keywordargs` and “Function Examples” sections of the Python
@@ -103,25 +106,20 @@ def make_df(name, **data):
         if `name` is not the name of a MESSAGE or MACRO parameter; if arrays in `data`
         have uneven lengths.
     """
-    # NB could be expanded to handle "mapping sets"
-
     if isinstance(name, (Mapping, pd.Series, pd.DataFrame)):
         return _deprecated_make_df(name, **data)
 
-    # Get parameter information
+    # Get item information
     try:
         info = ChainMap(MESSAGE.items, MACRO.items)[name]
     except KeyError:
         raise ValueError(f"{repr(name)} is not a MESSAGE or MACRO parameter")
 
-    if info.type != ItemType.PAR:
-        raise ValueError(f"{repr(name)} is {info.type}, not a parameter")
-
     # Index names, if not given explicitly, are the same as the index sets
     dims = info.dims or info.coords
 
     # Columns for the resulting data frame
-    columns = list(dims) + ["value", "unit"]
+    columns = list(dims) + (["value", "unit"] if info.type == ItemType.PAR else [])
 
     # Default values for every column
     data = ChainMap(data, defaultdict(lambda: None))
