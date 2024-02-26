@@ -51,10 +51,7 @@ def test_run_clone(tmpdir, request):
 
 def test_run_remove_solution(test_mp, request):
     # create a new instance of the transport problem and solve it
-    name = "_test_run_remove_solution"
-    scen = make_dantzig(test_mp, solve=True, quiet=True, request=request).clone(
-        scenario=request.node.name + name
-    )
+    scen = make_dantzig(test_mp, solve=True, quiet=True, request=request)
     assert np.isclose(scen.var("OBJ")["lvl"], 153.675)
 
     # check that re-solving the model will raise an error if a solution exists
@@ -68,10 +65,8 @@ def test_run_remove_solution(test_mp, request):
     # before first model year (DIFFERENT behaviour from `ixmp.Scenario`)
     scen.remove_solution()
     assert scen.firstmodelyear == 1963
-    expected = TS_DF_CLEARED.copy()
     assert_frame_equal(
-        scen.timeseries(iamc=True),
-        expected.assign(scenario=request.node.name + name),
+        scen.timeseries(iamc=True), TS_DF_CLEARED.assign(scenario=scen.scenario)
     )
 
 
