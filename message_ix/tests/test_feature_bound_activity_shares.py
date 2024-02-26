@@ -240,12 +240,11 @@ def test_commodity_share_up(request, message_test_mp):
 
 
 def test_commodity_share_lo(request, message_test_mp):
-    scen = make_dantzig(
-        message_test_mp, solve=True, request=request, solve_options=dict(quiet=True)
-    )
+    scen = make_dantzig(message_test_mp, request=request, solve=True, quiet=True)
 
     # data for share bound
-    def calc_share(s):
+    def calc_share(s: Scenario) -> float:
+        """Compute the share achieved on scenario `s`."""
         a = calculate_activity(s, tec="transport_from_seattle").loc["to_new-york"]
         b = calculate_activity(s, tec="transport_from_san-diego").loc["to_new-york"]
         return a / (a + b)
@@ -253,66 +252,46 @@ def test_commodity_share_lo(request, message_test_mp):
     exp = 1.0 * calc_share(scen)
 
     # add share constraints
-    clone = scen.clone(scenario="share_commodity_lo", keep_solution=False)
-    with clone.transact():
-        clone.add_cat("technology", "share", "transport_from_seattle")
-        clone.add_cat(
-            "technology",
-            "total",
-            ["transport_from_seattle", "transport_from_san-diego"],
-        )
-        clone.add_set("shares", "test-share")
-        clone.add_set(
-            "map_shares_commodity_share",
-            pd.DataFrame(
-                {
-                    "shares": "test-share",
-                    "node_share": "new-york",
-                    "node": "new-york",
-                    "type_tec": "share",
-                    "mode": "all",
-                    "commodity": "cases",
-                    "level": "consumption",
-                },
-                index=[0],
-            ),
-        )
-        clone.add_set(
-            "map_shares_commodity_total",
-            pd.DataFrame(
-                {
-                    "shares": "test-share",
-                    "node_share": "new-york",
-                    "node": "new-york",
-                    "type_tec": "total",
-                    "mode": "all",
-                    "commodity": "cases",
-                    "level": "consumption",
-                },
-                index=[0],
-            ),
-        )
-        clone.add_par(
-            "share_commodity_lo",
-            pd.DataFrame(
-                {
-                    "shares": "test-share",
-                    "node_share": "new-york",
-                    "year_act": _year,
-                    "time": "year",
-                    "unit": "cases",
-                    "value": exp,
-                },
-                index=[0],
-            ),
-        )
-    clone.solve(quiet=True)
-    obs = calc_share(clone)
-    assert np.isclose(obs, exp)
+    clone = scen.clone(keep_solution=False)
 
-    orig_obj = scen.var("OBJ")["lvl"]
-    new_obj = clone.var("OBJ")["lvl"]
-    assert new_obj >= orig_obj
+    with clone.transact("Add share constraints"):
+        clone.add_set("shares", "test-share")
+
+        common = dict(
+            mode="all", node="new-york", node_share="new-york", shares="test-share"
+        )
+
+        # Add category and mapping set elements
+        for tt, members in (
+            ("share", ["transport_from_seattle"]),
+            ("total", ["transport_from_seattle", "transport_from_san-diego"]),
+        ):
+            clone.add_cat("technology", tt, members)
+            clone.add_set(
+                f"map_shares_commodity_{tt}",
+                pd.DataFrame(
+                    dict(type_tec=tt, commodity="cases", level="consumption", **common),
+                    index=[0],
+                ),
+            )
+
+        # Add the value of the constraint
+        name = "share_commodity_lo"
+        clone.add_par(
+            name,
+            make_df(
+                name, time="year", unit="cases", value=exp, year_act=_year, **common
+            ),
+        )
+
+    clone.solve(quiet=True)
+
+    # The solution has the expected share
+    assert np.isclose(exp, calc_share(clone))
+
+    # Objective function value is larger in the clone (with constraints) than the
+    # original scenario (unconstrained)
+    assert clone.var("OBJ")["lvl"] >= scen.var("OBJ")["lvl"]
 
 
 def test_add_share_mode_up(request, message_test_mp):

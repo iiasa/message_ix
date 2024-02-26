@@ -297,19 +297,20 @@ def make_dantzig(
     mp.add_unit("case")
     mp.add_region("DantzigLand", "country")
 
-    # initialize a new (empty) instance of an `ixmp.Scenario`
-    if request:
-        scenario_name = request.node.name
-    else:
-        scenario_name = "multi-year" if multi_year else "standard"
-
-    scen = Scenario(
-        mp,
+    # Scenario identifiers
+    args = dict(
         model=SCENARIO["dantzig"]["model"],
-        scenario=scenario_name,
-        annotation="Dantzig's canning problem as a MESSAGE-scheme Scenario",
         version="new",
+        annotation="Dantzig's canning problem as a MESSAGE-scheme Scenario",
     )
+    if request:
+        # Use a distinct scenario name for a particular test
+        args.update(scenario=request.node.name)
+    else:
+        args.update(scenario="multi-year" if multi_year else "standard")
+
+    # Initialize a new (empty) instance of an `ixmp.Scenario`
+    scen = Scenario(mp, **args)
 
     # Sets
     # NB commit() is refused if technology and year are not given
