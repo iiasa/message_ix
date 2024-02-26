@@ -1,7 +1,12 @@
-import numpy as np
+import logging
 
-from message_ix import Scenario, make_df
+import numpy as np
+import pytest
+
+from message_ix import ModelError, Scenario, make_df
 from message_ix.testing import make_dantzig
+
+log = logging.getLogger(__name__)
 
 # First model year of the Dantzig scenario
 _year = 1963
@@ -43,7 +48,10 @@ def test_add_bound_activity_up(request, test_mp):
     assert new_obj >= orig_obj
 
 
-def test_add_bound_activity_up_all_modes(request, test_mp):
+@pytest.mark.parametrize(
+    "lpmethod", (2, pytest.param(4, marks=pytest.mark.xfail(raises=ModelError)))
+)
+def test_add_bound_activity_up_all_modes(request, test_mp, lpmethod):
     """
 
     This test specifically has two solutions for which the `OBJ` function is the same
@@ -66,11 +74,13 @@ def test_add_bound_activity_up_all_modes(request, test_mp):
       for "to_chicago".
     """
     scen = make_dantzig(test_mp, request=request, solve=False, quiet=True)
-    scen.solve(quiet=True, solve_options=dict(lpmethod=2))
+    scen.solve(quiet=True, solve_options=dict(lpmethod=lpmethod))
 
     # data for act bound
-    # print(calculate_activity(scen))
     exp = 0.95 * calculate_activity(scen).sum()
+
+    log.debug(f"{exp = }")
+
     name = "bound_activity_up"
     data = make_df(
         name,
@@ -89,13 +99,15 @@ def test_add_bound_activity_up_all_modes(request, test_mp):
     with clone.transact():
         clone.add_par(name, data)
 
-    clone.solve(quiet=True, solve_options=dict(lpmethod=2))
-    obs = calculate_activity(clone).sum()
-    assert np.isclose(obs, exp)
+    clone.solve(quiet=True, solve_options=dict(lpmethod=lpmethod))
 
-    orig_obj = scen.var("OBJ")["lvl"]
-    new_obj = clone.var("OBJ")["lvl"]
-    assert new_obj >= orig_obj
+    # Objective function value is greater than or equal to the unconstrained value
+    assert scen.var("OBJ")["lvl"] <= clone.var("OBJ")["lvl"]
+
+    # Activity of transport_from_seattle is the same as in the unconstrained case
+    obs = calculate_activity(clone).sum()
+    log.debug(f"{obs = }")
+    assert np.isclose(exp, obs)
 
 
 def test_commodity_share_up(request, test_mp):
