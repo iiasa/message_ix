@@ -275,8 +275,7 @@ def add_dac(scenario, filepath=""):
         the default is in the module's folder
     """
 
-    # year_df = scenario.vintage_and_active_years()
-    # vintage_years, act_years = year_df["year_vtg"], year_df["year_act"]
+    # check if all required sets already in scenario
     if "CO2_storage" not in scenario.set("emission"):
         scenario.add_set("emission", "CO2_storage")
     if "co2_storage_pot" not in scenario.set("type_emission"):
