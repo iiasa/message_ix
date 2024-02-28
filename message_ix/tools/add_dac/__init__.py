@@ -7,6 +7,7 @@ Created on Mon Mar 20 15:41:32 2023
 
 import os
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import yaml
@@ -365,3 +366,120 @@ def add_dac(scenario, filepath=""):
     # emission_list = ["CO2_storage"]
     # type_tec_list = ["co2_potential"]
     # technology_list = ["dacco2_tr_dis"]
+
+
+def get_values(
+    scenario,
+    variable="",
+    valuetype="lvl",
+    # filters = {}
+):
+    # filters must use 'cat_tec' to aggregate technology
+    # don't forget to include check unit
+    """
+    Parameters
+    ----------
+    scenario    : message_ix.Scenario()
+        MESSAGEix Scenario where the data will be included
+    variable    : string
+        name of variable to report
+    valuetype   : string, 'lvl' or 'mrg'
+        type of values reported to report,
+        either level or marginal.
+        default is 'lvl'
+    """
+
+    if isinstance(scenario.var(variable), pd.DataFrame):
+        df = scenario.var(variable)
+        dimensions = [col for col in df.columns if col not in ["lvl", "mrg"]]
+        return df.set_index(dimensions)[[valuetype]]
+    else:
+        return scenario.var(variable)[valuetype]
+
+
+def get_report(
+    scenario,
+    technologies=[],
+):
+    """
+    Parameters
+    ----------
+    scenario    : message_ix.Scenario()
+        MESSAGEix Scenario where the data will be included
+    technologies    : string or list
+        name of technology to be reported
+    variable    : string or list
+        name of variable to report
+    """
+    var_dict = {var: [] for var in ["CAP", "CAP_NEW", "INVESTMENT", "REMOVAL"]}
+
+    # listing model years to be reported
+    years_rep = sorted(
+        scenario.set("cat_year")
+        .set_index("type_year")
+        .loc["cumulative", "year"]
+        .to_list()
+    )
+
+    # Create dataframe
+    for var in var_dict.keys():
+        # primary variables
+        if var in ["CAP", "CAP_NEW"]:
+            df = (
+                get_values(scenario, var)["lvl"]
+                .unstack()
+                .loc[:, technologies, :]
+                .groupby(["node_loc"])
+                .sum()
+            )[years_rep]
+
+        # investment
+        elif var == "INVESTMENT":
+            depl = (
+                get_values(scenario, "CAP_NEW")["lvl"].unstack().loc[:, technologies, :]
+            )[years_rep]
+
+            dfic = scenario.par("inv_cost")
+
+            inv = (
+                dfic.loc[dfic["technology"].isin(technologies)]
+                .set_index(["node_loc", "technology", "year_vtg"])["value"]
+                .unstack()
+            )
+
+            df = depl.mul(inv).groupby(["node_loc"]).sum()
+
+        # removal
+        elif var == "REMOVAL":
+            acts = get_values(scenario, "ACT").droplevel(["mode", "time"])
+            df = (
+                acts.loc[:, technologies, :, :]["lvl"]
+                .unstack()
+                .groupby(["node_loc"])
+                .sum()
+            )
+
+        df.loc["World"] = df.sum(axis=0)
+
+        var_dict[var] = df
+
+    # Create dictionary for variable dataframes and write variables to excel
+    with pd.ExcelWriter("get_report_output.xlsx", engine="openpyxl") as writer:
+        for var in var_dict.keys():
+            var_dict[var].to_excel(writer, sheet_name=var)
+
+    frame_count = 0
+    fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(10, 6))
+    for k, v in var_dict.items():
+        r = np.int32(np.floor(frame_count / 2))
+        c = frame_count - r * 2
+        frame_count += 1
+        for reg in range(len(v)):
+            kwargs = {"marker": "o"} if reg == 11 else {}
+            axs[r, c].plot(v.columns, v.iloc[reg], label=v.index[reg], **kwargs)
+        axs[r, c].set_title(k)
+    axs[0, 0].legend(ncols=2)
+    plt.tight_layout()
+    plt.show()
+
+    return var_dict
