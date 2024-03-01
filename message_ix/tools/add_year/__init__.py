@@ -314,9 +314,9 @@ def add_year_set(
         if not yr_cat.loc[yr_cat["type_year"] == "baseyear_macro", "year"].empty:
             yr_cat.loc[yr_cat["type_year"] == "baseyear_macro", "year"] = baseyear_macro
         if not yr_cat.loc[yr_cat["type_year"] == "initializeyear_macro", "year"].empty:
-            yr_cat.loc[
-                yr_cat["type_year"] == "initializeyear_macro", "year"
-            ] = baseyear_macro
+            yr_cat.loc[yr_cat["type_year"] == "initializeyear_macro", "year"] = (
+                baseyear_macro
+            )
 
     yr_pair = []
     for yr in years_new:

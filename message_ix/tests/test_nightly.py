@@ -1,4 +1,5 @@
 """Slow-running tests for nightly continuous integration."""
+
 from functools import partial  # noqa: F401
 
 import ixmp
