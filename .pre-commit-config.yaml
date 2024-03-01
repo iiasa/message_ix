@@ -13,6 +13,7 @@ repos:
     - mypy
     - asyncssh
     - git+https://github.com/iiasa/ixmp.git@main
+    - importlib_resources
     - pytest
     - Sphinx
     - types-PyYAML
