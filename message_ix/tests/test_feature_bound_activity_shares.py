@@ -96,7 +96,9 @@ def assert_dantzig_solution(s: "Scenario", lp_method: int) -> None:
     "constraint_value",
     (pytest.param(299, marks=pytest.mark.xfail(raises=ModelError)), 301, 325),
 )
-def test_add_bound_activity_up_all_modes(request, test_mp, lp_method, constraint_value):
+def test_add_bound_activity_up_all_modes(
+    request, test_mp, tmp_model_dir, lp_method, constraint_value
+):
     """Test ``bound_activity_up`` values applied mode="all".
 
     - In the unconstrained Dantzig problem:
@@ -123,13 +125,16 @@ def test_add_bound_activity_up_all_modes(request, test_mp, lp_method, constraint
           solution.
         - The objective function value does not change.
     """
-    scen = make_dantzig(
-        test_mp, request=request, solve=True, solve_options=dict(lpmethod=lp_method)
-    )
+    # Solve options: use the model files and read/write cplex.opt in the temporary dir
+    so = dict(model_dir=tmp_model_dir, solve_options=dict(lpmethod=lp_method))
+
+    # Create and solve the Dantzig model
+    scen = make_dantzig(test_mp, request=request, solve=True, **so)
+
+    # Ensure the solution is as expected given the LP method
     assert_dantzig_solution(scen, lp_method)
 
     clone = scen.clone(scenario=f"{scen.scenario} cloned", keep_solution=False)
-
     with clone.transact("Bound all modes of t=transport_from_seattle"):
         name = "bound_activity_up"
         clone.add_par(
@@ -147,7 +152,7 @@ def test_add_bound_activity_up_all_modes(request, test_mp, lp_method, constraint
         )
 
     # Scenario solves (not with constraint_value = 299)
-    clone.solve(quiet=True, solve_options=dict(lpmethod=lp_method))
+    clone.solve(quiet=True, **so)
 
     # Objective function value is equal to the unconstrained value
     assert_equal(scen.var("OBJ")["lvl"], clone.var("OBJ")["lvl"])
