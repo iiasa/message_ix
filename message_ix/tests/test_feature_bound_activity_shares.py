@@ -1,7 +1,10 @@
 import logging
 
 import numpy as np
+import pandas as pd
 import pytest
+from numpy.testing import assert_equal
+from pandas.testing import assert_frame_equal
 
 from message_ix import ModelError, Scenario, make_df
 from message_ix.testing import make_dantzig
@@ -12,7 +15,8 @@ log = logging.getLogger(__name__)
 _year = 1963
 
 
-def calculate_activity(scen, tec="transport_from_seattle"):
+def calculate_activity(scen, tec="transport_from_seattle") -> pd.Series:
+    """Sum ``ACT`` levels for `technology` and `mode` groups; return sums for `tec`."""
     return scen.var("ACT").groupby(["technology", "mode"])["lvl"].sum().loc[tec]
 
 
@@ -48,66 +52,115 @@ def test_add_bound_activity_up(request, test_mp):
     assert new_obj >= orig_obj
 
 
-@pytest.mark.parametrize(
-    "lpmethod", (2, pytest.param(4, marks=pytest.mark.xfail(raises=ModelError)))
-)
-def test_add_bound_activity_up_all_modes(request, test_mp, lpmethod):
+def assert_dantzig_solution(s: "Scenario", lp_method: int) -> None:
+    """Assert that the Dantzig model contains the expected solution.
+
+    The model has two solutions with equal objective function values.
+
+    - The simplex algorithms—`lp_method` is 1 (primal simplex), 2 (dual simplex), or 3
+      (network simplex) find a solution in which, for instance, ``ACT`` of
+      nl=san-diego, t=transport_from_san-diego, m=to_new-york is 275 cases.
+    - The barrier (`lp_method` is 4) and sifting (`lp_method` is 5) algorithms find a
+      solution in which the same variable is 325 cases.
+
+    This function asserts that `s` contains the expected solution.
     """
+    assert np.isclose(153.675, s.var("OBJ")["lvl"])
 
-    This test specifically has two solutions for which the `OBJ` function is the same
-    therefore the lpmethod must be set to "2".
+    cols = ["node_loc", "mode", "lvl"]
 
-    With lpmethod=2:
-
-    - "transport_from_seattle" needs to provide "to_chicago" with 300.
-    - in the unconstrained example seattle delivers 50 to "to_new_york" and 300
-      "to_chicago".
-    - additional 275 to "to_new_york" comes from san-diego.
-    - the activity bound for "transport_from_seattle" (see below) below is therefore
-      set to 325.
-
-    With  lpmethod=4:
-
-    - the unconstrained example seattle delivers 300 "to_chicago".
-    - san-diego delivers 325 to "to_new_york"
-    - the resulting bound on activity for seattle, therefore is below what is required
-      for "to_chicago".
-    """
-    scen = make_dantzig(test_mp, request=request, solve=False, quiet=True)
-    scen.solve(quiet=True, solve_options=dict(lpmethod=lpmethod))
-
-    # data for act bound
-    exp = 0.95 * calculate_activity(scen).sum()
-
-    log.debug(f"{exp = }")
-
-    name = "bound_activity_up"
-    data = make_df(
-        name,
-        node_loc="seattle",
-        technology="transport_from_seattle",
-        year_act=_year,
-        time="year",
-        unit="cases",
-        mode="all",
-        value=exp,
+    # First lvl column: simplex solution
+    # Second lvl column: other methods solution
+    exp = (
+        pd.DataFrame(
+            [
+                ["seattle", "production", 350.0, 350.0],
+                ["seattle", "to_new-york", 50.0, 0.0],
+                ["seattle", "to_chicago", 300.0, 300.0],
+                ["seattle", "to_topeka", 0.0, 0.0],
+                ["san-diego", "production", 600.0, 600.0],
+                ["san-diego", "to_new-york", 275.0, 325.0],
+                ["san-diego", "to_chicago", 0.0, 0.0],
+                ["san-diego", "to_topeka", 275.0, 275.0],
+            ]
+        )
+        .take([0, 1, 2 if lp_method in {1, 2, 3} else 3], axis=1)
+        .set_axis(cols, axis=1)
     )
 
-    # test limiting all modes
+    assert_frame_equal(exp, s.var("ACT")[cols])
+
+
+@pytest.mark.parametrize("lp_method", (1, 2, 3, 4, 5))
+@pytest.mark.parametrize(
+    "constraint_value",
+    (pytest.param(299, marks=pytest.mark.xfail(raises=ModelError)), 301, 325),
+)
+def test_add_bound_activity_up_all_modes(request, test_mp, lp_method, constraint_value):
+    """Test ``bound_activity_up`` values applied mode="all".
+
+    - In the unconstrained Dantzig problem:
+
+      - Regardless of CPLEX `lp_method`, the ``ACT`` of t=transport_from_seattle,
+        m=to_chicago is 300.
+      - Depending on `lp_method`:
+
+        - Simplex methods: t=transport_from_seattle, m=to_new-york is 50.0. The sum of
+          the values is 300 + 50 = 350, equal to the ``ACT`` of nl=seattle,
+          t=canning_plant, m=production.
+        - Other methods (barrier, sifting): t=transport_from_seattle, m=to_new-york is
+          zero. The sum of values is 300 + 0 = 300. The demand at n=new-york is instead
+          supplied by t=transport_from_san-diego.
+
+    - If ``bound_activity_up`` is applied to t=transport_from_seattle, m=all:
+
+      - Any value < 300 is infeasible. This would be the value obtained, for instance,
+        by summing ``ACT`` for t=transport_from_seattle across all modes for the
+        barrier/sifting solution and then applying a factor < 1.0.
+      - Any value >= 300 is feasible.
+
+        - Values in the range (300, 350) alter the simplex solution, but not the barrier
+          solution.
+        - The objective function value does not change.
+    """
+    scen = make_dantzig(
+        test_mp, request=request, solve=True, solve_options=dict(lpmethod=lp_method)
+    )
+    assert_dantzig_solution(scen, lp_method)
+
     clone = scen.clone(scenario=f"{scen.scenario} cloned", keep_solution=False)
 
-    with clone.transact():
-        clone.add_par(name, data)
+    with clone.transact("Bound all modes of t=transport_from_seattle"):
+        name = "bound_activity_up"
+        clone.add_par(
+            name,
+            make_df(
+                name,
+                node_loc="seattle",
+                technology="transport_from_seattle",
+                year_act=_year,
+                time="year",
+                mode="all",
+                value=constraint_value,
+                unit="cases",
+            ),
+        )
 
-    clone.solve(quiet=True, solve_options=dict(lpmethod=lpmethod))
+    # Scenario solves (not with constraint_value = 299)
+    clone.solve(quiet=True, solve_options=dict(lpmethod=lp_method))
 
-    # Objective function value is greater than or equal to the unconstrained value
-    assert scen.var("OBJ")["lvl"] <= clone.var("OBJ")["lvl"]
+    # Objective function value is equal to the unconstrained value
+    assert_equal(scen.var("OBJ")["lvl"], clone.var("OBJ")["lvl"])
 
-    # Activity of transport_from_seattle is the same as in the unconstrained case
-    obs = calculate_activity(clone).sum()
-    log.debug(f"{obs = }")
-    assert np.isclose(exp, obs)
+    # Constraint is effective
+    assert constraint_value >= calculate_activity(clone).sum()
+
+    if lp_method in {1, 2, 3}:
+        # Constraint reduced the total ACT of t=transport_from_seattle
+        assert calculate_activity(scen).sum() > calculate_activity(clone).sum()
+    else:
+        # Constraint had no effect on total ACT of t=transport_from_seattle
+        assert_equal(calculate_activity(scen).sum(), calculate_activity(clone).sum())
 
 
 def test_commodity_share_up(request, test_mp):
