@@ -26,7 +26,7 @@ def test_copy_model(monkeypatch, message_ix_cli, tmp_path, tmp_env):
     # Copying with --overwrite succeeds
     r = message_ix_cli("copy-model", "--overwrite", str(tmp_path))
     assert r.exit_code == 0
-    assert "Overwriting" in r.output
+    assert "Overwrite" in r.output
 
     # --set-default causes a configuration change
     assert config.get("message model dir") == Path(message_ix.__file__).parent / "model"
