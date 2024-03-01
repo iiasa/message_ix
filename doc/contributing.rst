@@ -187,20 +187,19 @@ Code style
 - **Python** code:
 
   - Follow the `PEP 8 naming conventions <https://www.python.org/dev/peps/pep-0008/#naming-conventions>`_.
-  - Apply `black <https://black.readthedocs.io>`_ code formatting.
-  - Use `ruff <https://beta.ruff.rs/docs>`_ to check code quality.
+  - Use `ruff <https://docs.astral.sh/ruff>`_ to check code formatting (:program:`ruff format`, which applies the "black" format) and quality (:program:`ruff check`).
     In particular, through :file:`pyproject.toml`, :mod:`message_ix` uses the following rule sets to ensure:
 
-    - `"F" <https://beta.ruff.rs/docs/rules/#pyflakes-f>`_: code is free of basic errors, equivalent to Pyflakes or `flake8 <https://flake8.pycqa.org>`_.
-    - `"E", "W" <https://beta.ruff.rs/docs/rules/#pycodestyle-e-w>`_: code conforms to `PEP 8 <https://www.python.org/dev/peps/pep-0008>`_, equivalent to using pycodestyle.
-    - `"I" <https://beta.ruff.rs/docs/rules/#isort-i>`_: :py:`import` statements are sorted in a consistent way, equivalent to `isort <https://pypi.org/project/isort/>`_.
-    - `"C90" <https://beta.ruff.rs/docs/rules/#mccabe-c90>`_: the McCabe complexity of code is below a fixed threshold, equivalent to using `mccabe <https://pypi.org/project/mccabe/>`_ via flake8.
+    - `"F" <https://docs.astral.sh/ruff/rules/#pyflakes-f>`_: code is free of basic errors, equivalent to Pyflakes or `flake8 <https://flake8.pycqa.org>`_.
+    - `"E", "W" <https://docs.astral.sh/ruff/rules/#pycodestyle-e-w>`_: code conforms to `PEP 8 <https://www.python.org/dev/peps/pep-0008>`_, equivalent to using pycodestyle.
+    - `"I" <https://docs.astral.sh/ruff/rules/#isort-i>`_: :py:`import` statements are sorted in a consistent way, equivalent to `isort <https://pypi.org/project/isort/>`_.
+    - `"C90" <https://docs.astral.sh/ruff/rules/#mccabe-c90>`_: the McCabe complexity of code is below a fixed threshold, equivalent to using `mccabe <https://pypi.org/project/mccabe/>`_ via flake8.
 
   - Add type hints to new or changed functions, methods, and global variables, and check these using the `mypy <https://mypy.readthedocs.io>`_ static type checker.
 
   To simplify the use of these tools:
 
-  - Black, ruff, and mypy can each be configured to run automatically within your code editor with an extension, plugin, or script (see their respective documentation for links and details).
+  - Ruff and mypy can each be configured to run automatically within your code editor with an extension, plugin, or script (see their respective documentation for links and details).
     These tools help apply the code style every time a file is saved, or even as you type.
   - The source repository contains configuration for `pre-commit <https://pre-commit.com>`_, a tool that invokes multiple actions via `git hooks <https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks>`_.
     This runs all of the above checks every time you do a :program:`git commit`.
@@ -240,7 +239,7 @@ Documentation
   3. Inline documentation in :file:`message_ix/model/*.gms` files.
 
   For (2) and (3), start each sentence on a new line, and do not hard-wrap within sentences.
-  For (1), wrap at the same 88 characters as :command:`black` enforces for code.
+  For (1), wrap at the same 88 characters as :command:`ruff` enforces for code.
 
 - Ensure Sphinx does not give warnings about ReST syntax for new or modified documentation.
 
