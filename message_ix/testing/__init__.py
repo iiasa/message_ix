@@ -1,15 +1,16 @@
 import io
 from itertools import product
-from typing import TYPE_CHECKING, List, Optional, Union
+from typing import TYPE_CHECKING, Generator, List, Optional, Union
 
 import numpy as np
 import pandas as pd
+import pytest
 from ixmp import IAMC_IDX
 
 from message_ix import Scenario, make_df
 
 if TYPE_CHECKING:
-    import pytest
+    import pathlib
 
 
 SCENARIO = {
@@ -794,3 +795,21 @@ def make_subannual(
     scen.solve()
 
     return scen
+
+
+@pytest.fixture(scope="function")
+def tmp_model_dir(tmp_path) -> Generator["pathlib.Path", None, None]:
+    """Temporary directory containing a copy of the MESSAGE model files.
+
+    This may be used, among other purposes, to isolate the writing/reading of
+    :file:`cplex.opt` from other tests.
+
+    See also
+    --------
+    :func:`.copy_model`
+    """
+    from message_ix.util import copy_model
+
+    copy_model(tmp_path, overwrite=False, set_default=False, quiet=True)
+
+    yield tmp_path
