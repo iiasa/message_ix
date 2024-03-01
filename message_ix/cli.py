@@ -1,4 +1,4 @@
-import re
+import logging
 from pathlib import Path
 
 import click
@@ -8,6 +8,8 @@ from ixmp.cli import main
 import message_ix
 import message_ix.tools.add_year.cli
 import message_ix.tools.lp_diag.cli
+
+log = logging.getLogger(__name__)
 
 # Override the docstring of the ixmp CLI so that it masquerades as the
 # message_ix CLI
@@ -28,51 +30,18 @@ ixmp.cli.ScenarioClass = message_ix.Scenario
     help="Set the copy to be the default used when running MESSAGE.",
 )
 @click.option("--overwrite", is_flag=True, help="Overwrite existing files.")
+@click.option("--quiet", is_flag=True, help="Don't print paths of copied files.")
 @click.argument("path", type=click.Path(file_okay=False))
-def copy_model(path, overwrite, set_default):
+def copy_model_cmd(path, overwrite, set_default, quiet):
     """Copy the MESSAGE GAMS files to a new PATH.
 
     To use an existing set of GAMS files, you can also call:
 
         $ message-ix config set "message model dir" PATH
     """
-    from shutil import copyfile
+    from message_ix.util import copy_model
 
-    path = Path(path).resolve()
-
-    src_dir = Path(__file__).parent / "model"
-    for src in src_dir.rglob("*.*"):
-        # Skip certain files
-        if src.suffix in (".gdx", ".log", ".lst") or re.search("225[a-z]+", str(src)):
-            continue
-
-        # Destination path
-        dst = path / src.relative_to(src_dir)
-
-        # Create parent directory
-        dst.parent.mkdir(parents=True, exist_ok=True)
-
-        if dst.is_dir():
-            # No further action for directories
-            continue
-
-        # Display output
-        if dst.exists():
-            if not overwrite:
-                print("{} exists, will not overwrite".format(dst))
-
-                # Skip copyfile() below
-                continue
-            else:
-                print("Overwriting {}".format(dst))
-        else:
-            print("Copying to {}".format(dst))
-
-        copyfile(src, dst)
-
-    if set_default:
-        ixmp.config.set("message model dir", path)
-        ixmp.config.save()
+    copy_model(path, overwrite, set_default, quiet)
 
 
 @main.command()

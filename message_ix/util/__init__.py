@@ -1,7 +1,9 @@
 import copy
+import re
 import warnings
 from collections import ChainMap, defaultdict
 from collections.abc import Mapping
+from pathlib import Path
 
 import pandas as pd
 from ixmp.backend import ItemType
@@ -9,6 +11,83 @@ from pandas.api.types import is_scalar
 
 from message_ix.core import Scenario
 from message_ix.models import MACRO, MESSAGE
+
+
+def copy_model(
+    path: Path, overwrite: bool = False, set_default: bool = False, quiet: bool = False
+) -> None:
+    """Copy the MESSAGE GAMS files to a new `path`.
+
+    Parameters
+    ----------
+    overwrite : bool
+        If :any:`True`, overwrite existing files.
+    set_default : bool
+        If :any:`True`, update the ixmp configuration setting "message model dir".
+    quiet : bool
+        If :any:`False`, print actions to stdout; otherwise display nothing.
+    """
+    try:
+        from importlib.resources import as_file, files
+    except ImportError:  # Python < 3.9
+        from importlib_resources import as_file, files
+
+    from shutil import copyfile
+
+    import ixmp
+
+    path = Path(path).resolve()
+
+    if quiet:
+
+        def output(str):
+            pass
+
+    else:
+        output = print
+
+    # Identify the source directory using importlib.resources
+    for traversable in files("message_ix").iterdir():
+        if traversable.name == "model":
+            # Record the pathlib.Path associated with the Traversible object
+            # NB This may not work if `traversable` is, for instance, in a ZIP archive
+            with as_file(traversable) as f:
+                src_dir: Path = f
+            break
+
+    # Iterate over files in `src_dir`
+    for src in src_dir.rglob("*"):
+        # Skip certain files
+        if src.suffix in (".gdx", ".log", ".lst") or re.search("225[a-z]+", str(src)):
+            continue
+
+        # Construct the destination path
+        dst = path / src.relative_to(src_dir)
+
+        # Create parent directory
+        dst.parent.mkdir(parents=True, exist_ok=True)
+
+        if src.is_dir():
+            # No further action for directories
+            continue
+
+        # Display output
+        if dst.exists():
+            if not overwrite:
+                output(f"{dst} exists, will not overwrite")
+
+                # Skip copyfile() below
+                continue
+            else:
+                output(f"Overwrite {dst}")
+        else:
+            output(f"Copy to {dst}")
+
+        copyfile(src, dst)
+
+    if set_default:
+        ixmp.config.set("message model dir", path)
+        ixmp.config.save()
 
 
 def make_df(name, **data):
