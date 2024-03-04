@@ -20,7 +20,7 @@ docutils==0.20.1
     #   sphinxcontrib-bibtex
 gitdb==4.0.10
     # via gitpython
-gitpython==3.1.41
+gitpython==3.1.42
     # via -r doc/requirements.in
 idna==3.4
     # via requests
