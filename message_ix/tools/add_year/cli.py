@@ -21,6 +21,7 @@ If --bound_extend is True (the default), data from previous timestep is copied
 if only one data point is available for extrapolation.
 
 """
+
 from functools import partial
 from timeit import default_timer as timer
 
@@ -259,8 +260,7 @@ def main(
     )
 
     print(
-        "> New scenario with additional years is:\n"
-        "  ixmp://{}/{}/{}#{}".format(
-            sc_new.platform.name, sc_new.model, sc_new.scenario, sc_new.version
-        )
+        "> New scenario with additional years is:",
+        f"ixmp://{sc_new.platform.name}/{sc_new.url}",
+        sep="\n",
     )

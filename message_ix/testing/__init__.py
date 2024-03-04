@@ -1,16 +1,39 @@
 import io
+import os
 from itertools import product
-from typing import TYPE_CHECKING, List, Optional, Union
+from pathlib import Path
+from typing import TYPE_CHECKING, Generator, List, Optional, Union
 
 import numpy as np
 import pandas as pd
+import pytest
 from ixmp import IAMC_IDX
 
 from message_ix import Scenario, make_df
 
 if TYPE_CHECKING:
-    import pytest
+    import pathlib
 
+
+# Pytest hooks
+
+
+def pytest_report_header(config, start_path):
+    """Add the message_ix import path to the pytest report header."""
+    import message_ix
+
+    return f"message_ix location: {Path(message_ix.__file__).parent}"
+
+
+def pytest_sessionstart():
+    """Use only 2 threads for CPLEX on GitHub Actions runners with 2 CPU cores."""
+    import message_ix.models
+
+    if "GITHUB_ACTIONS" in os.environ:
+        message_ix.models.DEFAULT_CPLEX_OPTIONS["threads"] = 2
+
+
+# Data for testing
 
 SCENARIO = {
     "austria": dict(model="Austrian energy model", scenario="baseline"),
@@ -272,7 +295,14 @@ def make_austria(mp, solve=False, quiet=True):  # noqa: C901
     return scen
 
 
-def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
+def make_dantzig(
+    mp,
+    solve=False,
+    multi_year=False,
+    *,
+    request: Optional["pytest.FixtureRequest"] = None,
+    **solve_opts,
+):
     """Return an :class:`message_ix.Scenario` for Dantzig's canning problem.
 
     Parameters
@@ -290,14 +320,20 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
     mp.add_unit("case")
     mp.add_region("DantzigLand", "country")
 
-    # initialize a new (empty) instance of an `ixmp.Scenario`
-    scen = Scenario(
-        mp,
+    # Scenario identifiers
+    args = dict(
         model=SCENARIO["dantzig"]["model"],
-        scenario="multi-year" if multi_year else "standard",
-        annotation="Dantzig's canning problem as a MESSAGE-scheme Scenario",
         version="new",
+        annotation="Dantzig's canning problem as a MESSAGE-scheme Scenario",
     )
+    if request:
+        # Use a distinct scenario name for a particular test
+        args.update(scenario=request.node.name)
+    else:
+        args.update(scenario="multi-year" if multi_year else "standard")
+
+    # Initialize a new (empty) instance of an `ixmp.Scenario`
+    scen = Scenario(mp, **args)
 
     # Sets
     # NB commit() is refused if technology and year are not given
@@ -781,3 +817,21 @@ def make_subannual(
     scen.solve()
 
     return scen
+
+
+@pytest.fixture(scope="function")
+def tmp_model_dir(tmp_path) -> Generator["pathlib.Path", None, None]:
+    """Temporary directory containing a copy of the MESSAGE model files.
+
+    This may be used, among other purposes, to isolate the writing/reading of
+    :file:`cplex.opt` from other tests.
+
+    See also
+    --------
+    :func:`.copy_model`
+    """
+    from message_ix.util import copy_model
+
+    copy_model(tmp_path, overwrite=False, set_default=False, quiet=True)
+
+    yield tmp_path

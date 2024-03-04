@@ -8,6 +8,7 @@ functionality of storage equations. The workflow is as follows:
 - Add storage implementation (dam: storage device, pump: charger, turbine: discharger).
 - Test storage functionality and equations.
 """
+
 import logging
 from itertools import product
 

@@ -92,11 +92,8 @@ def plot_cumulative(x, y, labels):
     d0, d1, d2 = y.dims
 
     assert (
-        d0,
-        d1,
-    ) == x.dims, (
-        f"dimensions of x {repr(x.dims)} != first dimensions of y {repr((d0, d1))}"
-    )
+        (d0, d1) == x.dims
+    ), f"dimensions of x {repr(x.dims)} != first dimensions of y {repr((d0, d1))}"
 
     # Check that all data have the same value in the first dimension
     d0_labels = set(x.coords[d0].values) | set(y.coords[d0].values)

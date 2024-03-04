@@ -252,14 +252,14 @@ Utility methods
 ---------------
 
 .. automodule:: message_ix.util
-   :members: expand_dims, make_df
+   :members: expand_dims, copy_model, make_df
 
 
 Testing utilities
 -----------------
 
 .. automodule:: message_ix.testing
-   :members: make_dantzig, make_westeros
+   :members: make_austria, make_dantzig, make_westeros, tmp_model_dir
 
 .. automodule:: message_ix.testing.nightly
    :members:

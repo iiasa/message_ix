@@ -4,6 +4,9 @@ Next release
 All changes
 -----------
 
+- :func:`.make_df` can now create partly-filled :class:`DataFrames <pandas.DataFrame>` for indexed sets; not only parameters (:pull:`784`).
+- New function :func:`.util.copy_model` that exposes the behaviour of the :program:`message-ix copy-model` CLI command to other Python code (:pull:`784`).
+- New test fixture :func:`.tmp_model_dir` (:pull:`784`).
 - Bug fix: :meth:`.Scenario.rename` would not rename keys where the index set and index name differed (:issue:`601`, :pull:`791`).
 - Increase minimum requirement for genno dependency to 1.20 (:pull:`783`).
 

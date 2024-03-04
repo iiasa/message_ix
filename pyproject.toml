@@ -32,6 +32,7 @@ classifiers = [
 requires-python = ">=3.8"
 dependencies = [
   "click",
+  "importlib_resources; python_version <= '3.8'",
   "ixmp >= 3.8.0",
   "genno[pyam] >= 1.20",
   "numpy",
@@ -114,17 +115,15 @@ markers = [
   "tutorial: Tests of the tutorial Jupyter notebooks",
 ]
 
-[tool.ruff]
+[tool.ruff.lint]
 select = ["C9", "E", "F", "I", "W"]
-
-[tool.ruff.mccabe]
 # Exceptions:
 # - message_ix/core.py:716:5: C901 'Scenario.rename' is too complex (18)
 # - message_ix/tools/add_year/__init__.py:86:1: C901 'add_year' is too complex (17)
 # - message_ix/tools/add_year/__init__.py:533:1: C901 'interpolate_1d' is too complex (19)
 # - message_ix/tools/add_year/__init__.py:687:1: C901 'interpolate_2d' is too complex (38)
 # - message_ix/testing/__init__.py:91:1: C901 'make_austria' is too complex (18)
-max-complexity = 14
+mccabe.max-complexity = 14
 
 [tool.setuptools.packages]
 find = {}
