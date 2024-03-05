@@ -1,0 +1,98 @@
+daccs:
+  year_init: 700
+  inv_cost_: 
+    par_name: inv_cost
+    value: 100
+    unit: USD/kW
+    node_loc:
+      Westeros: 1
+    year_vtg:
+      rate: 0
+  fix_cost_: 
+    par_name: fix_cost
+    value: 5
+    unit: USD/kWa
+    node_loc:
+      Westeros: 1
+    year_vtg:
+      rate: 0
+    year_act:
+      rate: 0
+  var_cost_: 
+    par_name: var_cost
+    value: 5
+    unit: USD/kWa
+    node_loc:
+      Westeros: 1
+    year_vtg:
+      rate: 0
+    year_act:
+      rate: 0
+  input_:
+    par_name: input
+    value: 1
+    unit: kWa
+    node_loc:
+      Westeros: 1
+    mode:
+      standard: 1
+    commodity:
+      electricity: 1
+    level:
+      final: 1
+  #output_:
+  #  par_name: output
+  #  value: 20
+  #  unit: tCO2
+  #  node_loc:
+  #    Westeros: 1
+  #  mode:
+  #    standard: 1
+  #  commodity:
+  #    CO2: 1
+  #  level:
+  #    final: 1
+  capacity_factor_:
+    par_name: capacity_factor
+    value: 0.913
+    unit: '-'
+    node_loc:
+      Westeros: 1
+  emission_factor_:
+    par_name: emission_factor
+    value: -20
+    unit: tCO2/kWa
+    node_loc:
+      Westeros: 1
+    mode:
+      standard: 1
+    emission:
+      CO2: 1
+  technical_lifetime_:
+    par_name: technical_lifetime
+    value: 25
+    unit: y
+    node_loc:
+      Westeros: 1
+  initial_new_capacity_up_: 
+    par_name: initial_new_capacity_up
+    value: 50
+    unit: GWa
+    node_loc:
+      Westeros: 1
+    year_vtg:
+      rate: 0
+    time:
+      year: 1
+  growth_new_capacity_up_: 
+    par_name: growth_new_capacity_up
+    value: 0.05
+    unit: '-'
+    node_loc:
+      Westeros: 1
+    year_vtg:
+      rate: 0
+    time:
+      year: 1
+
+  

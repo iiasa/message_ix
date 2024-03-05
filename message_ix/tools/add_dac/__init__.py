@@ -93,8 +93,13 @@ def generate_df(
     # Create DataFrame for all parameters
     for tec, val in data.items():
         for name in val.keys():
-            # tec = 'DACCS'
-            # name = 'emission_factor_co2'
+            if tec not in scenario.set("technology"):
+                scenario.add_set("technology", tec)
+
+            if "commodity" in par_idx[tec][name]:
+                commodity = list(tech_data[tec][name]["commodity"].keys())[0]
+                if commodity not in scenario.set("commodity"):
+                    scenario.add_set("commodity", commodity)
 
             kwargs = {}
             if all(idx in par_idx[tec][name] for idx in ["year_vtg", "year_act"]):
