@@ -12,9 +12,6 @@ Order=1,2,3,4
 Decim=7
 PlaneRownr=-1
 
-[RP:MESSAGE_MASTER]
-1=
-
 [GDXDISP: OBJ Var 0]
 PlaneDim=0
 RowDim=0
@@ -34,20 +31,6 @@ Decim=7
 PlaneRownr=193
 PlaneFilter1=LT_DAC
 
-[MRUFILES]
-1=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\MESSAGE_master.lst
-
-[OPENWINDOW_1]
-FILE0=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\MESSAGE\model_solve.gms
-FILE1=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\MESSAGE_master.gms
-FILE2=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\output\MsgOutput_GENIE_sandbox_add_tech_baseline.gdx
-FILE3=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\output\MsgOutput_GENIE_sandbox_add_tech_baseline.gdx
-MAXIM=1
-TOP=50
-LEFT=50
-HEIGHT=400
-WIDTH=400
-
 [GDXDISP: CAP_NEW Var 3]
 PlaneDim=2
 RowDim=1
@@ -55,6 +38,28 @@ Squeeze=1
 SqTrail0=0
 Order=2,4,1,3
 Decim=7
-PlaneRownr=171
+PlaneRownr=-1
 PlaneFilter1=LT_DAC
 PlaneFilter2=Level
+
+[RP:DATA_LOAD]
+1=
+
+[RP:MESSAGE_MASTER]
+1=
+
+[MRUFILES]
+1=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\output\MsgOutput_GENIE_sandbox_add_tech_baseline.gdx
+
+[OPENWINDOW_1]
+FILE0=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\data_load.lst
+FILE1=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\MESSAGE\data_load.gms
+FILE2=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\MESSAGE\model_solve.gms
+FILE3=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\MESSAGE_master.gms
+FILE4=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\MESSAGE_master.lst
+FILE5=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\MESSAGE\data_load.gms
+MAXIM=1
+TOP=50
+LEFT=50
+HEIGHT=400
+WIDTH=400

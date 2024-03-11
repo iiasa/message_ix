@@ -180,45 +180,66 @@ def generate_df(
 
                 # year_vtg factor
                 # _year_vtg = (1+rate)**delta_years
-                _year_vtg = (
-                    (
-                        (
-                            1
-                            + tech_data[tec]
-                            .get(name, {})
-                            .get("year_vtg", {})
-                            .get("rate", 0)
-                        )
-                        ** (df["year_vtg"][i] - tech_data[tech]["year_init"])
+
+                if "year_vtg" in df.columns:
+                    usf_year_vtg = (
+                        tech_data[tec]
+                        .get(name, {})
+                        .get("year_vtg", {})
+                        .get(df["year_vtg"][i], 1)
                     )
-                    if "year_vtg" in df.columns
-                    else 1
-                )
+
+                    exp_year_vtg = df["year_vtg"][i] - tech_data[tech]["year_init"]
+
+                    _year_vtg = (
+                        np.power(
+                            (
+                                1
+                                + tech_data[tec]
+                                .get(name, {})
+                                .get("year_vtg", {})
+                                .get("rate", 0)
+                            ),
+                            exp_year_vtg,
+                        )
+                        * usf_year_vtg
+                    )
+                else:
+                    _year_vtg = 1
 
                 # year_act factor
-                # _year_act = (1+rate)**(year_act-year_vtg) if both years present
-                # _year_act = (1+rate)**(year_act-first_active_year) if no year_vtg
-                _year_act = (
-                    (
-                        (
-                            1
-                            + tech_data[tec]
-                            .get(name, {})
-                            .get("year_act", {})
-                            .get("rate", 0)
-                        )
-                        ** (
-                            df["year_act"][i]
-                            - (
-                                df["year_vtg"][i]
-                                if "year_vtg" in df.columns
-                                else tech_data[tech]["year_init"]
-                            )
-                        )
+                # _year_act = ((1+rate)**(year_act-year_vtg))*usf_year_act if both years present
+                # _year_act = ((1+rate)**(year_act-first_active_year))*usf_year_act if no year_vtg
+
+                if "year_act" in df.columns:
+                    usf_year_act = (
+                        tech_data[tec]
+                        .get(name, {})
+                        .get("year_act", {})
+                        .get(df["year_act"][i], 1)
                     )
-                    if "year_act" in df.columns
-                    else 1
-                )
+
+                    exp_year_act = df["year_act"][i] - (
+                        df["year_vtg"][i]
+                        if "year_vtg" in df.columns
+                        else tech_data[tech]["year_init"]
+                    )
+
+                    _year_act = (
+                        np.power(
+                            (
+                                1
+                                + tech_data[tec]
+                                .get(name, {})
+                                .get("year_act", {})
+                                .get("rate", 0)
+                            ),
+                            exp_year_act,
+                        )
+                        * usf_year_act
+                    )
+                else:
+                    _year_act = 1
 
                 # get mode multiplier from model_data
                 _mode = (
