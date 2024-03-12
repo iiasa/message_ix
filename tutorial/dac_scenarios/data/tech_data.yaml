@@ -6,17 +6,17 @@ dac_1:
     value: 5574.49
     unit: USD/GWa # USD/(tC/yr)
     node_loc:
-      R11_AFR: 1
-      R11_CPA: 1
-      R11_EEU: 1
-      R11_FSU: 1
-      R11_LAM: 1
-      R11_MEA: 1
-      R11_NAM: 1
-      R11_PAO: 1
-      R11_PAS: 1
-      R11_SAS: 1
-      R11_WEU: 1
+      R11_AFR: 1.000000
+      R11_CPA: 0.912150
+      R11_EEU: 1.070281
+      R11_FSU: 1.070281
+      R11_LAM: 1.000000
+      R11_MEA: 1.122991
+      R11_NAM: 1.182275
+      R11_PAO: 1.263552
+      R11_PAS: 0.947290
+      R11_SAS: 0.947290
+      R11_WEU: 1.228412
     year_vtg:
       rate: 0
       2025: 1
@@ -351,17 +351,17 @@ dac_2:
     value: 3096.88
     unit: USD/GWa # USD/(tC/yr)
     node_loc:
-      R11_AFR: 1
-      R11_CPA: 1
-      R11_EEU: 1
-      R11_FSU: 1
-      R11_LAM: 1
-      R11_MEA: 1
-      R11_NAM: 1
-      R11_PAO: 1
-      R11_PAS: 1
-      R11_SAS: 1
-      R11_WEU: 1
+      R11_AFR: 1.000000
+      R11_CPA: 0.912150
+      R11_EEU: 1.070281
+      R11_FSU: 1.070281
+      R11_LAM: 1.000000
+      R11_MEA: 1.122991
+      R11_NAM: 1.182275
+      R11_PAO: 1.263552
+      R11_PAS: 0.947290
+      R11_SAS: 0.947290
+      R11_WEU: 1.228412
     year_vtg:
       rate: 0
       2025: 1
@@ -696,17 +696,17 @@ dac_3:
     value: 3911.84
     unit: USD/GWa # USD/(tC/yr)
     node_loc:
-      R11_AFR: 1
-      R11_CPA: 1
-      R11_EEU: 1
-      R11_FSU: 1
-      R11_LAM: 1
-      R11_MEA: 1
-      R11_NAM: 1
-      R11_PAO: 1
-      R11_PAS: 1
-      R11_SAS: 1
-      R11_WEU: 1
+      R11_AFR: 1.000000
+      R11_CPA: 0.912150
+      R11_EEU: 1.070281
+      R11_FSU: 1.070281
+      R11_LAM: 1.000000
+      R11_MEA: 1.122991
+      R11_NAM: 1.182275
+      R11_PAO: 1.263552
+      R11_PAS: 0.947290
+      R11_SAS: 0.947290
+      R11_WEU: 1.228412
     year_vtg:
       rate: 0
       2025: 1
@@ -1063,17 +1063,17 @@ dac_4:
     value: 2985.76
     unit: USD/GWa # USD/(tC/yr)
     node_loc:
-      R11_AFR: 1
-      R11_CPA: 1
-      R11_EEU: 1
-      R11_FSU: 1
-      R11_LAM: 1
-      R11_MEA: 1
-      R11_NAM: 1
-      R11_PAO: 1
-      R11_PAS: 1
-      R11_SAS: 1
-      R11_WEU: 1
+      R11_AFR: 1.000000
+      R11_CPA: 0.912150
+      R11_EEU: 1.070281
+      R11_FSU: 1.070281
+      R11_LAM: 1.000000
+      R11_MEA: 1.122991
+      R11_NAM: 1.182275
+      R11_PAO: 1.263552
+      R11_PAS: 0.947290
+      R11_SAS: 0.947290
+      R11_WEU: 1.228412
     year_vtg:
       rate: 0
       2025: 1
@@ -1408,17 +1408,17 @@ dac_5:
     value: 4173.85
     unit: USD/GWa # USD/(tC/yr)
     node_loc:
-      R11_AFR: 1
-      R11_CPA: 1
-      R11_EEU: 1
-      R11_FSU: 1
-      R11_LAM: 1
-      R11_MEA: 1
-      R11_NAM: 1
-      R11_PAO: 1
-      R11_PAS: 1
-      R11_SAS: 1
-      R11_WEU: 1
+      R11_AFR: 1.000000
+      R11_CPA: 0.912150
+      R11_EEU: 1.070281
+      R11_FSU: 1.070281
+      R11_LAM: 1.000000
+      R11_MEA: 1.122991
+      R11_NAM: 1.182275
+      R11_PAO: 1.263552
+      R11_PAS: 0.947290
+      R11_SAS: 0.947290
+      R11_WEU: 1.228412
     year_vtg:
       rate: 0
       2025: 1
@@ -1937,7 +1937,7 @@ DAC_mpen:
       year: 1
   soft_activity_up_:
     par_name: soft_activity_up
-    value: 0.5
+    value: 0.05
     unit: '-'
     node_loc:
       R11_AFR: 1
@@ -1957,7 +1957,7 @@ DAC_mpen:
       year: 1
   initial_activity_up_:
     par_name: initial_activity_up
-    value: 0.00824
+    value: 0.00824158
     unit: '-'
     node_loc:
       R11_AFR: 1

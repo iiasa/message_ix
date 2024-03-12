@@ -135,6 +135,7 @@ def generate_df(
                     "year_rel",
                     "node_origin",
                     "node_dest",
+                    "node_rel",
                     "time_origin",
                     "time_dest",
                 ]
@@ -162,7 +163,7 @@ def generate_df(
 
             # assigning values for node and time related indices
             for idx in df.columns:
-                if idx in ["node_origin", "node_dest"]:
+                if idx in ["node_origin", "node_dest", "node_rel"]:
                     df[idx] = df["node_loc"]
                 if idx in ["time_origin", "time_dest"]:
                     df[idx] = df["time"]
@@ -175,7 +176,7 @@ def generate_df(
                     tech_data[tec]
                     .get(name, {})
                     .get("node_loc", {})
-                    .get(df.get("node_loc", {}).get(2), 1)
+                    .get(df.get("node_loc", {}).get(i), 1)
                 )
 
                 # year_vtg factor
