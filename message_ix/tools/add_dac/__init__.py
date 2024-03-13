@@ -350,10 +350,13 @@ def add_dac(scenario, filepath=""):
 
         for name in val.keys():
             if tech_data[tec][name]["par_name"] == "relation_activity":
-                if tech_data[tec][name]["relation"][0] not in set(
-                    scenario.set("relation")
-                ):
-                    scenario.add_set("relation", tech_data[tec][name]["relation"][0])
+                for rel in tech_data[tec][name]["relation"]:
+                    if rel not in set(scenario.set("relation")):
+                        scenario.add_set("relation", rel)
+                # if tech_data[tec][name]["relation"][0] not in set(
+                #    scenario.set("relation")
+                # ):
+                #    scenario.add_set("relation", tech_data[tec][name]["relation"][0])
             scenario.add_par(tech_data[tec][name]["par_name"], data[tec][name])
 
     # Adding other requirements

@@ -343,6 +343,41 @@ dac_1:
       rate: 0
     mode:
       M1: 1
+  relation_activity_vrenewable:
+    par_name: relation_activity
+    value: 1
+    unit: '???'
+    relation:
+      solar_curtailment_1: -0.515524
+      solar_curtailment_2: -0.309314
+      solar_curtailment_3: -0.164968
+      solar_step: 0.055971
+      solar_step2: 0.167913
+      solar_step3: 0.279856
+      wind_curtailment_1: -0.721733
+      wind_curtailment_2: -0.412419
+      wind_curtailment_3: -0.206210
+      wind_step: 0.055971
+      wind_step2: 0.167913
+      wind_step3: 0.279856
+    year_rel:
+      rate: 0
+    node_loc:
+      R11_AFR: 1
+      R11_CPA: 1
+      R11_EEU: 1
+      R11_FSU: 1
+      R11_LAM: 1
+      R11_MEA: 1
+      R11_NAM: 1
+      R11_PAO: 1
+      R11_PAS: 1
+      R11_SAS: 1
+      R11_WEU: 1
+    year_act:
+      rate: 0
+    mode:
+      M1: 1
     
 dac_2:
   year_init: 2025
@@ -1727,6 +1762,35 @@ dac_5:
     value: 0.85
     unit: Mt C/yr
     relation: [oper_res]
+    year_rel:
+      rate: 0
+    node_loc:
+      R11_AFR: 1
+      R11_CPA: 1
+      R11_EEU: 1
+      R11_FSU: 1
+      R11_LAM: 1
+      R11_MEA: 1
+      R11_NAM: 1
+      R11_PAO: 1
+      R11_PAS: 1
+      R11_SAS: 1
+      R11_WEU: 1
+    year_act:
+      rate: 0
+    mode:
+      M1: 1
+  relation_activity_vrenewable:
+    par_name: relation_activity
+    value: 1
+    unit: '???'
+    relation:
+      solar_curtailment_1: -0.132115
+      solar_curtailment_2: -0.079269
+      solar_curtailment_3: -0.042277
+      wind_curtailment_1: -0.184961
+      wind_curtailment_2: -0.105692
+      wind_curtailment_3: -0.052846
     year_rel:
       rate: 0
     node_loc:
