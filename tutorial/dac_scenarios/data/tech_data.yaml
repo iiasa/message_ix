@@ -1974,6 +1974,29 @@ dacco2_tr_dis:
       rate: 0.0
     time:
       year: 1
+  relation_activity_dacco2_trans_disp:
+    par_name: relation_activity
+    value: 1
+    unit: Mt C/yr
+    relation: [dacco2_trans_disp]
+    year_rel:
+      rate: 0
+    node_loc:
+      R11_AFR: 1
+      R11_CPA: 1
+      R11_EEU: 1
+      R11_FSU: 1
+      R11_LAM: 1
+      R11_MEA: 1
+      R11_NAM: 1
+      R11_PAO: 1
+      R11_PAS: 1
+      R11_SAS: 1
+      R11_WEU: 1
+    year_act:
+      rate: 0
+    mode:
+      M1: 1
 
 
 
