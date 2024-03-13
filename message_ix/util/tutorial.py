@@ -10,7 +10,9 @@ log = logging.getLogger(__name__)
 PLOTS = [
     ("activity", computations.stacked_bar, "out:nl-t-ya", "GWa"),
     ("capacity", computations.stacked_bar, "CAP:nl-t-ya", "GW"),
+    ("daccs capacity", computations.stacked_bar, "CAP:nl-t-ya", "tCO2/yr"),
     ("demand", computations.stacked_bar, "demand:n-c-y", "GWa"),
+    ("emission", computations.stacked_bar, "emi:nl-t-ya", "tCO2"),
     ("extraction", computations.stacked_bar, "EXT:n-c-g-y", "GW"),
     ("new capacity", computations.stacked_bar, "CAP_NEW:nl-t-yv", "GWa"),
     ("prices", computations.stacked_bar, "PRICE_COMMODITY:n-c-y", "¢/kW·h"),
@@ -27,6 +29,8 @@ def prepare_plots(rep: Reporter, input_costs="$/GWa") -> None:
     - ``plot extraction``
     - ``plot fossil supply curve``
     - ``plot capacity``
+    - ``plot daccs capacity``
+    - ``plot emission``
     - ``plot new capacity``
     - ``plot prices``
 
