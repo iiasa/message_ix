@@ -209,4 +209,4 @@ jobs:
       run: gh cache list -L 999 | cut -f2 | grep pre-commit | xargs -I{} gh cache delete "{}" || true
       env: { GH_TOKEN: "${{ github.token }}" }
 
-    - uses: pre-commit/action@v3.0.0
+    - uses: pre-commit/action@v3.0.1
