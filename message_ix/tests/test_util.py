@@ -4,7 +4,9 @@ import pandas.testing as pdt
 import pytest
 
 from message_ix import Scenario, make_df
+from message_ix.report import Reporter
 from message_ix.testing import make_dantzig, make_westeros
+from message_ix.util.sankey import sankey_mapper
 
 
 def test_make_df():
@@ -59,3 +61,55 @@ def test_testing_make_scenario(test_mp, request):
     # Westeros model can be created
     scen = make_westeros(test_mp, solve=True, request=request)
     assert isinstance(scen, Scenario)
+
+
+def test_sankey_mapper(test_mp):
+    # NB: we actually only need a pd.DataFrame that has the same form as the result of
+    # these setup steps, so maybe this can be simplified
+    scen = make_westeros(test_mp, solve=True)
+    rep = Reporter.from_scenario(scen)
+    rep.configure(units={"replace": {"-": ""}})
+    df = rep.get("message::sankey")
+
+    # Set expectations
+    expected_all = {
+        "in|final|electricity|bulb|standard": ("final|electricity", "bulb|standard"),
+        "in|secondary|electricity|grid|standard": (
+            "secondary|electricity",
+            "grid|standard",
+        ),
+        "out|final|electricity|grid|standard": ("grid|standard", "final|electricity"),
+        "out|secondary|electricity|coal_ppl|standard": (
+            "coal_ppl|standard",
+            "secondary|electricity",
+        ),
+        "out|secondary|electricity|wind_ppl|standard": (
+            "wind_ppl|standard",
+            "secondary|electricity",
+        ),
+        "out|useful|light|bulb|standard": ("bulb|standard", "useful|light"),
+    }
+    expected_without_final_electricity = {
+        "in|secondary|electricity|grid|standard": (
+            "secondary|electricity",
+            "grid|standard",
+        ),
+        "out|secondary|electricity|coal_ppl|standard": (
+            "coal_ppl|standard",
+            "secondary|electricity",
+        ),
+        "out|secondary|electricity|wind_ppl|standard": (
+            "wind_ppl|standard",
+            "secondary|electricity",
+        ),
+        "out|useful|light|bulb|standard": ("bulb|standard", "useful|light"),
+    }
+
+    # Load all variables
+    mapping_all = sankey_mapper(df, year=700, region="Westeros")
+    assert mapping_all == expected_all
+
+    mapping_without_final_electricity = sankey_mapper(
+        df, year=700, region="Westeros", exclude=["final|electricity"]
+    )
+    assert mapping_without_final_electricity == expected_without_final_electricity
