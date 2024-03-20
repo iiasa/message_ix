@@ -156,7 +156,7 @@ framework, such as used in global research applications of |MESSAGEix|.
       system (:tut:`westeros/westeros_historical_new_capacity.ipynb`).
 
    #. Modeling of a multi-node energy system and representing trade between nodes
-      (:tut:`westeros/westeros_multinode.ipynb`).
+      (:tut:`westeros/westeros_multinode_energy_trade.ipynb`).
 
 #. Use other features of :mod:`message_ix` and :mod:`ixmp`:
 
