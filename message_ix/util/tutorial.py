@@ -3,17 +3,19 @@ from contextlib import contextmanager
 from functools import partial
 
 from message_ix import Scenario
-from message_ix.report import Key, Reporter, operator
+from message_ix.reporting import Key, Reporter, computations
 
 log = logging.getLogger(__name__)
 
 PLOTS = [
-    ("activity", operator.stacked_bar, "out:nl-t-ya", "GWa"),
-    ("capacity", operator.stacked_bar, "CAP:nl-t-ya", "GW"),
-    ("demand", operator.stacked_bar, "demand:n-c-y", "GWa"),
-    ("extraction", operator.stacked_bar, "EXT:n-c-g-y", "GW"),
-    ("new capacity", operator.stacked_bar, "CAP_NEW:nl-t-yv", "GWa"),
-    ("prices", operator.stacked_bar, "PRICE_COMMODITY:n-c-y", "¢/kW·h"),
+    ("activity", computations.stacked_bar, "out:nl-t-ya", "GWa"),
+    ("capacity", computations.stacked_bar, "CAP:nl-t-ya", "GW"),
+    ("removal capacity", computations.stacked_bar, "CAP:nl-t-ya", "tCO2/yr"),
+    ("demand", computations.stacked_bar, "demand:n-c-y", "GWa"),
+    ("emission", computations.stacked_bar, "emi:nl-t-ya", "tCO2"),
+    ("extraction", computations.stacked_bar, "EXT:n-c-g-y", "GW"),
+    ("new capacity", computations.stacked_bar, "CAP_NEW:nl-t-yv", "GWa"),
+    ("prices", computations.stacked_bar, "PRICE_COMMODITY:n-c-y", "¢/kW·h"),
 ]
 
 
@@ -27,6 +29,8 @@ def prepare_plots(rep: Reporter, input_costs="$/GWa") -> None:
     - ``plot extraction``
     - ``plot fossil supply curve``
     - ``plot capacity``
+    - ``plot removal capacity``
+    - ``plot emission``
     - ``plot new capacity``
     - ``plot prices``
 
@@ -47,7 +51,7 @@ def prepare_plots(rep: Reporter, input_costs="$/GWa") -> None:
     # Add one node to the reporter for each plot
     for title, func, key_str, units in PLOTS:
         # Convert the string to a Key object so as to reference its .dims
-        key = Key(key_str)
+        key = Key.from_str_or_key(key_str)
 
         # Operation for the reporter
         comp = partial(
@@ -68,7 +72,7 @@ def prepare_plots(rep: Reporter, input_costs="$/GWa") -> None:
         "plot fossil supply curve",
         (
             partial(
-                operator.plot_cumulative,
+                computations.plot_cumulative,
                 labels=("Fossil supply", "Resource volume", "Cost"),
             ),
             "resource_volume:n-g",
