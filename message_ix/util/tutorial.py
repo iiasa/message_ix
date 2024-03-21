@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from functools import partial
 
 from message_ix import Scenario
-from message_ix.reporting import Key, Reporter, computations
+from message_ix.report import Key, Reporter, computations
 
 log = logging.getLogger(__name__)
 
