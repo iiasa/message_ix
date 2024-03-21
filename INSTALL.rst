@@ -229,6 +229,8 @@ Next:
     $ pytest -m rmessageix
 
 
+.. _common-issues:
+
 Common issues
 =============
 
