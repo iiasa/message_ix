@@ -89,7 +89,9 @@ Set
 * NB MAX_ADJUSTMENT and max_adjustment have different meanings:
 * - MAX_ADJUSTMENT is a fixed threshold used to truncate the relative demand change produced by MACRO.
 * - max_adjustment is the amount of that change, after any truncation.
+*setting solve_param to 1 (the default values) triggers sequential solving across regions in MACRO, whereas setting it to 2 enables concurrent solving for all regions
 Scalar
+    solve_param        solving mechanism for MACRO                                  / 1 /
     max_adjustment_pre maximum adjustment in previous iteration                     / 0 /
     max_adjustment_pos maximum positive adjustment in current iteration
     max_adjustment_neg maximum negative adjustment in current iteration
