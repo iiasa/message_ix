@@ -1,7 +1,6 @@
 from typing import Callable, Optional
 
 import pandas as pd
-from genno.compat.pyam import util
 
 
 def collapse_message_cols(
@@ -27,6 +26,8 @@ def collapse_message_cols(
         - 'emi': 'variable' is ``'<var>|<emission>|<technology>|<mode>'``.
         - Otherwise: 'variable' is ``'<var>|<technology>'``.
     """
+    from genno.compat.pyam import util
+
     columns = dict(variable=[var] if var else [])
 
     if kind == "ene":
