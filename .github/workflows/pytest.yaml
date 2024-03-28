@@ -162,11 +162,9 @@ jobs:
       # By default, the below installs ixmp from the main branch. To run against
       # other code, e.g. other branches for open PRs), temporarily edit as
       # appropriate. DO NOT merge such changes to `main`.
-      # plotnine: temporary work around for https://github.com/has2k1/plotnine/pull/751
       run: |
         pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
         pip install .[tests]
-        pip install "plotnine != 0.13.0"
 
     - name: Install R dependencies and tutorial requirements
       run: |
