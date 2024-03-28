@@ -159,11 +159,11 @@ intersphinx_mapping = {
     "message_doc": ("https://docs.messageix.org/projects/global/en/latest/", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
     "pint": ("https://pint.readthedocs.io/en/stable/", None),
-    "plotnine": ("https://plotnine.readthedocs.io/en/stable", None),
+    "plotnine": ("https://plotnine.org", None),
     "pyam": ("https://pyam-iamc.readthedocs.io/en/stable/", None),
     "python": ("https://docs.python.org/3/", None),
     "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
-    "xarray": ("https://xarray.pydata.org/en/stable/", None),
+    "xarray": ("https://docs.xarray.dev/en/stable", None),
 }
 
 # -- Options for sphinx.ext.linkcode / ixmp.util.sphinx_linkcode_github ----------------
