@@ -248,6 +248,8 @@ class Scenario(ixmp.Scenario):
         # TODO Move this upstream, to ixmp
         super().add_par(name, key_or_data, value, unit, comment)  # type: ignore [arg-type]
 
+    add_par.__doc__ = ixmp.Scenario.add_par.__doc__
+
     def add_set(
         self,
         name: str,
@@ -259,6 +261,8 @@ class Scenario(ixmp.Scenario):
         # failures.
         # TODO Move this upstream, to ixmp
         super().add_set(name, key, comment)  # type: ignore [arg-type]
+
+    add_set.__doc__ = ixmp.Scenario.add_set.__doc__
 
     def add_spatial_sets(self, data):
         """Add sets related to spatial dimensions of the model.
