@@ -48,6 +48,7 @@ documentation = "https://docs.messageix.org"
 
 [project.optional-dependencies]
 docs = [
+  "genno >= 1.26",  # For sphinx extensions; see doc/conf.py
   "GitPython",
   "message_ix[report]",
   "numpydoc",

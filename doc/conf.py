@@ -28,6 +28,7 @@ release = version
 # Add any Sphinx extension module names here, as strings. They can be extensions coming
 # with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
+    # First-party
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
     "sphinx.ext.extlinks",
@@ -38,6 +39,8 @@ extensions = [
     "sphinxcontrib.bibtex",
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
+    # Others
+    "genno.compat.sphinx.rewrite_refs",
     "ixmp.util.sphinx_linkcode_github",
     "message_ix.util.sphinx_gams",
 ]
@@ -115,6 +118,19 @@ html_theme_options = {"logo_only": True}
 
 # The LaTeX engine to build the docs.
 latex_engine = "lualatex"
+
+# -- Options for genno.compat.sphinx.rewrite_refs --------------------------------------
+
+reference_aliases = {
+    "AnyQuantity": ":data:`genno.core.quantity.AnyQuantity`",
+    r"(genno\.|)Key(?=Seq|[^\w]|$)": "genno.core.key.Key",
+    r"(genno\.|)Quantity": "genno.core.attrseries.AttrSeries",
+    #
+    # Many projects (including Sphinx itself!) do not have a py:module target in for the
+    # top-level module in objects.inv. Resolve these using :doc:`index` or similar for
+    # each project.
+    "plotnine$": ":class:`plotnine.ggplot`",
+}
 
 # -- Options for sphinx.ext.extlinks ---------------------------------------------------
 
