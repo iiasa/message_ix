@@ -96,6 +96,7 @@ def plot_cumulative(x: "AnyQuantity", y: "AnyQuantity", labels: Tuple[str, str, 
 
     # Unpack the dimensions of `y`, typically "n" (node), "g" (grade), "y" (year)
     d0, d1, d2 = y.dims
+    assert isinstance(d1, str)
 
     assert (
         d0,

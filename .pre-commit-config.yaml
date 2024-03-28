@@ -14,6 +14,8 @@ repos:
     - asyncssh
     - git+https://github.com/iiasa/ixmp.git@main
     - importlib_resources
+    - matplotlib
+    - pandas-stubs
     - pytest
     - Sphinx
     - types-PyYAML
