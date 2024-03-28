@@ -4,7 +4,7 @@ Developing tutorials
 Developers *and users* of the |MESSAGEix| framework are welcome to contribute **tutorials**, according to the following guidelines.
 Per the license and CLA, tutorials will become part of the message_ix test suite and will be publicly available.
 
-Developers **must** ensure new features (including :mod:`message_ix.tools` submodules) are fully documented.
+Developers **must** ensure new features (including :py:`message_ix.tools` submodules) are fully documented.
 This can be done via the API documentation (this site) and, optionally, a tutorial.
 These have complementary purposes:
 

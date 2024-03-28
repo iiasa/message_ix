@@ -4,13 +4,9 @@
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-import re
 from importlib.metadata import version as get_version
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
-
-if TYPE_CHECKING:
-    import sphinx
+from typing import Optional
 
 # -- Project information ---------------------------------------------------------------
 
@@ -28,6 +24,7 @@ release = version
 # Add any Sphinx extension module names here, as strings. They can be extensions coming
 # with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
+    # First-party
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
     "sphinx.ext.extlinks",
@@ -38,6 +35,8 @@ extensions = [
     "sphinxcontrib.bibtex",
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
+    # Others
+    "genno.compat.sphinx.rewrite_refs",
     "ixmp.util.sphinx_linkcode_github",
     "message_ix.util.sphinx_gams",
 ]
@@ -66,28 +65,7 @@ rst_prolog = r"""
 .. |IIASA| raw:: html
 
    <abbr title="International Institute for Applied Systems Analysis">IIASA</abbr>
-
-.. |KeyLike| replace:: :obj:`~genno.core.key.KeyLike`
 """  # noqa: E501
-
-
-def setup(app: "sphinx.application.Sphinx") -> None:
-    """Sphinx setup hook."""
-
-    expr = re.compile("docstring of (ixmp|genno)")
-
-    def warn_missing_reference(app: "sphinx.application.Sphinx", domain, node) -> bool:
-        """Silently discard unresolved references internal to upstream code.
-
-        When base classes in upstream (genno, ixmp) packages are inherited in
-        message_ix, Sphinx cannot properly resolve relative references within docstrings
-        of methods of the former.
-        """
-        # Return True without doing anything to silently discard the warning. Anything
-        # else, return False to allow other Sphinx hook implementations to handle.
-        return expr.search(node.source or "") is not None
-
-    app.connect("warn-missing-reference", warn_missing_reference)
 
 
 # -- Options for HTML output -----------------------------------------------------------
@@ -115,6 +93,43 @@ html_theme_options = {"logo_only": True}
 
 # The LaTeX engine to build the docs.
 latex_engine = "lualatex"
+
+# -- Options for genno.compat.sphinx.rewrite_refs --------------------------------------
+
+# When base classes in upstream (genno, ixmp) packages are inherited in message_ix,
+# Sphinx will not properly resolve relative references within docstrings of methods of
+# the former. Some of these aliases are to allow Sphinx to locate the correct targets.
+reference_aliases = {
+    # genno
+    "AnyQuantity": ":data:`genno.core.quantity.AnyQuantity`",
+    "Computer": "genno.Computer",
+    "Graph": "genno.core.graph.Graph",
+    "Operator": "genno.Operator",
+    "KeyLike": ":data:`genno.core.key.KeyLike`",
+    "iter_keys": "genno.core.key.iter_keys",
+    "single_key": "genno.core.key.single_key",
+    r"(genno\.|)Key(?=Seq|[^\w]|$)": "genno.core.key.Key",
+    r"(genno\.|)Quantity": "genno.core.attrseries.AttrSeries",
+    # ixmp
+    "ItemType": "ixmp.backend.ItemType",
+    "Platform": "ixmp.Platform",
+    "TimeSeries": "ixmp.TimeSeries",
+    #
+    # Many projects (including Sphinx itself!) do not have a py:module target in for the
+    # top-level module in objects.inv. Resolve these using :doc:`index` or similar for
+    # each project.
+    "dask$": ":std:doc:`dask:index`",
+    "plotnine$": ":class:`plotnine.ggplot`",
+}
+
+# -- Options for ixmp.util.sphinx_linkcode_github / sphinx.ext.linkcode ----------------
+
+linkcode_github_repo_slug = "iiasa/message_ix"
+
+# -- Options for message_ix.util.sphinx_gams -------------------------------------------
+
+gams_source_dir = Path(__file__).parents[1].joinpath("message_ix", "model")
+gams_target_dir = "model"
 
 # -- Options for sphinx.ext.extlinks ---------------------------------------------------
 
@@ -159,16 +174,12 @@ intersphinx_mapping = {
     "message_doc": ("https://docs.messageix.org/projects/global/en/latest/", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
     "pint": ("https://pint.readthedocs.io/en/stable/", None),
-    "plotnine": ("https://plotnine.readthedocs.io/en/stable", None),
+    "plotnine": ("https://plotnine.org", None),
     "pyam": ("https://pyam-iamc.readthedocs.io/en/stable/", None),
     "python": ("https://docs.python.org/3/", None),
     "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
-    "xarray": ("https://xarray.pydata.org/en/stable/", None),
+    "xarray": ("https://docs.xarray.dev/en/stable", None),
 }
-
-# -- Options for sphinx.ext.linkcode / ixmp.util.sphinx_linkcode_github ----------------
-
-linkcode_github_repo_slug = "iiasa/message_ix"
 
 # -- Options for sphinx.ext.mathjax ----------------------------------------------------
 
@@ -215,8 +226,3 @@ todo_include_todos = True
 # -- Options for sphinxcontrib.bibtex --------------------------------------------------
 
 bibtex_bibfiles = ["references.bib"]
-
-# -- Options for message_ix.util.sphinx_gams -------------------------------------------
-
-gams_source_dir = Path(__file__).parents[1].joinpath("message_ix", "model")
-gams_target_dir = "model"

@@ -1,9 +1,11 @@
-from typing import List, Mapping, Union
+from typing import TYPE_CHECKING, List, Mapping, Tuple, Union
 
 import pandas as pd
-from ixmp.report import Quantity
 
 from message_ix.util import make_df
+
+if TYPE_CHECKING:
+    from genno.types import AnyQuantity
 
 __all__ = [
     "as_message_df",
@@ -14,7 +16,11 @@ __all__ = [
 
 
 def as_message_df(
-    qty: Quantity, name: str, dims: Mapping, common: Mapping, wrap: bool = True
+    qty: "AnyQuantity",
+    name: str,
+    dims: Mapping,
+    common: Mapping,
+    wrap: bool = True,
 ) -> Union[pd.DataFrame, dict]:
     """Convert `qty` to an :meth:`.add_par`-ready data frame using :func:`.make_df`.
 
@@ -70,7 +76,7 @@ def model_periods(y: List[int], cat_year: pd.DataFrame) -> List[int]:
     )
 
 
-def plot_cumulative(x, y, labels):
+def plot_cumulative(x: "AnyQuantity", y: "AnyQuantity", labels: Tuple[str, str, str]):
     """Plot a supply curve.
 
     - `x` and `y` must share the first two dimensions.
@@ -90,27 +96,28 @@ def plot_cumulative(x, y, labels):
 
     # Unpack the dimensions of `y`, typically "n" (node), "g" (grade), "y" (year)
     d0, d1, d2 = y.dims
+    assert isinstance(d1, str)
 
     assert (
-        (d0, d1) == x.dims
-    ), f"dimensions of x {repr(x.dims)} != first dimensions of y {repr((d0, d1))}"
+        d0,
+        d1,
+    ) == x.dims, f"dimensions of x {x.dims!r} != first dimensions of y {(d0, d1)!r}"
 
     # Check that all data have the same value in the first dimension
     d0_labels = set(x.coords[d0].values) | set(y.coords[d0].values)
-    assert (
-        len(d0_labels) == 1
-    ), f"non-unique values {repr(d0_labels)} for dimension {repr(d0)}"
+    assert len(d0_labels) == 1, f"non-unique values {d0_labels!r} for dimension {d0!r}"
+    d0_label = d0_labels.pop()
 
     axes_properties = dict(
-        title=f"{d0_labels.pop()} {labels[0].title()}",
+        title=f"{d0_label} {labels[0].title()}",
         xlabel=f"{labels[1]} [{x.attrs['_unit']:~}]",
         ylabel=f"{labels[2]} [{y.attrs['_unit']:~}]",
     )
 
     # Reshape data
-    x_series = x.drop(d0).to_series()
+    x_series = x.sel({d0: d0_label}, drop=True).to_series()
     # NB groupby().mean() here will compute a mean price across d2, e.g. year
-    y_series = y.drop(d0).to_series().groupby(d1).mean()
+    y_series = y.sel({d0: d0_label}, drop=True).to_series().groupby(d1).mean()
 
     fig, ax = pyplot.subplots()
 
@@ -130,7 +137,14 @@ def plot_cumulative(x, y, labels):
     return ax
 
 
-def stacked_bar(qty, dims=["nl", "t", "ya"], units="", title="", cf=1.0, stacked=True):
+def stacked_bar(
+    qty: "AnyQuantity",
+    dims: Tuple[str, str, str] = ("nl", "t", "ya"),
+    units: str = "",
+    title: str = "",
+    cf: float = 1.0,
+    stacked: bool = True,
+):
     """Plot `qty` as a stacked bar chart.
 
     Parameters
