@@ -13,7 +13,8 @@ from message_ix import Scenario
 
 
 # A function for generating a simple model with sub-annual time slices
-def model_generator(
+# FIXME reduce complexity 14 → ≤13
+def model_generator(  # noqa: C901
     test_mp,
     comment,
     tec_time,
