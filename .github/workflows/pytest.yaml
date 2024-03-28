@@ -200,7 +200,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:  # Same as the "Latest version supported by message_ix", above
-        python-version: "3.11"
+        python-version: "3.12"
 
     - name: Force recreation of pre-commit virtual environment for mypy
       if: github.event_name == 'schedule'  # Comment this line to run on a PR
