@@ -6,18 +6,18 @@ This page explains the notation used in this mathematical formulation section of
 .. math::
 
    & \forall \, c, h, \ l \notin L^{\text{RES}} \cup L^{\text{REN}} \cup L^{\text{STOR}}, n = n^D = n^O, y = y^A: \\&
-   \sum_{h^A m n^L t ; y^V \leq y}{\left(
+   \sum_{h m n^L t ; y^V \leq y}{\left(
      \text{output}_{c h h^D l m n^D n^L t y^A y^V}
-     \cdot \text{duration_time_rel}_{h h^A}
-     \cdot \text{ACT}_{h^A m n^L t y^A y^V}
+     \cdot \text{duration_time_rel}_{h^1=h^D;h^2=h}
+     \cdot \text{ACT}_{h m n^L t y^A y^V}
    \right)} \\&
-   - \sum_{h^A m n^L t; y^V \leq y}{\left(
+   - \sum_{h m n^L t; y^V \leq y}{\left(
      \text{input}_{c h h^O l m n^L n^O t y^A y^V}
-     \cdot \text{duration_time_rel}_{h h^A}
-     \cdot \text{ACT}_{h^A m n^L t y^A y^V}
+     \cdot \text{duration_time_rel}_{h^1=h^O;h^2=h}
+     \cdot \text{ACT}_{h m n^L t y^A y^V}
    \right)} \\&
    + \text{STOCK_CHG}_{c h l n y} \\&
-   + \sum_s{\left(
+   + \sum_{s}{\left(
       \left( \text{land_output}_{c h l n s y} - \text{land_input}_{c h l n s y} \right)
      \cdot \text{LAND}_{n s y}
    \right)} \\&
@@ -41,17 +41,26 @@ This page explains the notation used in this mathematical formulation section of
 
 - The equality (=) or inequality (< or >) is on a line by itself.
   This allows to distinguish the **left- and right-hand sides** of the expression.
-- The names of particular **parameters** (always lower case, for instance 'output') and **variables** (always upper case, for instance 'ACT') are given in roman (upright) text.
-- Each parameter or variable has a right subscript with its dimensionality, given as an alphabetical list of indices.
-  This:
 
-  - Facilitates understanding of alignment and broadcasting between elements of parameters/variables with different dimensionality.
-  - Always exactly restates the dimensionality of the item given elsewhere in this documentation.
-    In other words, it is shown for convenience or reference, and **never** expresses any new information about the parameter or operations applied to it.
+- References to items (exogenous **parameters** or endogenous **variables**) include:
+
+  - The **name** in roman (upright) text.
+    Parameter names are always lower case, for instance 'output'.
+    Variables names are always upper case, for instance 'ACT'.
+
+  - Its **dimensionality** as a right subscript with an alphabetical list of indices.
+    These:
+
+    - Always exactly restate the dimensionality of the item given elsewhere in this documentation.
+      That is, it does not express aggregation or other operations.
+    - *May* express an alignment or restriction of indices, if this is particular to one reference of the parameter/variable.
+      Otherwise, these are expressed in the first line, as described above.
+      In the above example, 'duration_time_rel' has indices :math:`h^1, h^2`, but these are aligned differently in the two places it is used in the equation.
+    - Facilitate understanding of alignment and broadcasting between elements of parameters/variables with different dimensionality.
 
 - Indices are always exactly one character, for instance 'y'.
   If a parameter or variable is indexed more than once by the same set, all but 0 or 1 occurrence of the same base has a right superscript, for instance :math:`y^A` and :math:`y^V`.
-  These correspond to different **dimension- or index names** given in the "sets and parameters" page of the documentation; for instance :math:`y^A`` is always the dimension/index name "year_active", referring to a member of :math:`Y \subseteq Y^A`.
+  These correspond to different **dimension- or index names** given in the "sets and parameters" page of the documentation; for instance :math:`y^A` is always the dimension/index name "year_active", referring to a member of :math:`Y^A \subseteq Y`.
 - In both the left- and right-hand sides:
 
   - Individual additive terms are shown on separate lines.
