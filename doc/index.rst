@@ -71,6 +71,7 @@ the core MESSAGEix mathematical implementation.
    :hidden:
    :caption: Mathematical Specification
 
+   notation
    model/MESSAGE/sets_maps_def
    time
    model/MESSAGE/parameter_def
