@@ -44,14 +44,8 @@ The full API is also available from R; see :doc:`rmessageix`.
    :show-inheritance:
    :inherited-members:
 
-   This class extends :class:`ixmp.Scenario` and :class:`ixmp.TimeSeries` and
-   inherits all their methods. Documentation of these inherited methods is
-   included here for convenience. :class:`message_ix.Scenario` defines
-   additional methods specific to |MESSAGEix|:
-
-   .. versionchanged:: 3.0
-
-      :meth:`.read_excel` and :meth:`.to_excel` are now methods of :class:`ixmp.Scenario`, but continue to work with message_ix.Scenario.
+   This class extends :class:`ixmp.Scenario` and :class:`ixmp.TimeSeries` and inherits of the methods of those classes, shown below.
+   :class:`message_ix.Scenario` adds or overrides the following methods specific to |MESSAGEix|:
 
    .. autosummary::
 
@@ -61,18 +55,70 @@ The full API is also available from R; see :doc:`rmessageix`.
       add_spatial_sets
       cat
       cat_list
+      clone
       equ
       firstmodelyear
       par
-      read_excel
       rename
-      to_excel
+      set
+      solve
       var
       vintage_and_active_years
       y0
       years_active
       ya
       yv_ya
+
+   Inherited from :class:`.ixmp.Scenario`:
+
+   .. versionchanged:: 3.0
+
+      :meth:`.read_excel` and :meth:`.to_excel` are now methods of :class:`ixmp.Scenario`, but continue to work with message_ix.Scenario.
+
+   .. autosummary::
+
+      add_par
+      add_set
+      change_scalar
+      has_item
+      has_solution
+      idx_names
+      idx_sets
+      init_item
+      init_scalar
+      items
+      list_items
+      load_scenario_data
+      read_excel
+      remove_par
+      remove_set
+      remove_solution
+      scalar
+      to_excel
+
+   Inherited from :class:`.ixmp.TimeSeries`:
+
+   .. autosummary::
+
+      add_geodata
+      add_timeseries
+      check_out
+      commit
+      discard_changes
+      get_geodata
+      get_meta
+      is_default
+      last_update
+      preload_timeseries
+      read_file
+      remove_geodata
+      remove_timeseries
+      run_id
+      set_as_default
+      set_meta
+      timeseries
+      transact
+      url
 
    .. automethod:: add_macro
 

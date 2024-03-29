@@ -86,7 +86,7 @@ def unit_uniform(df):
 # %% III) The main function
 
 
-# FIXME reduce complexity from 17 to <=14
+# FIXME reduce complexity 17 → ≤13
 def add_year(  # noqa: C901
     sc_ref,
     sc_new,
@@ -266,7 +266,8 @@ def add_year(  # noqa: C901
 
 # %% Submodules needed for running the main function
 #   IV) Adding new years to sets
-def add_year_set(
+# FIXME reduce complexity 13 → ≤13
+def add_year_set(  # noqa: C901
     sc_ref,
     sc_new,
     years_new,
@@ -537,7 +538,7 @@ def add_year_par(
 # %% VI) Required functions
 
 
-# FIXME reduce complexity from 19 to <=14
+# FIXME reduce complexity 19 → ≤13
 def interpolate_1d(  # noqa: C901
     df,
     yrs_new,
@@ -692,7 +693,7 @@ def interpolate_1d(  # noqa: C901
 # %% VI.B) Interpolating parameters with two dimensions related to time
 
 
-# FIXME reduce complexity from 38 to <=14
+# FIXME reduce complexity 38 → ≤13
 def interpolate_2d(  # noqa: C901
     df,
     yrs_new,
