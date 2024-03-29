@@ -7,7 +7,7 @@ This page explains the notation used in this mathematical formulation section of
 
    & \forall \, c, h, \ l \notin L^{\text{RES}} \cup L^{\text{REN}} \cup L^{\text{STOR}}, n = n^D = n^O, y = y^A: \\&
    \sum_{h m n^L t ; y^V \leq y}{\left(
-     \text{output}_{c h h^D l m n^D n^L t y^A y^V}
+     \output
      \cdot \text{duration_time_rel}_{h^1=h^D;h^2=h}
      \cdot \text{ACT}_{h m n^L t y^A y^V}
    \right)} \\&
