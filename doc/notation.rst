@@ -25,10 +25,13 @@ This page explains the notation used in this mathematical formulation section of
    = \\&
    \text{COMMODITY_BALANCE}_{c h l n y}
 
-- The first line gives:
+- The equality (=) or inequality (< or >) relation is on a line by itself.
+  This allows to distinguish the **left- and right-hand sides** of the expression.
+- The first line begins with the "for all …" symbol (:math:`\forall`) and gives:
 
   - The **dimensionality** of the equation or inequality, via a list of **indices** (in alphabetical order).
-    In some cases, this is equivalent to the dimensionality of a single term on either side; for instance, in the example above, of COMMODITY_BALANCE.
+    In some cases, this is equivalent to the dimensionality of a single term on either side.
+    In the example above, this is COMMODITY_BALANCE.
     Where both sides are more complicated, the first line informs about the dimensionality.
   - Any **conditions or restrictions** on the set members to which the indices apply.
     Implicitly, indices without condition may take any value from their corresponding set.
@@ -36,11 +39,8 @@ This page explains the notation used in this mathematical formulation section of
 
     - Index :math:`l` must be in the union of certain other sets.
     - The indices :math:`y` (for parameters/variables with a dimension named "year") must always align with indices :math:`y^A` (for parameters/variables with a dimension named "year_active").
-    - Likewise, :math:`n`, :math:`n^D` (node_dest), and :math:`n_O` (node_origin) must all be aligned
-    - The other indices are unconstrained, so implicitly :math:`c \in C` and :math:`h in H`.
-
-- The equality (=) or inequality (< or >) is on a line by itself.
-  This allows to distinguish the **left- and right-hand sides** of the expression.
+    - Likewise, :math:`n`, :math:`n^D` (node_dest), and :math:`n^O` (node_origin) must all be aligned
+    - The other indices are unconstrained, so implicitly :math:`c \in C` and :math:`h \in H`.
 
 - References to items (exogenous **parameters** or endogenous **variables**) include:
 
@@ -52,8 +52,8 @@ This page explains the notation used in this mathematical formulation section of
     These:
 
     - Always exactly restate the dimensionality of the item given elsewhere in this documentation.
-      That is, it does not express aggregation or other operations.
-    - *May* express an alignment or restriction of indices, if this is particular to one reference of the parameter/variable.
+      That is, the indices do indicate aggregation or other operations.
+    - *May* express an alignment or restriction of indices, *if and only if* this is particular to one reference of the parameter/variable.
       Otherwise, these are expressed in the first line, as described above.
       In the above example, 'duration_time_rel' has indices :math:`h^1, h^2`, but these are aligned differently in the two places it is used in the equation.
     - Facilitate understanding of alignment and broadcasting between elements of parameters/variables with different dimensionality.
