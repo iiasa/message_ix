@@ -1,5 +1,4 @@
 import os
-import platform
 
 import numpy as np
 import pytest
@@ -41,7 +40,8 @@ def test_run_clone(tmpdir):
 
 def test_run_remove_solution(test_mp):
     # create a new instance of the transport problem and solve it
-    scen = make_dantzig(test_mp, solve=True, quiet=True)
+    name = "test_run_remove_solution"
+    scen = make_dantzig(test_mp, solve=True, quiet=True).clone(scenario=name)
     assert np.isclose(scen.var("OBJ")["lvl"], 153.675)
 
     # check that re-solving the model will raise an error if a solution exists
@@ -55,7 +55,7 @@ def test_run_remove_solution(test_mp):
     # before first model year (DIFFERENT behaviour from `ixmp.Scenario`)
     scen.remove_solution()
     assert scen.firstmodelyear == 1963
-    assert_frame_equal(scen.timeseries(iamc=True), TS_DF_CLEARED)
+    assert_frame_equal(scen.timeseries(iamc=True), TS_DF_CLEARED.assign(scenario=name))
 
 
 def test_shift_first_model_year(test_mp):
@@ -90,7 +90,7 @@ def assert_multi_db(mp1, mp2):
 @pytest.mark.flaky(
     reruns=5,
     rerun_delay=2,
-    condition="GITHUB_ACTIONS" in os.environ and platform.system() == "Darwin",
+    condition="GITHUB_ACTIONS" in os.environ,
     reason="Flaky; see iiasa/message_ix#731",
 )
 def test_multi_db_run(tmpdir):

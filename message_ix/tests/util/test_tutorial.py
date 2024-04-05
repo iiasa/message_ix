@@ -1,4 +1,4 @@
-from ixmp.reporting import Key
+from ixmp.report import Key
 
 from message_ix import Scenario
 from message_ix.testing import SCENARIO

@@ -31,10 +31,12 @@ The full API is also available from R; see :doc:`rmessageix`.
 
 .. currentmodule:: message_ix
 
+.. automodule:: message_ix
+
 ``message_ix`` package
 ----------------------
 
-|MESSAGEix| models are created using the :py:class:`message_ix.Scenario` class. Several utility methods are also provided in the module :py:mod:`message_ix.utils`.
+|MESSAGEix| models are created using the :py:class:`message_ix.Scenario` class. Several utility methods are also provided in the module :py:mod:`message_ix.util`.
 
 .. autoclass:: message_ix.Scenario
    :members:
@@ -90,8 +92,8 @@ Model classes
    MESSAGE_MACRO
    GAMSModel
    DEFAULT_CPLEX_OPTIONS
-   MESSAGE_ITEMS
-   ~message_ix.macro.MACRO_ITEMS
+   Item
+   ItemType
 
 .. autodata:: DEFAULT_CPLEX_OPTIONS
 
@@ -137,6 +139,9 @@ Model classes
       # Model options are read from configuration file
       scen.solve()
 
+   GDX input and output files generated using this class will contain a 2-dimensional set named ``ixmp_version``, wherein the first element of each member is a package name from the :py:`record_version_packages` parameter, and the second is its version according to :func:`importlib.metadata.version`.
+   If the package is not installed, the string "(not installed)" is stored.
+
    The following tables list all model options:
 
    .. list-table:: Options in :class:`message_ix.models.GAMSModel` or overridden from :mod:`ixmp`
@@ -151,16 +156,16 @@ Model classes
         - See above.
       * - **model_file**
         - Path to GAMS source file.
-        - ``'{model_dir}/{model_name}_run.gms'``
+        - :py:`"{model_dir}/{model_name}_run.gms"`
       * - **in_file**
         - Path to write GDX input file.
-        - ``'{model_dir}/data/MsgData_{case}.gdx'``
+        - :py:`"{model_dir}/data/MsgData_{case}.gdx"`
       * - **out_file**
         - Path to read GDX output file.
-        - ``'{model_dir}/output/MsgOutput_{case}.gdx'``
+        - :py:`"{model_dir}/output/MsgOutput_{case}.gdx"`
       * - **solve_args**
         - Arguments passed directly to GAMS.
-        - .. code-block::
+        - .. code-block:: python
 
              [
                  '--in="{in_file}"',
@@ -170,6 +175,9 @@ Model classes
       * - **solve_options**
         - Options for the GAMS LP solver.
         - :data:`.DEFAULT_CPLEX_OPTIONS`
+      * - **record_version_packages**
+        - Python package versions to record.
+        - :py:`["message_ix", "ixmp"]`
 
    .. list-table:: Option defaults inherited from :class:`ixmp.model.gams.GAMSModel`
       :widths: 20 80
@@ -178,9 +186,9 @@ Model classes
       * - Option
         - Default value
       * - **case**
-        - ``'{scenario.model}_{scenario.scenario}'``
+        - :py:`"{scenario.model}_{scenario.scenario}"`
       * - **gams_args**
-        - ``['LogOption=4']``
+        - :py:`["LogOption=4"]`
       * - **check_solution**
         - :obj:`True`
       * - **comment**
@@ -195,12 +203,23 @@ Model classes
    :exclude-members: defaults
    :show-inheritance:
 
+   .. autoattribute:: items
+      :no-value:
+
+      Keys are the names of items (sets, parameters, variables, and equations); values are :class:`.Item` instances.
+      These include all items listed in the MESSAGE mathematical specification, i.e. :ref:`sets_maps_def` and :ref:`parameter_def`.
+
 .. autoclass:: MACRO
    :members:
+   :exclude-members: items
    :show-inheritance:
+
+   .. autoattribute:: items
+      :no-value:
 
 .. autoclass:: MESSAGE_MACRO
    :members:
+   :exclude-members: items
    :show-inheritance:
 
    MESSAGE_MACRO solves the MESSAGE and MACRO models iteratively, connecting changes in technology activity and resource demands (from MESSAGE) to changes in final demands and prices (from MACRO).
@@ -218,21 +237,14 @@ Model classes
 
    .. seealso:: :meth:`.Scenario.add_macro`
 
-.. autodata:: MESSAGE_ITEMS
-   :annotation: = dict(…)
+   .. autoattribute:: items
+      :no-value:
 
-   Keys are the names of items (sets, parameters, variables, and equations); values are :class:`dict` specifying their type and dimensionality, with keys 'ix_type', 'idx_sets', and in some cases 'idx_names'.
-   These include all items listed in the MESSAGE mathematical specification, i.e. :ref:`sets_maps_def` and :ref:`parameter_def`.
-
-   .. seealso:: :meth:`.MESSAGE.initialize`, :data:`.MACRO_ITEMS`
+.. autodata:: DIMS
+.. autoclass:: Item
+   :members:
 
 .. currentmodule:: message_ix.macro
-
-.. autodata:: MACRO_ITEMS
-   :annotation: = dict(…)
-
-   .. seealso:: :data:`.MESSAGE_ITEMS`
-
 
 .. _utils:
 
@@ -248,3 +260,6 @@ Testing utilities
 
 .. automodule:: message_ix.testing
    :members: make_dantzig, make_westeros
+
+.. automodule:: message_ix.testing.nightly
+   :members:

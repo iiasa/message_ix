@@ -489,3 +489,5 @@ Sets
     is_fixed_activity(node,tec,vintage,year_all,mode,time) flag whether activity variable is fixed
     is_fixed_land(node,land_scenario,year_all)             flag whether land level is fixed
 ;
+
+Set ixmp_version(*,*) "Versions of Python packages used to generate this model";

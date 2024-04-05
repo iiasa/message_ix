@@ -4,11 +4,11 @@ from collections import ChainMap, defaultdict
 from collections.abc import Mapping
 
 import pandas as pd
+from ixmp.backend import ItemType
 from pandas.api.types import is_scalar
 
 from message_ix.core import Scenario
-from message_ix.macro import MACRO_ITEMS
-from message_ix.models import MESSAGE, MESSAGE_ITEMS
+from message_ix.models import MACRO, MESSAGE
 
 
 def make_df(name, **data):
@@ -88,7 +88,7 @@ def make_df(name, **data):
     Parameters
     ----------
     name : str
-        Name of a parameter listed in :data:`MESSAGE_ITEMS` or :data:`MACRO_ITEMS`.
+        Name of a parameter listed in :attr:`.MESSAGE.items` or :attr:`.MACRO.items`.
     data : optional
         Contents for dimensions of the parameter, its 'value', or 'unit'. Other keys are
         ignored.
@@ -110,18 +110,18 @@ def make_df(name, **data):
 
     # Get parameter information
     try:
-        info = ChainMap(MESSAGE_ITEMS, MACRO_ITEMS)[name]
+        info = ChainMap(MESSAGE.items, MACRO.items)[name]
     except KeyError:
         raise ValueError(f"{repr(name)} is not a MESSAGE or MACRO parameter")
 
-    if info["ix_type"] != "par":
-        raise ValueError(f"{repr(name)} is {info['ix_type']}, not par")
+    if info.type != ItemType.PAR:
+        raise ValueError(f"{repr(name)} is {info.type}, not a parameter")
 
     # Index names, if not given explicitly, are the same as the index sets
-    idx_names = info.get("idx_names", info["idx_sets"])
+    dims = info.dims or info.coords
 
     # Columns for the resulting data frame
-    columns = list(idx_names) + ["value", "unit"]
+    columns = list(dims) + ["value", "unit"]
 
     # Default values for every column
     data = ChainMap(data, defaultdict(lambda: None))
@@ -199,7 +199,7 @@ def expand_dims(scenario: Scenario, name, **data):
 
     This function is for use when an existing parameter `name` has dimensions that are a
     subset of those that would be created by :func:`make_df`, i.e. those given by
-    :data:`.MESSAGE_ITEMS`.
+    :attr:`.MESSAGE.items`.
 
     This can occur when the underlying structure of MESSAGE and the model core is
     enhanced by adding dimensions to existing parameters. Existing scenario data in
@@ -212,7 +212,7 @@ def expand_dims(scenario: Scenario, name, **data):
        :func:`make_df`. The result must be a data frame with no empty values; in other
        words, `data` must include all the dimensions to be added to `name`.
     3. Re-initializes the parameter `name` on `scenario`, with the dimensions given by
-       :data:`.MESSAGE_ITEMS`.
+       :attr:`.MESSAGE.items`.
     4. Adds the expanded data.
 
     The modifications (steps 3 and 4) are wrapped using :meth:`.transact`.
@@ -228,7 +228,7 @@ def expand_dims(scenario: Scenario, name, **data):
     with scenario.transact(f"expand_dims({name}, …)"):
         # Remove the parameter entirely, and re-initialize
         scenario.remove_par(name)
-        MESSAGE.initialize_items(scenario, {name: MESSAGE_ITEMS[name]})
+        MESSAGE.initialize_items(scenario, {name: MESSAGE.items[name].to_dict()})
 
         # Add the expanded data
         scenario.add_par(name, new_data)

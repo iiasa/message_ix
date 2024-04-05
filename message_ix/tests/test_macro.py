@@ -9,7 +9,7 @@ import pytest
 
 from message_ix import Scenario, macro
 from message_ix.models import MACRO
-from message_ix.reporting import Quantity
+from message_ix.report import Quantity
 from message_ix.testing import SCENARIO, make_westeros
 
 FLAKY = pytest.mark.flaky(
@@ -42,19 +42,21 @@ def w_data(w_data_path):
 @pytest.fixture(scope="module")
 def _ws(test_mp):
     """Reusable fixture with an instance of the Westeros model."""
-    yield make_westeros(test_mp, solve=True, quiet=True)
+    scenario = make_westeros(test_mp, quiet=True).clone(scenario="test_macro")
+    scenario.solve()
+    yield scenario
 
 
 @pytest.fixture
-def westeros_solved(_ws):
+def westeros_solved(request, _ws):
     """Fresh clone of the Westeros model."""
-    yield _ws.clone()
+    yield _ws.clone(scenario=request.node.name)
 
 
 @pytest.fixture
-def westeros_not_solved(_ws):
+def westeros_not_solved(request, _ws):
     """Fresh clone of the Westeros model, without a solution."""
-    yield _ws.clone(keep_solution=False)
+    yield _ws.clone(scenario=request.node.name, keep_solution=False)
 
 
 # Tests
@@ -117,7 +119,7 @@ def test_config(westeros_solved, w_data_path):
 
     # Missing columns in config raises an exception
     data = c.get("data")
-    data["config"] = data["config"][["node", "sector"]]
+    data["config"] = data["config"][["node", "sector", "commodity", "year"]]
     c = macro.prepare_computer(westeros_solved, data=data)
     with pytest.raises(Exception, match="level"):
         c.get("check all")
@@ -251,7 +253,7 @@ def test_init(message_test_mp):
 @FLAKY
 def test_add_model_data(westeros_solved, w_data_path):
     base = westeros_solved
-    clone = base.clone("foo", "bar", keep_solution=False)
+    clone = base.clone(scenario=f"{base.scenario} cloned", keep_solution=False)
     clone.check_out()
     MACRO.initialize(clone)
     macro.add_model_data(base, clone, w_data_path)

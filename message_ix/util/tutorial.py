@@ -3,17 +3,17 @@ from contextlib import contextmanager
 from functools import partial
 
 from message_ix import Scenario
-from message_ix.reporting import Key, Reporter, computations
+from message_ix.report import Key, Reporter, operator
 
 log = logging.getLogger(__name__)
 
 PLOTS = [
-    ("activity", computations.stacked_bar, "out:nl-t-ya", "GWa"),
-    ("capacity", computations.stacked_bar, "CAP:nl-t-ya", "GW"),
-    ("demand", computations.stacked_bar, "demand:n-c-y", "GWa"),
-    ("extraction", computations.stacked_bar, "EXT:n-c-g-y", "GW"),
-    ("new capacity", computations.stacked_bar, "CAP_NEW:nl-t-yv", "GWa"),
-    ("prices", computations.stacked_bar, "PRICE_COMMODITY:n-c-y", "¢/kW·h"),
+    ("activity", operator.stacked_bar, "out:nl-t-ya", "GWa"),
+    ("capacity", operator.stacked_bar, "CAP:nl-t-ya", "GW"),
+    ("demand", operator.stacked_bar, "demand:n-c-y", "GWa"),
+    ("extraction", operator.stacked_bar, "EXT:n-c-g-y", "GW"),
+    ("new capacity", operator.stacked_bar, "CAP_NEW:nl-t-yv", "GWa"),
+    ("prices", operator.stacked_bar, "PRICE_COMMODITY:n-c-y", "¢/kW·h"),
 ]
 
 
@@ -47,7 +47,7 @@ def prepare_plots(rep: Reporter, input_costs="$/GWa") -> None:
     # Add one node to the reporter for each plot
     for title, func, key_str, units in PLOTS:
         # Convert the string to a Key object so as to reference its .dims
-        key = Key.from_str_or_key(key_str)
+        key = Key(key_str)
 
         # Operation for the reporter
         comp = partial(
@@ -68,7 +68,7 @@ def prepare_plots(rep: Reporter, input_costs="$/GWa") -> None:
         "plot fossil supply curve",
         (
             partial(
-                computations.plot_cumulative,
+                operator.plot_cumulative,
                 labels=("Fossil supply", "Resource volume", "Cost"),
             ),
             "resource_volume:n-g",

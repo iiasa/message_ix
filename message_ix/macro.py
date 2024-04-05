@@ -20,12 +20,14 @@ from typing import (
 import numpy as np
 import pandas as pd
 
-from message_ix.reporting import Key, Reporter
+from message_ix.report import Key, Reporter
 
 log = logging.getLogger(__name__)
 
-if TYPE_CHECKING:  # pragma: no cover
-    from genno import Computer, Quantity
+if TYPE_CHECKING:
+    import genno
+    import pandas
+    from genno import Quantity
     from pandas import DataFrame, Series
 
     from message_ix.core import Scenario
@@ -50,52 +52,6 @@ UNITS = dict(
     demand_MESSAGE="demand_ref",
     historical_gdp="gdp_calibrate",
     price_MESSAGE="price_ref",
-)
-
-#: ixmp items (sets, parameters, variables, and equations) for MACRO.
-MACRO_ITEMS: Mapping[str, Mapping] = dict(
-    sector=dict(ix_type="set"),
-    mapping_macro_sector=dict(ix_type="set", idx_sets=["sector", "commodity", "level"]),
-    MERtoPPP=dict(ix_type="par", idx_sets=["node", "year"]),
-    aeei=dict(ix_type="par", idx_sets=["node", "sector", "year"]),
-    cost_MESSAGE=dict(ix_type="par", idx_sets=["node", "year"]),
-    demand_MESSAGE=dict(ix_type="par", idx_sets=["node", "sector", "year"]),
-    depr=dict(ix_type="par", idx_sets=["node"]),
-    drate=dict(ix_type="par", idx_sets=["node"]),
-    esub=dict(ix_type="par", idx_sets=["node"]),
-    gdp_calibrate=dict(ix_type="par", idx_sets=["node", "year"]),
-    grow=dict(ix_type="par", idx_sets=["node", "year"]),
-    historical_gdp=dict(ix_type="par", idx_sets=["node", "year"]),
-    kgdp=dict(ix_type="par", idx_sets=["node"]),
-    kpvs=dict(ix_type="par", idx_sets=["node"]),
-    lakl=dict(ix_type="par", idx_sets=["node"]),
-    lotol=dict(ix_type="par", idx_sets=["node"]),
-    prfconst=dict(ix_type="par", idx_sets=["node", "sector"]),
-    price_MESSAGE=dict(ix_type="par", idx_sets=["node", "sector", "year"]),
-    # Total consumption
-    C=dict(ix_type="var", idx_sets=["node", "year"]),
-    COST_NODAL=dict(ix_type="var", idx_sets=["node", "year"]),
-    # Net of trade and emissions costs
-    COST_NODAL_NET=dict(ix_type="var", idx_sets=["node", "year"]),
-    DEMAND=dict(ix_type="var", idx_sets=["node", "commodity", "level", "year", "time"]),
-    EC=dict(ix_type="var", idx_sets=["node", "year"]),
-    GDP=dict(ix_type="var", idx_sets=["node", "year"]),
-    # Total investment
-    I=dict(ix_type="var", idx_sets=["node", "year"]),  # noqa: E741
-    K=dict(ix_type="var", idx_sets=["node", "year"]),
-    KN=dict(ix_type="var", idx_sets=["node", "year"]),
-    MAX_ITER=dict(ix_type="var", idx_sets=None),
-    N_ITER=dict(ix_type="var", idx_sets=None),
-    NEWENE=dict(ix_type="var", idx_sets=["node", "sector", "year"]),
-    PHYSENE=dict(ix_type="var", idx_sets=["node", "sector", "year"]),
-    PRICE=dict(ix_type="var", idx_sets=["node", "commodity", "level", "year", "time"]),
-    PRODENE=dict(ix_type="var", idx_sets=["node", "sector", "year"]),
-    UTILITY=dict(ix_type="var", idx_sets=None),
-    Y=dict(ix_type="var", idx_sets=["node", "year"]),
-    YN=dict(ix_type="var", idx_sets=["node", "year"]),
-    aeei_calibrate=dict(ix_type="var", idx_sets=["node", "sector", "year"]),
-    grow_calibrate=dict(ix_type="var", idx_sets=["node", "year"]),
-    COST_ACCOUNTING_NODAL=dict(ix_type="equ", idx_sets=["node", "year"]),
 )
 
 #: MACRO calibration parameters to be verified when reading the input data.
@@ -150,7 +106,9 @@ def aconst(
     return aconst.droplevel("year")
 
 
-def add_par(scenario: "Scenario", data: "DataFrame", ym1: int, *, name: str) -> None:
+def add_par(
+    scenario: "Scenario", data: "pandas.DataFrame", ym1: int, *, name: str
+) -> None:
     """Add `data` to the `scenario`."""
     # FIXME look up the correct units
     units: Mapping[str, str] = {}
@@ -179,7 +137,10 @@ class Structures:
 
 
 def add_structure(
-    scenario: "Scenario", mapping_macro_sector: "DataFrame", s: Structures, ym1: int
+    scenario: "Scenario",
+    mapping_macro_sector: "pandas.DataFrame",
+    s: Structures,
+    ym1: int,
 ) -> None:
     """Add MACRO structure information to `scenario`."""
     # Remove old initializeyear_macro before adding new one
@@ -220,16 +181,16 @@ def clean_model_data(data: "Quantity", s: Structures) -> "DataFrame":
 
     Parameters
     ----------
-    data : .Quantity
+    data : genno.Quantity
         With short dimension names (c, l, n, y), etc.
 
     Returns
     -------
-    .DataFrame
+    pandas.DataFrame
         With full column names and a "value" column. Only the labels in `s` (levels,
         nodes, sectors, and years) appear in the respective dimensions.
     """
-    from genno.computations import rename_dims, select
+    from genno.operator import rename_dims, select
 
     names = {"c": "commodity"}
 
@@ -445,7 +406,7 @@ def total_cost(model_cost: "DataFrame", cost_ref: "DataFrame", ym1: int) -> "Dat
 
     Returns
     -------
-    total_cost : pandas DataFrame
+    pandas.DataFrame
         Total cost of the system.
 
     """
@@ -532,12 +493,16 @@ def _validate_data(name: Optional[str], df: "DataFrame", s: Structures) -> List:
     list of str
         Dimensions/index sets of the validated MESSAGEix parameter.
     """
+    from .models import MACRO
+
     # Check required dimensions
     if name is None:
         dims: List[str] = []
     else:
-        item = name.replace("_ref", "_MESSAGE")
-        dims = MACRO_ITEMS[item]["idx_sets"].copy()
+        item_name = name.replace("_ref", "_MESSAGE")
+        item = MACRO.items[item_name]
+        dims = list(item.dims or item.coords)
+
         # For cost_ref, demand_ref, price_ref, only require one year's data, without a
         # "year" dimension
         if name.endswith("_ref"):
@@ -604,9 +569,9 @@ def add_model_data(
 
     Parameters
     ----------
-    base : message_ix.Scenario()
+    base : .Scenario
         Base scenario with a solution.
-    clone : message_ix.Scenario()
+    clone : .Scenario
         Clone of base scenario for adding calibration parameters.
     data : dict
         Data for calibration.
@@ -617,17 +582,17 @@ def add_model_data(
         c2.get(k)
 
 
-def calibrate(s, check_convergence=True, **kwargs):
+def calibrate(s, check_convergence: bool = True, **kwargs):
     """Calibrate a MESSAGEix scenario to parameters of MACRO.
 
     Parameters
     ----------
-    s : message_ix.Scenario()
+    s : .Scenario
         MESSAGEix scenario with calibration data.
-    check_convergence : bool, optional, default: True
+    check_convergence : bool, optional
         Test is MACRO-calibrated scenario converges in one iteration.
-    **kwargs : keyword arguments
-        To be passed to message_ix.Scenario.solve().
+    **kwargs :
+        Keyword arguments passed to meth:`message_ix.Scenario.solve`.
 
     Raises
     ------
@@ -674,7 +639,7 @@ def calibrate(s, check_convergence=True, **kwargs):
 
     # Test to make sure number of iterations is 1
     if check_convergence:
-        test = s.clone(s.model, "test to confirm MACRO converges")
+        test = s.clone(scenario=f"{s.scenario} test to confirm MACRO converges")
         kwargs.setdefault("gams_args", gams_args)
         test.solve(model="MESSAGE-MACRO", var_list=["N_ITER"], **kwargs)
         test.set_as_default()
@@ -690,7 +655,7 @@ def prepare_computer(
     base: "Scenario",
     target: Optional["Scenario"] = None,
     data: Union[Mapping, os.PathLike, None] = None,
-) -> "Computer":
+) -> "genno.Computer":
     """Prepare a :class:`.Reporter` to perform MACRO calibration calculations.
 
     Parameters
@@ -699,17 +664,23 @@ def prepare_computer(
         Must have a stored solution.
     target : message_ix.Scenario
         Scenario to which to add computed data.
-    data : dict (str -> pd.DataFrame) or os.PathLike
-        If :class:`.PathLike`, the path to an Excel file containing parameter data, one
-        per sheet. If :class:`dict`, a dictionary mapping parameter names to data
-        frames.
+    data : dict or os.PathLike
+        If :class:`~os.PathLike`, the path to an Excel file containing parameter data,
+        one per sheet. If :class:`dict`, a mapping from parameter names to data frames.
 
     Raises
     ------
     ValueError
-        if any of the require parameters for MACRO calibration
-        (:data:`VERIFY_INPUT_DATA`) is missing.
+        if any of the require parameters for MACRO calibration (:data:`INPUT_DATA`) is
+        missing.
+
+    See also
+    --------
+    :ref:`macro-input-data`
     """
+    from ixmp.backend import ItemType
+
+    from .models import MACRO
 
     if not base.has_solution():
         raise RuntimeError("Scenario must have a solution to add MACRO")
@@ -815,7 +786,8 @@ def prepare_computer(
     # from the input (also appearing in VERIFY_INPUT_DATA); others are from calculations
     # above.
     added = []  # List of keys for tasks that add data
-    for name, info in filter(lambda i: i[1]["ix_type"] == "par", MACRO_ITEMS.items()):
+    for item in filter(lambda i: i.type == ItemType.PAR, MACRO.items.values()):
+        name = item.name
         added.append(
             c.add(f"add {name}", partial(add_par, name=name), "target", name, "ym1")
         )

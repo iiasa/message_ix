@@ -51,15 +51,15 @@ Decide which part of the |MESSAGEix| software stack is the appropriate location 
 :mod:`ixmp`
    Contributions not specific to |MESSAGEix| model framework, e.g. that could be used for other, non-MESSAGE models.
 
-   :mod:`ixmp_source`
+   `ixmp_source <https://github.com/iiasa/ixmp_source>`__ (closed source)
       Java / JDBC backend for ``ixmp``.
 
 :mod:`message_ix`
    Contributions not specific to *any particular MESSAGEix* model instance.
    Additions to ``message_ix`` should be usable in any MESSAGE-scheme model.
 
-:mod:`message_data` or :mod:`message_doc`
-   Contributions to the MESSAGE-GLOBIOM family of models, including the global model; and its documentation, respectively.
+:mod:`message_ix_models`
+   Contributions to the MESSAGE-GLOBIOM family of models, including the global model, and its documentation.
 
 
 2. Fork, branch, and open a pull request
@@ -97,6 +97,8 @@ Optionally:
 __ https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests#draft-pull-requests
 
 
+.. _ci-workflows:
+
 3. Ensure checks pass
 ---------------------
 
@@ -111,12 +113,15 @@ __ https://help.github.com/en/github/collaborating-with-issues-and-pull-requests
   pytest
      This workflow runs all Python and R tests; on Linux, macOS, and Windows; and for multiple versions of Python.
 
-  lint
-     This workflow checks for code style and other details:
+     It also:
 
-     - “Lint with flake8”: checks that `Code style`_ is met.
-     - “Test package build”: checks that the Python package for upload to PyPI, can be built cleanly and without errors.
-     - “Test documentation build”: checks that the documentation can be built without fatal errors.
+     - Checks that the documentation can be built without fatal errors.
+     - Checks that the `code style`_ is applied.
+
+  publish
+     This workflow checks that the Python package (for upload to PyPI) can be built cleanly and without errors.
+
+     The package is not actually uploaded, unless this workflow is started from a release candidate tag or on the creation of a new release on GitHub.
 
   nightly
      These tests run daily at 05:00 UTC.
@@ -182,23 +187,37 @@ Code style
 - **Python** code:
 
   - Follow the `PEP 8 naming conventions <https://www.python.org/dev/peps/pep-0008/#naming-conventions>`_.
+  - Apply `black <https://black.readthedocs.io>`_ code formatting.
+  - Use `ruff <https://beta.ruff.rs/docs>`_ to check code quality.
+    In particular, through :file:`pyproject.toml`, :mod:`message_ix` uses the following rule sets to ensure:
 
-  - Apply the following to all code::
+    - `"F" <https://beta.ruff.rs/docs/rules/#pyflakes-f>`_: code is free of basic errors, equivalent to Pyflakes or `flake8 <https://flake8.pycqa.org>`_.
+    - `"E", "W" <https://beta.ruff.rs/docs/rules/#pycodestyle-e-w>`_: code conforms to `PEP 8 <https://www.python.org/dev/peps/pep-0008>`_, equivalent to using pycodestyle.
+    - `"I" <https://beta.ruff.rs/docs/rules/#isort-i>`_: :py:`import` statements are sorted in a consistent way, equivalent to `isort <https://pypi.org/project/isort/>`_.
+    - `"C90" <https://beta.ruff.rs/docs/rules/#mccabe-c90>`_: the McCabe complexity of code is below a fixed threshold, equivalent to using `mccabe <https://pypi.org/project/mccabe/>`_ via flake8.
 
-      isort -rc . && black . && mypy . && flake8
+  - Add type hints to new or changed functions, methods, and global variables, and check these using the `mypy <https://mypy.readthedocs.io>`_ static type checker.
 
-    Links to the documentation for these tools:
+  To simplify the use of these tools:
 
-    - `isort <https://pypi.org/project/isort/>`_: sorts import lines at the top of code files in a consistent way.
-    - `black <https://black.readthedocs.io>`_: applies consistent code style & formatting.
-      Plugins are available for popular code editors.
-    - `mypy <https://mypy.readthedocs.io>`_: checks typing for inconsistencies.
-    - `flake8 <https://flake8.pycqa.org>`_: check code style against `PEP 8 <https://www.python.org/dev/peps/pep-0008>`_.
+  - Black, ruff, and mypy can each be configured to run automatically within your code editor with an extension, plugin, or script (see their respective documentation for links and details).
+    These tools help apply the code style every time a file is saved, or even as you type.
+  - The source repository contains configuration for `pre-commit <https://pre-commit.com>`_, a tool that invokes multiple actions via `git hooks <https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks>`_.
+    This runs all of the above checks every time you do a :program:`git commit`.
+    To use this tool, install :program:`pre-commit` and install it in your local checkout of the Git repository:
 
-    The ``lint`` continuous integration workflow runs these on every pull request.
+    .. code-block::
+
+       pip install pre-commit
+       pre-commit install -f
+
+       # Run the tools on all files to confirm they are working
+       pre-commit run --all-files
+
+    To force mypy type checking to use packages from an existing `Python virtual environment <https://docs.python.org/3/library/venv.html>`_ on your system (for instance, with development code), set the ``PRE_COMMIT_MYPY_VENV`` environment variable to the path to that environment.
+
+  - The "Code quality" job in the "pytest" workflow :ref:`described above <ci-workflows>` applies exactly the same checks for PR branches.
     PRs that fail the checks must be corrected before they can be merged.
-
-  - Add type hints to new or changed functions, methods, and global variables.
 
 - **GAMS** code:
 
@@ -220,7 +239,7 @@ Documentation
   2. Documentation pages, :file:`doc/*.rst`.
   3. Inline documentation in :file:`message_ix/model/*.gms` files.
 
-  For (2) and (3), start each sentence on a new line, and do not hard-wrap sentences.
+  For (2) and (3), start each sentence on a new line, and do not hard-wrap within sentences.
   For (1), wrap at the same 88 characters as :command:`black` enforces for code.
 
 - Ensure Sphinx does not give warnings about ReST syntax for new or modified documentation.

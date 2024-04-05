@@ -1,12 +1,16 @@
 import io
 from itertools import product
-from typing import List, Union
+from typing import TYPE_CHECKING, List, Optional, Union
 
 import numpy as np
 import pandas as pd
 from ixmp import IAMC_IDX
 
 from message_ix import Scenario, make_df
+
+if TYPE_CHECKING:
+    import pytest
+
 
 SCENARIO = {
     "austria": dict(model="Austrian energy model", scenario="baseline"),
@@ -426,7 +430,13 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
 
 
 def make_westeros(
-    mp, emissions=False, solve=False, quiet=True, model_horizon=[700, 710, 720]
+    mp,
+    emissions=False,
+    solve=False,
+    quiet=True,
+    model_horizon=[700, 710, 720],
+    *,
+    request: Optional["pytest.FixtureRequest"] = None,
 ):
     """Return an :class:`message_ix.Scenario` for the Westeros model.
 
@@ -443,7 +453,15 @@ def make_westeros(
     """
     mp.add_unit("USD/kW")
     mp.add_unit("tCO2/kWa")
-    scen = Scenario(mp, version="new", **SCENARIO["westeros"])
+
+    # Scenario identifiers
+    args = SCENARIO["westeros"].copy()
+    args.setdefault("version", "new")
+    if request:
+        # Use a distinct scenario name for a particular test
+        args.update(scenario=request.node.name)
+
+    scen = Scenario(mp, **args)
 
     # Sets
     history = [690]
@@ -513,7 +531,7 @@ def make_westeros(
     grid_efficiency = 0.9
     common.update(unit="-")
 
-    for name, tec, c, l, value in [
+    for name, tec, c, L, value in [
         ("input", "bulb", "electricity", "final", 1.0),
         ("output", "bulb", "light", "useful", 1.0),
         ("input", "grid", "electricity", "secondary", 1.0),
@@ -523,7 +541,7 @@ def make_westeros(
     ]:
         scen.add_par(
             name,
-            make_df(name, **common, technology=tec, commodity=c, level=l, value=value),
+            make_df(name, **common, technology=tec, commodity=c, level=L, value=value),
         )
 
     name = "capacity_factor"

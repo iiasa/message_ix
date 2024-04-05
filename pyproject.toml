@@ -24,6 +24,7 @@ classifiers = [
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
   "Programming Language :: R",
   "Topic :: Scientific/Engineering",
   "Topic :: Scientific/Engineering :: Information Analysis",
@@ -31,8 +32,8 @@ classifiers = [
 requires-python = ">=3.8"
 dependencies = [
   "click",
-  "ixmp >= 3.7.0",
-  "genno[pyam] >= 1.18.1",
+  "ixmp >= 3.8.0",
+  "genno[pyam] >= 1.20",
   "numpy",
   "pandas >= 1.2",
   "PyYAML",
@@ -70,15 +71,19 @@ tests = [
 [project.scripts]
 message-ix = "message_ix.cli:main"
 
+[tool.coverage.report]
+exclude_also = [
+  # Imports only used by type checkers
+  "if TYPE_CHECKING:",
+  "if __name__ == '__main__':",
+]
+
 [tool.coverage.run]
 omit = [
   "message_ix/model/*",
   "message_ix/tests/test_nightly.py",
   "message_ix/testing/nightly.py",
 ]
-
-[tool.isort]
-profile = "black"
 
 [tool.mypy]
 exclude = ["doc/"]
@@ -106,7 +111,20 @@ addopts = """
 markers = [
   "nightly: Slow-running nightly tests of particular scenarios.",
   "rmessageix: test of the message_ix R interface.",
+  "tutorial: Tests of the tutorial Jupyter notebooks",
 ]
+
+[tool.ruff]
+select = ["C9", "E", "F", "I", "W"]
+
+[tool.ruff.mccabe]
+# Exceptions:
+# - message_ix/core.py:716:5: C901 'Scenario.rename' is too complex (18)
+# - message_ix/tools/add_year/__init__.py:86:1: C901 'add_year' is too complex (17)
+# - message_ix/tools/add_year/__init__.py:533:1: C901 'interpolate_1d' is too complex (19)
+# - message_ix/tools/add_year/__init__.py:687:1: C901 'interpolate_2d' is too complex (38)
+# - message_ix/testing/__init__.py:91:1: C901 'make_austria' is too complex (18)
+max-complexity = 14
 
 [tool.setuptools.packages]
 find = {}

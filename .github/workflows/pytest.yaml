@@ -1,8 +1,6 @@
 name: Test
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
   # 05:00 UTC = 06:00 CET = 07:00 CEST
@@ -31,7 +29,8 @@ jobs:
         - "3.8"   # Earliest version supported by message_ix
         - "3.9"
         - "3.10"
-        - "3.11"  # Latest version supported by message_ix
+        - "3.11"
+        - "3.12"  # Latest version supported by message_ix
 
         # Below this comment are newly released or development versions of
         # Python. For these versions, binary wheels are not available for some
@@ -39,7 +38,7 @@ jobs:
         # these on the job runner requires a more elaborate build environment,
         # currently out of scope for the message_ix project.
 
-        # - "3.12.0-alpha.1"  # Development version
+        # - "3.13.0-alpha.1"  # Development version
 
       fail-fast: false
 
@@ -48,16 +47,84 @@ jobs:
 
     steps:
     - name: Check out message_ix
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: ${{ env.depth }}
 
     - name: Fetch tags (for setuptools-scm)
       run: git fetch --tags --depth=${{ env.depth }}
 
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+        cache: pip
+        cache-dependency-path: "**/pyproject.toml"
+
+    - uses: ts-graphviz/setup-graphviz@v1.2.0
+      with:
+        macos-skip-brew-update: true
+
+    - name: Cache GAMS installer and R packages
+      uses: actions/cache@v3
+      with:
+        path: |
+          gams
+        key: ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}
+        restore-keys: |
+          ${{ matrix.os }}-
+
+    - uses: iiasa/actions/setup-gams@main
+      with:
+        version: ${{ env.GAMS_VERSION }}
+        license: ${{ secrets.GAMS_LICENSE }}
+
+    - name: Install Python package and dependencies
+      # By default, the below installs ixmp from the main branch. To run against
+      # other code, e.g. other branches for open PRs), temporarily edit as
+      # appropriate. DO NOT merge such changes to `main`.
+      run: |
+        pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
+        pip install .[tests]
+        # TEMPORARY work around iiasa/message_ix#788
+        pip install "genno<1.23"
+
+    - name: Run test suite using pytest
+      env:
+        # For test_cli.test_dl; see code in message_ix.cli.dl
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        pytest message_ix \
+          -m "not nightly and not tutorial" \
+          -rA --verbose --color=yes --durations=20 \
+          --cov-report=xml \
+          --numprocesses=auto --dist=loadgroup
+      shell: bash
+
+    - name: Upload test coverage to Codecov.io
+      uses: codecov/codecov-action@v3
+
+  tutorials:
+    strategy:
+      matrix:
+        os:
+        - macos-latest
+        - ubuntu-latest
+        - windows-latest
+
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} tutorials
+
+    steps:
+    - name: Check out message_ix
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: ${{ env.depth }}
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
         cache: pip
         cache-dependency-path: "**/pyproject.toml"
 
@@ -73,16 +140,16 @@ jobs:
     - uses: r-lib/actions/setup-r@v2
       id: setup-r
 
-    - name: Cache GAMS installer, Python packages, and R packages
+    - name: Cache GAMS installer and R packages
       uses: actions/cache@v3
       with:
         path: |
           gams
           ${{ env.R_LIBS_USER }}
-        key: ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-R${{ steps.setup-r.outputs.installed-r-version }}
+        key: tutorial-${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-R${{ steps.setup-r.outputs.installed-r-version }}
         restore-keys: |
-          ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-
-          ${{ matrix.os }}-
+          tutorial-${{ matrix.os }}-gams${{ env.GAMS_VERSION }}-
+          tutorial-${{ matrix.os }}-
 
     - uses: iiasa/actions/setup-gams@main
       with:
@@ -109,26 +176,31 @@ jobs:
       shell: Rscript {0}
 
     - name: Run test suite using pytest
-      env:
-        # For test_cli.test_dl; see code in message_ix.cli.dl
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # Work around iiasa/ixmp#411
       run: |
         pytest message_ix \
-          -m "not nightly" \
+          -m "tutorial" \
           -rA --verbose --color=yes --durations=20 \
           --cov-report=xml \
-          --numprocesses=auto --dist=loadgroup || ( [ $? -eq 127 -a "${{ runner.os }}" = "Windows" ] && echo "Spurious exit code 127 from pytest" && exit 0)
+          --numprocesses=auto --dist=loadgroup
       shell: bash
-
-    - name: Test documentation build using Sphinx
-      if: ${{ startsWith(matrix.os, 'ubuntu') }}
-      env:
-        # For pull_request triggers, GitHub creates a temporary merge commit
-        # with a hash that does not match the head of the branch. Tell it which
-        # branch to use.
-        SPHINXOPTS: -D linkcode_github_remote_head=${{ github.head_ref }}
-      run: make --directory=doc html
 
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v3
+
+  pre-commit:
+    name: Code quality
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:  # Same as the "Latest version supported by message_ix", above
+        python-version: "3.11"
+
+    - name: Force recreation of pre-commit virtual environment for mypy
+      if: github.event_name == 'schedule'  # Comment this line to run on a PR
+      run: gh cache list -L 999 | cut -f2 | grep pre-commit | xargs -I{} gh cache delete "{}" || true
+      env: { GH_TOKEN: "${{ github.token }}" }
+
+    - uses: pre-commit/action@v3.0.0

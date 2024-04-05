@@ -1,0 +1,26 @@
+version: 2 
+updates: 
+  - package-ecosystem: "pip" 
+    directory: "/" 
+    schedule: 
+      interval: "monthly" 
+    groups:
+      # Specify a name for the group, which will be used in pull request titles
+      # and branch names
+      all-dependencies:
+        # Define patterns to include dependencies in the group (based on
+        # dependency name)
+        patterns:
+          - "*" # All dependencies in the package-ecosystem
+    # Add assignees 
+    assignees: 
+      - "glatterf42" 
+      - "khaeru" 
+    # Specify labels 
+    labels: 
+      - "dependencies" 
+    # Add reviewers:
+    reviewers: 
+      - "glatterf42" 
+      - "khaeru" 
+    

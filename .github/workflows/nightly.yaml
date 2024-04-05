@@ -21,14 +21,14 @@ jobs:
 
     steps:
     - name: Check out ixmp
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: iiasa/ixmp
         path: ixmp
         fetch-depth: ${{ env.depth }}
 
     - name: Check out message_ix
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: message_ix
         fetch-depth: ${{ env.depth }}
@@ -38,7 +38,7 @@ jobs:
         (cd ixmp; git fetch --tags --depth=${{ env.depth }})
         (cd message_ix; git fetch --tags --depth=${{ env.depth }})
 
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         # If the "Latest version testable on GitHub Actions" in pytest.yaml
         # is not the latest 3.x stable version, adjust here to match:

@@ -141,6 +141,9 @@ Variables
 * :math:`\text{GDP}_{n,y} \in \mathbb{R}`                                     Gross domestic product (GDP) in market exchange rates for MACRO reporting
 * =========================================================================== ======================================================================================================
 *
+* .. warning::
+*    Please be aware that transitioning from one period length to another for consecutive periods may result in false values of :math:`\text{PRICE_EMISSION}`. 
+*    Please see `this issue <https://github.com/iiasa/message_ix/issues/723>`_ for further information. We are currently working on a fix.
 ***
 
 Variables
@@ -272,7 +275,7 @@ Equations
     SHARE_CONSTRAINT_COMMODITY_LO   lower bounds on share constraints for commodities
     SHARE_CONSTRAINT_MODE_UP        upper bounds on share constraints for modes of a given technology
     SHARE_CONSTRAINT_MODE_LO        lower bounds on share constraints for modes of a given technology
-    ACTIVITY_CONSTRAINT_UP          dynamic constraint on the market penetration of a tgeneric_share_factor_upechnology activity (upper bound)
+    ACTIVITY_CONSTRAINT_UP          dynamic constraint on the market penetration of a technology activity (upper bound)
     ACTIVITY_SOFT_CONSTRAINT_UP     bound on relaxation of the dynamic constraint on market penetration (upper bound)
     ACTIVITY_CONSTRAINT_LO          dynamic constraint on the market penetration of a technology activity (lower bound)
     ACTIVITY_SOFT_CONSTRAINT_LO     bound on relaxation of the dynamic constraint on market penetration (lower bound)

@@ -1,0 +1,28 @@
+repos:
+- repo: local
+  hooks:
+  - id: mypy
+    name: mypy
+    always_run: true
+    require_serial: true
+    pass_filenames: false
+
+    language: python
+    entry: bash -c ". ${PRE_COMMIT_MYPY_VENV:-/dev/null}/bin/activate 2>/dev/null; mypy $0 $@"
+    additional_dependencies:
+    - mypy
+    - asyncssh
+    - git+https://github.com/iiasa/ixmp.git@main
+    - pytest
+    - Sphinx
+    - types-PyYAML
+    - types-requests
+    args: ["."]
+- repo: https://github.com/psf/black
+  rev: 23.7.0
+  hooks:
+  - id: black
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.0.287
+  hooks:
+  - id: ruff

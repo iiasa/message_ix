@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 from shutil import copyfile
@@ -25,12 +26,15 @@ MARK = [
 ]
 
 # Affects all tests in the file
-pytestmark = pytest.mark.flaky(
-    reruns=5,
-    rerun_delay=2,
-    condition=GHA,
-    reason="Flaky; fails occasionally on GitHub Actions runners",
-)
+pytestmark = [
+    pytest.mark.tutorial,
+    pytest.mark.flaky(
+        reruns=5,
+        rerun_delay=2,
+        condition=GHA,
+        reason="Flaky; fails occasionally on GitHub Actions runners",
+    ),
+]
 
 
 def _t(group: Union[str, None], basename: str, *, check=None, marks=None):
@@ -83,7 +87,7 @@ TUTORIALS: List[Tuple] = [
     _t("w0", f"{W}_historical_new_capacity"),
     _t("w0", f"{W}_multinode"),
     # NB this is the same value as in test_reporter()
-    _t(None, f"{W}_report", check=[("len-rep-graph", 13076)]),
+    _t(None, f"{W}_report", check=[("len-rep-graph", 13724)]),
     _t("at0", "austria", check=[("solve-objective-value", 206321.90625)]),
     _t("at0", "austria_single_policy", check=[("solve-objective-value", 205310.34375)]),
     _t("at0", "austria_multiple_policies"),
@@ -127,11 +131,14 @@ def default_args():
 # Parametrize the first 3 arguments using the variables *TUTORIALS* and *IDS*.
 # Argument 'nb_path' is indirect so that the above function can modify it.
 @pytest.mark.parametrize("nb_path,checks", TUTORIALS, ids=IDS, indirect=["nb_path"])
-def test_tutorial(nb_path, checks, tmp_path, tmp_env):
+def test_tutorial(caplog, nb_path, checks, tmp_path, tmp_env):
     """Test tutorial in the IPython or IR notebook at `nb_path`.
 
     If `checks` are given, values in the specified cells are tested.
     """
+    caplog.set_level(logging.INFO, "traitlets")
+    tmp_env.update(PYDEVD_DISABLE_FILE_VALIDATION="1")
+
     if nb_path.name == "westeros_baseline_using_xlsx_import_part2.ipynb":
         # Copy data files used by this tutorial to `tmp_path`
         for name in DATA_FILES:

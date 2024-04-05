@@ -1,4 +1,5 @@
 # Python, R, etc.
+__pycache__
 *-checkpoint.ipynb
 *.bak
 *.dat
@@ -8,6 +9,7 @@
 *.pyc
 *.RData*
 *.tmp
+*.swp
 *#
 *~
 #*
@@ -38,11 +40,12 @@ dist
 .cache/**
 tests/data/nightly
 
-# pytest and related
+# Python tooling, pytest, etc.
 .benchmarks
 .coverage*
 .mypy_cache
 .pytest_cache
+.ruff_cache
 coverage.xml
 htmlcov
 prof/
@@ -57,3 +60,7 @@ prof/
 
 # macOS
 .DS_Store
+
+# LPdiag
+message_ix/tests/data/lp_diag/diet_output.txt
+message_ix/tools/lp_diag/data/mps/*

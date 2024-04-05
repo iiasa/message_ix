@@ -1,3 +1,6 @@
+from pathlib import Path
+from subprocess import run
+
 import ixmp
 import numpy as np
 import numpy.testing as npt
@@ -5,6 +8,7 @@ import pandas as pd
 import pandas.testing as pdt
 import pytest
 
+import message_ix
 from message_ix import Scenario
 from message_ix.testing import SCENARIO, make_dantzig
 
@@ -12,6 +16,28 @@ from message_ix.testing import SCENARIO, make_dantzig
 @pytest.fixture
 def dantzig_message_scenario(message_test_mp):
     yield Scenario(message_test_mp, **SCENARIO["dantzig"])
+
+
+class TestScenario:
+    def test_solve(self, dantzig_message_scenario):
+        s = dantzig_message_scenario
+
+        # Scenario solves correctly
+        s.solve()
+
+        base_path = Path(message_ix.__file__).parent.joinpath("model")
+        name = "Canning_problem_(MESSAGE_scheme)_standard.gdx"
+
+        # Check both the GDX input and output files
+        for parts in ("data", f"MsgData_{name}"), ("output", f"MsgOutput_{name}"):
+            path = str(base_path.joinpath(*parts))
+
+            # ixmp_version is present in the GDX file
+            result = run(["gdxdump", path, "Symb=ixmp_version"], capture_output=True)
+
+            # ixmp_version contains the expected contents
+            assert "'message_ix'.'3-" in result.stdout.decode()
+            assert "'ixmp'.'3-" in result.stdout.decode()
 
 
 def test_year_int(test_mp):
@@ -161,7 +187,7 @@ def test_add_horizon(test_mp, args, kwargs, exp):
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
 
     # Call completes successfully
-    if isinstance(args[0], dict):
+    if isinstance(args[0], dict) and "data" not in kwargs:
         with pytest.warns(
             DeprecationWarning,
             match=(

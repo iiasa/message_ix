@@ -7,6 +7,7 @@ from ixmp.cli import main
 
 import message_ix
 import message_ix.tools.add_year.cli
+import message_ix.tools.lp_diag.cli
 
 # Override the docstring of the ixmp CLI so that it masquerades as the
 # message_ix CLI
@@ -154,6 +155,7 @@ def dl(branch, tag, path):
 
 # Add subcommands
 main.add_command(message_ix.tools.add_year.cli.main)
+main.add_command(message_ix.tools.lp_diag.cli.main)
 
 try:
     import message_ix.testing.nightly
