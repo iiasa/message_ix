@@ -1,0 +1,38 @@
+* ENCODING=ISO-8859-1
+NAME          gamsmodel
+ROWS
+ N  _obj                 
+ L  supply(seattle)      
+ L  supply(san-diego)    
+ G  demand(new-york)     
+ G  demand(chicago)      
+ G  demand(topeka)       
+COLUMNS
+    x(seattle,new-york)    _obj                        0.0324675324675325
+    x(seattle,new-york)    supply(seattle)                              1
+    x(seattle,new-york)    demand(new-york)                             1
+    x(seattle,chicago)     _obj                        0.0220779220779221
+    x(seattle,chicago)     supply(seattle)                              1
+    x(seattle,chicago)     demand(chicago)                              1
+    x(seattle,topeka)      _obj                        0.0233766233766234
+    x(seattle,topeka)      supply(seattle)                              1
+    x(seattle,topeka)      demand(topeka)                               1
+    x(san-diego,new-york)  _obj                      4.22077922077922e-10
+    x(san-diego,new-york)  supply(san-diego)                           13
+    x(san-diego,new-york)  demand(new-york)                            13
+    x(san-diego,chicago)   _obj                        0.0233766233766234
+    x(san-diego,chicago)   supply(san-diego)                            1
+    x(san-diego,chicago)   demand(chicago)                              1
+    x(san-diego,topeka)    _obj                       1.81818181818182e-9
+    x(san-diego,topeka)    supply(san-diego)                           10
+    x(san-diego,topeka)    demand(topeka)                              10
+    constobj               _obj                                         1
+RHS
+    rhs                    supply(seattle)                            350
+    rhs                    supply(san-diego)                          600
+    rhs                    demand(new-york)                           325
+    rhs                    demand(chicago)                            300
+    rhs                    demand(topeka)                             275
+BOUNDS
+ FX bnd                    constobj                                     0
+ENDATA

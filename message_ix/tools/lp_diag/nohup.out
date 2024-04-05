@@ -1,0 +1,977 @@
+[I 17:31:34.132 NotebookApp] Serving notebooks from local directory: C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\tools\lp_diag
+[I 17:31:34.132 NotebookApp] Jupyter Notebook 6.5.3 is running at:
+[I 17:31:34.132 NotebookApp] http://localhost:8888/?token=a738bfdc89cf5d4ac011657b3a6cf2f882ed79ee7c7b1857
+[I 17:31:34.132 NotebookApp]  or http://127.0.0.1:8888/?token=a738bfdc89cf5d4ac011657b3a6cf2f882ed79ee7c7b1857
+[I 17:31:34.132 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 17:31:34.251 NotebookApp] 
+    
+    To access the notebook, open this file in a browser:
+        file:///C:/Users/pratama/AppData/Roaming/jupyter/runtime/nbserver-9180-open.html
+    Or copy and paste one of these URLs:
+        http://localhost:8888/?token=a738bfdc89cf5d4ac011657b3a6cf2f882ed79ee7c7b1857
+     or http://127.0.0.1:8888/?token=a738bfdc89cf5d4ac011657b3a6cf2f882ed79ee7c7b1857
+[I 17:31:42.551 NotebookApp] Creating new notebook in 
+[I 17:31:45.014 NotebookApp] Kernel started: c7170213-4682-4a9f-aa31-a04414c7a587, name: python3
+[I 17:33:44.941 NotebookApp] Saving file at /Untitled.ipynb
+C:\Users\pratama\Anaconda3\envs\message_env\lib\site-packages\nbformat\__init__.py:129: MissingIDFieldWarning: Code cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.
+  validate(nb)
+C:\Users\pratama\Anaconda3\envs\message_env\lib\site-packages\notebook\services\contents\manager.py:353: MissingIDFieldWarning: Code cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.
+  validate_nb(model['content'])
+[I 17:35:45.922 NotebookApp] Saving file at /Untitled.ipynb
+[I 17:37:44.943 NotebookApp] Saving file at /Untitled.ipynb
+[I 17:38:48.477 NotebookApp] Saving file at /Untitled.ipynb
+[I 17:47:44.953 NotebookApp] Saving file at /Untitled.ipynb
+[I 17:49:44.942 NotebookApp] Saving file at /Untitled.ipynb
+[I 18:27:06.505 NotebookApp] Starting buffering for c7170213-4682-4a9f-aa31-a04414c7a587:17e78bc3478e409999446d49c69d79c9
+[I 18:27:09.662 NotebookApp] Restoring connection for c7170213-4682-4a9f-aa31-a04414c7a587:17e78bc3478e409999446d49c69d79c9
+[I 18:27:12.775 NotebookApp] Starting buffering for c7170213-4682-4a9f-aa31-a04414c7a587:17e78bc3478e409999446d49c69d79c9
+[I 18:27:27.666 NotebookApp] Restoring connection for c7170213-4682-4a9f-aa31-a04414c7a587:17e78bc3478e409999446d49c69d79c9
+[I 20:24:34.127 NotebookApp] Starting buffering for c7170213-4682-4a9f-aa31-a04414c7a587:17e78bc3478e409999446d49c69d79c9
+[I 20:24:38.909 NotebookApp] Kernel shutdown: c7170213-4682-4a9f-aa31-a04414c7a587
+[I 20:24:40.316 NotebookApp] Shutting down on /api/shutdown request.
+[I 20:24:40.318 NotebookApp] Shutting down 0 kernels
+[I 20:24:40.318 NotebookApp] Shutting down 0 terminals
+
+  _   _          _      _
+ | | | |_ __  __| |__ _| |_ ___
+ | |_| | '_ \/ _` / _` |  _/ -_)
+  \___/| .__/\__,_\__,_|\__\___|
+       |_|
+                       
+Read the migration plan to Notebook 7 to learn about the new features and the actions to take if you are using extensions.
+
+https://jupyter-notebook.readthedocs.io/en/latest/migrate_to_notebook7.html
+
+Please note that updating to Notebook 7 might break some of your extensions.
+
+,_\__,_|\__\___|
+       |_|
+                       
+Read the migration plan to Notebook 7 to learn about the new features and the actions to take if you are using extensions.
+
+https://jupyter-notebook.readthedocs.io/en/latest/migrate_to_notebook7.html
+
+Please note that updating to Notebook 7 might break some of your extensions.
+
+[I 20:31:49.579 NotebookApp] Serving notebooks from local directory: C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\tools\lp_diag
+[I 20:31:49.579 NotebookApp] Jupyter Notebook 6.5.3 is running at:
+[I 20:31:49.579 NotebookApp] http://localhost:8888/?token=8bd707abde3223b11975bb9cc8890de02596bd88335a4454
+[I 20:31:49.579 NotebookApp]  or http://127.0.0.1:8888/?token=8bd707abde3223b11975bb9cc8890de02596bd88335a4454
+[I 20:31:49.579 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 20:31:49.710 NotebookApp] 
+    
+    To access the notebook, open this file in a browser:
+        file:///C:/Users/pratama/AppData/Roaming/jupyter/runtime/nbserver-19876-open.html
+    Or copy and paste one of these URLs:
+        http://localhost:8888/?token=8bd707abde3223b11975bb9cc8890de02596bd88335a4454
+     or http://127.0.0.1:8888/?token=8bd707abde3223b11975bb9cc8890de02596bd88335a4454
+[W 20:31:56.246 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[I 20:31:56.356 NotebookApp] Kernel started: 08b25722-a90a-4727-8980-ba9ff63b142e, name: python3
+[I 20:33:56.323 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[W 20:33:56.323 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[I 20:35:56.319 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 20:37:56.325 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 20:39:56.330 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 20:41:56.324 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 20:43:56.338 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 20:45:56.336 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 20:47:56.336 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 20:49:56.341 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+C:\Users\pratama\Anaconda3\envs\message_env\lib\site-packages\nbformat\__init__.py:129: MissingIDFieldWarning: Code cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.
+  validate(nb)
+C:\Users\pratama\Anaconda3\envs\message_env\lib\site-packages\notebook\services\contents\manager.py:353: MissingIDFieldWarning: Code cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.
+  validate_nb(model['content'])
+[I 20:51:56.326 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 20:55:56.335 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 20:57:56.349 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 20:59:56.341 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:01:56.341 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:03:07.562 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:03:56.337 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:05:56.342 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:07:56.341 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:11:56.342 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:13:56.331 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:15:56.340 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:17:56.337 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:19:56.352 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:21:56.976 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:23:56.354 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:25:56.347 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:26:09.315 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:31:56.349 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:33:56.343 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:35:56.344 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:36:17.503 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 21:36:34.091 NotebookApp] Starting buffering for 08b25722-a90a-4727-8980-ba9ff63b142e:b4b4028221634213907700f7f9483e1e
+[I 21:52:18.955 NotebookApp] Restoring connection for 08b25722-a90a-4727-8980-ba9ff63b142e:b4b4028221634213907700f7f9483e1e
+[I 21:59:56.343 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 22:01:12.375 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 22:01:56.323 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 22:03:56.327 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 22:05:56.317 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 22:06:19.842 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 22:07:56.314 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 22:09:56.322 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 22:20:04.757 NotebookApp] Starting buffering for 08b25722-a90a-4727-8980-ba9ff63b142e:b4b4028221634213907700f7f9483e1e
+[I 22:20:05.454 NotebookApp] Kernel restarted: 08b25722-a90a-4727-8980-ba9ff63b142e
+[I 22:20:05.462 NotebookApp] Restoring connection for 08b25722-a90a-4727-8980-ba9ff63b142e:b4b4028221634213907700f7f9483e1e
+[I 22:20:07.003 NotebookApp] Replaying 3 buffered messages
+[I 22:21:56.321 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 22:37:45.741 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 06:07:56.317 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 06:09:56.311 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 06:13:56.308 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 06:15:56.320 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 07:19:45.367 NotebookApp] Starting buffering for 08b25722-a90a-4727-8980-ba9ff63b142e:b4b4028221634213907700f7f9483e1e
+[I 07:19:50.950 NotebookApp] Restoring connection for 08b25722-a90a-4727-8980-ba9ff63b142e:b4b4028221634213907700f7f9483e1e
+[I 07:19:54.303 NotebookApp] Starting buffering for 08b25722-a90a-4727-8980-ba9ff63b142e:b4b4028221634213907700f7f9483e1e
+[I 07:49:51.074 NotebookApp] Restoring connection for 08b25722-a90a-4727-8980-ba9ff63b142e:b4b4028221634213907700f7f9483e1e
+[I 07:49:55.892 NotebookApp] Starting buffering for 08b25722-a90a-4727-8980-ba9ff63b142e:b4b4028221634213907700f7f9483e1e
+[I 07:49:59.666 NotebookApp] Restoring connection for 08b25722-a90a-4727-8980-ba9ff63b142e:b4b4028221634213907700f7f9483e1e
+[I 10:11:25.043 NotebookApp] Starting buffering for 08b25722-a90a-4727-8980-ba9ff63b142e:b4b4028221634213907700f7f9483e1e
+[I 10:12:38.619 NotebookApp] Restoring connection for 08b25722-a90a-4727-8980-ba9ff63b142e:b4b4028221634213907700f7f9483e1e
+[I 10:14:40.743 NotebookApp] Starting buffering for 08b25722-a90a-4727-8980-ba9ff63b142e:b4b4028221634213907700f7f9483e1e
+[I 10:14:44.426 NotebookApp] Restoring connection for 08b25722-a90a-4727-8980-ba9ff63b142e:b4b4028221634213907700f7f9483e1e
+[I 10:39:39.702 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:39:45.483 NotebookApp] Starting buffering for 08b25722-a90a-4727-8980-ba9ff63b142e:b4b4028221634213907700f7f9483e1e
+[I 10:39:48.999 NotebookApp] Kernel shutdown: 08b25722-a90a-4727-8980-ba9ff63b142e
+[I 10:39:53.577 NotebookApp] Shutting down on /api/shutdown request.
+[I 10:39:53.579 NotebookApp] Shutting down 0 kernels
+[I 10:39:53.579 NotebookApp] Shutting down 0 terminals
+
+  _   _          _      _
+ | | | |_ __  __| |__ _| |_ ___
+ | |_| | '_ \/ _` / _` |  _/ -_)
+  \___/| .__/\__,_\__,_|\__\___|
+       |_|
+                       
+Read the migration plan to Notebook 7 to learn about the new features and the actions to take if you are using extensions.
+
+https://jupyter-notebook.readthedocs.io/en/latest/migrate_to_notebook7.html
+
+Please note that updating to Notebook 7 might break some of your extensions.
+
+[I 15:33:44.317 NotebookApp] Serving notebooks from local directory: C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\tools\lp_diag
+[I 15:33:44.317 NotebookApp] Jupyter Notebook 6.5.3 is running at:
+[I 15:33:44.317 NotebookApp] http://localhost:8888/?token=c72df32a06ab5e4a1817ddbd9d022b611b7c54b9678c1a2d
+[I 15:33:44.317 NotebookApp]  or http://127.0.0.1:8888/?token=c72df32a06ab5e4a1817ddbd9d022b611b7c54b9678c1a2d
+[I 15:33:44.317 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 15:33:44.465 NotebookApp] 
+    
+    To access the notebook, open this file in a browser:
+        file:///C:/Users/pratama/AppData/Roaming/jupyter/runtime/nbserver-3168-open.html
+    Or copy and paste one of these URLs:
+        http://localhost:8888/?token=c72df32a06ab5e4a1817ddbd9d022b611b7c54b9678c1a2d
+     or http://127.0.0.1:8888/?token=c72df32a06ab5e4a1817ddbd9d022b611b7c54b9678c1a2d
+[W 15:34:53.707 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[I 15:34:54.205 NotebookApp] Kernel started: 7a12c8e4-1969-49a6-88b8-0ab8baeb29c1, name: python3
+[I 15:35:53.107 NotebookApp] Starting buffering for 7a12c8e4-1969-49a6-88b8-0ab8baeb29c1:277889f27a44462289c8e32fad85a9e7
+[I 15:35:53.375 NotebookApp] Kernel restarted: 7a12c8e4-1969-49a6-88b8-0ab8baeb29c1
+[I 15:35:53.422 NotebookApp] Restoring connection for 7a12c8e4-1969-49a6-88b8-0ab8baeb29c1:277889f27a44462289c8e32fad85a9e7
+[I 15:35:54.441 NotebookApp] Replaying 3 buffered messages
+[I 15:36:53.965 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+C:\Users\pratama\Anaconda3\envs\message_env\lib\site-packages\nbformat\__init__.py:129: MissingIDFieldWarning: Code cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.
+  validate(nb)
+C:\Users\pratama\Anaconda3\envs\message_env\lib\site-packages\notebook\services\contents\manager.py:353: MissingIDFieldWarning: Code cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.
+  validate_nb(model['content'])
+[I 15:38:53.972 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:46:53.966 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:00:53.983 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:02:53.991 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:04:53.984 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:06:53.967 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:08:54.833 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:11:08.042 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:12:53.968 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:14:53.962 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:16:53.961 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:18:53.981 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:32:53.982 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:34:53.963 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:35:02.665 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:35:03.792 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:36:53.962 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:38:53.977 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:40:53.968 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:43:44.511 NotebookApp] Kernel interrupted: 7a12c8e4-1969-49a6-88b8-0ab8baeb29c1
+[I 16:44:53.962 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:46:53.980 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:48:53.970 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:50:53.973 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:51:27.384 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:51:30.412 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:51:44.245 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:52:04.398 NotebookApp] Starting buffering for 7a12c8e4-1969-49a6-88b8-0ab8baeb29c1:277889f27a44462289c8e32fad85a9e7
+[I 07:30:39.001 NotebookApp] Serving notebooks from local directory: C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\tools\lp_diag
+[I 07:30:39.001 NotebookApp] Jupyter Notebook 6.5.3 is running at:
+[I 07:30:39.001 NotebookApp] http://localhost:8888/?token=bea9e6c7cc93a52b7f2827f0fff8e7c36fee1d960a1df1d8
+[I 07:30:39.001 NotebookApp]  or http://127.0.0.1:8888/?token=bea9e6c7cc93a52b7f2827f0fff8e7c36fee1d960a1df1d8
+[I 07:30:39.001 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 07:30:39.117 NotebookApp] 
+    
+    To access the notebook, open this file in a browser:
+        file:///C:/Users/pratama/AppData/Roaming/jupyter/runtime/nbserver-7780-open.html
+    Or copy and paste one of these URLs:
+        http://localhost:8888/?token=bea9e6c7cc93a52b7f2827f0fff8e7c36fee1d960a1df1d8
+     or http://127.0.0.1:8888/?token=bea9e6c7cc93a52b7f2827f0fff8e7c36fee1d960a1df1d8
+[W 07:30:46.544 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[I 07:30:47.010 NotebookApp] Kernel started: 4aa50906-521b-44c8-997a-aaabcbe91cce, name: python3
+[I 07:34:45.277 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:d7a3f65425b0483a91371b372b70c94e
+[I 07:34:45.829 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 07:34:45.838 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:d7a3f65425b0483a91371b372b70c94e
+[I 07:34:46.855 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 07:34:47.372 NotebookApp] Replaying 3 buffered messages
+[I 07:36:46.859 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 07:38:46.853 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 07:52:46.868 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 08:04:46.856 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+C:\Users\pratama\Anaconda3\envs\message_env\lib\site-packages\nbformat\__init__.py:129: MissingIDFieldWarning: Code cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.
+  validate(nb)
+C:\Users\pratama\Anaconda3\envs\message_env\lib\site-packages\notebook\services\contents\manager.py:353: MissingIDFieldWarning: Code cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.
+  validate_nb(model['content'])
+[I 08:06:46.859 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 08:08:46.867 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:00:21.131 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:d7a3f65425b0483a91371b372b70c94e
+[I 10:00:23.383 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:d7a3f65425b0483a91371b372b70c94e
+[I 10:00:28.151 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:d7a3f65425b0483a91371b372b70c94e
+[I 10:00:45.315 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:d7a3f65425b0483a91371b372b70c94e
+[I 10:32:46.906 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:34:46.912 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:36:46.908 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:38:46.905 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:40:08.211 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:40:46.919 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:42:46.910 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:43:33.376 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:54:46.918 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[W 10:56:20.711 NotebookApp] IOPub message rate exceeded.
+    The notebook server will temporarily stop sending output
+    to the client in order to avoid crashing it.
+    To change this limit, set the config variable
+    `--NotebookApp.iopub_msg_rate_limit`.
+    
+    Current values:
+    NotebookApp.iopub_msg_rate_limit=1000.0 (msgs/sec)
+    NotebookApp.rate_limit_window=3.0 (secs)
+    
+[W 10:56:21.612 NotebookApp] iopub messages resumed
+[I 10:56:46.987 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:57:17.964 NotebookApp] Kernel interrupted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 10:57:20.324 NotebookApp] Kernel interrupted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 10:58:46.985 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:00:46.914 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:01:50.004 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:02:46.923 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:04:46.928 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:17:41.903 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:17:59.462 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:18:10.674 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:18:43.457 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:18:46.918 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:20:46.932 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:24:46.915 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:26:46.930 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:28:46.929 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:30:46.944 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:32:46.924 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:36:46.934 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:38:46.938 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:40:46.935 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:42:46.941 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:44:46.935 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:48:46.928 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:50:46.946 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:52:46.943 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:54:46.940 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:56:46.944 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:58:46.928 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 12:00:46.932 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 12:08:46.937 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 12:09:29.713 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 12:10:28.609 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 12:11:19.600 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:d7a3f65425b0483a91371b372b70c94e
+[I 12:11:22.227 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 12:11:22.236 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:d7a3f65425b0483a91371b372b70c94e
+[I 12:11:23.267 NotebookApp] Replaying 3 buffered messages
+[I 12:12:46.951 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:06:19.736 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:d7a3f65425b0483a91371b372b70c94e
+[I 13:06:27.124 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:d7a3f65425b0483a91371b372b70c94e
+[I 13:06:27.285 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:d7a3f65425b0483a91371b372b70c94e
+[I 13:06:48.378 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:d7a3f65425b0483a91371b372b70c94e
+[I 13:06:51.698 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:d7a3f65425b0483a91371b372b70c94e
+[I 13:06:59.744 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:d7a3f65425b0483a91371b372b70c94e
+[I 13:07:13.304 NotebookApp] Kernel interrupted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 13:08:52.216 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 4aa50906-521b-44c8-997a-aaabcbe91cce restarted
+[I 13:09:04.032 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:09:20.165 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:09:20.713 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:09:21.012 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:09:24.714 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:d7a3f65425b0483a91371b372b70c94e
+[W 13:09:30.030 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[I 13:11:11.169 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:f39c9d5f301a4841b3479acb50ad1d93
+[I 13:11:11.424 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 13:11:11.483 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:f39c9d5f301a4841b3479acb50ad1d93
+[I 13:11:12.528 NotebookApp] Replaying 3 buffered messages
+[I 13:11:30.341 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:13:30.360 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:13:32.423 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 4aa50906-521b-44c8-997a-aaabcbe91cce restarted
+[I 13:13:41.943 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:f39c9d5f301a4841b3479acb50ad1d93
+[I 13:14:20.553 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:6e98247948e547c88ce1a51d468c41e3
+[I 13:14:20.821 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 13:14:20.825 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:6e98247948e547c88ce1a51d468c41e3
+[I 13:14:21.851 NotebookApp] Replaying 3 buffered messages
+[I 13:16:15.178 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:18:15.956 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:20:15.193 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:20:23.282 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:21:05.740 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:6e98247948e547c88ce1a51d468c41e3
+[I 13:21:06.297 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 13:21:06.304 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:6e98247948e547c88ce1a51d468c41e3
+[I 13:21:07.824 NotebookApp] Replaying 3 buffered messages
+[I 13:21:37.809 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:22:15.973 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:28:15.190 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:30:15.180 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:32:15.180 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:34:15.183 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:36:15.181 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:38:15.179 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:40:15.190 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:42:15.179 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:44:15.184 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:46:15.196 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:48:15.196 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:50:15.201 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:52:15.187 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:54:15.185 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:56:15.189 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:56:29.258 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:58:15.187 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:59:57.413 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:00:15.184 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:02:15.188 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:02:46.651 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:6e98247948e547c88ce1a51d468c41e3
+[I 14:02:47.222 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 14:02:47.230 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:6e98247948e547c88ce1a51d468c41e3
+[I 14:02:48.755 NotebookApp] Replaying 3 buffered messages
+[I 14:04:15.184 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:04:38.713 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:06:15.185 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:10:15.185 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:12:15.186 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:14:15.189 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:16:05.738 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:16:15.187 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:18:15.190 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:20:15.203 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:26:15.202 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:28:15.221 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:30:15.196 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:39:19.312 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:39:19.876 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:39:20.450 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:39:20.488 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:39:20.647 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:39:20.831 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:39:21.031 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:39:21.477 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:39:32.233 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 4aa50906-521b-44c8-997a-aaabcbe91cce restarted
+[I 14:39:37.041 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:39:38.138 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:39:38.929 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:39:45.003 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:6e98247948e547c88ce1a51d468c41e3
+[W 14:39:50.054 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[I 14:40:39.724 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[W 14:40:39.740 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[I 14:41:19.912 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[W 14:41:19.912 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[I 14:41:30.182 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:1b01dcd84282431c8d555e2224d6fe9d
+[I 14:41:30.457 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 14:41:30.505 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:1b01dcd84282431c8d555e2224d6fe9d
+[I 14:41:31.540 NotebookApp] Replaying 3 buffered messages
+[I 14:41:50.406 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:43:50.401 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:00:21.864 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:00:24.094 NotebookApp] Kernel interrupted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 15:00:33.458 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 4aa50906-521b-44c8-997a-aaabcbe91cce restarted
+[I 15:00:40.518 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:1b01dcd84282431c8d555e2224d6fe9d
+[I 15:00:51.372 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:c804636ad4a344da831d77a13892fa0f
+[I 15:00:51.636 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 15:00:51.662 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:c804636ad4a344da831d77a13892fa0f
+[I 15:00:52.678 NotebookApp] Replaying 3 buffered messages
+[I 15:01:11.505 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:01:14.540 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:02:46.332 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:04:46.314 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:16:45.635 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 4aa50906-521b-44c8-997a-aaabcbe91cce restarted
+[I 15:17:02.422 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:c804636ad4a344da831d77a13892fa0f
+[W 15:26:51.997 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[I 15:26:56.457 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:92d0bd1cc15f486393c5916336431beb
+[I 15:26:56.745 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 15:26:56.865 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:92d0bd1cc15f486393c5916336431beb
+[I 15:26:57.895 NotebookApp] Replaying 3 buffered messages
+[I 15:27:25.573 NotebookApp] Kernel interrupted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 15:28:52.349 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:30:52.326 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:32:52.336 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:36:52.345 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:38:52.340 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:46:52.349 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:48:52.364 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:51:33.774 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:92d0bd1cc15f486393c5916336431beb
+[I 15:51:34.573 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 15:51:34.725 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:92d0bd1cc15f486393c5916336431beb
+[I 15:51:35.755 NotebookApp] Replaying 3 buffered messages
+[I 15:52:01.578 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:52:52.347 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:54:52.345 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:56:06.543 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:56:52.349 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 15:59:09.058 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:00:52.343 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:02:52.353 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:03:05.992 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:92d0bd1cc15f486393c5916336431beb
+[I 16:03:06.466 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 16:03:06.472 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:92d0bd1cc15f486393c5916336431beb
+[I 16:03:07.509 NotebookApp] Replaying 3 buffered messages
+[I 16:04:52.344 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:14:52.352 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:16:52.344 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:18:53.035 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:20:52.333 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:22:52.353 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:28:09.080 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:28:11.476 NotebookApp] Copying [PROTOTYPE] Matrix Rescale Tool.ipynb to 
+[W 16:28:11.483 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[W 16:28:11.485 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy1.ipynb is not trusted
+[W 16:28:14.005 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy1.ipynb is not trusted
+[I 16:28:14.369 NotebookApp] Kernel started: 9293def2-127e-47b0-a884-858267c38a6f, name: python3
+[I 16:28:16.699 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy1.ipynb
+[W 16:28:16.700 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy1.ipynb is not trusted
+[I 16:28:18.021 NotebookApp] Starting buffering for 9293def2-127e-47b0-a884-858267c38a6f:3173bac4ed4644e586605f299df80666
+[I 16:35:42.591 NotebookApp] Kernel interrupted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 16:36:52.360 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:56:52.370 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:58:53.031 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:00:52.362 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:02:52.359 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:04:52.360 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:06:52.363 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:08:52.368 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:10:53.038 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:12:52.357 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:14:52.363 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:16:03.788 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:16:52.373 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:18:12.087 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:19:30.490 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:92d0bd1cc15f486393c5916336431beb
+[W 17:20:06.792 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[I 17:20:08.741 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:4073e4c8024c4f54aed5556a95a5c941
+[I 17:21:39.451 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+[W 17:21:45.042 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[I 17:22:29.826 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 17:22:30.093 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 17:22:30.229 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 17:22:31.258 NotebookApp] Replaying 3 buffered messages
+[I 17:23:45.383 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:25:45.375 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:27:45.382 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:29:45.382 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:31:45.377 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:33:45.395 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:35:45.386 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:37:45.395 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:39:45.385 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:41:45.382 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:43:45.385 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:45:45.381 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:49:45.384 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:51:45.382 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:53:45.399 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:57:45.389 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:59:45.396 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:01:12.577 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:01:45.397 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:03:45.385 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:05:45.391 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:07:45.408 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:09:45.396 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:15:45.386 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:17:45.387 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:19:45.393 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:21:45.404 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[W 18:22:36.430 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy1.ipynb is not trusted
+[I 18:23:12.089 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 18:23:13.018 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 18:23:13.025 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 18:23:14.051 NotebookApp] Replaying 3 buffered messages
+[I 18:23:15.023 NotebookApp] Starting buffering for 9293def2-127e-47b0-a884-858267c38a6f:92c5707dc0524407a1bd5f99a982098a
+[I 18:23:45.400 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:25:45.397 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:27:45.399 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:28:29.380 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:29:45.394 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:31:45.395 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:33:45.400 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:35:45.398 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:36:06.875 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 18:36:07.348 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 18:36:07.355 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 18:36:08.380 NotebookApp] Replaying 3 buffered messages
+[W 18:36:18.441 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy1.ipynb is not trusted
+[I 18:37:45.410 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:39:45.412 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:44:21.746 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 18:44:22.333 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 18:44:22.342 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 18:44:23.874 NotebookApp] Replaying 3 buffered messages
+[I 18:46:31.053 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:51:45.393 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:55:00.979 NotebookApp] Starting buffering for 9293def2-127e-47b0-a884-858267c38a6f:82e7cef8a758407e8254464f1eb4836e
+[I 18:55:45.409 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:57:45.398 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 19:23:47.505 NotebookApp] Kernel interrupted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 19:23:55.335 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 4aa50906-521b-44c8-997a-aaabcbe91cce restarted
+[I 19:23:58.242 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 19:24:08.607 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 19:24:08.887 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 19:24:08.899 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 19:24:09.937 NotebookApp] Replaying 3 buffered messages
+[I 19:24:17.214 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 19:24:17.574 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 19:24:17.579 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 19:24:18.618 NotebookApp] Replaying 3 buffered messages
+[I 19:25:45.416 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 19:37:45.420 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 19:39:45.422 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 19:41:45.428 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 19:43:45.426 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 19:45:45.430 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 19:57:29.984 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 19:59:45.431 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 20:01:45.424 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 20:03:45.430 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 20:04:17.081 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 20:04:17.532 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 20:07:14.305 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 20:07:50.913 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 20:07:57.904 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 20:08:11.663 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 20:08:14.600 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 07:48:04.710 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 07:52:33.238 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 07:52:34.276 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 07:52:34.468 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 07:52:35.497 NotebookApp] Replaying 3 buffered messages
+[I 07:52:54.795 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 07:53:45.415 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 07:55:46.010 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 08:07:45.273 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 08:09:45.270 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 09:27:45.966 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 09:29:45.976 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 09:31:45.306 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 09:35:39.965 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 09:35:41.646 NotebookApp] Copying [PROTOTYPE] Matrix Rescale Tool.ipynb to 
+[W 09:35:41.652 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[W 09:35:41.654 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy2.ipynb is not trusted
+[W 09:35:43.333 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy2.ipynb is not trusted
+[I 09:35:43.720 NotebookApp] Kernel started: 17bdfebc-5481-4eee-8ed7-cad512fb7ce6, name: python3
+[I 09:35:57.927 NotebookApp] Starting buffering for 17bdfebc-5481-4eee-8ed7-cad512fb7ce6:232616bc88a3469c890340617c6b4dd0
+[I 09:36:09.440 NotebookApp] Kernel shutdown: 9293def2-127e-47b0-a884-858267c38a6f
+[I 09:36:12.528 NotebookApp] Kernel shutdown: 17bdfebc-5481-4eee-8ed7-cad512fb7ce6
+[I 09:37:45.306 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 09:39:45.293 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 09:41:45.320 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 09:43:45.305 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 09:45:45.308 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 09:50:36.985 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 09:51:45.307 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 09:53:45.302 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 09:55:45.300 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 09:57:45.967 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 09:59:45.301 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:00:43.391 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 10:00:44.530 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 10:00:44.598 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 10:00:46.143 NotebookApp] Replaying 3 buffered messages
+[I 10:01:45.311 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:03:45.301 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:05:45.318 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:07:45.309 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:11:18.028 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:13:19.714 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:13:20.135 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:13:25.690 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 10:13:26.268 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 10:13:26.291 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 10:13:27.794 NotebookApp] Replaying 3 buffered messages
+[I 10:13:45.310 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:15:45.306 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:17:45.328 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:19:45.303 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:29:45.318 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:33:45.311 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:35:45.322 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:37:45.328 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:39:45.323 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:41:45.314 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:43:45.314 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:45:45.327 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:47:45.324 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:49:45.316 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:51:45.332 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:53:45.329 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:55:45.324 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:57:45.332 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:59:45.323 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:00:15.646 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:01:45.320 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:05:00.330 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:07:45.325 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:09:45.332 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:39:45.324 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:39:58.795 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:41:45.332 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:41:53.055 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 11:41:53.757 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 11:41:53.763 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 11:41:55.306 NotebookApp] Replaying 3 buffered messages
+[I 11:43:45.338 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:44:20.524 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:45:45.336 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:51:45.337 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:52:21.738 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 11:53:45.536 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 11:53:46.121 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 11:53:46.135 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 11:53:47.644 NotebookApp] Replaying 3 buffered messages
+[I 11:55:45.332 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 12:57:45.365 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 12:59:45.357 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:01:45.363 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 13:28:01.936 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 13:28:02.512 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 13:28:02.519 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 13:28:04.042 NotebookApp] Replaying 3 buffered messages
+[I 13:29:45.360 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:10:26.350 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:10:33.749 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:10:45.450 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 14:10:45.905 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 14:10:45.911 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 14:10:46.948 NotebookApp] Replaying 3 buffered messages
+[I 14:11:46.033 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:13:45.375 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:15:45.375 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:21:45.381 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:23:45.374 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:25:45.371 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:27:45.367 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:28:59.903 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:29:34.026 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:30:05.558 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:31:45.370 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:33:45.385 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:34:36.616 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 14:34:37.982 NotebookApp] Copying [PROTOTYPE] Matrix Rescale Tool.ipynb to 
+[W 14:34:37.984 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[W 14:34:37.986 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy3.ipynb is not trusted
+[W 14:34:39.612 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy3.ipynb is not trusted
+[I 14:34:39.872 NotebookApp] Kernel started: 7a602e50-a4c8-40f8-b051-3c640784f554, name: python3
+[I 14:34:46.385 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy3.ipynb
+[W 14:34:46.385 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy3.ipynb is not trusted
+[I 14:34:47.812 NotebookApp] Starting buffering for 7a602e50-a4c8-40f8-b051-3c640784f554:ef83fc089c5d484a86c2d9ddeb5a083e
+[I 14:35:45.373 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:00:02.864 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 16:00:18.753 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 16:07:03.351 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 16:07:03.894 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 16:07:03.902 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 16:07:05.437 NotebookApp] Replaying 3 buffered messages
+[I 16:07:46.043 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:08:55.206 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:08:57.339 NotebookApp] Copying [PROTOTYPE] Matrix Rescale Tool.ipynb to 
+[W 16:08:57.340 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[I 16:08:59.086 NotebookApp] Kernel started: 2d55f666-8afd-41fc-8cf3-f36f2d4e5ce6, name: python3
+[I 16:09:00.710 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy4.ipynb
+[I 16:09:01.500 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy4.ipynb
+[I 16:09:02.911 NotebookApp] Starting buffering for 2d55f666-8afd-41fc-8cf3-f36f2d4e5ce6:da9f611659054b4b8a2ddedfb684c4b4
+[I 16:09:45.404 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:12:31.209 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:33:45.909 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 4aa50906-521b-44c8-997a-aaabcbe91cce restarted
+[I 16:33:50.530 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:b8f1c39d0c54419ca8ceed2c178f3567
+[I 16:33:56.849 NotebookApp] Kernel shutdown: 7a602e50-a4c8-40f8-b051-3c640784f554
+[I 16:33:56.850 NotebookApp] Kernel shutdown: 2d55f666-8afd-41fc-8cf3-f36f2d4e5ce6
+[W 16:34:00.830 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[I 16:36:51.851 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:808d68c0d6b84c568bb654ffc98c5894
+[I 16:36:52.100 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 16:36:52.112 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:808d68c0d6b84c568bb654ffc98c5894
+[I 16:36:53.133 NotebookApp] Replaying 3 buffered messages
+[I 16:38:01.045 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:40:01.027 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:42:01.079 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:44:01.045 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:48:01.047 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:50:01.040 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:51:19.435 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:52:01.037 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:54:01.038 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:56:01.058 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 16:58:01.051 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:00:01.044 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:07:34.747 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:14:01.049 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:16:01.042 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:18:01.060 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:20:01.037 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:22:01.046 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:24:01.053 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:26:31.068 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:28:01.051 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:30:01.042 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:32:01.054 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:32:36.361 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:34:01.059 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:36:01.066 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:38:01.055 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:40:01.049 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:40:51.868 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:42:01.061 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:42:49.279 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:44:01.060 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:44:13.978 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:44:23.707 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:45:01.874 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:45:02.609 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:46:01.052 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:48:01.063 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:50:01.067 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:50:05.488 NotebookApp] Kernel started: c550f1b2-b9ef-4f7a-a257-491e36fffe2a, name: python3
+[I 17:50:23.864 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:52:01.056 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:55:03.569 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:55:04.090 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 4aa50906-521b-44c8-997a-aaabcbe91cce restarted
+[I 17:55:08.097 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 17:55:11.376 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:808d68c0d6b84c568bb654ffc98c5894
+[I 17:55:14.497 NotebookApp] Starting buffering for c550f1b2-b9ef-4f7a-a257-491e36fffe2a:bfd505f5c62c4acc86f76af7da4d1916
+[I 17:55:16.516 NotebookApp] Kernel shutdown: c550f1b2-b9ef-4f7a-a257-491e36fffe2a
+[W 17:55:20.092 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[I 17:55:42.353 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[W 17:55:42.354 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[I 17:55:55.075 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[W 17:55:55.075 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool.ipynb is not trusted
+[I 17:56:02.840 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:806be7e4aa6a476d8cb32e39457515ed
+[I 17:56:03.125 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 17:56:03.175 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:806be7e4aa6a476d8cb32e39457515ed
+[I 17:56:04.208 NotebookApp] Replaying 3 buffered messages
+[I 17:57:20.356 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:01:31.793 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:01:45.110 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 4aa50906-521b-44c8-997a-aaabcbe91cce restarted
+[I 18:01:52.153 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:806be7e4aa6a476d8cb32e39457515ed
+[I 18:02:17.907 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:02:35.044 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:03:57.290 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:04:12.950 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:04:20.118 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:003dc2874ccc45c68eda190ebda6d948
+[I 18:04:20.392 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 18:04:20.399 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:003dc2874ccc45c68eda190ebda6d948
+[W 18:04:21.439 NotebookApp] Got events for closed stream <zmq.eventloop.zmqstream.ZMQStream object at 0x0000017836660C70>
+[I 18:04:21.441 NotebookApp] Replaying 3 buffered messages
+[I 18:05:57.294 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:14:08.392 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 4aa50906-521b-44c8-997a-aaabcbe91cce restarted
+[I 18:14:13.342 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:003dc2874ccc45c68eda190ebda6d948
+[I 18:14:30.260 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:15:11.245 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:16:17.837 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:16:49.961 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:17:30.827 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:17:41.277 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:82fcabf8915449b3acb748bc583008ac
+[I 18:17:41.532 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 18:17:41.567 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:82fcabf8915449b3acb748bc583008ac
+[W 18:17:42.617 NotebookApp] Got events for closed stream <zmq.eventloop.zmqstream.ZMQStream object at 0x0000017836649180>
+[W 18:17:42.617 NotebookApp] Got events for closed stream <zmq.eventloop.zmqstream.ZMQStream object at 0x000001783664A5F0>
+[I 18:17:42.618 NotebookApp] Replaying 3 buffered messages
+[I 18:17:46.326 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:18:17.828 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:20:17.850 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:32:39.031 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:36:19.077 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:36:35.540 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 4aa50906-521b-44c8-997a-aaabcbe91cce restarted
+[I 18:36:40.975 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:36:44.070 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:82fcabf8915449b3acb748bc583008ac
+[I 18:38:47.998 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:38:54.504 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:39:26.428 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:e2e4e0a72bc248738480f64a8a432d21
+[I 18:39:26.699 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 18:39:26.706 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:e2e4e0a72bc248738480f64a8a432d21
+[I 18:39:27.734 NotebookApp] Replaying 3 buffered messages
+[I 18:40:48.002 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:45:59.699 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 4aa50906-521b-44c8-997a-aaabcbe91cce restarted
+[I 18:46:05.638 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:e2e4e0a72bc248738480f64a8a432d21
+[I 18:46:39.363 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:47:13.271 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:f58786d145214fe2ab864d429eda1327
+[I 18:47:13.536 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 18:47:13.542 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:f58786d145214fe2ab864d429eda1327
+[I 18:47:14.589 NotebookApp] Replaying 3 buffered messages
+[I 18:48:09.840 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:52:11.080 NotebookApp] Kernel interrupted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 18:52:16.512 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 4aa50906-521b-44c8-997a-aaabcbe91cce restarted
+[I 18:52:19.544 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:f58786d145214fe2ab864d429eda1327
+[I 18:52:42.955 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:53:24.128 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 18:53:31.808 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:8a39b473737e4efb8c91dd2d8d5c8a9e
+[I 18:53:32.063 NotebookApp] Kernel restarted: 4aa50906-521b-44c8-997a-aaabcbe91cce
+[I 18:53:32.070 NotebookApp] Restoring connection for 4aa50906-521b-44c8-997a-aaabcbe91cce:8a39b473737e4efb8c91dd2d8d5c8a9e
+[I 18:53:33.105 NotebookApp] Replaying 3 buffered messages
+[I 18:54:23.310 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 19:06:43.313 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 19:06:53.048 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 4aa50906-521b-44c8-997a-aaabcbe91cce restarted
+[I 19:06:58.883 NotebookApp] Starting buffering for 4aa50906-521b-44c8-997a-aaabcbe91cce:8a39b473737e4efb8c91dd2d8d5c8a9e
+[I 2024-02-15 10:32:38.931 LabApp] JupyterLab extension loaded from C:\Users\pratama\Anaconda3\lib\site-packages\jupyterlab
+[I 2024-02-15 10:32:38.931 LabApp] JupyterLab application directory is C:\Users\pratama\Anaconda3\share\jupyter\lab
+[I 10:32:38.947 NotebookApp] Serving notebooks from local directory: C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\tools\lp_diag
+[I 10:32:38.947 NotebookApp] Jupyter Notebook 6.4.8 is running at:
+[I 10:32:38.947 NotebookApp] http://localhost:8888/?token=ddb795c2a0875a2dd85fa28ba3b0b06b20c970515e5b3970
+[I 10:32:38.947 NotebookApp]  or http://127.0.0.1:8888/?token=ddb795c2a0875a2dd85fa28ba3b0b06b20c970515e5b3970
+[I 10:32:38.947 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 10:32:39.101 NotebookApp] 
+    
+    To access the notebook, open this file in a browser:
+        file:///C:/Users/pratama/AppData/Roaming/jupyter/runtime/nbserver-1176-open.html
+    Or copy and paste one of these URLs:
+        http://localhost:8888/?token=ddb795c2a0875a2dd85fa28ba3b0b06b20c970515e5b3970
+     or http://127.0.0.1:8888/?token=ddb795c2a0875a2dd85fa28ba3b0b06b20c970515e5b3970
+[I 10:42:03.847 NotebookApp] Kernel started: d9d68c56-94c3-431c-87ce-5a5b94bf715a, name: python3
+[I 10:42:08.629 NotebookApp] Starting buffering for d9d68c56-94c3-431c-87ce-5a5b94bf715a:f5eea4b5c15b4e8b8d4b1e5b310f1385
+[I 10:42:08.855 NotebookApp] Kernel restarted: d9d68c56-94c3-431c-87ce-5a5b94bf715a
+[I 10:42:08.863 NotebookApp] Restoring connection for d9d68c56-94c3-431c-87ce-5a5b94bf715a:f5eea4b5c15b4e8b8d4b1e5b310f1385
+[I 10:42:09.887 NotebookApp] Replaying 3 buffered messages
+[I 10:42:57.803 NotebookApp] Kernel started: 589de64a-edb7-4489-95da-e02afee79343, name: python3
+[I 10:43:21.800 NotebookApp] Starting buffering for 589de64a-edb7-4489-95da-e02afee79343:bbc508fb1f9c4b4486747d585b46468c
+[I 10:44:03.809 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:45:14.211 NotebookApp] Starting buffering for 589de64a-edb7-4489-95da-e02afee79343:ef9227ca5c114931b0a85a0fb572b7f6
+[I 10:46:03.810 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:46:54.876 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool.ipynb
+[I 10:46:55.758 NotebookApp] Starting buffering for d9d68c56-94c3-431c-87ce-5a5b94bf715a:f5eea4b5c15b4e8b8d4b1e5b310f1385
+[I 10:47:01.255 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy4.ipynb
+[I 10:47:01.274 NotebookApp] Copying [PROTOTYPE] Matrix Rescale Tool-Copy4.ipynb to 
+[I 10:47:03.139 NotebookApp] Kernel started: 3f2b62f5-4a67-4a70-9c58-ccada69e0f82, name: python3
+[I 10:47:04.277 NotebookApp] Starting buffering for 589de64a-edb7-4489-95da-e02afee79343:cd2364d9e0424e038d64b19f0735f544
+[I 10:47:09.194 NotebookApp] Kernel shutdown: 3f2b62f5-4a67-4a70-9c58-ccada69e0f82
+[I 10:47:09.311 NotebookApp] Kernel shutdown: d9d68c56-94c3-431c-87ce-5a5b94bf715a
+[W 10:47:09.781 NotebookApp] 404 DELETE /api/sessions/057a3387-6433-4d32-aacb-4b2f83aee5ae (::1): Session not found: session_id='057a3387-6433-4d32-aacb-4b2f83aee5ae'
+[W 10:47:09.781 NotebookApp] Session not found: session_id='057a3387-6433-4d32-aacb-4b2f83aee5ae'
+[W 10:47:09.781 NotebookApp] 404 DELETE /api/sessions/057a3387-6433-4d32-aacb-4b2f83aee5ae (::1) 0.920000ms referer=http://localhost:8888/notebooks/%5BPROTOTYPE%5D%20Matrix%20Rescale%20Tool-Copy5.ipynb
+[I 10:47:18.628 NotebookApp] Kernel shutdown: 589de64a-edb7-4489-95da-e02afee79343
+[I 10:47:24.933 NotebookApp] Kernel started: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a, name: python3
+[I 10:47:30.143 NotebookApp] Starting buffering for b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a:42cd742f3b1048508d19346d2839b890
+[I 10:47:30.363 NotebookApp] Kernel restarted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 10:47:30.501 NotebookApp] Restoring connection for b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a:42cd742f3b1048508d19346d2839b890
+[I 10:47:32.530 NotebookApp] Replaying 3 buffered messages
+[I 10:49:25.695 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 10:51:23.291 NotebookApp] Starting buffering for b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a:42cd742f3b1048508d19346d2839b890
+[I 10:51:23.739 NotebookApp] Kernel restarted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 10:51:23.749 NotebookApp] Restoring connection for b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a:42cd742f3b1048508d19346d2839b890
+[I 10:51:25.267 NotebookApp] Replaying 3 buffered messages
+[I 10:53:24.947 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 10:55:24.950 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:03:25.716 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:09:25.707 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:09:58.585 NotebookApp] Starting buffering for b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a:42cd742f3b1048508d19346d2839b890
+[I 11:09:59.024 NotebookApp] Kernel restarted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 11:09:59.034 NotebookApp] Restoring connection for b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a:42cd742f3b1048508d19346d2839b890
+[I 11:10:00.557 NotebookApp] Replaying 3 buffered messages
+[I 11:11:25.711 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:21:24.962 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:23:24.963 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:23:42.631 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 11:25:24.963 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:27:25.700 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:31:25.722 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:32:29.900 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:33:48.763 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:39:24.975 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:43:24.962 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:45:18.736 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:45:41.670 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:45:53.167 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:47:26.276 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:50:46.604 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 11:51:07.352 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 11:53:25.076 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 12:09:19.100 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 12:09:31.963 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 12:09:32.316 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 12:11:25.029 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 12:13:24.981 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 12:17:24.996 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 12:17:27.689 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 12:19:25.862 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb
+[I 12:31:40.127 NotebookApp] Copying [PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb to 
+[W 12:31:40.283 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy5.ipynb is not trusted
+[W 12:31:40.285 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb is not trusted
+[W 12:31:42.716 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb is not trusted
+[I 12:31:43.142 NotebookApp] Kernel started: 6174e01d-98ff-4110-b742-89423036f02d, name: python3
+[I 12:33:42.009 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb
+[W 12:33:42.011 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb is not trusted
+[I 13:21:43.143 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb
+[W 13:21:43.149 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb is not trusted
+[I 13:23:43.549 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb
+[W 13:23:43.597 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb is not trusted
+[I 13:25:43.260 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb
+[W 13:25:43.282 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb is not trusted
+[I 13:26:32.132 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb
+[W 13:26:32.132 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb is not trusted
+[I 13:27:43.103 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb
+[W 13:27:43.106 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb is not trusted
+[I 13:29:43.741 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb
+[W 13:29:43.742 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb is not trusted
+[I 13:31:43.109 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb
+[W 13:31:43.110 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb is not trusted
+[I 13:33:43.375 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb
+[W 13:33:43.410 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb is not trusted
+[I 13:34:15.383 NotebookApp] Saving file at /[PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb
+[W 13:34:15.385 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb is not trusted
+[I 13:35:02.364 NotebookApp] Creating new notebook in 
+[I 13:35:07.707 NotebookApp] Kernel started: 34fb97db-e849-4790-a4a6-da2ebd9315e4, name: python3
+[I 13:35:11.018 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 13:35:11.644 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 13:35:12.011 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 13:35:12.219 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 13:35:12.507 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 13:35:12.779 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 13:35:12.970 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 13:35:13.291 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 13:37:06.848 NotebookApp] Saving file at /Untitled.ipynb
+[I 13:43:12.860 NotebookApp] Starting buffering for 6174e01d-98ff-4110-b742-89423036f02d:be7c5a5fa8c640ca89adb8ef01fceee1
+[W 13:43:22.933 NotebookApp] Notebook [PROTOTYPE] Matrix Rescale Tool-Copy6.ipynb is not trusted
+[I 13:43:28.067 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 13:43:28.132 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 13:43:28.331 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 13:43:28.789 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 13:43:28.793 NotebookApp] Kernel interrupted: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[I 13:43:35.176 NotebookApp] Kernel shutdown: b8edfdb5-a3e1-4f37-acf6-34ca0b6a2f7a
+[W 13:43:40.017 NotebookApp] 404 DELETE /api/sessions/ff27ede1-dce1-40e9-a7a3-b00150ba634c (::1): Session not found: session_id='ff27ede1-dce1-40e9-a7a3-b00150ba634c'
+[W 13:43:40.018 NotebookApp] Session not found: session_id='ff27ede1-dce1-40e9-a7a3-b00150ba634c'
+[W 13:43:40.018 NotebookApp] 404 DELETE /api/sessions/ff27ede1-dce1-40e9-a7a3-b00150ba634c (::1) 2.000000ms referer=http://localhost:8888/tree
+[I 13:45:07.766 NotebookApp] Saving file at /Untitled.ipynb
+[I 13:46:47.249 NotebookApp] Starting buffering for 6174e01d-98ff-4110-b742-89423036f02d:3184662dfb584e21837cd9541f08a27e
+[I 13:46:47.814 NotebookApp] Starting buffering for 34fb97db-e849-4790-a4a6-da2ebd9315e4:aa83cceddffc41648ca5ba0420a85323
+[I 13:46:52.639 NotebookApp] Kernel shutdown: 6174e01d-98ff-4110-b742-89423036f02d
+[I 13:47:00.878 NotebookApp] Kernel shutdown: 34fb97db-e849-4790-a4a6-da2ebd9315e4
