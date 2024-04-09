@@ -10,7 +10,7 @@ import pytest
 
 import message_ix
 from message_ix import Scenario
-from message_ix.testing import SCENARIO, make_dantzig
+from message_ix.testing import SCENARIO, make_dantzig, make_westeros
 
 
 @pytest.fixture
@@ -19,6 +19,95 @@ def dantzig_message_scenario(message_test_mp):
 
 
 class TestScenario:
+    @pytest.mark.parametrize(
+        "set_name, old, new, keep",
+        (
+            ("technology", "coal_ppl", "coal_powerplant", False),
+            ("node", "Westeros", "Essos", False),
+            ("node", "Westeros", "Essos", True),
+            # "year" dimensions: integer instead of string values; model is infeasible
+            # (GAMS error)
+            pytest.param("year", 700, 701, False, marks=pytest.mark.xfail),
+            # Indexed set, doesn't work
+            pytest.param("cat_year", "foo", "bar", False, marks=pytest.mark.xfail),
+            # Name of a parameter, not a set
+            pytest.param(
+                "bound_activity_up",
+                "",
+                "",
+                False,
+                marks=pytest.mark.xfail(raises=KeyError),
+            ),
+            # Not a name of any item
+            pytest.param(
+                "foo", "", "", False, marks=pytest.mark.xfail(raises=KeyError)
+            ),
+        ),
+    )
+    def test_rename0(
+        self, test_mp, set_name: str, old: str, new: str, keep: bool, request
+    ) -> None:
+        # Create a Westeros scenario instance and solve it
+        scen_ref = make_westeros(test_mp, quiet=True, solve=True, request=request)
+
+        # Clone the scenario to do renaming and tests
+        scen = scen_ref.clone(keep_solution=False)
+
+        # Rename members of a message_ix.set from an "old" name to a "new" name
+        scen.check_out()
+        scen.rename(set_name, {old: new}, keep)
+
+        # Check if the new member has been added to that set
+        assert new in set(scen.set(set_name))
+
+        # Check if the scenario solves and the objective function remains the same
+        scen.solve(quiet=True)
+
+        # Check if "old" is removed (keep=False)
+        assert keep == (old in set(scen.set(set_name)))
+
+        # Check if OBJ value remains unchanged when "old" is removed (keep=False); or
+        # twice as high when "old" note is kept (keep=True)
+        exp = scen_ref.var("OBJ")["lvl"] * (1 + int(keep and set_name == "node"))
+        assert exp == scen.var("OBJ")["lvl"]
+
+    @pytest.mark.parametrize("check_out", (True, False))
+    @pytest.mark.parametrize("keep", (True, False))
+    def test_rename1(self, request, dantzig_message_scenario, check_out, keep):
+        scen = dantzig_message_scenario
+        assert scen.par("output")["technology"].isin(["canning_plant"]).any()
+
+        clone = scen.clone(scenario=request.node.name)
+
+        if check_out:
+            clone.check_out()
+
+        clone.rename("technology", {"canning_plant": "foo_bar"}, keep=keep)
+
+        assert keep == clone.par("output")["technology"].isin(["canning_plant"]).any()
+        assert clone.par("output")["technology"].isin(["foo_bar"]).any()
+
+        clone.solve(quiet=True)
+        assert np.isclose(clone.var("OBJ")["lvl"], 153.675)
+
+    def test_rename2(self, dantzig_message_scenario):
+        """Test :meth:`.rename` for parameters with 2+ indexes for the same set."""
+        scen = dantzig_message_scenario
+
+        # Counts of unique combinations of (node_loc, node_dest)
+        vc_pre = scen.par("output")[["node_loc", "node_dest"]].value_counts()
+        assert 1 == vc_pre[("seattle", "new-york")]
+
+        # Rename
+        scen.rename("node", {"seattle": "redmond", "new-york": "brooklyn"})
+
+        # Same number of unique combinations
+        vc_post = scen.par("output")[["node_loc", "node_dest"]].value_counts()
+        assert len(vc_pre) == len(vc_post)
+
+        # Values are renamed when appearing in either of the sets indexed by `node`
+        assert 1 == vc_post[("redmond", "brooklyn")]
+
     def test_solve(self, dantzig_message_scenario):
         s = dantzig_message_scenario
 
@@ -454,45 +543,20 @@ def test_new_timeseries_long_name64plus(message_test_mp):
     scen.commit("importing a testing timeseries")
 
 
-def test_rename_technology(dantzig_message_scenario):
-    scen = dantzig_message_scenario
-    assert scen.par("output")["technology"].isin(["canning_plant"]).any()
-
-    clone = scen.clone("foo", "bar")
-    clone.rename("technology", {"canning_plant": "foo_bar"})
-    assert not clone.par("output")["technology"].isin(["canning_plant"]).any()
-    assert clone.par("output")["technology"].isin(["foo_bar"]).any()
-    clone.solve(quiet=True)
-    assert np.isclose(clone.var("OBJ")["lvl"], 153.675)
-
-
-def test_rename_technology_no_rm(dantzig_message_scenario):
-    scen = dantzig_message_scenario
-    assert scen.par("output")["technology"].isin(["canning_plant"]).any()
-
-    clone = scen.clone("foo", "bar")
-    # also test if already checked out
-    clone.check_out()
-
-    clone.rename("technology", {"canning_plant": "foo_bar"}, keep=True)
-    assert clone.par("output")["technology"].isin(["canning_plant"]).any()
-    assert clone.par("output")["technology"].isin(["foo_bar"]).any()
-
-
-def test_excel_read_write(message_test_mp, tmp_path):
+def test_excel_read_write(message_test_mp, tmp_path, request):
     # Path to temporary file
-    tmp_path /= "excel_read_write.xlsx"
+    tmp_path /= request.node.name + "_excel_read_write.xlsx"
     # Convert to string to ensure this can be handled
     fname = str(tmp_path)
 
     scen1 = Scenario(message_test_mp, **SCENARIO["dantzig"])
-    scen1 = scen1.clone(keep_solution=False)
-    scen1.check_out()
-    scen1.init_set("new_set")
-    scen1.add_set("new_set", "member")
-    scen1.init_par("new_par", idx_sets=["new_set"])
-    scen1.add_par("new_par", "member", 2, "-")
-    scen1.commit("new set and parameter added.")
+    scen1 = make_dantzig(mp=message_test_mp, request=request)
+    scen1 = scen1.clone(scenario=request.node.name + "_clone", keep_solution=False)
+    with scen1.transact(message="new set and parameter added."):
+        scen1.init_set("new_set")
+        scen1.add_set("new_set", "member")
+        scen1.init_par("new_par", idx_sets=["new_set"])
+        scen1.add_par("new_par", "member", 2, "-")
 
     # Writing to Excel without solving
     scen1.to_excel(fname)

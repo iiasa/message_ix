@@ -8,6 +8,7 @@ In these tests, "demand" is defined in different time slices with different
 fuel from a supply technology ("gas_supply"). Different temporal level hierarchies are
 tested, by linkages of "ACT" with "demand" and "CAP".
 """
+
 import pytest
 
 from message_ix import ModelError, Scenario
@@ -41,9 +42,7 @@ def check_solution(scen: Scenario) -> None:
         act.loc[
             (act["time"] == h) & (act["technology"] == "gas_ppl"),
             "capacity-corrected",
-        ] = (
-            act["lvl"] / scen.par("duration_time", {"time": h}).at[0, "value"]
-        )
+        ] = act["lvl"] / scen.par("duration_time", {"time": h}).at[0, "value"]
     assert (
         max(act.loc[act["technology"] == "gas_ppl", "capacity-corrected"])
         == scen.var("CAP", {"technology": "gas_ppl"}).at[0, "lvl"]

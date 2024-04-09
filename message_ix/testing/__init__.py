@@ -1,16 +1,39 @@
 import io
+import os
 from itertools import product
-from typing import TYPE_CHECKING, List, Optional, Union
+from pathlib import Path
+from typing import TYPE_CHECKING, Generator, List, Optional, Union
 
 import numpy as np
 import pandas as pd
+import pytest
 from ixmp import IAMC_IDX
 
 from message_ix import Scenario, make_df
 
 if TYPE_CHECKING:
-    import pytest
+    import pathlib
 
+
+# Pytest hooks
+
+
+def pytest_report_header(config, start_path):
+    """Add the message_ix import path to the pytest report header."""
+    import message_ix
+
+    return f"message_ix location: {Path(message_ix.__file__).parent}"
+
+
+def pytest_sessionstart():
+    """Use only 2 threads for CPLEX on GitHub Actions runners with 2 CPU cores."""
+    import message_ix.models
+
+    if "GITHUB_ACTIONS" in os.environ:
+        message_ix.models.DEFAULT_CPLEX_OPTIONS["threads"] = 2
+
+
+# Data for testing
 
 SCENARIO = {
     "austria": dict(model="Austrian energy model", scenario="baseline"),
@@ -37,9 +60,11 @@ INP_DF = pd.DataFrame(
     [_ms + ["DantzigLand", "Demand", "cases", 850.0, 900.0, 950.0]],
     columns=IAMC_IDX + [1962, 1963, 1964],
 )
-TS_DF = pd.concat([HIST_DF, INP_DF], sort=False)
-TS_DF.sort_values(by="variable", inplace=True)
-TS_DF.index = range(len(TS_DF.index))
+TS_DF = (
+    pd.concat([HIST_DF, INP_DF], sort=False)
+    .sort_values(by="variable")
+    .reset_index(drop=True)
+)
 
 TS_DF_CLEARED = TS_DF.copy()
 TS_DF_CLEARED.loc[0, 1963] = np.nan
@@ -92,7 +117,7 @@ cfl                  0.0  0.1   10   900
 )
 
 
-# FIXME reduce complexity from 18 to <=14
+# FIXME reduce complexity 18 → ≤13
 def make_austria(mp, solve=False, quiet=True):  # noqa: C901
     """Return an :class:`message_ix.Scenario` for the Austrian energy system.
 
@@ -272,7 +297,14 @@ def make_austria(mp, solve=False, quiet=True):  # noqa: C901
     return scen
 
 
-def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
+def make_dantzig(
+    mp,
+    solve=False,
+    multi_year=False,
+    *,
+    request: Optional["pytest.FixtureRequest"] = None,
+    **solve_opts,
+):
     """Return an :class:`message_ix.Scenario` for Dantzig's canning problem.
 
     Parameters
@@ -290,14 +322,20 @@ def make_dantzig(mp, solve=False, multi_year=False, **solve_opts):
     mp.add_unit("case")
     mp.add_region("DantzigLand", "country")
 
-    # initialize a new (empty) instance of an `ixmp.Scenario`
-    scen = Scenario(
-        mp,
+    # Scenario identifiers
+    args = dict(
         model=SCENARIO["dantzig"]["model"],
-        scenario="multi-year" if multi_year else "standard",
-        annotation="Dantzig's canning problem as a MESSAGE-scheme Scenario",
         version="new",
+        annotation="Dantzig's canning problem as a MESSAGE-scheme Scenario",
     )
+    if request:
+        # Use a distinct scenario name for a particular test
+        args.update(scenario=request.node.name)
+    else:
+        args.update(scenario="multi-year" if multi_year else "standard")
+
+    # Initialize a new (empty) instance of an `ixmp.Scenario`
+    scen = Scenario(mp, **args)
 
     # Sets
     # NB commit() is refused if technology and year are not given
@@ -496,26 +534,30 @@ def make_westeros(
         year=model_horizon,
     )
 
-    gdp_profile = pd.DataFrame({"years": [700, 710, 720], "values": [1.0, 1.5, 1.9]})
-    missing_years = [y for y in model_horizon if y not in set(gdp_profile.years)]
-    if missing_years:
-        gdp_profile = pd.concat(
+    # Base GDP data
+    df_gdp = pd.DataFrame({"years": [700, 710, 720], "values": [1.0, 1.5, 1.9]})
+
+    # Identify periods in `model_horizon` for which no df_gdp data exists
+    # NB this could be done using genno.operator.interpolate
+    y_missing = sorted(set(model_horizon) - set(df_gdp.years.unique()))
+    if y_missing:
+        # Insert NaNs for missing periods, to be interpolated
+        df_gdp = pd.concat(
             [
-                gdp_profile,
-                pd.DataFrame(
-                    {"years": missing_years, "values": [np.nan] * len(missing_years)}
-                ),
+                df_gdp,
+                pd.DataFrame({"years": y_missing, "values": [np.nan] * len(y_missing)}),
             ]
-        )
-        # Interpolate missing years
-        gdp_profile = (
-            gdp_profile.sort_values(by="years")
-            .set_index("years")
-            .interpolate(how="index", limit_direction="both")
-            .reset_index()
-        )
-    gdp_profile = np.array(gdp_profile.set_index("years")["values"])
+        ).sort_values(by="years")
+
+    # - Maybe interpolate missing years
+    # - Convert to series
+    s_gdp_profile = df_gdp.set_index("years").interpolate(
+        how="index", limit_direction="both"
+    )["values"]
+
+    # Base demand value
     demand_per_year = 40 * 12 * 1000 / 8760
+
     scen.add_par(
         "demand",
         make_df(
@@ -523,7 +565,7 @@ def make_westeros(
             **common,
             commodity="light",
             level="useful",
-            value=(demand_per_year * gdp_profile).round(),
+            value=(demand_per_year * s_gdp_profile).round(),
             unit="GWa",
         ),
     )
@@ -781,3 +823,21 @@ def make_subannual(
     scen.solve()
 
     return scen
+
+
+@pytest.fixture(scope="function")
+def tmp_model_dir(tmp_path) -> Generator["pathlib.Path", None, None]:
+    """Temporary directory containing a copy of the MESSAGE model files.
+
+    This may be used, among other purposes, to isolate the writing/reading of
+    :file:`cplex.opt` from other tests.
+
+    See also
+    --------
+    :func:`.copy_model`
+    """
+    from message_ix.util import copy_model
+
+    copy_model(tmp_path, overwrite=False, set_default=False, quiet=True)
+
+    yield tmp_path

@@ -1,4 +1,4 @@
-import os
+import copy
 
 import numpy as np
 import pytest
@@ -10,38 +10,48 @@ from message_ix import Scenario
 from message_ix.testing import SCENARIO, TS_DF, TS_DF_CLEARED, make_dantzig
 
 
-def test_run_clone(tmpdir):
+def test_run_clone(tmpdir, request):
     # this test is designed to cover the full functionality of the GAMS API
     # - initialize a new ixmp platform instance
     # - create a new scenario based on Dantzigs tutorial transport model
     # - solve the model and read back the solution from the output
     # - perform tests on the objective value and the timeseries data
     mp = Platform(driver="hsqldb", path=tmpdir / "db")
-    scen = make_dantzig(mp, solve=True)
+    scen = make_dantzig(mp, solve=True, request=request)
     assert np.isclose(scen.var("OBJ")["lvl"], 153.675)
     assert scen.firstmodelyear == 1963
-    assert_frame_equal(scen.timeseries(iamc=True), TS_DF)
+    expected = TS_DF.copy()
+    assert_frame_equal(
+        scen.timeseries(iamc=True), expected.assign(scenario=request.node.name)
+    )
 
     # cloning with `keep_solution=True` keeps all timeseries and the solution
     # (same behaviour as `ixmp.Scenario`)
-    scen2 = scen.clone(keep_solution=True)
+    scen2 = scen.clone(scenario=request.node.name + "_clone", keep_solution=True)
     assert np.isclose(scen2.var("OBJ")["lvl"], 153.675)
     assert scen2.firstmodelyear == 1963
-    assert_frame_equal(scen2.timeseries(iamc=True), TS_DF)
+    expected = TS_DF.copy()
+    assert_frame_equal(
+        scen2.timeseries(iamc=True),
+        expected.assign(scenario=request.node.name + "_clone"),
+    )
 
     # cloning with `keep_solution=False` drops the solution and only keeps
     # timeseries set as `meta=True` or prior to the first model year
     # (DIFFERENT behaviour from `ixmp.Scenario`)
-    scen3 = scen.clone(keep_solution=False)
+    scen3 = scen.clone(scenario=request.node.name + "_clone_2", keep_solution=False)
     assert np.isnan(scen3.var("OBJ")["lvl"])
     assert scen3.firstmodelyear == 1963
-    assert_frame_equal(scen3.timeseries(iamc=True), TS_DF_CLEARED)
+    expected = TS_DF_CLEARED.copy()
+    assert_frame_equal(
+        scen3.timeseries(iamc=True),
+        expected.assign(scenario=request.node.name + "_clone_2"),
+    )
 
 
-def test_run_remove_solution(test_mp):
+def test_run_remove_solution(test_mp, request):
     # create a new instance of the transport problem and solve it
-    name = "test_run_remove_solution"
-    scen = make_dantzig(test_mp, solve=True, quiet=True).clone(scenario=name)
+    scen = make_dantzig(test_mp, solve=True, quiet=True, request=request)
     assert np.isclose(scen.var("OBJ")["lvl"], 153.675)
 
     # check that re-solving the model will raise an error if a solution exists
@@ -55,21 +65,27 @@ def test_run_remove_solution(test_mp):
     # before first model year (DIFFERENT behaviour from `ixmp.Scenario`)
     scen.remove_solution()
     assert scen.firstmodelyear == 1963
-    assert_frame_equal(scen.timeseries(iamc=True), TS_DF_CLEARED.assign(scenario=name))
+    assert_frame_equal(
+        scen.timeseries(iamc=True), TS_DF_CLEARED.assign(scenario=scen.scenario)
+    )
 
 
-def test_shift_first_model_year(test_mp):
-    scen = make_dantzig(test_mp, solve=True, multi_year=True, quiet=True)
+def test_shift_first_model_year(test_mp, request):
+    scen = make_dantzig(
+        test_mp, solve=True, multi_year=True, quiet=True, request=request
+    )
 
     # assert that `historical_activity` is empty in the source scenario
     assert scen.par("historical_activity").empty
 
     # clone and shift first model year
-    clone = scen.clone(shift_first_model_year=1964)
+    clone = scen.clone(
+        scenario=request.node.name + "_multi-year", shift_first_model_year=1964
+    )
 
     exp = TS_DF.copy()
     exp.loc[0, 1964] = np.nan
-    exp["scenario"] = "multi-year"
+    exp["scenario"] = request.node.name + "_multi-year"
 
     # check that solution and timeseries in new model horizon have been removed
     assert np.isnan(clone.var("OBJ")["lvl"])
@@ -87,16 +103,10 @@ def assert_multi_db(mp1, mp2):
     assert_frame_equal(scenario_list(mp1), scenario_list(mp2))
 
 
-@pytest.mark.flaky(
-    reruns=5,
-    rerun_delay=2,
-    condition="GITHUB_ACTIONS" in os.environ,
-    reason="Flaky; see iiasa/message_ix#731",
-)
-def test_multi_db_run(tmpdir):
+def test_multi_db_run(tmpdir, request):
     # create a new instance of the transport problem and solve it
     mp1 = Platform(driver="hsqldb", path=tmpdir / "mp1")
-    scen1 = make_dantzig(mp1, solve=True, quiet=True)
+    scen1 = make_dantzig(mp1, solve=True, quiet=True, request=request)
 
     mp2 = Platform(driver="hsqldb", path=tmpdir / "mp2")
     # add other unit to make sure that the mapping is correct during clone
@@ -109,7 +119,7 @@ def test_multi_db_run(tmpdir):
     pytest.raises(NotImplementedError, scen1.clone, shift_first_model_year=1964, **dest)
 
     # clone solved model across platforms (with default settings)
-    scen1.clone(platform=mp2, keep_solution=True)
+    scen1.clone(platform=mp2, scenario=request.node.name, keep_solution=True)
 
     # close the db to ensure that data and solution of the clone are saved
     mp2.close_db()
@@ -117,7 +127,9 @@ def test_multi_db_run(tmpdir):
 
     # reopen the connection to the second platform and reload scenario
     _mp2 = Platform(driver="hsqldb", path=tmpdir / "mp2")
-    scen2 = Scenario(_mp2, **SCENARIO["dantzig"])
+    to_be_loaded = copy.deepcopy(SCENARIO["dantzig"])
+    to_be_loaded["scenario"] = request.node.name
+    scen2 = Scenario(_mp2, **to_be_loaded)
     assert_multi_db(mp1, _mp2)
 
     # check that sets, variables and parameter were copied correctly
@@ -127,5 +139,8 @@ def test_multi_db_run(tmpdir):
     assert np.isclose(scen2.var("OBJ")["lvl"], 153.675)
     assert_frame_equal(scen1.var("ACT"), scen2.var("ACT"))
 
+    expected = TS_DF.copy()
     # check that custom unit, region and timeseries are migrated correctly
-    assert_frame_equal(scen2.timeseries(iamc=True), TS_DF)
+    assert_frame_equal(
+        scen2.timeseries(iamc=True), expected.assign(scenario=request.node.name)
+    )

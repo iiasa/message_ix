@@ -32,6 +32,7 @@ classifiers = [
 requires-python = ">=3.8"
 dependencies = [
   "click",
+  "importlib_resources; python_version <= '3.8'",
   "ixmp >= 3.8.0",
   "genno[pyam] >= 1.20",
   "numpy",
@@ -47,6 +48,7 @@ documentation = "https://docs.messageix.org"
 
 [project.optional-dependencies]
 docs = [
+  "genno >= 1.26",  # For sphinx extensions; see doc/conf.py
   "GitPython",
   "message_ix[report]",
   "numpydoc",
@@ -80,7 +82,6 @@ exclude_also = [
 
 [tool.coverage.run]
 omit = [
-  "message_ix/model/*",
   "message_ix/tests/test_nightly.py",
   "message_ix/testing/nightly.py",
 ]
@@ -91,12 +92,9 @@ exclude = ["doc/"]
 [[tool.mypy.overrides]]
 # Packages/modules for which no type hints are available.
 module = [
-  "matplotlib.*",
-  "pandas.*",
   "pyam",
   "scipy.*",
   # Indirectly via ixmp; this should be a subset of the list in ixmp's pyproject.toml
-  "dask.*",
   "jpype",
   "memory_profiler",
 ]
@@ -114,17 +112,16 @@ markers = [
   "tutorial: Tests of the tutorial Jupyter notebooks",
 ]
 
-[tool.ruff]
+[tool.ruff.lint]
 select = ["C9", "E", "F", "I", "W"]
-
-[tool.ruff.mccabe]
-# Exceptions:
-# - message_ix/core.py:716:5: C901 'Scenario.rename' is too complex (18)
-# - message_ix/tools/add_year/__init__.py:86:1: C901 'add_year' is too complex (17)
-# - message_ix/tools/add_year/__init__.py:533:1: C901 'interpolate_1d' is too complex (19)
-# - message_ix/tools/add_year/__init__.py:687:1: C901 'interpolate_2d' is too complex (38)
-# - message_ix/testing/__init__.py:91:1: C901 'make_austria' is too complex (18)
-max-complexity = 14
+# FIXME the following exceed this limit
+# - .testing.make_austria(): 18
+# - .tests.test_feature_duration_time.model_generator(): 14
+# - .tools.add_year.add_year_set(): 14
+# - .tools.add_year.add_year(): 17
+# - .tools.add_year.interpolate_1d(): 19
+# - .tools.add_year.interpolate_2d(): 38
+mccabe.max-complexity = 13
 
 [tool.setuptools.packages]
 find = {}

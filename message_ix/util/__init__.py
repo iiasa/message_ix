@@ -1,7 +1,9 @@
 import copy
+import re
 import warnings
 from collections import ChainMap, defaultdict
 from collections.abc import Mapping
+from pathlib import Path
 
 import pandas as pd
 from ixmp.backend import ItemType
@@ -11,12 +13,92 @@ from message_ix.core import Scenario
 from message_ix.models import MACRO, MESSAGE
 
 
-def make_df(name, **data):
-    """Return a data frame for parameter `name` filled with `data`.
+def copy_model(
+    path: Path, overwrite: bool = False, set_default: bool = False, quiet: bool = False
+) -> None:
+    """Copy the MESSAGE GAMS files to a new `path`.
 
-    :func:`make_df` always returns a data frame with the columns required by
-    :meth:`.add_par`: the dimensions of the parameter `name`, plus 'value' and
-    'unit'. Columns not listed in `data` are left empty.
+    Parameters
+    ----------
+    overwrite : bool
+        If :any:`True`, overwrite existing files.
+    set_default : bool
+        If :any:`True`, update the ixmp configuration setting "message model dir".
+    quiet : bool
+        If :any:`False`, print actions to stdout; otherwise display nothing.
+    """
+    try:
+        from importlib.resources import as_file, files
+    except ImportError:  # Python < 3.9
+        from importlib_resources import as_file, files
+
+    from shutil import copyfile
+
+    import ixmp
+
+    path = Path(path).resolve()
+
+    if quiet:
+
+        def output(str):
+            pass
+
+    else:
+        output = print
+
+    # Identify the source directory using importlib.resources
+    for traversable in files("message_ix").iterdir():
+        if traversable.name == "model":
+            # Record the pathlib.Path associated with the Traversible object
+            # NB This may not work if `traversable` is, for instance, in a ZIP archive
+            with as_file(traversable) as f:
+                src_dir: Path = f
+            break
+
+    # Iterate over files in `src_dir`
+    for src in src_dir.rglob("*"):
+        # Skip certain files
+        if src.suffix in (".gdx", ".log", ".lst") or re.search("225[a-z]+", str(src)):
+            continue
+
+        # Construct the destination path
+        dst = path / src.relative_to(src_dir)
+
+        # Create parent directory
+        dst.parent.mkdir(parents=True, exist_ok=True)
+
+        if src.is_dir():
+            # No further action for directories
+            continue
+
+        # Display output
+        if dst.exists():
+            if not overwrite:
+                output(f"{dst} exists, will not overwrite")
+
+                # Skip copyfile() below
+                continue
+            else:
+                output(f"Overwrite {dst}")
+        else:
+            output(f"Copy to {dst}")
+
+        copyfile(src, dst)
+
+    if set_default:
+        ixmp.config.set("message model dir", path)
+        ixmp.config.save()
+
+
+def make_df(name, **data):
+    """Return a data frame for parameter or indexed set `name` filled with `data`.
+
+    :func:`make_df` always returns a data frame with the columns required by either:
+
+    - :meth:`.add_par`: the dimensions of the parameter `name`, plus 'value' and 'unit'.
+    - :meth:`.add_set`: the dimensions of the indexed set `name`.
+
+    Columns not listed in `data` are left empty.
 
     The `data` keyword arguments can be passed in many ways; see the
     :ref:`python:tut-keywordargs` and “Function Examples” sections of the Python
@@ -103,25 +185,20 @@ def make_df(name, **data):
         if `name` is not the name of a MESSAGE or MACRO parameter; if arrays in `data`
         have uneven lengths.
     """
-    # NB could be expanded to handle "mapping sets"
-
     if isinstance(name, (Mapping, pd.Series, pd.DataFrame)):
         return _deprecated_make_df(name, **data)
 
-    # Get parameter information
+    # Get item information
     try:
         info = ChainMap(MESSAGE.items, MACRO.items)[name]
     except KeyError:
         raise ValueError(f"{repr(name)} is not a MESSAGE or MACRO parameter")
 
-    if info.type != ItemType.PAR:
-        raise ValueError(f"{repr(name)} is {info.type}, not a parameter")
-
     # Index names, if not given explicitly, are the same as the index sets
     dims = info.dims or info.coords
 
     # Columns for the resulting data frame
-    columns = list(dims) + ["value", "unit"]
+    columns = list(dims) + (["value", "unit"] if info.type == ItemType.PAR else [])
 
     # Default values for every column
     data = ChainMap(data, defaultdict(lambda: None))

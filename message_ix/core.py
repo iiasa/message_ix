@@ -1,15 +1,15 @@
 import logging
 import os
-from collections.abc import Mapping
-from functools import lru_cache
-from itertools import chain, product
-from typing import Iterable, List, Optional, Tuple, Union
+from functools import lru_cache, partial
+from itertools import chain, product, zip_longest
+from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union
 from warnings import warn
 
 import ixmp
 import numpy as np
 import pandas as pd
-from ixmp.util import as_str_list
+from ixmp.backend import ItemType
+from ixmp.util import as_str_list, maybe_check_out, maybe_commit
 
 log = logging.getLogger(__name__)
 
@@ -231,6 +231,38 @@ class Scenario(ixmp.Scenario):
                 self._backend("cat_get_elements", name, cat),
             )
         )
+
+    def add_par(
+        self,
+        name: str,
+        key_or_data: Optional[
+            Union[int, str, Sequence[Union[int, str]], Dict, pd.DataFrame]
+        ] = None,
+        value=None,
+        unit: Optional[str] = None,
+        comment: Optional[str] = None,
+    ) -> None:
+        # ixmp.Scenario.add_par() is typed as accepting only str, but this method also
+        # accepts int for "year"-like dimensions. Proxy the call to avoid type check
+        # failures.
+        # TODO Move this upstream, to ixmp
+        super().add_par(name, key_or_data, value, unit, comment)  # type: ignore [arg-type]
+
+    add_par.__doc__ = ixmp.Scenario.add_par.__doc__
+
+    def add_set(
+        self,
+        name: str,
+        key: Union[int, str, Sequence[Union[str, int]], Dict, pd.DataFrame],
+        comment: Union[str, Sequence[str], None] = None,
+    ) -> None:
+        # ixmp.Scenario.add_par() is typed as accepting only str, but this method also
+        # accepts int for "year"-like dimensions. Proxy the call to avoid type check
+        # failures.
+        # TODO Move this upstream, to ixmp
+        super().add_set(name, key, comment)  # type: ignore [arg-type]
+
+    add_set.__doc__ = ixmp.Scenario.add_set.__doc__
 
     def add_spatial_sets(self, data):
         """Add sets related to spatial dimensions of the model.
@@ -725,56 +757,83 @@ class Scenario(ixmp.Scenario):
         calibrate(clone, check_convergence=check_convergence, **kwargs)
         return clone
 
-    # FIXME reduce complexity from 18 to <=14
-    def rename(self, name, mapping, keep=False):  # noqa: C901
-        """Rename an element in a set
+    def rename(self, name: str, mapping: Mapping[str, str], keep: bool = False) -> None:
+        """Rename elements in the set `name` and transform data indexed by old name(s).
+
+        - All new set element names per `mapping` are added to the set `name`, if not
+          already present.
+        - Data in all sets and parameters indexed by the set `name` is also either
+          duplicated (if :py:`keep=True`) or replaced (if :py:`keep=False`) with mapped
+          keys.
 
         Parameters
         ----------
         name : str
-            name of the set to change (e.g., 'technology')
-        mapping : str
-            mapping of old (current) to new set element names
-        keep : bool, optional, default: False
-            keep the old values in the model
+            Name of the set to change, for instance :py:`"technology"`. Note that
+            renaming the "year" set may require further adjustments for a feasible
+            scenario.
+        mapping : dict
+            Mapping from old/current to new set element names.
+        keep : bool, optional
+            If :any:`False` (the default), old/current set element names are removed
+            entirely from the Scenario.
+            If :any:`True`, old/current set elements *and* all parameter data indexed by
+            them is retained.
+
+        Raises
+        ------
+        KeyError
+            if `name` is the name of a different kind of item (for instance, a
+            parameter) or of no known item.
+        ValueError
+            if `name` is a set indexed by 1 or more others.
         """
-        try:
-            self.check_out()
-            commit = True
-        except RuntimeError:
-            commit = False
-        keys = list(mapping.keys())
+        commit = maybe_check_out(self)
 
-        # search for from_tech in sets and replace
-        for item in self.set_list():
-            ix_set = self.set(item)
-            if isinstance(ix_set, pd.DataFrame):
-                if name in ix_set.columns and not ix_set.empty:
-                    for key, value in mapping.items():
-                        df = ix_set[ix_set[name] == key]
-                        if not df.empty:
-                            df[name] = value
-                            self.add_set(item, df)
-            elif ix_set.isin(keys).any():  # ix_set is pd.Series
-                for key, value in mapping.items():
-                    if ix_set.isin([key]).any():
-                        self.add_set(item, value)
+        # Add the new value(s) to the set itself
+        self.add_set(name, self.set(name).replace(mapping))
 
-        # search for from_tech in pars and replace
-        for item in self.par_list():
-            if name not in self.idx_names(item):
-                continue
-            for key, value in mapping.items():
-                df = self.par(item, filters={name: [key]})
-                if not df.empty:
-                    df[name] = value
-                    self.add_par(item, df)
+        # - Iterate over tuples of (item_name, ix_type); only those indexed by `name`.
+        # - First all sets indexed sets; then all parameters.
+        items = partial(self.items, indexed_by=name, par_data=False)
+        for item_name, ix_type in chain(
+            zip_longest(items(ItemType.SET), [], fillvalue="set"),
+            zip_longest(items(ItemType.PAR), [], fillvalue="par"),
+        ):
+            # Identify some index names of this set; only those where the corresponding
+            # index set is `name`
+            names = [
+                n
+                for (s, n) in zip(self.idx_sets(item_name), self.idx_names(item_name))
+                if s == name
+            ]
 
-        # this removes all instances of from_tech in the model
+            # Scenario methods to retrieve and add data
+            f_retrieve = getattr(self, ix_type)  # .par() or .set()
+            f_add = getattr(self, f"add_{ix_type}")  # .add_par() or .add_set()
+
+            # Replacements:
+            # - First level keys: column names (=index names).
+            # - Second-level keys and values: `mapping`, the replacement(s) to be made.
+            to_replace = {n: mapping for n in names}
+
+            # - Call f_retrieve once for each dimension indexed by `name`; filter
+            #   elements in (only) that dimension for only values to be replaced.
+            # - Concatenate to a single data frame.
+            # - Perform replacement.
+            renamed = pd.concat(
+                [f_retrieve(item_name, filters={n: mapping}) for n in names]
+            ).replace(to_replace)
+
+            if not len(renamed):
+                continue  # Nothing modified
+
+            # Update
+            log.info(f"{len(renamed)} values/elements in {ix_type} {item_name!r}")
+            f_add(item_name, renamed)
+
         if not keep:
-            for key in keys:
-                self.remove_set(name, key)
+            # Remove all instances of the original elements from the scenario
+            self.remove_set(name, list(mapping.keys()))
 
-        # commit
-        if commit:
-            self.commit("Renamed {} using mapping {}".format(name, mapping))
+        maybe_commit(self, commit, f"Rename {name!r} using mapping {mapping}")

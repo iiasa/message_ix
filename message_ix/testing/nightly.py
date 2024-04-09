@@ -64,12 +64,15 @@ def iter_scenarios():
         )
 
     for id, data in scenarios.items():
-        yield id, (
-            data["model"],
-            data["scenario"],
-            data["solve"],
-            data.get("solve_options", {}),
-            data["cases"],
+        yield (
+            id,
+            (
+                data["model"],
+                data["scenario"],
+                data["solve"],
+                data.get("solve_options", {}),
+                data["cases"],
+            ),
         )
 
 

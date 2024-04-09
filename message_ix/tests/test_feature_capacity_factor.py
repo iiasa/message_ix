@@ -1,4 +1,5 @@
 """Test ``capacity_factor`` effects, mainly for models with sub-annual resolution."""
+
 import pytest
 
 from message_ix import ModelError, Scenario

@@ -10,19 +10,20 @@ repos:
     language: python
     entry: bash -c ". ${PRE_COMMIT_MYPY_VENV:-/dev/null}/bin/activate 2>/dev/null; mypy $0 $@"
     additional_dependencies:
-    - mypy
+    - mypy >= 1.9.0
     - asyncssh
     - git+https://github.com/iiasa/ixmp.git@main
+    - importlib_resources
+    - matplotlib
+    - pandas-stubs
     - pytest
     - Sphinx
     - types-PyYAML
     - types-requests
     args: ["."]
-- repo: https://github.com/psf/black
-  rev: 23.7.0
-  hooks:
-  - id: black
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.0.287
+  rev: v0.3.4
   hooks:
   - id: ruff
+  - id: ruff-format
+    args: [ --check ]
