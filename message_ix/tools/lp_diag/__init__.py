@@ -226,6 +226,34 @@ class LPdiag:
         )
         print(f"Distribution of the GF (objective) values:\n{df.describe()}")
 
+    def read_matrix(self):
+        # check, if there was at least one N row
+        # (the first N row assumed to be the objective):
+        assert self.gf_seq != -1, "objective (goal function) row is undefined."
+
+        # create a df with the matrix coefficients
+        self.mat = pd.DataFrame(
+            {"row": self.mat_row, "col": self.mat_col, "val": self.mat_val}
+        )
+        self.mat["abs_val"] = abs(
+            self.mat["val"]
+        )  # add column with absolute values of coeff.
+        self.mat["log"] = np.log10(self.mat["abs_val"]).astype(
+            int
+        )  # add col with int(log10(coeffs))
+
+        # recreate all matrix dataframe for rescaler
+        row_name = pd.DataFrame(self.seq_row).transpose()[0].to_dict()
+        col_name = pd.DataFrame(self.seq_col).transpose()[0].to_dict()
+        matrix = self.mat.copy()
+        matrix = (
+            matrix.set_index(["row", "col"], drop=True)[["val"]]
+            .rename(index=row_name, level="row")
+            .rename(index=col_name, level="col")
+        )
+
+        return matrix
+
     def add_row(self, words: List[str], n_line: int):
         """Process current line of the ROWS section.
 

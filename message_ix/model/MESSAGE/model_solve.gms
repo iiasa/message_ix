@@ -30,6 +30,7 @@ if (%foresight% = 0,
 * write a status update to the log file, solve the model
     put_utility 'log' /'+++ Solve the perfect-foresight version of MESSAGEix +++ ' ;
     option threads = 4 ;
+    MESSAGE_LP.scaleopt = 1 ;
     Solve MESSAGE_LP using LP minimizing OBJ ;
 
 * write model status summary

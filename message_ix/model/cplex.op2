@@ -2,4 +2,5 @@ advind = 0
 lpmethod = 4
 threads = 4
 epopt = 1e-06
+writemps = C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\tools\make_prescaler\Westeros Electrified_emission_bound_scaled.mps
 barcrossalg = 2

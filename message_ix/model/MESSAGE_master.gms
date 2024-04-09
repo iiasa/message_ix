@@ -46,7 +46,7 @@ $ONGLOBAL
 
 ** scenario/case selection - this must match the name of the MsgData_<%%%>.gdx input data file **
 *$SETGLOBAL data "<your datafile name here>"
-$SETGLOBAL data "mps_test_baseline"
+$SETGLOBAL data "Westeros_Electrified_emission_bound_scaled"
 
 ** MACRO mode
 * "none": MESSAGEix is run in stand-alone mode
