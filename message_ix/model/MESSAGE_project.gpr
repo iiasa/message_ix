@@ -738,29 +738,30 @@ PlaneRownr=-1
 [RP:MODEL_LEARNINGEOS]
 1=
 
-[RP:MODEL_SOLVE]
-1=
-
 [RP:MESSAGE_MASTER]
 1=
 
+[RP:MODEL_SOLVE]
+1=
+
 [MRUFILES]
-1=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\MESSAGE\model_setup.gms
-2=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\MESSAGE\sets_maps_def.gms
-3=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\MESSAGE/data_load.gms
-4=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\data\MsgData_Westeros_Electrified_baseline.gdx
-5=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\MESSAGE_run.lst
-6=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\output\MsgOutput_Westeros_Electrified_baseline.gdx
-7=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\learningeos.gdx
+1=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\MESSAGE_run.lst
+2=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\MESSAGE\model_setup.gms
+3=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\MESSAGE\sets_maps_def.gms
+4=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\MESSAGE/data_load.gms
+5=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\data\MsgData_Westeros_Electrified_baseline.gdx
+6=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\MESSAGE_run.lst
+7=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\output\MsgOutput_Westeros_Electrified_baseline.gdx
+8=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\learningeos.gdx
 
 [OPENWINDOW_1]
-FILE0=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\MESSAGE\model_core.gms
-FILE1=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\MESSAGE\model_learningeos.gms
-FILE2=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\MESSAGE\model_solve.gms
-FILE3=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\MESSAGE_master.gms
-FILE4=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\MESSAGE_master.lst
-FILE5=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\model_solve.lst
-FILE6=C:\Users\wiend\Documents\GitHub\message_ix\message_ix\model\MESSAGE_master.gms
+FILE0=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\MESSAGE\model_solve.gms
+FILE1=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\MESSAGE_master.gms
+FILE2=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\MESSAGE_master.lst
+FILE3=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\Scale_test.mps
+FILE4=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\tools\make_prescaler\Westeros Electrified_emission_bound_scaled.mps
+FILE5=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\tools\make_prescaler\Westeros Electrified_emission_bound_unscaled.mps
+FILE6=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\MESSAGE_master.gms
 MAXIM=0
 TOP=7
 LEFT=50

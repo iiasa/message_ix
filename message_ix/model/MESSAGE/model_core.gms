@@ -142,7 +142,7 @@ Variables
 * =========================================================================== ======================================================================================================
 *
 * .. warning::
-*    Please be aware that transitioning from one period length to another for consecutive periods may result in false values of :math:`\text{PRICE_EMISSION}`. 
+*    Please be aware that transitioning from one period length to another for consecutive periods may result in false values of :math:`\text{PRICE_EMISSION}`.
 *    Please see `this issue <https://github.com/iiasa/message_ix/issues/723>`_ for further information. We are currently working on a fix.
 ***
 

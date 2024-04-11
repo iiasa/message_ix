@@ -211,6 +211,28 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         optfile.write_text("\n".join(lines))
         log.info(f"Use CPLEX options {self.cplex_opts}")
 
+        """
+        # removing prescaler arguments in options file
+        current_dir = os.getcwd()
+        prescale_args_dir = os.path.join(current_dir, "prescale_args.csv")
+
+        if os.path.exists(prescale_args_dir):
+            prescale_args = pd.read_csv(prescale_args_dir)
+            keys2remove = list(prescale_args["key"])
+
+            for key in keys2remove:
+                del self.cplex_opts[key]
+
+        if "writemps" in self.cplex_opts.keys():
+            del self.cplex_opts["writemps"]
+
+        # for k, v in self.cplex_opts.items():
+        #    print(k, v)
+        
+        print("opt1:", self.cplex_opts)
+        print("opt2:", self.cplex_opts)
+        """
+
         self.cplex_opts.update({"barcrossalg": 2})
         optfile2 = Path(self.model_dir).joinpath("cplex.op2")
         lines2 = ("{} = {}".format(*kv) for kv in self.cplex_opts.items())

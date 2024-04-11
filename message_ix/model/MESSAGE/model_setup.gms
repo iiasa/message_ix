@@ -21,6 +21,11 @@ $IF NOT SET out      $SETGLOBAL out "output/MsgOutput.gdx"
 * rolling horizon (period-by-period, recursive-dynamic with limited foresight - 'number of years of foresight'
 $IF NOT SET foresight   $SETGLOBAL foresight "0"
 
+
+*$IF NOT SET scaler
+$SETGLOBAL scaler "MsgPrescaler_Westeros Electrified_emission_bound_unscaled"
+
+
 ** define learning mode (active / inactive) **
 * deactivate - 0 (assumed as default if not specified)
 * activate - 1
@@ -89,4 +94,9 @@ $INCLUDE MESSAGE/scaling_investment_costs.gms
 *----------------------------------------------------------------------------------------------------------------------*
 
 $INCLUDE MESSAGE/model_core.gms
+
+*$OFFLISTING
+$INCLUDE prescaler/%scaler%.gms
+*$ONLISTING
+
 $INCLUDE MESSAGE/model_learningeos.gms
