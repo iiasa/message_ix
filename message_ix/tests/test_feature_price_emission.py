@@ -1,5 +1,4 @@
 import numpy.testing as npt
-import pandas as pd
 import pytest
 
 from message_ix import Scenario, make_df
@@ -24,7 +23,6 @@ def model_setup(scen, years, simple_tecs=True):
     scen.add_set("level", "level")
     scen.add_set("year", years)
     scen.add_cat("year", "firstmodelyear", years[0])
-
     scen.add_set("mode", "mode")
 
     scen.add_set("emission", "CO2")
@@ -105,13 +103,6 @@ def add_many_tecs(scen, years, n=50):
 
     # Add some hardcoded tecs for temporary testing
     # tec: [emission_factor, var_cost, bound_activity_up]
-    # tecs = {
-    #     "tec1": [10, 5, 1],
-    #     "tec2": [-1, 10, 0.4],
-    #     "tec3": [-5, 200, 0.3],
-    #     "tec4": [-15, 1200, 0.2],
-    #     "tec5": [-50, 6000, 0.1],
-    # }
     tecs = {
         "tec1": [10, 5, 1],
         "tec2": [-10, 10, 0.4],
@@ -119,22 +110,11 @@ def add_many_tecs(scen, years, n=50):
         "tec4": [-14, 30, 0.2],
         "tec5": [-16, 40, 0.1],
     }
-    # This is the original and we want to convert back to it after testing:
-    # for i in range(1, n + 1):
-    #     t = f"tec{i}"
-    # -----------------
+
     for t in tecs:
         scen.add_set("technology", t)
         for y in years:
             tec_specs = ["node", t, y, y, "mode"]
-            # This is the original, convert back after testing:
-            # # variable costs grow quadratically over technologies
-            # # to get rid of the curse of linearity
-            # c = (10 * i / n) ** 2 * (1.045) ** (y - years[0])
-            # e = 1 - i / n
-            # scen.add_par("var_cost", tec_specs + ["year"], c, "USD/GWa")
-            # scen.add_par("emission_factor", tec_specs + ["co2"], e, "tCO2")
-            # -------------
             scen.add_par("output", tec_specs + output_specs, 1, "GWa")
 
             scen.add_par("var_cost", tec_specs + ["year"], tecs[t][1], "USD/GWa")
@@ -142,26 +122,6 @@ def add_many_tecs(scen, years, n=50):
             scen.add_par(
                 "bound_activity_up", ["node", t, y, "mode", "year"], tecs[t][2], "GWa"
             )
-
-        # scen.add_set("type_addon", "mitigation")
-        # scen.add_set("map_tec_addon", ["tec1", "mitigation"])
-        # if t != "tec1":
-        #     scen.add_set("addon", t)
-        #     scen.add_cat("addon", "mitigation", t)
-        # df = pd.DataFrame(
-        #     {
-        #         "node": "node",
-        #         "technology": "tec1",
-        #         "year_vtg": years,
-        #         "year_act": years,
-        #         "mode": "mode",
-        #         "time": "year",
-        #         "type_addon": "mitigation",
-        #         "value": 1,
-        #         "unit": "-",
-        #     }
-        # )
-        # scen.add_par("addon_conversion", df)
 
 
 def test_no_constraint(test_mp, request):
@@ -285,19 +245,19 @@ def test_custom_type_variable_periodlength(test_mp, request):
 
     npt.assert_allclose(obs, exp)
 
+
 @pytest.mark.parametrize(
     "cumulative_bound, years, tag",
     (
         (0.25, [2020, 2030, 2040, 2050], "0.25_equal"),
         (0.25, [2020, 2025, 2030, 2040, 2050], "0.25_varying"),
-        (0.50, [2020, 2030, 2040, 2050], "0.5_equal")
-        (0.50, [2020, 2025, 2030, 2040, 2050], "0.5_varying")
-        (0.75, [2020, 2030, 2040, 2050], "0.75_equal")
+        (0.50, [2020, 2030, 2040, 2050], "0.5_equal"),
+        (0.50, [2020, 2025, 2030, 2040, 2050], "0.5_varying"),
+        (0.75, [2020, 2030, 2040, 2050], "0.75_equal"),
         (0.75, [2020, 2025, 2030, 2040, 2050], "0.75_varying"),
-        )
-    )
+    ),
+)
 def test_price_duality(test_mp, request, cumulative_bound, years, tag):
-    
     # set up a scenario for cumulative constraints
     scen = Scenario(test_mp, MODEL, "cum_many_tecs_" + tag, version="new")
     model_setup(scen, years, simple_tecs=False)
@@ -306,7 +266,7 @@ def test_price_duality(test_mp, request, cumulative_bound, years, tag):
         "bound_emission",
         ["World", "ghg", "all", "cumulative"],
         cumulative_bound,
-        "tCO2"
+        "tCO2",
     )
     scen.commit("initialize test scenario")
     scen.solve(quiet=True)
@@ -315,10 +275,7 @@ def test_price_duality(test_mp, request, cumulative_bound, years, tag):
     # Run scenario with `tax_emission` based on `PRICE_EMISSION`
     # from cumulative constraint scenario.
     # ----------------------------------------------------------
-
-    tax_scen = Scenario(
-        test_mp, MODEL, scenario="tax_many_tecs_" + tag, version="new"
-    )
+    tax_scen = Scenario(test_mp, MODEL, scenario="tax_many_tecs_" + tag, version="new")
     model_setup(tax_scen, years, simple_tecs=False)
     for y in years:
         tax_scen.add_cat("year", y, y)
@@ -350,9 +307,7 @@ def test_price_duality(test_mp, request, cumulative_bound, years, tag):
     # from cumulative constraint scenario.
     # --------------------------------------------------------
 
-    perbnd_scen = Scenario(
-        test_mp, MODEL, "period-bnd_many_tecs_" + tag, version="new"
-        )
+    perbnd_scen = Scenario(test_mp, MODEL, "period-bnd_many_tecs_" + tag, version="new")
     model_setup(perbnd_scen, years, simple_tecs=False)
     for y in years:
         perbnd_scen.add_cat("year", y, y)
