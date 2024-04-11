@@ -243,17 +243,18 @@ def test_custom_type_variable_periodlength(test_mp, request):
 
     npt.assert_allclose(obs, exp)
 
+
 @pytest.mark.parametrize(
     "cumulative_bound, years, tag",
-    (
+    [
         (0.25, [2020, 2030, 2040, 2050], "0.25_equal"),
         (0.25, [2020, 2025, 2030, 2040, 2050], "0.25_varying"),
-        (0.50, [2020, 2030, 2040, 2050], "0.5_equal")
-        (0.50, [2020, 2025, 2030, 2040, 2050], "0.5_varying")
-        (0.75, [2020, 2030, 2040, 2050], "0.75_equal")
+        (0.50, [2020, 2030, 2040, 2050], "0.5_equal"),
+        (0.50, [2020, 2025, 2030, 2040, 2050], "0.5_varying"),
+        (0.75, [2020, 2030, 2040, 2050], "0.75_equal"),
         (0.75, [2020, 2025, 2030, 2040, 2050], "0.75_varying"),
-        )
-    )
+    ],
+)
 def test_price_duality(test_mp, request, cumulative_bound, years, tag):
     # set up a scenario for cumulative constraints
     scen = Scenario(test_mp, MODEL, "cum_many_tecs_" + tag, version="new")
@@ -263,7 +264,7 @@ def test_price_duality(test_mp, request, cumulative_bound, years, tag):
         "bound_emission",
         ["World", "ghg", "all", "cumulative"],
         cumulative_bound,
-        "tCO2"
+        "tCO2",
     )
     scen.commit("initialize test scenario")
     scen.solve(quiet=True)
@@ -272,9 +273,7 @@ def test_price_duality(test_mp, request, cumulative_bound, years, tag):
     # Run scenario with `tax_emission` based on `PRICE_EMISSION`
     # from cumulative constraint scenario.
     # ----------------------------------------------------------
-    tax_scen = Scenario(
-        test_mp, MODEL, scenario="tax_many_tecs_" + tag, version="new"
-    )
+    tax_scen = Scenario(test_mp, MODEL, scenario="tax_many_tecs_" + tag, version="new")
     model_setup(tax_scen, years, simple_tecs=False)
     for y in years:
         tax_scen.add_cat("year", y, y)
@@ -306,9 +305,7 @@ def test_price_duality(test_mp, request, cumulative_bound, years, tag):
     # from cumulative constraint scenario.
     # --------------------------------------------------------
 
-    perbnd_scen = Scenario(
-        test_mp, MODEL, "period-bnd_many_tecs_" + tag, version="new"
-        )
+    perbnd_scen = Scenario(test_mp, MODEL, "period-bnd_many_tecs_" + tag, version="new")
     model_setup(perbnd_scen, years, simple_tecs=False)
     for y in years:
         perbnd_scen.add_cat("year", y, y)
