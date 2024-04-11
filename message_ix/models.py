@@ -408,8 +408,6 @@ par("capacity_factor", "nl t yv ya h")
 par("commodity_stock", "n c l y")
 par("construction_time", "nl t yv")
 par("demand", "n c l y h")
-par("df_year", "y")
-par("df_period", "y")
 par("duration_period", "y")
 par("duration_time", "h")
 par("dynamic_land_lo", "n s y u")
@@ -458,7 +456,6 @@ par("level_cost_activity_soft_lo", "nl t ya h")
 par("level_cost_activity_soft_up", "nl t ya h")
 par("level_cost_new_capacity_soft_lo", "nl t yv")
 par("level_cost_new_capacity_soft_up", "nl t yv")
-par("levelized_cost", "n t y h")
 par("min_utilization_factor", "nl t yv ya")
 par("operation_factor", "nl t yv ya")
 par("output", "nl t yv ya m nd c l h hd")
@@ -561,12 +558,7 @@ var(
 var(
     "PRICE_EMISSION",
     "n type_emission type_tec y",
-    "Emission price (derived from marginals of EMISSION_BOUND constraint)",
-)
-var(
-    "PRICE_EMISSION_NEW",
-    "n type_emission type_tec y",
-    "TEMPORARY test for Emission price fix",
+    "Emission price (derived from marginals of EMISSION_EQUIVALENCE constraint)",
 )
 var(
     "REL",
