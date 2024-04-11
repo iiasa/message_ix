@@ -248,14 +248,14 @@ def test_custom_type_variable_periodlength(test_mp, request):
 
 @pytest.mark.parametrize(
     "cumulative_bound, years, tag",
-    (
+    [
         (0.25, [2020, 2030, 2040, 2050], "0.25_equal"),
         (0.25, [2020, 2025, 2030, 2040, 2050], "0.25_varying"),
         (0.50, [2020, 2030, 2040, 2050], "0.5_equal"),
         (0.50, [2020, 2025, 2030, 2040, 2050], "0.5_varying"),
         (0.75, [2020, 2030, 2040, 2050], "0.75_equal"),
         (0.75, [2020, 2025, 2030, 2040, 2050], "0.75_varying"),
-    ),
+    ],
 )
 def test_price_duality(test_mp, request, cumulative_bound, years, tag):
     # set up a scenario for cumulative constraints
