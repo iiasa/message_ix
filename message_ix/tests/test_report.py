@@ -74,7 +74,7 @@ def test_reporter_from_scenario(message_test_mp):
 
     # message_ix.Reporter pre-populated with additional, derived quantities
     # This is the same value as in test_tutorials.py
-    assert 13724 == len(rep.graph)
+    assert 13739 == len(rep.graph)
 
     # Derived quantities have expected dimensions
     vom_key = rep.full_key("vom")
