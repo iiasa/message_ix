@@ -8,8 +8,10 @@ MODEL = "test_emissions_price"
 
 solve_args = {
     "equ_list": ["EMISSION_EQUIVALENCE"],
-    "par_list": ["df_period", "df_year", "levelized_cost"],
-    "var_list": ["PRICE_EMISSION_NEW"],
+    # "par_list": ["df_period", "df_year", "levelized_cost"],
+    # At the moment, it is not possible to retrieve auxilliary parameters that
+    # are created in GAMS back to ixmp. The default "par_list" is coded in Java
+    # backened, and specifying a list here does not add/modify the default list.
 }
 
 
