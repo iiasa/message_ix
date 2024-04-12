@@ -45,8 +45,7 @@ $ONGLOBAL
 *----------------------------------------------------------------------------------------------------------------------*
 
 ** scenario/case selection - this must match the name of the MsgData_<%%%>.gdx input data file **
-*$SETGLOBAL data "<your datafile name here>"
-$SETGLOBAL data "Westeros_Electrified_emission_bound_unscaled"
+$SETGLOBAL data "<your datafile name here>"
 
 ** MACRO mode
 * "none": MESSAGEix is run in stand-alone mode
@@ -64,8 +63,8 @@ $SETGLOBAL foresight "0"
 * activate technology learning - 1
 $SETGLOBAL learningmode "0"
 
-** for recursive dynamic approach, this is to activate/deactivate technology learning module **
-*$SETGLOBAL scaler ""
+** include scaler commands
+$SETGLOBAL scaler "MsgScaler_Default"
 
 ** add a comment and name extension for model report files (e.g. run-specific info, calibration notes) - optional **
 $SETGLOBAL comment ""

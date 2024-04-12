@@ -79,7 +79,7 @@ def get_lvl_ix(data, lvl):
     return data.index.get_level_values(lvl)
 
 
-def disp_range(data, pretext):
+def show_range(data, pretext):
     """
     To displace coefficient exponents range.
 
@@ -97,7 +97,31 @@ def disp_range(data, pretext):
     )
 
 
-def make_prescaler(path, scen, bounds=4, steps=1, show_range=True):
+def get_scaler_args(scenario_ref=None, model="", scenario=""):
+    """
+    Function to make gams argument for scaling
+
+    """
+    if not scenario_ref:
+        strings = ["MsgScaler", model, scenario]
+    else:
+        strings = ["MsgScaler", scenario_ref.model, scenario_ref.scenario]
+
+    file_name = "_".join(s.replace(" ", "_") for s in strings)
+
+    current_directory = os.getcwd()
+    two_levels_up = os.path.abspath(os.path.join(current_directory, "../.."))
+
+    prescale_args_dir = os.path.join(two_levels_up, f"model/scaler/{file_name}.gms")
+
+    if os.path.exists(prescale_args_dir):
+        return f"--scaler={file_name}"
+    else:
+        print("The referred scenario doesn't have prescaler file!")
+        print("Please use make_prescaler() function to create one")
+
+
+def make_scaler(path, scen, bounds=4, steps=1, display_range=True):
     """
     Process to generate prescale_args in GAMS to improve
     matrix coefficients.
@@ -134,8 +158,8 @@ def make_prescaler(path, scen, bounds=4, steps=1, show_range=True):
 
     matrix = data
 
-    if show_range is True:
-        disp_range(matrix, "\nUnscaled range     ")
+    if display_range is True:
+        show_range(matrix, "\nUnscaled range     ")
 
     scalers = {"row": [], "col": []}
 
@@ -182,18 +206,18 @@ def make_prescaler(path, scen, bounds=4, steps=1, show_range=True):
             # Create new matrix with scaled rows
             matrix = matrix.div(step_scaler) if s == "row" else matrix.mul(step_scaler)
 
-        if show_range is True:
-            disp_range(matrix, f"Scaled range step {counter + 1}")
+        if display_range is True:
+            show_range(matrix, f"Scaled range step {counter + 1}")
 
         # Increment the counter
         counter += 1
 
     # generating prescaler arguments for GAMS
-    prescale_args = {}
+    scaler_dict = {}
     for key, df_scaler in scalers.items():
         df_scaler = df_scaler.loc[df_scaler["val"] != 1]
-        scaler_dict = df_scaler["val"].to_dict()
-        for k, v in scaler_dict.items():
+        df_scaler_dict = df_scaler["val"].to_dict()
+        for k, v in df_scaler_dict.items():
             if k == "_obj":
                 k_ = "_obj.scale"
             elif k == "constobj":
@@ -202,33 +226,31 @@ def make_prescaler(path, scen, bounds=4, steps=1, show_range=True):
                 k_ = k.replace("(", ".scale('")
                 k_ = k_.replace(")", "')")
                 k_ = k_.replace(",", "','")
-            prescale_args.update({k_: v})
+            scaler_dict.update({k_: v})
 
-    prescale_args["MESSAGE_LP.scaleopt"] = 1
+    # add this line to active scaling option
+    scaler_dict["MESSAGE_LP.scaleopt"] = 1
 
-    # prescale_args = {} # activate this for temporary test
+    scaler_df = pd.DataFrame(scaler_dict, index=["val"]).transpose()
+    scaler_df.index = scaler_df.index.rename("key", inplace=False)
 
-    # prescale_args["MESSAGE_LP.OptFile"] = 1
+    scaler_list = []
+    for k, v in scaler_dict.items():
+        scaler_list.append(f"{k}={v};")
+    scaler_args_txt = "\n".join(scaler_list)
 
     current_directory = os.getcwd()
     two_levels_up = os.path.abspath(os.path.join(current_directory, "../.."))
-    # args_name = os.path.join(two_levels_up, "prescale_args.csv")
-    prescale_args_df = pd.DataFrame(prescale_args, index=["val"]).transpose()
-    prescale_args_df.index = prescale_args_df.index.rename("key", inplace=False)
-    # args_df_temp.to_csv(args_name)
-    # print(args_name)
 
-    prescale_args_list = []
-    for k, v in prescale_args.items():
-        prescale_args_list.append(f"{k}={v};")
-    prescale_args_txt = "\n".join(prescale_args_list)
+    scaler_gms_name = [scen.model, scen.scenario]
+    scaler_gms_name = "_".join(s.replace(" ", "_") for s in scaler_gms_name)
 
-    prescale_args_dir = os.path.join(
-        two_levels_up, f"model/prescaler/MsgPrescaler_{scen.model}_{scen.scenario}.gms"
+    scaler_gms_dir = os.path.join(
+        two_levels_up, f"model/scaler/MsgScaler_{scaler_gms_name}.gms"
     )
 
-    with open(prescale_args_dir, "w") as txtfile:
+    with open(scaler_gms_dir, "w") as txtfile:
         # Write some text to the file
-        txtfile.write(prescale_args_txt)
+        txtfile.write(scaler_args_txt)
 
-    return prescale_args_df
+    return scaler_df
