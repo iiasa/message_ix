@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import yaml
+
 from message_ix.models import MESSAGE_ITEMS
 from message_ix.utils import make_df
 
@@ -134,6 +135,7 @@ def generate_df(
                     "year_rel",
                     "node_origin",
                     "node_dest",
+                    "node_rel",
                     "time_origin",
                     "time_dest",
                 ]
@@ -161,7 +163,7 @@ def generate_df(
 
             # assigning values for node and time related indices
             for idx in df.columns:
-                if idx in ["node_origin", "node_dest"]:
+                if idx in ["node_origin", "node_dest", "node_rel"]:
                     df[idx] = df["node_loc"]
                 if idx in ["time_origin", "time_dest"]:
                     df[idx] = df["time"]
@@ -174,50 +176,71 @@ def generate_df(
                     tech_data[tec]
                     .get(name, {})
                     .get("node_loc", {})
-                    .get(df.get("node_loc", {}).get(2), 1)
+                    .get(df.get("node_loc", {}).get(i), 1)
                 )
 
                 # year_vtg factor
                 # _year_vtg = (1+rate)**delta_years
-                _year_vtg = (
-                    (
-                        (
-                            1
-                            + tech_data[tec]
-                            .get(name, {})
-                            .get("year_vtg", {})
-                            .get("rate", 0)
-                        )
-                        ** (df["year_vtg"][i] - tech_data[tech]["year_init"])
+
+                if "year_vtg" in df.columns:
+                    usf_year_vtg = (
+                        tech_data[tec]
+                        .get(name, {})
+                        .get("year_vtg", {})
+                        .get(df["year_vtg"][i], 1)
                     )
-                    if "year_vtg" in df.columns
-                    else 1
-                )
+
+                    exp_year_vtg = df["year_vtg"][i] - tech_data[tech]["year_init"]
+
+                    _year_vtg = (
+                        np.power(
+                            (
+                                1
+                                + tech_data[tec]
+                                .get(name, {})
+                                .get("year_vtg", {})
+                                .get("rate", 0.0)
+                            ),
+                            exp_year_vtg,
+                        )
+                        * usf_year_vtg
+                    )
+                else:
+                    _year_vtg = 1
 
                 # year_act factor
-                # _year_act = (1+rate)**(year_act-year_vtg) if both years present
-                # _year_act = (1+rate)**(year_act-first_active_year) if no year_vtg
-                _year_act = (
-                    (
-                        (
-                            1
-                            + tech_data[tec]
-                            .get(name, {})
-                            .get("year_act", {})
-                            .get("rate", 0)
-                        )
-                        ** (
-                            df["year_act"][i]
-                            - (
-                                df["year_vtg"][i]
-                                if "year_vtg" in df.columns
-                                else tech_data[tech]["year_init"]
-                            )
-                        )
+                # _year_act = ((1+rate)**(year_act-year_vtg))*usf_year_act if both years present
+                # _year_act = ((1+rate)**(year_act-first_active_year))*usf_year_act if no year_vtg
+
+                if "year_act" in df.columns:
+                    usf_year_act = (
+                        tech_data[tec]
+                        .get(name, {})
+                        .get("year_act", {})
+                        .get(df["year_act"][i], 1)
                     )
-                    if "year_act" in df.columns
-                    else 1
-                )
+
+                    exp_year_act = df["year_act"][i] - (
+                        df["year_vtg"][i]
+                        if "year_vtg" in df.columns
+                        else tech_data[tech]["year_init"]
+                    )
+
+                    _year_act = (
+                        np.power(
+                            (
+                                1
+                                + tech_data[tec]
+                                .get(name, {})
+                                .get("year_act", {})
+                                .get("rate", 0)
+                            ),
+                            exp_year_act,
+                        )
+                        * usf_year_act
+                    )
+                else:
+                    _year_act = 1
 
                 # get mode multiplier from model_data
                 _mode = (
@@ -240,7 +263,7 @@ def generate_df(
 
             # index adjusted df
             value = df["value"] * mult
-            value = [round(e, 3) for e in value]
+            value = [e for e in value]
             df["value"] = value
 
             data[tec][name] = df
@@ -280,6 +303,20 @@ def add_tech(scenario, filepath=""):
         the default is in the module's folder
     """
 
+    # check if all required sets already in scenario
+    # TODO: this must not be hardcoded here
+    if "CO2_storage" not in scenario.set("emission"):
+        scenario.add_set("emission", "CO2_storage")
+    if "co2_storage_pot" not in scenario.set("type_emission"):
+        scenario.add_set("type_emission", "co2_storage_pot")
+    if "co2_potential" not in scenario.set("type_tec"):
+        scenario.add_set("type_tec", "co2_potential")
+    if "co2_stor" not in scenario.set("technology"):
+        scenario.add_set("technology", "co2_stor")
+
+    scenario.add_set("cat_emission", ["co2_storage_pot", "CO2_storage"])
+    scenario.add_set("cat_tec", ["co2_potential", "co2_stor"])
+
     # Reading new technology database
     if not filepath:
         module_path = os.path.abspath(__file__)  # get the module path
@@ -308,7 +345,6 @@ def add_tech(scenario, filepath=""):
             tech_data = yaml.safe_load(stream)
 
     # TODO: @ywpratama, bring in the set information here from the YAML file
-
     # Adding parameters by technology and name
     for tec, val in data.items():
         if tec not in set(scenario.set("technology")):
@@ -316,10 +352,13 @@ def add_tech(scenario, filepath=""):
 
         for name in val.keys():
             if tech_data[tec][name]["par_name"] == "relation_activity":
-                if tech_data[tec][name]["relation"][0] not in set(
-                    scenario.set("relation")
-                ):
-                    scenario.add_set("relation", tech_data[tec][name]["relation"][0])
+                for rel in tech_data[tec][name]["relation"]:
+                    if rel not in set(scenario.set("relation")):
+                        scenario.add_set("relation", rel)
+                # if tech_data[tec][name]["relation"][0] not in set(
+                #    scenario.set("relation")
+                # ):
+                #    scenario.add_set("relation", tech_data[tec][name]["relation"][0])
             scenario.add_par(tech_data[tec][name]["par_name"], data[tec][name])
 
     # Adding other requirements
@@ -329,6 +368,45 @@ def add_tech(scenario, filepath=""):
     year_act = [e for e in scenario.set("year") if e >= 2025]
 
     # TODO: @ywpratama, add in the relation_actiavity for emissions in the yaml file
+    # Creating dataframe for CO2_Emission_Global_Total relation
+    # TODO: next verion should be able to check RXX_GLB
+    # according to regional config used by the scenario
+    CO2_global_par = []
+    for reg in node_loc:
+        CO2_global_par.append(
+            make_df(
+                "relation_activity",
+                relation="CO2_Emission_Global_Total",
+                node_rel=f"R{n_nodes}_GLB",
+                year_rel=year_act,
+                node_loc=reg,
+                technology="co2_stor",
+                year_act=year_act,
+                mode="M1",
+                value=-1,
+                unit="-",
+            )
+        )
+    CO2_global_par = pd.concat(CO2_global_par)
+    # relation lower and upper bounds
+    # rel_lower_upper = []
+    # for rel in ["co2_trans", "bco2_trans"]:
+    #    for reg in node_loc:
+    #        rel_lower_upper.append(
+    #            make_df(
+    #                "relation_lower",
+    #                relation=rel,
+    #                node_rel=reg,
+    #                year_rel=year_act,
+    #                value=0,
+    #                unit="-",
+    #            )
+    #        )
+    # rel_lower_upper = pd.concat(rel_lower_upper)
+    # Adding the dataframe to the scenario
+    scenario.add_par("relation_activity", CO2_global_par)
+    # scenario.add_par("relation_lower", rel_lower_upper)
+    # scenario.add_par("relation_upper", rel_lower_upper)
 
 
 def get_values(
