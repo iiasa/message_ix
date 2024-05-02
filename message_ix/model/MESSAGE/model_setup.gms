@@ -21,15 +21,6 @@ $IF NOT SET out      $SETGLOBAL out "output/MsgOutput.gdx"
 * rolling horizon (period-by-period, recursive-dynamic with limited foresight - 'number of years of foresight'
 $IF NOT SET foresight   $SETGLOBAL foresight "0"
 
-
-$IF NOT SET scaler $SETGLOBAL scaler "MsgScaler_Default"
-
-
-** define learning mode (active / inactive) **
-* deactivate - 0 (assumed as default if not specified)
-* activate - 1
-$IF NOT SET learningmode   $SETGLOBAL learningmode "0"
-
 ** specify optional additional calibration output **
 $IF NOT SET calibration $SETGLOBAL calibration ""
 * mark with * to include detailed calibration information in outputs and get an extended GAMS listing (.lst) file
@@ -93,7 +84,4 @@ $INCLUDE MESSAGE/scaling_investment_costs.gms
 *----------------------------------------------------------------------------------------------------------------------*
 
 $INCLUDE MESSAGE/model_core.gms
-
 $INCLUDE scaler/%scaler%.gms
-
-$INCLUDE MESSAGE/model_learningeos.gms

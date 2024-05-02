@@ -103,8 +103,6 @@ Set rating_unrated(rating) ;
 rating_unrated(rating) = yes ;
 rating_unrated('unrated') = no ;
 
-Set newtec(tec) / wind_ppl / ;
-
 *----------------------------------------------------------------------------------------------------------------------*
 * assignment and computation of MESSAGE-specific auxiliary parameters                                                  *
 *----------------------------------------------------------------------------------------------------------------------*
