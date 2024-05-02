@@ -20,6 +20,18 @@ def generate_df(
     scenario,
     filepath="",
 ):
+    """
+    This function generate parameter dataframe, matching the data input
+    in yaml file and parameter's dimension
+
+    Parameters
+    ----------
+    scenario    : message_ix.Scenario()
+        MESSAGEix Scenario where the data will be included
+    filepath    : string, path of the input file
+        the default is in the module's folder
+    """
+
     if not filepath:
         module_path = os.path.abspath(__file__)  # get the module path
         package_path = os.path.dirname(
@@ -68,7 +80,8 @@ def generate_df(
 
         data.update({tech: {name: [] for name in list(par_idx[tech].keys())}})
 
-    # If those are not provided, then this block of code is needed to retrieve them from the data input
+    # If those are not provided, then this block of code
+    # is needed to retrieve them from the data input
     regions = []
     emissions = []
     times = []
@@ -111,7 +124,8 @@ def generate_df(
                 kwargs = {"year_vtg": sorted(set(tech_data[tec]["year_vtg"]))}
             else:
                 kwargs = {"year_act": sorted(set(tech_data[tec]["year_act"]))}
-                # if 'year_rel' is present, the values are assumed from 'year_act' values
+                # if 'year_rel' is present, the values are assumed
+                # from 'year_act' values
                 if "year_rel" in par_idx[tec][name]:
                     kwargs.update({"year_rel": sorted(set(tech_data[tec]["year_act"]))})
 
@@ -209,8 +223,10 @@ def generate_df(
                     _year_vtg = 1
 
                 # year_act factor
-                # _year_act = ((1+rate)**(year_act-year_vtg))*usf_year_act if both years present
-                # _year_act = ((1+rate)**(year_act-first_active_year))*usf_year_act if no year_vtg
+                # _year_act = ((1+rate)**(year_act-year_vtg))*usf_year_act
+                # if both years present
+                # _year_act = ((1+rate)**(year_act-first_active_year))*usf_year_act
+                # if no year_vtg
 
                 if "year_act" in df.columns:
                     usf_year_act = (
@@ -305,17 +321,17 @@ def add_tech(scenario, filepath=""):
 
     # check if all required sets already in scenario
     # TODO: this must not be hardcoded here
-    if "CO2_storage" not in scenario.set("emission"):
-        scenario.add_set("emission", "CO2_storage")
-    if "co2_storage_pot" not in scenario.set("type_emission"):
-        scenario.add_set("type_emission", "co2_storage_pot")
-    if "co2_potential" not in scenario.set("type_tec"):
-        scenario.add_set("type_tec", "co2_potential")
-    if "co2_stor" not in scenario.set("technology"):
-        scenario.add_set("technology", "co2_stor")
+    # if "CO2_storage" not in scenario.set("emission"):
+    #    scenario.add_set("emission", "CO2_storage")
+    # if "co2_storage_pot" not in scenario.set("type_emission"):
+    #    scenario.add_set("type_emission", "co2_storage_pot")
+    # if "co2_potential" not in scenario.set("type_tec"):
+    #    scenario.add_set("type_tec", "co2_potential")
+    # if "co2_stor" not in scenario.set("technology"):
+    #    scenario.add_set("technology", "co2_stor")
 
-    scenario.add_set("cat_emission", ["co2_storage_pot", "CO2_storage"])
-    scenario.add_set("cat_tec", ["co2_potential", "co2_stor"])
+    # scenario.add_set("cat_emission", ["co2_storage_pot", "CO2_storage"])
+    # scenario.add_set("cat_tec", ["co2_potential", "co2_stor"])
 
     # Reading new technology database
     if not filepath:
@@ -361,33 +377,36 @@ def add_tech(scenario, filepath=""):
                 #    scenario.add_set("relation", tech_data[tec][name]["relation"][0])
             scenario.add_par(tech_data[tec][name]["par_name"], data[tec][name])
 
-    # Adding other requirements
-    n_nodes = np.int32(len(scenario.set("node")) - 2)  # excluding 'World' and 'RXX_GLB'
-    reg_exception = ["World", f"R{n_nodes}_GLB"]
-    node_loc = [e for e in scenario.set("node") if e not in reg_exception]
-    year_act = [e for e in scenario.set("year") if e >= 2025]
-
     # TODO: @ywpratama, add in the relation_actiavity for emissions in the yaml file
+    # Specific for daccs setup in the global model,
+    # "CO2_Emission_Global_Total" relation should be added via
+    # yaml file referencing this method below
+
+    # n_nodes = np.int32(len(scenario.set("node")) - 2)
+
+    # excluding 'World' and 'RXX_GLB'
+    # reg_exception = ["World", f"R{n_nodes}_GLB"]
+    # node_loc = [e for e in scenario.set("node") if e not in reg_exception]
+    # year_act = [e for e in scenario.set("year") if e >= 2025]
+
     # Creating dataframe for CO2_Emission_Global_Total relation
-    # TODO: next verion should be able to check RXX_GLB
-    # according to regional config used by the scenario
-    CO2_global_par = []
-    for reg in node_loc:
-        CO2_global_par.append(
-            make_df(
-                "relation_activity",
-                relation="CO2_Emission_Global_Total",
-                node_rel=f"R{n_nodes}_GLB",
-                year_rel=year_act,
-                node_loc=reg,
-                technology="co2_stor",
-                year_act=year_act,
-                mode="M1",
-                value=-1,
-                unit="-",
-            )
-        )
-    CO2_global_par = pd.concat(CO2_global_par)
+    # CO2_global_par = []
+    # for reg in node_loc:
+    #    CO2_global_par.append(
+    #        make_df(
+    #            "relation_activity",
+    #            relation="CO2_Emission_Global_Total",
+    #            node_rel=f"R{n_nodes}_GLB",
+    #            year_rel=year_act,
+    #            node_loc=reg,
+    #            technology="co2_stor",
+    #            year_act=year_act,
+    #            mode="M1",
+    #            value=-1,
+    #            unit="-",
+    #        )
+    #    )
+    # CO2_global_par = pd.concat(CO2_global_par)
     # relation lower and upper bounds
     # rel_lower_upper = []
     # for rel in ["co2_trans", "bco2_trans"]:
@@ -404,7 +423,7 @@ def add_tech(scenario, filepath=""):
     #        )
     # rel_lower_upper = pd.concat(rel_lower_upper)
     # Adding the dataframe to the scenario
-    scenario.add_par("relation_activity", CO2_global_par)
+    # scenario.add_par("relation_activity", CO2_global_par)
     # scenario.add_par("relation_lower", rel_lower_upper)
     # scenario.add_par("relation_upper", rel_lower_upper)
 
