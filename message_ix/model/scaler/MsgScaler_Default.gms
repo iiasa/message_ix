@@ -1,0 +1,1 @@
+* This default prescaler is intentionally left empty

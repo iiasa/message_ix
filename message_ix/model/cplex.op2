@@ -1,0 +1,5 @@
+advind = determined by GAMS Bratio
+lpmethod = 1
+threads = 4
+epopt = 1.0e-06
+barcrossalg = 2

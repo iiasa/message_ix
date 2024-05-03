@@ -167,4 +167,4 @@ COST_NODAL_NET.L(node, year)$(NOT macro_base_period(year)) = (
             AND map_node(node2,node) AND cat_year(type_year,year) ),
         emission_scaling(type_emission,emission) * tax_emission(node2,type_emission,type_tec,type_year)
         * EMISS.L(node,emission,type_tec,year) )
-) ;
+) / 1000 ;
