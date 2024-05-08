@@ -158,13 +158,13 @@ def add_structure(
         scenario.add_set("cat_node", ["economy", n])
 
     # Add sectoral set structure
-    scenario.add_set("sector", s.sector)
+    scenario.add_set("sector", sorted(s.sector))
     scenario.add_set("mapping_macro_sector", mapping_macro_sector)
 
 
 def bconst(
     demand_ref: "DataFrame", gdp0: "Series", price_ref: "DataFrame", rho: "Series"
-) -> "Series":
+) -> "DataFrame":
     """Calculate production function coefficient.
 
     This is the MACRO GAMS parameter ``prfconst``.
@@ -450,7 +450,7 @@ def validate_transform(
         for col in cols:
             if df[col].dropna().empty:
                 raise ValueError(f"Config data for {col!r} is empty")
-        return
+        return pd.Series()
 
     # Validate this parameter and retrieve the index columns/dimensions
     idx = _validate_data(name, df, s)

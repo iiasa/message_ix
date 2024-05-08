@@ -7,6 +7,8 @@ Installation
 Ensure you have first read the :doc:`prerequisites <prereqs>` for understanding and using |MESSAGEix|.
 These include specific points of knowledge that are necessary to understand these instructions and choose among different installation options.
 
+.. _system-dependencies:
+
 Install system dependencies
 ===========================
 
@@ -228,6 +230,8 @@ Next:
 
     $ pytest -m rmessageix
 
+
+.. _common-issues:
 
 Common issues
 =============

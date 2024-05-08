@@ -14,13 +14,15 @@ repos:
     - asyncssh
     - git+https://github.com/iiasa/ixmp.git@main
     - importlib_resources
+    - matplotlib
+    - pandas-stubs
     - pytest
     - Sphinx
     - types-PyYAML
     - types-requests
     args: ["."]
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.3.2
+  rev: v0.3.4
   hooks:
   - id: ruff
   - id: ruff-format

@@ -1,12 +1,15 @@
-from typing import Callable, Optional
+from typing import TYPE_CHECKING, Optional
 
-import pandas as pd
-from genno.compat.pyam import util
+if TYPE_CHECKING:
+    import pandas
 
 
 def collapse_message_cols(
-    df: pd.DataFrame, var: Optional[str] = None, kind: Optional[str] = None, var_cols=[]
-) -> Callable:
+    df: "pandas.DataFrame",
+    var: Optional[str] = None,
+    kind: Optional[str] = None,
+    var_cols=[],
+) -> "pandas.DataFrame":
     """:mod:`genno.compat.pyam` `collapse=...` callback for MESSAGEix quantities.
 
     Wraps :func:`~genno.compat.pyam.util.collapse` with arguments particular to
@@ -27,6 +30,8 @@ def collapse_message_cols(
         - 'emi': 'variable' is ``'<var>|<emission>|<technology>|<mode>'``.
         - Otherwise: 'variable' is ``'<var>|<technology>'``.
     """
+    from genno.compat.pyam import util
+
     columns = dict(variable=[var] if var else [])
 
     if kind == "ene":

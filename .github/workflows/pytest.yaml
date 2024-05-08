@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         os:
-        - macos-latest
+        - macos-13
         - ubuntu-latest
         - windows-latest
         python-version:
@@ -107,7 +107,7 @@ jobs:
     strategy:
       matrix:
         os:
-        - macos-latest
+        - macos-13
         - ubuntu-latest
         - windows-latest
 
@@ -162,11 +162,9 @@ jobs:
       # By default, the below installs ixmp from the main branch. To run against
       # other code, e.g. other branches for open PRs), temporarily edit as
       # appropriate. DO NOT merge such changes to `main`.
-      # plotnine: temporary work around for https://github.com/has2k1/plotnine/pull/751
       run: |
         pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
         pip install .[tests]
-        pip install "plotnine != 0.13.0"
 
     - name: Install R dependencies and tutorial requirements
       run: |
@@ -202,7 +200,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:  # Same as the "Latest version supported by message_ix", above
-        python-version: "3.11"
+        python-version: "3.12"
 
     - name: Force recreation of pre-commit virtual environment for mypy
       if: github.event_name == 'schedule'  # Comment this line to run on a PR
