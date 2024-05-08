@@ -1,19 +1,46 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Mar 20 15:41:32 2023
-
-@author: pratama
-"""
-
 import os
+from typing import Any, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import yaml
 
+from message_ix import Scenario
 from message_ix.models import MESSAGE_ITEMS
 from message_ix.utils import make_df
+
+
+def add_missing_commodities_to_scenario(
+    scenario: Scenario, tech_data: dict, par_idx: dict, tec: str, name: str
+) -> None:
+    if tec not in scenario.set("technology"):
+        scenario.add_set("technology", tec)
+
+    if "commodity" in par_idx[tec][name]:
+        commodity = list(tech_data[tec][name]["commodity"].keys())[0]
+        if commodity not in scenario.set("commodity"):
+            scenario.add_set("commodity", commodity)
+
+
+def prepare_kwargs_for_make_df(
+    tech_data: dict, par_idx: dict, tec: str, name: str
+) -> dict[str, Union[Any, list]]:
+    kwargs = {}
+    if all(idx in par_idx[tec][name] for idx in ["year_vtg", "year_act"]):
+        kwargs = {
+            "year_vtg": tech_data[tec]["year_vtg"],
+            "year_act": tech_data[tec]["year_act"],
+        }
+    elif "year_vtg" in par_idx[tec][name]:
+        kwargs = {"year_vtg": sorted(set(tech_data[tec]["year_vtg"]))}
+    else:
+        kwargs = {"year_act": sorted(set(tech_data[tec]["year_act"]))}
+        # if 'year_rel' is present, the values are assumed
+        # from 'year_act' values
+        if "year_rel" in par_idx[tec][name]:
+            kwargs.update({"year_rel": sorted(set(tech_data[tec]["year_act"]))})
+    return kwargs
 
 
 def generate_df(
@@ -40,11 +67,14 @@ def generate_df(
         path = os.path.join(
             package_path, "add_dac/tech_data.yaml"
         )  # join the current working directory with a filename
-        with open(path, "r") as stream:
-            tech_data = yaml.safe_load(stream)
+
     else:
-        with open(filepath, "r") as stream:
-            tech_data = yaml.safe_load(stream)
+        path = filepath
+
+    with open(path, "r") as stream:
+        tech_data = yaml.safe_load(stream)
+
+    assert isinstance(tech_data, dict)
 
     # Set up dictionary of parameter indices list
     par_idx = {}
@@ -106,28 +136,17 @@ def generate_df(
     # Create DataFrame for all parameters
     for tec, val in data.items():
         for name in val.keys():
-            if tec not in scenario.set("technology"):
-                scenario.add_set("technology", tec)
+            add_missing_commodities_to_scenario(
+                scenario=scenario,
+                tech_data=tech_data,
+                par_idx=par_idx,
+                tec=tec,
+                name=name,
+            )
 
-            if "commodity" in par_idx[tec][name]:
-                commodity = list(tech_data[tec][name]["commodity"].keys())[0]
-                if commodity not in scenario.set("commodity"):
-                    scenario.add_set("commodity", commodity)
-
-            kwargs = {}
-            if all(idx in par_idx[tec][name] for idx in ["year_vtg", "year_act"]):
-                kwargs = {
-                    "year_vtg": tech_data[tec]["year_vtg"],
-                    "year_act": tech_data[tec]["year_act"],
-                }
-            elif "year_vtg" in par_idx[tec][name]:
-                kwargs = {"year_vtg": sorted(set(tech_data[tec]["year_vtg"]))}
-            else:
-                kwargs = {"year_act": sorted(set(tech_data[tec]["year_act"]))}
-                # if 'year_rel' is present, the values are assumed
-                # from 'year_act' values
-                if "year_rel" in par_idx[tec][name]:
-                    kwargs.update({"year_rel": sorted(set(tech_data[tec]["year_act"]))})
+            kwargs = prepare_kwargs_for_make_df(
+                tech_data=tech_data, par_idx=par_idx, tec=tec, name=name
+            )
 
             df = make_df(
                 tech_data[tec][name]["par_name"],
@@ -179,7 +198,7 @@ def generate_df(
             for idx in df.columns:
                 if idx in ["node_origin", "node_dest", "node_rel"]:
                     df[idx] = df["node_loc"]
-                if idx in ["time_origin", "time_dest"]:
+                elif idx in ["time_origin", "time_dest"]:
                     df[idx] = df["time"]
 
             # Calculate values of row-by-row multipliers
