@@ -3,19 +3,19 @@ from contextlib import contextmanager
 from functools import partial
 
 from message_ix import Scenario
-from message_ix.report import Key, Reporter, computations
+from message_ix.report import Key, Reporter, operator
 
 log = logging.getLogger(__name__)
 
 PLOTS = [
-    ("activity", computations.stacked_bar, "out:nl-t-ya", "GWa"),
-    ("capacity", computations.stacked_bar, "CAP:nl-t-ya", "GW"),
-    ("cdr capacity", computations.stacked_bar, "CAP:nl-t-ya", "tCO2/yr"),
-    ("demand", computations.stacked_bar, "demand:n-c-y", "GWa"),
-    ("emission", computations.stacked_bar, "emi:nl-t-ya", "tCO2"),
-    ("extraction", computations.stacked_bar, "EXT:n-c-g-y", "GW"),
-    ("new capacity", computations.stacked_bar, "CAP_NEW:nl-t-yv", "GWa"),
-    ("prices", computations.stacked_bar, "PRICE_COMMODITY:n-c-y", "¢/kW·h"),
+    ("activity", operator.stacked_bar, "out:nl-t-ya", "GWa"),
+    ("capacity", operator.stacked_bar, "CAP:nl-t-ya", "GW"),
+    ("cdr capacity", operator.stacked_bar, "CAP:nl-t-ya", "tCO2/yr"),
+    ("demand", operator.stacked_bar, "demand:n-c-y", "GWa"),
+    ("emission", operator.stacked_bar, "emi:nl-t-ya", "tCO2"),
+    ("extraction", operator.stacked_bar, "EXT:n-c-g-y", "GW"),
+    ("new capacity", operator.stacked_bar, "CAP_NEW:nl-t-yv", "GWa"),
+    ("prices", operator.stacked_bar, "PRICE_COMMODITY:n-c-y", "¢/kW·h"),
 ]
 
 
@@ -72,7 +72,7 @@ def prepare_plots(rep: Reporter, input_costs="$/GWa") -> None:
         "plot fossil supply curve",
         (
             partial(
-                computations.plot_cumulative,
+                operator.plot_cumulative,
                 labels=("Fossil supply", "Resource volume", "Cost"),
             ),
             "resource_volume:n-g",
