@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import Any, Union
 
 import matplotlib.pyplot as plt
@@ -306,26 +307,14 @@ def generate_df(
     return data
 
 
-def print_df(scenario, filepath=""):
-    if not filepath:
-        module_path = os.path.abspath(__file__)  # get the module path
-        package_path = os.path.dirname(
-            os.path.dirname(module_path)
-        )  # get the package path
-        path = os.path.join(
-            package_path, "add_dac/tech_data.yaml"
-        )  # join the current working directory with a filename
-        data = generate_df(scenario, path)
-        for tec, val in data.items():
-            with pd.ExcelWriter(f"{tec}.xlsx", engine="xlsxwriter", mode="w") as writer:
-                for sheet_name, sheet_data in val.items():
-                    sheet_data.to_excel(writer, sheet_name=sheet_name, index=False)
-    else:
-        data = generate_df(scenario, filepath)
-        for tec, val in data.items():
-            with pd.ExcelWriter(f"{tec}.xlsx", engine="xlsxwriter", mode="w") as writer:
-                for sheet_name, sheet_data in val.items():
-                    sheet_data.to_excel(writer, sheet_name=sheet_name, index=False)
+def print_df(scenario: Scenario, input_path: str, output_dir: Path) -> None:
+    data = generate_df(scenario, input_path)
+    for tec, val in data.items():
+        with pd.ExcelWriter(
+            str(output_dir / f"{tec}.xlsx"), engine="xlsxwriter", mode="w"
+        ) as writer:
+            for sheet_name, sheet_data in val.items():
+                sheet_data.to_excel(writer, sheet_name=sheet_name, index=False)
 
 
 def add_tech(scenario, filepath=""):
