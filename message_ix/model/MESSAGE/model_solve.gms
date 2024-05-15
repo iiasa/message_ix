@@ -53,7 +53,7 @@ if (%foresight% = 0,
         SMAX(emission$( cat_emission(type_emission,emission) ),
                EMISSION_EQUIVALENCE.m(node,emission,type_tec,year) / emission_scaling(type_emission,emission) )
             / df_period(year);
-   PRICE_EMISSION.l(node,type_emission,type_tec,year)$(
+    PRICE_EMISSION.l(node,type_emission,type_tec,year)$(
         ( PRICE_EMISSION.l(node,type_emission,type_tec,year) = eps ) or
         ( PRICE_EMISSION.l(node,type_emission,type_tec,year) = -inf ) ) = 0 ;
 
