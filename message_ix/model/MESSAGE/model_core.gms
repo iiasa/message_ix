@@ -136,7 +136,7 @@ Variables
 * ======================================================================================= =======================================================================================================
 * :math:`\text{DEMAND}_{n,c,l,y,h} \in \mathbb{R}`                                        Demand level (in equilibrium with MACRO integration)
 * :math:`\text{PRICE_COMMODITY}_{n,c,l,y,h} \in \mathbb{R}`                               Commodity price (undiscounted marginals of :ref:`commodity_balance_gt` and :ref:`commodity_balance_lt`)
-* :math:`\text{PRICE_EMISSION}_{n,\widehat{e},\widehat{t},y} \in \mathbb{R}`              Emission price (undiscounted marginals of :ref:`emission_constraint`)
+* :math:`\text{PRICE_EMISSION}_{n,\widehat{e},\widehat{t},y} \in \mathbb{R}`              Emission price (undiscounted marginals of :ref:`emission_equivalence`)
 * :math:`\text{COST_NODAL_NET}_{n,y} \in \mathbb{R}`                                      System costs at the node level net of energy trade revenues/cost
 * :math:`\text{GDP}_{n,y} \in \mathbb{R}`                                                 Gross domestic product (GDP) in market exchange rates for MACRO reporting
 * ======================================================================================= =======================================================================================================
