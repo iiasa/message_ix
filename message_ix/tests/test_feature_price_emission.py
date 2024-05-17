@@ -34,7 +34,6 @@ def add_two_tecs(scen, years):
 
     for y in years:
         # the dirty technology is free (no costs) but has emissions
-        tec_specs = ["node", "dirty_tec", y, y, "mode"]
         scen.add_par(
             "output",
             make_df(
@@ -69,7 +68,6 @@ def add_two_tecs(scen, years):
         )
 
         # the clean technology has variable costs but no emissions
-        tec_specs = ["node", "clean_tec", y, y, "mode"]
         scen.add_par(
             "output",
             make_df(
@@ -88,7 +86,6 @@ def add_two_tecs(scen, years):
                 unit="GWa",
             ),
         )
-        scen.add_par("var_cost", tec_specs + ["year"], 1, "USD/GWa")
         scen.add_par(
             "var_cost",
             make_df(
