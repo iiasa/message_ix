@@ -112,6 +112,9 @@ markers = [
   "tutorial: Tests of the tutorial Jupyter notebooks",
 ]
 
+[tool.ruff]
+extend-include = ["*.ipynb"]
+
 [tool.ruff.lint]
 select = ["C9", "E", "F", "I", "W"]
 # FIXME the following exceed this limit
