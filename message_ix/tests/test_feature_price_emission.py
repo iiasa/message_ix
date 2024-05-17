@@ -1,6 +1,7 @@
 import numpy.testing as npt
 
 from message_ix import Scenario
+from message_ix.util import make_df
 
 MODEL = "test_emissions_price"
 
@@ -30,18 +31,78 @@ def model_setup(scen, years, simple_tecs=True):
 def add_two_tecs(scen, years):
     """add two technologies to the scenario"""
     scen.add_set("technology", ["dirty_tec", "clean_tec"])
-    output_specs = ["node", "comm", "level", "year", "year"]
 
     for y in years:
         # the dirty technology is free (no costs) but has emissions
         tec_specs = ["node", "dirty_tec", y, y, "mode"]
-        scen.add_par("output", tec_specs + output_specs, 1, "GWa")
-        scen.add_par("emission_factor", tec_specs + ["co2"], 1, "tCO2")
+        scen.add_par(
+            "output",
+            make_df(
+                "output",
+                node_loc="node",
+                node_dest="node",
+                technology="dirty_tec",
+                year_vtg=y,
+                year_act=y,
+                mode="mode",
+                commodity="comm",
+                level="level",
+                time="year",
+                time_dest="year",
+                value=1,
+                unit="GWa",
+            ),
+        )
+        scen.add_par(
+            "emission_factor",
+            make_df(
+                "emission_factor",
+                node_loc="node",
+                year_vtg=y,
+                year_act=y,
+                unit="tCO2",
+                technology="dirty_tec",
+                mode="mode",
+                value=1,
+                emission="CO2",
+            ),
+        )
 
         # the clean technology has variable costs but no emissions
         tec_specs = ["node", "clean_tec", y, y, "mode"]
-        scen.add_par("output", tec_specs + output_specs, 1, "GWa")
+        scen.add_par(
+            "output",
+            make_df(
+                "output",
+                node_loc="node",
+                node_dest="node",
+                technology="clean_tec",
+                year_vtg=y,
+                year_act=y,
+                mode="mode",
+                commodity="comm",
+                level="level",
+                time="year",
+                time_dest="year",
+                value=1,
+                unit="GWa",
+            ),
+        )
         scen.add_par("var_cost", tec_specs + ["year"], 1, "USD/GWa")
+        scen.add_par(
+            "var_cost",
+            make_df(
+                "var_cost",
+                node_loc="node",
+                year_vtg=y,
+                year_act=y,
+                mode="mode",
+                time="year",
+                unit="USD/GWa",
+                technology="clean_tec",
+                value=1,
+            ),
+        )
 
 
 def add_many_tecs(scen, years, n=50):
