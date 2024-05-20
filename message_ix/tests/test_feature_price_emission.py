@@ -389,18 +389,22 @@ def test_custom_type_variable_periodlength(test_mp, request):
     npt.assert_allclose(obs, exp)
 
 
+bound = 0.2
+cumulative = False
+years = [2020, 2021, 2022, 2023]
+tag = "yearly_" + str(bound) + "_equal"
 @pytest.mark.parametrize(
-    "cumulative_bound, years",
+    "bound, cumulative, years, tag",
     [
-        (2.5, [2020, 2030, 2040, 2050]),
-        (0.25, [2020, 2025, 2030, 2040, 2050]),
-        (0.50, [2020, 2030, 2040, 2050]),
-        (0.50, [2020, 2025, 2030, 2040, 2050]),
-        (0.75, [2020, 2030, 2040, 2050]),
-        (0.75, [2020, 2025, 2030, 2040, 2050]),
+        (0.25, True, [2020, 2030, 2040, 2050], "0.25_equal"),
+        (0.25, True, [2020, 2025, 2030, 2040, 2050], "0.25_varying"),
+        (0.50, True, [2020, 2030, 2040, 2050], "0.5_equal"),
+        (0.50, True, [2020, 2025, 2030, 2040, 2050], "0.5_varying"),
+        (0.75, True, [2020, 2030, 2040, 2050], "0.75_equal"),
+        (0.75, True, [2020, 2025, 2030, 2040, 2050], "0.75_varying"),
     ],
 )
-def test_price_duality(test_mp, request, cumulative_bound, years):
+def test_price_duality(test_mp, request, bound, cumulative, years, tag):
     # set up a scenario for cumulative constraints
     scen = Scenario(
         test_mp,
@@ -409,13 +413,15 @@ def test_price_duality(test_mp, request, cumulative_bound, years):
         version="new",
     )
     model_setup(scen, years, simple_tecs=False)
-    scen.add_cat("year", "cumulative", years)
-    scen.add_par(
-        "bound_emission",
-        ["World", "GHG", "all", "cumulative"],
-        cumulative_bound,
-        "tCO2",
-    )
+    if cumulative:
+        scen.add_cat("year", "cumulative", years)
+        scen.add_par(
+            "bound_emission", ["World", "ghg", "all", "cumulative"], bound, "tCO2",
+        )
+    else:
+        for y in years:
+            scen.add_cat("year", y, y)
+            scen.add_par("bound_emission", ["World", "ghg", "all", y], bound, "tCO2")
     scen.commit("initialize test scenario")
     scen.solve(quiet=True, **solve_args)
 
