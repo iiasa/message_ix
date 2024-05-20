@@ -310,13 +310,15 @@ def test_price_duality(test_mp, request, cumulative_bound, years, tag):
         version="new",
     )
     model_setup(scen, years, simple_tecs=False)
-    scen.add_cat("year", "cumulative", years)
-    scen.add_par(
-        "bound_emission",
-        ["World", "GHG", "all", "cumulative"],
-        cumulative_bound,
-        "tCO2",
-    )
+    if cumulative:
+        scen.add_cat("year", "cumulative", years)
+        scen.add_par(
+            "bound_emission", ["World", "ghg", "all", "cumulative"], bound, "tCO2",
+        )
+    else:
+        for y in years:
+            scen.add_cat("year", y, y)
+            scen.add_par("bound_emission", ["World", "ghg", "all", y], bound, "tCO2")
     scen.commit("initialize test scenario")
     scen.solve(quiet=True, **solve_args)
 
