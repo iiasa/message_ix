@@ -287,7 +287,9 @@ def extrapolate(
     # Apply fitted_intercept to grouped data
     groupby_cols = set(model_data.columns) - {"year", "value"}
     result = (
-        model_data.groupby(list(groupby_cols)).apply(fitted_intercept).rename("value")
+        model_data.groupby(list(groupby_cols))
+        .apply(fitted_intercept, include_groups=False)
+        .rename("value")
     )
 
     # Convert "commodity" and "level" to "sector"
