@@ -12,7 +12,7 @@
 
 # %% I) Importing required packages
 import logging
-from typing import Literal, Optional, Union
+from typing import List, Literal, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -49,9 +49,9 @@ def intpol(
 
 def slice_df(
     df: pd.DataFrame,
-    idx: list[str],
+    idx: List[str],
     level: str,
-    locator: list,
+    locator: List,
     value: Union[int, str, None],
 ) -> pd.DataFrame:
     """Slice a MultiIndex DataFrame and set a value to a specific level.
@@ -105,13 +105,13 @@ def unit_uniform(df: pd.DataFrame) -> pd.DataFrame:
 def add_year(
     sc_ref: Scenario,
     sc_new: Scenario,
-    years_new: list[int],
+    years_new: List[int],
     firstyear_new: Optional[int] = None,
     lastyear_new: Optional[int] = None,
     macro: bool = False,
     baseyear_macro: Optional[int] = None,
-    parameter: Union[list[str], Literal["all"]] = "all",
-    region: Union[list[str], Literal["all"]] = "all",
+    parameter: Union[List[str], Literal["all"]] = "all",
+    region: Union[List[str], Literal["all"]] = "all",
     rewrite: bool = True,
     unit_check: bool = True,
     extrapol_neg: Optional[float] = None,
@@ -160,7 +160,7 @@ def add_year(
     # -------------------------------------------------------------------------
     # III.B)  Adding parameters and calculating the missing values for the
     # additonal years
-    par_list: list[str]
+    par_list: List[str]
     if parameter in ("all", ["all"]):
         par_list = sorted(sc_ref.par_list())
     elif isinstance(parameter, list):
@@ -174,7 +174,7 @@ def add_year(
     if "technical_lifetime" in par_list:
         par_list.insert(0, par_list.pop(par_list.index("technical_lifetime")))
 
-    reg_list: list[str]
+    reg_list: List[str]
     if region in ("all", ["all"]):
         nodes: pd.Series = sc_ref.set("node")  # type: ignore
         reg_list = nodes.tolist()
@@ -190,8 +190,6 @@ def add_year(
     # scenario)
     par_ignore = ["duration_period"]
     par_list = [x for x in par_list if x not in par_ignore]
-
-    firstyear_ref: Optional[int] = None
 
     if not macro:
         par_macro = [
@@ -217,34 +215,29 @@ def add_year(
         ]
         par_list = [x for x in par_list if x not in par_macro]
 
-        firstyear_new = (
-            sc_new.set("cat_year", {"type_year": "firstmodelyear"})["year"]
-            if not sc_new.set("cat_year", {"type_year": "firstmodelyear"}).empty
-            else min([int(x) for x in sc_new.set("year").tolist()])
-        )  # type: ignore
+    cat_year_new: pd.DataFrame = sc_new.set("cat_year")
+    firstmodelyear_new = cat_year_new.query("type_year == 'firstmodelyear'")
+    firstyr_new: int = (
+        min(cat_year_new["year"])
+        if firstmodelyear_new.empty
+        else firstmodelyear_new["year"]
+    )  # type: ignore
+    # assert isinstance(firstyear_new, int)
 
-        firstyear_ref = (
-            sc_ref.set("cat_year", {"type_year": "firstmodelyear"})["year"]
-            if not sc_ref.set("cat_year", {"type_year": "firstmodelyear"}).empty
-            else firstyear_new
-        )
-
-    if firstyear_new is None:
-        raise ValueError(
-            "Missing 'firstyear_new'; please provide 'firstyear_new' or "
-            "set 'macro' to 'False'!"
-        )
-    elif firstyear_ref is None:
-        raise ValueError("Missing 'firstyear_ref'; please set 'macro' to 'False'!")
+    cat_year_ref: pd.DataFrame = sc_new.set("cat_year")
+    firstmodelyear_ref = cat_year_ref.query("type_year == 'firstmodelyear'")
+    firstyr_ref: int = (
+        min(cat_year_ref["year"]) if firstmodelyear_ref.empty else firstyr_new
+    )
 
     for parname in par_list:
         # For historical parameters extrapolation permitted (e.g., from
         # 2010 to 2015)
         extrapol = (
-            True if "historical" in parname or firstyear_ref > firstyear_new else False
+            True if "historical" in parname or firstyr_ref > firstyr_new else False
         )
         yrs_new = (
-            [x for x in years_new if x < firstyear_new]
+            [x for x in years_new if x < firstyr_new]
             if "historical" in parname
             else years_new
         )
@@ -262,7 +255,7 @@ def add_year(
                     yrs_new,
                     parname,
                     [node],
-                    firstyear_new,
+                    firstyr_new,
                     extrapol,
                     rewrite,
                     unit_check,
@@ -276,7 +269,7 @@ def add_year(
                 yrs_new,
                 parname,
                 reg_list,
-                firstyear_new,
+                firstyr_new,
                 extrapol,
                 rewrite,
                 unit_check,
@@ -294,7 +287,7 @@ def add_year(
 def add_year_set(  # noqa: C901
     sc_ref: Scenario,
     sc_new: Scenario,
-    years_new: list[int],
+    years_new: List[int],
     firstyear_new: Optional[int] = None,
     lastyear_new: Optional[int] = None,
     baseyear_macro: Optional[int] = None,
@@ -343,7 +336,7 @@ def add_year_set(  # noqa: C901
                 baseyear_macro
             )
 
-    yr_pair: list[list[Union[int, str]]] = []
+    yr_pair: List[List[Union[int, str]]] = []
     for yr in years_new:
         yr_pair.append([yr, yr])
         yr_pair.append(["cumulative", yr])
@@ -392,7 +385,7 @@ def add_year_set(  # noqa: C901
     log.info("All the sets updated and added to the new scenario")
 
 
-def next_step_bigger_than_previous(x: list[int], i: int) -> bool:
+def next_step_bigger_than_previous(x: List[int], i: int) -> bool:
     return x[i + 1] - x[i] > x[i] - x[i - 1]
 
 
@@ -400,9 +393,9 @@ def next_step_bigger_than_previous(x: list[int], i: int) -> bool:
 def add_year_par(
     sc_ref: Scenario,
     sc_new: Scenario,
-    yrs_new: list[int],
+    yrs_new: List[int],
     parname: str,
-    reg_list: list[str],
+    reg_list: List[str],
     firstyear_new: int,
     extrapolate: bool = False,
     rewrite: bool = True,
@@ -576,8 +569,8 @@ def add_year_par(
 # FIXME reduce complexity 18 → ≤13
 def interpolate_1d(  # noqa: C901
     df: pd.DataFrame,
-    yrs_new: list[int],
-    horizon: list[int],
+    yrs_new: List[int],
+    horizon: List[int],
     year_col: str,
     value_col: str = "value",
     extrapolate: bool = False,
@@ -732,16 +725,16 @@ def interpolate_1d(  # noqa: C901
 # FIXME reduce complexity 38 → ≤13
 def interpolate_2d(  # noqa: C901
     df: pd.DataFrame,
-    yrs_new: list[int],
-    horizon: list[int],
+    yrs_new: List[int],
+    horizon: List[int],
     year_ref: str,
     year_col: str,
-    tec_list: list[str],
+    tec_list: List[str],
     par_tec: pd.DataFrame,
     value_col: str = "value",
     extrapolate: bool = False,
     extrapol_neg: Optional[float] = None,
-    year_diff: Optional[list[int]] = None,
+    year_diff: Optional[List[int]] = None,
     bound_extend: bool = True,
 ):
     """Interpolate parameters with two dimensions related year.
