@@ -1,10 +1,10 @@
+from typing import List
+
 import numpy.testing as npt
 import pytest
 
-from message_ix import Scenario, make_df
-
 # from message_ix.testing import make_westeros
-from message_ix.util import make_df
+from message_ix import Scenario, make_df
 
 MODEL = "test_emissions_price"
 
@@ -13,7 +13,7 @@ solve_args = {"equ_list": ["EMISSION_EQUIVALENCE"]}
 interest_rate = 0.05
 
 
-def model_setup(scen: Scenario, years: list[int], simple_tecs=True) -> None:
+def model_setup(scen: Scenario, years: List[int], simple_tecs=True) -> None:
     """generate a minimal model to test the behaviour of the emission prices"""
     scen.add_spatial_sets({"country": "node"})
     scen.add_set("commodity", "comm")
@@ -43,70 +43,44 @@ def model_setup(scen: Scenario, years: list[int], simple_tecs=True) -> None:
     add_two_tecs(scen, years) if simple_tecs else add_many_tecs(scen, years)
 
 
-def add_two_tecs(scen: Scenario, years: list[int]) -> None:
+def add_two_tecs(scen: Scenario, years: List[int]) -> None:
     """add two technologies to the scenario"""
     scen.add_set("technology", ["dirty_tec", "clean_tec"])
 
-    for y in years:
-        # the dirty technology is free (no costs) but has emissions
-        tec_specs = ["node", "dirty_tec", y, y, "mode"]
-        scen.add_par("output", tec_specs + output_specs, 1, "GWa")
-        scen.add_par("emission_factor", tec_specs + ["CO2"], 1, "tCO2")
+    common_base = dict(
+        node_loc="node", year_vtg=years, year_act=years, mode="mode", value=1
+    )
+    common_output = dict(
+        node_dest="node",
+        commodity="comm",
+        level="level",
+        time="year",
+        time_dest="year",
+        unit="GWa",
+    )
 
     # the dirty technology is free (no costs) but has emissions
     scen.add_par(
         "output",
-        make_df(
-            "output",
-            node_dest="node",
-            technology="dirty_tec",
-            commodity="comm",
-            level="level",
-            time="year",
-            time_dest="year",
-            unit="GWa",
-            **common,
-        ),
+        make_df("output", technology="dirty_tec", **common_base, **common_output),
     )
     scen.add_par(
         "emission_factor",
-        make_df(
-            "emission_factor",
-            unit="tCO2",
-            technology="dirty_tec",
-            emission="CO2",
-            **common,
-        ),
+        make_df("emission_factor", technology="dirty_tec", emission="CO2", unit="tCO2"),
     )
 
     # the clean technology has variable costs but no emissions
     scen.add_par(
         "output",
-        make_df(
-            "output",
-            node_dest="node",
-            technology="clean_tec",
-            commodity="comm",
-            level="level",
-            time="year",
-            time_dest="year",
-            unit="GWa",
-            **common,
-        ),
+        make_df("output", technology="clean_tec", **common_base, **common_output),
     )
     scen.add_par(
         "var_cost",
-        make_df(
-            "var_cost",
-            time="year",
-            unit="USD/GWa",
-            technology="clean_tec",
-            **common,
-        ),
+        make_df("var_cost", technology="clean_tec", time="year", unit="USD/GWa"),
     )
 
 
-def add_many_tecs(scen: Scenario, years: list[int], n=50) -> None:
+def add_many_tecs(scen: Scenario, years: List[int], n=50) -> None:
     """add a range of dirty-to-clean technologies to the scenario"""
     # Add some hardcoded tecs for temporary testing
     tecs: dict[str, dict] = {
@@ -310,15 +284,26 @@ def test_price_duality(test_mp, request, cumulative_bound, years, tag):
         version="new",
     )
     model_setup(scen, years, simple_tecs=False)
+    bound_emission_base = dict(
+        node="World", type_emission="ghg", type_tec="all", value=bound, unit="tCO2"
+    )
     if cumulative:
         scen.add_cat("year", "cumulative", years)
         scen.add_par(
-            "bound_emission", ["World", "ghg", "all", "cumulative"], bound, "tCO2",
+            "bound_emission",
+            make_df(
+                "bound_emission",
+                type_year="cumulative",
+                **bound_emission_base,
+            ),
         )
     else:
         for y in years:
             scen.add_cat("year", y, y)
-            scen.add_par("bound_emission", ["World", "ghg", "all", y], bound, "tCO2")
+            scen.add_par(
+                "bound_emission",
+                make_df("bound_emission", type_year=y, **bound_emission_base),
+            )
     scen.commit("initialize test scenario")
     scen.solve(quiet=True, **solve_args)
 
