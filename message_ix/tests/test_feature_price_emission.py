@@ -15,8 +15,8 @@ def model_setup(scen, years, simple_tecs=True):
 
     scen.add_set("mode", "mode")
 
-    scen.add_set("emission", "co2")
-    scen.add_cat("emission", "ghg", "co2")
+    scen.add_set("emission", "CO2")
+    scen.add_cat("emission", "ghg", "CO2")
 
     for y in years:
         scen.add_par("interestrate", y, 0.05, "-")
@@ -117,7 +117,7 @@ def add_many_tecs(scen, years, n=50):
             e = 1 - i / n
             scen.add_par("output", tec_specs + output_specs, 1, "GWa")
             scen.add_par("var_cost", tec_specs + ["year"], c, "USD/GWa")
-            scen.add_par("emission_factor", tec_specs + ["co2"], e, "tCO2")
+            scen.add_par("emission_factor", tec_specs + ["CO2"], e, "tCO2")
 
 
 def test_no_constraint(test_mp, request):
