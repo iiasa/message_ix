@@ -4,6 +4,7 @@ Next release
 All changes
 -----------
 
+- Ensure compatibility with pandas upcoming 3.0 Copy-on-Write behaviour (:pull:`842`).
 - Update tutorial Westeros multinode to include code-based hints for in-depth questions (:pull:`798`).
 - :func:`.make_df` can now create partly-filled :class:`DataFrames <pandas.DataFrame>` for indexed sets; not only parameters (:pull:`784`).
 - New function :func:`.util.copy_model` that exposes the behaviour of the :program:`message-ix copy-model` CLI command to other Python code (:pull:`784`).
