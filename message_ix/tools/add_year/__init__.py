@@ -430,16 +430,8 @@ def add_year_par(
         )
         sc_new.commit("New parameter initiated!")
 
-    par_old = (
-        sc_ref.par(parname, {node_col[0]: reg_list})
-        if node_col
-        else sc_ref.par(parname)
-    )
-    par_new = (
-        sc_new.par(parname, {node_col[0]: reg_list})
-        if node_col
-        else sc_new.par(parname)
-    )
+    par_old = sc_ref.par(parname, filters={node_col[0]: reg_list} if node_col else None)
+    par_new = sc_new.par(parname, filters={node_col[0]: reg_list} if node_col else None)
     sort_order = (
         [
             node_col[0],
