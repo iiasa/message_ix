@@ -167,5 +167,7 @@ Releasing
     3. Merge the PR.
     4. Check that the new package version appears on conda-forge. This may take up to several hours.
 
-11. Announce the release(s) on the GitHub Discussions pages and/or on Twitter.
+11. (Only for message_ix) Update ``version`` and ``date-released`` in :file:`CITATION.cff`.
+
+12. Announce the release(s) on the GitHub Discussions pages and/or on Twitter.
     Copy the text from the What's New page of the built documentation.
