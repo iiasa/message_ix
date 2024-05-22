@@ -24,8 +24,12 @@ log = logging.getLogger(__name__)
 
 # %% II) Utility functions for dataframe manupulation
 def intpol(
-    y1: Union[float, pd.Series], y2: Union[float, pd.Series], x1: int, x2: int, x: int
-) -> Union[float, pd.Series]:
+    y1: Union[float, pd.Series, pd.DataFrame],
+    y2: Union[float, pd.Series, pd.DataFrame],
+    x1: int,
+    x2: int,
+    x: int,
+) -> Union[float, pd.Series, pd.DataFrame]:
     """Interpolate between (*x1*, *y1*) and (*x2*, *y2*) at *x*.
 
     Parameters
@@ -156,6 +160,7 @@ def add_year(
     # -------------------------------------------------------------------------
     # III.B)  Adding parameters and calculating the missing values for the
     # additonal years
+    par_list: list[str]
     if parameter in ("all", ["all"]):
         par_list = sorted(sc_ref.par_list())
     elif isinstance(parameter, list):
@@ -164,6 +169,7 @@ def add_year(
         log.warning(
             "Parameters should be defined in a list of strings or as a single string"
         )
+        par_list = []
 
     if "technical_lifetime" in par_list:
         par_list.insert(0, par_list.pop(par_list.index("technical_lifetime")))
@@ -178,12 +184,14 @@ def add_year(
         log.warning(
             "Regions should be defined in a list of strings or as a single string"
         )
-        reg_list = ["None"]
+        reg_list = []
 
     # List of parameters to be ignored (even not copied to the new
     # scenario)
     par_ignore = ["duration_period"]
     par_list = [x for x in par_list if x not in par_ignore]
+
+    firstyear_ref: Optional[int] = None
 
     if not macro:
         par_macro = [
@@ -222,20 +230,24 @@ def add_year(
         )
 
     if firstyear_new is None:
-        raise ValueError("Please provide 'firstyear_new' or set 'macro' to 'False'!")
+        raise ValueError(
+            "Missing 'firstyear_new'; please provide 'firstyear_new' or "
+            "set 'macro' to 'False'!"
+        )
+    elif firstyear_ref is None:
+        raise ValueError("Missing 'firstyear_ref'; please set 'macro' to 'False'!")
 
     for parname in par_list:
         # For historical parameters extrapolation permitted (e.g., from
         # 2010 to 2015)
-        if "historical" in parname:
-            extrapol = True
-            yrs_new = [x for x in years_new if x < firstyear_new]
-        elif int(firstyear_ref) > firstyear_new:
-            extrapol = True
-            yrs_new = years_new
-        else:
-            extrapol = False
-            yrs_new = years_new
+        extrapol = (
+            True if "historical" in parname or firstyear_ref > firstyear_new else False
+        )
+        yrs_new = (
+            [x for x in years_new if x < firstyear_new]
+            if "historical" in parname
+            else years_new
+        )
 
         bound_ext = bound_extend if "bound" in parname else True
 
@@ -278,7 +290,7 @@ def add_year(
 
 # %% Submodules needed for running the main function
 #   IV) Adding new years to sets
-# FIXME reduce complexity 13 → ≤13
+# FIXME reduce complexity 14 → ≤13
 def add_year_set(  # noqa: C901
     sc_ref: Scenario,
     sc_new: Scenario,
@@ -380,6 +392,10 @@ def add_year_set(  # noqa: C901
     log.info("All the sets updated and added to the new scenario")
 
 
+def next_step_bigger_than_previous(x: list[int], i: int) -> bool:
+    return x[i + 1] - x[i] > x[i] - x[i - 1]
+
+
 # %% V) Adding new years to parameters
 def add_year_par(
     sc_ref: Scenario,
@@ -447,18 +463,18 @@ def add_year_par(
 
     if not par_new.empty and not rewrite:
         log.info(
-            f"Parameter {repr(parname)} already has data in new scenario and left "
-            f"unchanged for node(s): {repr(reg_list)}"
+            f"Parameter {parname} already has data in new scenario and left "
+            f"unchanged for node(s): {reg_list}"
         )
         return
     if par_old.empty:
         log.info(
-            f"Parameter {repr(parname)} is empty in reference scenario for node(s): "
+            f"Parameter {parname} is empty in reference scenario for node(s): "
             + repr(reg_list)
         )
         return
 
-    # Sorting the data to make it ready for dataframe manupulation
+    # Sorting the data to make it ready for dataframe manipulation
     sort_order = [x for x in sort_order if x in idx_names]
     if sort_order:
         par_old = par_old.sort_values(sort_order).reset_index(drop=True)
@@ -510,16 +526,15 @@ def add_year_par(
         year_col = "year_act"
         year_ref = [x for x in year_list if x != year_col][0]
 
-        def f(x, i):
-            return x[i + 1] - x[i] > x[i] - x[i - 1]
-
-        year_diff = [x for x in horizon[1:-1] if f(horizon, horizon.index(x))]
+        year_diff = [
+            x
+            for x in horizon[1:-1]
+            if next_step_bigger_than_previous(horizon, horizon.index(x))
+        ]
         log.info(f"Parameter {parname} is being added for node(s): {nodes}")
 
         # Flagging technologies that have lifetime for adding new timesteps
-        yr_list = [
-            int(x) for x in set(sc_new.set("year")) if int(x) > int(firstyear_new)
-        ]
+        yr_list = [int(x) for x in set(sc_new.set("year")) if int(x) > firstyear_new]
         min_step = min(np.diff(sorted(yr_list)))
         par_tec = sc_new.par("technical_lifetime", {"node_loc": nodes})
         # Technologies with lifetime bigger than minimum time interval
@@ -769,8 +784,8 @@ def interpolate_2d(  # noqa: C901
         return df1.loc[df1.index.isin(df2.index)]
 
     if df.empty:
-        return df
         log.warning("The submitted dataframe is empty, so returned empty results")
+        return df
 
     df_tec = df.loc[df["technology"].isin(tec_list)]
     idx = [x for x in df.columns if x not in [year_col, value_col]]
@@ -782,17 +797,19 @@ def interpolate_2d(  # noqa: C901
     # First, changing the time interval for the transition period
     # (e.g., year 2010 in old R11 model transits from 5 year to 10 year)
     horizon_new = sorted(horizon + [x for x in yrs_new if x not in horizon])
-
-    def f(x, i):
-        return x[i + 1] - x[i] > x[i] - x[i - 1]
-
-    yr_diff_new = [x for x in horizon_new[1:-1] if f(horizon_new, horizon_new.index(x))]
+    yr_diff_new = [
+        x
+        for x in horizon_new[1:-1]
+        if next_step_bigger_than_previous(horizon_new, horizon_new.index(x))
+    ]
 
     # Generating duration_period_sum matrix for masking
-    df_dur = pd.DataFrame(index=horizon_new[:-1], columns=horizon_new[1:])
-    for i in df_dur.index:
+    df_dur = pd.DataFrame(
+        index=horizon_new[:-1], columns=[str(year) for year in horizon_new[1:]]
+    )
+    for i in df_dur.index.astype(str):
         for j in [x for x in df_dur.columns if x > i]:
-            df_dur.loc[i, j] = j - i
+            df_dur.loc[i, j] = int(j) - int(i)
 
     # Adding data for new transition year
     if yr_diff_new and tec_list and year_diff not in yr_diff_new:
@@ -842,43 +859,35 @@ def interpolate_2d(  # noqa: C901
             year_pre = max([x for x in df2_int_column_list if x < yr])
             year_pp = max([x for x in df2_int_column_list if x < year_pre])
 
-            df2[str(yr)] = intpol(
-                df2[str(year_pre)], df2[str(year_pp)], year_pre, year_pp, yr
-            )
-            df2[str(yr)][np.isinf(df2[str(year_pre)].shift(+1))] = df2[
-                str(year_pre)
-            ].shift(+1)
-            df2[str(yr)] = df2[str(yr)].fillna(df2[str(year_pre)])
+            df2[yr] = intpol(df2[year_pre], df2[year_pp], year_pre, year_pp, yr)
+            df2[yr][np.isinf(df2[year_pre].shift(+1))] = df2[year_pre].shift(+1)
+            df2[yr] = df2[yr].fillna(df2[year_pre])
 
             k = horizon_new.index(yr)
             if yr - horizon_new[k - 1] >= horizon_new[k - 1] - horizon_new[k - 2]:
-                df2[str(yr)].loc[
-                    (pd.isna(df2[str(year_pre)].shift(+1)))
-                    & (~pd.isna(df2[str(year_pp)].shift(+1)))
+                df2[yr].loc[
+                    (pd.isna(df2[year_pre].shift(+1)))
+                    & (~pd.isna(df2[year_pp].shift(+1)))
                 ] = np.nan
-            cond = (df2[str(yr)] < 0) & (df2[str(year_pre)].shift(+1) >= 0)
-            if not df2[str(yr)].loc[cond].empty and extrapol_neg:
-                df2.loc[cond, str(yr)] = df2.loc[cond, str(year_pre)] * extrapol_neg
+            cond = (df2[yr] < 0) & (df2[year_pre].shift(+1) >= 0)
+            if not df2[yr].loc[cond].empty and extrapol_neg:
+                df2.loc[cond, yr] = df2.loc[cond, year_pre] * extrapol_neg
 
         # b) Otherwise, do intrapolation
         elif yr > min(df2_int_column_list) and yr < max(df2_int_column_list):
             year_pre = max([x for x in df2_int_column_list if x < yr])
             year_next = min([x for x in df2_int_column_list if x > yr])
 
-            print(df2.index)
-            print(df2.columns)
-            df2[str(yr)] = intpol(
-                df2[str(year_pre)], df2[str(year_next)], year_pre, year_next, yr
-            )
+            df2[yr] = intpol(df2[year_pre], df2[year_next], year_pre, year_next, yr)
             df2_t = df2.loc[df2_tec.index, :].copy()
 
             # This part calculates the missing value if only the previous
             # timestep has a value (and not the next)
             if tec_list:
-                cond = (pd.isna(df2_t[str(yr)])) & (~pd.isna(df2_t[str(year_pre)]))
-                df2_t.loc[cond, str(yr)] = intpol(
-                    df2_t[str(year_pre)],
-                    df2_t[str(year_next)].shift(-1),
+                cond = (pd.isna(df2_t[yr])) & (~pd.isna(df2_t[year_pre]))
+                df2_t.loc[cond, yr] = intpol(
+                    df2_t[year_pre],
+                    df2_t[year_next].shift(-1),
                     year_pre,
                     year_next,
                     yr,
@@ -887,20 +896,19 @@ def interpolate_2d(  # noqa: C901
                 # Treating technologies with phase-out in model years
                 if [x for x in df2_int_column_list if x < year_pre]:
                     year_pp = max([x for x in df2_int_column_list if x < year_pre])
-                    cond3 = (pd.isna(df2_t[str(yr)])) & (~pd.isna(df2_t[str(year_pre)]))
-                    cond4 = pd.isna(df2_t[str(year_pre)].shift(-1))
+                    cond3 = (pd.isna(df2_t[yr])) & (~pd.isna(df2_t[year_pre]))
+                    cond4 = pd.isna(df2_t[year_pre].shift(-1))
 
-                    df2_t.loc[cond3 & cond4, str(yr)] = intpol(
-                        df2_t[str(year_pre)], df2_t[str(year_pp)], year_pre, year_pp, yr
+                    df2_t.loc[cond3 & cond4, yr] = intpol(
+                        df2_t[year_pre], df2_t[year_pp], year_pre, year_pp, yr
                     )
-                    cond = (df2_t[str(yr)] < 0) & (df2_t[str(year_pre)] >= 0)
-                    if not df2_t[str(yr)].loc[cond].empty and extrapol_neg:
-                        df2_t.loc[cond, str(yr)] = (
-                            df2_t.loc[cond, str(year_pre)] * extrapol_neg
-                        )
+                    cond = (df2_t[yr] < 0) & (df2_t[year_pre] >= 0)
+                    if not df2_t[yr].loc[cond].empty and extrapol_neg:
+                        df2_t.loc[cond, yr] = df2_t.loc[cond, year_pre] * extrapol_neg
                 df2.loc[df2_tec.index, :] = df2_t
-            df2.loc[np.isinf(df2[str(year_pre)]), str(yr)] = df2[str(year_pre)]
-        df2 = df2.reindex(sorted([str(column) for column in df2.columns]), axis=1)
+            df2.loc[np.isinf(df2[year_pre]), yr] = df2[year_pre]
+        df2 = df2.reindex(sorted([column for column in df2.columns]), axis=1)
+
     # -------------------------------------------------------------------------
     # Third, adding year_vtg of new years
     for yr in yrs_new:
@@ -910,18 +918,21 @@ def interpolate_2d(  # noqa: C901
             year_pp = horizon_new[horizon_new.index(yr) - 2]
             df_pre = slice_df(df2, idx, year_ref, [year_pre], yr)
             df_pp = slice_df(df2, idx, year_ref, [year_pp], yr)
-            df_yr = intpol(df_pre, idx_check(df_pp, df_pre), year_pre, year_pp, yr)
+            df_yr: pd.DataFrame = intpol(
+                df_pre, idx_check(df_pp, df_pre), year_pre, year_pp, yr
+            )  # type: ignore
             df_yr[np.isinf(df_pre)] = df_pre
 
             # For those technolofies with one value for each year
-            df_yr.loc[pd.isna(df_yr[yr])] = intpol(
+            df_to_fill_nans: pd.DataFrame = intpol(
                 df_pre, df_pp.shift(+1, axis=1), year_pre, year_pp, yr
-            ).shift(+1, axis=1)
+            )  # type: ignore
+            df_yr.loc[pd.isna(df_yr[yr])] = df_to_fill_nans.shift(+1, axis=1)
             df_yr[pd.isna(df_yr)] = df_pre
 
             if extrapol_neg:
                 df_yr[(df_yr < 0) & (df_pre >= 0)] = df_pre * extrapol_neg
-            df_yr.loc[:, df_yr.columns < yr] = np.nan
+            df_yr.loc[:, df_yr.columns < str(yr)] = np.nan
 
         # c) Otherwise, do intrapolation
         elif yr > min(df2_int_column_list) and yr < max(horizon):
