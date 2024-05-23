@@ -87,7 +87,7 @@ Using ``pip``
 -------------
 
 `pip`_ is Python's default package management system.
-``pip`` can be used when Python is installed directly or as installed from ``conda``.
+``pip`` can be used when Python is installed directly or as installed from ``conda``. [1]_
 
 4. We strongly recommend creating and activating a virtual environment, e.g. using ``virtualenv``. Open a command prompt and run::
 
@@ -105,10 +105,12 @@ Using ``pip``
 
     pip install message_ix[docs,report,tests,tutorial]
 
-   The ``[docs,report,tests,tutorial]`` extra requirements ensure additional dependencies are installed and can be adapted as desired. [1]_
+   The ``[docs,report,tests,tutorial]`` extra requirements ensure additional dependencies are installed and can be adapted as desired. [2]_
    ``docs`` allows you to build this documentation locally, ``report`` enables you to use the built-in :doc:`reporting <reporting>` functionality, ``tests`` facilitates running our test suite locally, and ``tutorial`` contains everything required for running our :doc:`tutorials <tutorials>`.
 
-.. [1] If using ``zsh``, recall that ``[...]`` is a `glob operator <https://zsh.sourceforge.io/Doc/Release/Expansion.html#Glob-Operators>`__, so the argument to pip must be quoted appropriately: ``pip install -e '.[docs,tests,tutorial]'.
+.. [1] If you intend to use ``pip`` in a venv managed by ``conda``, please read `conda's guide to using pip in a venv <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#using-pip-in-an-environment>`__. 
+   In particular, please make sure you use ``conda`` only to install ``pip`` in your venv and then use that specific ``pip`` for all further install commands.
+.. [2] If using ``zsh``, recall that ``[...]`` is a `glob operator <https://zsh.sourceforge.io/Doc/Release/Expansion.html#Glob-Operators>`__, so the argument to pip must be quoted appropriately: ``pip install -e '.[docs,tests,tutorial]'.
 
 
 .. _using-conda:
@@ -167,6 +169,10 @@ Go to the section `Check that installation was successful`_.
 
 From source
 -----------
+
+.. note::
+   If you want to install |MESSAGEix| from source, but already have an install from ``pip``, please make sure you run ``pip uninstall message-ix`` first.
+   Otherwise, ``pip`` might not recognize your new install correctly, resulting in an error message along the lines of ``'message_ix' has not attribute 'Scenario'```.
 
 4. We strongly recommend creating and activating a virtual environment, e.g. using ``virtualenv``. Open a command prompt and run::
 
