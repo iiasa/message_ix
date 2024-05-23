@@ -159,7 +159,7 @@ Go to the section `Check that installation was successful`_.
 .. [1] See the `conda glossary`_ for the differences between Anaconda and Miniconda, and the definitions of the terms ‘channel’ and ‘environment’ here.
 .. [2] On newer macOS systems with "Apple M1" processors: the Miniconda or Anaconda installers provided for M1 lead to errors in ixmp.
    Instead, we recommend to use the macOS installers for "x86_64" processors on these systems.
-   See also `ixmp issue 473 <https://github.com/iiasa/ixmp/issues/473>`_.
+   See also `ixmp issue 473 <https://github.com/iiasa/ixmp/issues/473>`_ and `ixmp issue 531 <https://github.com/iiasa/ixmp/issues/531>`_.
 .. [3] The ‘$’ character at the start of these lines indicates that the command text should be entered in the terminal or prompt, depending on the operating system.
    Do not retype the ‘$’ character itself.
 .. [4] Notice that conda uses the hyphen (‘-’) in package names, different from the underscore (‘_’) used in Python when importing the package.
