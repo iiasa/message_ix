@@ -117,7 +117,7 @@ def test_reporter_from_westeros(test_mp):
     obs = rep.get("message::default")
 
     # all expected reporting exists
-    assert len(obs.data) == 69
+    assert len(obs.data) == 78
 
     # custom values are correct
     obs = obs.filter(variable="total om*")
@@ -132,14 +132,14 @@ def test_reporter_from_westeros(test_mp):
 
     obs = obs.data["value"].values
     exp = [
-        2842.4574905,
-        5373.0510978,
-        6933.3333333,
-        3055.5555555,
-        4555.5555555,
-        5777.7777777,
-        381.57832228,
-        43.340541129,
+        2842.457491,
+        5373.051098,
+        6933.333333,
+        880.0,
+        1312.0,
+        1664.0,
+        381.578322,
+        43.340541,
         0.0,
     ]
     assert len(obs) == len(exp)

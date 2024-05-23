@@ -71,7 +71,7 @@ def _t(group: Union[str, None], basename: str, *, check=None, marks=None):
 #: Argument values to parametrize :func:`test_tutorial`.
 TUTORIALS: List[Tuple] = [
     # IPython kernel
-    _t("w0", f"{W}_baseline", check=[("solve-objective-value", 173795.09375)]),
+    _t("w0", f"{W}_baseline", check=[("solve-objective-value", 159025.82812)]),
     # NB could also check objective function values in the following tutorials; however,
     #    better to test features directly (not via Jupyter/IPython)
     _t("w0", f"{W}_baseline_using_xlsx_import_part1"),

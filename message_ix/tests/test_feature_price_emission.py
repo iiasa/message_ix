@@ -1,6 +1,6 @@
 import numpy.testing as npt
 
-from message_ix import Scenario
+from message_ix import Scenario, make_df
 
 MODEL = "test_emissions_price"
 
@@ -14,8 +14,8 @@ def model_setup(scen, years, simple_tecs=True):
 
     scen.add_set("mode", "mode")
 
-    scen.add_set("emission", "co2")
-    scen.add_cat("emission", "ghg", "co2")
+    scen.add_set("emission", "CO2")
+    scen.add_cat("emission", "ghg", "CO2")
 
     for y in years:
         scen.add_par("interestrate", y, 0.05, "-")
@@ -30,18 +30,60 @@ def model_setup(scen, years, simple_tecs=True):
 def add_two_tecs(scen, years):
     """add two technologies to the scenario"""
     scen.add_set("technology", ["dirty_tec", "clean_tec"])
-    output_specs = ["node", "comm", "level", "year", "year"]
 
-    for y in years:
-        # the dirty technology is free (no costs) but has emissions
-        tec_specs = ["node", "dirty_tec", y, y, "mode"]
-        scen.add_par("output", tec_specs + output_specs, 1, "GWa")
-        scen.add_par("emission_factor", tec_specs + ["co2"], 1, "tCO2")
+    common = dict(node_loc="node", year_vtg=years, year_act=years, value=1, mode="mode")
 
-        # the clean technology has variable costs but no emissions
-        tec_specs = ["node", "clean_tec", y, y, "mode"]
-        scen.add_par("output", tec_specs + output_specs, 1, "GWa")
-        scen.add_par("var_cost", tec_specs + ["year"], 1, "USD/GWa")
+    # the dirty technology is free (no costs) but has emissions
+    scen.add_par(
+        "output",
+        make_df(
+            "output",
+            node_dest="node",
+            technology="dirty_tec",
+            commodity="comm",
+            level="level",
+            time="year",
+            time_dest="year",
+            unit="GWa",
+            **common,
+        ),
+    )
+    scen.add_par(
+        "emission_factor",
+        make_df(
+            "emission_factor",
+            unit="tCO2",
+            technology="dirty_tec",
+            emission="CO2",
+            **common,
+        ),
+    )
+
+    # the clean technology has variable costs but no emissions
+    scen.add_par(
+        "output",
+        make_df(
+            "output",
+            node_dest="node",
+            technology="clean_tec",
+            commodity="comm",
+            level="level",
+            time="year",
+            time_dest="year",
+            unit="GWa",
+            **common,
+        ),
+    )
+    scen.add_par(
+        "var_cost",
+        make_df(
+            "var_cost",
+            time="year",
+            unit="USD/GWa",
+            technology="clean_tec",
+            **common,
+        ),
+    )
 
 
 def add_many_tecs(scen, years, n=50):
@@ -59,7 +101,7 @@ def add_many_tecs(scen, years, n=50):
             e = 1 - i / n
             scen.add_par("output", tec_specs + output_specs, 1, "GWa")
             scen.add_par("var_cost", tec_specs + ["year"], c, "USD/GWa")
-            scen.add_par("emission_factor", tec_specs + ["co2"], e, "tCO2")
+            scen.add_par("emission_factor", tec_specs + ["CO2"], e, "tCO2")
 
 
 def test_no_constraint(test_mp, request):

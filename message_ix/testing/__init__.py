@@ -576,8 +576,8 @@ def make_westeros(
     for name, tec, c, L, value in [
         ("input", "bulb", "electricity", "final", 1.0),
         ("output", "bulb", "light", "useful", 1.0),
-        ("input", "grid", "electricity", "secondary", 1.0),
-        ("output", "grid", "electricity", "final", grid_efficiency),
+        ("input", "grid", "electricity", "secondary", 1.0 / grid_efficiency),
+        ("output", "grid", "electricity", "final", 1.0),
         ("output", "coal_ppl", "electricity", "secondary", 1.0),
         ("output", "wind_ppl", "electricity", "secondary", 1.0),
     ]:
@@ -587,13 +587,13 @@ def make_westeros(
         )
 
     name = "capacity_factor"
-    capacity_factor = dict(coal_ppl=1.0, wind_ppl=0.36, bulb=1.0)
+    capacity_factor = dict(coal_ppl=1.0, wind_ppl=0.36, bulb=1.0, grid=1.0)
     for tec, value in capacity_factor.items():
         scen.add_par(name, make_df(name, **common, technology=tec, value=value))
 
     name = "technical_lifetime"
     common.update(year_vtg=model_horizon, unit="y")
-    for tec, value in dict(coal_ppl=20, wind_ppl=20, bulb=1).items():
+    for tec, value in dict(coal_ppl=20, wind_ppl=20, bulb=1, grid=30).items():
         scen.add_par(name, make_df(name, **common, technology=tec, value=value))
 
     name = "growth_activity_up"
@@ -609,6 +609,7 @@ def make_westeros(
     for tec, value in (
         ("coal_ppl", coal_fraction * historic_generation),
         ("wind_ppl", (1 - coal_fraction) * historic_generation),
+        ("grid", historic_generation),
     ):
         name = "historical_activity"
         scen.add_par(name, make_df(name, **common, technology=tec, value=value))
@@ -631,10 +632,11 @@ def make_westeros(
         ("inv_cost", "coal_ppl", 500),
         ("inv_cost", "wind_ppl", 1500),
         ("inv_cost", "bulb", 5),
+        ("inv_cost", "grid", 800),
         ("fix_cost", "coal_ppl", 30),
         ("fix_cost", "wind_ppl", 10),
+        ("fix_cost", "grid", 16),
         ("var_cost", "coal_ppl", 30),
-        ("var_cost", "grid", 50),
     ]:
         common.update(
             dict(year_vtg=model_horizon, unit="USD/kW")
