@@ -1,5 +1,5 @@
-Installation
-************
+Full Installation Guide
+***********************
 
 .. contents::
    :local:
@@ -110,13 +110,13 @@ Using ``pip``
 
 .. [1] If you intend to use ``pip`` in a venv managed by ``conda``, please read `conda's guide to using pip in a venv <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#using-pip-in-an-environment>`__. 
    In particular, please make sure you use ``conda`` only to install ``pip`` in your venv and then use that specific ``pip`` for all further install commands.
-.. [2] If using ``zsh``, recall that ``[...]`` is a `glob operator <https://zsh.sourceforge.io/Doc/Release/Expansion.html#Glob-Operators>`__, so the argument to pip must be quoted appropriately: ``pip install -e '.[docs,tests,tutorial]'.
+.. [2] If using ``zsh``, recall that ``[...]`` is a `glob operator <https://zsh.sourceforge.io/Doc/Release/Expansion.html#Glob-Operators>`__, so the argument to pip must be quoted appropriately: ``pip install -e '.[docs,tests,tutorial]'``.
 
 
 .. _using-conda:
 
 Using ``conda``
---------------
+---------------
 
 .. note:: This section is also available as a narrated video on the `IIASA YouTube channel`_.
    If you are a beginner, you may want to watch the video before attempting the installation yourself.
@@ -125,14 +125,14 @@ Using ``conda``
 
       <iframe width="690" height="360" src="https://www.youtube.com/embed/QZw-7rIqUJ0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-4. Install Python via either `Miniconda`_ or `Anaconda`_. [1]_
-   We recommend the latest version; currently Python 3.12. [2]_
+4. Install Python via either `Miniconda`_ or `Anaconda`_. [3]_
+   We recommend the latest version; currently Python 3.12. [4]_
 
 5. Open a command prompt.
    Windows users should use the “Anaconda Prompt” to avoid issues with permissions and environment variables when installing and using |MESSAGEix|.
    This program is available in the Windows Start menu after installing Anaconda.
 
-6. Configure conda to install :mod:`message_ix` from the conda-forge channel [3]_::
+6. Configure conda to install :mod:`message_ix` from the conda-forge channel [5]_::
 
     conda config --prepend channels conda-forge
 
@@ -148,7 +148,7 @@ Using ``conda``
     conda create --name message_env
     conda activate message_env
 
-9. Install the ``message-ix`` package into the current environment (either e.g. ``message_env``, or another name from step 7) [4]_::
+9. Install the ``message-ix`` package into the current environment (either e.g. ``message_env``, or another name from step 7) [6]_::
 
     conda install message-ix
 
@@ -156,13 +156,13 @@ Again: at this point, installation is complete.
 You do not need to complete the steps in “Using ``pip``” or “From source”.
 Go to the section `Check that installation was successful`_.
 
-.. [1] See the `conda glossary`_ for the differences between Anaconda and Miniconda, and the definitions of the terms ‘channel’ and ‘environment’ here.
-.. [2] On newer macOS systems with "Apple M1" processors: the Miniconda or Anaconda installers provided for M1 lead to errors in ixmp.
+.. [3] See the `conda glossary`_ for the differences between Anaconda and Miniconda, and the definitions of the terms ‘channel’ and ‘environment’ here.
+.. [4] On newer macOS systems with "Apple M1" processors: the Miniconda or Anaconda installers provided for M1 lead to errors in ixmp.
    Instead, we recommend to use the macOS installers for "x86_64" processors on these systems.
    See also `ixmp issue 473 <https://github.com/iiasa/ixmp/issues/473>`_ and `ixmp issue 531 <https://github.com/iiasa/ixmp/issues/531>`_.
-.. [3] The ‘$’ character at the start of these lines indicates that the command text should be entered in the terminal or prompt, depending on the operating system.
+.. [5] The ‘$’ character at the start of these lines indicates that the command text should be entered in the terminal or prompt, depending on the operating system.
    Do not retype the ‘$’ character itself.
-.. [4] Notice that conda uses the hyphen (‘-’) in package names, different from the underscore (‘_’) used in Python when importing the package.
+.. [6] Notice that conda uses the hyphen (‘-’) in package names, different from the underscore (‘_’) used in Python when importing the package.
 .. note:: When using Anaconda (not Miniconda), steps (5) through (9) can also be performed using the graphical Anaconda Navigator.
    See the `Anaconda Navigator documentation`_ for how to perform the various steps.
 
@@ -209,22 +209,22 @@ From source
     pip install --editable .[docs,report,tests,tutorial]
 
    The ``--editable`` flag ensures that changes to the source code are picked up every time :code:`import message_ix` is used in Python code.
-   The ``[docs,report,tests,tutorial]`` extra requirements ensure additional dependencies are installed are installed and can be adapted as desired. [1]_
+   The ``[docs,report,tests,tutorial]`` extra requirements ensure additional dependencies are installed are installed and can be adapted as desired. [7]_
    ``docs`` allows you to build this documentation locally, ``report`` enables you to use the built-in :doc:`reporting <reporting>` functionality, ``tests`` facilitates running our test suite locally, and ``tutorial`` contains everything required for running our :doc:`tutorials <tutorials>`.
 
-10. (Optional) If you will be using :file:`MESSAGE_master.gms` outside of Python :mod:`message_ix` to run |MESSAGEix|, you will likely modify this file, but will not want to commit these changes to Git.
-   Set the Git “assume unchanged” bit for this file::
+10. (Optional) If you will be using :file:`MESSAGE_master.gms` outside of Python :mod:`message_ix` to run |MESSAGEix|, you will likely modify this file, but will not want to commit these changes to Git. Set the Git “assume unchanged” bit for this file::
 
-    git update-index --assume-unchanged message_ix/model/MESSAGE_master.gms
+     git update-index --assume-unchanged message_ix/model/MESSAGE_master.gms
 
-   To unset the bit, use ``--no-assume-unchanged``.
-   See the `Git documentation`_ for more details.
+    To unset the bit, use ``--no-assume-unchanged``.
+    See the `Git documentation`_ for more details.
 
 11. (Optional) If installed from source, run the built-in test suite to check that |MESSAGEix| functions correctly on your system::
 
-    pytest
+     pytest
 
-.. [1] If using ``zsh``, recall that ``[...]`` is a `glob operator <https://zsh.sourceforge.io/Doc/Release/Expansion.html#Glob-Operators>`__, so the argument to pip must be quoted appropriately: ``pip install -e '.[docs,tests,tutorial]'.
+
+.. [7] If using ``zsh``, recall that ``[...]`` is a `glob operator <https://zsh.sourceforge.io/Doc/Release/Expansion.html#Glob-Operators>`__, so the argument to pip must be quoted appropriately: ``pip install -e '.[docs,tests,tutorial]'``.
 
 
 Check that installation was successful
