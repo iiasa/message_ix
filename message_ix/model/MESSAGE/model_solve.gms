@@ -14,7 +14,7 @@ if (%foresight% = 0,
 * This is the standard option; the GAMS global variable ``%foresight%=0`` by default.
 *
 * .. math::
-*    \min_x \text{OBJ} = \sum_{y \in Y} \text{OBJ}_y(x_y)
+*    \min_x OBJ = \sum_{y \in Y} OBJ_y(x_y)
 ***
 
 * reset year in case it was set by MACRO to include the base year before
@@ -39,25 +39,23 @@ if (%foresight% = 0,
         ABORT "MESSAGEix did not solve to optimality!"
     ) ;
 
-* rescale the dual of the emission constraint to account that the constraint is defined on the average year, not total
-EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
-        EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year) ) =
-    EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)
-        / SUM(year$( cat_year(type_year,year) ), duration_period(year) )
-        * SUM(year$( map_first_period(type_year,year) ), duration_period(year) / df_period(year) * df_year(year) );
-
-
-* assign auxiliary variables DEMAND, PRICE_COMMODITY and PRICE_EMISSION for integration with MACRO and reporting
+* assign auxiliary variables DEMAND for integration with MACRO
     DEMAND.l(node,commodity,level,year,time) = demand_fixed(node,commodity,level,year,time) ;
+
+* assign auxiliary variables PRICE_COMMODITY and PRICE_EMISSION for reporting
     PRICE_COMMODITY.l(node,commodity,level,year,time) =
         ( COMMODITY_BALANCE_GT.m(node,commodity,level,year,time) + COMMODITY_BALANCE_LT.m(node,commodity,level,year,time) )
             / df_period(year) ;
-    PRICE_EMISSION.l(node,type_emission,type_tec,year)$( SUM(type_year$( cat_year(type_year,year) ), 1 ) ) =
-        SMAX(type_year$( cat_year(type_year,year) ),
-               - EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year) )
-            / df_year(year) ;
+
+* calculate PRICE_EMISSION based on the marginals of EMISSION_EQUIVALENCE
+    PRICE_EMISSION.l(node,type_emission,type_tec,year)$( SUM(emission$( cat_emission(type_emission,emission) ),
+         EMISSION_EQUIVALENCE.m(node,emission,type_tec,year) ) ) =
+        SMAX(emission$( cat_emission(type_emission,emission) ),
+               EMISSION_EQUIVALENCE.m(node,emission,type_tec,year) / emission_scaling(type_emission,emission) )
+            / df_period(year);
     PRICE_EMISSION.l(node,type_emission,type_tec,year)$(
-        PRICE_EMISSION.l(node,type_emission,type_tec,year) = - inf ) = 0 ;
+        ( PRICE_EMISSION.l(node,type_emission,type_tec,year) = eps ) or
+        ( PRICE_EMISSION.l(node,type_emission,type_tec,year) = -inf ) ) = 0 ;
 
 %AUX_BOUNDS% AUX_ACT_BOUND_LO(node,tec,year_all,year_all2,mode,time)$( ACT.l(node,tec,year_all,year_all2,mode,time) < 0 AND
 %AUX_BOUNDS%    ACT.l(node,tec,year_all,year_all2,mode,time) = -%AUX_BOUND_VALUE% ) = yes ;
@@ -77,10 +75,10 @@ else
 * Loop over :math:`\hat{y} \in Y`, solving
 *
 * .. math::
-*     \min_x \ \text{OBJ} = \sum_{y \in \hat{Y}(\hat{y})} \text{OBJ}_y(x_y) \\
+*     \min_x \ OBJ = \sum_{y \in \hat{Y}(\hat{y})} OBJ_y(x_y) \\
 *     \text{s.t. } x_{y'} = x_{y'}^* \quad \forall \ y' < y
 *
-* where :math:`\hat{Y}(\hat{y}) = \{y \in Y | \ |\hat{y}| - |y| < \text{optimization_horizon} \}` and
+* where :math:`\hat{Y}(\hat{y}) = \{y \in Y | \ |\hat{y}| - |y| < optimization\_horizon \}` and
 * :math:`x_{y'}^*` is the optimal value of :math:`x_{y'}` in iteration :math:`|y'|` of the iterative loop.
 *
 * The advantage of this implementation is that there is no need to 'store' the optimal values of all decision
