@@ -17,7 +17,7 @@ Quick installation
 ==================
 
 This quick install guide assumes you have read the :doc:`prerequisites <prereqs>` for understanding and using |MESSAGEix|. 
-It further assumes that you have a working installation of `GAMS`_ 24.8.1 or later.
+It further assumes that you have a working installation of `GAMS`_ 24.8.1 or later and that you use the default terminal on your OS.
 Finally, this guide assumes that you use Python to interact with |MESSAGEix|. See :ref:`install-r` for notes on using |MESSAGEix| with R.
 We strongly recommend that you are familiar with `Python's virtual environments`_ and use them for your |MESSAGEix| projects.
 Depending on your choice  of installation method below, you should have either `pip`_ or `conda`_ installed on your system. If in doubt, we recommend ``pip`` for ease of usage.

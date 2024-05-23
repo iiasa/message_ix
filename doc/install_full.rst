@@ -105,7 +105,10 @@ Using ``pip``
 
     pip install message_ix[docs,report,tests,tutorial]
 
-   The ``[docs,report,tests,tutorial]`` extra requirements ensure additional dependencies are installed.
+   The ``[docs,report,tests,tutorial]`` extra requirements ensure additional dependencies are installed and can be adapted as desired. [1]_
+   ``docs`` allows you to build this documentation locally, ``report`` enables you to use the built-in :doc:`reporting <reporting>` functionality, ``tests`` facilitates running our test suite locally, and ``tutorial`` contains everything required for running our :doc:`tutorials <tutorials>`.
+
+.. [1] If using ``zsh``, recall that ``[...]`` is a `glob operator <https://zsh.sourceforge.io/Doc/Release/Expansion.html#Glob-Operators>`__, so the argument to pip must be quoted appropriately: ``pip install -e '.[docs,tests,tutorial]'.
 
 
 .. _using-conda:
@@ -200,7 +203,8 @@ From source
     pip install --editable .[docs,report,tests,tutorial]
 
    The ``--editable`` flag ensures that changes to the source code are picked up every time :code:`import message_ix` is used in Python code.
-   The ``[docs,report,tests,tutorial]`` extra requirements ensure additional dependencies are installed.
+   The ``[docs,report,tests,tutorial]`` extra requirements ensure additional dependencies are installed are installed and can be adapted as desired. [1]_
+   ``docs`` allows you to build this documentation locally, ``report`` enables you to use the built-in :doc:`reporting <reporting>` functionality, ``tests`` facilitates running our test suite locally, and ``tutorial`` contains everything required for running our :doc:`tutorials <tutorials>`.
 
 10. (Optional) If you will be using :file:`MESSAGE_master.gms` outside of Python :mod:`message_ix` to run |MESSAGEix|, you will likely modify this file, but will not want to commit these changes to Git.
    Set the Git “assume unchanged” bit for this file::
@@ -213,6 +217,8 @@ From source
 11. (Optional) If installed from source, run the built-in test suite to check that |MESSAGEix| functions correctly on your system::
 
     pytest
+
+.. [1] If using ``zsh``, recall that ``[...]`` is a `glob operator <https://zsh.sourceforge.io/Doc/Release/Expansion.html#Glob-Operators>`__, so the argument to pip must be quoted appropriately: ``pip install -e '.[docs,tests,tutorial]'.
 
 
 Check that installation was successful
