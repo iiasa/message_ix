@@ -175,7 +175,7 @@ From source
     # On Windows:
     .\message_env\Scripts\activate
 
-5. Install :doc:`ixmp <ixmp:install>` from source.
+5. Install :doc:`ixmp <ixmp:install>` from source. If you prefer to install ``ixmp`` from ``pip``, please be sure to use the same combination of major and minor version, i.e. if ``message_ix`` has 3.9.x, ``ixmp`` should also have 3.9.x.
 
 6. (Optional) If you intend to contribute changes to |MESSAGEix|, first register a Github account, and fork the `message_ix repository <https://github.com/iiasa/message_ix>`_.
    This will create a new repository ``<user>/message_ix``.
@@ -183,21 +183,21 @@ From source
 
 7. Clone either the main repository, or your fork; using the `Github Desktop`_ client, or the command line::
 
-    $ git clone git@github.com:iiasa/message_ix.git
+    git clone git@github.com:iiasa/message_ix.git
 
     # or:
-    $ git clone git@github.com:USER/message_ix.git
+    git clone git@github.com:USER/message_ix.git
 
 8. (Conditional) If you cloned your fork, add the main repository as a remote git repository.
    This will allow keeping up to date with changes there and importing tags, which also needs to be done for the install tests to succeed::
 
-    $ git remote add upstream git@github.com:iiasa/message_ix.git
+    git remote add upstream git@github.com:iiasa/message_ix.git
 
-    $ git fetch upstream --tags
+    git fetch upstream --tags
 
 9. Open a command prompt in the ``message_ix`` directory and type::
 
-    $ pip install --editable .[docs,report,tests,tutorial]
+    pip install --editable .[docs,report,tests,tutorial]
 
    The ``--editable`` flag ensures that changes to the source code are picked up every time :code:`import message_ix` is used in Python code.
    The ``[docs,report,tests,tutorial]`` extra requirements ensure additional dependencies are installed.
@@ -205,14 +205,14 @@ From source
 10. (Optional) If you will be using :file:`MESSAGE_master.gms` outside of Python :mod:`message_ix` to run |MESSAGEix|, you will likely modify this file, but will not want to commit these changes to Git.
    Set the Git “assume unchanged” bit for this file::
 
-    $ git update-index --assume-unchanged message_ix/model/MESSAGE_master.gms
+    git update-index --assume-unchanged message_ix/model/MESSAGE_master.gms
 
    To unset the bit, use ``--no-assume-unchanged``.
    See the `Git documentation`_ for more details.
 
 11. (Optional) If installed from source, run the built-in test suite to check that |MESSAGEix| functions correctly on your system::
 
-    $ pytest
+    pytest
 
 
 Check that installation was successful
@@ -221,21 +221,21 @@ Check that installation was successful
 Verify that the version installed corresponds to the `latest release`_ by running the following commands on the command line::
 
     # Show versions of message_ix, ixmp, and key dependencies
-    $ message-ix show-versions
+    message-ix show-versions
 
     # Show the list of modelling platforms that have been installed and the path to the database config file
     # By default, just the local database should appear in the list
-    $ message-ix platform list
+    message-ix platform list
 
 The above commands will work as of :mod:`message_ix` 3.0 and in subsequent versions.
 If an error occurs, this may mean that an older version has been installed and should be updated.
 To check the current version::
 
     # If installed using conda
-    $ conda list message-ix
+    conda list message-ix
 
     # If installed using pip
-    $ pip show message-ix
+    pip show message-ix
 
 
 .. _install-r:
@@ -284,7 +284,7 @@ There are multiple ways to resolve this issue:
 
 To check which JVM will be used by ixmp, run the following in any prompt or terminal::
 
-    $ python -c "import jpype; print(jpype.getDefaultJVMPath())"
+    python -c "import jpype; print(jpype.getDefaultJVMPath())"
 
 
 “No module named 'pyam'”
@@ -294,12 +294,12 @@ The package `pyam-iamc <https://pypi.org/project/pyam-iamc/>`_ is one of the "re
 These extra dependencies are not installed automatically, but can be installed using::
 
     # If message_ix is installed using pip
-    $ pip install message_ix[report]
+    pip install message_ix[report]
     # or
-    $ pip install pyam-iamc
+    pip install pyam-iamc
 
     # If message_ix is installed using Anaconda (see note below)
-    $ conda install pyam
+    conda install pyam
 
 Note that this package has the *different* name on conda-forge versus PyPI: `pyam <https://anaconda.org/conda-forge/pyam>`__.
 
@@ -307,7 +307,7 @@ The package listed as `pyam <https://pypi.org/project/pyam/>`__ on PyPI (and not
 If you installed this package accidentally, remove it using::
 
     # If installed using pip
-    $ pip uninstall pyam
+    pip uninstall pyam
 
 
 Copy GAMS model files for editing
@@ -321,15 +321,15 @@ GAMS files is not necessary.
 
 To edit the files directly—to change the mathematical formulation, such as adding new types of parameters, constraints, etc.—use the ``message-ix`` command-line program to copy the model files in a directory of your choice::
 
-    $ message-ix copy-model /path/for/model/files
+    message-ix copy-model /path/for/model/files
 
 You can also set the ``message model dir`` configuration key so that this copy of the files is used by default::
 
-    $ message-ix config set "message model dir" /path/for/model/files
+    message-ix config set "message model dir" /path/for/model/files
 
 …or do both in one step::
 
-    $ message-ix copy-model --set-default /path/for/model/files
+    message-ix copy-model --set-default /path/for/model/files
 
 .. _`GAMS`: http://www.gams.com
 .. _`latest version`: https://www.gams.com/download/
