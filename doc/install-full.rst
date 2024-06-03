@@ -73,7 +73,7 @@ Whichever option you choose, please skip the other sections.
 Using virtual environments
 --------------------------
 
-Python uses virtual environments to keep track of different sets of dependency versions. 
+Python uses virtual environments to keep track of different sets of dependency versions.
 Each virtual environment (“venv”) contains one set of packages with specific versions, allowing your system to contain multiple versions of packages at the same time, that might be conflicting with one another.
 Usually, one virtual environment is used per project, and if you want to switch from one project to another, you simply switch your active virtual environment, too.
 
@@ -108,7 +108,7 @@ Using ``pip``
    The ``[docs,report,tests,tutorial]`` extra requirements ensure additional dependencies are installed and can be adapted as desired. [2]_
    ``docs`` allows you to build this documentation locally, ``report`` enables you to use the built-in :doc:`reporting <reporting>` functionality, ``tests`` facilitates running our test suite locally, and ``tutorial`` contains everything required for running our :doc:`tutorials <tutorials>`.
 
-.. [1] If you intend to use ``pip`` in a venv managed by ``conda``, please read `conda's guide to using pip in a venv <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#using-pip-in-an-environment>`__. 
+.. [1] If you intend to use ``pip`` in a venv managed by ``conda``, please read `conda's guide to using pip in a venv <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#using-pip-in-an-environment>`__.
    In particular, please make sure you use ``conda`` only to install ``pip`` in your venv and then use that specific ``pip`` for all further install commands.
 .. [2] If using ``zsh``, recall that ``[...]`` is a `glob operator <https://zsh.sourceforge.io/Doc/Release/Expansion.html#Glob-Operators>`__, so the argument to pip must be quoted appropriately: ``pip install -e '.[docs,tests,tutorial]'``.
 

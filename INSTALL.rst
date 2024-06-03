@@ -6,9 +6,8 @@ Installation
 
 .. toctree::
    :hidden:
-   :caption: Full install
-   
-   install_full
+
+   install-full
 
 Thank you for using |MESSAGEix|! We hope this documentation can help you with your modelling journey.
 
