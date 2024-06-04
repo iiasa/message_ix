@@ -4,6 +4,7 @@ Next release
 All changes
 -----------
 
+- Split installation instructions to a basic :ref:`install-quick` and detailed :doc:`install-adv` (:pull:`843`).
 - Ensure compatibility with pandas upcoming 3.0 Copy-on-Write behaviour (:pull:`842`).
 - Improve tutorial Westeros baseline for correct lifetime, units, and vintage-activity years (:pull:`815`).
 - Update tutorial Westeros multinode to include code-based hints for in-depth questions (:pull:`798`).
