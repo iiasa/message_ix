@@ -119,14 +119,14 @@ Releasing
       - Description of a change (:pull:`9999`).
 
    Build the docs locally to ensure any ReST markup in these additions renders correctly.
-
 3. Make a commit with a message like “Mark v<version> in release notes”.
-4. Tag the release candidate version, i.e. with a ``rcN`` suffix where ``N`` is a natural number, and push::
+4. (Only for message_ix) Update ``version`` and ``date-released`` in :file:`CITATION.cff`.
+5. Tag the release candidate version, i.e. with a ``rcN`` suffix where ``N`` is a natural number, and push::
 
    $ git tag vX.Y.ZrcN
    $ git push --tags <upstream> release/X.Y.Z
 
-5. Open a PR with the title “Release vX.Y.Z” using this branch.
+6. Open a PR with the title “Release vX.Y.Z” using this branch.
    Check:
 
    - at https://github.com/iiasa/message_ix/actions/workflows/publish.yaml (or `ixmp <https://github.com/iiasa/ixmp/actions/workflows/publish.yaml>`__) that the workflow completes: the package builds successfully and is published to PyPI.
@@ -138,16 +138,14 @@ Releasing
    Address any warnings or errors that appear, if necessary through ≥1 new commit(s).
    Then continue from step (4), incrementing the release candidate number, e.g. from ``rc1`` to ``rc2``.
 
-6. Merge the PR using the ‘rebase and merge’ method.
-
-7. (optional) Tag the release itself and push::
+7. Merge the PR using the ‘rebase and merge’ method.
+8. (optional) Tag the release itself and push::
 
     $ git tag v<version>
     $ git push --tags <upstream> main
 
    This step (but *not* step (4)) can be performed directly on GitHub; see (8), next.
-
-8. Visit https://github.com/iiasa/message_ix/releases (or `ixmp <https://github.com/iiasa/ixmp/releases>`__) and mark the new release: either using the pushed tag from (7), or by creating the tag and release simultaneously.
+9. Visit https://github.com/iiasa/message_ix/releases (or `ixmp <https://github.com/iiasa/ixmp/releases>`__) and mark the new release: either using the pushed tag from (7), or by creating the tag and release simultaneously.
 
    For the description, provide a link to the section in the “What's New” page of the documentation that corresponds to the new release, using the anchor added in (3), above.
    For example:
@@ -156,9 +154,8 @@ Releasing
 
       See [“What's New”](https://docs.messageix.org/en/stable/whatsnew.html#v99-98-0) in the documentation for a list of all changes.
 
-9. Check at https://github.com/iiasa/message_ix/actions/workflows/publish.yaml (or `ixmp <https://github.com/iiasa/ixmp/actions/workflows/publish.yaml>`__) and https://pypi.org/project/message-ix/ (or `ixmp <https://pypi.org/project/ixmp/>`__) that the distributions are published.
-
-10. Update on conda-forge.
+10. Check at https://github.com/iiasa/message_ix/actions/workflows/publish.yaml (or `ixmp <https://github.com/iiasa/ixmp/actions/workflows/publish.yaml>`__) and https://pypi.org/project/message-ix/ (or `ixmp <https://pypi.org/project/ixmp/>`__) that the distributions are published.
+11. Update on conda-forge.
     A PR should automatically be opened by a bot after the GitHub release (sometimes this takes from 30 minutes to several hours).
 
     1. Confirm that any new dependencies are added.
@@ -166,8 +163,6 @@ Releasing
     2. Ensure that tests pass and complete any other checklist items.
     3. Merge the PR.
     4. Check that the new package version appears on conda-forge. This may take up to several hours.
-
-11. (Only for message_ix) Update ``version`` and ``date-released`` in :file:`CITATION.cff`.
 
 12. Announce the release(s) on the GitHub Discussions pages and/or on Twitter.
     Copy the text from the What's New page of the built documentation.
