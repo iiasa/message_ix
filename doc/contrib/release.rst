@@ -147,7 +147,7 @@ Releasing
 
    This step (but *not* step (4)) can be performed directly on GitHub; see (8), next.
 
-8. Visit https://github.com/iiasa/message-ix/releases (or `ixmp <https://github.com/iiasa/ixmp/releases>`__) and mark the new release: either using the pushed tag from (7), or by creating the tag and release simultaneously.
+8. Visit https://github.com/iiasa/message_ix/releases (or `ixmp <https://github.com/iiasa/ixmp/releases>`__) and mark the new release: either using the pushed tag from (7), or by creating the tag and release simultaneously.
 
    For the description, provide a link to the section in the “What's New” page of the documentation that corresponds to the new release, using the anchor added in (3), above.
    For example:
