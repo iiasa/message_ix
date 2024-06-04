@@ -38,7 +38,7 @@ Before making this choice, see :ref:`install-pip-or-conda`, below, for further c
 Java (required)
 ---------------
 
-A `Java Runtime Environment (JRE) <https://en.wikipedia.org/wiki/Java_(software_platform)#Java_Runtime_Environment>`_ is required to use the current default :class:`.JDBCBackend` in the :mod:`ixmp` package that handles data storage for :mod:`message_ix`.
+A `Java Runtime Environment (JRE) <https://en.wikipedia.org/wiki/Java_(software_platform)#Java_Runtime_Environment>`_ is required to use the current default :class:`ixmp.JDBCBackend <ixmp.backend.jdbc.JDBCBackend>` in the :mod:`ixmp` package that handles data storage for :mod:`message_ix`.
 
 Common ways to install Java include:
 
