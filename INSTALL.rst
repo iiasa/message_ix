@@ -17,12 +17,12 @@ Use the :ref:`install-quick` steps on this page if *all* of the following apply:
 - You have already installed on your system:
 
   - :ref:`Python <install-python>` (version 3.8 or later) installed, along with either :program:`pip` or :program:`conda`;
-  - :ref:`Java <install-java>` (if *not* using :program:`conda`; see :ref:`here <install-java>`); and
+  - a :ref:`Java Runtime Environment (JRE) <install-java>` (if *not* using :program:`conda`; see :ref:`here <install-java>`); and
   - :ref:`GAMS <install-gams>` (version 24.8.1 or later).
 
-If *any* of the above does not apply, instead consult the :doc:`install-full` (separate page).
+If *any* of the above does not apply, instead consult the :doc:`install-adv`.
 If the terms above are unfamiliar, you may need to review the :doc:`prereqs` for using |MESSAGEix| before you proceed.
-For issues encountered during installation, see :ref:`common-issues` in the full guide, and further resources linked there.
+For issues encountered during installation, see “:ref:`common-issues`” in the guide, and further resources linked there.
 
 .. contents::
    :local:
@@ -30,7 +30,7 @@ For issues encountered during installation, see :ref:`common-issues` in the full
 .. toctree::
    :hidden:
 
-   install-full
+   install-adv
 
 .. _install-quick:
 
@@ -40,12 +40,12 @@ Quick install
 Choose one of the install methods below.
 Depending on your choice, you should have either :program:`pip` or :program:`conda` installed on your system.
 If in doubt, we recommend :program:`pip` because it is quick, easy to use and to troubleshoot.
-(For more considerations, see “:ref:`install-pip-or-conda`” in the full guide.)
+(For more considerations, see “:ref:`install-pip-or-conda`” in the guide.)
 
 Install the latest release using :program:`pip`
 -----------------------------------------------
 
-1. Open a command prompt.
+1. Open a terminal/command prompt.
 
 2. Activate your virtual environment.
 
@@ -55,14 +55,14 @@ Install the latest release using :program:`pip`
 
 This will install the latest release of |MESSAGEix| from the `Python Package Index (PyPI) <https://pypi.org/project/message-ix/>`_.
 
-.. [1] See :ref:`install-extras` for an explanation of the ``[docs,report,tests,tutorial]`` extra requirements.
-   See the :ref:`Graphviz section <install-graphviz>` in the full guide for further requirements if you want to use :meth:`.visualize` or run the test suite.
+.. [1] See “:ref:`install-extras`” in the advanced guide for an explanation of the ``[docs,report,tests,tutorial]`` extra requirements.
+   See “:ref:`Graphviz <install-graphviz>`” if you want to use :meth:`.visualize` or run the test suite.
 
 
-Install from latest release using :program:`conda`
---------------------------------------------------
+Install the latest release using :program:`conda`
+-------------------------------------------------
 
-1. Open a command prompt.
+1. Open a terminal/command prompt.
 
 2. Activate your virtual environment.
 
@@ -84,16 +84,18 @@ This will install the latest release of |MESSAGEix| from `conda-forge <https://a
 Check that installation was successful
 ======================================
 
-Verify that the version installed corresponds to the latest release by running the following commands on the command line::
+Verify that the version installed corresponds to the latest release by running the following commands on the command line.
+Show versions of :mod:`message_ix`, :mod:`ixmp`, and key dependencies::
 
-    # Show versions of message_ix, ixmp, and key dependencies
     message-ix show-versions
 
-    # Show the list of modelling platforms that have been installed
-    # and the path to the database config file
+The versions should correspond to the latest version shown on the :doc:`whatsnew` page.
+
+Show the list of platforms (~databases) that have been configured and the path to the :mod:`ixmp` config file::
+
     message-ix platform list
 
-See the :ref:`full guide <check-install>` for further details.
+See the :ref:`advanced guide <check-install>` for further details.
 
 .. _pip: https://pip.pypa.io/en/stable/user_guide/
 .. _conda: https://docs.conda.io/projects/conda/en/stable/
