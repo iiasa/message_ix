@@ -59,7 +59,7 @@ You should be able to:
 
 1. Install and uninstall software on your operating system (OS): one of Linux, Windows, or macOS.
 
-2. Use a command line on your OS to navigate directories and files, run commands, and view their output.
+2. Use a command line (terminal, command prompt) on your OS to navigate directories and files, run commands, and view their output.
 
 3. Modify environment variables on your OS.
 
@@ -73,18 +73,28 @@ You should be able to:
    For Python, `Dive Into Python <https://diveinto.org/python3/table-of-contents.html>`_ is one beginner resource.
    Many free and paid online courses are available.
 
-5. Understand the concept of a software package, software release, version number (in particular the concept of `semantic versioning <https://semver.org>`_), deprecation.
-
+5. Understand the **concepts of a software package**, software release, version number (in particular the concept of `semantic versioning <https://semver.org>`_), and deprecation.
    See :ref:`releases` for specific practices used for :mod:`message_ix`.
 
-6. Use the `Anaconda Navigator <https://docs.anaconda.com/anaconda/navigator/>`_ graphical interface or the ``conda`` command-line interface (`documentation <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-pkgs.html#installing-packages>`__) to install, uninstall, upgrade, and check the versions of Python packages.
-   Understand the concept of `conda environments <https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/environments.html>`_; create, activate, switch, and remove environments.
+.. _prereq-venv:
 
-7. Understand or learn the basic functionality of Python data science packages, including pandas.
+6. Understand the concept of **virtual environments** for Python, using either
+   the built-in :mod:`venv` module (`docs <https://docs.python.org/3/library/venv.html>`__, `usage with pip`_), or `Anaconda environments`_ to create, activate, switch, and remove environments.
 
-   - `Introductory tutorials <https://pandas.pydata.org/docs/getting_started/index.html#intro-to-pandas>`__ for pandas.
+   The :ref:`install-quick` and :ref:`install-adv` give instructions for the above two systems, but several others are in common use including
+   `virtualenv <https://virtualenv.pypa.io/en/latest/index.html>`__ and `virtualfish <https://virtualfish.readthedocs.io/en/latest/>`__.
 
-8. Use a Jupyter notebook to run Python or R code, including: start the notebook server; open, restart, and close notebooks; create and edit cells.
+7. **Manage Python packages**—that is, install, uninstall, upgrade, and check installed versions—using at least one of:
+
+   - The `Anaconda Navigator <https://docs.anaconda.com/anaconda/navigator/>`_ graphical interface,
+   - the :program:`conda` command-line interface (`documentation <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-pkgs.html#installing-packages>`__), or
+   - :program:`pip`.
+
+8. Understand or learn the basic concepts functionality of widely-used Python data science packages:
+
+   - `Introductory tutorials <https://pandas.pydata.org/docs/getting_started/index.html#intro-to-pandas>`__ for pandas, including the concept of a **series** and **data frame**.
+
+9. Use a **Jupyter notebook** to run Python or R code, including: start the notebook server; open, restart, and close notebooks; create and edit cells.
 
    - `Jupyter notebook <https://jupyter-notebook.readthedocs.io/en/stable/notebook.html>`_ official documentation.
    - Video introductions to the notebook.
@@ -143,3 +153,7 @@ You should be able to:
 5. Provide a complete and explicit description of a software error message and how to reproduce it.
 
 6. Read and understand GAMS code.
+
+
+.. _`usage with pip`: https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#create-and-use-virtual-environments
+.. _`Anaconda environments`: https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/environments.html
