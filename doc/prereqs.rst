@@ -59,7 +59,7 @@ You should be able to:
 
 1. Install and uninstall software on your operating system (OS): one of Linux, Windows, or macOS.
 
-2. Use a command line on your OS to navigate directories and files, run commands, and view their output.
+2. Use a command line (terminal, command prompt) on your OS to navigate directories and files, run commands, and view their output.
 
 3. Modify environment variables on your OS.
 

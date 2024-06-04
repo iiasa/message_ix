@@ -1,7 +1,7 @@
 Advanced installation guide
 ***************************
 
-This guide includes full, detailed instructions for a variety of ways of installing |MESSAGEix| in cases beyond the simple case covered by the :doc:`Quick install instructions <install>`.
+This guide includes detailed instructions for a variety of ways of installing |MESSAGEix| in cases beyond the simple case covered by the :doc:`Quick install instructions <install>`.
 
 Again, be sure that you have the :doc:`prerequisites skills and knowledge <prereqs>`; these include specific points of knowledge that are necessary to understand these instructions and choose among different installation options.
 
@@ -45,8 +45,9 @@ Common ways to install Java include:
 - Use the official releases of `Java <https://www.java.com>`_.
 - Use a version of Java bundled or packaged for your operating system (for example, Ubuntu and other Linux distributions).
 
-If using Anaconda or Miniconda, the ``message-ix`` conda-forge package depends on the `openjdk <https://anaconda.org/conda-forge/openjdk>`_ package, so the latter is automatically installed with the former.
-A manual Java install is not required.
+If using Anaconda or Miniconda, installing Java manually is *not required*.
+Tis is because the ``message-ix`` conda-forge package depends on the `openjdk <https://anaconda.org/conda-forge/openjdk>`_ package, so the latter is automatically installed with the former.
+
 
 .. _install-gams:
 
@@ -71,11 +72,13 @@ GAMS (required)
       - When prompted to specify the "Installation Type" (step 3 of the installation process), select "Customise".
       - Check the box labeled "Add GAMS to PATH".
 
-	If this option is not available see instructions below.
+     If this option is not available see instructions below.
 
    - on other platforms (macOS or Linux), add the following line to a file such as :file:`~/.bash_profile` (macOS), :file:`~/.bashrc`, or :file:`~/.profile`::
 
        $ export PATH=$PATH:/path/to/gams-directory-with-gams-binary
+
+   Run :program:`gams` in a terminal/command prompt to confirm this step has taken effect.
 
 .. note::
    MESSAGE-MACRO and MACRO require GAMS 24.8.1 or later (see :attr:`.MACRO.GAMS_min_version`)
@@ -98,12 +101,12 @@ Installing :mod:`message_ix` causes the `graphviz <https://graphviz.readthedocs.
 If you want to use :meth:`.visualize` or run the test suite, the Graphviz program itself must also be installed; otherwise it is **optional**.
 
 If you install MESSAGEix :ref:`using conda <using-conda>`, Graphviz is installed automatically via `its conda-forge package`_.
-For other methods of installation, see the `Graphviz download page`_ for downloads and instructions for your system.
+For other methods of installation (such as :program:`pip`) see the `Graphviz download page`_ for downloads and instructions for your system.
 
 Install |MESSAGEix|
 ===================
 
-4. Open a command prompt.
+4. Open a terminal/command prompt.
 
    Windows users who have installed Python using Anaconda/Miniconda should use the “Anaconda Prompt” to avoid issues with permissions and environment variables.
    This program is available in the Windows Start menu after installing Anaconda.
@@ -114,12 +117,12 @@ Choose :program:`pip` or :program:`conda`
 -----------------------------------------
 
 We recommend that new users install |MESSAGEix| using :program:`pip` (`user guide <https://pip.pypa.io/en/stable/user_guide/>`_), the package manager recommended by the Python Software Foundation.
-:program:`pip` can be used when Python is installed directly or as installed from :program:`conda`. [3]_
+:program:`pip` can be used when Python is installed directly, or it can be installed using :program:`conda`. [3]_
 
 If you are more comfortable with Anaconda, you can also install |MESSAGEix| using :program:`conda`.
 
 Advanced users may choose to install from source code, to benefit from the latest features or to test features that have not been merged.
-For this purpose :program:`pip` *must* be used; while it is possible to do this within an initial install made using :program:`conda`, [3]_ it is usually simpler not to mix the two and to use :program:`pip` from the start.
+For this purpose :program:`pip` *must* be used; while it is possible to do this within an initial install made using :program:`conda`, [3]_ it is usually simpler not to mix the two and instead use :program:`pip` from the start.
 
 Whichever option you choose, please skip the other sections.
 
@@ -140,7 +143,7 @@ It is also possible to use |MESSAGEix| *without* a virtual environment, but we s
 The way of doing so depends on whether you chose:
 
 - :program:`pip` —then the steps further depend on which virtual environment tool you choose.
-  This guide uses the first-party :mod:`venv` and third-party `virtualenv <https://virtualenv.pypa.io/en/latest/user_guide.html#quick-start>`_; for others, see their documentation.
+  This guide gives examples for the first-party :mod:`venv` and third-party `virtualenv <https://virtualenv.pypa.io/en/latest/user_guide.html#quick-start>`_; for others, see their documentation.
 - :program:`conda` —this program handles *both* virtual environment *and* package management.
 
 See the respective sections below.
@@ -157,6 +160,8 @@ Use :program:`pip`
 
     virtualenv message_env
 
+   These examples store the environment files in a directory named :file:`message_env` under the current working directory, but you can also place these anywhere else on your system.
+
 6. Activate the environment with::
 
     # On Linux or macOS
@@ -165,7 +170,14 @@ Use :program:`pip`
     # On Windows
     .\message_env\Scripts\activate
 
-7. Ensure :program:`pip` is installed.
+   These examples use the directory created in the previous step.
+   If you stored your virtual environment elsewhere, use the appropriate path.
+
+7. Ensure :program:`pip` is installed::
+
+    pip --version
+
+   If not, see the `installation instructions for pip <https://pip.pypa.io/en/stable/installation/>`_.
 
 .. _install-extras:
 
@@ -185,7 +197,7 @@ This implies four groups of extra requirements:
 - ``tests`` includes packages required to run the test suite, and
 - ``tutorial`` includes packages required to run the :doc:`tutorials <tutorials>`.
 
-The extras used can be freely adjusted according to your needs.
+The set of extras used can be freely adjusted according to your needs.
 
 Install the latest release from PyPI
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -194,7 +206,7 @@ Install the latest release from PyPI
 
     pip install message_ix[docs,report,tests,tutorial]
 
-.. [4] If using the (non-standard) :program:`zsh` shell, recall that ``[...]`` is a `glob operator <https://zsh.sourceforge.io/Doc/Release/Expansion.html#Glob-Operators>`__, so the argument to pip must be quoted appropriately: ``pip install -e '.[docs,tests,tutorial]'``.
+.. [4] If using the (non-standard) :program:`zsh` shell, note or recall that ``[...]`` is a `glob operator <https://zsh.sourceforge.io/Doc/Release/Expansion.html#Glob-Operators>`__, so the argument to pip must be quoted appropriately: ``pip install -e '.[docs,tests,tutorial]'``.
 
 At this point, installation is complete.
 Next, you can `Check that installation was successful`_.
@@ -205,7 +217,8 @@ Install from GitHub
 The above installs the latest release of |MESSAGEix|.
 If you are instead interested in installing a specific version of the code such as a branch of the :mod:`message_ix` `GitHub repository <https://github.com/iiasa/message_ix>`_, instead:
 
-8. Run the following, replacing ``<ref>`` with a specific Git reference such as a branch name (for instance, the ``main`` development branch, or a branch associated with a pull request), a tag, or a commit hash::
+8. Run the following.
+   Replace ``<ref>`` with a specific Git reference such as a branch name (for instance, the ``main`` development branch, or a branch associated with a pull request), a tag, or a commit hash::
 
     pip install git+ssh://git@github.com:iiasa/message_ix.git@<ref>[docs,report,tests,tutorial]
 
@@ -221,13 +234,14 @@ Install from a :program:`git` clone of the source code
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. note::
-   If you want to install |MESSAGEix| from source, but already have an install from :program:`pip`, please make sure you run :program:`pip uninstall message-ix` first.
-   Otherwise, Python might not recognize your new install correctly, resulting in an error message along the lines of ``'message_ix' has no attribute 'Scenario'``.
+   If you want to install |MESSAGEix| from source, but already have an install from :program:`pip`, please make sure to first :program:`pip uninstall message-ix`.
+   Otherwise, Python might not recognize your new install correctly.
+   A symptom of this error is a message like “'message_ix' has no attribute 'Scenario'”.
 
 8. Install :doc:`ixmp <ixmp:install>`, either *also* from source, or from PyPI.
    Use the same combination of major and minor versions: for instance, if installing :mod:`message_ix` version 3.9.x from source, install :mod:`ixmp` version 3.9.x.
 
-9. (Optional) If you intend to contribute changes to |MESSAGEix|, first register a Github account, and fork the `message_ix repository <https://github.com/iiasa/message_ix>`_.
+9. (Optional) If you intend to contribute changes to |MESSAGEix|, first register a GitHub account, and fork the `message_ix repository <https://github.com/iiasa/message_ix>`_.
    This will create a new repository ``<user>/message_ix``.
    (Please also see :doc:`contributing`.)
 
@@ -244,7 +258,7 @@ Install from a :program:`git` clone of the source code
      git remote add upstream git@github.com:iiasa/message_ix.git
      git fetch upstream --tags
 
-12. Navigate to the the ``message_ix`` directory created by :program:`git clone`.
+12. Navigate to the ``message_ix`` directory created by :program:`git clone`.
     Run [4]_::
 
      pip install --editable .[docs,report,tests,tutorial]
@@ -282,7 +296,7 @@ Use :program:`conda`
     conda create --name message_env
     conda activate message_env
 
-8. Install the ``message-ix`` package into the current environment (either e.g. ``message_env``, or another name from step 7) [5]_::
+8. Install the ``message-ix`` package into the current environment (either ``message_env``, or another name from the previous step) [5]_::
 
     conda install message-ix
 
@@ -304,13 +318,14 @@ Verify that the version installed corresponds to the `latest release`_ by runnin
     # Show versions of message_ix, ixmp, and key dependencies
     message-ix show-versions
 
-    # Show the list of modelling platforms that have been installed and the path to the database config file
-    # By default, just the local database should appear in the list
+    # Show the list of platforms (~databases) that have been configured
+    # and the path to the ixmp config file. By default, only the "local"
+    # platform, backed by a local database, should appear in the list
     message-ix platform list
 
 The above commands will work as of :mod:`message_ix` 3.0 and in subsequent versions.
-If an error occurs, this may mean that an older version has been installed and should be updated.
-To check the current version::
+If an error occurs, this may mean that an older version has been installed unintentionally.
+To check the installed version directly::
 
     # If installed using pip
     pip show message-ix
