@@ -81,7 +81,7 @@ You should be able to:
 6. Understand the concept of **virtual environments** for Python, using either
    the built-in :mod:`venv` module (`docs <https://docs.python.org/3/library/venv.html>`__, `usage with pip`_), or `Anaconda environments`_ to create, activate, switch, and remove environments.
 
-   The :ref:`install-quick` and :ref:`install-full` give instructions for the above two systems, but several others are in common use including
+   The :ref:`install-quick` and :doc:`install-advanced` give instructions for the above two systems, but several others are in common use including
    `virtualenv <https://virtualenv.pypa.io/en/latest/index.html>`__ and `virtualfish <https://virtualfish.readthedocs.io/en/latest/>`__.
 
 7. **Manage Python packages**—that is, install, uninstall, upgrade, and check installed versions—using at least one of:

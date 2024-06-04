@@ -20,9 +20,9 @@ Use the :ref:`install-quick` steps on this page if *all* of the following apply:
   - :ref:`Java <install-java>` (if *not* using :program:`conda`; see :ref:`here <install-java>`); and
   - :ref:`GAMS <install-gams>` (version 24.8.1 or later).
 
-If *any* of the above does not apply, instead consult the :doc:`install-full` (separate page).
+If *any* of the above does not apply, instead consult the :doc:`install-advanced` (separate page).
 If the terms above are unfamiliar, you may need to review the :doc:`prereqs` for using |MESSAGEix| before you proceed.
-For issues encountered during installation, see :ref:`common-issues` in the full guide, and further resources linked there.
+For issues encountered during installation, see :ref:`common-issues` in the advanced guide, and further resources linked there.
 
 .. contents::
    :local:
@@ -30,7 +30,7 @@ For issues encountered during installation, see :ref:`common-issues` in the full
 .. toctree::
    :hidden:
 
-   install-full
+   install-advanced
 
 .. _install-quick:
 
@@ -40,7 +40,7 @@ Quick install
 Choose one of the install methods below.
 Depending on your choice, you should have either :program:`pip` or :program:`conda` installed on your system.
 If in doubt, we recommend :program:`pip` because it is quick, easy to use and to troubleshoot.
-(For more considerations, see “:ref:`install-pip-or-conda`” in the full guide.)
+(For more considerations, see “:ref:`install-pip-or-conda`” in the advanced guide.)
 
 Install the latest release using :program:`pip`
 -----------------------------------------------
@@ -56,7 +56,7 @@ Install the latest release using :program:`pip`
 This will install the latest release of |MESSAGEix| from the `Python Package Index (PyPI) <https://pypi.org/project/message-ix/>`_.
 
 .. [1] See :ref:`install-extras` for an explanation of the ``[docs,report,tests,tutorial]`` extra requirements.
-   See the :ref:`Graphviz section <install-graphviz>` in the full guide for further requirements if you want to use :meth:`.visualize` or run the test suite.
+   See the :ref:`Graphviz section <install-graphviz>` in the advanced guide for further requirements if you want to use :meth:`.visualize` or run the test suite.
 
 
 Install from latest release using :program:`conda`
@@ -93,7 +93,7 @@ Verify that the version installed corresponds to the latest release by running t
     # and the path to the database config file
     message-ix platform list
 
-See the :ref:`full guide <check-install>` for further details.
+See the :ref:`advanced guide <check-install>` for further details.
 
 .. _pip: https://pip.pypa.io/en/stable/user_guide/
 .. _conda: https://docs.conda.io/projects/conda/en/stable/
