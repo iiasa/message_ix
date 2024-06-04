@@ -33,7 +33,7 @@ requires-python = ">=3.8"
 dependencies = [
   "click",
   "importlib_resources; python_version <= '3.8'",
-  "ixmp >= 3.8.0",
+  "ixmp >= 3.9.0",
   "genno[pyam] >= 1.20",
   "numpy",
   "pandas >= 1.2",
