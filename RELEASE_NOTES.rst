@@ -1,5 +1,13 @@
-Next release
-============
+.. Next release
+.. ============
+
+.. All changes
+.. -----------
+
+.. _v3.9.0:
+
+v3.9.0 (2024-06-04)
+===================
 
 All changes
 -----------
@@ -21,6 +29,7 @@ v3.8.0 (2024-01-12)
 
 Migration notes
 ---------------
+
 Update code that imports from the following modules:
 
 - :py:`message_ix.reporting` → use :mod:`message_ix.report`.
