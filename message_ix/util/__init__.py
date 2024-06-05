@@ -94,8 +94,8 @@ def make_df(name, **data):
     """Return a data frame for parameter or indexed set `name` filled with `data`.
 
     :func:`make_df` always returns a data frame with the columns required by either:
-    - :meth:`.add_par`: the dimensions of the parameter `name`, plus 'value' and
-      'unit'.
+
+    - :meth:`.add_par`: the dimensions of the parameter `name`, plus 'value' and 'unit'.
     - :meth:`.add_set`: the dimensions of the indexed set `name`.
 
     Columns not listed in `data` are left empty.
