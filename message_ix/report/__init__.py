@@ -121,7 +121,6 @@ PYAM_CONVERT = [
     ("emi:nl-t-ya-m-e", dict(kind="emi", var="emis")),
 ]
 
-#: Automatic reports that :func:`~genno.operator.concat` quantities converted to IAMC
 #: format.
 TASKS1 = (
     (
@@ -141,7 +140,6 @@ TASKS1 = (
         "message::costs",
         "message::emissions",
     ),
-    ("message::sankey", "concat", "out::pyam", "in::pyam"),
 )
 
 
