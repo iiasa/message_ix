@@ -158,6 +158,9 @@ framework, such as used in global research applications of |MESSAGEix|.
    #. Modeling of a multi-node energy system and representing trade between nodes
       (:tut:`westeros/westeros_multinode_energy_trade.ipynb`).
 
+   #. Including carbon removal technologies
+      (:tut:`westeros/westeros_carbon_removal.ipynb`).
+
 #. Use other features of :mod:`message_ix` and :mod:`ixmp`:
 
    #. ⭐ After the MESSAGE model has solved, use the :mod:`.message_ix.report`
