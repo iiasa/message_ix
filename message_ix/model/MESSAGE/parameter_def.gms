@@ -56,7 +56,7 @@
 * .. [#duration_time_year] The element 'Year' in the set of subannual time slices ``time`` has the value of 1.
 *    This value is assigned by default when creating a new :class:`ixmp.Scenario` based on the ``MESSAGE`` scheme.
 *
-* .. [#short_dur] The short-hand notation :math:`|y|` is used for the parameters :math:`\text{duration_period}_y`
+* .. [#short_dur] The short-hand notation :math:`|y|` is used for the parameters :math:`\text{duration\_period}_y`
 *    in the mathematical model documentation for exponents.
 *
 * .. [#year_auto] The values for this parameter are computed automatically when exporting a ``MESSAGE``-scheme
@@ -525,13 +525,13 @@ Parameters
 * The activity in the historic period can be defined with
 *
 * .. math::
-*    \sum_{m} \text{ACT}_{n,t,y^V,y,m,h} \leq \text{duration_time}_{h} \cdot \text{capacity_factor}_{n,t,y^V,y,h} \\
+*    \sum_{m} \text{ACT}_{n,t,y^V,y,m,h} \leq \text{duration\_time}_{h} \cdot \text{capacity\_factor}_{n,t,y^V,y,h} \\
 *    \cdot \text{CAP}_{n,t,y^V,y} \quad t \ \in \ T^{\text{INV}}
 *
 * and the historical new capacity with
 *
 * .. math::
-*    \text{CAP_NEW}_{n,t,y^V} = \frac{\text{CAP}_{n,t,y^V,y}}{\text{duration_period}_{y}}
+*    \text{CAP\_NEW}_{n,t,y^V} = \frac{\text{CAP}_{n,t,y^V,y}}{\text{duration\_period}_{y}}
 *
 * Both equations are equally valid for model periods. However, to calculate ``historical_new_capacity``
 * and ``historical_activity`` all parameters must describe the historic period.
@@ -817,7 +817,7 @@ Parameters
 *    * - fixed_land
 *      - ``node`` | ``land_scenario`` | ``year``
 *
-* Note that the variable :math:`\text{STOCK_CHG}` is determined implicitly by the :math:`\text{STOCK}` variable
+* Note that the variable :math:`\text{STOCK\_CHG}` is determined implicitly by the :math:`\text{STOCK}` variable
 * and therefore does not need to be explicitly fixed.
 ***
 
