@@ -196,10 +196,12 @@ def clean_model_data(data: "Quantity", s: Structures) -> "DataFrame":
 
     # Construct selectors for only the values appearing in `s`
     selectors: MutableMapping[Hashable, Iterable[Hashable]] = {}
-    for dim, kind in ("l", "level"), ("n", "node"), ("sector", "sector"), ("y", "year"):
+    for dim, kind in ("l", "level"), ("n", "node"), ("sector", "sector"), ("y", "year"), ("c", "sector"):
         if dim in data.dims:
             selectors[dim] = sorted(getattr(s, kind))
             names[dim] = kind
+
+    names.update({"c": "commodity"})
 
     return (
         select(data, selectors)  # type: ignore [attr-defined]
@@ -418,7 +420,8 @@ def total_cost(model_cost: "DataFrame", cost_ref: "DataFrame", ym1: int) -> "Dat
     return (
         pd.concat(
             [
-                cost_ref.reset_index().assign(year=ym1),
+                (cost_ref / 1000).reset_index().assign(year=ym1),
+                #cost_ref.reset_index().assign(year=ym1),
                 model_cost.assign(value=model_cost.value / 1e3),
             ],
             sort=True,
