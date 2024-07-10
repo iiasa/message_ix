@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GAMS_VERSION: 25.1.1
+  GAMS_VERSION: 43.4.1
   # See description in lint.yml
   depth: 100
 
