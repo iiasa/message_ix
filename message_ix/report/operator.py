@@ -186,7 +186,7 @@ def stacked_bar(
     cf : float, optional
         Conversion factor to apply to data.
     """
-    if len(dims) < 3:
+    if len(dims) < 3:  # pragma: no cover
         raise ValueError(f"Must pass >= 3 dimensions; got dims={dims!r}")
 
     # - Multiply by the conversion factor
