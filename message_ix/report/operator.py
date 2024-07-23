@@ -139,7 +139,7 @@ def plot_cumulative(x: "AnyQuantity", y: "AnyQuantity", labels: Tuple[str, str, 
 
 def stacked_bar(
     qty: "AnyQuantity",
-    dims: Tuple[str, str, str] = ("nl", "t", "ya"),
+    dims: Tuple[str, ...] = ("nl", "t", "ya"),
     units: str = "",
     title: str = "",
     cf: float = 1.0,
@@ -152,11 +152,11 @@ def stacked_bar(
     qty : Quantity
         Data to plot.
     dims : tuple of str
-        Dimensions for, respectively:
+        3 or more dimensions for, respectively:
 
-        1. The node/region.
-        2. Dimension to stack.
-        3. The ordinate (x-axis).
+        - 1 dimension: The node/region.
+        - 1 or more dimensions: to stack in bars of different colour.
+        - 1 dimension: The ordinate (x-axis); typically the year.
     units : str
         Units to display on the plot.
     title : str
@@ -164,15 +164,18 @@ def stacked_bar(
     cf : float, optional
         Conversion factor to apply to data.
     """
+    if len(dims) < 3:
+        raise ValueError(f"Must pass >= 3 dimensions; got dims={dims!r}")
+
     # - Multiply by the conversion factor
     # - Convert to a pd.Series
     # - Unstack one dimension
     # - Convert to pd.DataFrame
-    df = (cf * qty).to_series().unstack(dims[1]).reset_index()
+    df = (cf * qty).to_series().unstack(dims[1:-1]).reset_index()
 
     # Plot using matplotlib via pandas
     ax = df.plot(
-        x=dims[2],
+        x=dims[-1],
         kind="bar",
         stacked=stacked,
         xlabel="Year",
