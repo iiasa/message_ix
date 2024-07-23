@@ -1,4 +1,12 @@
-from typing import TYPE_CHECKING, List, Mapping, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Dict,
+    List,
+    Literal,
+    Mapping,
+    Tuple,
+    overload,
+)
 
 import pandas as pd
 
@@ -15,13 +23,27 @@ __all__ = [
 ]
 
 
+@overload
 def as_message_df(
     qty: "AnyQuantity",
     name: str,
     dims: Mapping,
     common: Mapping,
-    wrap: bool = True,
-) -> Union[pd.DataFrame, dict]:
+    wrap: Literal[True] = True,
+) -> Dict[str, pd.DataFrame]: ...
+
+
+@overload
+def as_message_df(
+    qty: "AnyQuantity",
+    name: str,
+    dims: Mapping,
+    common: Mapping,
+    wrap: Literal[False],
+) -> pd.DataFrame: ...
+
+
+def as_message_df(qty, name, dims, common, wrap=True):
     """Convert `qty` to an :meth:`.add_par`-ready data frame using :func:`.make_df`.
 
     The resulting data frame has:
