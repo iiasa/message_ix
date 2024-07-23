@@ -1,0 +1,6 @@
+advind = 0
+lpmethod = 4
+threads = 4
+epopt = 1e-06
+scaind = 1
+barcrossalg = 2
