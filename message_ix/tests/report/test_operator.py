@@ -1,4 +1,5 @@
 from functools import partial
+from typing import Any, Mapping, Tuple
 
 import matplotlib
 import pandas as pd
@@ -12,11 +13,11 @@ from message_ix.report import Reporter, operator
 from message_ix.testing import SCENARIO
 
 
-def test_as_message_df(test_mp):
+def test_as_message_df(test_mp) -> None:
     q = random_qty(dict(c=3, h=2, nl=5))
     q.units = "kg"
 
-    args = (
+    args: Tuple[Any, Mapping, Mapping] = (
         literal("demand"),
         dict(commodity="c", node="nl", time="h"),
         dict(level="l", year=2022),
@@ -49,7 +50,7 @@ def test_as_message_df(test_mp):
     for col, values in result0.items():
         if col in ("value", "unit"):
             continue
-        s.add_set(col, values.unique().tolist())
+        s.add_set(str(col), values.unique().tolist())
     s.add_set("technology", "t")
     s.commit("")
 
@@ -60,6 +61,7 @@ def test_as_message_df(test_mp):
     r.add("q::ixmp", partial(operator.as_message_df, wrap=False), key, *args)
     # Add a task to update the scenario
     us = r.get_operator("update_scenario")
+    assert us is not None
     key = r.add("add q", partial(us, params=["demand"]), "scenario", "q::ixmp")
 
     # No data in "demand" parameter
