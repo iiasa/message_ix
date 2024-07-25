@@ -105,20 +105,13 @@ Positive Variables
     ACT_LO(node,tec,year_all,time)   relaxation variable for dynamic constraints on activity (downwards)
 * land-use model emulator
     LAND(node,land_scenario,year_all) relative share of land-use scenario
-*    LAND_BIO(node,land_scenario_bio,year_all) relative share of biomass land-use scenario
-*    LAND_GHG_ZERO(node, land_scenario_ghg_zero, year_all) relative share of G000 land-use scenarios
-* content of storage
-    STORAGE(node,tec,mode,level,commodity,year_all,time)       state of charge (SoC) of storage at each sub-annual time slice (positive)
-
-*    LAND_COST_DYN(node,year_all)                     dynamically calculated cost from the land-use emulator
     LAND_COST_NEW(node, year_all)     Land cost including debt from scenario switching
     LAND_COST_DEBT(node, year_all,year_all2) Land cost debt from scenario switching 
-    EMISS_LU_AUX(node,emission,type_tec,year_all)    positive emissions overshoot of historic emissions compared to chosen land scenario mix
-    EMISS_LU_AUX2(node,emission,type_tec,year_all,year_all2)    positive emissions overshoot of historic emissions compared to chosen land scenario mix
+    EMISS_LU_AUX(node,emission,type_tec,year_all,year_all2)    positive emissions overshoot of historic emissions compared to chosen land scenario mix
+
+* content of storage
+    STORAGE(node,tec,mode,level,commodity,year_all,time)       state of charge (SoC) of storage at each sub-annual time slice (positive)
 ;
-
-
-
 
 
 Variables
@@ -134,11 +127,6 @@ Variables
     EMISS(node,emission,type_tec,year_all)       aggregate emissions by technology type and land-use model emulator
 * auxiliary variable for aggregate emissions from land-use model emulator
     EMISS_LU(node,emission,type_tec,year_all)    aggregate emissions from land-use model emulator
-*    EMISS_LU_ZERO(node,emission,type_tec,year_all)   aggregate emissions from land-use model emulator at GHG price baseline
-*    LU_GHG(node, year_all)                       Check variable for GHG emissions used for dynamic land cost calculation
-*    LU_GHG_Base(node, year_all)                  Check variable for baseline GHG emissions for dynamic land cost calculation
-*    LAND_COST_BIO(node,year_all)                 Land scenario price component from biomass
-*    LAND_COST_GHG(node,year_all)                 Land scenario price component from ghg emissions
 * auxiliary variable for left-hand side of relations (linear constraints)
     REL(relation,node,year_all)                  auxiliary variable for left-hand side of user-defined relations
 * change in the content of storage device
@@ -302,26 +290,16 @@ Equations
     EMISSION_EQUIVALENCE            auxiliary equation to simplify the notation of emissions
     EMISSION_EQUIVALENCE_AUX_ANNUAL auxiliary equation calculating land-use emissions from annual scenario input
     EMISSION_EQUIVALENCE_AUX_CUMU   auxiliary equation calculating land-use emissions from cumulative scenario input
-*    EMISSION_EQUIVALENCE_AUX_ZERO   auxiliary equation calculating the land-use emissions baseline from cumulative scenario input
     EMISSION_EQUIVALENCE_AUX_CUMU_AUX auxiliary equation calculating the land-use emissions overshoot if positive compared to historic scenario mix
-    EMISSION_EQUIVALENCE_AUX_CUMU_AUX2 auxiliary equation calculating the land-use emissions overshoot if positive compared to historic scenario mix
     EMISSION_CONSTRAINT             nodal-regional-global constraints on emissions (by category)
-*    LAND_CHECK_EMISS                fill LU_GHG check variable
-*    LAND_CHECK_EMISS_ZERO           fill LU_GHG check variable for emissions baseline
-*    LAND_COST_CUMU                  dynamic land-cost calculation
-*    LAND_COST_CUMU_BIO              dynamic land-cost calculation helper for BIO price 
-*    LAND_COST_CUMU_GHG              dynamic land-cost calculation helper for GHG price
-    LAND_COST_CUMU                   land cost including debt from scenario switching                                 
-    LAND_COST_CUMU_DEBT               land cost debt from scenario switching
+    LAND_COST_CUMU                  land cost including debt from scenario switching                                 
+    LAND_COST_CUMU_DEBT             land cost debt from scenario switching
     LAND_CONSTRAINT                 constraint on total land use (linear combination of land scenarios adds up to 1)
-*    LAND_FILL_BIO                   mapping land-use scenario to biomass land-use scenario
-*    LAND_FILL_GHG_ZERO              mapping biomass land-use scenario to G000 land-use scenario
     DYNAMIC_LAND_SCEN_CONSTRAINT_UP dynamic constraint on land scenario change (upper bound)
     DYNAMIC_LAND_SCEN_CONSTRAINT_LO dynamic constraint on land scenario change (lower bound)
     DYNAMIC_LAND_TYPE_CONSTRAINT_UP dynamic constraint on land-use change (upper bound)
     DYNAMIC_LAND_TYPE_CONSTRAINT_LO dynamic constraint on land-use change (lower bound)
-*    PRIMARY_FOREST_CONSTRAINT       constraint on primary-forest growth (primary forest may not grow)
-    TAU_CONSTRAINT                  constraint on land-use intensity growth (regional tau is not allowed to shrink)
+*    TAU_CONSTRAINT                  constraint on land-use intensity growth (regional tau is not allowed to shrink)
     RELATION_EQUIVALENCE            auxiliary equation to simplify the implementation of relations
     RELATION_CONSTRAINT_UP          upper bound of relations (linear constraints)
     RELATION_CONSTRAINT_LO          lower bound of relations (linear constraints)
@@ -449,7 +427,6 @@ COST_ACCOUNTING_NODAL(node, year)..
 * cost terms from land-use model emulator (only includes valid node-land_scenario-year combinations)
 *    + SUM(land_scenario$( land_cost(node,land_scenario,year) ),
 *        land_cost(node,land_scenario,year) * LAND(node,land_scenario,year) )
-*    + LAND_COST_DYN(node,year)
     + LAND_COST_NEW(node, year)
 * cost terms associated with linear relations
     + SUM(relation$( relation_cost(relation,node,year) ),
@@ -1887,8 +1864,12 @@ EMISSION_EQUIVALENCE(node,emission,type_tec,year)..
             AND map_tec_act(location,tec,year,mode,time) AND map_tec_lifetime(location,tec,vintage,year) ),
         emission_factor(location,tec,vintage,year,mode,emission) * ACT(location,tec,vintage,year,mode,time) )
 * emissions from land use if 'type_tec' is included in the dynamic set 'type_tec_land'
+
+** old calculation directly based on land scenario mix
 *       + SUM(land_scenario $( type_tec_land(type_tec) ) ,
 *           land_emission(location,land_scenario,year,emission) * LAND(location,land_scenario,year) )
+
+** new calculation based on land scenario mix and its path dependencies for selected variables (emission_cumulative)
         + EMISS_LU(location,emission,type_tec,year) $ ( type_tec_land(type_tec) )
       ) ;
 
@@ -1906,54 +1887,21 @@ EMISSION_EQUIVALENCE_AUX_CUMU(location,emission,type_tec,year) $ emission_cumula
     =E=
     SUM(land_scenario ,
             land_emission(location,land_scenario,year,emission) * LAND(location,land_scenario,year) )
-*    + EMISS_LU_AUX(location,emission,type_tec,year) 
-    + SUM(year2, EMISS_LU_AUX2(location,emission,type_tec,year, year2) )
+    + SUM(year2, EMISS_LU_AUX(location,emission,type_tec,year, year2) )
     ;
-    
-* emissions from land use if 'type_tec' is included in the dynamic set 'type_tec_land'
-*    ( SUM(land_scenario,
-*        SUM(year2 $ ( year2.pos <= year.pos ), land_emission(location, land_scenario, year2, emission) * duration_period(year2) ) *
-*        LAND(location, land_scenario, year)
-*        ) -
-*      SUM(year2 $( year2.pos < year.pos ),
-*        EMISS_LU(location, emission, type_tec, year2) * duration_period(year2)
-*        ) ) /
-*      duration_period(year) ;
+
 
 * find positive emissions overshoot for history of current land scenario mix compared to mix of earlier time steps
-EMISSION_EQUIVALENCE_AUX_CUMU_AUX(location,emission,type_tec,year) $ emission_cumulative(emission)..
-    EMISS_LU_AUX(location,emission,type_tec,year)
-    =G=
-    ( SUM(land_scenario,
-        SUM(year2 $ ( year2.pos < year.pos ), land_emission(location, land_scenario, year2, emission) * duration_period(year2) ) *
-        LAND(location, land_scenario, year)
-        ) -
-      SUM(year2 $( year2.pos < year.pos ),
-        EMISS_LU(location, emission, type_tec, year2) * duration_period(year2)
-        ) ) /
-      duration_period(year) ;
-
-
-EMISSION_EQUIVALENCE_AUX_CUMU_AUX2(location,emission,type_tec,year,year2) $ (emission_cumulative(emission) AND model_horizon(year) AND year2.pos < year.pos)..
-    EMISS_LU_AUX2(location,emission,type_tec,year,year2) $ ( year2.pos < year.pos ) 
+EMISSION_EQUIVALENCE_AUX_CUMU_AUX(location,emission,type_tec,year,year2) $ (emission_cumulative(emission) AND model_horizon(year) AND year2.pos < year.pos)..
+    EMISS_LU_AUX(location,emission,type_tec,year,year2) $ ( year2.pos < year.pos ) 
     =G=
     SUM(land_scenario,
             LAND(location, land_scenario, year) * land_emission(location, land_scenario, year2, emission)
             - LAND(location, land_scenario, year2) * land_emission(location, land_scenario, year2, emission) )
-        - SUM(year3 $ ( year3.pos < year.pos AND year2.pos < year3.pos ), EMISS_LU_AUX2(location, emission,type_tec, year3, year2) ) ;
+        - SUM(year3 $ ( year3.pos < year.pos AND year2.pos < year3.pos ), EMISS_LU_AUX(location, emission,type_tec, year3, year2) ) ;
 
-
-* EMISSION_EQUIVALENCE_AUX_ZERO(location,emission,type_tec,year) $ emission_cumulative(emission)..
-*      EMISS_LU_ZERO(location,emission,type_tec,year) =E=
-*      ( SUM(land_scenario_ghg_zero,
-*         SUM(year2 $ ( year2.pos <= year.pos ), land_emission(location, land_scenario_ghg_zero, year2, emission) * duration_period(year2) ) *
-*         LAND_GHG_ZERO(location, land_scenario_ghg_zero, year)
-*         ) -
-*       SUM(year2 $( year2.pos < year.pos ),
-*         EMISS_LU(location, emission, type_tec, year2) * duration_period(year2)
-*         ) ) /
-*       duration_period(year) ;
-
+* calculate scenario cost of current land scenario mix under consideration of its path dependencies and 
+* associated cost differences compared to the land scenario mix of earlier time steps
 LAND_COST_CUMU(location, year)$( model_horizon(year) )..
        LAND_COST_NEW(location, year) =E=
        SUM(land_scenario$( land_cost(location,land_scenario,year) ),
@@ -1968,58 +1916,6 @@ LAND_COST_CUMU_DEBT(location, year, year2) $ (model_horizon(year) AND year2.pos 
             LAND(location, land_scenario, year) * land_cost(location,land_scenario,year2)
             - LAND(location, land_scenario, year2) * land_cost(location,land_scenario,year2) ) * df_period(year2) / df_period(year)
         - SUM(year3 $ ( year3.pos < year.pos AND year2.pos < year3.pos ), LAND_COST_DEBT(location, year3, year2) ) ;
-
-* LAND_COST_DEBT.UP(location, year, year2) = 0;
-* LAND_COST_DEBT.UP(location, year, year2)$( year2.pos < year.pos ) = INF;
-
-
-* LAND_COST_CUMU(location, year)$( model_horizon(year) )..
-*      LAND_COST_DYN(location,year) =E=
-*      LAND_COST_BIO(location,year)
-*      + LAND_COST_GHG(location,year) ;
-
-* LAND_COST_CUMU_BIO(location, year)$( model_horizon(year) )..
-*      LAND_COST_BIO(location,year) =E=
-*      SUM(land_scenario$( map_land(location,land_scenario,year) ),
-*         land_output(location, land_scenario, year, "bioenergy", "land_use", "year") * 1000 / 31.71
-*         * land_output(location, land_scenario, year, "Price|Primary Energy|Biomass", "land_use_reporting", "year") 
-*         * LAND(location,land_scenario,year) ) ;
-
-* LAND_COST_CUMU_GHG(location, year)$( model_horizon(year) )..
-*      LAND_COST_GHG(location,year) =E=       
-*      ( SUM(land_scenario$( map_land(location,land_scenario,year) ),
-*         (LAND(location, land_scenario, year) 
-*             * ( SUM(year2 $ ( year2.pos <= year.pos ), 
-*                 SUM(map_scenario_zero(land_scenario_ghg_zero,land_scenario),land_output(location, land_scenario_ghg_zero, year2, "LU_GHG", "land_use_reporting", "year") 
-*                 * duration_period(year2) ) 
-*                 - land_output(location, land_scenario, year2, "LU_GHG", "land_use_reporting", "year") * duration_period(year2) ) )
-*             * land_output(location, land_scenario, year, "Price|Carbon|CO2", "land_use_reporting", "year") ) )
-*      - SUM(year2 $ ( year2.pos < year.pos ),
-*         LAND_COST_GHG(location, year2) * duration_period(year2) ) )
-*      / duration_period(year) 
-*          ;
-
-* LAND_CHECK_EMISS_ZERO(location, year)..
-*     LU_GHG_Base(location, year) =E=
-*     SUM(land_scenario$( map_land(location,land_scenario,year) ),
-*         LAND(location, land_scenario, year) 
-*         * SUM(year2 $ ( year2.pos <= year.pos ), 
-*           SUM(map_scenario_zero(land_scenario_ghg_zero,land_scenario),land_output(location, land_scenario_ghg_zero, year2, "LU_GHG", "land_use_reporting", "year") 
-*           * duration_period(year2) ) ) ) ;
-
-* LAND_CHECK_EMISS(location, year)..
-*     LU_GHG(location, year) =E=
-*     SUM(land_scenario$( map_land(location,land_scenario,year) ),
-*         LAND(location, land_scenario, year) 
-*         * SUM(year2 $ ( year2.pos <= year.pos ), 
-*           land_output(location, land_scenario, year2, "LU_GHG", "land_use_reporting", "year") * duration_period(year2)  ) ) ;
-
-
-*     + (EMISS_LU_ZERO(location,"TCE","all",year) - EMISS_LU(location,"TCE","all",year)) * 44 / 12
-*     * SUM(land_scenario$( map_land(location,land_scenario,year) ),
-*          LAND(location,land_scenario,year)
-*          * land_output(location, land_scenario, year, "Price|Carbon|CO2", "land_use_reporting", "year")
-*          ) ;
 
 
 ***
@@ -2084,13 +1980,6 @@ LAND_CONSTRAINT(node,year)$( SUM(land_scenario$( map_land(node,land_scenario,yea
     SUM(land_scenario$( map_land(node,land_scenario,year) ), LAND(node,land_scenario,year) ) =E= 1 ;
 
 
-* LAND_FILL_BIO(node,land_scenario_bio,year)$( SUM(land_scenario$( map_land(node,land_scenario,year) ), 1 ) ) ..
-*     LAND_BIO(node,land_scenario_bio,year)  =E= 
-*       SUM(map_scenario_bio(land_scenario_bio,land_scenario)$( map_land(node,land_scenario,year) ), LAND(node,land_scenario,year));
-
-* LAND_FILL_GHG_ZERO(node,land_scenario_ghg_zero,year)$( SUM(land_scenario$( map_land(node,land_scenario,year) ), 1 ) ) ..
-*     LAND_GHG_ZERO(node, land_scenario_ghg_zero, year) =E=
-*        SUM(map_bio_ghg_zero(land_scenario_bio,land_scenario_ghg_zero), LAND_BIO(node,land_scenario_bio,year) );
 ***
 * Dynamic constraints on land use
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -2250,34 +2139,20 @@ DYNAMIC_LAND_TYPE_CONSTRAINT_LO(node,year,land_type)$( is_dynamic_land_lo(node,y
 %SLACK_LAND_TYPE_LO% - SLACK_LAND_TYPE_LO(node,year,land_type)
 ;
 
-*PRIMARY_FOREST_CONSTRAINT(node, year, level, time) .. 
-*   SUM(land_scenario$( map_land(node,land_scenario,year) ),
-*        land_output(node, land_scenario, year, "Land Cover|Forest|Forest old|Primary forest", level, time) 
-*          * LAND(node, land_scenario, year)
-*        ) =L=
-*    SUM((year_all2)$( seq_period(year_all2,year) ),
-*        SUM(land_scenario$( map_land(node,land_scenario,year) ),
-*            land_output(node, land_scenario, year_all2, "Land Cover|Forest|Forest old|Primary forest", level, time) 
-*              * ( LAND(node, land_scenario, year_all2) $ ( model_horizon(year_all2) ) 
-*                  + historical_land(node,land_scenario,year_all2) )
-*            )
-*      )
-*;
 
-
-TAU_CONSTRAINT(node, year, level, time) .. 
-   SUM(land_scenario$( map_land(node,land_scenario,year) ),
-        land_output(node, land_scenario, year, "Landuse intensity indicator Tau", level, time) 
-          * LAND(node, land_scenario, year)
-        ) =G=
-    SUM((year_all2)$( seq_period(year_all2,year) ),
-        SUM(land_scenario$( map_land(node,land_scenario,year) ),
-            land_output(node, land_scenario, year_all2, "Landuse intensity indicator Tau", level, time) 
-              * ( LAND(node, land_scenario, year_all2) $ ( model_horizon(year_all2) ) 
-                  + historical_land(node,land_scenario,year_all2) )
-            )
-      )
-;
+* TAU_CONSTRAINT(node, year, level, time) .. 
+*    SUM(land_scenario$( map_land(node,land_scenario,year) ),
+*         land_output(node, land_scenario, year, "Landuse intensity indicator Tau", level, time) 
+*           * LAND(node, land_scenario, year)
+*         ) =G=
+*     SUM((year_all2)$( seq_period(year_all2,year) ),
+*         SUM(land_scenario$( map_land(node,land_scenario,year) ),
+*             land_output(node, land_scenario, year_all2, "Landuse intensity indicator Tau", level, time) 
+*               * ( LAND(node, land_scenario, year_all2) $ ( model_horizon(year_all2) ) 
+*                   + historical_land(node,land_scenario,year_all2) )
+*             )
+*       )
+* ;
 
 
 *----------------------------------------------------------------------------------------------------------------------*
