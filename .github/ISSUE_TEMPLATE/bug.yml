@@ -1,0 +1,56 @@
+# This form has been adapted from https://github.com/conda/conda/blob/main/.github/ISSUE_TEMPLATE/0_bug.yml.
+name: Bug report
+description: "`message_ix` does not work as expected."
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Because processing new bug reports is time-consuming, we would like to ask you to fill out the following form to the best of your ability and as completely as possible.
+
+        > [!NOTE]
+        > If you have a question about how to *use* message_ix or ixmp, please first:      
+        > - Read the [Prerequisite knowledge & skills](https://docs.messageix.org/en/stable/prereqs.html) page of the documentation.
+        > - Check the [Discussions](https://github.com/iiasa/message_ix/discussions) associated with the message_ix GitHub repository.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Please tell us what happened. Please provide as many details as possible. The more information provided, the more likely we are able to replicate your problem and offer a solution.
+    validations:
+      required: true
+  - type: textarea
+    id: info
+    attributes:
+      label: Code Sample
+      description: If possible, provide a minimal, working code example below. Your example should work in itself up until the point where it produces the error you are reporting.
+      render: python
+  - type: textarea
+    id: expectation
+    attributes:
+      label: What did you expect to happen?
+      description: Please tell us what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: versions
+    attributes:
+      label: Versions
+      description: |
+        The exact package versions you installed into your environment can hold the solution to the problem you are facing.
+
+        Please activate the environment within which you are encountering this bug, run the following command from your command line, and paste the output below.
+
+        ```bash
+        message-ix show-versions
+        ```
+
+        Alternatively, activate your environment and run the following in a Python interpreter:
+        ```python
+        import ixmp; ixmp.show_versions()
+        ```
+      render: shell
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Please include any additional information (or screenshots) that you think would be valuable.

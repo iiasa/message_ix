@@ -1,0 +1,19 @@
+name: Other issue
+description: "Feature request, enhancement proposal, etc."
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > [!NOTE]
+        > If you have a question about how to *use* message_ix or ixmp, please first:      
+        > - Read the [Prerequisite knowledge & skills](https://docs.messageix.org/en/stable/prereqs.html) page of the documentation.
+        > - Check the [Discussions](https://github.com/iiasa/message_ix/discussions) associated with the message_ix GitHub repository.
+
+        If these do not help, please describe your issue below.
+  - type: textarea
+    id: what
+    attributes:
+      label: What is this about?
+      description: Please tell us what this issue is about. Please provide as many details as possible. The more information you provide, the more likely we are able to help you or incorporate your suggestions!
+    validations:
+      required: true
