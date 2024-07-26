@@ -44,6 +44,10 @@ Other forms of documentation:
 - For offline use, the documentation can be built from the source code.
   See the file [`doc/README.rst`](doc/README.rst)
 
+## Security
+
+We highly value code security. To learn more about our security practice and advice, please visit [our security policy](.github/SECURITY.md).
+
 ## License
 
 Copyright © 2018–2024 IIASA Energy, Climate, and Environment (ECE) Program
