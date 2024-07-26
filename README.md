@@ -48,6 +48,10 @@ Other forms of documentation:
 
 We aim to create a community that is welcoming to everyone. Please respect our [Code of Conduct](CODE_OF_CONDUCT.md) at all times when interacting with `message_ix` and the community.
 
+## Contributing
+
+We warmly welcome all contributions to our community. Please take a look at our [guidelines for contributing to development](https://docs.messageix.org/en/latest/contributing.html).
+
 ## Security
 
 We highly value code security. To learn more about our security practice and advice, please visit [our security policy](.github/SECURITY.md).
