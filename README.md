@@ -52,9 +52,13 @@ We aim to create a community that is welcoming to everyone. Please respect our [
 
 We warmly welcome all contributions to our community. Please take a look at our [guidelines for contributing to development](https://docs.messageix.org/en/latest/contributing.html).
 
+## Governance
+
+If you are looking to understand how the `message_ix` team operates and how we decide what to do with your contributions, please read our [governance guidelines](GOVERNANCE.md).
+
 ## Security
 
-We highly value code security. To learn more about our security practice and advice, please visit [our security policy](.github/SECURITY.md).
+We highly value code security. To learn more about our security practice and advice, please visit our [security policy](.github/SECURITY.md).
 
 ## Support
 
