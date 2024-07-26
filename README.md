@@ -56,6 +56,10 @@ We warmly welcome all contributions to our community. Please take a look at our 
 
 We highly value code security. To learn more about our security practice and advice, please visit [our security policy](.github/SECURITY.md).
 
+## Support
+
+We strive to entertain a welcoming and inclusive community. If you struggle to use `message_ix`, please check our [guidelines for getting support](SUPPORT.md).
+
 ## License
 
 Copyright © 2018–2024 IIASA Energy, Climate, and Environment (ECE) Program
