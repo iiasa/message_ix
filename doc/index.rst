@@ -112,12 +112,17 @@ Using, getting help, and contributing
 
 Everyone is encouraged to use the framework to develop energy system and integrated assessment models!
 
+Everyone is required to please follow our Code of Conduct, which you can find `on GitHub <https://github.com/iiasa/message_ix/blob/main/CODE_OF_CONDUCT.md>`__ or in :file:`CODE_OF_CONDUCT.md` included with the source code.
+
 - :doc:`api`
 - :doc:`rmessageix`
 - :doc:`whatsnew` —release history and migration/upgrade notes.
 - :doc:`notice` —including how to properly cite the framework and software in scientific research.
+
 - :doc:`contributing` —we welcome enhancements to the framework itself that enable new features across all models.
+- You can learn more about how we handle your contributions `on GitHub <https://github.com/iiasa/message_ix/blob/main/GOVERNANCE.md>`__ or in :file:`GOVERNANCE.md` included with the source code.
 - :doc:`sharing`—we invite the sharing of the usage of the |MESSAGEix| framework.
+- See our Security Policy `on GitHub <https://github.com/iiasa/message_ix/blob/main/.github/SECURITY.md>`__ or in :file:`.github/SECURITY.md` included with the source code.
 - :doc:`faq`
 - :doc:`bibliography`
 
@@ -130,7 +135,9 @@ Everyone is encouraged to use the framework to develop energy system and integra
    whatsnew
    notice
    contributing
+   governance
    sharing
+   security policy
    faq
    bibliography
 
