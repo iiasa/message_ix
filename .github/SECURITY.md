@@ -5,12 +5,16 @@ For this purpose, we highly value your input and will acknowledge your contribut
 
 ## Supported Versions
 
-Unfortunately, our team size does not permit us to support multiple versions at once. 
+Unfortunately, the resources available for maintaining `message_ix` do not allow us to:
+
+- Support multiple versions at once.
+- Publish maintenance updates for older versions. For example, once `message_ix` version 3.10 is released, no further patch versions like 3.8.x, 3.9.x, etc. are possible.
+
 We generally develop our `main` branch and so to get the version of our code that contains all currently available security updates, please [install our code from source](https://docs.messageix.org/en/latest/install-adv.html#install-from-github) using the `main` branch. 
 Please reach out to us if you encounter any issues in doing so.
 
 If this is not an option, please ensure you are using the [latest release of our code](https://github.com/iiasa/message_ix/releases) to profit from as many security updates as possible.
-We strive to publish new releases at least twice a year, so there should never be too many security updates pending.
+`message_ix` is generally released twice a year, but may make additional releases on a shorter time line if necessary to mitigate critical vulnerabilities.
 
 ## Reporting a Vulnerability
 

@@ -44,25 +44,13 @@ Other forms of documentation:
 - For offline use, the documentation can be built from the source code.
   See the file [`doc/README.rst`](doc/README.rst)
 
-## Code of Conduct
+## Commitment to our Community
 
-We aim to create a community that is welcoming to everyone. Please respect our [Code of Conduct](CODE_OF_CONDUCT.md) at all times when interacting with `message_ix` and the community.
-
-## Contributing
-
-We warmly welcome all contributions to our community. Please take a look at our [guidelines for contributing to development](https://docs.messageix.org/en/latest/contributing.html).
-
-## Governance
-
-If you are looking to understand how the `message_ix` team operates and how we decide what to do with your contributions, please read our [governance guidelines](GOVERNANCE.md).
-
-## Security
-
-We highly value code security. To learn more about our security practice and advice, please visit our [security policy](.github/SECURITY.md).
-
-## Support
-
-We strive to entertain a welcoming and inclusive community. If you struggle to use `message_ix`, please check our [guidelines for getting support](SUPPORT.md).
+- We aim to create a community that is welcoming to everyone. Please respect our [Code of Conduct](CODE_OF_CONDUCT.md) at all times when interacting with `message_ix` and the community.
+- We warmly welcome all contributions to our community. Please take a look at our [guidelines for contributing to development](https://docs.messageix.org/en/latest/contributing.html).
+- If you are looking to understand how the `message_ix` team operates and how we decide what to do with your contributions, please read our [governance guidelines](GOVERNANCE.md).
+- We highly value code security. To learn more about our security practice and advice, please visit our [security policy](.github/SECURITY.md).
+- We strive to entertain a welcoming and inclusive community. If you struggle to use `message_ix`, please check our [guidelines for getting support](SUPPORT.md).
 
 ## License
 
