@@ -212,7 +212,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         optfile.write_text("\n".join(lines))
         log.info(f"Use CPLEX options {self.cplex_opts}")
 
-        self.cplex_opts.update({"barcrossalg": 2})
+        self.cplex_opts.update({"predual": 1})
         optfile2 = Path(self.model_dir).joinpath("cplex.op2")
         lines2 = ("{} = {}".format(*kv) for kv in self.cplex_opts.items())
         optfile2.write_text("\n".join(lines2))
