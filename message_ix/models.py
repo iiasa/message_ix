@@ -20,7 +20,7 @@ DEFAULT_CPLEX_OPTIONS = {
     "lpmethod": 4,
     "threads": 4,
     "epopt": 1e-6,
-    "scaind": 1,
+    "scaind": -1,
 }
 
 #: Common dimension name abbreviations mapped to tuples with:
