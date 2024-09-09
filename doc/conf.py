@@ -4,6 +4,7 @@
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
+import os
 from importlib.metadata import version as get_version
 from pathlib import Path
 from typing import Optional
@@ -89,6 +90,15 @@ html_theme = "sphinx_rtd_theme"
 
 html_theme_options = {"logo_only": True}
 
+# Define the canonical URL if you are using a custom domain on Read the Docs
+html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
+
+# Tell Jinja2 templates the build is running on Read the Docs
+if os.environ.get("READTHEDOCS", "") == "True":
+    if "html_context" not in globals():
+        html_context = {}
+    html_context["READTHEDOCS"] = True
+
 # -- Options for LaTeX output ----------------------------------------------------------
 
 # The LaTeX engine to build the docs.
@@ -157,6 +167,7 @@ def local_inv(name: str, *parts: str) -> Optional[str]:
 
     if 0 == len(parts):
         parts = ("doc", "_build", "html")
+    assert spec.origin is not None
     return str(Path(spec.origin).parents[1].joinpath(*parts, "objects.inv"))
 
 

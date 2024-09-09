@@ -1,7 +1,16 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Optional, TypedDict
 
 if TYPE_CHECKING:
     import pandas
+
+
+class CollapseMessageColsKw(TypedDict, total=False):
+    """Type hint for :class:`dict` of keyword args to :func:`collapse_message_cols`."""
+
+    df: "pandas.DataFrame"
+    var: Optional[str]
+    kind: Optional[str]
+    var_cols: List[str]
 
 
 def collapse_message_cols(

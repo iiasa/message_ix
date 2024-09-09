@@ -1,7 +1,7 @@
 import logging
 from functools import lru_cache, partial
 from operator import itemgetter
-from typing import List, Mapping, Tuple, Union, cast
+from typing import TYPE_CHECKING, List, Mapping, Tuple, Union, cast
 
 from genno.operator import broadcast_map
 from ixmp.report import (
@@ -17,6 +17,9 @@ from ixmp.report import Reporter as IXMPReporter
 from message_ix.models import DIMS
 
 from .pyam import collapse_message_cols
+
+if TYPE_CHECKING:
+    from .pyam import CollapseMessageColsKw
 
 __all__ = [
     "ComputationError",
@@ -109,7 +112,7 @@ TASKS0: Tuple[Tuple, ...] = (
 
 #: Quantities to automatically convert to IAMC format using
 #: :func:`~genno.compat.pyam.operator.as_pyam`.
-PYAM_CONVERT = [
+PYAM_CONVERT: List[Tuple[str, "CollapseMessageColsKw"]] = [
     ("out:nl-t-ya-m-nd-c-l", dict(kind="ene", var="out")),
     ("in:nl-t-ya-m-no-c-l", dict(kind="ene", var="in")),
     ("CAP:nl-t-ya", dict(var="capacity")),
