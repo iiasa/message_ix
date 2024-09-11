@@ -6,6 +6,7 @@
 [![Documentation build](https://readthedocs.com/projects/iiasa-energy-program-message-ix/badge/?version=stable)](https://docs.messageix.org/en/stable/)
 [![Build status](https://github.com/iiasa/message_ix/actions/workflows/pytest.yaml/badge.svg)](https://github.com/iiasa/message_ix/actions/workflows/pytest.yaml)
 [![Test coverage](https://codecov.io/gh/iiasa/message_ix/branch/main/graph/badge.svg)](https://codecov.io/gh/iiasa/message_ix)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md) 
 
 
 MESSAGEix is a versatile, dynamic, model framework for energy-engineering-economy-environment (E4) systems research.
@@ -43,6 +44,14 @@ Other forms of documentation:
 - Use the chooser to access the [‘latest’ version](https://docs.messageix.org/en/latest/), corresponding to the ``main`` branch and including the latest development code; or to access docs for a specific release, e.g. `v3.2.0`.
 - For offline use, the documentation can be built from the source code.
   See the file [`doc/README.rst`](doc/README.rst)
+
+## Commitment to our Community
+
+- We aim to create a community that is welcoming to everyone. Please respect our [Code of Conduct](CODE_OF_CONDUCT.md) at all times when interacting with `message_ix` and the community.
+- We warmly welcome all contributions to our community. Please take a look at our [guidelines for contributing to development](https://docs.messageix.org/en/latest/contributing.html).
+- If you are looking to understand how the `message_ix` team operates and how we decide what to do with your contributions, please read our [governance guidelines](GOVERNANCE.md).
+- We highly value code security. To learn more about our security practice and advice, please visit our [security policy](.github/SECURITY.md).
+- We strive to entertain a welcoming and inclusive community. If you struggle to use `message_ix`, please check our [guidelines for getting support](SUPPORT.md).
 
 ## License
 
