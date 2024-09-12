@@ -91,10 +91,10 @@ def assert_dantzig_solution(s: "Scenario", lp_method: int) -> None:
     assert_frame_equal(exp, s.var("ACT")[cols])
 
 
-@pytest.mark.parametrize("lp_method", (1, 2, 3, 4, 5))
+@pytest.mark.parametrize("lp_method", [1, 2, 3, 4, 5])
 @pytest.mark.parametrize(
     "constraint_value",
-    (pytest.param(299, marks=pytest.mark.xfail(raises=ModelError)), 301, 325),
+    [pytest.param(299, marks=pytest.mark.xfail(raises=ModelError)), 301, 325],
 )
 def test_b_a_u_all_modes(request, test_mp, tmp_model_dir, lp_method, constraint_value):
     """Test ``bound_activity_up`` values applied mode="all".
