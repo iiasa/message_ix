@@ -8,7 +8,7 @@ import message_ix
 from message_ix import config
 
 
-def test_copy_model(monkeypatch, message_ix_cli, tmp_path, tmp_env):
+def test_copy_model(monkeypatch, message_ix_cli, tmp_path, tmp_env, request):
     # Use Pytest monkeypatch fixture; this ensures the original value is restored at the
     # end of the test
     monkeypatch.setattr(
@@ -16,7 +16,7 @@ def test_copy_model(monkeypatch, message_ix_cli, tmp_path, tmp_env):
     )
 
     r = message_ix_cli("copy-model", str(tmp_path))
-    assert r.exit_code == 0
+    assert r.exit_code == 0, (r.exception, r.output)
 
     # Copying again without --overwrite fails
     r = message_ix_cli("copy-model", str(tmp_path))
@@ -37,14 +37,15 @@ def test_copy_model(monkeypatch, message_ix_cli, tmp_path, tmp_env):
     # Check if specific directory will be skipped
 
     # Create a GAMS runtime directory; these have names like "225a", etc.
-    model_path = Path(message_ix.__file__).parent.joinpath("model", "225c", "test.txt")
-    model_path.parent.mkdir(parents=True, exist_ok=True)
-    model_path.write_text("foo")
+    model_path = Path(message_ix.__file__).parent.joinpath(
+        "model", request.node.name, "225c"
+    )
+    model_path.mkdir(parents=True)
 
     message_ix_cli("copy-model", str(tmp_path))
 
     # Directory is ignored
-    assert not Path(tmp_path / "225c").exists()
+    assert not Path(tmp_path / f"{request.node.name}/225c").exists()
 
     # Clean up
     shutil.rmtree(model_path.parent)
