@@ -4,6 +4,7 @@ import warnings
 from collections import ChainMap, defaultdict
 from collections.abc import Mapping
 from pathlib import Path
+from typing import Optional
 
 import pandas as pd
 from ixmp.backend import ItemType
@@ -14,12 +15,18 @@ from message_ix.models import MACRO, MESSAGE
 
 
 def copy_model(
-    path: Path, overwrite: bool = False, set_default: bool = False, quiet: bool = False
+    path: Path,
+    source_dir: Optional[Path] = None,
+    overwrite: bool = False,
+    set_default: bool = False,
+    quiet: bool = False,
 ) -> None:
     """Copy the MESSAGE GAMS files to a new `path`.
 
     Parameters
     ----------
+    source_dir : Path
+        If given, copy model files from this directory instead of the main one.
     overwrite : bool
         If :any:`True`, overwrite existing files.
     set_default : bool
@@ -43,7 +50,11 @@ def copy_model(
     else:
         output = print
 
-    src_dir: Path = Path(message_ix.__file__).resolve().parent
+    src_dir = (
+        source_dir
+        if source_dir
+        else Path(message_ix.__file__).resolve().parent.joinpath("model")
+    )
 
     # Iterate over files in `src_dir`
     for src in src_dir.rglob("*"):
