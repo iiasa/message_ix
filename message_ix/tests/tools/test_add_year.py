@@ -30,7 +30,7 @@ def base_scen_mp(test_mp, request):
             scen.add_par("output", tec_specs + output_specs, 1, "-")
             scen.add_par("var_cost", tec_specs + ["year"], value, "USD/GWa")
 
-    scen.solve(case="original_years", quiet=True)
+    scen.solve(case=f"{request.node.name}_original_years", quiet=True)
 
     yield scen, test_mp
 
