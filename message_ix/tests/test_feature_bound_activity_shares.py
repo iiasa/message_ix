@@ -98,9 +98,7 @@ def assert_dantzig_solution(s: "Scenario", lp_method: int) -> None:
     "constraint_value",
     [pytest.param(299, marks=pytest.mark.xfail(raises=ModelError)), 301, 325],
 )
-def test_b_a_u_all_modes(
-    request, test_mp, tmp_model_dir, lp_method, constraint_value, testrun_uid
-):
+def test_b_a_u_all_modes(request, test_mp, tmp_model_dir, lp_method, constraint_value):
     """Test ``bound_activity_up`` values applied mode="all".
 
     - In the unconstrained Dantzig problem:
@@ -136,9 +134,7 @@ def test_b_a_u_all_modes(
     # Ensure the solution is as expected given the LP method
     assert_dantzig_solution(scen, lp_method)
 
-    clone = scen.clone(
-        scenario=f"{scen.scenario}-{testrun_uid} cloned", keep_solution=False
-    )
+    clone = scen.clone(scenario=f"{scen.scenario} cloned", keep_solution=False)
     with clone.transact("Bound all modes of t=transport_from_seattle"):
         name = "bound_activity_up"
         clone.add_par(
