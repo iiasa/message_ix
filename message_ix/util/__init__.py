@@ -27,14 +27,11 @@ def copy_model(
     quiet : bool
         If :any:`False`, print actions to stdout; otherwise display nothing.
     """
-    try:
-        from importlib.resources import as_file, files
-    except ImportError:  # Python < 3.9
-        from importlib_resources import as_file, files
-
     from shutil import copyfile
 
     import ixmp
+
+    import message_ix
 
     path = Path(path).resolve()
 
@@ -46,14 +43,7 @@ def copy_model(
     else:
         output = print
 
-    # Identify the source directory using importlib.resources
-    for traversable in files("message_ix").iterdir():
-        if traversable.name == "model":
-            # Record the pathlib.Path associated with the Traversible object
-            # NB This may not work if `traversable` is, for instance, in a ZIP archive
-            with as_file(traversable) as f:
-                src_dir: Path = f
-            break
+    src_dir: Path = Path(message_ix.__file__).resolve().parent
 
     # Iterate over files in `src_dir`
     for src in src_dir.rglob("*"):
