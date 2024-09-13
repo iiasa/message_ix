@@ -1,5 +1,4 @@
 import re
-import shutil
 from pathlib import Path
 
 import pytest
@@ -8,7 +7,9 @@ import message_ix
 from message_ix import config
 
 
-def test_copy_model(monkeypatch, message_ix_cli, tmp_path, tmp_env, request):
+def test_copy_model(
+    monkeypatch, message_ix_cli, tmp_path, tmp_env, request, tmp_model_dir
+):
     # Use Pytest monkeypatch fixture; this ensures the original value is restored at the
     # end of the test
     monkeypatch.setattr(
@@ -37,18 +38,13 @@ def test_copy_model(monkeypatch, message_ix_cli, tmp_path, tmp_env, request):
     # Check if specific directory will be skipped
 
     # Create a GAMS runtime directory; these have names like "225a", etc.
-    model_path = Path(message_ix.__file__).parent.joinpath(
-        "model", request.node.name, "225c"
-    )
-    model_path.mkdir(parents=True)
+    model_path = tmp_model_dir.joinpath("225c")
+    model_path.mkdir()
 
-    message_ix_cli("copy-model", str(tmp_path))
+    message_ix_cli("copy-model", "--source-dir", tmp_model_dir, f"{tmp_path}-dest")
 
     # Directory is ignored
-    assert not Path(tmp_path / f"{request.node.name}/225c").exists()
-
-    # Clean up
-    shutil.rmtree(model_path.parent)
+    assert not Path(f"{tmp_path}-dest/225c").exists()
 
 
 @pytest.mark.parametrize(
