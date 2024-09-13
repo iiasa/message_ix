@@ -40,9 +40,9 @@ def message_ix_cli(tmp_env):
 
 
 @pytest.fixture(scope="class")
-def message_test_mp(test_mp, request):
-    make_dantzig(test_mp, request=request)
-    make_dantzig(test_mp, multi_year=True, request=request)
+def message_test_mp(test_mp):
+    make_dantzig(test_mp)
+    make_dantzig(test_mp, multi_year=True)
     yield test_mp
 
 
