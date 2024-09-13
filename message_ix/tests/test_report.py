@@ -90,8 +90,8 @@ def test_reporter_from_scenario(message_test_mp):
     assert_qty_equal(vom, rep.get(vom_key))
 
 
-def test_reporter_from_dantzig(test_mp):
-    scen = make_dantzig(test_mp, solve=True, quiet=True)
+def test_reporter_from_dantzig(test_mp, request):
+    scen = make_dantzig(test_mp, solve=True, quiet=True, request=request)
 
     # Reporter.from_scenario can handle Dantzig example model
     rep = Reporter.from_scenario(scen)
@@ -100,8 +100,10 @@ def test_reporter_from_dantzig(test_mp):
     rep.get("all")
 
 
-def test_reporter_from_westeros(test_mp):
-    scen = make_westeros(test_mp, emissions=True, solve=True, quiet=True)
+def test_reporter_from_westeros(test_mp, request):
+    scen = make_westeros(
+        test_mp, emissions=True, solve=True, quiet=True, request=request
+    )
 
     # Reporter.from_scenario can handle Westeros example model
     rep = Reporter.from_scenario(scen)

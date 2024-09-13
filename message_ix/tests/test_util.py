@@ -46,16 +46,16 @@ def test_make_df_deprecated():
     pdt.assert_frame_equal(pd.DataFrame.from_dict(base), exp)
 
 
-def test_testing_make_scenario(test_mp):
+def test_testing_make_scenario(test_mp, request):
     """Check the model creation functions in message_ix.testing."""
     # MESSAGE-scheme Dantzig problem can be created
-    scen = make_dantzig(test_mp, True)
+    scen = make_dantzig(test_mp, True, request=request)
     assert isinstance(scen, Scenario)
 
     # Multi-year variant can be created
-    scen = make_dantzig(test_mp, solve=True, multi_year=True)
+    scen = make_dantzig(test_mp, solve=True, multi_year=True, request=request)
     assert isinstance(scen, Scenario)
 
     # Westeros model can be created
-    scen = make_westeros(test_mp, solve=True)
+    scen = make_westeros(test_mp, solve=True, request=request)
     assert isinstance(scen, Scenario)
