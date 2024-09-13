@@ -129,8 +129,8 @@ class TestScenario:
             assert "'ixmp'.'3-" in result.stdout.decode()
 
 
-def test_year_int(test_mp):
-    scen = make_dantzig(test_mp, solve=True, multi_year=True)
+def test_year_int(test_mp, request):
+    scen = make_dantzig(test_mp, solve=True, multi_year=True, request=request)
 
     # Dimensions indexed by 'year' are returned as integers for all item types
     assert scen.set("cat_year").dtypes["year"] == "int"

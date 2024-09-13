@@ -251,9 +251,9 @@ def test_storage(test_mp):
     storage_setup(test_mp, time_duration, "_unequal_time")
 
 
-def test_structure(caplog, test_mp):
+def test_structure(caplog, test_mp, request):
     """:meth:`MESSAGE.initialize` and :meth:`MESSAGE.enforce` handle old structure."""
-    scen = make_dantzig(test_mp)
+    scen = make_dantzig(test_mp, request=request)
 
     # Item name to use for the tests, a parameter, and its dimensions
     name = "storage_initial"
