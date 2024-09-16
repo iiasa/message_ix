@@ -31,9 +31,11 @@ def w_data(w_data_path):
 
 
 @pytest.fixture(scope="module")
-def _ws(test_mp):
+def _ws(test_mp, request):
     """Reusable fixture with an instance of the Westeros model."""
-    scenario = make_westeros(test_mp, quiet=True).clone(scenario="test_macro")
+    scenario = make_westeros(test_mp, quiet=True, request=request).clone(
+        scenario=f"{request.node.name}_test_macro"
+    )
     scenario.solve()
     yield scenario
 
