@@ -56,19 +56,23 @@ def copy_model(
         else Path(message_ix.__file__).resolve().parent.joinpath("model")
     )
 
-    # Iterate over files in `src_dir`
-    for src in src_dir.rglob("*"):
+    def _exclude_path(p: Path) -> bool:
         # Skip certain files
-        if src.suffix in (".gdx", ".log", ".lst") or re.search("225[a-z]+", str(src)):
-            continue
+        if p.suffix in (".gdx", ".log", ".lst") or re.search("225[a-z]+", str(p)):
+            return False
+        return True
 
+    paths = list(filter(_exclude_path, src_dir.rglob("*")))
+
+    # Iterate over pre-filtered paths in `src_dir`
+    for original_path in paths:
         # Construct the destination path
-        dst = path / src.relative_to(src_dir)
+        dst = path / original_path.relative_to(src_dir)
 
         # Create parent directory
         dst.parent.mkdir(parents=True, exist_ok=True)
 
-        if src.is_dir():
+        if original_path.is_dir():
             # No further action for directories
             continue
 
@@ -84,7 +88,7 @@ def copy_model(
         else:
             output(f"Copy to {dst}")
 
-        copyfile(src, dst)
+        copyfile(original_path, dst)
 
     if set_default:
         ixmp.config.set("message model dir", path)
