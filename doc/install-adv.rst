@@ -46,7 +46,7 @@ Common ways to install Java include:
 - Use a version of Java bundled or packaged for your operating system (for example, Ubuntu and other Linux distributions).
 
 If using Anaconda or Miniconda, installing Java manually is *not required*.
-Tis is because the ``message-ix`` conda-forge package depends on the `openjdk <https://anaconda.org/conda-forge/openjdk>`_ package, so the latter is automatically installed with the former.
+This is because the ``message-ix`` conda-forge package depends on the `openjdk <https://anaconda.org/conda-forge/openjdk>`_ package, so the latter is automatically installed with the former.
 
 
 .. _install-gams:
