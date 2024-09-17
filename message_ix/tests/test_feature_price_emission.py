@@ -71,7 +71,13 @@ def add_two_tecs(scen: Scenario, years: List[int]) -> None:
     )
     scen.add_par(
         "emission_factor",
-        make_df("emission_factor", technology="dirty_tec", emission="CO2", unit="tCO2"),
+        make_df(
+            "emission_factor",
+            technology="dirty_tec",
+            emission="CO2",
+            unit="tCO2",
+            **common_base,
+        ),
     )
 
     # the clean technology has variable costs but no emissions
@@ -81,7 +87,13 @@ def add_two_tecs(scen: Scenario, years: List[int]) -> None:
     )
     scen.add_par(
         "var_cost",
-        make_df("var_cost", technology="clean_tec", time="year", unit="USD/GWa"),
+        make_df(
+            "var_cost",
+            technology="clean_tec",
+            time="year",
+            unit="USD/GWa",
+            **common_base,
+        ),
     )
 
 
@@ -132,6 +144,9 @@ def add_many_tecs(scen: Scenario, years: List[int], n=50) -> None:
     }
     year_df = scen.vintage_and_active_years()
     vintage_years, act_years = year_df["year_vtg"], year_df["year_act"]
+    mp = scen.platform
+    mp.add_unit("USD/kW")
+    mp.add_unit("tCO2/kWa")
 
     for t in tecs:
         scen.add_set("technology", t)
@@ -379,7 +394,7 @@ def test_price_duality(test_mp, request, bound, cumulative, years):
     )
     model_setup(scen, years, simple_tecs=False)
     bound_emission_base = dict(
-        node="World", type_emission="ghg", type_tec="all", value=bound, unit="tCO2"
+        node="World", type_emission="GHG", type_tec="all", value=bound, unit="tCO2"
     )
     if cumulative:
         scen.add_cat("year", "cumulative", years)
