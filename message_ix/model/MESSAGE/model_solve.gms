@@ -39,7 +39,14 @@ if (%foresight% = 0,
         ABORT "MESSAGEix did not solve to optimality!"
     ) ;
 
-* assign auxiliary variables DEMAND for integration with MACRO
+* rescale the dual of the emission constraint to account that the constraint is defined on the average year, not total
+EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
+        EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year) ) =
+    EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)
+        / SUM(year$( cat_year(type_year,year) ), duration_period(year) )
+        * SUM(year$( map_first_period(type_year,year) ), duration_period(year) / df_period(year) * df_year(year) );
+
+* assign auxiliary variable DEMAND for integration with MACRO
     DEMAND.l(node,commodity,level,year,time) = demand_fixed(node,commodity,level,year,time) ;
 
 * assign auxiliary variables PRICE_COMMODITY and PRICE_EMISSION for reporting
