@@ -102,7 +102,7 @@ def add_many_tecs(scen: Scenario, years: List[int], n=50) -> None:
     # Add some hardcoded tecs for temporary testing
     tecs: dict[str, dict] = {
         "tec1": {
-            "emission_factor": 10,
+            "emission_factor": 7.4,
             "inv_cost": 500,
             "fix_cost": 30,
             "var_cost": 30,
@@ -110,35 +110,35 @@ def add_many_tecs(scen: Scenario, years: List[int], n=50) -> None:
             "lifetime": 20,
         },
         "tec2": {
-            "emission_factor": -10,
-            "inv_cost": 1200,
+            "emission_factor": 0,
+            "inv_cost": 1500,
             "fix_cost": 10,
             "var_cost": 0,
-            "bound_activity_up": 40,
+            "bound_activity_up": 100,
             "lifetime": 20,
         },
         "tec3": {
-            "emission_factor": -12,
-            "inv_cost": 1300,
-            "fix_cost": 12,
-            "var_cost": 0,
-            "bound_activity_up": 30,
+            "emission_factor": 2.5,
+            "inv_cost": 700,
+            "fix_cost": 30,
+            "var_cost": 30,
+            "bound_activity_up": 1000,
             "lifetime": 20,
         },
         "tec4": {
-            "emission_factor": -14,
-            "inv_cost": 1400,
-            "fix_cost": 14,
-            "var_cost": 0,
-            "bound_activity_up": 20,
-            "lifetime": 20,
-        },
-        "tec5": {
-            "emission_factor": -16,
-            "inv_cost": 1500,
-            "fix_cost": 16,
+            "emission_factor": 0,
+            "inv_cost": 2000,
+            "fix_cost": 5,
             "var_cost": 0,
             "bound_activity_up": 10,
+            "lifetime": 40,
+        },
+        "tec5": {
+            "emission_factor": 10,
+            "inv_cost": 400,
+            "fix_cost": 30,
+            "var_cost": 30,
+            "bound_activity_up": 100,
             "lifetime": 20,
         },
     }
@@ -190,7 +190,7 @@ def add_many_tecs(scen: Scenario, years: List[int], n=50) -> None:
                 time="year",
                 unit="USD/kWa",
                 technology=t,
-                value=tecs[t]["fix_cost"],
+                value=tecs[t]["var_cost"],
             ),
         )
         scen.add_par(
@@ -367,24 +367,20 @@ def test_custom_type_variable_periodlength(test_mp, request):
     npt.assert_allclose(obs, exp)
 
 
-bound = 0.2
-cumulative = False
-years = [2020, 2021, 2022, 2023]
-tag = "yearly_" + str(bound) + "_equal"
-
-
+# TODO as per Oliver's description:
+# - Only need cumulative (no need to parametrize)
 @pytest.mark.parametrize(
-    "bound, cumulative, years",
+    "bound, years",
     [
-        (0.25, True, [2020, 2030, 2040, 2050]),
-        (0.25, True, [2020, 2025, 2030, 2040, 2050]),
-        (0.50, True, [2020, 2030, 2040, 2050]),
-        (0.50, True, [2020, 2025, 2030, 2040, 2050]),
-        (0.75, True, [2020, 2030, 2040, 2050]),
-        (0.75, True, [2020, 2025, 2030, 2040, 2050]),
+        (10, [2010, 2020, 2025, 2030, 2035, 2040, 2050]),
+        (10, [2010, 2015, 2020, 2030, 2040, 2045, 2050]),
+        (40, [2010, 2020, 2025, 2030, 2035, 2040, 2050]),
+        (40, [2010, 2015, 2020, 2030, 2040, 2045, 2050]),
+        (75, [2010, 2020, 2025, 2030, 2035, 2040, 2050]),
+        (75, [2010, 2015, 2020, 2030, 2040, 2045, 2050]),
     ],
 )
-def test_price_duality(test_mp, request, bound, cumulative, years):
+def test_price_duality(test_mp, request, bound, years):
     # set up a scenario for cumulative constraints
     scen = Scenario(
         test_mp,
@@ -396,23 +392,16 @@ def test_price_duality(test_mp, request, bound, cumulative, years):
     bound_emission_base = dict(
         node="World", type_emission="GHG", type_tec="all", value=bound, unit="tCO2"
     )
-    if cumulative:
-        scen.add_cat("year", "cumulative", years)
-        scen.add_par(
+    # We use a `cumulative` base
+    scen.add_cat("year", "cumulative", years)
+    scen.add_par(
+        "bound_emission",
+        make_df(
             "bound_emission",
-            make_df(
-                "bound_emission",
-                type_year="cumulative",
-                **bound_emission_base,
-            ),
-        )
-    else:
-        for y in years:
-            scen.add_cat("year", y, y)
-            scen.add_par(
-                "bound_emission",
-                make_df("bound_emission", type_year=y, **bound_emission_base),
-            )
+            type_year="cumulative",
+            **bound_emission_base,
+        ),
+    )
     scen.commit("initialize test scenario")
     scen.solve(quiet=True, **solve_args)
 
@@ -427,6 +416,8 @@ def test_price_duality(test_mp, request, bound, cumulative, years):
         version="new",
     )
     model_setup(scen_tax, years, simple_tecs=False)
+    # TODO Why do we do this? We applied the bound as cumulative before, but the tax
+    # should be per-period?
     for year in years:
         scen_tax.add_cat("year", year, year)
 
@@ -435,6 +426,7 @@ def test_price_duality(test_mp, request, bound, cumulative, years):
         columns={"year": "type_year", "lvl": "value"}
     )
     taxes["unit"] = "USD/tCO2"
+    # TODO Check: bound is on "World", taxes are on "node"
     taxes["node"] = "node"
     scen_tax.add_par("tax_emission", taxes)
     scen_tax.commit("initialize test scenario for taxes")
@@ -458,6 +450,12 @@ def test_price_duality(test_mp, request, bound, cumulative, years):
     price_emission = scen.var("PRICE_EMISSION", filters).set_index("year").lvl
     price_emission_tax = scen_tax.var("PRICE_EMISSION", filters).set_index("year").lvl
     npt.assert_allclose(price_emission, price_emission_tax)
+
+    # check "tax_emission" and "PRICE_EMISSION" are equal in tax-scenario
+    filters = {"node": "World"}
+    tax_emission = scen_tax.par("tax_emission", filters).set_index("type_year").value
+    price_emission_tax = scen_tax.var("PRICE_EMISSION", filters).set_index("year").lvl
+    npt.assert_allclose(tax_emission, price_emission_tax)
 
     # --------------------------------------------------------
     # Run scenario with annual-emission bound based on `EMISS`
@@ -499,107 +497,3 @@ def test_price_duality(test_mp, request, bound, cumulative, years):
         scenario_period_bound.var("PRICE_EMISSION", filters).set_index("year").lvl
     )
     npt.assert_allclose(price_emission, price_emission_period_bound)
-
-
-# idea: try running the same with the westeros scenario
-# Let's not do that, though, because make_westeros has the westeros years hardcoded
-# Instead, try to ensure this model setup follows westeros as a sanity check
-# @pytest.mark.parametrize(
-#     "cumulative_bound, years",
-#     [
-#         (400, [2020, 2030, 2040, 2050]),
-#         (400, [2020, 2025, 2030, 2040, 2050]),
-#         (500, [2020, 2030, 2040, 2050]),
-#         (500, [2020, 2025, 2030, 2040, 2050]),
-#         (600, [2020, 2030, 2040, 2050]),
-#         (600, [2020, 2025, 2030, 2040, 2050]),
-#     ],
-# )
-# def test_price_duality_westeros(test_mp, request, cumulative_bound, years):
-#     baseline = make_westeros(
-#         mp=test_mp, model_horizon=years, emissions=True, request=request
-#     )
-#     year_df = baseline.vintage_and_active_years()
-#     vintage_years, act_years = year_df["year_vtg"], year_df["year_act"]
-#     country = "Westeros"
-#     test_mp.add_unit("MtCO2")
-#     emission_factor = make_df(
-#         "emission_factor",
-#         node_loc=country,
-#         year_vtg=vintage_years,
-#         year_act=act_years,
-#         mode="standard",
-#         unit="tCO2/kWa",
-#         technology="coal_ppl",
-#         emission="CO2",
-#         value=7.4,
-#     )
-
-#     # Define cumulate emission bound and solve that Scenario
-#     scen_cumulative_bound = baseline.clone(
-#         MODEL,
-#         "emission_bound",
-#         "introducing an upper bound on emissions",
-#         keep_solution=False,
-#     )
-#     scen_cumulative_bound.check_out()
-#     scen_cumulative_bound.add_set("emission", "CO2")
-#     scen_cumulative_bound.add_cat("emission", "GHG", "CO2")
-#     scen_cumulative_bound.add_par("emission_factor", emission_factor)
-#     scen_cumulative_bound.add_par(
-#         "bound_emission",
-#         [country, "GHG", "all", "cumulative"],
-#         value=cumulative_bound,
-#         unit="MtCO2",
-#     )
-#     scen_cumulative_bound.commit(
-#         comment="Introducing emissions and setting an upper bound"
-#     )
-#     scen_cumulative_bound.set_as_default()
-#     scen_cumulative_bound.solve(quiet=True, **solve_args)
-
-#     # ----------------------------------------------------------
-#     # Run scenario with `tax_emission` based on `PRICE_EMISSION`
-#     # from cumulative constraint scenario.
-#     # ----------------------------------------------------------
-#     scen_tax = baseline.clone(
-#         MODEL,
-#         "tax_emission",
-#         "introducing a fixed tax on emissions",
-#         keep_solution=False,
-#     )
-#     scen_tax.check_out()
-#     scen_cumulative_bound.add_set("emission", "CO2")
-#     scen_cumulative_bound.add_cat("emission", "GHG", "CO2")
-#     scen_cumulative_bound.add_par("emission_factor", emission_factor)
-
-#     # use emission prices from cumulative-constraint scenario as taxes
-#     taxes = scen_cumulative_bound.var("PRICE_EMISSION").rename(
-#         columns={"year": "type_year", "lvl": "value"}
-#     )
-#     taxes["unit"] = "USD/tCO2"
-#     taxes["node"] = "node"
-#     scen_tax.add_par("tax_emission", taxes)
-#     scen_tax.commit("initialize test scenario for taxes")
-#     scen_tax.solve(quiet=True, **solve_args)
-#     # scen_tax.solve(**solve_args)
-
-#     print(scen_cumulative_bound.var("PRICE_EMISSION"))
-#     print(scen_tax.var("PRICE_EMISSION"))
-#     print(scen_tax.par("tax_emission"))
-#     print(scen_cumulative_bound.var("EMISS"))
-#     print(scen_tax.var("EMISS"))
-
-#     # check emissions are close between cumulative and tax scenarios
-#     filters = {"node": "World"}
-#     emiss = scen_cumulative_bound.var("EMISS", filters).set_index("year").lvl
-#     emiss_tax = scen_tax.var("EMISS", filters).set_index("year").lvl
-#     npt.assert_allclose(emiss, emiss_tax, rtol=0.05)
-
-#     # check "PRICE_EMISSION" is close between cumulative and tax scenarios
-#     filters = {"node": "World"}
-#     price_emission = (
-#         scen_cumulative_bound.var("PRICE_EMISSION", filters).set_index("year").lvl
-#     )
-#     price_emission_tax = scen_tax.var("PRICE_EMISSION", filters).set_index("year").lvl
-#     npt.assert_allclose(price_emission, price_emission_tax)
