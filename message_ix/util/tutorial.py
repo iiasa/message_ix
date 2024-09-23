@@ -10,7 +10,9 @@ log = logging.getLogger(__name__)
 PLOTS = [
     ("activity", operator.stacked_bar, "out:nl-t-ya", "GWa"),
     ("capacity", operator.stacked_bar, "CAP:nl-t-ya", "GW"),
+    ("cdr capacity", operator.stacked_bar, "CAP:nl-t-ya", "tCO2/yr"),
     ("demand", operator.stacked_bar, "demand:n-c-y", "GWa"),
+    ("emission", operator.stacked_bar, "emi:nl-t-ya", "tCO2"),
     ("extraction", operator.stacked_bar, "EXT:n-c-g-y", "GW"),
     ("new capacity", operator.stacked_bar, "CAP_NEW:nl-t-yv", "GWa"),
     ("prices", operator.stacked_bar, "PRICE_COMMODITY:n-c-y", "¢/kW·h"),
@@ -27,6 +29,8 @@ def prepare_plots(rep: Reporter, input_costs="$/GWa") -> None:
     - ``plot extraction``
     - ``plot fossil supply curve``
     - ``plot capacity``
+    - ``plot cdr capacity``
+    - ``plot emission``
     - ``plot new capacity``
     - ``plot prices``
 
@@ -47,7 +51,7 @@ def prepare_plots(rep: Reporter, input_costs="$/GWa") -> None:
     # Add one node to the reporter for each plot
     for title, func, key_str, units in PLOTS:
         # Convert the string to a Key object so as to reference its .dims
-        key = Key(key_str)
+        key = Key.from_str_or_key(key_str)
 
         # Operation for the reporter
         comp = partial(
