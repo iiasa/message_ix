@@ -33,7 +33,12 @@ def message_ix_cli(tmp_env):
     class Runner(CliRunner):
         def invoke(self, *args, **kwargs):
             return super().invoke(
-                cli.main, list(filter(None, args)), env=tmp_env, **kwargs
+                cli.main,
+                list(filter(None, args)),
+                env=tmp_env,
+                catch_exceptions=False,
+                color=True,
+                **kwargs,
             )
 
     yield Runner().invoke
