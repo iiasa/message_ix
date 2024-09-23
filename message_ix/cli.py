@@ -65,7 +65,7 @@ def dl(branch, tag, path):
     from urllib.request import Request, urlopen
 
     if tag and branch:
-        raise click.BadOptionUsage("Can only provide one of `tag` or `branch`")
+        raise click.UsageError(message="Can only provide one of `tag` or `branch`")
     elif branch:
         # Construct URL and filename from branch
         zipname = f"{branch}.zip"
