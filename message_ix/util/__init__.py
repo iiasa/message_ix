@@ -62,7 +62,7 @@ def copy_model(
             return False
         return True
 
-    paths = list(filter(_exclude_path, src_dir.rglob("*")))
+    paths = filter(_exclude_path, list(src_dir.rglob("*")))
 
     # Iterate over pre-filtered paths in `src_dir`
     for original_path in paths:
