@@ -17,7 +17,7 @@ def map_for_sankey(
     iam_df: IamDataFrame,
     year: int,
     region: str,
-    exclude: list[Optional[str]] = [],
+    exclude: List[Optional[str]] = [],
 ) -> dict[str, Tuple[Union[List, Any, LiteralString], Union[List, Any, LiteralString]]]:
     """Maps input to output flows to enable Sankey plots.
 
