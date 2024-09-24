@@ -16,23 +16,24 @@ from message_ix.models import MACRO, MESSAGE
 
 def copy_model(
     path: Path,
-    source_dir: Optional[Path] = None,
     overwrite: bool = False,
     set_default: bool = False,
     quiet: bool = False,
+    *,
+    source_dir: Optional[Path] = None,
 ) -> None:
     """Copy the MESSAGE GAMS files to a new `path`.
 
     Parameters
     ----------
-    source_dir : Path
-        If given, copy model files from this directory instead of the main one.
     overwrite : bool
         If :any:`True`, overwrite existing files.
     set_default : bool
         If :any:`True`, update the ixmp configuration setting "message model dir".
     quiet : bool
         If :any:`False`, print actions to stdout; otherwise display nothing.
+    source_dir : Path, optional
+        If given, copy model files from this directory instead of the main one.
     """
     from shutil import copyfile
 

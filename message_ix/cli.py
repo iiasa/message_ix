@@ -34,10 +34,10 @@ ixmp.cli.ScenarioClass = message_ix.Scenario
 @click.option(
     "--source-dir",
     type=click.Path(file_okay=False),
-    help="Optional directory to copy file from.",
+    help="Optional directory to copy files from.",
 )
 @click.argument("path", type=click.Path(file_okay=False))
-def copy_model_cmd(path, source_dir, overwrite, set_default, quiet):
+def copy_model_cmd(path, overwrite, set_default, quiet, source_dir):
     """Copy the MESSAGE GAMS files to a new PATH.
 
     To use an existing set of GAMS files, you can also call:
@@ -46,7 +46,7 @@ def copy_model_cmd(path, source_dir, overwrite, set_default, quiet):
     """
     from message_ix.util import copy_model
 
-    copy_model(path, source_dir, overwrite, set_default, quiet)
+    copy_model(path, overwrite, set_default, quiet, source_dir=source_dir)
 
 
 @main.command()
