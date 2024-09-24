@@ -49,36 +49,32 @@ def test_copy_model(
 
 
 @pytest.mark.parametrize(
-    "opts",
+    "opts, exit_code",
     [
-        "",
-        "--branch=main",
-        "--tag=v1.2.0",
+        ([""], 0),
+        (["--branch=main"], 0),
+        (["--tag=v1.2.0"], 0),
         # Nonexistent tag
-        pytest.param("--tag=v999", marks=pytest.mark.xfail(raises=ValueError)),
+        pytest.param(["--tag=v999"], 0, marks=pytest.mark.xfail(raises=ValueError)),
         # Can't use both --tag and --branch
+        # TODO Why is this not actually raising a click.UsageError?
         pytest.param(
             ["--branch=main", "--tag=v1.2.0"],
+            2,
             marks=pytest.mark.xfail(raises=click.UsageError),
         ),
     ],
 )
-def test_dl(message_ix_cli, opts, tmp_path):
-    if isinstance(opts, list):
-        r = message_ix_cli("dl", *opts, str(tmp_path))
-        # TODO Why is this not actually raising a click.UsageError?
-        assert r.exit_code == 2, (r.exception, r.output)
-    else:
-        r = message_ix_cli("dl", opts, str(tmp_path))
+def test_dl(message_ix_cli, opts, exit_code, tmp_path):
+    r = message_ix_cli("dl", *opts, str(tmp_path))
+    assert r.exit_code == exit_code, (r.exception, r.output)
 
-        assert r.exit_code == 0, (r.exception, r.output)
+    if opts == "":
+        # Guess what the latest release will be from GitHub, using __version__.
+        # This string is provided by setuptools-scm based on the most recent
+        # Git tag, e.g. if the tag is 'v3.0.0' it may be '3.0.1.devN+etc'.
+        major = message_ix.__version__.split(".")[0]
 
-        if opts == "":
-            # Guess what the latest release will be from GitHub, using __version__.
-            # This string is provided by setuptools-scm based on the most recent
-            # Git tag, e.g. if the tag is 'v3.0.0' it may be '3.0.1.devN+etc'.
-            major = message_ix.__version__.split(".")[0]
-
-            # 'message-ix dl' defaults to the latest release
-            pattern = re.compile(rf"Default: latest release v{major}\.\d+\.\d+")
-            assert pattern.match(r.output)
+        # 'message-ix dl' defaults to the latest release
+        pattern = re.compile(rf"Default: latest release v{major}\.\d+\.\d+")
+        assert pattern.match(r.output)
