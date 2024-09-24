@@ -7,8 +7,10 @@ GitHub community guidelines
 Add community guidelines for interaction on GitHub (:pull:`871`).
 Please familiarize yourself with these to foster an open and welcoming community!
 
-.. All changes
-.. -----------
+All changes
+-----------
+
+- Add option to :func:`.util.copy_model` from a non-default location of model files (:pull:`877`).
 
 .. _v3.9.0:
 
