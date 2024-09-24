@@ -1,4 +1,4 @@
-from typing import Any, List, LiteralString, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 from pyam import IamDataFrame
 
@@ -6,6 +6,11 @@ try:
     from pyam.str import get_variable_components
 except ImportError:  # Python < 3.10, pandas < 2.0
     from pyam.utils import get_variable_components
+
+try:
+    from typing import LiteralString
+except ImportError:  # Python < 3.11
+    from typing_extensions import LiteralString
 
 
 def map_for_sankey(
