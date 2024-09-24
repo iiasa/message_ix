@@ -6,7 +6,7 @@ import pytest
 from message_ix import Scenario, make_df
 from message_ix.report import Reporter
 from message_ix.testing import make_dantzig, make_westeros
-from message_ix.util.sankey import sankey_mapper
+from message_ix.util.sankey import map_for_sankey
 
 
 def test_make_df():
@@ -63,12 +63,13 @@ def test_testing_make_scenario(test_mp, request):
     assert isinstance(scen, Scenario)
 
 
-def test_sankey_mapper(test_mp):
-    # NB: we actually only need a pd.DataFrame that has the same form as the result of
-    # these setup steps, so maybe this can be simplified
-    scen = make_westeros(test_mp, solve=True)
+def test_map_for_sankey(test_mp, request):
+    # NB: we actually only need a pyam.IamDataFrame that has the same form as the result
+    # of these setup steps, so maybe this can be simplified
+    scen = make_westeros(test_mp, solve=True, request=request)
     rep = Reporter.from_scenario(scen)
     rep.configure(units={"replace": {"-": ""}})
+    rep.add_sankey()
     df = rep.get("message::sankey")
 
     # Set expectations
@@ -90,26 +91,16 @@ def test_sankey_mapper(test_mp):
         "out|useful|light|bulb|standard": ("bulb|standard", "useful|light"),
     }
     expected_without_final_electricity = {
-        "in|secondary|electricity|grid|standard": (
-            "secondary|electricity",
-            "grid|standard",
-        ),
-        "out|secondary|electricity|coal_ppl|standard": (
-            "coal_ppl|standard",
-            "secondary|electricity",
-        ),
-        "out|secondary|electricity|wind_ppl|standard": (
-            "wind_ppl|standard",
-            "secondary|electricity",
-        ),
-        "out|useful|light|bulb|standard": ("bulb|standard", "useful|light"),
+        key: value
+        for (key, value) in expected_all.items()
+        if "final|electricity" not in value
     }
 
     # Load all variables
-    mapping_all = sankey_mapper(df, year=700, region="Westeros")
+    mapping_all = map_for_sankey(df, year=700, region="Westeros")
     assert mapping_all == expected_all
 
-    mapping_without_final_electricity = sankey_mapper(
+    mapping_without_final_electricity = map_for_sankey(
         df, year=700, region="Westeros", exclude=["final|electricity"]
     )
     assert mapping_without_final_electricity == expected_without_final_electricity
