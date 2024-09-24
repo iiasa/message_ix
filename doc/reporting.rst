@@ -215,6 +215,7 @@ These automatic contents are prepared using:
    .. autosummary::
       add
       add_queue
+      add_sankey
       add_single
       apply
       check_keys
