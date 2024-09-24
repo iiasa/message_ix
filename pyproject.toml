@@ -96,7 +96,7 @@ local_partial_types = true
 [[tool.mypy.overrides]]
 # Packages/modules for which no type hints are available.
 module = [
-  "pyam",
+  "pyam.*",
   "scipy.*",
   # Indirectly via ixmp; this should be a subset of the list in ixmp's pyproject.toml
   "jpype",
