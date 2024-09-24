@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from pyam import IamDataFrame
 
@@ -18,7 +18,7 @@ def map_for_sankey(
     year: int,
     region: str,
     exclude: List[Optional[str]] = [],
-) -> dict[str, Tuple[Union[List, Any, LiteralString], Union[List, Any, LiteralString]]]:
+) -> Dict[str, Tuple[Union[List, Any, LiteralString], Union[List, Any, LiteralString]]]:
     """Maps input to output flows to enable Sankey plots.
 
     Parameters
