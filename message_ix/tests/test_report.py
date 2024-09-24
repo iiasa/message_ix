@@ -289,3 +289,20 @@ def test_reporter_as_pyam(caplog, tmp_path, dantzig_reporter):
     # Results have the expected units
     assert all(df5["unit"] == "centiUSD / case")
     assert_series_equal(df4["value"], df5["value"] / 100.0)
+
+
+def test_reporter_add_sankey(test_mp, request):
+    scen = make_westeros(
+        test_mp, emissions=True, solve=True, quiet=True, request=request
+    )
+
+    # Reporter.from_scenario can handle Westeros example model
+    rep = Reporter.from_scenario(scen)
+
+    # Westeros-specific configuration: '-' is a reserved character in pint
+    configure(units={"replace": {"-": ""}})
+
+    # Add Sankey calculation(s)
+    rep.add_sankey()
+
+    assert rep.check_keys("message::sankey")
