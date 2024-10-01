@@ -142,7 +142,7 @@ Variables
 * =========================================================================== ======================================================================================================
 *
 * .. warning::
-*    Please be aware that transitioning from one period length to another for consecutive periods may result in false values of :math:`\text{PRICE_EMISSION}`. 
+*    Please be aware that transitioning from one period length to another for consecutive periods may result in false values of :math:`\text{PRICE_EMISSION}`.
 *    Please see `this issue <https://github.com/iiasa/message_ix/issues/723>`_ for further information. We are currently working on a fix.
 ***
 
@@ -246,6 +246,7 @@ Equations
     CAPACITY_MAINTENANCE_HIST       constraint for capacity maintenance  historical installation (built before start of model horizon)
     CAPACITY_MAINTENANCE_NEW        constraint for capacity maintenance of new capacity built in the current period (vintage == year)
     CAPACITY_MAINTENANCE            constraint for capacity maintenance over the technical lifetime
+    END_OF_LIFETIME_CAPACITY        constraint to keep the capcacity zero after the lifetime of a technology
     OPERATION_CONSTRAINT            constraint on maximum yearly operation (scheduled down-time for maintenance)
     MIN_UTILIZATION_CONSTRAINT      constraint for minimum yearly operation (aggregated over the course of a year)
     RENEWABLES_POTENTIAL_CONSTRAINT constraint on renewable resource potential
@@ -555,40 +556,128 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 *
 * Auxiliary COMMODITY_BALANCE
 * """""""""""""""""""""""""""
-* For the commodity balance constraints below, we introduce an auxiliary variable called :math:`\text{COMMODITY_BALANCE}`. This is implemented
-* as a GAMS ``$macro`` function.
+* For the commodity balance constraints below, we introduce an auxiliary variable called :math:`COMMODITY\_BALANCE`. This is implemented
+* as a GAMS ``$macro`` function. This variable also incldues the material flows upon construction and retirement of the technology capacities.
+* For the material flows, below formulation is valid for the model years that are different than the first model year. The formulation for the first model
+* year requires the use of :math:`historical\_new\_capacity` instead of :math:`CAP` variable and depends on conditions for :math:`remaining\_capacity` to
+* consider whether the end of a lifetime falls within a duration of a model period (:math:`duration\_period`) or not.
 *
 *  .. math::
-*     \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} \text{output}_{n^L,t,y^V,y,m,n,c,l,h^A,h}
-*         \cdot \text{duration_time_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,y^V,y,m,h^A} & \\
-*     - \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} \text{input}_{n^L,t,y^V,y,m,n,c,l,h^A,h}
-*         \cdot \text{duration_time_rel}_{h,h^A} \cdot \text{ACT}_{n^L,t,m,y,h^A} & \\
-*     + \ \text{STOCK_CHG}_{n,c,l,y,h} + \ \sum_s \Big( \text{land_output}_{n,s,y,c,l,h} - \text{land_input}_{n,s,y,c,l,h} \Big) \cdot & \text{LAND}_{n,s,y} \\[4pt]
-*     - \ \text{demand_fixed}_{n,c,l,y,h}
-*     = \text{COMMODITY_BALANCE}_{n,c,l,y,h} \quad \forall \ l \notin (L^{\text{RES}}, & L^{\text{REN}}, L^{\text{STOR}} \subseteq L)
+*     \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} output_{n^L,t,y^V,y,m,n,c,l,h^A,h}
+*         \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,y^V,y,m,h^A} & \\
+*     - \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} input_{n^L,t,y^V,y,m,n,c,l,h^A,h}
+*         \cdot duration\_time\_rel_{h,h^A} \cdot ACT_{n^L,t,m,y,h^A} & \\
+*     + \sum_{\substack{n^L,t}} output\_cap\_new_{n^L,t,y,n,c,l,h}
+*        \cdot CAP\_NEW_{n^L,t,y} & \\
+*     - \sum_{\substack{n^L,t}} input\_cap\_new_{n^L,t,y,n,c,l,h}
+*         \cdot CAP\_NEW_{n^L,t,y} & \\
+*     + \sum_{\substack{n^L,t \\ y^V \leq y}} output\_cap\_ret_{n^L,t,y^V,n,c,l,h}
+*         \cdot ( CAP_{n^L,t,y^V,y-1} - CAP_{n^L,t,y^V,y} ) \cdot \frac{1}{duration\_period_y} & \\
+*     - \sum_{\substack{n^L,t \\ y^V \leq y}} input\_cap\_ret_{n^L,t,y^V,n,c,l,h}
+*         \cdot ( CAP_{n^L,t,y^V,y-1} - CAP_{n^L,t,y^V,y} ) \cdot \frac{1}{duration\_period_y} & \\
+*     + \sum_{\substack{n^L,t \\ y^V \leq y}} output\_cap_{n^L,t,y^V,y,n,c,l,h}
+*         \cdot CAP_{n^L,t,y^V,y} & \\
+*     - \sum_{\substack{n^L,t \\ y^V \leq y}} input\_cap_{n^L,t,y^V,y,n,c,l,h}
+*         \cdot CAP_{n^L,t,y^V,y} & \\
+*     + \ STOCK\_CHG_{n,c,l,y,h} + \ \sum_s \Big( land\_output_{n,s,y,c,l,h} - land\_input_{n,s,y,c,l,h} \Big) \cdot & LAND_{n,s,y} \\[4pt]
+*     - \ demand\_fixed_{n,c,l,y,h}
+*     = COMMODITY\_BALANCE_{n,c,l,y,h} \quad \forall \ l \notin (L^{RES}, & L^{REN}, L^{STOR} \subseteq L)
 *
 * The commodity balance constraint at the resource level is included in the `Equation RESOURCE_CONSTRAINT`_,
 * while at the renewable level, it is included in the `Equation RENEWABLES_EQUIVALENCE`_,
 * and at the storage level, it is included in the `Equation STORAGE_BALANCE`_.
 ***
-$macro COMMODITY_BALANCE(node,commodity,level,year,time) (                                                             \
-    SUM( (location,tec,vintage,mode,time2)$( map_tec_act(location,tec,year,mode,time2)                                 \
-            AND map_tec_lifetime(location,tec,vintage,year) ),                                                         \
+Sets
+map_retirement_induration_period(location,tec,vintage,year_all2,year_all)  mapping set of the if conditions for the capacity retirement flows with lifetime within the duration period
+map_retirement_outduration_period(location,tec,vintage,year_all2,year_all) mapping set of the if conditions for the capacity retirement flows with lifetime outside the duration period
+map_cap_new(location,tec,vintage,year_all2,year_all)                       mapping set of the if conditions for the new capacity construction flows
+;
+map_retirement_induration_period(location,tec,vintage,year_all2,year_all)   $ (inv_tec(tec) AND map_tec_lifetime_extended(location,tec,vintage,year_all2)
+                                                                                        AND first_period(year_all) AND seq_period(year_all2,year_all)
+                                                                                        AND (remaining_capacity_extended(location,tec,vintage,year_all) = 0)
+                                                                                        AND NOT map_tec_lifetime_extended(location,tec,vintage,year_all)) = yes;
+map_retirement_outduration_period(location,tec,vintage,year_all2,year_all)  $ (inv_tec(tec) AND map_tec_lifetime_extended(location,tec,vintage,year_all2)
+                                                                                        AND first_period(year_all) AND seq_period(year_all2,year_all)
+                                                                                        AND (remaining_capacity_extended(location,tec,vintage,year_all)< 1)
+                                                                                        AND (remaining_capacity_extended(location,tec,vintage,year_all)>0) ) = yes;
+map_cap_new(location,tec,vintage,year_all2,year_all)                        $  (inv_tec(tec) AND map_tec_lifetime(location,tec,vintage,year_all2)
+                                                                                        AND NOT first_period(year_all) AND seq_period(year_all2,year_all)) = yes ;
+
+Equation
+COMMODITY_BALANCE_AUX(node,commodity,level,year_all,time) 'auxiliary equation to calculate commodity balance' ;
+
+Variable
+COMMODITY_BALANCE(node,commodity,level,year_all,time) 'auxiliary variable to calculate commodity balance';
+
+COMMODITY_BALANCE_AUX(node,commodity,level,year,time) $( map_commodity(node,commodity,level,year,time) AND NOT level_resource(level) AND NOT level_renewable(level) ) ..
+COMMODITY_BALANCE(node,commodity,level,year,time) =E=
+    SUM( (location,tec,vintage,mode,time2)$( map_tec_act(location,tec,year,mode,time2)
+            AND map_tec_lifetime(location,tec,vintage,year) ),
 * import into node and output by all technologies located at 'location' sending to 'node' and 'time2' sending to 'time'
-        output(location,tec,vintage,year,mode,node,commodity,level,time2,time)                                         \
-        * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2)                                    \
+        output(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+        * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2)
 * export from node and input into technologies located at 'location' taking from 'node' and 'time2' taking from 'time'
-        - input(location,tec,vintage,year,mode,node,commodity,level,time2,time)                                        \
-        * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2) )                                  \
+        - input(location,tec,vintage,year,mode,node,commodity,level,time2,time)
+        * duration_time_rel(time,time2) * ACT(location,tec,vintage,year,mode,time2) )
+* +++++
+* commodity input and output associated with construction of new technology capacity (during vintage period)
+  + SUM( (location,tec)$( inv_tec(tec) AND map_tec(location,tec,year) ),
+* output by all new capacity of technologies located at 'location' sending to 'node' and 'time'
+        output_cap_new(location,tec,year,node,commodity,level,time)
+        * CAP_NEW(location,tec,year)
+* input by all new capacity of technologies located at 'location' taking from 'node' and 'time'
+        - input_cap_new(location,tec,year,node,commodity,level,time)
+        * CAP_NEW(location,tec,year) )
+* commodity input and output associated with retirement of technology capacity (via differentials of capacity of successive periods)
+* for first model period (differential with historical remaining capacity)
+* if the end of a lifetime falls within a duration of a model period (remaining capacity in the first year is 0).
+  + SUM( (location,tec,vintage,year_all2)$(map_retirement_induration_period(location,tec,vintage,year_all2,year)
+),
+* output by all new capacity of technologies located at 'location' sending to 'node' and 'time' distributed over years of periods
+        output_cap_ret(location,tec,vintage,node,commodity,level,time)
+        *  (historical_new_capacity(node,tec,vintage) * remaining_capacity_extended(node,tec,vintage,year_all2))
+* input by all new capacity of technologies located at 'location' taking from 'node' and 'time' distributed over years of periods
+        - input_cap_ret(location,tec,vintage,node,commodity,level,time)
+        *  (historical_new_capacity(node,tec,vintage) * remaining_capacity_extended(node,tec,vintage,year_all2)))
+* commodity input and output associated with retirement of technology capacity (via differentials of capacity of successive periods)
+* for first model period (differential with historical remaining capacity)
+* if the end of a lifetime doens't fall within a duration of a model period (remaining capacity in the first year is different than 1 or 0).
+  + SUM( (location,tec,vintage,year_all2)$( map_retirement_outduration_period(location,tec,vintage,year_all2,year)
+),
+* output by all new capacity of technologies located at 'location' sending to 'node' and 'time' distributed over years of periods
+        output_cap_ret(location,tec,vintage,node,commodity,level,time)
+        *  (historical_new_capacity(node,tec,vintage) * (1 - remaining_capacity_extended(node,tec,vintage,year)))
+* input by all new capacity of technologies located at 'location' taking from 'node' and 'time' distributed over years of periods
+        - input_cap_ret(location,tec,vintage,node,commodity,level,time)
+        *  (historical_new_capacity(node,tec,vintage) * (1-remaining_capacity_extended(node,tec,vintage,year))) )
+* for other model periods (differential with installed capacity of preceding period)
+  + SUM( (location,tec,vintage,year2)$(map_cap_new(location,tec,vintage,year2,year)),
+* output by all new capacity of technologies located at 'location' sending to 'node' and 'time' distributed over years of periods
+        output_cap_ret(location,tec,vintage,node,commodity,level,time)
+        * ( CAP(location,tec,vintage,year2) - CAP(location,tec,vintage,year) )
+        / duration_period(year)
+* input by all new capacity of technologies located at 'location' taking from 'node' and 'time' distributed over years of periods
+        - input_cap_ret(location,tec,vintage,node,commodity,level,time)
+        * ( CAP(location,tec,vintage,year2) - CAP(location,tec,vintage,year) )
+        / duration_period(year) )
+* commodity input and output associated with operation of capacity at any period
+  + SUM( (location,tec,vintage)$( inv_tec(tec) AND map_tec_lifetime(location,tec,vintage,year) ),
+* output by all new capacity of technologies located at 'location' sending to 'node', 'year' and 'time'
+        output_cap(location,tec,vintage,year,node,commodity,level,time)
+        * CAP(location,tec,vintage,year)
+* input by all new capacity of technologies located at 'location' taking from 'node', 'year' and 'time'
+        - input_cap(location,tec,vintage,year,node,commodity,level,time)
+        * CAP(location,tec,vintage,year) )
+* +++++
 * quantity taken out from ( >0 ) or put into ( <0 ) inter-period stock (storage)
-    + STOCK_CHG(node,commodity,level,year,time)$( map_stocks(node,commodity,level,year) )                              \
+    + STOCK_CHG(node,commodity,level,year,time)$( map_stocks(node,commodity,level,year) )
 * yield from land-use model emulator
-    + SUM(land_scenario,                                                                                               \
-        ( land_output(node,land_scenario,year,commodity,level,time)                                                    \
-          - land_input(node,land_scenario,year,commodity,level,time) ) * LAND(node,land_scenario,year) )               \
+    + SUM(land_scenario,
+        ( land_output(node,land_scenario,year,commodity,level,time)
+          - land_input(node,land_scenario,year,commodity,level,time) ) * LAND(node,land_scenario,year) )
 * final demand (exogenous parameter to be satisfied by the commodity system)
-    - demand_fixed(node,commodity,level,year,time)                                                                     \
-    )$( map_commodity(node,commodity,level,year,time) AND NOT level_resource(level) AND NOT level_renewable(level) )
+    - demand_fixed(node,commodity,level,year,time)
+    $( map_commodity(node,commodity,level,year,time) AND NOT level_resource(level) AND NOT level_renewable(level) );
 
 ***
 * .. _commodity_balance_gt:
@@ -695,12 +784,12 @@ CAPACITY_CONSTRAINT(node,inv_tec,vintage,year,time)$( map_tec_time(node,inv_tec,
 * as installed capacity in the first model period.
 *
 *   .. math::
-*      \text{CAP}_{n,t,y^V,\text{'first_period'}} & \leq
-*          \text{remaining_capacity}_{n,t,y^V,\text{'first_period'}} \cdot
-*          \text{duration_period}_{y^V} \cdot
-*          \text{historical_new_capacity}_{n,t,y^V} \\
-*      & \text{if } y^V  < \text{'first_period'} \text{ and } |y| - |y^V| < \text{technical_lifetime}_{n,t,y^V}
-*      \quad \forall \ t \in T^{\text{INV}}
+*      CAP_{n,t,y^V,'first\_period'} & \leq
+*          remaining\_capacity_{n,t,y^V,'first\_period'} \cdot
+*          duration\_period_{y^V} \cdot
+*          historical\_new\_capacity_{n,t,y^V} \\
+*      & \text{if } y^V  < first\_period \text{ and } |y| - |y^V| < technical\_lifetime_{n,t,y^V}
+*      \quad \forall \ t \in T^{INV}
 *
 ***
 CAPACITY_MAINTENANCE_HIST(node,inv_tec,vintage,first_period)$( map_tec_lifetime(node,inv_tec,vintage,first_period)
@@ -741,11 +830,11 @@ CAPACITY_MAINTENANCE_NEW(node,inv_tec,vintage,vintage)$( map_tec_lifetime(node,i
 * Installed capacity can be maintained over time until decommissioning, which is irreversible.
 *
 *   .. math::
-*      \text{CAP}_{n,t,y^V,y} & \leq
-*          \text{remaining_capacity}_{n,t,y^V,y} \cdot
-*          \text{CAP}_{n,t,y^V,y-1} \\
-*      \quad & \text{if } y > y^V \text{ and } y^V  > \text{'first_period'} \text{ and } |y| - |y^V| < \text{technical_lifetime}_{n,t,y^V}
-*      \quad \forall \ t \in T^{\text{INV}}
+*      CAP_{n,t,y^V,y} & \leq
+*          remaining\_capacity_{n,t,y^V,y} \cdot
+*          CAP_{n,t,y^V,y-1} \\
+*      \quad & \text{if } y > y^V \text{ and } y^V  > first\_period \text{ and } |y| - |y^V| < technical\_lifetime_{n,t,y^V}
+*      \quad \forall \ t \in T^{INV}
 *
 ***
 CAPACITY_MAINTENANCE(node,inv_tec,vintage,year)$( map_tec_lifetime(node,inv_tec,vintage,year)
@@ -754,6 +843,26 @@ CAPACITY_MAINTENANCE(node,inv_tec,vintage,year)$( map_tec_lifetime(node,inv_tec,
     =L= remaining_capacity(node,inv_tec,vintage,year) *
         ( SUM(year2$( seq_period(year2,year) ),
               CAP(node,inv_tec,vintage,year2) ) ) ;
+
+***
+* .. _equation_end_of_lifetime_capacity:
+*
+* Equation END_OF_LIFETIME_CAPACITY
+* """""""""""""""""""""""""""""""""
+* This constraint ensures that the capacity is not preserved after the technical lifetime of a technology.
+*
+*   .. math::
+*      CAP_{n,t,y^V,y} =
+*          0 \\
+*      \quad & \text{if } y > y^V \text{ and } y^V  > first\_period \text{ and } |y| - |y^V| >= technical\_lifetime_{n,t,y^V}
+*      \quad \forall \ t \in T^{INV}
+*
+***
+END_OF_LIFETIME_CAPACITY(node,inv_tec,vintage,year)$( map_tec(node,inv_tec,vintage) AND NOT map_tec_lifetime(node,inv_tec,vintage,year)
+        AND NOT first_period(year) AND year_order(vintage) < year_order(year))..
+    CAP(node,inv_tec,vintage,year)
+    =L= 0 ;
+
 
 ***
 * .. _equation_operation_constraint:
