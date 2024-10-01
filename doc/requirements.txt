@@ -68,7 +68,7 @@ sphinx-rtd-theme==2.0.0
     # via -r doc/requirements.in
 sphinxcontrib-applehelp==1.0.4
     # via sphinx
-sphinxcontrib-bibtex==2.6.2
+sphinxcontrib-bibtex==2.6.3
     # via -r doc/requirements.in
 sphinxcontrib-devhelp==1.0.2
     # via sphinx
