@@ -18,8 +18,8 @@ Install system dependencies
 Python (required)
 -----------------
 
-|MESSAGEix| requires Python version 3.8 or greater.
-We recommend the latest version; currently Python 3.12.
+|MESSAGEix| requires Python version 3.9 or greater.
+We recommend the latest version; currently Python 3.13.
 Common ways to install Python include:
 
 - Use the official `Python releases <https://www.python.org/downloads/>`_.

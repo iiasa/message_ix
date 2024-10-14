@@ -16,7 +16,7 @@ Use the :ref:`install-quick` steps on this page if *all* of the following apply:
 
 - You have already installed on your system:
 
-  - :ref:`Python <install-python>` (version 3.8 or later) installed, along with either :program:`pip` or :program:`conda`;
+  - :ref:`Python <install-python>` (version 3.9 or later) installed, along with either :program:`pip` or :program:`conda`;
   - a :ref:`Java Runtime Environment (JRE) <install-java>` (if *not* using :program:`conda`; see :ref:`here <install-java>`); and
   - :ref:`GAMS <install-gams>` (version 24.8.1 or later).
 
