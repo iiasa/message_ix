@@ -12,7 +12,7 @@
 
 # %% I) Importing required packages
 import logging
-from typing import List, Literal, Optional, Union
+from typing import Literal, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -49,9 +49,9 @@ def intpol(
 
 def slice_df(
     df: pd.DataFrame,
-    idx: List[str],
+    idx: list[str],
     level: str,
-    locator: List,
+    locator: list,
     value: Union[int, str, None],
 ) -> pd.DataFrame:
     """Slice a MultiIndex DataFrame and set a value to a specific level.
@@ -105,13 +105,13 @@ def unit_uniform(df: pd.DataFrame) -> pd.DataFrame:
 def add_year(
     sc_ref: Scenario,
     sc_new: Scenario,
-    years_new: List[int],
+    years_new: list[int],
     firstyear_new: Optional[int] = None,
     lastyear_new: Optional[int] = None,
     macro: bool = False,
     baseyear_macro: Optional[int] = None,
-    parameter: Union[List[str], Literal["all"]] = "all",
-    region: Union[List[str], Literal["all"]] = "all",
+    parameter: Union[list[str], Literal["all"]] = "all",
+    region: Union[list[str], Literal["all"]] = "all",
     rewrite: bool = True,
     unit_check: bool = True,
     extrapol_neg: Optional[float] = None,
@@ -160,7 +160,7 @@ def add_year(
     # -------------------------------------------------------------------------
     # III.B)  Adding parameters and calculating the missing values for the
     # additonal years
-    par_list: List[str]
+    par_list: list[str]
     if parameter in ("all", ["all"]):
         par_list = sorted(sc_ref.par_list())
     elif isinstance(parameter, list):
@@ -174,7 +174,7 @@ def add_year(
     if "technical_lifetime" in par_list:
         par_list.insert(0, par_list.pop(par_list.index("technical_lifetime")))
 
-    reg_list: List[str]
+    reg_list: list[str]
     if region in ("all", ["all"]):
         nodes: pd.Series = sc_ref.set("node")  # type: ignore
         reg_list = nodes.tolist()
@@ -287,7 +287,7 @@ def add_year(
 def add_year_set(  # noqa: C901
     sc_ref: Scenario,
     sc_new: Scenario,
-    years_new: List[int],
+    years_new: list[int],
     firstyear_new: Optional[int] = None,
     lastyear_new: Optional[int] = None,
     baseyear_macro: Optional[int] = None,
@@ -336,7 +336,7 @@ def add_year_set(  # noqa: C901
                 baseyear_macro
             )
 
-    yr_pair: List[List[Union[int, str]]] = []
+    yr_pair: list[list[Union[int, str]]] = []
     for yr in years_new:
         yr_pair.append([yr, yr])
         yr_pair.append(["cumulative", yr])
@@ -385,7 +385,7 @@ def add_year_set(  # noqa: C901
     log.info("All the sets updated and added to the new scenario")
 
 
-def next_step_bigger_than_previous(x: List[int], i: int) -> bool:
+def next_step_bigger_than_previous(x: list[int], i: int) -> bool:
     return x[i + 1] - x[i] > x[i] - x[i - 1]
 
 
@@ -393,9 +393,9 @@ def next_step_bigger_than_previous(x: List[int], i: int) -> bool:
 def add_year_par(
     sc_ref: Scenario,
     sc_new: Scenario,
-    yrs_new: List[int],
+    yrs_new: list[int],
     parname: str,
-    reg_list: List[str],
+    reg_list: list[str],
     firstyear_new: int,
     extrapolate: bool = False,
     rewrite: bool = True,
@@ -561,8 +561,8 @@ def add_year_par(
 # FIXME reduce complexity 18 → ≤13
 def interpolate_1d(  # noqa: C901
     df: pd.DataFrame,
-    yrs_new: List[int],
-    horizon: List[int],
+    yrs_new: list[int],
+    horizon: list[int],
     year_col: str,
     value_col: str = "value",
     extrapolate: bool = False,
@@ -717,16 +717,16 @@ def interpolate_1d(  # noqa: C901
 # FIXME reduce complexity 38 → ≤13
 def interpolate_2d(  # noqa: C901
     df: pd.DataFrame,
-    yrs_new: List[int],
-    horizon: List[int],
+    yrs_new: list[int],
+    horizon: list[int],
     year_ref: str,
     year_col: str,
-    tec_list: List[str],
+    tec_list: list[str],
     par_tec: pd.DataFrame,
     value_col: str = "value",
     extrapolate: bool = False,
     extrapol_neg: Optional[float] = None,
-    year_diff: Optional[List[int]] = None,
+    year_diff: Optional[list[int]] = None,
     bound_extend: bool = True,
 ):
     """Interpolate parameters with two dimensions related year.

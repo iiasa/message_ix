@@ -9,11 +9,9 @@ from typing import (
     Collection,
     Hashable,
     Iterable,
-    List,
     Mapping,
     MutableMapping,
     Optional,
-    Set,
     Union,
 )
 
@@ -129,11 +127,11 @@ def add_par(
 class Structures:
     """MACRO structure information."""
 
-    level: Set[str]
-    node: Set[str]
-    sector: Set[str]
+    level: set[str]
+    node: set[str]
+    sector: set[str]
     #: Model years for which MACRO is calibrated.
-    year: Set[int]
+    year: set[int]
 
 
 def add_structure(
@@ -323,7 +321,7 @@ def growth(gdp_calibrate) -> "DataFrame":
     return growth.dropna()
 
 
-def macro_periods(demand: "Quantity", config: "DataFrame") -> Set[int]:
+def macro_periods(demand: "Quantity", config: "DataFrame") -> set[int]:
     """Periods ("years") for the MACRO model.
 
     The intersection of those appearing in the `config` data and in the ``DEMAND``
@@ -433,7 +431,7 @@ def total_cost(model_cost: "DataFrame", cost_ref: "DataFrame", ym1: int) -> "Dat
     )
 
 
-def unique_set(column: str, df: "DataFrame") -> Set:
+def unique_set(column: str, df: "DataFrame") -> set:
     """A :class:`set` of the unique elements in `column` of `df`."""
     return set(df[column].dropna().unique())
 
@@ -475,7 +473,7 @@ def validate_transform(
     return df.set_index(idx)["value"]
 
 
-def _validate_data(name: Optional[str], df: "DataFrame", s: Structures) -> List:
+def _validate_data(name: Optional[str], df: "DataFrame", s: Structures) -> list:
     """Validate input `df` against `s` for MACRO parameter `name` calibration .
 
     Parameters
@@ -502,7 +500,7 @@ def _validate_data(name: Optional[str], df: "DataFrame", s: Structures) -> List:
 
     # Check required dimensions
     if name is None:
-        dims: List[str] = []
+        dims: list[str] = []
     else:
         item_name = name.replace("_ref", "_MESSAGE")
         item = MACRO.items[item_name]

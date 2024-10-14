@@ -1,4 +1,5 @@
 """Command-line interface to :mod:`.lp_diag`."""
+
 # Written by Marek Makowski, ECE Program of IIASA, in March 2023.
 # Developed in PyCharm, with Python 3.10.4.
 #

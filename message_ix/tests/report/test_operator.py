@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Any, Mapping, Tuple
+from typing import Any, Mapping
 
 import matplotlib
 import pandas as pd
@@ -17,7 +17,7 @@ def test_as_message_df(test_mp) -> None:
     q = random_qty(dict(c=3, h=2, nl=5))
     q.units = "kg"
 
-    args: Tuple[Any, Mapping, Mapping] = (
+    args: tuple[Any, Mapping, Mapping] = (
         literal("demand"),
         dict(commodity="c", node="nl", time="h"),
         dict(level="l", year=2022),

@@ -1,10 +1,9 @@
 """Analyse MPS-format files."""
+
 # Written by Marek Makowski, ECE Program of IIASA, in March 2023.
 
 import math
-import typing
 from collections import Counter
-from typing import List
 
 import numpy as np
 import pandas as pd
@@ -226,7 +225,7 @@ class LPdiag:
         )
         print(f"Distribution of the GF (objective) values:\n{df.describe()}")
 
-    def add_row(self, words: List[str], n_line: int):
+    def add_row(self, words: list[str], n_line: int):
         """Process current line of the ROWS section.
 
         While processing the ROWS section the row attributes are initialized to the
@@ -268,7 +267,7 @@ class LPdiag:
         # (to be changed in rhs/ranges) [lo_bnd, upp_bnd]
         self.row_att(row_seq, row_name, row_type, "rows")
 
-    def add_coeff(self, words: List[str], n_line: int):
+    def add_coeff(self, words: list[str], n_line: int):
         """Process current line of the COLUMNS section.
 
         The section defines both column names and values of the matrix coefficients.
@@ -349,7 +348,7 @@ class LPdiag:
             self.mat_col.append(col_seq)
             self.mat_val.append(val)
 
-    def add_rhs(self, words: List[str], n_line: int):
+    def add_rhs(self, words: list[str], n_line: int):
         """Process current line of the RHS section.
 
         The section defines both column names and values of the matrix coefficients.
@@ -497,7 +496,7 @@ class LPdiag:
             self.row_att(row_seq, row_name, row_type, "ranges", val)
             self.n_ranges += 1
 
-    def add_bnd(self, words: List[str], n_line: int):
+    def add_bnd(self, words: list[str], n_line: int):
         """Process current line of the BOUNDS section.
 
         The section defines both column names and values of the matrix coefficients.
@@ -850,7 +849,7 @@ class LPdiag:
 
     def get_entity_info(
         self, mat_row: pd.Series, by_row: bool = True
-    ) -> typing.Tuple[int, str]:
+    ) -> tuple[int, str]:
         """Return info on the entity (row or col) defining the given matrix coefficient.
 
         Each row of the dataFrame contains the definition (composed of the row_seq,

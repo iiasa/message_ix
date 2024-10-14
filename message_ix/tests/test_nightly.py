@@ -1,9 +1,6 @@
 """Slow-running tests for nightly continuous integration."""
 
-from functools import partial  # noqa: F401
-
 import ixmp
-import numpy as np  # noqa: F401
 import pytest
 
 import message_ix
