@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List, Optional, TypedDict
+from typing import TYPE_CHECKING, Optional, TypedDict
 
 if TYPE_CHECKING:
     import pandas
@@ -10,7 +10,7 @@ class CollapseMessageColsKw(TypedDict, total=False):
     df: "pandas.DataFrame"
     var: Optional[str]
     kind: Optional[str]
-    var_cols: List[str]
+    var_cols: list[str]
 
 
 def collapse_message_cols(

@@ -4,7 +4,7 @@ from copy import copy
 from dataclasses import InitVar, dataclass, field
 from functools import partial
 from pathlib import Path
-from typing import Mapping, MutableMapping, Optional, Tuple
+from typing import Mapping, MutableMapping, Optional
 from warnings import warn
 
 import ixmp.model.gams
@@ -79,10 +79,10 @@ class Item:
 
     #: Coordinates of the item; that is, the names of sets that index its dimensions.
     #: The same set name may be repeated if it indexes multiple dimensions.
-    coords: Tuple[str, ...] = field(default_factory=tuple)
+    coords: tuple[str, ...] = field(default_factory=tuple)
 
     #: Dimensions of the item.
-    dims: Tuple[str, ...] = field(default_factory=tuple)
+    dims: tuple[str, ...] = field(default_factory=tuple)
 
     #: Text description of the item.
     description: Optional[str] = None
