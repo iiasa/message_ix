@@ -687,7 +687,7 @@ CAPACITY_CONSTRAINT(node,inv_tec,vintage,year,time)$( map_tec_time(node,inv_tec,
 *
 * Equation CAPACITY_MAINTENANCE_HIST
 * """"""""""""""""""""""""""""""""""
-* The following three constraints implement technology capacity maintenance over time to allow early retirment.
+* The following three constraints implement technology capacity maintenance over time to allow early retirement.
 * The optimization problem determines the optimal timing of retirement, when fixed operation-and-maintenance costs
 * exceed the benefit in the objective function.
 *
