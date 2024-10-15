@@ -4,13 +4,16 @@ from copy import copy
 from dataclasses import InitVar, dataclass, field
 from functools import partial
 from pathlib import Path
-from typing import Mapping, MutableMapping, Optional, Tuple
+from typing import TYPE_CHECKING, Mapping, MutableMapping, Optional, Tuple
 from warnings import warn
 
 import ixmp.model.gams
 from ixmp import config
 from ixmp.backend import ItemType
 from ixmp.util import maybe_check_out, maybe_commit
+
+if TYPE_CHECKING:
+    from .core import Scenario
 
 log = logging.getLogger(__name__)
 
@@ -1009,3 +1012,62 @@ class MESSAGE_MACRO(MESSAGE, MACRO):
     def initialize(cls, scenario, with_data=False):
         MESSAGE.initialize(scenario)
         MACRO.initialize(scenario, with_data)
+
+
+def shift_period(scenario: "Scenario", y0: int) -> None:
+    """Shift the first period of the model horizon."""
+    from ixmp.backend.jdbc import JDBCBackend
+
+    # Retrieve existing cat_year information, including the current 'firstmodelyear'
+    cat_year = scenario.set("cat_year")
+    y0_pre = cat_year.query("type_year == 'firstmodelyear'")["year"].item()
+
+    if y0 == y0_pre:
+        log.info(f"First model period is already {y0!r}")
+        return
+    elif y0 < y0_pre:
+        raise NotImplementedError(
+            f"Shift first model period *earlier*, from {y0_pre!r} -> {y0}"
+        )
+
+    # Periods to be shifted from within to before the model horizon
+    periods = list(
+        filter(lambda y: y0_pre <= y < y0, map(int, sorted(cat_year["year"].unique())))
+    )
+    log.info(f"Shift data for period(s): {periods}")
+
+    # Handle historical_* parameters for which the dimensions are a subset of the
+    # corresponding variable's dimensions
+    data = {}
+    for var_name, par_name, filter_dim in (
+        ("ACT", "historical_activity", "year_act"),
+        ("CAP_NEW", "historical_new_capacity", "year_vtg"),
+        ("EXT", "historical_extraction", "year"),
+        ("GDP", "historical_gdp", "year"),
+        ("LAND", "historical_land", "year"),
+    ):
+        # - Filter data for `var_name` along the `filter_dim`, keeping only the periods
+        #   to be shifted.
+        # - Drop the marginal column; rename the level column to "value".
+        # - Group according to the dimensions of the target `par_name`.
+        # - Sum within groups.
+        # - Restore index columns.
+        data[par_name] = (
+            scenario.var(var_name, filters={filter_dim: periods})
+            .drop("mrg", axis=1)
+            .rename(columns={"lvl": "value"})
+            .groupby(list(MESSAGE.items[par_name].dims))
+            .sum()["value"]
+            .reset_index()
+        )
+
+    # TODO Handle "EMISS:n-e-type_tec-y" →
+    # "historical_emission:n-type_emission-type_tec-type_year", in which dimension names
+    # are changed
+
+    # TODO Adjust cat_year
+
+    if isinstance(scenario.platform._backend, JDBCBackend):
+        raise NotImplementedError("Cannot set variable values with JDBCBackend")
+
+    # TODO Store new data
