@@ -10,6 +10,7 @@ Please familiarize yourself with these to foster an open and welcoming community
 All changes
 -----------
 
+- Add functionality to create Sankey diagrams from :class:`.Reporter` together with a new tutorial showcase (:pull:`770`).
 - Add option to :func:`.util.copy_model` from a non-default location of model files (:pull:`877`).
 
 .. _v3.9.0:
