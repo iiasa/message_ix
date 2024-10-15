@@ -88,6 +88,8 @@ omit = [
 
 [tool.mypy]
 exclude = ["doc/"]
+# TODO Remove this once it has become default with mypy 2.0:
+local_partial_types = true
 
 [[tool.mypy.overrides]]
 # Packages/modules for which no type hints are available.
