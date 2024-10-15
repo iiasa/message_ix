@@ -16,13 +16,12 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest]
         conda:
-        - {installer: anaconda, version: 2023.03-1}
-        - {installer: miniconda, version: py310_23.3.1-0}
-        extra-deps: ["", "JPype1=1.2.1"]
+        - {installer: anaconda, version: 2024.06-1}
+        - {installer: miniconda, version: py312_24.7.1-0}
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.conda.installer }}-${{ matrix.extra-deps }}
+    name: ${{ matrix.os }}-${{ matrix.conda.installer }}
 
     steps:
     - name: Cache Anaconda installer, conda packages
@@ -70,7 +69,7 @@ jobs:
 
         # Also install pytest and packages required for testing. pip/PyPI
         # supports this via message_ix[testing], but conda does not.
-        conda create --quiet --name testenv message-ix ${{ matrix.extra-deps }} pytest asyncssh sphinx
+        conda create --quiet --name testenv message-ix pytest asyncssh sphinx
         conda list --name testenv
 
     - name: Check CLI commands and run test
