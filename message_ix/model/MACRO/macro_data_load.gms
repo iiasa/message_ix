@@ -43,7 +43,10 @@ Sets
 ;
 
 * parameters specific to MACRO
-
+*setting solve_param to 1 (the default values) triggers sequential solving across regions in MACRO, whereas setting it to 2 enables concurrent solving for all regions
+SCALAR solve_param     solving mechanism for MACRO
+                                  / 1 /
+;								  
 SCALAR node_counter   'node counter for looping over regions' ;
 
 SCALAR  epsilon            small number to avoid divergences
