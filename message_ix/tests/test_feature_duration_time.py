@@ -13,8 +13,7 @@ from message_ix import Scenario
 
 
 # A function for generating a simple model with sub-annual time slices
-# FIXME reduce complexity 14 → ≤13
-def model_generator(  # noqa: C901
+def model_generator(
     test_mp,
     comment,
     tec_time,
@@ -66,23 +65,21 @@ def model_generator(  # noqa: C901
     map_time = {}
     for [tmp_lvl, number, parent] in time_steps:
         scen.add_set("lvl_temporal", tmp_lvl)
-        if parent == "year":
-            times = [tmp_lvl[0] + "-" + str(x + 1) for x in range(number)]
-        else:
-            times = [
+        times = (
+            [tmp_lvl[0] + "-" + str(x + 1) for x in range(number)]
+            if parent == "year"
+            else [
                 p + "_" + tmp_lvl[0] + "-" + str(x + 1)
                 for (p, x) in product(map_time[parent], range(number))
             ]
+        )
 
         map_time[tmp_lvl] = times
         scen.add_set("time", times)
 
         # Adding "map_temporal_hierarchy" and "duration_time"
         for h in times:
-            if parent == "year":
-                p = "year"
-            else:
-                p = h.split("_" + tmp_lvl[0])[0]
+            p = "year" if parent == "year" else h.split("_" + tmp_lvl[0])[0]
             # Temporal hierarchy (order: temporal level, time, parent time)
             scen.add_set("map_temporal_hierarchy", [tmp_lvl, h, p])
 
@@ -111,10 +108,11 @@ def model_generator(  # noqa: C901
             "time"
         ]
         # If technology is linking two different temporal levels
-        if tmp_lvl_in != tmp_lvl_out:
-            time_pairs = product(times_in, times_out)
-        else:
-            time_pairs = zip(times_in, times_out)
+        time_pairs = (
+            product(times_in, times_out)
+            if tmp_lvl_in != tmp_lvl_out
+            else zip(times_in, times_out)
+        )
 
         # Configuring data for "time_origin" and "time" in "input"
         for h_in, h_act in time_pairs:

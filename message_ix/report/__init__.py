@@ -1,7 +1,7 @@
 import logging
 from functools import lru_cache, partial
 from operator import itemgetter
-from typing import TYPE_CHECKING, List, Mapping, Tuple, Union, cast
+from typing import TYPE_CHECKING, Mapping, Union, cast
 
 from genno.operator import broadcast_map
 from ixmp.report import (
@@ -53,7 +53,7 @@ configure(
 #:    contains the value 1 at every valid (type_addon, ta) location, and 0 elsewhere.
 #: 2. Simple products of 2 or mode quantities.
 #: 3. Other derived quantities.
-TASKS0: Tuple[Tuple, ...] = (
+TASKS0: tuple[tuple, ...] = (
     # Mapping sets
     ("map_addon", "map_as_qty", "cat_addon", "t"),
     ("map_emission", "map_as_qty", "cat_emission", "e"),
@@ -112,7 +112,7 @@ TASKS0: Tuple[Tuple, ...] = (
 
 #: Quantities to automatically convert to IAMC format using
 #: :func:`~genno.compat.pyam.operator.as_pyam`.
-PYAM_CONVERT: List[Tuple[str, "CollapseMessageColsKw"]] = [
+PYAM_CONVERT: list[tuple[str, "CollapseMessageColsKw"]] = [
     ("out:nl-t-ya-m-nd-c-l", dict(kind="ene", var="out")),
     ("in:nl-t-ya-m-no-c-l", dict(kind="ene", var="in")),
     ("CAP:nl-t-ya", dict(var="capacity")),
@@ -148,11 +148,11 @@ TASKS1 = (
 
 
 @lru_cache(1)
-def get_tasks() -> List[Tuple[Tuple, Mapping]]:
+def get_tasks() -> list[tuple[tuple, Mapping]]:
     """Return a list of tasks describing MESSAGE reporting calculations."""
     # Assemble queue of items to add. Each element is a 2-tuple of (positional, keyword)
     # arguments for Reporter.add()
-    to_add: List[Tuple[Tuple, Mapping]] = []
+    to_add: list[tuple[tuple, Mapping]] = []
 
     strict = dict(strict=True)
 
@@ -160,7 +160,7 @@ def get_tasks() -> List[Tuple[Tuple, Mapping]]:
         if len(t) == 2 and isinstance(t[1], dict):
             # (args, kwargs) → update kwargs with strict
             t[1].update(strict)
-            to_add.append(cast(Tuple[Tuple, Mapping], t))
+            to_add.append(cast(tuple[tuple, Mapping], t))
         else:
             # args only → use strict as kwargs
             to_add.append((t, strict))
