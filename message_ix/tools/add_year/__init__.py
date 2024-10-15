@@ -218,9 +218,9 @@ def add_year(
     cat_year_new: pd.DataFrame = sc_new.set("cat_year")
     firstmodelyear_new = cat_year_new.query("type_year == 'firstmodelyear'")
     firstyr_new: int = (
-        min(cat_year_new["year"])
+        int(min(cat_year_new["year"]))
         if firstmodelyear_new.empty
-        else firstmodelyear_new["year"]
+        else int(firstmodelyear_new["year"].item())
     )  # type: ignore
     # assert isinstance(firstyear_new, int)
 
