@@ -79,6 +79,8 @@ is_fixed_extraction, is_fixed_stock, is_fixed_new_capacity, is_fixed_capacity, i
 fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activity, fixed_land
 * storage parameters
 storage_initial, storage_self_discharge, time_order
+* time-related relation parameters and mappings
+is_relation_upper_time, is_relation_lower_time, relation_activity_time, relation_upper_time, relation_lower_time, relation_cost_time
 ;
 
 
@@ -114,6 +116,16 @@ $INCLUDE includes/period_parameter_assignment.gms
 duration_time_rel(time,time2)$( map_time(time,time2) ) = duration_time(time2) / duration_time(time) ;
 * making duration_time_rel equal to 1, i.e., a consistent unit for ACT in sub-annual time slices, for parent 'time' not specified in set 'time_relative'
 duration_time_rel(time,time2)$( Not time_relative(time) ) = 1 ;
+
+* add the mapping of new time slice-related parameters to existing mappings
+* Note: such mapping sets are typically generated at the Java backend, and this one should be added to the existing ones or to a new solution implemented in python.
+map_tec_relation(node,relation,tec,year_all,mode,time)$(sum( (node2,year_all2),
+    relation_activity_time(relation,node2,year_all,node,tec,year_all2,mode,time) ) ) = yes;
+
+* update mapping sets based on new relations defined at the sub-annual time slice level
+map_tec(node,tec,year_all)$(sum( (relation,mode,time), map_tec_relation(node,relation,tec,year_all,mode,time) ) ) = yes;
+map_tec_mode(node,tec,year_all,mode)$(sum( (relation,time), map_tec_relation(node,relation,tec,year_all,mode,time) ) ) = yes;
+map_tec_time(node,tec,year_all,time)$(sum( (relation,mode), map_tec_relation(node,relation,tec,year_all,mode,time) ) ) = yes;
 
 * assign an additional mapping set for technologies to nodes, modes and subannual time slices (for shorter reference)
 map_tec_act(node,tec,year_all,mode,time)$( map_tec_time(node,tec,year_all,time) AND
@@ -184,6 +196,22 @@ map_time_period(year_all,lvl_temporal,time,time2)$( time_order(lvl_temporal,time
 * mapping of sequence of the last sub-annual time slice to the first to create a close the order of time slices
 map_time_period(year_all,lvl_temporal,time,time2)$( time_order(lvl_temporal,time) AND
      time_order(lvl_temporal,time) = SMAX(time3,time_order(lvl_temporal,time3) ) AND time_order(lvl_temporal,time2) = 1 ) = yes;
+* mapping of relations that should be accounted at 'year' even with sub-annual time slices
+map_relation_year(relation,node,year_all,time)$(
+    SUM( (node2,year_all2,tec,mode), relation_activity_time(relation,node,year_all,node2,tec,year_all2,mode,time)
+    ) AND ( duration_time(time) = 1 )  ) = yes;
+
+* including those with only activity at time slice, but relation at 'year' level
+map_relation_year(relation,node,year_all,'year')$( is_relation_upper_time(relation,node,year_all,'year') OR
+    is_relation_lower_time(relation,node,year_all,'year')  ) = yes;
+
+* mapping set of relations at 'year' level
+relation_year(relation)$( SUM( (node,year_all,time), map_relation_year(relation,node,year_all,time) ) ) = yes;
+
+* mapping of relations that should be accounted at the subannual time slice level
+map_relation_time(relation,node,year_all,time)$(
+    SUM( (node2,year_all2,tec,mode), relation_activity_time(relation,node,year_all,node2,tec,year_all2,mode,time)
+    ) AND NOT relation_year(relation) ) = yes;
 *----------------------------------------------------------------------------------------------------------------------*
 * sanity checks on the data set                                                                                        *
 *----------------------------------------------------------------------------------------------------------------------*
