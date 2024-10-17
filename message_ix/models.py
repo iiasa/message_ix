@@ -374,6 +374,8 @@ _set("cat_relation", "type_relation r")
 _set("cat_tec", "type_tec t")
 _set("cat_year", "type_year y")
 _set("is_capacity_factor", "nl t yv ya h")
+_set("is_relation_lower_time", "r nr yr h")
+_set("is_relation_upper_time", "r nr yr h")
 _set("level_renewable", "l")
 _set("level_resource", "l")
 _set("level_stocks", "l")
@@ -469,11 +471,15 @@ par("ref_extraction", "n c g y")
 par("ref_new_capacity", "nl t yv")
 par("ref_relation", "r nr yr")
 par("relation_activity", "r nr yr nl t ya m")
+par("relation_activity_time", "r nr yr nl t ya m h")
 par("relation_cost", "r nr yr")
+par("relation_cost_time", "r nr yr h")
 par("relation_lower", "r nr yr")
+par("relation_lower_time", "r nr yr h")
 par("relation_new_capacity", "r nr yr t")
 par("relation_total_capacity", "r nr yr t")
 par("relation_upper", "r nr yr")
+par("relation_upper_time", "r nr yr h")
 par("reliability_factor", "n t ya c l h q")
 par("renewable_capacity_factor", "n c g l y")
 par("renewable_potential", "n c g l y")
@@ -567,6 +573,11 @@ var(
     "REL",
     "r nr yr",
     "Auxiliary variable for left-hand side of user-defined relations",
+)
+var(
+    "REL_TIME",
+    "r nr yr",
+    "Time-dependent auxiliary variable for left-hand side of user-defined relations",
 )
 var(
     "REN",
@@ -832,6 +843,25 @@ equ(
     "",
     "Auxiliary equation to simplify the implementation of relations",
 )
+equ(
+    "RELATION_EQUIVALENCE_TIME",
+    "", "time dependent auxiliary equation to simplify the implementation of relations",
+    )
+equ(
+    "RELATION_EQUIVALENCE_YEAR",
+    "",
+    "time dependent auxiliary equation to simplify the implementation of relations at"
+    " the year level",
+    )
+equ(
+    "RELATION_CONSTRAINT_UP_TIME",
+    "",
+    "time dependentupper bound of relations (linear constraints)",
+    )
+equ(
+    "RELATION_CONSTRAINT_LO_TIME",
+    "",
+    "time dependent lower bound of relations (linear constraints)")
 equ(
     "RENEWABLES_CAPACITY_REQUIREMENT",
     "",

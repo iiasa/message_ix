@@ -145,7 +145,7 @@ Variables
 * =========================================================================== ======================================================================================================
 *
 * .. warning::
-*    Please be aware that transitioning from one period length to another for consecutive periods may result in false values of :math:`\text{PRICE_EMISSION}`. 
+*    Please be aware that transitioning from one period length to another for consecutive periods may result in false values of :math:`\text{PRICE_EMISSION}`.
 *    Please see `this issue <https://github.com/iiasa/message_ix/issues/723>`_ for further information. We are currently working on a fix.
 ***
 
@@ -426,7 +426,7 @@ COST_ACCOUNTING_NODAL(node, year)..
     + SUM(relation$( relation_cost(relation,node,year) ),
         relation_cost(relation,node,year) * REL(relation,node,year) )
 * cost terms associated with linear relations at the sub-annual time slice level
-    + SUM((relation,time)$( relation_cost(relation,node,year) AND
+    + SUM((relation,time)$( relation_cost_time(relation,node,year,time) AND
           (map_relation_time(relation,node,year,time) OR map_relation_year(relation,node,year,time) ) ),
         relation_cost_time(relation,node,year,time) * REL_TIME(relation,node,year,time ) )
 * implementation of slack variables for constraints to aid in debugging
