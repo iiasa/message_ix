@@ -845,23 +845,25 @@ equ(
 )
 equ(
     "RELATION_EQUIVALENCE_TIME",
-    "", "time dependent auxiliary equation to simplify the implementation of relations",
-    )
+    "",
+    "time dependent auxiliary equation to simplify the implementation of relations",
+)
 equ(
     "RELATION_EQUIVALENCE_YEAR",
     "",
     "time dependent auxiliary equation to simplify the implementation of relations at"
     " the year level",
-    )
+)
 equ(
     "RELATION_CONSTRAINT_UP_TIME",
     "",
     "time dependentupper bound of relations (linear constraints)",
-    )
+)
 equ(
     "RELATION_CONSTRAINT_LO_TIME",
     "",
-    "time dependent lower bound of relations (linear constraints)")
+    "time dependent lower bound of relations (linear constraints)",
+)
 equ(
     "RENEWABLES_CAPACITY_REQUIREMENT",
     "",
