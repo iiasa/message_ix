@@ -1875,8 +1875,7 @@ ACTIVITY_SOFT_CONSTRAINT_LO(node,tec,year,time)$( soft_activity_lo(node,tec,year
 *          \sum_{n^L \in N(n)} \Bigg(
 *              \sum_{t \in T(\widehat{t}),y^V \leq y,m,h }
 *                  \text{emission_factor}_{n^L,t,y^V,y,m,e} \cdot \text{ACT}_{n^L,t,y^V,y,m,h} \\
-*              + \sum_{s} \ \text{land_emission}_{n^L,s,y,e} \cdot \text{LAND}_{n^L,s,y}
-*                   \text{ if } \widehat{t} \in \widehat{T}^{LAND} \Bigg)
+*              + \text{EMISS_LU}_{n^L,e,\widehat{t},y} \text{ if } \widehat{t} \in \widehat{T}^{LAND} \Bigg)
 *
 * .. versionchanged:: v3.11.0
 *
@@ -1894,25 +1893,44 @@ EMISSION_EQUIVALENCE(node,emission,type_tec,year)$(
         SUM((tec,vintage,mode,time)$( cat_tec(type_tec,tec)
             AND map_tec_act(location,tec,year,mode,time) AND map_tec_lifetime(location,tec,vintage,year) ),
         emission_factor(location,tec,vintage,year,mode,emission) * ACT(location,tec,vintage,year,mode,time) )
-* emissions from land use if 'type_tec' is included in the dynamic set 'type_tec_land'
-
-** old calculation directly based on land scenario mix
-*       + SUM(land_scenario $( type_tec_land(type_tec) ) ,
-*           land_emission(location,land_scenario,year,emission) * LAND(location,land_scenario,year) )
-
-** new calculation based on land scenario mix and its path dependencies for selected variables (emission_cumulative)
+* emissions from land-use activity based on land scenario mix and its path dependencies 
+* for selected variables (emission_cumulative) if 'type_tec' is included in the dynamic set 'type_tec_land'
         + EMISS_LU(location,emission,type_tec,year) $ ( type_tec_land(type_tec) )
       ) ;
 
+
+* .. _equation_emission_equivalence_aux_annual:
+*
+* Equation EMISSION_EQUIVALENCE_AUX_ANNUAL
+* """""""""""""""""""""""""""""
+* This auxillary equation accounts for emissions in set emission_annual without considering a path-dependent emission debt
+*
+*
+*   .. math::
+*      \text{EMISS_LU}_{n^L,e^a,\widehat{t},y} =
+*               \sum_{s} \text{land_emission}_{n^L,s,y,e^a} \cdot \text{LAND}_{n^L,s,y}
+*
+***
 EMISSION_EQUIVALENCE_AUX_ANNUAL(location,emission,type_tec,year) $ emission_annual(emission)..
     EMISS_LU(location,emission,type_tec,year)
     =E=
-* emissions from land use if 'type_tec' is included in the dynamic set 'type_tec_land'
     SUM(land_scenario ,
             land_emission(location,land_scenario,year,emission) * LAND(location,land_scenario,year)
     ) ;
     
 
+* .. _equation_emission_equivalence_aux_cumu:
+*
+* Equation EMISSION_EQUIVALENCE_AUX_CUMU
+* """""""""""""""""""""""""""""
+* This auxillary equation accounts for emissions in set emission_annual without considering a path-dependent emission debt
+*
+*
+*   .. math::
+*      \text{EMISS_LU}_{n^L,e^a,\widehat{t},y} =
+*               \sum_{s} \text{land_emission}_{n^L,s,y,e^a} \cdot \text{LAND}_{n^L,s,y}
+*
+***
 EMISSION_EQUIVALENCE_AUX_CUMU(location,emission,type_tec,year) $ emission_cumulative(emission)..
     EMISS_LU(location,emission,type_tec,year)
     =E=
