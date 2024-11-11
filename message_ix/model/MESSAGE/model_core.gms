@@ -1923,12 +1923,19 @@ EMISSION_EQUIVALENCE_AUX_ANNUAL(location,emission,type_tec,year) $ emission_annu
 *
 * Equation EMISSION_EQUIVALENCE_AUX_CUMU
 * """""""""""""""""""""""""""""
-* This auxillary equation accounts for emissions in set emission_annual without considering a path-dependent emission debt
-*
+* This auxillary equation accounts for emissions in set emission_cumulative considering a path-dependent emission debt
+* This debt is calculated by comparing the historic emissions of the current time step's land-use mix in variable LAND 
+* to the emissions of the actually chosen scenario mix of previous timesteps, including any emission debts accounted for 
+* before. To do so, first, for every previous model time step, the emissions in those steps under the current land-use 
+* scenario mix and the delta to the chosen mix in that time step are calculated. To ensure any historic emission debt is
+* only accounted for the first time step(s) it occurs, the accounted debt towards any previous time step is subtracted 
+* towards a minimum of 0.
+* 
 *
 *   .. math::
-*      \text{EMISS_LU}_{n^L,e^a,\widehat{t},y} =
-*               \sum_{s} \text{land_emission}_{n^L,s,y,e^a} \cdot \text{LAND}_{n^L,s,y}
+*      \text{EMISS_LU}_{n^L,e^c,\widehat{t},y} =
+*               \sum_{s} \text{land_emission}_{n^L,s,y,e^c} \cdot \text{LAND}_{n^L,s,y} \\
+*              + \sum_{\widehat{y}} \text{EMISS_LU_AUX}_{n^L,e^c,\widehat{t},y,\widehat{y}}
 *
 ***
 EMISSION_EQUIVALENCE_AUX_CUMU(location,emission,type_tec,year) $ emission_cumulative(emission)..
@@ -1939,8 +1946,15 @@ EMISSION_EQUIVALENCE_AUX_CUMU(location,emission,type_tec,year) $ emission_cumula
     + SUM(year2, EMISS_LU_AUX(location,emission,type_tec,year, year2) )
     ;
 
-
-* find positive emissions overshoot for history of current land scenario mix compared to mix of earlier time steps
+* find positive emissions overshoot for history of current land scenario mix compared to mix of earlier time steps by
+* applying both the current and previously chosen land mix to the previous time steps.
+*   .. math::
+*      \text{EMISS_LU_AUX}_{n^L,e^c,\widehat{t},y,\widehat{y}} \text{ if } \widehat{y} < y >=
+*               \sum_{s} \Bigg( \text{land_emission}_{n^L,s,\widehat{y},e^c} \cdot \text{LAND}_{n^L,s,y} \\
+*              - \text{land_emission}_{n^L,s,\widehat{y},e^c} \cdot \text{LAND}_{n^L,s,\widehat{y}} \Bigg) \\
+*              - \sum_{\dot{y}} \text{EMISS_LU_AUX}_{n^L,e^c,\widehat{t},\dot{y},\widehat{y}} \text{ if } \widehat{y} < \dot{y} \text{ and } \dot{y} < y
+*
+***
 EMISSION_EQUIVALENCE_AUX_CUMU_AUX(location,emission,type_tec,year,year2) $ (emission_cumulative(emission) AND model_horizon(year) AND year2.pos < year.pos)..
     EMISS_LU_AUX(location,emission,type_tec,year,year2) $ ( year2.pos < year.pos ) 
     =G=
