@@ -86,9 +86,9 @@ jobs:
         pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
         pip install .[tests]
 
-        # TEMPORARY Work around unionai-oss/pandera#1685;
-        # see https://github.com/khaeru/genno/issues/140
-        pip install "numpy < 2"
+        # TEMPORARY Work around dask v2024.11.0;
+        # see https://github.com/khaeru/genno/issues/149
+        pip install "dask < 2024.11.0"
 
     - name: Run test suite using pytest
       env:
@@ -170,9 +170,9 @@ jobs:
         pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
         pip install .[tests]
 
-        # TEMPORARY Work around unionai-oss/pandera#1685;
-        # see https://github.com/khaeru/genno/issues/140
-        pip install "numpy < 2"
+        # TEMPORARY Work around dask v2024.11.0;
+        # see https://github.com/khaeru/genno/issues/149
+        pip install "dask < 2024.11.0"
 
     - name: Install R dependencies and tutorial requirements
       run: |
