@@ -149,8 +149,6 @@ Sets
     mode            modes of operation
     emission        greenhouse gases - pollutants - etc.
     land_scenario   scenarios of land use (for land-use model emulator)
-*    land_scenario_bio biomass scenarios of land use (for land-use emulator)
-    land_scenario_ghg emission scenarios of land use (for land-use emulator)
     land_type       types of land use
     year_all        "All periods, including historical and future periods outside the horizon"
     year (year_all) "Periods in model horizon, without historical and (for limited-foresight mode) future periods"
@@ -420,9 +418,6 @@ Sets
 
     map_land(node,land_scenario,year_all)            mapping of land-use model emulator scenarios to nodes and years
     map_relation(relation,node,year_all)             mapping of generic (user-defined) relations to nodes and years
-
-*    map_scenario_bio(land_scenario_bio,land_scenario) mapping of land-use model emulator scenarios to biomass scenarios
-    map_scenario_ghg(land_scenario_ghg,land_scenario) mapping of land-use model emulator scenarios to emission scenarios
 
 * Storage
     map_time_commodity_storage(node,tec,level,commodity,mode,year_all,time)  mapping of storage containers to their input commodity-level (not commodity-level of stored media)
