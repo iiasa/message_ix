@@ -21,6 +21,11 @@ On separate pages:
    contrib/cla
    contrib/video
 
+On GitHub:
+
+- `Our community Code of Conduct <https://github.com/iiasa/message_ix?tab=coc-ov-file>`_
+- `How we handle code safety <https://github.com/iiasa/message_ix?tab=security-ov-file>`_
+
 File issues for bugs and enhancements
 =====================================
 
