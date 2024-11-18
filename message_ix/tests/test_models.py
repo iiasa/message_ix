@@ -3,7 +3,8 @@ from collections import defaultdict
 import ixmp
 import pytest
 
-from message_ix.models import MESSAGE, MESSAGE_MACRO
+from message_ix.models import MESSAGE, MESSAGE_MACRO, shift_period
+from message_ix.testing import make_dantzig
 
 
 def test_initialize(test_mp):
@@ -52,3 +53,21 @@ def test_message_macro():
         "--MAX_ITERATION=100",
     ]
     assert all(e in mm.solve_args for e in expected)
+
+
+@pytest.mark.parametrize(
+    "y0",
+    (
+        # Not implemented: shifting to an earlier period
+        pytest.param(1962, marks=pytest.mark.xfail(raises=NotImplementedError)),
+        # Does nothing
+        1963,
+        # Not implemented with ixmp.JDBCBackend
+        pytest.param(1964, marks=pytest.mark.xfail(raises=NotImplementedError)),
+        pytest.param(1965, marks=pytest.mark.xfail(raises=NotImplementedError)),
+    ),
+)
+def test_shift_period(test_mp, y0):
+    s = make_dantzig(test_mp, solve=True, multi_year=True)
+
+    shift_period(s, y0)
