@@ -46,18 +46,23 @@ EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
         / SUM(year$( cat_year(type_year,year) ), duration_period(year) )
         * SUM(year$( map_first_period(type_year,year) ), duration_period(year) / df_period(year) * df_year(year) );
 
-
-* assign auxiliary variables DEMAND, PRICE_COMMODITY and PRICE_EMISSION for integration with MACRO and reporting
+* assign auxiliary variable DEMAND for integration with MACRO
     DEMAND.l(node,commodity,level,year,time) = demand_fixed(node,commodity,level,year,time) ;
+
+* assign auxiliary variables PRICE_COMMODITY and PRICE_EMISSION for reporting
     PRICE_COMMODITY.l(node,commodity,level,year,time) =
         ( COMMODITY_BALANCE_GT.m(node,commodity,level,year,time) + COMMODITY_BALANCE_LT.m(node,commodity,level,year,time) )
             / df_period(year) ;
-    PRICE_EMISSION.l(node,type_emission,type_tec,year)$( SUM(type_year$( cat_year(type_year,year) ), 1 ) ) =
-        SMAX(type_year$( cat_year(type_year,year) ),
-               - EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year) )
-            / df_year(year) ;
+
+* calculate PRICE_EMISSION based on the marginals of EMISSION_EQUIVALENCE
+    PRICE_EMISSION.l(node,type_emission,type_tec,year)$( SUM(emission$( cat_emission(type_emission,emission) ),
+         EMISSION_EQUIVALENCE.m(node,emission,type_tec,year) ) ) =
+        SMAX(emission$( cat_emission(type_emission,emission) ),
+               EMISSION_EQUIVALENCE.m(node,emission,type_tec,year) / emission_scaling(type_emission,emission) )
+            / df_period(year);
     PRICE_EMISSION.l(node,type_emission,type_tec,year)$(
-        PRICE_EMISSION.l(node,type_emission,type_tec,year) = - inf ) = 0 ;
+        ( PRICE_EMISSION.l(node,type_emission,type_tec,year) = eps ) or
+        ( PRICE_EMISSION.l(node,type_emission,type_tec,year) = -inf ) ) = 0 ;
 
 %AUX_BOUNDS% AUX_ACT_BOUND_LO(node,tec,year_all,year_all2,mode,time)$( ACT.l(node,tec,year_all,year_all2,mode,time) < 0 AND
 %AUX_BOUNDS%    ACT.l(node,tec,year_all,year_all2,mode,time) = -%AUX_BOUND_VALUE% ) = yes ;
