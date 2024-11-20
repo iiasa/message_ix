@@ -1,8 +1,9 @@
 import io
 import os
+from collections.abc import Generator
 from itertools import product
 from pathlib import Path
-from typing import TYPE_CHECKING, Generator, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 import numpy as np
 import pandas as pd
