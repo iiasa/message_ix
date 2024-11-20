@@ -86,10 +86,6 @@ jobs:
         pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
         pip install .[tests]
 
-        # TEMPORARY Work around dask v2024.11.0;
-        # see https://github.com/khaeru/genno/issues/149
-        pip install "dask < 2024.11.0"
-
     - name: Run test suite using pytest
       env:
         # For test_cli.test_dl; see code in message_ix.cli.dl
@@ -169,10 +165,6 @@ jobs:
       run: |
         pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
         pip install .[tests]
-
-        # TEMPORARY Work around dask v2024.11.0;
-        # see https://github.com/khaeru/genno/issues/149
-        pip install "dask < 2024.11.0"
 
     - name: Install R dependencies and tutorial requirements
       run: |
