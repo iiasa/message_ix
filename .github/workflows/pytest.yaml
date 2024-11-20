@@ -13,7 +13,11 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GAMS_VERSION: 29.1.0
+  # Version used until 2024-11-20; disabled
+  # GAMS_VERSION: 29.1.0
+  # First version including a macOS arm64 distribution
+  GAMS_VERSION: 43.4.1
+
   # See description in lint.yml
   depth: 100
 
@@ -87,7 +91,7 @@ jobs:
     - uses: iiasa/actions/setup-gams@main
       with:
         version: ${{ env.GAMS_VERSION }}
-        # license: ${{ secrets.GAMS_LICENSE }}
+        license: ${{ secrets.GAMS_LICENSE }}
 
     - name: Install Python package and dependencies
       # By default, the below installs ixmp from the main branch. To run against
@@ -171,7 +175,7 @@ jobs:
     - uses: iiasa/actions/setup-gams@main
       with:
         version: ${{ env.GAMS_VERSION }}
-        # license: ${{ secrets.GAMS_LICENSE }}
+        license: ${{ secrets.GAMS_LICENSE }}
 
     - name: Install Python package and dependencies
       # By default, the below installs ixmp from the main branch. To run against
