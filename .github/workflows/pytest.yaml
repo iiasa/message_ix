@@ -86,6 +86,10 @@ jobs:
         pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
         pip install .[tests]
 
+        # TEMPORARY With Python 3.13 pyam-iamc resolves to 1.3.1, which in turn
+        # limits pint < 0.17. Override.
+        pip install --upgrade pint
+
     - name: Run test suite using pytest
       env:
         # For test_cli.test_dl; see code in message_ix.cli.dl
@@ -165,6 +169,10 @@ jobs:
       run: |
         pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
         pip install .[tests]
+
+        # TEMPORARY With Python 3.13 pyam-iamc resolves to 1.3.1, which in turn
+        # limits pint < 0.17. Override.
+        pip install --upgrade pint
 
     - name: Install R dependencies and tutorial requirements
       run: |
