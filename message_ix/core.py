@@ -1,8 +1,9 @@
 import logging
 import os
+from collections.abc import Iterable, Mapping, Sequence
 from functools import lru_cache, partial
 from itertools import chain, product, zip_longest
-from typing import Iterable, Mapping, Optional, Sequence, Union
+from typing import Optional, Union
 from warnings import warn
 
 import ixmp

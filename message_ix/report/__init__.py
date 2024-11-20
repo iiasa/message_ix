@@ -1,7 +1,8 @@
 import logging
+from collections.abc import Mapping
 from functools import lru_cache, partial
 from operator import itemgetter
-from typing import TYPE_CHECKING, Mapping, Union, cast
+from typing import TYPE_CHECKING, Union, cast
 
 from genno.operator import broadcast_map
 from ixmp.report import (

@@ -1,19 +1,11 @@
 import logging
 import os
+from collections.abc import Collection, Hashable, Iterable, Mapping, MutableMapping
 from dataclasses import dataclass
 from functools import partial
 from operator import itemgetter, mul
 from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    Collection,
-    Hashable,
-    Iterable,
-    Mapping,
-    MutableMapping,
-    Optional,
-    Union,
-)
+from typing import TYPE_CHECKING, Optional, Union
 
 import numpy as np
 import pandas as pd

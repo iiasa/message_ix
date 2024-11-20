@@ -1,5 +1,6 @@
+from collections.abc import Mapping
 from functools import partial
-from typing import Any, Mapping
+from typing import Any
 
 import matplotlib
 import pandas as pd

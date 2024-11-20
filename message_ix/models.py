@@ -1,10 +1,11 @@
 import logging
 from collections import ChainMap
+from collections.abc import Mapping, MutableMapping
 from copy import copy
 from dataclasses import InitVar, dataclass, field
 from functools import partial
 from pathlib import Path
-from typing import Mapping, MutableMapping, Optional
+from typing import Optional
 from warnings import warn
 
 import ixmp.model.gams
