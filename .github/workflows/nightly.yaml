@@ -9,6 +9,11 @@ on:
   schedule:
   # 05:00 UTC = 06:00 CET = 07:00 CEST
   - cron: "0 5 * * *"
+  pull_request_target:
+    paths:
+      - '**.gms'
+      - '**.gpr'
+      - '**.gdx'
 
 env:
   # Version used until 2024-11-20; disabled
