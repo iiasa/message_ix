@@ -139,6 +139,10 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   tutorials:
+    if: >
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
+
     strategy:
       matrix:
         os:
@@ -153,9 +157,17 @@ jobs:
 
     steps:
     - name: Check out message_ix
+      if: github.event_name != 'workflow_run'
       uses: actions/checkout@v4
       with:
         fetch-depth: ${{ env.depth }}
+
+    - name: Check out message_ix (workflow_run)
+      if: github.event_name == 'workflow_run'
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ github.event.workflow_run.repository }}
+        ref: ${{ github.event.workflow_run.head_branch }}
 
     - uses: actions/setup-python@v5
       with:
