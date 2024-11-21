@@ -9,9 +9,19 @@ on:
   schedule:
   # 05:00 UTC = 06:00 CET = 07:00 CEST
   - cron: "0 5 * * *"
+  pull_request_target:
+    paths:
+      - '**.gms'
+      - '**.gpr'
+      - '**.gdx'
+    types:
+     - labeled
 
 env:
-  GAMS_VERSION: 29.1.0
+  # Version used until 2024-11-20; disabled
+  # GAMS_VERSION: 29.1.0
+  # First version including a macOS arm64 distribution
+  GAMS_VERSION: 43.4.1
   # See description in lint.yml
   depth: 100
 
