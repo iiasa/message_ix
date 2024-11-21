@@ -6,6 +6,9 @@ on:
   # 05:00 UTC = 06:00 CET = 07:00 CEST
   schedule:
   - cron: "0 5 * * *"
+  workflow_run:
+    workflows: [ "Receive pull request" ]
+    types: [ completed ]
 
 # Cancel previous runs that have not completed
 concurrency:
@@ -23,6 +26,10 @@ env:
 
 jobs:
   pytest:
+    if: >
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
+
     strategy:
       matrix:
         os:
@@ -62,9 +69,18 @@ jobs:
 
     steps:
     - name: Check out message_ix
+      if: github.event_name != 'workflow_run'
       uses: actions/checkout@v4
       with:
         fetch-depth: ${{ env.depth }}
+
+    - name: Check out message_ix (workflow_run)
+      if: github.event_name == 'workflow_run'
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: ${{ env.depth }}
+        repository: ${{ github.event.workflow_run.repository }}
+        ref: ${{ github.event.workflow_run.head_branch }}
 
     - name: Fetch tags (for setuptools-scm)
       run: git fetch --tags --depth=${{ env.depth }}

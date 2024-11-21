@@ -1,0 +1,21 @@
+name: Receive pull request
+
+on:
+  pull_request:
+    branches: [ main ]
+
+env:
+  label: "safe to test"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Ensure first-party branch or valid label
+      if: >
+        github.repository != github.event.pull_request.head.repo.full_name &&
+        ! contains(github.event.pull_request.labels.*.name, env.label)
+      run: |
+        echo "Will not run \`pytest\` workflow for branch in fork without label \`${{ env.label }}\`." >>$GITHUB_STEP_SUMMARY
+        exit 1
