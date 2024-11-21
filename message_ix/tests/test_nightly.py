@@ -1,5 +1,8 @@
 """Slow-running tests for nightly continuous integration."""
 
+
+from functools import partial  # noqa: F401, is used through `case["test"]` below
+
 import ixmp
 import pytest
 
