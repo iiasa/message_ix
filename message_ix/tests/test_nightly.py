@@ -3,6 +3,7 @@
 from functools import partial  # noqa: F401, is used through `case["test"]` below
 
 import ixmp
+import numpy as np  # noqa: F401, same as above
 import pytest
 
 import message_ix
