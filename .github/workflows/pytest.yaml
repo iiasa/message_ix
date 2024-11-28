@@ -115,7 +115,7 @@ jobs:
       # other code, e.g. other branches for open PRs), temporarily edit as
       # appropriate. DO NOT merge such changes to `main`.
       run: |
-        uv pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
+        uv pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@enh/ixmp4"
         uv pip install .[tests]
 
     - name: Run test suite using pytest
@@ -194,7 +194,7 @@ jobs:
       # other code, e.g. other branches for open PRs), temporarily edit as
       # appropriate. DO NOT merge such changes to `main`.
       run: |
-        uv pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
+        uv pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@enh/ixmp4"
         uv pip install .[tests]
 
     - name: Install R dependencies and tutorial requirements
