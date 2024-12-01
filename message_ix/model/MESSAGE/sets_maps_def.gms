@@ -308,6 +308,7 @@ Sets
     type_tec_land(type_tec)                 dynamic set whether emissions from land use are included in type_tec
     balance_equality(commodity,level)       mapping of commodities-level where the supply-demand balance must be maintained with equality
     time_relative(time)                     flag for treating unit of ACT in sub-annual time slices relative to parent 'time' (activating parameter 'duration_time_rel')
+    relation_year(relation)                 set of relations accounted at the 'year' level
 ;
 
 Alias(type_tec,type_tec_share);
@@ -342,7 +343,7 @@ Alias(type_tec,type_tec_total);
 *    * - map_time(time,time2)
 *      - Mapping of time periods across hierarchy levels (time2 is in time)
 *    * - map_time_period(year_all,lvl_temporal,time,time2)
-*      - Mapping of the sequence of sub-annual timeslices (used in :ref:`storage <gams-storage>`)
+*      - Mapping of the sequence of sub-annual time slices (used in :ref:`storage <gams-storage>`)
 *    * - map_resource(node,commodity,grade,year_all)
 *      - Mapping of resources and grades to node over time
 *    * - map_ren_grade(node,commodity,grade,year_all)
@@ -386,6 +387,7 @@ Sets
     map_tec_act(node,tec,year_all,mode,time)        mapping of technology to modes AND temporal dissagregation
     map_tec_addon(tec,type_addon)                   mapping of types of add-on technologies to the underlying parent technology
     map_tec_storage(node,tec,mode,tec2,mode2,level,commodity,lvl_temporal)  mapping of charge-discharging technologies to their respective storage container tec and level-commodity
+	map_tec_relation(node,relation,tec,year_all,mode,time)     mapping of technologies to relations and periods
 
     map_spatial_hierarchy(lvl_spatial,node,node)    mapping of spatial resolution to nodes (last index is 'parent')
     map_temporal_hierarchy(lvl_temporal,time,time)  mapping of temporal resolution to time (last index is 'parent')
@@ -397,6 +399,9 @@ Sets
 
     map_land(node,land_scenario,year_all)            mapping of land-use model emulator scenarios to nodes and years
     map_relation(relation,node,year_all)             mapping of generic (user-defined) relations to nodes and years
+    map_relation_time(relation,node,year_all,time)             mapping of relations that should be accounted at the subannual time slice level
+    map_relation_year(relation,node,year_all,time)             mapping of relations that should be accounted at the year level
+
 
 * Storage
     map_time_commodity_storage(node,tec,level,commodity,mode,year_all,time)  mapping of storage containers to their input commodity-level (not commodity-level of stored media)
@@ -455,6 +460,8 @@ Sets
 
     is_relation_upper(relation,node,year_all)     flag whether upper bounds exists for generic relation
     is_relation_lower(relation,node,year_all)     flag whether lower bounds exists for generic relation
+    is_relation_upper_time(relation,node,year_all,time)     flag whether upper bounds exists for generic relation with time index
+    is_relation_lower_time(relation,node,year_all,time)     flag whether lower bounds exists for generic relation with time index
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
