@@ -148,6 +148,11 @@ All changes
 - New reporting computation :func:`.as_message_df` (:pull:`628`).
 - Extend functionality of :meth:`.vintage_and_active_years`; add aliases :meth:`.yv_ya`, :meth:`.ya`, and :attr:`.y0` (:pull:`572`, :pull:`623`).
 - Add scripts and HOWTO for documentation videos (:pull:`396`).
+- Extend functionality of :meth:`.vintage_and_active_years`; add aliases
+  :meth:`.yv_ya`, :meth:`.ya`, and :attr:`.y0` (:pull:`572`).
+- Add scripts and HOWTO for documentation videos (:pull:`396`)
+- Extend the auxiliary variable :ref:`_commodity_balance` to include input and output flows based on CAP and CAP_NEW variables (:pull:`451`)
+- When loading a Scenario created with a version of `message_ix` older than x.x.x, these items will be initialized (and left empty), using at most one call to :meth:`~message_ix.Scenario.commit`. See :meth:`.MESSAGE.initialize`.
 
 .. _v3.5.0:
 
