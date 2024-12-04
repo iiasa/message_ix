@@ -184,13 +184,17 @@ class Scenario(ixmp.Scenario):
         """
         return self._year_as_int(name, super().var(name, filters))
 
-    def cat_list(self, name):
+    def cat_list(self, name: str) -> list[str]:
         """Return a list of all categories for a mapping set.
 
         Parameters
         ----------
         name : str
             Name of the set.
+
+        Returns
+        -------
+        list of str
         """
         return self._backend("cat_list", name)
 
