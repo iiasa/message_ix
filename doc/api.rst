@@ -300,6 +300,8 @@ Utility methods
 .. automodule:: message_ix.util
    :members: expand_dims, copy_model, make_df
 
+.. automodule:: message_ix.util.sankey
+   :members: map_for_sankey
 
 Testing utilities
 -----------------

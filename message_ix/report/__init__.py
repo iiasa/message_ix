@@ -243,3 +243,24 @@ class Reporter(IXMPReporter):
 
         # Use a queue pattern via Reporter.add_queue()
         self.add_queue(get_tasks(), fail=fail_action)
+
+    def add_sankey(self, fail_action: Union[int, str] = "raise") -> None:
+        """Add the calculations required to produce Sankey plots.
+
+        Parameters
+        ----------
+        fail_action : "raise" or int
+            :mod:`logging` level or level name, passed to the `fail` argument of
+            :meth:`.Reporter.add_queue`.
+        """
+        # NOTE This includes just one task for the base version, but could later be
+        # expanded.
+        self.add_queue(
+            [
+                (
+                    ("message::sankey", "concat", "out::pyam", "in::pyam"),
+                    dict(strict=True),
+                )
+            ],
+            fail=fail_action,
+        )

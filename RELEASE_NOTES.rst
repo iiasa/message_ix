@@ -12,6 +12,7 @@ All changes
 
 - :mod:`message_ix` is tested and compatible with `Python 3.13 <https://www.python.org/downloads/release/python-3130/>`__ (:pull:`881`).
 - Support for Python 3.8 is dropped (:pull:`881`), as it has reached end-of-life.
+- Add functionality to create Sankey diagrams from :class:`.Reporter` together with a new tutorial showcase (:pull:`770`).
 - Add option to :func:`.util.copy_model` from a non-default location of model files (:pull:`877`).
 
 .. _v3.9.0:
