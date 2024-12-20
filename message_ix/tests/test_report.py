@@ -1,5 +1,6 @@
 import logging
 import re
+import sys
 from functools import partial
 from pathlib import Path
 
@@ -203,18 +204,34 @@ def test_reporter_as_pyam(caplog, tmp_path, dantzig_reporter):
     assert not any(c in df2.columns for c in ["h", "m", "t"])
 
     # Variable names were formatted by the callback
-    reg_var = pd.DataFrame(
-        [
-            ["san-diego", "Activity|canning_plant|production"],
-            ["san-diego", "Activity|transport_from_san-diego|to_chicago"],
-            ["san-diego", "Activity|transport_from_san-diego|to_new-york"],
-            ["san-diego", "Activity|transport_from_san-diego|to_topeka"],
-            ["seattle", "Activity|canning_plant|production"],
-            ["seattle", "Activity|transport_from_seattle|to_chicago"],
-            ["seattle", "Activity|transport_from_seattle|to_new-york"],
-            ["seattle", "Activity|transport_from_seattle|to_topeka"],
-        ],
-        columns=["region", "variable"],
+    reg_var = (
+        pd.DataFrame(
+            [
+                ["seattle", "Activity|canning_plant|production"],
+                ["seattle", "Activity|transport_from_seattle|to_new-york"],
+                ["seattle", "Activity|transport_from_seattle|to_chicago"],
+                ["seattle", "Activity|transport_from_seattle|to_topeka"],
+                ["san-diego", "Activity|canning_plant|production"],
+                ["san-diego", "Activity|transport_from_san-diego|to_new-york"],
+                ["san-diego", "Activity|transport_from_san-diego|to_chicago"],
+                ["san-diego", "Activity|transport_from_san-diego|to_topeka"],
+            ],
+            columns=["region", "variable"],
+        )
+        if sys.version_info >= (3, 10)
+        else pd.DataFrame(
+            [
+                ["san-diego", "Activity|canning_plant|production"],
+                ["san-diego", "Activity|transport_from_san-diego|to_chicago"],
+                ["san-diego", "Activity|transport_from_san-diego|to_new-york"],
+                ["san-diego", "Activity|transport_from_san-diego|to_topeka"],
+                ["seattle", "Activity|canning_plant|production"],
+                ["seattle", "Activity|transport_from_seattle|to_chicago"],
+                ["seattle", "Activity|transport_from_seattle|to_new-york"],
+                ["seattle", "Activity|transport_from_seattle|to_topeka"],
+            ],
+            columns=["region", "variable"],
+        )
     )
     assert_frame_equal(df2[["region", "variable"]], reg_var)
 
