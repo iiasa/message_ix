@@ -79,7 +79,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: ${{ env.depth }}
-        repository: ${{ github.event.workflow_run.repository }}
+        repository: ${{ github.event.workflow_run.repository.fullname }}
         ref: ${{ github.event.workflow_run.head_branch }}
 
     - name: Fetch tags (for setuptools-scm)
@@ -166,7 +166,7 @@ jobs:
       if: github.event_name == 'workflow_run'
       uses: actions/checkout@v4
       with:
-        repository: ${{ github.event.workflow_run.repository }}
+        repository: ${{ github.event.workflow_run.repository.fullname }}
         ref: ${{ github.event.workflow_run.head_branch }}
 
     - uses: actions/setup-python@v5
