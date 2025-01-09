@@ -185,6 +185,7 @@ intersphinx_mapping = {
     "message_doc": ("https://docs.messageix.org/projects/global/en/latest/", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
     "pint": ("https://pint.readthedocs.io/en/stable/", None),
+    "plotly": ("https://plotly.com/python-api-reference", None),
     "plotnine": ("https://plotnine.org", None),
     "pyam": ("https://pyam-iamc.readthedocs.io/en/stable/", None),
     "python": ("https://docs.python.org/3/", None),

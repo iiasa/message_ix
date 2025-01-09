@@ -20,6 +20,20 @@ from message_ix.report import Reporter, configure
 from message_ix.testing import SCENARIO, make_dantzig, make_westeros
 
 
+class TestReporter:
+    def test_add_sankey(self, test_mp, request) -> None:
+        scen = make_westeros(test_mp, solve=True, quiet=True, request=request)
+        rep = Reporter.from_scenario(scen, units={"replace": {"-": ""}})
+
+        # Method runs
+        key = rep.add_sankey(year=700, node="Westeros")
+
+        # Returns an existing key of the expected form
+        assert key.startswith("sankey figure ")
+
+        assert rep.check_keys(key)
+
+
 def test_reporter_no_solution(caplog, message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 

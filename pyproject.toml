@@ -55,8 +55,9 @@ docs = [
   "sphinx_rtd_theme",
   "sphinxcontrib-bibtex",
 ]
-tutorial = ["jupyter", "matplotlib", "message_ix[report]"]
+tutorial = ["jupyter", "matplotlib", "message_ix[report,sankey]"]
 report = ["ixmp[report]"]
+sankey = ["plotly"]
 tests = [
   "asyncssh",
   "message_ix[docs,tutorial]",
@@ -96,7 +97,7 @@ local_partial_types = true
 [[tool.mypy.overrides]]
 # Packages/modules for which no type hints are available.
 module = [
-  "pyam",
+  "pyam.*",
   "scipy.*",
   # Indirectly via ixmp; this should be a subset of the list in ixmp's pyproject.toml
   "jpype",
