@@ -229,6 +229,62 @@ class Reporter(IXMPReporter):
 
         return rep
 
+    def add_sankey(
+        self,
+        year: int,
+        node: str,
+        exclude: list[str] = [],
+    ) -> str:
+        """Add the tasks required to produce a Sankey diagram.
+
+        See :func:`.map_for_sankey` for the meaning of the `node`, and `exclude`
+        parameters.
+
+        Parameters
+        ----------
+        year : int
+            The period (year) to be plotted.
+
+        Returns
+        -------
+        str
+            A key like :py:`"sankey figure a1b2c"`, where the last part is a unique hash
+            of the arguments `year`, `node`, and `exclude`. Calling
+            :meth:`.Reporter.get` with this key triggers generation of a
+            :class:`plotly.Figure <plotly.graph_objects.Figure>` with the Sankey
+            diagram.
+
+        See also
+        --------
+        map_for_sankey
+        pyam.figures.sankey
+        """
+        from warnings import filterwarnings
+
+        from genno import KeySeq
+        from genno.caching import hash_args
+        from pyam import IamDataFrame
+        from pyam.figures import sankey
+
+        from message_ix.tools.sankey import map_for_sankey
+
+        # Silence a warning raised by pyam-iamc 3.0.0 with pandas 2.2.3
+        filterwarnings("ignore", "Downcasting behavior", FutureWarning, "pyam.figures")
+
+        # Sequence of similar Keys for individual operations; use a unique hash of the
+        # arguments to avoid conflicts between multiple calls
+        unique = hash_args(year, node, exclude)[:6]
+        k = KeySeq(f"message sankey {unique}")
+
+        # Concatenate 'out' and 'in' data
+        self.add(k[0], "concat", "out::pyam", "in::pyam", strict=True)
+        # `df` argument to pyam.figures.sankey()
+        self.add(k[1], partial(IamDataFrame.filter, year=year), k[0])
+        # `mapping` argument to pyam.figures.sankey()
+        self.add(k[2], map_for_sankey, k[1], node=node, exclude=exclude)
+        # Generate the plotly.Figure object; return the key
+        return str(self.add(f"sankey figure {unique}", sankey, k[1], k[2]))
+
     def add_tasks(self, fail_action: Union[int, str] = "raise") -> None:
         """Add the pre-defined MESSAGEix reporting tasks to the Reporter.
 
@@ -243,24 +299,3 @@ class Reporter(IXMPReporter):
 
         # Use a queue pattern via Reporter.add_queue()
         self.add_queue(get_tasks(), fail=fail_action)
-
-    def add_sankey(self, fail_action: Union[int, str] = "raise") -> None:
-        """Add the calculations required to produce Sankey plots.
-
-        Parameters
-        ----------
-        fail_action : "raise" or int
-            :mod:`logging` level or level name, passed to the `fail` argument of
-            :meth:`.Reporter.add_queue`.
-        """
-        # NOTE This includes just one task for the base version, but could later be
-        # expanded.
-        self.add_queue(
-            [
-                (
-                    ("message::sankey", "concat", "out::pyam", "in::pyam"),
-                    dict(strict=True),
-                )
-            ],
-            fail=fail_action,
-        )

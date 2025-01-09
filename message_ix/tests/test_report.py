@@ -20,6 +20,20 @@ from message_ix.report import Reporter, configure
 from message_ix.testing import SCENARIO, make_dantzig, make_westeros
 
 
+class TestReporter:
+    def test_add_sankey(self, test_mp, request) -> None:
+        scen = make_westeros(test_mp, solve=True, quiet=True, request=request)
+        rep = Reporter.from_scenario(scen, units={"replace": {"-": ""}})
+
+        # Method runs
+        key = rep.add_sankey(year=700, node="Westeros")
+
+        # Returns an existing key of the expected form
+        assert key.startswith("sankey figure ")
+
+        assert rep.check_keys(key)
+
+
 def test_reporter_no_solution(caplog, message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
@@ -289,20 +303,3 @@ def test_reporter_as_pyam(caplog, tmp_path, dantzig_reporter):
     # Results have the expected units
     assert all(df5["unit"] == "centiUSD / case")
     assert_series_equal(df4["value"], df5["value"] / 100.0)
-
-
-def test_reporter_add_sankey(test_mp, request):
-    scen = make_westeros(
-        test_mp, emissions=True, solve=True, quiet=True, request=request
-    )
-
-    # Reporter.from_scenario can handle Westeros example model
-    rep = Reporter.from_scenario(scen)
-
-    # Westeros-specific configuration: '-' is a reserved character in pint
-    configure(units={"replace": {"-": ""}})
-
-    # Add Sankey calculation(s)
-    rep.add_sankey()
-
-    assert rep.check_keys("message::sankey")

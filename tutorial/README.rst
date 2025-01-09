@@ -83,6 +83,8 @@ From the command line
 
        $ jupyter notebook
 
+.. _tutorial-westeros:
+
 Westeros Electrified
 ====================
 
@@ -164,9 +166,9 @@ framework, such as used in global research applications of |MESSAGEix|.
       module to ‘report’ results, e.g. do post-processing, plotting, and other
       calculations (:tut:`westeros/westeros_report.ipynb`).
 
-      #. After familiarizing yourself with ‘reporting’, learn how to quickly assess 
-         variable flows by plotting Sankey diagrams 
-         (:tut:`westeros/westeros_sankey.ipynb`). 
+      #. After familiarizing yourself with ‘reporting’, learn how to quickly assess
+         variable flows by plotting Sankey diagrams
+         (:tut:`westeros/westeros_sankey.ipynb`).
 
    #. Build the baseline scenario using data stored in Excel files to
       populate sets and parameters:
