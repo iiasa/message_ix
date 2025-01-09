@@ -1,7 +1,7 @@
 import logging
 import re
-import sys
 from functools import partial
+from importlib.metadata import version
 from pathlib import Path
 
 import pandas as pd
@@ -218,22 +218,7 @@ def test_reporter_as_pyam(caplog, tmp_path, dantzig_reporter):
     assert not any(c in df2.columns for c in ["h", "m", "t"])
 
     # Variable names were formatted by the callback
-    reg_var = (
-        pd.DataFrame(
-            [
-                ["seattle", "Activity|canning_plant|production"],
-                ["seattle", "Activity|transport_from_seattle|to_new-york"],
-                ["seattle", "Activity|transport_from_seattle|to_chicago"],
-                ["seattle", "Activity|transport_from_seattle|to_topeka"],
-                ["san-diego", "Activity|canning_plant|production"],
-                ["san-diego", "Activity|transport_from_san-diego|to_new-york"],
-                ["san-diego", "Activity|transport_from_san-diego|to_chicago"],
-                ["san-diego", "Activity|transport_from_san-diego|to_topeka"],
-            ],
-            columns=["region", "variable"],
-        )
-        if sys.version_info >= (3, 10)
-        else pd.DataFrame(
+    reg_var = pd.DataFrame(
             [
                 ["san-diego", "Activity|canning_plant|production"],
                 ["san-diego", "Activity|transport_from_san-diego|to_chicago"],
@@ -246,7 +231,11 @@ def test_reporter_as_pyam(caplog, tmp_path, dantzig_reporter):
             ],
             columns=["region", "variable"],
         )
-    )
+
+    # Adjust changes in behaviour in pyam-iamc ≥ 3 (Python ≥ 3.10) and < 3 (Python 3.9)
+    if version("pyam-iamc") >= "3.0.0":
+        # Version of pyam-iamc that does not sort 'region' and 'variable' dimensions
+        df2 = df2.sort_values(["region", "variable"], ignore_index=True)
     assert_frame_equal(df2[["region", "variable"]], reg_var)
 
     # message_ix.Reporter uses pyam.IamDataFrame.to_csv() to write to file
