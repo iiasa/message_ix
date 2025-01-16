@@ -2,10 +2,12 @@
 # Written by Marek Makowski, ECE Program of IIASA, in March 2023.
 
 import math
+import os
 import typing
 from collections import Counter
 from typing import List
 
+import ixmp
 import numpy as np
 import pandas as pd
 
@@ -139,9 +141,9 @@ class LPdiag:
             # end of MPS reading
 
         # check, if the last required section ('ENDATA') was defined
-        assert (
-            n_section == 7
-        ), f'The "ENDATA" section is not declared; last section_id = {n_section}.'
+        assert n_section == 7, (
+            f'The "ENDATA" section is not declared; last section_id = {n_section}.'
+        )
 
         self.mps_sum()  # summarize the processed MPS content
 
@@ -157,8 +159,7 @@ class LPdiag:
             if words[0] == sections[n_exp]:  # required section found
                 if n_exp == 0:  # store the problem name
                     assert n_words > 1, (
-                        f"problem name undefined: line {n_line} has"
-                        f" {n_words} words."
+                        f"problem name undefined: line {n_line} has {n_words} words."
                     )
                     # print(f"\tProblem name line {words[1:]}.")
                     if n_words == 2:
@@ -226,6 +227,34 @@ class LPdiag:
         )
         print(f"Distribution of the GF (objective) values:\n{df.describe()}")
 
+    def read_matrix(self):
+        # check, if there was at least one N row
+        # (the first N row assumed to be the objective):
+        assert self.gf_seq != -1, "objective (goal function) row is undefined."
+
+        # create a df with the matrix coefficients
+        self.mat = pd.DataFrame(
+            {"row": self.mat_row, "col": self.mat_col, "val": self.mat_val}
+        )
+        self.mat["abs_val"] = abs(
+            self.mat["val"]
+        )  # add column with absolute values of coeff.
+        self.mat["log"] = np.log10(self.mat["abs_val"]).astype(
+            int
+        )  # add col with int(log10(coeffs))
+
+        # recreate all matrix dataframe for rescaler
+        row_name = pd.DataFrame(self.seq_row).transpose()[0].to_dict()
+        col_name = pd.DataFrame(self.seq_col).transpose()[0].to_dict()
+        matrix = self.mat.copy()
+        matrix = (
+            matrix.set_index(["row", "col"], drop=True)[["val"]]
+            .rename(index=row_name, level="row")
+            .rename(index=col_name, level="col")
+        )
+
+        return matrix
+
     def add_row(self, words: List[str], n_line: int):
         """Process current line of the ROWS section.
 
@@ -247,16 +276,16 @@ class LPdiag:
 
         row_types = ["N", "E", "G", "L"]  # types of rows
         n_words = len(words)
-        assert (
-            n_words == 2
-        ), f"row declaration (line {n_line}) has {n_words} words instead of 2."
+        assert n_words == 2, (
+            f"row declaration (line {n_line}) has {n_words} words instead of 2."
+        )
         row_type = words[0]
         row_name = words[1]
         row_seq = len(self.row_name)
         assert row_type in row_types, f"unknown row type {row_type} (line {n_line})."
-        assert (
-            row_name not in self.row_name
-        ), f"duplicated row name: {row_name} (line {n_line})."
+        assert row_name not in self.row_name, (
+            f"duplicated row name: {row_name} (line {n_line})."
+        )
         if row_type == "N" and self.gf_seq == -1:
             self.gf_seq = row_seq
             print(
@@ -293,9 +322,9 @@ class LPdiag:
         ], f"matrix element (line {n_line}) has {n_words} words."
         col_name = words[0]
         if col_name != self.col_curr:  # new column
-            assert (
-                col_name not in self.col_name
-            ), f"duplicated column name: {col_name} (line {n_line})"
+            assert col_name not in self.col_name, (
+                f"duplicated column name: {col_name} (line {n_line})"
+            )
             col_seq = len(self.col_name)
             self.col_name.update({col_name: col_seq})
             self.seq_col.update({col_seq: [col_name, 0.0, self.infty]})
@@ -385,12 +414,11 @@ class LPdiag:
             pos_name = 0  # first row-name in words[pos_name]
 
         assert n_words in n_req_wrd, (
-            f"rhs line {n_line} has {n_words} words, expected" f" {n_req_wrd}."
+            f"rhs line {n_line} has {n_words} words, expected {n_req_wrd}."
         )
         if self.id_rhs:  # check id of the RHS entry, if it was defined
             assert words[0] == self.rhs_id, (
-                f"RHS id {words[0]}, line {n_line} differ from"
-                f"expected: {self.rhs_id}."
+                f"RHS id {words[0]}, line {n_line} differ fromexpected: {self.rhs_id}."
             )
         row_name = words[pos_name]
         row_seq = self.row_name.get(row_name)
@@ -408,9 +436,9 @@ class LPdiag:
         if n_words == n_req_wrd[1]:  # second pair of rhs defined
             row_name = words[pos_name + 2]
             row_seq = self.row_name.get(row_name)
-            assert (
-                row_seq is not None
-            ), f"unknown RHS row-name {row_name} (line {n_line})."
+            assert row_seq is not None, (
+                f"unknown RHS row-name {row_name} (line {n_line})."
+            )
             try:
                 val = float(words[pos_name + 3])
             except ValueError as e:
@@ -456,9 +484,9 @@ class LPdiag:
             n_req_wrd = [2, 4]
             pos_name = 0  # first row-name in words[pos_name]
 
-        assert (
-            n_words in n_req_wrd
-        ), f"ranges line {n_line} has {n_words} words, expected {n_req_wrd}."
+        assert n_words in n_req_wrd, (
+            f"ranges line {n_line} has {n_words} words, expected {n_req_wrd}."
+        )
         if self.id_range:  # check id of the ranges' entry, if it was defined
             assert words[0] == self.range_id, (
                 f"Ranges id {words[0]}, line {n_line} differ from"
@@ -466,9 +494,9 @@ class LPdiag:
             )
         row_name = words[pos_name]
         row_seq = self.row_name.get(row_name)
-        assert (
-            row_seq is not None
-        ), f"unknown range row-name {row_name} (line {n_line})."
+        assert row_seq is not None, (
+            f"unknown range row-name {row_name} (line {n_line})."
+        )
         try:
             val = float(words[pos_name + 1])
         except ValueError as e:
@@ -482,9 +510,9 @@ class LPdiag:
         if n_words == n_req_wrd[1]:  # second pair of ranges defined
             row_name = words[pos_name + 2]
             row_seq = self.row_name.get(row_name)
-            assert (
-                row_seq is not None
-            ), f"unknown ranges row-name {row_name} (line {n_line})."
+            assert row_seq is not None, (
+                f"unknown ranges row-name {row_name} (line {n_line})."
+            )
             try:
                 val = float(words[pos_name + 3])
             except ValueError as e:
@@ -544,9 +572,9 @@ class LPdiag:
             n_req_wrd = [3, 2]
             pos_name = 1  # col-name in words[pos_name]
 
-        assert (
-            n_words in n_req_wrd
-        ), f"bounds line {n_line} has {n_words} words, expected: {n_req_wrd}."
+        assert n_words in n_req_wrd, (
+            f"bounds line {n_line} has {n_words} words, expected: {n_req_wrd}."
+        )
         if self.id_bnd:  # check id of the BOUNDS line, if it was defined
             assert words[1] == self.bnd_id, (
                 f"BOUNDS id {words[1]}, line {n_line} differ from "
@@ -554,9 +582,9 @@ class LPdiag:
             )
         col_name = words[pos_name]
         col_seq = self.col_name.get(col_name)
-        assert (
-            col_seq is not None
-        ), f"unknown BOUNDS col-name {col_name} (line {n_line})."
+        assert col_seq is not None, (
+            f"unknown BOUNDS col-name {col_name} (line {n_line})."
+        )
         attr = self.seq_col.get(col_seq)  # [col_name, lo_bnd, up_bnd]
 
         typ = words[0]
@@ -582,8 +610,7 @@ class LPdiag:
                 attr[at_pos] = self.infty
         elif typ in bnd_type3:
             raise TypeError(
-                f"Bound type {typ} of integer var. (line {n_line}) not"
-                " processed yet."
+                f"Bound type {typ} of integer var. (line {n_line}) not processed yet."
             )
         else:
             raise TypeError(f"Unknown bound type {typ} (line {n_line}).")
@@ -632,9 +659,9 @@ class LPdiag:
             "L": [self.infty, 0.0],
             "N": [self.infty, self.infty],
         }
-        assert row_seq == self.row_name.get(
-            row_name
-        ), f"{row_seq=} should be equal to: {self.row_name.get(row_name)}."
+        assert row_seq == self.row_name.get(row_name), (
+            f"{row_seq=} should be equal to: {self.row_name.get(row_name)}."
+        )
         assert row_type in type2bnd, f"undefined row type {row_type=} for {row_name=}."
         if sec_name == "rows":  # initialize row attributes (used in ROW section)
             low_upp = type2bnd[row_type]
@@ -693,10 +720,10 @@ class LPdiag:
 
         # print(f'\nDistribution of non-zero values:\n{self.mat["val"].describe()}')
         print(
-            f'\nDistribution of abs(non-zero) values:\n{self.mat["abs_val"].describe()}'
+            f"\nDistribution of abs(non-zero) values:\n{self.mat['abs_val'].describe()}"
         )
         print(
-            f'\nDistribution of int(log10(abs(values))):\n{self.mat["log"].describe()}'
+            f"\nDistribution of int(log10(abs(values))):\n{self.mat['log'].describe()}"
         )
         min_logv = self.mat["log"].min()
         max_logv = self.mat["log"].max()
@@ -731,7 +758,7 @@ class LPdiag:
                 "\nDistribution of log10(values) in the requested low-tail (<="
                 f" {lo_tail}) of the distribution."
             )
-            print(f'{self.mat.loc[self.mat["log"] <= lo_tail].describe()}')
+            print(f"{self.mat.loc[self.mat['log'] <= lo_tail].describe()}")
             for val in [*range(min_logv, lo_tail + 1)]:
                 print(
                     f"Number of log10(values) == {val}:"
@@ -748,7 +775,7 @@ class LPdiag:
                 "\nDistribution of log10(values) in the requested upp-tail (>="
                 f" {up_tail}) of the distribution."
             )
-            print(f'{self.mat.loc[self.mat["log"] >= up_tail].describe()}')
+            print(f"{self.mat.loc[self.mat['log'] >= up_tail].describe()}")
             for val in [*range(up_tail, max_logv + 1)]:
                 print(
                     f"Number of log10(values) == {val}:"
@@ -776,13 +803,13 @@ class LPdiag:
         if small:  # sub-matrix composed of only small-value outliers
             df = self.mat.loc[self.mat["log"] <= thresh]
             print(
-                f'\nRow-wise locations of {df["log"].count()} outliers (coeff. with'
+                f"\nRow-wise locations of {df['log'].count()} outliers (coeff. with"
                 f" values of log10(values) <= {thresh})."
             )
         else:  # large-value outliers
             df = self.mat.loc[self.mat["log"] >= thresh]
             print(
-                f'\nRow-wise locations of {df["log"].count()} outliers (coeff. with'
+                f"\nRow-wise locations of {df['log'].count()} outliers (coeff. with"
                 f" values of log10(values) >= {thresh})."
             )
         df1 = df.sort_values(
@@ -791,9 +818,9 @@ class LPdiag:
         df1.reset_index()
         col_out = []  # col_seq of outliers' cols
         for n_rows, (_, row) in enumerate(df1.iterrows()):
-            assert (
-                n_rows < max_rec
-            ), "To process all requested coeffs modify the safety limit assertion."
+            assert n_rows < max_rec, (
+                "To process all requested coeffs modify the safety limit assertion."
+            )
             row_seq, row_name = self.get_entity_info(
                 row, True
             )  # row seq_id and name of the current coeff.
@@ -805,8 +832,8 @@ class LPdiag:
             else:
                 print(f"{col_seq = } already in another outlier row.")
             print(
-                f'Coeff. ({row_seq}, {col_seq}): val = {row["val"]:.4e}, log(val) ='
-                f' {row["log"]:n}'
+                f"Coeff. ({row_seq}, {col_seq}): val = {row['val']:.4e}, log(val) ="
+                f" {row['log']:n}"
             )
             df_row_out = df1.loc[df1["row"] == row_seq]  # df with only outlier elements
             df_row_all = self.mat.loc[
@@ -918,3 +945,244 @@ class LPdiag:
         .. note:: Not implemented.
         """
         raise NotImplementedError
+
+
+# from here below is the code to create scaling argumens to pass to GAMS
+# check with @ywpratama if found any issues
+
+lp = LPdiag()
+mp = ixmp.Platform()
+
+
+def filter_df(data, bounds):
+    """Extracts matrix elements with coefficient outliers.
+    This function extracts elements from a matrix where
+    the coefficients deviate from a specified threshold.
+    Parameters:
+    -----------
+    data : pandas DataFrame
+        The coefficient matrix, typically generated by
+        the mps_sum function in LPDiag.
+    bounds: int or list of 2 integers
+        Exponent threshold used to identify outlier coefficients.
+        If a single integer is provided, the bounds are set to +/- that value.
+        If a list of 2 integers is provided, they represent the lower and
+        upper bounds of the threshold.
+    Examples:
+    ---------
+    # Extract elements with coefficient exponents deviating beyond +/-3
+    extracted_data = filter_df(data_matrix, 3)
+    # Extract elements with coefficients exponents deviating
+    # beyond the range of -2 to 2
+    extracted_data = extract_outliers(data_matrix, [-2, 2])
+    """
+
+    if isinstance(bounds, int):
+        lo_bound = -bounds
+        up_bound = bounds
+    else:
+        lo_bound = bounds[0]
+        up_bound = bounds[1]
+
+    df_filtered = data.loc[(data["val"] <= lo_bound) | (data["val"] >= up_bound)]
+
+    return df_filtered
+
+
+def make_logdf(data):
+    """
+    Make log10 of the absolute non zero value element of dataframe.
+    """
+    log_absdf = data.copy()
+
+    log_absdf.loc[log_absdf["val"] != 0, "val"] = np.log10(
+        np.absolute(log_absdf.loc[log_absdf["val"] != 0, "val"])
+    )
+
+    return log_absdf
+
+
+def get_lvl_ix(data, lvl):
+    """
+    To get level index from coefficient matrix.
+    Parameters:
+    -----------
+    data : pandas DataFrame
+        The coefficient matrix, typically generated by
+        the mps_sum function in LPDiag.
+    lvl : int or str
+        0 or "row" for rows and 1 or "col" for columns
+    """
+    return data.index.get_level_values(lvl)
+
+
+def show_range(data, pretext):
+    """
+    To displace coefficient exponents range.
+    """
+
+    log_absdf = make_logdf(data)
+
+    print(
+        f"{pretext}:",
+        "[",
+        np.int32(np.min(log_absdf)),  # lower bound
+        "|",
+        np.int32(np.max(log_absdf)),  # upper bound
+        "]",
+    )
+
+
+def get_scaler_args(scenario_ref=None, model="", scenario=""):
+    """
+    Function to make gams argument for scaling
+    """
+    if not scenario_ref:
+        strings = ["MsgScaler", model, scenario]
+    else:
+        strings = ["MsgScaler", scenario_ref.model, scenario_ref.scenario]
+
+    file_name = "_".join(s.replace(" ", "_") for s in strings)
+
+    current_directory = os.getcwd()
+    two_levels_up = os.path.abspath(os.path.join(current_directory, "../.."))
+
+    prescale_args_dir = os.path.join(two_levels_up, f"model/scaler/{file_name}.gms")
+
+    if os.path.exists(prescale_args_dir):
+        return f"--scaler={file_name}"
+    else:
+        print("The referred scenario doesn't have prescaler file!")
+        print("Please use make_prescaler() function to create one")
+
+
+def make_scaler(path, scen, bounds=4, steps=1, display_range=True):
+    """
+    Process to generate prescale_args in GAMS to improve
+    matrix coefficients.
+    This function shifts matrix coefficient exponents to improve
+    the scaling properties of the matrix. The function returns
+    prescale arguments (prescale_args) to be passed to the GAMS model.
+    Parameters:
+    -----------
+    path: str
+        Pathways to locate the mps file.
+    bounds: int or list of 2 integers
+        Exponent threshold used to identify outlier coefficients.
+        If a single integer is provided, the bounds are set to +/- that value.
+        If a list of 2 integers is provided, they represent
+        the lower and upper bounds of the threshold.
+    steps: int
+        Number of times the prescaler generation process is repeated.
+        Larger values may lead to more refined prescale_args but
+        also increase computation time.
+    show_range: boolean
+        Option to show the coefficient exponents range before and after scaling.
+        If True, the function will display the range; otherwise, it will not.
+    Returns:
+    --------
+    prescale_args: dict
+        A dictionary of prescale arguments to be passed to the GAMS model.
+    """
+    lp.read_mps(path)
+
+    data = lp.read_matrix()
+
+    matrix = data
+
+    if display_range is True:
+        show_range(matrix, "\nUnscaled range     ")
+
+    scalers = {"row": [], "col": []}
+
+    counter = 0
+    while counter < steps:
+        for s in scalers.keys():
+            # print(matrix)
+            # calculate log base 10 of the absolute value of the matrix
+            log_absmatrix = make_logdf(matrix)
+
+            # Create matrix with small and large coefficients
+            log_absmatrix_solv = filter_df(log_absmatrix, bounds=bounds)
+
+            # Populating row scaler
+            objective_ix = "_obj" if s == "row" else "constobj"
+            index_solv = [
+                e for e in get_lvl_ix(log_absmatrix_solv, s) if e != objective_ix
+            ]
+
+            SFs = {k: [] for k in index_solv}
+            for k in SFs.keys():
+                index_val = get_lvl_ix(log_absmatrix, s) == k
+                dflog_val = log_absmatrix.loc[index_val, "val"]
+                lb, ub = np.int32(min(dflog_val)), np.int32(max(dflog_val))
+                mid = np.int32(np.mean([lb, ub]))
+
+                exp = mid if s == "row" else -mid
+
+                SFs[k] = 10.0 ** (exp)
+
+            # Create DataFrame of row scaler
+            return_index = list(set(get_lvl_ix(log_absmatrix, s)))
+            if counter == 0:
+                multiplier = 1
+            else:
+                multiplier = scalers[s].reindex(return_index).fillna(1)
+            step_scaler = pd.DataFrame(data=SFs, index=["val"]).transpose()
+            step_scaler.index.name = s
+            step_scaler = step_scaler.reindex(return_index).fillna(1)
+
+            # summarize multipliers from previous steps
+            scalers[s] = step_scaler.mul(multiplier)
+
+            # Create new matrix with scaled rows
+            matrix = matrix.div(step_scaler) if s == "row" else matrix.mul(step_scaler)
+
+        if display_range is True:
+            show_range(matrix, f"Scaled range step {counter + 1}")
+
+        # Increment the counter
+        counter += 1
+
+    # generating prescaler arguments for GAMS
+    scaler_dict = {}
+    for key, df_scaler in scalers.items():
+        df_scaler = df_scaler.loc[df_scaler["val"] != 1]
+        df_scaler_dict = df_scaler["val"].to_dict()
+        for k, v in df_scaler_dict.items():
+            if k == "_obj":
+                k_ = "_obj.scale"
+            elif k == "constobj":
+                k_ = "constobj.scale"
+            else:
+                k_ = k.replace("(", ".scale('")
+                k_ = k_.replace(")", "')")
+                k_ = k_.replace(",", "','")
+            scaler_dict.update({k_: v})
+
+    # add this line to active scaling option
+    scaler_dict["MESSAGE_LP.scaleopt"] = 1
+
+    scaler_df = pd.DataFrame(scaler_dict, index=["val"]).transpose()
+    scaler_df.index = scaler_df.index.rename("key", inplace=False)
+
+    scaler_list = []
+    for k, v in scaler_dict.items():
+        scaler_list.append(f"{k}={v};")
+    scaler_args_txt = "\n".join(scaler_list)
+
+    current_directory = os.getcwd()
+    two_levels_up = os.path.abspath(os.path.join(current_directory, "../.."))
+
+    scaler_gms_name = [scen.model, scen.scenario]
+    scaler_gms_name = "_".join(s.replace(" ", "_") for s in scaler_gms_name)
+
+    scaler_gms_dir = os.path.join(
+        two_levels_up, f"model/scaler/MsgScaler_{scaler_gms_name}.gms"
+    )
+
+    with open(scaler_gms_dir, "w") as txtfile:
+        # Write some text to the file
+        txtfile.write(scaler_args_txt)
+
+    return scaler_df

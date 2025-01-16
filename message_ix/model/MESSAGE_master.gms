@@ -58,6 +58,9 @@ $SETGLOBAL macromode "none"
 * rolling horizon (period-by-period, recursive-dynamic with limited foresight - 'number of years of foresight'
 $SETGLOBAL foresight "0"
 
+** include scaler commands
+$SETGLOBAL scaler "MsgScaler_Default"
+
 ** add a comment and name extension for model report files (e.g. run-specific info, calibration notes) - optional **
 $SETGLOBAL comment ""
 
