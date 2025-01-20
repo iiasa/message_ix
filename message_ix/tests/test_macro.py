@@ -315,12 +315,29 @@ def test_calibrate(westeros_solved: Scenario, w_data_path: Path) -> None:
     assert not end_grow.isnull().any()
 
 
-def test_calibrate_roundtrip(westeros_solved: Scenario, w_data_path: Path) -> None:
+@pytest.mark.parametrize(
+    "kwargs",
+    (
+        {},  # Default concurrent=0
+        dict(concurrent=0),  # Explicit value, same as default
+        dict(concurrent=1),
+        pytest.param(
+            dict(concurrent=2),
+            marks=pytest.mark.xfail(raises=ValueError, reason="Invalid value"),
+        ),
+    ),
+)
+def test_calibrate_roundtrip(
+    westeros_solved: Scenario, w_data_path: Path, kwargs
+) -> None:
     """Ensure certain values occur after checking convergence.
 
     The specific values used here were re-checked in :pull:`924`.
     """
-    with_macro = westeros_solved.add_macro(w_data_path, check_convergence=True)
+    # this is a regression test with values observed on May 23, 2024
+    with_macro = westeros_solved.add_macro(
+        w_data_path, check_convergence=True, **kwargs
+    )
     npt.assert_allclose(
         with_macro.par("aeei")["value"].values,
         1e-3 * np.array([20.0, -7.5674349, 43.659505, 21.182828]),
