@@ -1,11 +1,11 @@
 import logging
 from collections import ChainMap
-from collections.abc import Mapping, MutableMapping
+from collections.abc import MutableMapping
 from copy import copy
 from dataclasses import InitVar, dataclass, field
 from functools import partial
 from pathlib import Path
-from typing import Optional
+from typing import MutableMapping, Optional
 from warnings import warn
 
 import ixmp.model.gams
@@ -21,6 +21,7 @@ DEFAULT_CPLEX_OPTIONS = {
     "lpmethod": 4,
     "threads": 4,
     "epopt": 1e-6,
+    "scaind": -1,
 }
 
 #: Common dimension name abbreviations mapped to tuples with:
@@ -176,7 +177,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
 
     #: Mapping from model item (equation, parameter, set, or variable) names to
     #: :class:`.Item` describing the item.
-    items: Mapping[str, Item]
+    items: MutableMapping[str, Item]
 
     def __init__(self, name=None, **model_options):
         # Update the default options with any user-provided options
@@ -212,7 +213,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         optfile.write_text("\n".join(lines))
         log.info(f"Use CPLEX options {self.cplex_opts}")
 
-        self.cplex_opts.update({"barcrossalg": 2})
+        self.cplex_opts.update({"predual": 1})
         optfile2 = Path(self.model_dir).joinpath("cplex.op2")
         lines2 = ("{} = {}".format(*kv) for kv in self.cplex_opts.items())
         optfile2.write_text("\n".join(lines2))
@@ -558,7 +559,7 @@ var(
 var(
     "PRICE_EMISSION",
     "n type_emission type_tec y",
-    "Emission price (derived from marginals of EMISSION_BOUND constraint)",
+    "Emission price (derived from marginals of EMISSION_EQUIVALENCE constraint)",
 )
 var(
     "REL",
@@ -700,14 +701,12 @@ equ("ACTIVITY_RATING_TOTAL", "", "Equivalence of `ACT_RATING` to `ACT`")
 equ(
     "ACTIVITY_SOFT_CONSTRAINT_LO",
     "",
-    "Bound on relaxation of the dynamic constraint on market penetration"
-    " (lower bound)",
+    "Bound on relaxation of the dynamic constraint on market penetration (lower bound)",
 )
 equ(
     "ACTIVITY_SOFT_CONSTRAINT_UP",
     "",
-    "Bound on relaxation of the dynamic constraint on market penetration"
-    " (upper bound)",
+    "Bound on relaxation of the dynamic constraint on market penetration (upper bound)",
 )
 equ("ADDON_ACTIVITY_LO", "", "Addon technology activity lower constraint")
 equ("ADDON_ACTIVITY_UP", "", "Addon-technology activity upper constraint")
@@ -738,8 +737,7 @@ equ("COMMODITY_BALANCE_LT", "", "Commodity supply lower than or equal demand")
 equ(
     "COMMODITY_USE_LEVEL",
     "",
-    "Aggregate use of commodity by level as defined by total input into "
-    "technologies",
+    "Aggregate use of commodity by level as defined by total input into technologies",
 )
 equ("COST_ACCOUNTING_NODAL", "n y", "Cost accounting aggregated to the node")
 equ(
@@ -769,7 +767,7 @@ equ(
 )
 equ(
     "EMISSION_EQUIVALENCE",
-    "",
+    "n e type_tec y",
     "Auxiliary equation to simplify the notation of emissions",
 )
 equ("EXTRACTION_BOUND_UP", "", "Upper bound on extraction (by grade)")
@@ -791,7 +789,7 @@ equ(
 equ(
     "MIN_UTILIZATION_CONSTRAINT",
     "",
-    "Constraint for minimum yearly operation (aggregated over the course of a " "year)",
+    "Constraint for minimum yearly operation (aggregated over the course of a year)",
 )
 equ("NEW_CAPACITY_BOUND_LO", "", "Lower bound on technology capacity investment")
 equ("NEW_CAPACITY_BOUND_UP", "", "Upper bound on technology capacity investment")
@@ -803,8 +801,7 @@ equ(
 equ(
     "NEW_CAPACITY_CONSTRAINT_UP",
     "",
-    "Dynamic constraint for capacity investment (learning and spillovers upper "
-    "bound)",
+    "Dynamic constraint for capacity investment (learning and spillovers upper bound)",
 )
 equ(
     "NEW_CAPACITY_SOFT_CONSTRAINT_LO",
@@ -839,8 +836,7 @@ equ("RENEWABLES_POTENTIAL_CONSTRAINT", "", "Constraint on renewable resource pot
 equ(
     "RESOURCE_CONSTRAINT",
     "",
-    "Constraint on resources remaining in each period (maximum extraction per "
-    "period)",
+    "Constraint on resources remaining in each period (maximum extraction per period)",
 )
 equ(
     "RESOURCE_HORIZON",
