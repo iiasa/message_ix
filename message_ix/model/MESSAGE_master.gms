@@ -20,7 +20,7 @@ $SETGLOBAL macromode "none"
 ** MAgPIE connection
 * "0": MESSAGEix default is run
 * "1": MESSAGEix is run with connection to MAgPIE
-$SETGLOBAL magpiemode "1"
+$SETGLOBAL magpiemode "0"
 
 ** define the time horizon over which the model optimizes (perfect foresight, myopic or rolling horizon) **
 * perfect foresight - 0
