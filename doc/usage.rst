@@ -94,6 +94,21 @@ A low energy demand scenario for meeting the 1.5 °C target and sustainable de
 
 Scenarios that limit global warming to 1.5 °C describe major… `Read more → <https://www.nature.com/articles/s41560-018-0172-6>`__
 
+Seasonal pumped hydropower storage role in responding to climate change impacts on the Brazilian electrical sector
+------------------------------------------------------------------------------------------------------------------
+.. figure:: _static/usage_figures/1-s2.0-S2352152X2400834X-gr1.jpg
+   :width: 250px
+   :align: right
+
+:cite:ct:`Weber-2024`
+
+- **Spatial**: Brazil
+- **Keywords**: Energy modelling, energy variability
+- **Usage**: Evaluate how best to shift Brazil to 100% renewable energy by using seasonal pumped hydropower storage.
+- **Code**: `On GitHub. <https://github.com/natiweber/BESMM/tree/main>`_
+
+Since Brazil's major energy resources are renewable and directly... `Read more→ <https://www.sciencedirect.com/science/article/pii/S2352152X2400834X>`__
+
 .. _tools:
 
 Tools
