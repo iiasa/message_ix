@@ -30,6 +30,7 @@ All changes
 
 - Some MESSAGEix :doc:`tutorials <tutorials>` are runnable with the :class:`.IXMP4Backend` introduced in :mod:`ixmp` version 3.11 (:pull:`894`, :pull:`941`).
   See `Support roadmap for ixmp4 <https://github.com/iiasa/message_ix/discussions/939>`__ for details.
+- Add the :py:`concurrent=...` model option to :class:`.MACRO` (:pull:`808`).
 - Adjust use of :ref:`type_tec <mapping-sets>` in :ref:`equation_emission_equivalence` (:pull:`930`, :issue:`929`, :pull:`935`).
 
   This change reduces the size of the ``EMISS`` variable,
