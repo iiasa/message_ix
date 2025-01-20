@@ -10,7 +10,7 @@ $ONGLOBAL
 *----------------------------------------------------------------------------------------------------------------------*
 
 ** scenario/case selection - this must match the name of the MsgData_<%%%>.gdx input data file **
-*$SETGLOBAL data "<your datafile name here>"
+$SETGLOBAL data "<your datafile name here>"
 
 ** MACRO mode
 * "none": MESSAGEix is run in stand-alone mode

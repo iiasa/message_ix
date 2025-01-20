@@ -103,6 +103,7 @@ Set rating_unrated(rating) ;
 rating_unrated(rating) = yes ;
 rating_unrated('unrated') = no ;
 
+if(%magpiemode% = 1,
 *----------------------------------------------------------------------------------------------------------------------*
 * auxiliary mappings for split between cumulative and annualland-use emission calculations                             *
 *----------------------------------------------------------------------------------------------------------------------*
@@ -129,6 +130,7 @@ emission_cumulative('LU_CO2') = yes;
 emission_cumulative('TCE') = yes;
 emission_annual(emission) = yes;
 emission_annual(emission_cumulative) = no;
+);
 
 *----------------------------------------------------------------------------------------------------------------------*
 * assignment and computation of MESSAGE-specific auxiliary parameters                                                  *
