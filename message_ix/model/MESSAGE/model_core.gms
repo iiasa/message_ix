@@ -105,14 +105,9 @@ Positive Variables
     ACT_LO(node,tec,year_all,time)   relaxation variable for dynamic constraints on activity (downwards)
 * land-use model emulator
     LAND(node,land_scenario,year_all) relative share of land-use scenario
-    LAND_COST_NEW(node, year_all)     Land cost including debt from scenario switching
-    LAND_COST_DEBT(node, year_all,year_all2) Land cost debt from scenario switching 
-    EMISS_LU_AUX(node,emission,type_tec,year_all,year_all2)    positive emissions overshoot of historic emissions compared to chosen land scenario mix
-
 * content of storage
     STORAGE(node,tec,mode,level,commodity,year_all,time)       state of charge (SoC) of storage at each sub-annual time slice (positive)
 ;
-
 
 Variables
 * intertemporal stock variables (input or output quantity into the stock)
@@ -125,17 +120,11 @@ Variables
     COST_NODAL(node, year_all)                   system costs at the node level over time
 * auxiliary variable for aggregate emissions by technology type and land-use model emulator
     EMISS(node,emission,type_tec,year_all)       aggregate emissions by technology type and land-use model emulator
-* auxiliary variable for aggregate emissions from land-use model emulator
-    EMISS_LU(node,emission,type_tec,year_all)    aggregate emissions from land-use model emulator
 * auxiliary variable for left-hand side of relations (linear constraints)
     REL(relation,node,year_all)                  auxiliary variable for left-hand side of user-defined relations
 * change in the content of storage device
     STORAGE_CHARGE(node,tec,mode,level,commodity,year_all,time)    charging of storage in each time slice (negative for discharge)
 ;
-
-
-    
-
 
 ***
 * .. _section_auxiliary_variable_def:
@@ -287,18 +276,12 @@ Equations
     ACTIVITY_CONSTRAINT_LO          dynamic constraint on the market penetration of a technology activity (lower bound)
     ACTIVITY_SOFT_CONSTRAINT_LO     bound on relaxation of the dynamic constraint on market penetration (lower bound)
     EMISSION_EQUIVALENCE            auxiliary equation to simplify the notation of emissions
-    EMISSION_EQUIVALENCE_AUX_ANNUAL auxiliary equation calculating land-use emissions from annual scenario input
-    EMISSION_EQUIVALENCE_AUX_CUMU   auxiliary equation calculating land-use emissions from cumulative scenario input
-    EMISSION_EQUIVALENCE_AUX_CUMU_AUX auxiliary equation calculating the land-use emissions overshoot if positive compared to historic scenario mix
     EMISSION_CONSTRAINT             nodal-regional-global constraints on emissions (by category)
-    LAND_COST_CUMU                  land cost including debt from scenario switching                                 
-    LAND_COST_CUMU_DEBT             land cost debt from scenario switching
     LAND_CONSTRAINT                 constraint on total land use (linear combination of land scenarios adds up to 1)
     DYNAMIC_LAND_SCEN_CONSTRAINT_UP dynamic constraint on land scenario change (upper bound)
     DYNAMIC_LAND_SCEN_CONSTRAINT_LO dynamic constraint on land scenario change (lower bound)
     DYNAMIC_LAND_TYPE_CONSTRAINT_UP dynamic constraint on land-use change (upper bound)
     DYNAMIC_LAND_TYPE_CONSTRAINT_LO dynamic constraint on land-use change (lower bound)
-*    TAU_CONSTRAINT                  constraint on land-use intensity growth (regional tau is not allowed to shrink)
     RELATION_EQUIVALENCE            auxiliary equation to simplify the implementation of relations
     RELATION_CONSTRAINT_UP          upper bound of relations (linear constraints)
     RELATION_CONSTRAINT_LO          lower bound of relations (linear constraints)
@@ -424,9 +407,8 @@ COST_ACCOUNTING_NODAL(node, year)..
         * tax_emission(node,type_emission,type_tec,type_year)
         * EMISS(node,emission,type_tec,year) )
 * cost terms from land-use model emulator (only includes valid node-land_scenario-year combinations)
-*    + SUM(land_scenario$( land_cost(node,land_scenario,year) ),
-*        land_cost(node,land_scenario,year) * LAND(node,land_scenario,year) )
-    + LAND_COST_NEW(node, year)
+    + SUM(land_scenario$( land_cost(node,land_scenario,year) ),
+        land_cost(node,land_scenario,year) * LAND(node,land_scenario,year) )
 * cost terms associated with linear relations
     + SUM(relation$( relation_cost(relation,node,year) ),
         relation_cost(relation,node,year) * REL(relation,node,year) )
@@ -1897,36 +1879,7 @@ EMISSION_EQUIVALENCE(node,emission,type_tec,year)$(
 * emissions from land use if 'type_tec' is included in the dynamic set 'type_tec_land'
         + SUM(land_scenario$( type_tec_land(type_tec) ),
             land_emission(location,land_scenario,year,emission) * LAND(location,land_scenario,year) )
-    + SUM(year2, EMISS_LU_AUX(location,emission,type_tec,year, year2) )
-    ;
-
-
-* find positive emissions overshoot for history of current land scenario mix compared to mix of earlier time steps
-EMISSION_EQUIVALENCE_AUX_CUMU_AUX(location,emission,type_tec,year,year2) $ (emission_cumulative(emission) AND model_horizon(year) AND year2.pos < year.pos)..
-    EMISS_LU_AUX(location,emission,type_tec,year,year2) $ ( year2.pos < year.pos )
-    =G=
-    SUM(land_scenario,
-            LAND(location, land_scenario, year) * land_emission(location, land_scenario, year2, emission)
-            - LAND(location, land_scenario, year2) * land_emission(location, land_scenario, year2, emission) )
-        - SUM(year3 $ ( year3.pos < year.pos AND year2.pos < year3.pos ), EMISS_LU_AUX(location, emission,type_tec, year3, year2) ) ;
-
-* calculate scenario cost of current land scenario mix under consideration of its path dependencies and
-* associated cost differences compared to the land scenario mix of earlier time steps
-LAND_COST_CUMU(location, year)$( model_horizon(year) )..
-       LAND_COST_NEW(location, year) =E=
-       SUM(land_scenario$( land_cost(location,land_scenario,year) ),
-       land_cost(location,land_scenario,year) * LAND(location,land_scenario,year) )
-       + SUM(year2, 
-            LAND_COST_DEBT(location, year, year2)
-            ) ; 
-
-LAND_COST_CUMU_DEBT(location, year, year2) $ (model_horizon(year) AND year2.pos < year.pos)..
-        LAND_COST_DEBT(location, year, year2) $ ( year2.pos < year.pos ) =G=
-        SUM(land_scenario$( land_cost(location,land_scenario,year) ),
-            LAND(location, land_scenario, year) * land_cost(location,land_scenario,year2)
-            - LAND(location, land_scenario, year2) * land_cost(location,land_scenario,year2) ) * df_period(year2) / df_period(year)
-        - SUM(year3 $ ( year3.pos < year.pos AND year2.pos < year3.pos ), LAND_COST_DEBT(location, year3, year2) ) ;
-
+      ) ;
 
 ***
 * Bound on emissions
@@ -2147,39 +2100,6 @@ DYNAMIC_LAND_TYPE_CONSTRAINT_LO(node,year,land_type)$( is_dynamic_land_lo(node,y
 * optional relaxation for calibration and debugging
 %SLACK_LAND_TYPE_LO% - SLACK_LAND_TYPE_LO(node,year,land_type)
 ;
-
-
-***
-*
-* To ensure correct replication of MAgPIE behavior, the following constraint ensures that 
-* land-use intensity cannot decrease over time
-*
-* .. _equation_tau_constraint:
-*
-* Equation TAU_CONSTRAINT
-* """"""""""""""""""""""""""""""""""""""""
-*
-*  .. math::
-*     \sum_{s \in S} \text{land_output Tau}_{n,s,y,l,h} &\cdot \text{LAND}_{n,s,y}
-*         \geq \sum_{s \in S} \big( \text{land_output Tau}_{n,s,y-1,l,h}
-*                            & \quad \quad \cdot \big( \text{LAND}_{n,s,y-1} + \text{historical_land}_{n,s,y-1} \big) \big) 
-*
-***
-
-TAU_CONSTRAINT(node, year, level, time) .. 
-   SUM(land_scenario$( map_land(node,land_scenario,year) ),
-        land_output(node, land_scenario, year, "Landuse intensity indicator Tau", level, time) 
-          * LAND(node, land_scenario, year)
-        ) =G=
-    SUM((year_all2)$( seq_period(year_all2,year) ),
-        SUM(land_scenario$( map_land(node,land_scenario,year) ),
-            land_output(node, land_scenario, year_all2, "Landuse intensity indicator Tau", level, time) 
-              * ( LAND(node, land_scenario, year_all2) $ ( model_horizon(year_all2) ) 
-                  + historical_land(node,land_scenario,year_all2) )
-            )
-      )
-;
-
 
 *----------------------------------------------------------------------------------------------------------------------*
 ***
