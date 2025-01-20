@@ -64,6 +64,7 @@ TASKS0: tuple[tuple, ...] = (
     # Products
     ("out", "mul", "output", "ACT"),
     ("in", "mul", "input", "ACT"),
+    ("in_cap_new", "mul", "input_cap_new", "CAP_NEW"),
     ("rel", "mul", "relation_activity", "ACT"),
     ("emi", "mul", "emission_factor", "ACT"),
     ("inv", "mul", "inv_cost", "CAP_NEW"),
