@@ -26,6 +26,9 @@ $INCLUDE includes/copyright.gms
 * (or ``model\output\MsgOutput.gdx`` if ``--out`` is not provided).
 ***
 
+* Run MESSAGE and MACRO in linked/iterative mode mode.
+* To run MACRO alone, use MACRO_run.gms instead of this file.
+* To run MESSAGE alone, use MESSAGE_run.gms or MESSAGE_master.gms instead of this file.
 $SETGLOBAL macromode "linked"
 $EOLCOM #
 $INCLUDE MESSAGE/model_setup.gms
@@ -34,6 +37,7 @@ $INCLUDE MESSAGE/model_setup.gms
 * load additional equations and parameters for MACRO                                                                   *
 *----------------------------------------------------------------------------------------------------------------------*
 
+$INCLUDE MACRO/setup.gms
 $INCLUDE MACRO/macro_data_load.gms
 $INCLUDE MACRO/macro_core.gms
 
