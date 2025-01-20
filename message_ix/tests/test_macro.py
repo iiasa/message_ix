@@ -281,9 +281,19 @@ def test_calibrate(westeros_solved, w_data_path):
     assert not end_grow.isnull().any()
 
 
-def test_calibrate_roundtrip(westeros_solved, w_data_path):
+@pytest.mark.parametrize(
+    "kwargs",
+    (
+        {},  # Default concurrent=0
+        dict(concurrent=0),  # Explicit value, same as default
+        dict(concurrent=1),
+    ),
+)
+def test_calibrate_roundtrip(westeros_solved, w_data_path, kwargs):
     # this is a regression test with values observed on May 23, 2024
-    with_macro = westeros_solved.add_macro(w_data_path, check_convergence=True)
+    with_macro = westeros_solved.add_macro(
+        w_data_path, check_convergence=True, **kwargs
+    )
     aeei = with_macro.par("aeei")["value"].values
     npt.assert_allclose(
         aeei,
