@@ -71,6 +71,7 @@ TASKS0: tuple[tuple, ...] = (
     ("fom", "mul", "fix_cost", "CAP"),
     ("vom", "mul", "var_cost", "ACT"),
     ("land_out", "mul", "land_output", "LAND"),
+    ("land_in", "mul", "land_input", "LAND"),
     ("land_use_qty", "mul", "land_use", "LAND"),  # TODO: better name!
     ("land_emi", "mul", "land_emission", "LAND"),
     #
