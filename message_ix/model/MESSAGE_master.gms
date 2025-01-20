@@ -12,10 +12,12 @@ $ONGLOBAL
 ** scenario/case selection - this must match the name of the MsgData_<%%%>.gdx input data file **
 $SETGLOBAL data "<your datafile name here>"
 
-** MACRO mode
-* "none": MESSAGEix is run in stand-alone mode
-* "linked": MESSAGEix-MACRO is run in iterative mode **
-$SETGLOBAL macromode "none"
+* MACRO mode. This can take 3 possible values, only 2 of which are usable with this file:
+*
+* - "none": MACRO is not run, MESSAGE is run in stand-alone mode.
+* - "linked": MESSAGE and MACRO are run in linked/iterative mode.
+* - "standalone": MACRO is run without MESSAGE. Not valid when using this file; use MACRO_run.gms instead.
+$IF NOT SET macromode $SETGLOBAL macromode "none"
 
 ** define the time horizon over which the model optimizes (perfect foresight, myopic or rolling horizon) **
 * perfect foresight - 0
