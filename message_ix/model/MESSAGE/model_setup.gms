@@ -84,3 +84,4 @@ $INCLUDE MESSAGE/scaling_investment_costs.gms
 *----------------------------------------------------------------------------------------------------------------------*
 
 $INCLUDE MESSAGE/model_core.gms
+$INCLUDE MESSAGE/magpie_patch.gms

@@ -10,12 +10,17 @@ $ONGLOBAL
 *----------------------------------------------------------------------------------------------------------------------*
 
 ** scenario/case selection - this must match the name of the MsgData_<%%%>.gdx input data file **
-$SETGLOBAL data "<your datafile name here>"
+*$SETGLOBAL data "<your datafile name here>"
 
 ** MACRO mode
 * "none": MESSAGEix is run in stand-alone mode
 * "linked": MESSAGEix-MACRO is run in iterative mode **
 $SETGLOBAL macromode "none"
+
+** MAgPIE connection
+* "0": MESSAGEix default is run
+* "1": MESSAGEix is run with connection to MAgPIE
+$SETGLOBAL magpiemode "1"
 
 ** define the time horizon over which the model optimizes (perfect foresight, myopic or rolling horizon) **
 * perfect foresight - 0
