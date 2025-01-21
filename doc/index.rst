@@ -143,15 +143,20 @@ Everyone is required to please follow our Code of Conduct, which you can find `o
 
 .. _help:
 
-Have a question? Check…
 
-- …on GitHub:
+For further information and to get involved with the MESSAGEix user/developer community:
 
-  - Join an existing `discussion <https://github.com/iiasa/message_ix/discussions>`_ or start a new one with your question.
+- Check on GitHub:
+
+  - Join an existing `discussion <https://github.com/iiasa/message_ix/discussions>`_ or start a new one with your MESSAGEix usage question.
   - Search `current issues <https://github.com/iiasa/message_ix/issues?q=is:issue>`_, or open a new one to report a bug in the code.
 
-- …the :doc:`faq`.
-- …the message_ix Google Group, either `online <https://groups.google.com/d/forum/message_ix>`_ or via e-mail at <message_ix@googlegroups.com>.
+- See the less frequently updated :doc:`faq` and message_ix Google Group, either `online <https://groups.google.com/d/forum/message_ix>`_ or via e-mail at <message_ix@googlegroups.com>.
+
+.. _newsletter:
+
+- We cordially invite you to subscribe to the **MESSAGEix Community Newsletter** by filling `this form <https://iiasa.ac.at/signup>`__ and ticking the box for "MESSAGEix-Community".
+  At least once a year, we update all subscribers on the latest research and ongoing projects regarding MESSAGEix and invite you to our annual `Community Meeting <https://iiasa.ac.at/search?search_api_fulltext=MESSAGEix+Community+Meeting`__.
 
 .. _`MESSAGEix-GLOBIOM documentation`: http://data.ene.iiasa.ac.at/message-globiom/
 .. _`APACHE 2.0 open-source license`: https://github.com/iiasa/message_ix/blob/main/LICENSE
