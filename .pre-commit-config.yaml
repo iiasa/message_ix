@@ -1,16 +1,10 @@
 repos:
-- repo: local
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v1.14.1
   hooks:
   - id: mypy
-    name: mypy
-    always_run: true
-    require_serial: true
     pass_filenames: false
-
-    language: python
-    entry: bash -c ". ${PRE_COMMIT_MYPY_VENV:-/dev/null}/bin/activate 2>/dev/null; mypy $0 $@"
     additional_dependencies:
-    - mypy >= 1.12.0
     - asyncssh
     - git+https://github.com/iiasa/ixmp.git@main
     - importlib_resources
@@ -20,9 +14,8 @@ repos:
     - Sphinx
     - types-PyYAML
     - types-requests
-    args: ["."]
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.8.4
+  rev: v0.9.1
   hooks:
   - id: ruff
   - id: ruff-format

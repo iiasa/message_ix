@@ -87,9 +87,9 @@ omit = [
 ]
 
 [tool.mypy]
-exclude = [
-  "build/",
-  "doc/",
+files = [
+  "doc",
+  "message_ix",
 ]
 # TODO Remove this once it has become default with mypy 2.0:
 local_partial_types = true
