@@ -24,13 +24,8 @@ if (%foresight% = 0,
 
 * write a status update to the log file, solve the model
     put_utility 'log' /'+++ Solve the perfect-foresight version of MESSAGEix +++ ' ;
-    if (%magpiemode% = 0,
-      Solve MESSAGE_LP using LP minimizing OBJ ;
-    elseif %magpiemode% = 1,
-      Solve MESSAGE_MAgPIE_LP using LP minimizing OBJ ;
-             );
-
-
+    Solve MESSAGE_LP using LP minimizing OBJ ;
+    
 * write model status summary
     status('perfect_foresight','modelstat') = MESSAGE_LP.modelstat ;
     status('perfect_foresight','solvestat') = MESSAGE_LP.solvestat ;
@@ -39,7 +34,7 @@ if (%foresight% = 0,
     status('perfect_foresight','objVal')    = MESSAGE_LP.objVal ;
 
 * write an error message if model did not solve to optimality
-    IF( NOT ( MESSAGE_LP.modelstat = 1 OR MESSAGE_LP.modelstat = 8 OR MESSAGE_MAgPIE_LP.modelstat = 1 OR MESSAGE_MAgPIE_LP.modelstat = 8),
+    IF( NOT ( MESSAGE_LP.modelstat = 1 OR MESSAGE_LP.modelstat = 8),
         put_utility 'log' /'+++ MESSAGEix did not solve to optimality - run is aborted, no output produced! +++ ' ;
         ABORT "MESSAGEix did not solve to optimality!"
     ) ;

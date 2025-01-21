@@ -347,8 +347,8 @@ TAU_CONSTRAINT(node, year, level, time) ..
       )
 ;
 
-
-Model MESSAGE_MAgPIE_LP / all
+$onMultiR
+Model MESSAGE_LP / all
 *                       list all equations to be removed from MESSAGE-ix default
                         - COST_ACCOUNTING_NODAL
                         - EMISSION_EQUIVALENCE
@@ -364,5 +364,4 @@ Model MESSAGE_MAgPIE_LP / all
                         + DYNAMIC_LAND_TYPE_CONSTRAINT_LO_MAgPIE
                         + TAU_CONSTRAINT
 / ;
-
-MESSAGE_MAgPIE_LP.optfile = 1 ;
+$offMulti
