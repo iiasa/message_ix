@@ -1,12 +1,12 @@
-name: Test
+name: Tests
 
 on:
+  pull_request_target:
+    branches: [ main ]
+    types: [ labeled, opened, reopened, synchronize ]
   # 05:00 UTC = 06:00 CET = 07:00 CEST
   schedule:
   - cron: "0 5 * * *"
-  workflow_run:
-    workflows: [ "Receive pull request" ]
-    types: [ completed ]
 
 # Cancel previous runs that have not completed
 concurrency:
@@ -22,11 +22,23 @@ env:
   # See description in lint.yml
   depth: 100
 
+  label: "safe to test"
+
 jobs:
+  check:
+    name: check permissions
+    runs-on: ubuntu-latest
+    steps:
+    - if: >
+        github.repository != github.event.pull_request.head.repo.full_name &&
+        ! contains(github.event.pull_request.labels.*.name, env.label)
+      run: |
+        echo "Pytest workflow will not run for branch in fork without label \`${{ env.label }}\`." >>$GITHUB_STEP_SUMMARY
+        exit 1
+
   pytest:
-    if: >
-      github.event_name != 'workflow_run' ||
-      github.event.workflow_run.conclusion == 'success'
+    needs: [ check ]
+    name: run
 
     strategy:
       matrix:
@@ -67,18 +79,10 @@ jobs:
 
     steps:
     - name: Check out message_ix
-      if: github.event_name != 'workflow_run'
       uses: actions/checkout@v4
       with:
         fetch-depth: ${{ env.depth }}
-
-    - name: Check out message_ix (workflow_run)
-      if: github.event_name == 'workflow_run'
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: ${{ env.depth }}
-        repository: ${{ github.event.workflow_run.repository.fullname }}
-        ref: ${{ github.event.workflow_run.head_branch }}
+        ref: ${{ github.event.pull_request.head.sha }}
 
     - name: Fetch tags (for setuptools-scm)
       run: git fetch --tags --depth=${{ env.depth }}
