@@ -22,9 +22,9 @@ $LOAD addon, type_addon, cat_addon, map_tec_addon
 $LOAD storage_tec, level_storage, map_tec_storage
 
 * Version information; conditional load to allow older GDX files
-$ifthen gdxSetType ixmp_version
+$ifthen.tag_ixmp_version gdxSetType ixmp_version
 $load ixmp_version
-$endif
+$endif.tag_ixmp_version
 
 $GDXIN
 
@@ -103,7 +103,7 @@ Set rating_unrated(rating) ;
 rating_unrated(rating) = yes ;
 rating_unrated('unrated') = no ;
 
-if(%magpiemode% = 1,
+$ifthen.tag_magpie %landusemode% == "magpie"
 *----------------------------------------------------------------------------------------------------------------------*
 * auxiliary mappings for split between cumulative and annualland-use emission calculations                             *
 *----------------------------------------------------------------------------------------------------------------------*
@@ -130,7 +130,7 @@ emission_cumulative('LU_CO2') = yes;
 emission_cumulative('TCE') = yes;
 emission_annual(emission) = yes;
 emission_annual(emission_cumulative) = no;
-);
+$endif.tag_magpie
 
 *----------------------------------------------------------------------------------------------------------------------*
 * assignment and computation of MESSAGE-specific auxiliary parameters                                                  *
