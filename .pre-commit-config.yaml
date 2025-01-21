@@ -27,3 +27,19 @@ repos:
   - id: ruff
   - id: ruff-format
     args: [ --check ]
+
+# GitHub Actions workflows
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v5.0.0
+  hooks:
+  - id: check-yaml
+    name: Validate GitHub Actions workflow YAML
+    files: '.github/workflows/.*\.ya?ml'
+- repo: local
+  hooks:
+  - id: validate-github-actions
+    name: Validate GitHub Actions workflow schema
+    language: rust
+    entry: action-validator
+    additional_dependencies: [ cli:action-validator:0.6.0 ]
+    files: '.github/workflows/.*\.ya?ml'
