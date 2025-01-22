@@ -1,6 +1,9 @@
 name: Tests
 
 on:
+  # Uncomment this entry only to debug the workflow
+  # pull_request:
+  #   branches: [ main ]
   pull_request_target:
     branches: [ main ]
     types: [ labeled, opened, reopened, synchronize ]
