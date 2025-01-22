@@ -78,7 +78,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: ${{ env.depth }}
-        ref: ${{ github.event.pull_request.head.sha }}
+        ref: ${{ github.event_name != 'pull_request_target' && github.ref || github.event.pull_request.head.sha }}
 
     - name: Fetch tags (for setuptools-scm)
       run: git fetch --tags --depth=${{ env.depth }}
@@ -152,7 +152,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: ${{ env.depth }}
-        ref: ${{ github.event.pull_request.head.sha }}
+        ref: ${{ github.event_name != 'pull_request_target' && github.ref || github.event.pull_request.head.sha }}
 
     - name: Set up uv, Python
       uses: astral-sh/setup-uv@v5
@@ -221,6 +221,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event_name != 'pull_request_target' && github.ref || github.event.pull_request.head.sha }}
     - uses: astral-sh/setup-uv@v5
       with: { cache-dependency-glob: "**/pyproject.toml" }
     - uses: actions/cache@v4
