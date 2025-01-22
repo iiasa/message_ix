@@ -502,7 +502,7 @@ def test_new_timeseries_long_name64(message_test_mp):
                 "India",
             ],
             "variable": [
-                ("Emissions|CO2|Energy|Demand|Transportation|Aviation|" "Domestic|Fre"),
+                ("Emissions|CO2|Energy|Demand|Transportation|Aviation|Domestic|Fre"),
             ],
             "unit": [
                 "Mt CO2/yr",
