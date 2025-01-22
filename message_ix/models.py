@@ -558,7 +558,7 @@ var(
 var(
     "PRICE_EMISSION",
     "n type_emission type_tec y",
-    "Emission price (derived from marginals of EMISSION_BOUND constraint)",
+    "Emission price (derived from marginals of EMISSION_EQUIVALENCE constraint)",
 )
 var(
     "REL",
@@ -766,7 +766,7 @@ equ(
 )
 equ(
     "EMISSION_EQUIVALENCE",
-    "",
+    "n e type_tec y",
     "Auxiliary equation to simplify the notation of emissions",
 )
 equ("EXTRACTION_BOUND_UP", "", "Upper bound on extraction (by grade)")
