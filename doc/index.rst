@@ -4,7 +4,7 @@ The |MESSAGEix| framework
 |MESSAGEix| is a versatile, dynamic systems-optimization modelling framework developed by the |IIASA| Energy, Climate, and Environment (ECE) Program [#rename]_ since the 1980s.
 
 This is the documentation for :mod:`message_ix`, a Python package that ties together all components of the framework.
-:mod:`message_ix` and :mod:`ixmp` are free and open source, licensed under the `APACHE 2.0 open-source license`_.
+:mod:`message_ix` and :mod:`ixmp` are free and open source software, licensed under the `APACHE 2.0 license`_.
 
 - For the scientific reference of the framework, see Huppmann et al. (2019) :cite:`Huppmann-2018`.
 - For an overview and recent publications related to the specific |MESSAGEix|-GLOBIOM global model instance used at the IIASA ECE Program, see the `MESSAGEix-GLOBIOM documentation`_.
@@ -41,7 +41,7 @@ Then, continue with the:
    framework
    install
    tutorials
-   Publications, Projects, and Tools <usage>
+   Publications, projects, and tools <usage>
 
 .. figure:: _static/ix_features.svg
    :width: 360px
@@ -55,8 +55,7 @@ Then, continue with the:
 Mathematical specification
 ==========================
 
-These pages provide comprehensive description of the variables and equations in
-the core MESSAGEix mathematical implementation.
+These pages provide comprehensive description of the variables and equations in the core MESSAGEix mathematical implementation.
 
 - :doc:`model/MESSAGE/sets_maps_def`
 - :doc:`time`
@@ -69,7 +68,7 @@ the core MESSAGEix mathematical implementation.
 
 .. toctree::
    :hidden:
-   :caption: Mathematical Specification
+   :caption: Mathematical specification
 
    model/MESSAGE/sets_maps_def
    time
@@ -86,7 +85,8 @@ the core MESSAGEix mathematical implementation.
 Developing |MESSAGEix| models
 =============================
 
-Developing a valid, scientific |MESSAGEix| model requires careful use of the framework features.
+Everyone is encouraged to use |MESSAGEix| to develop energy system and integrated assessment models!
+Developing a valid, scientific model requires careful use of the framework features.
 This section provides guidelines for how to make some common model design choices.
 
 - :doc:`efficiency`
@@ -94,6 +94,8 @@ This section provides guidelines for how to make some common model design choice
 - :doc:`reporting`
 - :doc:`debugging`
 - :doc:`macro`
+- :doc:`notice` describes how to cite the framework and software in published research.
+- :doc:`sharing` explains how to add your |MESSAGEix| applications to the :doc:`Usage <usage>` page in these docs.
 
 .. toctree::
    :hidden:
@@ -105,55 +107,58 @@ This section provides guidelines for how to make some common model design choice
    reporting
    debugging
    macro
+   notice
+   sharing
 
-
-Using, getting help, and contributing
-=====================================
-
-Everyone is encouraged to use the framework to develop energy system and integrated assessment models!
-
-Everyone is required to please follow our Code of Conduct, which you can find `on GitHub <https://github.com/iiasa/message_ix/blob/main/CODE_OF_CONDUCT.md>`__ or in :file:`CODE_OF_CONDUCT.md` included with the source code.
+Reference and development
+=========================
 
 - :doc:`api`
 - :doc:`rmessageix`
 - :doc:`whatsnew` —release history and migration/upgrade notes.
-- :doc:`notice` —including how to properly cite the framework and software in scientific research.
-
 - :doc:`contributing` —we welcome enhancements to the framework itself that enable new features across all models.
-- You can learn more about how we handle your contributions `on GitHub <https://github.com/iiasa/message_ix/blob/main/GOVERNANCE.md>`__ or in :file:`GOVERNANCE.md` included with the source code.
-- :doc:`sharing`—we invite the sharing of the usage of the |MESSAGEix| framework.
-- See our Security Policy `on GitHub <https://github.com/iiasa/message_ix/blob/main/.github/SECURITY.md>`__ or in :file:`.github/SECURITY.md` included with the source code.
-- :doc:`faq`
+  You can learn more about how we handle these contributions in :file:`GOVERNANCE.md` (`on GitHub <https://github.com/iiasa/message_ix/blob/main/GOVERNANCE.md>`__ or included with the source code)  [#osguides]_
 - :doc:`bibliography`
 
 .. toctree::
    :hidden:
-   :caption: Help & reference
+   :caption: Reference & development
 
    api
    rmessageix
    whatsnew
-   notice
    contributing
-   governance
-   sharing
-   security policy
-   faq
    bibliography
 
 .. _help:
 
-Have a question? Check…
+Community and support
+=====================
 
-- …on GitHub:
+We aim to maintain a healthy community for developers and users of MESSAGEix; thus we expect everyone to follow our **Code of Conduct**, which you can find in :file:`CODE_OF_CONDUCT.md` (`on GitHub <https://github.com/iiasa/message_ix?tab=coc-ov-file>`__  or included with the source code). [#osguides]_
 
-  - Join an existing `discussion <https://github.com/iiasa/message_ix/discussions>`_ or start a new one with your question.
-  - Search `current issues <https://github.com/iiasa/message_ix/issues?q=is:issue>`_, or open a new one to report a bug in the code.
+You can also:
 
-- …the :doc:`faq`.
-- …the message_ix Google Group, either `online <https://groups.google.com/d/forum/message_ix>`_ or via e-mail at <message_ix@googlegroups.com>.
+.. _newsletter:
+
+- Read or join existing `discussions <https://github.com/iiasa/message_ix/discussions>`_ on GitHub, or start a new one with your MESSAGEix usage question.
+- Search `current issues <https://github.com/iiasa/message_ix/issues?q=is:issue>`_, or open a new one to report a bug in the code.
+- Subscribe to the **MESSAGEix Community Newsletter** by filling `this form <https://iiasa.ac.at/signup>`__ and ticking the box for "MESSAGEix-Community".
+  At least once a year, we update all subscribers on the latest research and ongoing projects regarding MESSAGEix and invite you to our annual `Community Meeting <https://iiasa.ac.at/search?search_api_fulltext=MESSAGEix+Community+Meeting>`__.
+- See our security policy in :file:`SECURITY.md` (`on GitHub <https://github.com/iiasa/message_ix?tab=security-ov-file>`_ or included with the source code). [#osguides]_
+- Read answers to some not-so-:doc:`‘frequently’ asked questions <faq>`.
+- Check the older message_ix Google Group, either `online <https://groups.google.com/d/forum/message_ix>`_ or via e-mail at <message_ix@googlegroups.com>.
+
+.. toctree::
+   :hidden:
+   :caption: Community & support
+
+   Code of conduct <https://github.com/iiasa/message_ix?tab=coc-ov-file#readme>
+   Discussions <https://github.com/iiasa/message_ix/discussions>
+   faq
 
 .. _`MESSAGEix-GLOBIOM documentation`: http://data.ene.iiasa.ac.at/message-globiom/
 .. _`APACHE 2.0 open-source license`: https://github.com/iiasa/message_ix/blob/main/LICENSE
 
 .. [#rename] Known as the “Energy Program” until 2020-12-31.
+.. [#osguides] `Our usage <https://github.com/iiasa/message_ix/community>`_ of files like CODE_OF_CONDUCT, GOVERNANCE, SECURITY, and SUPPORT follows the `Open Source Guides <https://opensource.guide/>`_ recommendations.

@@ -4,7 +4,7 @@ Next release
 GitHub community guidelines
 ---------------------------
 
-Add community guidelines for interaction on GitHub (:pull:`871`).
+Add community guidelines for interaction on GitHub (:pull:`871`, :pull:`911`).
 Please familiarize yourself with these to foster an open and welcoming community!
 
 All changes

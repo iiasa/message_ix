@@ -6,7 +6,7 @@
 [![Documentation build](https://readthedocs.com/projects/iiasa-energy-program-message-ix/badge/?version=stable)](https://docs.messageix.org/en/stable/)
 [![Build status](https://github.com/iiasa/message_ix/actions/workflows/pytest.yaml/badge.svg)](https://github.com/iiasa/message_ix/actions/workflows/pytest.yaml)
 [![Test coverage](https://codecov.io/gh/iiasa/message_ix/branch/main/graph/badge.svg)](https://codecov.io/gh/iiasa/message_ix)
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md) 
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
 
 MESSAGEix is a versatile, dynamic, model framework for energy-engineering-economy-environment (E4) systems research.
@@ -20,11 +20,11 @@ The `message_ix` Python package—also fully usable from R—includes:
 - Application programming interfaces (APIs) and tools for model building and scientific programming,
 - Extensive documentation and a complete test suite.
 
-The framework is built on IIASA's [*ix* modeling platform (`ixmp`)](https://github.com/iiasa/ixmp), which provides data warehouse features for high-powered numerical scenario analysis.
+The framework is built on IIASA's [*ix* modeling platform (`ixmp`)](https://github.com/iiasa/ixmp), which provides data warehouse features for numerical scenario analysis.
 
 ## Documentation
 
-Complete documentation of the framework is avaiable at **https://docs.messageix.org/**.
+Complete documentation of the framework is available at **https://docs.messageix.org**.
 This includes:
 
 - **Installation** and recommended pre-requisite learning.
@@ -39,7 +39,7 @@ This includes:
 Other forms of documentation:
 
 - The online documentation is built automatically from the contents of the
-[`message_ix` GitHub repository](https://github.com/iiasa/messag_ix).
+[`message_ix` GitHub repository](https://github.com/iiasa/message_ix).
 - Documentation for the ‘latest’ or ‘stable’ release is shown by default.
 - Use the chooser to access the [‘latest’ version](https://docs.messageix.org/en/latest/), corresponding to the ``main`` branch and including the latest development code; or to access docs for a specific release, e.g. `v3.2.0`.
 - For offline use, the documentation can be built from the source code.
@@ -47,15 +47,23 @@ Other forms of documentation:
 
 ## Commitment to our Community
 
-- We aim to create a community that is welcoming to everyone. Please respect our [Code of Conduct](CODE_OF_CONDUCT.md) at all times when interacting with `message_ix` and the community.
+- We aim to create a community that is welcoming to everyone.
+  Please respect our [Code of Conduct](CODE_OF_CONDUCT.md) at all times when interacting with `message_ix` and the community.
 - We warmly welcome all contributions to our community. Please take a look at our [guidelines for contributing to development](https://docs.messageix.org/en/latest/contributing.html).
 - If you are looking to understand how the `message_ix` team operates and how we decide what to do with your contributions, please read our [governance guidelines](GOVERNANCE.md).
-- We highly value code security. To learn more about our security practice and advice, please visit our [security policy](.github/SECURITY.md).
-- We strive to entertain a welcoming and inclusive community. If you struggle to use `message_ix`, please check our [guidelines for getting support](SUPPORT.md).
+- We highly value code security.
+  To learn more about our security practice and advice, please visit our [security policy](.github/SECURITY.md).
+- We strive to entertain a welcoming and inclusive community.
+  If you struggle to use `message_ix`, please check our [guidelines for getting support](SUPPORT.md).
+- We also:
+  - Host an annual [MESSAGEix Community Meeting](https://iiasa.ac.at/search?search_api_fulltext=MESSAGEix+Community+Meeting).
+  - Publish, at least once per year, a community newsletter.
+    You are cordially invited to subscribe by filling [this form](https://iiasa.ac.at/signup) and ticking the box for “MESSAGEix Community”.
+
 
 ## License
 
-Copyright © 2018–2024 IIASA Energy, Climate, and Environment (ECE) Program
+Copyright © 2018–2025 IIASA Energy, Climate, and Environment (ECE) Program
 
 The MESSAGEix framework is licensed under the Apache License, Version 2.0 (the "License"); you may not use the files in this repository except in compliance with the License. You may obtain a copy of the License in [`LICENSE`](LICENSE) or at <http://www.apache.org/licenses/LICENSE-2.0>.
 
