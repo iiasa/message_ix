@@ -24,8 +24,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - if: >
-        github.repository != github.event.pull_request.head.repo.full_name &&
-        ! contains(github.event.pull_request.labels.*.name, env.label)
+        !(
+          github.event_name == "schedule"
+          || github.repository == github.event.pull_request.head.repo.full_name
+          || contains(github.event.pull_request.labels.*.name, env.label)
+        )
       run: |
         echo "Pytest workflow will not run for branch in fork without label \`${{ env.label }}\`." >>$GITHUB_STEP_SUMMARY
         exit 1
