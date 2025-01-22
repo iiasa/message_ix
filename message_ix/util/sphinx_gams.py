@@ -35,7 +35,7 @@ def transcribe_docs(infp, outfp, source_filename):
     on = None
 
     note = (
-        ".. note:: This page is generated from inline documentation in " "``{}``.\n\n"
+        ".. note:: This page is generated from inline documentation in ``{}``.\n\n"
     ).format(source_filename)
 
     for line in infp:

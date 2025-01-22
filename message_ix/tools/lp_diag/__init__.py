@@ -138,9 +138,9 @@ class LPdiag:
             # end of MPS reading
 
         # check, if the last required section ('ENDATA') was defined
-        assert (
-            n_section == 7
-        ), f'The "ENDATA" section is not declared; last section_id = {n_section}.'
+        assert n_section == 7, (
+            f'The "ENDATA" section is not declared; last section_id = {n_section}.'
+        )
 
         self.mps_sum()  # summarize the processed MPS content
 
@@ -156,8 +156,7 @@ class LPdiag:
             if words[0] == sections[n_exp]:  # required section found
                 if n_exp == 0:  # store the problem name
                     assert n_words > 1, (
-                        f"problem name undefined: line {n_line} has"
-                        f" {n_words} words."
+                        f"problem name undefined: line {n_line} has {n_words} words."
                     )
                     # print(f"\tProblem name line {words[1:]}.")
                     if n_words == 2:
@@ -246,16 +245,16 @@ class LPdiag:
 
         row_types = ["N", "E", "G", "L"]  # types of rows
         n_words = len(words)
-        assert (
-            n_words == 2
-        ), f"row declaration (line {n_line}) has {n_words} words instead of 2."
+        assert n_words == 2, (
+            f"row declaration (line {n_line}) has {n_words} words instead of 2."
+        )
         row_type = words[0]
         row_name = words[1]
         row_seq = len(self.row_name)
         assert row_type in row_types, f"unknown row type {row_type} (line {n_line})."
-        assert (
-            row_name not in self.row_name
-        ), f"duplicated row name: {row_name} (line {n_line})."
+        assert row_name not in self.row_name, (
+            f"duplicated row name: {row_name} (line {n_line})."
+        )
         if row_type == "N" and self.gf_seq == -1:
             self.gf_seq = row_seq
             print(
@@ -292,9 +291,9 @@ class LPdiag:
         ], f"matrix element (line {n_line}) has {n_words} words."
         col_name = words[0]
         if col_name != self.col_curr:  # new column
-            assert (
-                col_name not in self.col_name
-            ), f"duplicated column name: {col_name} (line {n_line})"
+            assert col_name not in self.col_name, (
+                f"duplicated column name: {col_name} (line {n_line})"
+            )
             col_seq = len(self.col_name)
             self.col_name.update({col_name: col_seq})
             self.seq_col.update({col_seq: [col_name, 0.0, self.infty]})
@@ -384,12 +383,11 @@ class LPdiag:
             pos_name = 0  # first row-name in words[pos_name]
 
         assert n_words in n_req_wrd, (
-            f"rhs line {n_line} has {n_words} words, expected" f" {n_req_wrd}."
+            f"rhs line {n_line} has {n_words} words, expected {n_req_wrd}."
         )
         if self.id_rhs:  # check id of the RHS entry, if it was defined
             assert words[0] == self.rhs_id, (
-                f"RHS id {words[0]}, line {n_line} differ from"
-                f"expected: {self.rhs_id}."
+                f"RHS id {words[0]}, line {n_line} differ from expected: {self.rhs_id}."
             )
         row_name = words[pos_name]
         row_seq = self.row_name.get(row_name)
@@ -407,9 +405,9 @@ class LPdiag:
         if n_words == n_req_wrd[1]:  # second pair of rhs defined
             row_name = words[pos_name + 2]
             row_seq = self.row_name.get(row_name)
-            assert (
-                row_seq is not None
-            ), f"unknown RHS row-name {row_name} (line {n_line})."
+            assert row_seq is not None, (
+                f"unknown RHS row-name {row_name} (line {n_line})."
+            )
             try:
                 val = float(words[pos_name + 3])
             except ValueError as e:
@@ -455,9 +453,9 @@ class LPdiag:
             n_req_wrd = [2, 4]
             pos_name = 0  # first row-name in words[pos_name]
 
-        assert (
-            n_words in n_req_wrd
-        ), f"ranges line {n_line} has {n_words} words, expected {n_req_wrd}."
+        assert n_words in n_req_wrd, (
+            f"ranges line {n_line} has {n_words} words, expected {n_req_wrd}."
+        )
         if self.id_range:  # check id of the ranges' entry, if it was defined
             assert words[0] == self.range_id, (
                 f"Ranges id {words[0]}, line {n_line} differ from"
@@ -465,9 +463,9 @@ class LPdiag:
             )
         row_name = words[pos_name]
         row_seq = self.row_name.get(row_name)
-        assert (
-            row_seq is not None
-        ), f"unknown range row-name {row_name} (line {n_line})."
+        assert row_seq is not None, (
+            f"unknown range row-name {row_name} (line {n_line})."
+        )
         try:
             val = float(words[pos_name + 1])
         except ValueError as e:
@@ -481,9 +479,9 @@ class LPdiag:
         if n_words == n_req_wrd[1]:  # second pair of ranges defined
             row_name = words[pos_name + 2]
             row_seq = self.row_name.get(row_name)
-            assert (
-                row_seq is not None
-            ), f"unknown ranges row-name {row_name} (line {n_line})."
+            assert row_seq is not None, (
+                f"unknown ranges row-name {row_name} (line {n_line})."
+            )
             try:
                 val = float(words[pos_name + 3])
             except ValueError as e:
@@ -543,9 +541,9 @@ class LPdiag:
             n_req_wrd = [3, 2]
             pos_name = 1  # col-name in words[pos_name]
 
-        assert (
-            n_words in n_req_wrd
-        ), f"bounds line {n_line} has {n_words} words, expected: {n_req_wrd}."
+        assert n_words in n_req_wrd, (
+            f"bounds line {n_line} has {n_words} words, expected: {n_req_wrd}."
+        )
         if self.id_bnd:  # check id of the BOUNDS line, if it was defined
             assert words[1] == self.bnd_id, (
                 f"BOUNDS id {words[1]}, line {n_line} differ from "
@@ -553,9 +551,9 @@ class LPdiag:
             )
         col_name = words[pos_name]
         col_seq = self.col_name.get(col_name)
-        assert (
-            col_seq is not None
-        ), f"unknown BOUNDS col-name {col_name} (line {n_line})."
+        assert col_seq is not None, (
+            f"unknown BOUNDS col-name {col_name} (line {n_line})."
+        )
         attr = self.seq_col.get(col_seq)  # [col_name, lo_bnd, up_bnd]
 
         typ = words[0]
@@ -581,8 +579,7 @@ class LPdiag:
                 attr[at_pos] = self.infty
         elif typ in bnd_type3:
             raise TypeError(
-                f"Bound type {typ} of integer var. (line {n_line}) not"
-                " processed yet."
+                f"Bound type {typ} of integer var. (line {n_line}) not processed yet."
             )
         else:
             raise TypeError(f"Unknown bound type {typ} (line {n_line}).")
@@ -631,9 +628,9 @@ class LPdiag:
             "L": [self.infty, 0.0],
             "N": [self.infty, self.infty],
         }
-        assert row_seq == self.row_name.get(
-            row_name
-        ), f"{row_seq=} should be equal to: {self.row_name.get(row_name)}."
+        assert row_seq == self.row_name.get(row_name), (
+            f"{row_seq=} should be equal to: {self.row_name.get(row_name)}."
+        )
         assert row_type in type2bnd, f"undefined row type {row_type=} for {row_name=}."
         if sec_name == "rows":  # initialize row attributes (used in ROW section)
             low_upp = type2bnd[row_type]
@@ -692,10 +689,10 @@ class LPdiag:
 
         # print(f'\nDistribution of non-zero values:\n{self.mat["val"].describe()}')
         print(
-            f'\nDistribution of abs(non-zero) values:\n{self.mat["abs_val"].describe()}'
+            f"\nDistribution of abs(non-zero) values:\n{self.mat['abs_val'].describe()}"
         )
         print(
-            f'\nDistribution of int(log10(abs(values))):\n{self.mat["log"].describe()}'
+            f"\nDistribution of int(log10(abs(values))):\n{self.mat['log'].describe()}"
         )
         min_logv = self.mat["log"].min()
         max_logv = self.mat["log"].max()
@@ -730,7 +727,7 @@ class LPdiag:
                 "\nDistribution of log10(values) in the requested low-tail (<="
                 f" {lo_tail}) of the distribution."
             )
-            print(f'{self.mat.loc[self.mat["log"] <= lo_tail].describe()}')
+            print(f"{self.mat.loc[self.mat['log'] <= lo_tail].describe()}")
             for val in [*range(min_logv, lo_tail + 1)]:
                 print(
                     f"Number of log10(values) == {val}:"
@@ -747,7 +744,7 @@ class LPdiag:
                 "\nDistribution of log10(values) in the requested upp-tail (>="
                 f" {up_tail}) of the distribution."
             )
-            print(f'{self.mat.loc[self.mat["log"] >= up_tail].describe()}')
+            print(f"{self.mat.loc[self.mat['log'] >= up_tail].describe()}")
             for val in [*range(up_tail, max_logv + 1)]:
                 print(
                     f"Number of log10(values) == {val}:"
@@ -775,13 +772,13 @@ class LPdiag:
         if small:  # sub-matrix composed of only small-value outliers
             df = self.mat.loc[self.mat["log"] <= thresh]
             print(
-                f'\nRow-wise locations of {df["log"].count()} outliers (coeff. with'
+                f"\nRow-wise locations of {df['log'].count()} outliers (coeff. with"
                 f" values of log10(values) <= {thresh})."
             )
         else:  # large-value outliers
             df = self.mat.loc[self.mat["log"] >= thresh]
             print(
-                f'\nRow-wise locations of {df["log"].count()} outliers (coeff. with'
+                f"\nRow-wise locations of {df['log'].count()} outliers (coeff. with"
                 f" values of log10(values) >= {thresh})."
             )
         df1 = df.sort_values(
@@ -790,9 +787,9 @@ class LPdiag:
         df1.reset_index()
         col_out = []  # col_seq of outliers' cols
         for n_rows, (_, row) in enumerate(df1.iterrows()):
-            assert (
-                n_rows < max_rec
-            ), "To process all requested coeffs modify the safety limit assertion."
+            assert n_rows < max_rec, (
+                "To process all requested coeffs modify the safety limit assertion."
+            )
             row_seq, row_name = self.get_entity_info(
                 row, True
             )  # row seq_id and name of the current coeff.
@@ -804,8 +801,8 @@ class LPdiag:
             else:
                 print(f"{col_seq = } already in another outlier row.")
             print(
-                f'Coeff. ({row_seq}, {col_seq}): val = {row["val"]:.4e}, log(val) ='
-                f' {row["log"]:n}'
+                f"Coeff. ({row_seq}, {col_seq}): val = {row['val']:.4e}, log(val) ="
+                f" {row['log']:n}"
             )
             df_row_out = df1.loc[df1["row"] == row_seq]  # df with only outlier elements
             df_row_all = self.mat.loc[
