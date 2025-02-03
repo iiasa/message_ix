@@ -30,6 +30,7 @@ All changes
 - Support for Python 3.8 is dropped (:pull:`881`), as it has reached end-of-life.
 - Add :meth:`.Reporter.add_sankey` and :mod:`.tools.sankey` to create Sankey diagrams from solved scenarios (:pull:`770`).
   The :file:`westeros_sankey.ipynb` :ref:`tutorial <tutorial-westeros>` shows how to use this feature.
+- Add the :py:`concurrent=...` model option to :class:`.MACRO` (:pull:`808`).
 - Add option to :func:`.util.copy_model` from a non-default location of model files (:pull:`877`).
 - Bug fix for calculation of ``PRICE_EMISSION`` (:pull:`912`, :issue:`723`).
   See the :ref:`migration note <v3.10.0-migrate-1>` above.
