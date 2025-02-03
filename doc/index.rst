@@ -70,6 +70,7 @@ These pages provide comprehensive description of the variables and equations in 
    :hidden:
    :caption: Mathematical specification
 
+   notation
    model/MESSAGE/sets_maps_def
    time
    model/MESSAGE/parameter_def
