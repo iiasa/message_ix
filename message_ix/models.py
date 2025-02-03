@@ -1,6 +1,6 @@
 import logging
 from collections import ChainMap
-from collections.abc import Mapping, MutableMapping
+from collections.abc import MutableMapping
 from copy import copy
 from dataclasses import InitVar, dataclass, field
 from functools import partial
@@ -176,7 +176,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
 
     #: Mapping from model item (equation, parameter, set, or variable) names to
     #: :class:`.Item` describing the item.
-    items: Mapping[str, Item]
+    items: MutableMapping[str, Item]
 
     def __init__(self, name=None, **model_options):
         # Update the default options with any user-provided options
@@ -558,7 +558,7 @@ var(
 var(
     "PRICE_EMISSION",
     "n type_emission type_tec y",
-    "Emission price (derived from marginals of EMISSION_BOUND constraint)",
+    "Emission price (derived from marginals of EMISSION_EQUIVALENCE constraint)",
 )
 var(
     "REL",
@@ -766,7 +766,7 @@ equ(
 )
 equ(
     "EMISSION_EQUIVALENCE",
-    "",
+    "n e type_tec y",
     "Auxiliary equation to simplify the notation of emissions",
 )
 equ("EXTRACTION_BOUND_UP", "", "Upper bound on extraction (by grade)")

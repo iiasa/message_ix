@@ -169,7 +169,7 @@ addon_up(node,tec,year_all,mode,time,type_addon)$(
     AND map_tec_act(node,tec,year_all,mode,time)
     AND NOT addon_up(node,tec,year_all,mode,time,type_addon) ) = 1 ;
 
-* set the emission scaling parameter to 1 if only one emission is included in a category
+* set the emission scaling parameter to 1 by default
 emission_scaling(type_emission,emission)$( cat_emission(type_emission,emission)
         and not emission_scaling(type_emission,emission) ) = 1 ;
 
