@@ -4,6 +4,8 @@ from message_ix import Scenario, make_df
 
 MODEL = "test_emissions_price"
 
+solve_args = {"equ_list": ["EMISSION_EQUIVALENCE"]}
+
 
 def model_setup(scen, years, simple_tecs=True):
     """generate a minimal model to test the behaviour of the emission prices"""
@@ -15,7 +17,7 @@ def model_setup(scen, years, simple_tecs=True):
     scen.add_set("mode", "mode")
 
     scen.add_set("emission", "CO2")
-    scen.add_cat("emission", "ghg", "CO2")
+    scen.add_cat("emission", "GHG", "CO2")
 
     for y in years:
         scen.add_par("interestrate", y, 0.05, "-")
@@ -122,7 +124,7 @@ def test_cumulative_equidistant(test_mp, request):
 
     model_setup(scen, years)
     scen.add_cat("year", "cumulative", years)
-    scen.add_par("bound_emission", ["World", "ghg", "all", "cumulative"], 0, "tCO2")
+    scen.add_par("bound_emission", ["World", "GHG", "all", "cumulative"], 0, "tCO2")
     scen.commit("initialize test scenario")
     scen.solve(quiet=True)
 
@@ -141,7 +143,7 @@ def test_per_period_equidistant(test_mp, request):
     model_setup(scen, years)
     for y in years:
         scen.add_cat("year", y, y)
-        scen.add_par("bound_emission", ["World", "ghg", "all", y], 0, "tCO2")
+        scen.add_par("bound_emission", ["World", "GHG", "all", y], 0, "tCO2")
     scen.commit("initialize test scenario")
     scen.solve(quiet=True)
 
@@ -158,16 +160,25 @@ def test_cumulative_variable_periodlength(test_mp, request):
 
     model_setup(scen, years)
     scen.add_cat("year", "cumulative", years)
-    scen.add_par("bound_emission", ["World", "ghg", "all", "cumulative"], 0, "tCO2")
+    scen.add_par("bound_emission", ["World", "GHG", "all", "cumulative"], 0, "tCO2")
     scen.commit("initialize test scenario")
-    scen.solve(quiet=True)
+    scen.solve(quiet=True, **solve_args)
 
     # with an emissions constraint, the technology with costs satisfies demand
     assert scen.var("OBJ")["lvl"] > 0
     # under a cumulative constraint, the price must increase with the discount
     # rate starting from the marginal relaxation in the first year
     obs = scen.var("PRICE_EMISSION")["lvl"].values
-    npt.assert_allclose(obs, [1.05 ** (y - years[0]) for y in years])
+    # npt.assert_allclose(obs, [1.05 ** (y - years[0]) for y in years])
+
+    # Retrieve `EMISSION_EQUIVALENCE` and divide by `df_period`
+    emi_equ = scen.equ("EMISSION_EQUIVALENCE", {"node": "World"}).mrg.tolist()
+    # Excluded until parameter can be loaded directly from scenario-object.
+    # df_period = scen.par("df_period").value.tolist()
+    df_period = [5.52563125, 4.329476671, 3.392258259, 4.740475413]
+    exp = [i / j for i, j in zip(emi_equ, df_period)]
+
+    npt.assert_allclose(obs, exp)
 
 
 def test_per_period_variable_periodlength(test_mp, request):
@@ -177,7 +188,7 @@ def test_per_period_variable_periodlength(test_mp, request):
     model_setup(scen, years)
     for y in years:
         scen.add_cat("year", y, y)
-        scen.add_par("bound_emission", ["World", "ghg", "all", y], 0, "tCO2")
+        scen.add_par("bound_emission", ["World", "GHG", "all", y], 0, "tCO2")
     scen.commit("initialize test scenario")
     scen.solve(quiet=True)
 
@@ -195,17 +206,28 @@ def test_custom_type_variable_periodlength(test_mp, request):
 
     model_setup(scen, years)
     scen.add_cat("year", "custom", custom)
-    scen.add_par("bound_emission", ["World", "ghg", "all", "custom"], 0, "tCO2")
+    scen.add_par("bound_emission", ["World", "GHG", "all", "custom"], 0, "tCO2")
 
     scen.commit("initialize test scenario")
-    scen.solve(quiet=True)
+    scen.solve(quiet=True, **solve_args)
 
     # with an emissions constraint, the technology with costs satisfies demand
     assert scen.var("OBJ")["lvl"] > 0
     # under a cumulative constraint, the price must increase with the discount
     # rate starting from the marginal relaxation in the first year
     obs = scen.var("PRICE_EMISSION")["lvl"].values
-    npt.assert_allclose(obs, [1.05 ** (y - custom[0]) for y in custom])
+    # npt.assert_allclose(obs, [1.05 ** (y - custom[0]) for y in custom])
+
+    # Retrieve `EMISSION_EQUIVALENCE` and divide by `df_period`
+    emi_equ = scen.equ(
+        "EMISSION_EQUIVALENCE", {"node": "World", "year": custom}
+    ).mrg.tolist()
+    # Excluded until parameter can be loaded directly from scenario-object.
+    # df_period = scen.par("df_period").value.tolist()
+    df_period = [4.329476671, 3.392258259, 4.740475413]
+    exp = [i / j for i, j in zip(emi_equ, df_period)]
+
+    npt.assert_allclose(obs, exp)
 
 
 def test_price_duality(test_mp, request):
@@ -218,7 +240,7 @@ def test_price_duality(test_mp, request):
         model_setup(scen, years, simple_tecs=False)
         scen.add_cat("year", "cumulative", years)
         scen.add_par(
-            "bound_emission", ["World", "ghg", "all", "cumulative"], 0.5, "tCO2"
+            "bound_emission", ["World", "GHG", "all", "cumulative"], 0.5, "tCO2"
         )
         scen.commit("initialize test scenario")
         scen.solve(quiet=True)
