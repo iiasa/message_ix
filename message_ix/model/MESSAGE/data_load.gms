@@ -103,6 +103,9 @@ Set rating_unrated(rating) ;
 rating_unrated(rating) = yes ;
 rating_unrated('unrated') = no ;
 
+* this is a temporary data for learning technologies. this need to be made automatic
+Set newtec(tec) / wind_ppl / ;
+
 *----------------------------------------------------------------------------------------------------------------------*
 * assignment and computation of MESSAGE-specific auxiliary parameters                                                  *
 *----------------------------------------------------------------------------------------------------------------------*
