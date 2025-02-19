@@ -3,7 +3,7 @@ Calibrate and tune MESSAGE-MACRO
 
 “MESSAGE-MACRO” refers to an iterative algorithm that links MESSAGE and MACRO :cite:`Messner-Schrattenholzer-2000`.
 This algorithm allows to model demand elasticity: MESSAGE solution data on energy prices and total system costs are provided to MACRO, and MACRO solution data on (endogenous) demand and GDP are provided to MESSAGE.
-This process continues until a convergence criterion or “equilibrium” is reached—briefly, that the MACRO demand output varies minimally between two iterations (:cite:`Johnson-2016`, further details can be found :ref:`here <message_doc:macro>`).
+This process continues until a convergence criterion or “equilibrium” is reached—briefly, that the MACRO demand output varies minimally between two iterations (:cite:`Johnson-2016`, further details can be found :doc:`here <message-ix-models:global/macro>`).
 
 The linked models can be activated by calling :meth:`.Scenario.solve` with the argument `model='MESSAGE-MACRO'`, or using the GAMS :file:`MESSAGE-MACRO_run.gms` script directly (see :ref:`running` for details about these two methods).
 
