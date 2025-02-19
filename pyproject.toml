@@ -32,7 +32,7 @@ classifiers = [
 requires-python = ">=3.9"
 dependencies = [
   "click",
-  "ixmp >= 3.9.0",
+  "ixmp >= 3.10.0",
   "genno[pyam] >= 1.20",
   "numpy",
   "pandas >= 1.2",
