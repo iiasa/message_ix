@@ -6,7 +6,7 @@ repos:
     pass_filenames: false
     additional_dependencies:
     - asyncssh
-    - git+https://github.com/iiasa/ixmp.git@main
+    - git+https://github.com/iiasa/ixmp.git@enh/ixmp4
     - importlib_resources
     - matplotlib
     - pandas-stubs
