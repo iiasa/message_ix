@@ -10,6 +10,10 @@ on:
   # pull_request:
   #   branches: [ main ]
 
+env:
+  # First version including a macOS arm64 distribution
+  GAMS_VERSION: 43.4.1
+
 jobs:
   conda:
     strategy:
@@ -55,6 +59,20 @@ jobs:
             f.write(f"init={init}\n")
             f.write(f"profile={profile}\n")
       shell: python
+
+    - name: Cache GAMS installer
+      uses: actions/cache@v4
+      with:
+        path: |
+          gams
+        key: ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}
+        restore-keys: |
+          ${{ matrix.os }}-
+
+    - uses: iiasa/actions/setup-gams@main
+      with:
+        version: ${{ env.GAMS_VERSION }}
+        license: ${{ secrets.GAMS_LICENSE }}
 
     - name: Initialize shell for "conda activate"
       run: conda init ${{ steps.shell.outputs.init }}
