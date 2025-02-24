@@ -90,6 +90,9 @@ jobs:
         conda create --quiet --name testenv message-ix pytest asyncssh sphinx
         conda list --name testenv
 
+        # Try installing pyam version explicitly
+        conda install -n testenv -y pyam=3.0.0
+
     - name: Check CLI commands and run test
       run: |
         # Source profile. On non-windows OSes, GHA invokes bash with
