@@ -7,8 +7,8 @@ on:
   schedule:
   - cron: "0 5 * * *"
   # Uncomment to debug
-  # pull_request:
-  #   branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 env:
   # First version including a macOS arm64 distribution
@@ -89,6 +89,9 @@ jobs:
         # supports this via message_ix[testing], but conda does not.
         conda create --quiet --name testenv message-ix pytest asyncssh sphinx
         conda list --name testenv
+
+        # Try installing pyam version explicitly
+        conda install -n testenv -y pyam=3.0.0
 
     - name: Check CLI commands and run test
       run: |
