@@ -87,7 +87,9 @@ jobs:
 
         # Also install pytest and packages required for testing. pip/PyPI
         # supports this via message_ix[testing], but conda does not.
-        conda create --quiet --name testenv message-ix pytest asyncssh sphinx
+        # Pin Python version to enable pyam versions relied on by the sankey tool;
+        # remove once pyam supports the latest Python
+        conda create --quiet --name testenv message-ix pytest asyncssh sphinx python=3.12
         conda list --name testenv
 
     - name: Check CLI commands and run test
