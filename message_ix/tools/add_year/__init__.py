@@ -76,12 +76,16 @@ def slice_df(
     return df.set_index(idx)
 
 
-def mask_df(df: pd.DataFrame, index: str, count: int, value) -> None:
+def mask_df(
+    df: pd.DataFrame, index: tuple[Union[int, str], ...], count: int, value
+) -> None:
     """Create a mask for removing extra values from *df*."""
     df.loc[
         index,
         df.columns
-        > (df.loc[[index]].notnull().cumsum(axis=1) == count).idxmax(axis=1).values[0],
+        > (df.loc[[index], :].notnull().cumsum(axis=1) == count)
+        .idxmax(axis=1)
+        .values[0],
     ] = value
 
 
