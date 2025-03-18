@@ -109,7 +109,7 @@ map_first_period(type_year,year_all)$( cat_year(type_year,year_all)
 
 * auxiliary parameters for duration between periods (years) - not including the final period 'year_all2'
 duration_period_sum(year_all,year_all2) =
-    SUM(year_all3$( ORD(year_all) <= ORD(year_all3) AND ORD(year_all3) < ORD(year_all2) ) , duration_period(year_all3) ) ;
+    SUM(year_all3$( ORD(year_all) < ORD(year_all3) AND ORD(year_all3) <= ORD(year_all2) ) , duration_period(year_all3) ) ;
 
 * auxiliary parameter for duration since the first year of the model horizon - not including the period 'year_all'
 elapsed_years(year_all) = sum(first_period, duration_period_sum(first_period,year_all) ) ;
