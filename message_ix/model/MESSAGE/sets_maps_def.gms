@@ -140,24 +140,26 @@ $ONEMPTY
 ***
 
 Sets
-    node            world - regions - countries - grid cells
-    commodity       resources - electricity - water - land availability - etc.
-    level           levels of the reference energy system or supply chain ( primary - secondary - ... - useful )
-    sector          sectors (for integration with MACRO)
-    grade           grades of extraction of raw materials
-    tec             technologies
-    mode            modes of operation
-    emission        greenhouse gases - pollutants - etc.
-    land_scenario   scenarios of land use (for land-use model emulator)
-    land_type       types of land use
-    year_all        years (over entire model horizon)
-    year (year_all) years included in a model instance (for myopic or rolling-horizon optimization)
-    time            subannual time periods (seasons - days - hours)
-    shares          share constraint relations
-    relation        generic linear relations
-    lvl_spatial     hierarchical levels of spatial resolution
-    lvl_temporal    hierarchical levels of temporal resolution
-    rating          identifies the 'quality' of the renewable energy potential (bins acc. to Sullivan)
+    node                    world - regions - countries - grid cells
+    commodity               resources - electricity - water - land availability - etc.
+    level                   levels of the reference energy system or supply chain ( primary - secondary - ... - useful )
+    sector                  sectors (for integration with MACRO)
+    grade                   grades of extraction of raw materials
+    tec                     technologies
+    mode                    modes of operation
+    emission                greenhouse gases - pollutants - etc.
+    land_scenario           scenarios of land use (for land-use model emulator)
+    land_type               types of land use
+    year_all                years (over entire model horizon)
+    year (year_all)         years included in a model instance (for myopic or rolling-horizon optimization)
+    year4 (year_all)        years included in a model instance (for myopic or rolling-horizon optimization)
+    year_hist (year_all)    historical year
+    time                    subannual time periods (seasons - days - hours)
+    shares                  share constraint relations
+    relation                generic linear relations
+    lvl_spatial             hierarchical levels of spatial resolution
+    lvl_temporal            hierarchical levels of temporal resolution
+    rating                  identifies the 'quality' of the renewable energy potential (bins acc. to Sullivan)
 ;
 
 * definition of aliases
