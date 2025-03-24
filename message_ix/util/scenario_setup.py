@@ -1,3 +1,4 @@
+import logging
 from typing import TYPE_CHECKING, Literal, TypeVar, cast
 
 import pandas as pd
@@ -5,6 +6,7 @@ import pandas as pd
 if TYPE_CHECKING:
     from message_ix.core import Scenario
 
+from ixmp import Platform
 from ixmp4 import Run
 
 from .scenario_data import (
@@ -18,15 +20,20 @@ from .scenario_data import (
     REQUIRED_VARIABLES,
 )
 
+log = logging.getLogger(__name__)
+
 # TODO If this is writing every single addition to the DB, the following is slow. Could
 # we tell sqlalchemy to only commit to the DB at the end of this function?
 
 
-def set_up_scenario(s: Scenario) -> None:
-    """Create all optimization items required by MESSAGEix."""
+def set_up_scenario(scenario: "Scenario") -> None:
+    """Create all optimization items required by MESSAGEix.
+
+    (According to ixmp_source.)
+    """
     # NOTE this assumes an IXMP4Backend
     # Get the Run associated with the Scenario
-    run = cast(Run, s.platform._backend.index[s])
+    run = cast(Run, scenario.platform._backend.index[scenario])
 
     # Add all required IndexSets
     for indexset_name in REQUIRED_INDEXSETS:
@@ -65,11 +72,11 @@ def set_up_scenario(s: Scenario) -> None:
         )
 
 
-def add_default_data(s: Scenario) -> None:
+def add_default_data(scenario: "Scenario") -> None:
     """Add default data expected in a MESSAGEix Scenario."""
     # NOTE this assumes an IXMP4Backend
     # Get the Run associated with the Scenario
-    run = cast(Run, s.platform._backend.index[s])
+    run = cast(Run, scenario.platform._backend.index[scenario])
 
     # Add IndexSet data
     for indexset_data_info in DEFAULT_INDEXSET_DATA:
@@ -85,13 +92,19 @@ def add_default_data(s: Scenario) -> None:
 
     # Add Parameter data
     for parameter_data_info in DEFAULT_PARAMETER_DATA:
+        # NOTE parameter_data_info.data *must* contain a 'unit' column
+        scenario.units_to_warn_about = check_existence_of_units(
+            platform=scenario.platform,
+            units_to_warn_about=scenario.units_to_warn_about,
+            data=pd.DataFrame(parameter_data_info.data),
+        )
         run.optimization.parameters.get(name=parameter_data_info.name).add(
             data=parameter_data_info.data
         )
 
 
 # TODO Should this really be a ValueError?
-def ensure_required_indexsets_have_data(s: Scenario) -> None:
+def ensure_required_indexsets_have_data(scenario: "Scenario") -> None:
     """Ensure that required IndexSets contain *some* data.
 
     The checked IndexSets are: ("node", "technology", "year", "time").
@@ -105,8 +118,9 @@ def ensure_required_indexsets_have_data(s: Scenario) -> None:
 
     # NOTE this assumes an IXMP4Backend
     # Get the Run associated with the Scenario
-    run = cast(Run, s.platform._backend.index[s])
+    run = cast(Run, scenario.platform._backend.index[scenario])
 
+    # Raise an error if any of the checked IndexSets are empty
     for name in indexsets_to_check:
         indexset = run.optimization.indexsets.get(name=name)
         # NOTE this is prone to failure should ixmp4 make indexset.data optional
@@ -114,19 +128,23 @@ def ensure_required_indexsets_have_data(s: Scenario) -> None:
             raise ValueError(f"The required IndexSet {name} is empty!")
 
 
-def compose_dimension_map(s: Scenario, dimension: Literal["node", "time"]) -> None:
+def compose_dimension_map(
+    scenario: "Scenario", dimension: Literal["node", "time"]
+) -> None:
     """Add data to dimension maps.
 
     This covers assignDisaggregationMaps() from ixmp_source.
 
     Parameters
     ----------
+    scenario: Scenario
+        The Scenario object holding the data.
     dimension: 'node' or 'time'
         Whether to handle the spatial or temporal dimension.
     """
     # NOTE this assumes an IXMP4Backend
     # Get the Run associated with the Scenario
-    run = cast(Run, s.platform._backend.index[s])
+    run = cast(Run, scenario.platform._backend.index[scenario])
 
     # Handle both spatial and temporal dimensions
     name_part = "spatial" if dimension == "node" else "temporal"
@@ -135,10 +153,17 @@ def compose_dimension_map(s: Scenario, dimension: Literal["node", "time"]) -> No
     hierarchy_map = pd.DataFrame(
         run.optimization.tables.get(name=f"map_{name_part}_hierarchy").data
     )
+    # TODO do we want to call this function when 'hierarchy_map' is empty? If not,
+    # remove this:
+    if hierarchy_map.empty:
+        return
+
     map_parameter = run.optimization.tables.get(name=f"map_{dimension}")
 
     # Create auxiliary variables
-    dimension_items = set(hierarchy_map[f"{dimension}"].to_list())
+    dimension_items = set(hierarchy_map[f"{dimension}"].to_list()) | set(
+        hierarchy_map[f"{dimension}_parent"].to_list()
+    )
     self_map = pd.DataFrame(
         [(dim, dim) for dim in dimension_items],
         columns=[f"{dimension}", f"{dimension}_parent"],
@@ -177,41 +202,53 @@ def compose_dimension_map(s: Scenario, dimension: Literal["node", "time"]) -> No
     for dim in dimension_items:
         descendants = _find_all_descendants(parent=dim)
         if number := len(descendants):
-            descendant_data[f"{dimension}"].extend([dim] * number)
-            descendant_data[f"{dimension}_parent"].extend(descendants)
+            descendant_data[f"{dimension}"].extend(descendants)
+            descendant_data[f"{dimension}_parent"].extend([dim] * number)
 
     # Add map_{dimension} data after merging descendant data to original map
     map_parameter.add(data=data.merge(pd.DataFrame(descendant_data), how="outer"))
 
 
-def compose_period_map(s: Scenario) -> None:
-    """Add data to the `duration_period` Parameter.
+def compose_period_map(scenario: "Scenario") -> None:
+    """Add data to the `duration_period` Parameter in `scenario`.
 
     This covers assignPeriodMaps() from ixmp_source.
     """
     # NOTE this assumes an IXMP4Backend
     # Get the Run associated with the Scenario
-    run = cast(Run, s.platform._backend.index[s])
+    run = cast(Run, scenario.platform._backend.index[scenario])
 
     # TODO Included here in ixmp_source; this should likely move to add_default_data
+    # Add one default item to 'type_year'
     type_year = run.optimization.indexsets.get(name="type_year")
     type_year.add("cumulative")
 
     cat_year = run.optimization.tables.get(name="cat_year")
     cat_year_df = pd.DataFrame(cat_year.data)
 
-    # TODO Who/what ensures that cat_year is populated correctly first?
-    first_model_year_df = cat_year_df[cat_year_df["type_year"] == "firstmodelyear"]
-    assert len(first_model_year_df) <= 1, (
-        "A MESSAGEix Scenario can't have multiple first years!"
-    )
-    first_model_year = (
-        int(first_model_year_df["year"][0]) if not first_model_year_df.empty else None
-    )
+    # Get the first model year for determination of the model horizon below
+    first_model_year = None
+    if not cat_year_df.empty:
+        first_model_year_df = cat_year_df[cat_year_df["type_year"] == "firstmodelyear"]
+        assert len(first_model_year_df) <= 1, (
+            "A MESSAGEix Scenario can't have multiple first years!"
+        )
+        first_model_year = (
+            int(first_model_year_df["year"][0])
+            if not first_model_year_df.empty
+            else None
+        )
+
+    # Load 'year' data. NOTE that this is somehow converted to str going through ixmp,
+    # but we need int for the calculations here, then str to add the data back.
+    year = run.optimization.indexsets.get(name="year")
+    years = [int(_year) for _year in year.data]
+
+    # TODO do we want to call this function when 'year' is empty? If not remove this:
+    if years == []:
+        return
 
     # Ensure that years are sorted
-    year = run.optimization.indexsets.get(name="year")
-    years = cast(list[int], year.data)
     sorted_years = sorted(years)
     if years != sorted_years:
         year.remove(data=years)
@@ -220,8 +257,9 @@ def compose_period_map(s: Scenario) -> None:
     # Store years within the model horizon
     for y in sorted_years:
         if first_model_year is None or first_model_year <= y:
-            type_year.add(str(y))
-            cat_year.add({"type_year": ["cumulative", y], "year": [str(y), y]})
+            y_str = str(y)
+            type_year.add(y_str)
+            cat_year.add({"type_year": ["cumulative", y_str], "year": [y_str, y_str]})
 
     # Initialize duration_period with this data
     duration_period = run.optimization.parameters.get(name="duration_period")
@@ -233,10 +271,60 @@ def compose_period_map(s: Scenario) -> None:
     # no second period
     durations[0] = durations[1] if len(sorted_years) > 1 else 1
 
+    # Add data to `duration_period`
     duration_period.add(
         data={
-            "year": sorted_years,
+            "year": [str(y) for y in sorted_years],
             "values": durations,
             "units": ["y"] * len(sorted_years),
         }
     )
+
+
+def check_existence_of_units(
+    platform: Platform, units_to_warn_about: list[str], data: pd.DataFrame
+) -> list[str]:
+    """Check if all units requested for use exist on the Platform.
+
+    Create them if they don't exist, but warn that this will be disabled in the future.
+
+    Parameters
+    ----------
+    platform : ixmp.Platform
+        The platform to check.
+    units_to_warn_about : list[str]
+        The list of unit names that are expected for historical reasons and have not
+        been checked before.
+    data : pd.DataFrame
+        The data containing the requested units.
+
+    Returns
+    -------
+    list[str]
+        The units_to_warn_about minus the ones that were checked.
+    """
+    # Handle singular and plural form; could there be others?
+    try:
+        unit_column = data["units"]
+    except KeyError:
+        unit_column = data["unit"]
+
+    units = unit_column.astype(str).to_list()
+    existing_units = platform.units()
+
+    for unit in units:
+        if unit in units_to_warn_about and unit not in existing_units:
+            log.warning(
+                f"Unit '{unit}' does not exist on the Platform! Please adjust your "
+                "code to explicitly add all units to the Platform. This will be "
+                f"required in the future, but '{unit}' will be added automatically for "
+                "now."
+            )
+
+            # Add the unit to retain backward compatibility
+            platform.add_unit(unit=unit)
+
+            # Ensure each unit is only warned about once
+            units_to_warn_about.remove(unit)
+
+    return units_to_warn_about
