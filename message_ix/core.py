@@ -3,14 +3,37 @@ import os
 from collections.abc import Iterable, Mapping, Sequence
 from functools import lru_cache, partial
 from itertools import chain, product, zip_longest
-from typing import Optional, Union
+from typing import Optional, TypeVar, Union
 from warnings import warn
 
 import ixmp
 import numpy as np
 import pandas as pd
 from ixmp.backend import ItemType
+from ixmp.backend.ixmp4 import IXMP4Backend
 from ixmp.util import as_str_list, maybe_check_out, maybe_commit
+from ixmp.util.ixmp4 import ContainerData
+
+from message_ix.util.gams_io import (
+    add_auxiliary_items_to_container_data_list,
+    add_default_data_to_container_data_list,
+    store_message_version,
+)
+from message_ix.util.ixmp4 import add_or_extend_item_list
+
+# from message_ix.util.scenario_data import PARAMETERS
+from message_ix.util.scenario_data import (
+    REQUIRED_EQUATIONS,
+    REQUIRED_UNITS,
+    REQUIRED_VARIABLES,
+)
+from message_ix.util.scenario_setup import (
+    add_default_data,
+    check_existence_of_units,
+    compose_dimension_map,
+    compose_period_map,
+    ensure_required_indexsets_have_data,
+)
 
 log = logging.getLogger(__name__)
 
@@ -59,10 +82,50 @@ class Scenario(ixmp.Scenario):
         # Scheme returned by database
         assert self.scheme == "MESSAGE", self.scheme
 
+        if isinstance(self.platform._backend, IXMP4Backend):
+            self.units_to_warn_about = REQUIRED_UNITS
+
+            # NOTE I tried transcribing this from ixmp_source as-is, but the MESSAGE
+            # class defined in models.py takes care of setting up the Scenario -- except
+            # for adding default data.
+            # It does other things, too, which I don't think we need here, but I've kept
+            # them in for completeness for now.
+
+            # TODO is this correct?
+            # if version == "new":
+            #     # If the Scenario already exists, we don't need these two
+            # set_up_scenario(s=self)
+            add_default_data(scenario=self)
+
+            # TODO I don't think we need this, but include it for completeness
+            # If we do need them, give them better names
+            # self.tecParList = [
+            #     parameter_info for parameter_info in PARAMETERS if parameter_info.is_tec # noqa: E501
+            # ]
+            # self.tecActParList = [
+            #     parameter_info
+            #     for parameter_info in PARAMETERS
+            #     if parameter_info.is_tec_act
+            # ]
+
+            # NOTE the following could be activated in ixmp_source through the flag
+            # parameter `sanity_checks`, but I'm always running this for now
+            # This 'sanity_check' is generally only active when loading a scenario from
+            # the DB (unless explicitly loading via ID, in which case it's also
+            # inactive), so disable for running the tutorials
+            # ensure_required_indexsets_have_data(s=self)
+
+            # TODO It does not seem useful to construct these because some required
+            # indexsets won't have any data in them yet. They do get run in ixmp_source
+            # at this point, though.
+            # compose_dimension_map(s=self, dimension="node")
+            # compose_dimension_map(s=self, dimension="time")
+            # compose_period_map(s=self)
+
     # Utility methods used by .equ(), .par(), .set(), and .var()
 
     @lru_cache()
-    def _year_idx(self, name):
+    def _year_idx(self, name: str):
         """Return a sequence of (idx_set, idx_name) for 'year'-indexed dims.
 
         Since item dimensionality does not change, the the return value is
@@ -78,7 +141,10 @@ class Scenario(ixmp.Scenario):
             )
         )
 
-    def _year_as_int(self, name, df):
+    data_type = TypeVar("data_type", pd.Series, pd.DataFrame, dict)
+
+    # NOTE super().equ() etc hint that pd objects return, but they may also return dict
+    def _year_as_int(self, name: str, data: data_type) -> data_type:
         """Convert 'year'-indexed columns of *df* to :obj:`int` dtypes.
 
         :meth:`_year_idx` is used to retrieve a sequence of (idx_set, idx_name)
@@ -90,12 +156,18 @@ class Scenario(ixmp.Scenario):
         year_idx = self._year_idx(name)
 
         if len(year_idx):
-            return df.astype({col_name: "int" for _, col_name in year_idx})
+            assert isinstance(data, pd.DataFrame)
+            # NOTE With the IXMP4Backend, we call scenario.par() for parameters that
+            # might be empty, which fails df.astype() below.
+            if data.empty:
+                return data
+            return data.astype({col_name: "int" for _, col_name in year_idx})
         elif name == "year":
             # The 'year' set itself
-            return df.astype(int)
+            assert isinstance(data, pd.Series)
+            return data.astype(int)
         else:
-            return df
+            return data
 
     # Override ixmp methods to convert 'year'-indexed columns to int
 
@@ -251,6 +323,29 @@ class Scenario(ixmp.Scenario):
         # accepts int for "year"-like dimensions. Proxy the call to avoid type check
         # failures.
         # TODO Move this upstream, to ixmp
+
+        if isinstance(self.platform._backend, IXMP4Backend):
+            # Check for existence of required units
+            # NOTE these checks are similar to those in super().add_par(), but we need
+            # them here for access to self
+            # NOTE it seems to me that only dict or pd.DataFrame key_or_data could
+            # contain 'unit' already, else it's supplied by keyword or defaults to "???"
+            if isinstance(key_or_data, dict):
+                _data = pd.DataFrame.from_dict(key_or_data, orient="columns")
+            elif isinstance(key_or_data, pd.DataFrame):
+                _data = key_or_data
+            else:
+                _data = pd.DataFrame()
+
+            if "unit" not in _data.columns:
+                _data["unit"] = unit or "???"
+
+            self.units_to_warn_about = check_existence_of_units(
+                platform=self.platform,
+                units_to_warn_about=self.units_to_warn_about,
+                data=_data,
+            )
+
         super().add_par(name, key_or_data, value, unit, comment)  # type: ignore [arg-type]
 
     add_par.__doc__ = ixmp.Scenario.add_par.__doc__
@@ -323,6 +418,7 @@ class Scenario(ixmp.Scenario):
             recurse(k, v)
 
         self.add_set("node", nodes)
+        # TODO do we handle levels being added multiple times correctly for ixmp4?
         self.add_set("lvl_spatial", levels)
         self.add_set("map_spatial_hierarchy", hierarchy)
 
@@ -420,8 +516,11 @@ class Scenario(ixmp.Scenario):
         # Add the year set elements and first model year
         year = sorted(year)
         self.add_set("year", year)
+
+        # Avoid removing default data on IXMP4Backend
+        is_unique = False if isinstance(self.platform._backend, IXMP4Backend) else True
         self.add_cat(
-            "year", "firstmodelyear", firstmodelyear or year[0], is_unique=True
+            "year", "firstmodelyear", firstmodelyear or year[0], is_unique=is_unique
         )
 
         # Calculate the duration of all periods
@@ -560,7 +659,7 @@ class Scenario(ixmp.Scenario):
             vintages = sorted(
                 self.par(
                     "technical_lifetime",
-                    filters={"node_loc": ya_args[0], "technology": ya_args[1]},
+                    filters={"node_loc": [ya_args[0]], "technology": [ya_args[1]]},
                 )["year_vtg"].unique()
             )
             ya_max = max(vintages) if tl_only else np.inf
@@ -585,6 +684,7 @@ class Scenario(ixmp.Scenario):
 
         # Minimum value for year_act
         if "in_horizon" in kwargs:
+            # FIXME I don't receive this in the tutorials
             warn(
                 "'in_horizon' argument to .vintage_and_active_years() will be removed "
                 "in message_ix>=4.0. Use .query(…) instead per documentation examples.",
@@ -709,6 +809,50 @@ class Scenario(ixmp.Scenario):
             Other options control the execution of the underlying GAMS code; see the
             :class:`.MESSAGE_MACRO` class and :class:`.GAMSModel`.
         """
+        if isinstance(self.platform._backend, IXMP4Backend):
+            # Run the sanity checks
+            ensure_required_indexsets_have_data(scenario=self)
+
+            # Compose some auxiliary tables
+            for dimension in ("node", "time"):
+                compose_dimension_map(scenario=self, dimension=dimension)
+
+            compose_period_map(scenario=self)
+
+            # Create a list of `ContainerData` to collect MESSAGE-specific data that
+            # ixmp should write to GAMS
+            container_data: list[ContainerData] = []
+
+            # Add `MESSAGE_ix_version` parameter for validation by GAMS
+            store_message_version(container_data=container_data)
+
+            # TODO Why is this a dedicated function?
+            # Add default data for some `Table`s to container data
+            for name in ("cat_tec", "type_tec_land"):
+                add_default_data_to_container_data_list(
+                    container_data=container_data, name=name, scenario=self
+                )
+
+            # Add automatically created helper items to container data
+            add_auxiliary_items_to_container_data_list(
+                container_data=container_data, scenario=self
+            )
+
+            # Add container data to model_options
+            kwargs["container_data"] = container_data
+
+            # Request only required Equations per default
+            equation_names = [equation.gams_name for equation in REQUIRED_EQUATIONS]
+            add_or_extend_item_list(
+                kwargs=kwargs, key="equ_list", item_list=equation_names
+            )
+
+            # Request only required Variables per default
+            variable_names = [variable.gams_name for variable in REQUIRED_VARIABLES]
+            add_or_extend_item_list(
+                kwargs=kwargs, key="var_list", item_list=variable_names
+            )
+
         super().solve(model=model, solve_options=solve_options, **kwargs)
 
     def add_macro(
