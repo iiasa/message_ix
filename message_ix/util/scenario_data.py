@@ -1,30 +1,39 @@
 from dataclasses import dataclass
 from typing import Literal, Optional, Union
 
+# NOTE on transcribing from ixmp_source:
+# The data in this file is based on
+# https://github.com/iiasa/ixmp_source/blob/master/src/main/java/at/ac/iiasa/ixmp/modelspecs/MESSAGEspecs.java
+# for the item data and
+# https://github.com/iiasa/ixmp_source/blob/2ae0dcb6093e93e3047bf94b996da1e647ad701e/src/main/resources/db/migration/hsql/V1__hsql_base_version.sql
+# for the units
+# Comments within the item lists not starting with 'NOTE' or 'TODO' are copied from
+# ixmp_source unless otherwise noted
+
 # List of required indexset names
 REQUIRED_INDEXSETS = [
-    "year",
-    "node",
-    "technology",
-    "relation",
+    "commodity",
     "emission",
+    "grade",
     "land_scenario",
     "land_type",
+    "level",
     "lvl_spatial",
-    "time",
     "lvl_temporal",
+    "mode",
+    "node",
+    "rating",
+    "relation",
+    "shares",
+    "technology",
+    "time",
+    "type_addon",
+    "type_emission",
     "type_node",
+    "type_relation",
     "type_tec",
     "type_year",
-    "type_emission",
-    "type_relation",
-    "mode",
-    "grade",
-    "level",
-    "commodity",
-    "rating",
-    "shares",
-    "type_addon",
+    "year",
 ]
 
 
@@ -66,55 +75,27 @@ class TableInfo:
 # to multiple columns of the same item. Thus, the list below is constructed ignoring the
 # third ixmp_source item.
 REQUIRED_TABLES = [
+    TableInfo(name="addon", indexsets=["technology"]),
     TableInfo(
-        name="map_spatial_hierarchy",
-        indexsets=["lvl_spatial", "node", "node"],
-        column_names=["lvl_spatial", "node", "node_parent"],
+        name="balance_equality", indexsets=["commodity", "level"]
+    ),  # disabled in models.py
+    TableInfo(
+        name="cat_addon",
+        indexsets=["type_addon", "technology"],
+        column_names=["type_addon", "technology_addon"],
     ),
+    TableInfo(name="cat_emission", indexsets=["type_emission", "emission"]),
+    TableInfo(name="cat_node", indexsets=["type_node", "node"]),
+    TableInfo(name="cat_relation", indexsets=["type_relation", "relation"]),
+    TableInfo(name="cat_tec", indexsets=["type_tec", "technology"]),
+    TableInfo(name="cat_year", indexsets=["type_year", "year"]),
+    TableInfo(name="level_renewable", indexsets=["level"]),
+    TableInfo(name="level_resource", indexsets=["level"]),
+    TableInfo(name="level_stocks", indexsets=["level"]),
     TableInfo(
         name="map_node",
         indexsets=["node", "node"],
         column_names=["node_parent", "node"],
-    ),
-    TableInfo(
-        name="map_temporal_hierarchy",
-        indexsets=["lvl_temporal", "time", "time"],
-        column_names=["lvl_temporal", "time", "time_parent"],
-    ),
-    TableInfo(
-        name="map_time",
-        indexsets=["time", "time"],
-        column_names=["time_parent", "time"],
-    ),
-    TableInfo(name="cat_node", indexsets=["type_node", "node"]),
-    TableInfo(name="cat_tec", indexsets=["type_tec", "technology"]),
-    TableInfo(name="cat_year", indexsets=["type_year", "year"]),
-    TableInfo(name="cat_emission", indexsets=["type_emission", "emission"]),
-    TableInfo(name="cat_relation", indexsets=["type_relation", "relation"]),
-    TableInfo(name="type_tec_land", indexsets=["type_tec"]),
-    TableInfo(name="level_resource", indexsets=["level"]),
-    TableInfo(name="level_renewable", indexsets=["level"]),
-    TableInfo(name="level_stocks", indexsets=["level"]),
-    TableInfo(
-        name="map_shares_commodity_total",
-        indexsets=[
-            "shares",
-            "node",
-            "node",
-            "type_tec",
-            "mode",
-            "commodity",
-            "level",
-        ],
-        column_names=[
-            "shares",
-            "node_share",
-            "node",
-            "type_tec",
-            "mode",
-            "commodity",
-            "level",
-        ],
     ),
     TableInfo(
         name="map_shares_commodity_share",
@@ -137,14 +118,44 @@ REQUIRED_TABLES = [
             "level",
         ],
     ),
-    TableInfo(name="addon", indexsets=["technology"]),
     TableInfo(
-        name="type_addon",
-        indexsets=["type_addon", "technology"],
-        column_names=["type_addon", "technology_addon"],
+        name="map_shares_commodity_total",
+        indexsets=[
+            "shares",
+            "node",
+            "node",
+            "type_tec",
+            "mode",
+            "commodity",
+            "level",
+        ],
+        column_names=[
+            "shares",
+            "node_share",
+            "node",
+            "type_tec",
+            "mode",
+            "commodity",
+            "level",
+        ],
+    ),
+    TableInfo(
+        name="map_spatial_hierarchy",
+        indexsets=["lvl_spatial", "node", "node"],
+        column_names=["lvl_spatial", "node", "node_parent"],
     ),
     TableInfo(name="map_tec_addon", indexsets=["technology", "type_addon"]),
-    TableInfo(name="balance_equality", indexsets=["commodity", "level"]),
+    TableInfo(
+        name="map_temporal_hierarchy",
+        indexsets=["lvl_temporal", "time", "time"],
+        column_names=["lvl_temporal", "time", "time_parent"],
+    ),
+    TableInfo(
+        name="map_time",
+        indexsets=["time", "time"],
+        column_names=["time_parent", "time"],
+    ),
+    TableInfo(name="type_tec_land", indexsets=["type_tec"]),
 ]
 
 
@@ -1387,66 +1398,6 @@ class VariableInfo:
 # names used as keys here and need to ensure it's written to the correct names in the
 # gdx.
 REQUIRED_VARIABLES = [
-    # TODO Only leaving these here if I want plain dicts after all
-    # {"objective": {"gams_name": "OBJ", "indexsets": None, "column_names": None}},
-    # {
-    #     "extraction": {
-    #         "gams_name": "EXT",
-    #         "indexsets": ["node", "commodity", "grade", "year"],
-    #         "column_names": None,
-    #     }
-    # },
-    # {
-    #     "stock": {
-    #         "gams_name": "STOCK",
-    #         "indexsets": ["node", "commodity", "level", "year"],
-    #         "column_names": None,
-    #     }
-    # },
-    # {
-    #     "new capacity",
-    #     {
-    #         "gams_name": "CAP_NEW",
-    #         "indexsets": ["node", "technology", "year"],
-    #         "column_names": ["node_loc", "technology", "year_vtg"],
-    #     },
-    # },
-    # {
-    #     "maintained capacity",
-    #     {
-    #         "gams_name": "CAP",
-    #         "indexsets": ["node", "technology", "year", "year"],
-    #         "column_names": ["node_loc", "technology", "year_vtg", "year_act"],
-    #     },
-    # },
-    # {
-    #     "activity": {
-    #         "gams_name": "ACT",
-    #         "indexsets": ["node", "technology", "year", "year", "mode", "time"],
-    #         "column_names": [
-    #             "node_loc",
-    #             "technology",
-    #             "year_vtg",
-    #             "year_act",
-    #             "mode",
-    #             "time",
-    #         ],
-    #     }
-    # },
-    # {
-    #     "emissions": {
-    #         "gams_name": "EMISS",
-    #         "indexsets": ["node", "emission", "type_tec", "year"],
-    #         "column_names": None,
-    #     }
-    # },
-    # {
-    #     "land scenario share": {
-    #         "gams_name": "LAND",
-    #         "indexsets": ["node", "land_scenario", "year"],
-    #         "column_names": None,
-    #     }
-    # },
     VariableInfo(name="objective", gams_name="OBJ"),
     VariableInfo(
         name="extraction",
@@ -1577,4 +1528,253 @@ REQUIRED_EQUATIONS = [
     #     indexsets=["relation", "node", "year"],
     #     column_names=["relation", "node_rel", "year_rel"],
     # ),
+]
+
+
+@dataclass
+class HelperFilterInfo:
+    column_name: str
+    target_name: Literal["resource", "renewables", "stocks"]
+    target: Optional[list[str]] = None
+
+
+@dataclass
+class HelperIndexSetInfo:
+    name: str
+    sources: dict[str, Optional[list[str]]]
+    filters: Optional[HelperFilterInfo] = None
+
+
+HELPER_INDEXSETS = [
+    # auxiliary dynamic sets for technology categorization
+    # mapping for technologies with investment costs
+    HelperIndexSetInfo(
+        name="inv_tec",
+        sources={
+            "inv_cost": ["technology"],
+            "bound_new_capacity_up": ["technology"],
+            "bound_new_capacity_lo": ["technology"],
+            "bound_total_capacity_up": ["technology"],
+            "bound_total_capacity_lo": ["technology"],
+        },
+    ),
+    # check if the level is a "renewable" and add to auxiliary technology subset
+    HelperIndexSetInfo(
+        name="renewable_tec",
+        sources={"input": ["technology"]},
+        filters=HelperFilterInfo(column_name="level", target_name="renewables"),
+    ),
+]
+
+
+@dataclass
+class HelperTableInfo(HelperIndexSetInfo):
+    renames: Optional[dict[str, str]] = None
+
+
+# NOTE on transcribing from ixmp_source: ixmp.Element.getVector() only returns keys,
+# NOT values, units, levels, or marginals. Thus, sources with `None` values are lacking,
+# in theory, but we handle these default exclusions in util/gams_io.
+
+
+HELPER_TABLES = [
+    # auxiliary mapping set of resources, stocks, commodities and technologies from
+    # implicit definition in parameters
+    # check if the level is a "resource" and add all grades through a dedicated function
+    # in util/gams_io
+    HelperTableInfo(
+        name="map_resource",
+        # NOTE we do filter specific columns in the dedicated function due to complexity
+        sources={"input": None},
+        # TODO Renaming this Literal to singular 'resource', should we test the others,
+        # too?
+        filters=HelperFilterInfo(column_name="level", target_name="resource"),
+    ),
+    HelperTableInfo(
+        name="map_commodity",
+        sources={
+            "demand": None,
+            "input": ["node_origin", "commodity", "level", "year_act", "time_origin"],
+            "output": ["node_dest", "commodity", "level", "year_act", "time_dest"],
+        },
+        renames={
+            "node_origin": "node",
+            "node_dest": "node",
+            "time_origin": "time",
+            "time_dest": "time",
+            "year_act": "year",
+        },
+    ),
+    # check if the level is a "stock"
+    HelperTableInfo(
+        name="map_stocks",
+        sources={
+            "input": ["node_loc", "commodity", "level", "year_act"],
+            "output": ["node_loc", "commodity", "level", "year_act"],
+        },
+        filters=HelperFilterInfo(column_name="level", target_name="stocks"),
+    ),
+    # auxiliary mapping set for technologies and relations
+    HelperTableInfo(
+        name="map_relation",
+        sources={
+            "relation_new_capacity": ["relation", "node_rel", "year_rel"],
+            "relation_total_capacity": ["relation", "node_rel", "year_rel"],
+            "relation_activity": ["relation", "node_rel", "year_rel"],
+        },
+        renames={"node_rel": "node", "year_rel": "year_all"},
+    ),
+    # get the mapping set for all years where a technology can be in operation, i.e.,
+    # year_actual
+    HelperTableInfo(
+        name="map_tec",
+        sources={
+            "input": ["node_loc", "technology", "year_act"],
+            "output": ["node_loc", "technology", "year_act"],
+            "relation_new_capacity": ["node_rel", "technology", "year_rel"],
+            "relation_total_capacity": ["node_rel", "technology", "year_rel"],
+            "relation_activity": ["node_loc", "technology", "year_act"],
+        },
+        renames={
+            "node_loc": "node",
+            "node_rel": "node",
+            "year_act": "year",
+            "year_rel": "year",
+        },
+    ),
+    HelperTableInfo(
+        name="map_tec_mode",
+        sources={
+            "input": ["node_loc", "technology", "year_act", "mode"],
+            "output": ["node_loc", "technology", "year_act", "mode"],
+            "relation_activity": ["node_loc", "technology", "year_act", "mode"],
+        },
+    ),
+    HelperTableInfo(
+        name="map_tec_time",
+        sources={
+            "input": ["node_loc", "technology", "year_act", "time"],
+            "output": ["node_loc", "technology", "year_act", "time"],
+            # NOTE `relation_activity` doesn't have `time`, only `year_rel` and
+            # `year_act`. Currently, `time` = "year" is hardcoded in util/gams_io
+            "relation_activity": ["node_loc", "technology", "year_act"],
+        },
+    ),
+    # auxiliary mapping set for land-use model emulator scenarios
+    HelperTableInfo(
+        name="map_land",
+        sources={
+            "land_cost": None,
+            "land_input": ["node", "land_scenario", "year"],
+            "land_output": ["node", "land_scenario", "year"],
+            # this mapping needs to be included explicitly so that the LAND_CONSTRAINT
+            # is written correctly:
+            "fixed_land": None,
+        },
+        renames={"year": "year_all"},
+    ),
+    # we need auxiliary mapping sets to keep track of upper and lower constraints and
+    # bounds for activity and investment as well as for bounds on emissions and
+    # relations
+    # assign elements to flag (mapping) sets for upper and lower bounds
+    HelperTableInfo(
+        name="is_bound_extraction_up", sources={"bound_extraction_up": None}
+    ),
+    HelperTableInfo(
+        name="is_bound_new_capacity_up", sources={"bound_new_capacity_up": None}
+    ),
+    HelperTableInfo(
+        name="is_bound_new_capacity_lo", sources={"bound_new_capacity_lo": None}
+    ),
+    HelperTableInfo(
+        name="is_bound_total_capacity_up", sources={"bound_total_capacity_up": None}
+    ),
+    HelperTableInfo(
+        name="is_bound_total_capacity_lo", sources={"bound_total_capacity_lo": None}
+    ),
+    HelperTableInfo(name="is_bound_activity_up", sources={"bound_activity_up": None}),
+    # no need for a flag 'bound_activity_lo' because this defaults to 0 in MESSAGE
+    # flag for dynamic constraints
+    HelperTableInfo(
+        name="is_dynamic_new_capacity_up",
+        sources={"initial_new_capacity_up": None, "growth_new_capacity_up": None},
+    ),
+    HelperTableInfo(
+        name="is_dynamic_new_capacity_lo",
+        sources={"initial_new_capacity_lo": None, "growth_new_capacity_lo": None},
+    ),
+    HelperTableInfo(
+        name="is_dynamic_activity_up",
+        sources={"initial_activity_up": None, "growth_activity_up": None},
+    ),
+    HelperTableInfo(
+        name="is_dynamic_activity_lo",
+        sources={"initial_activity_lo": None, "growth_activity_lo": None},
+    ),
+    # flags for emission constraints
+    HelperTableInfo(name="is_bound_emission", sources={"bound_emission": None}),
+    # flags for land-use emulator constraints
+    HelperTableInfo(
+        name="is_dynamic_land_scen_up",
+        sources={"initial_land_scen_up": None, "growth_land_scen_up": None},
+    ),
+    HelperTableInfo(
+        name="is_dynamic_land_scen_lo",
+        sources={"initial_land_scen_lo": None, "growth_land_scen_lo": None},
+    ),
+    HelperTableInfo(
+        name="is_dynamic_land_up",
+        sources={
+            "initial_land_up": None,
+            "dynamic_land_up": ["node", "year", "land_type"],
+            "growth_land_up": None,
+        },
+    ),
+    HelperTableInfo(
+        name="is_dynamic_land_lo",
+        sources={
+            "initial_land_lo": None,
+            "dynamic_land_lo": ["node", "year", "land_type"],
+            "growth_land_lo": None,
+        },
+    ),
+    HelperTableInfo(name="is_relation_upper", sources={"relation_upper": None}),
+    HelperTableInfo(name="is_relation_lower", sources={"relation_lower": None}),
+    # auxiliary mapping sets for fixing decision variables
+    # flags for fixed decision variable values (for 'slicing', i.e., fixing of decision
+    # variables)
+    HelperTableInfo(name="is_fixed_extraction", sources={"fixed_extraction": None}),
+    HelperTableInfo(name="is_fixed_stock", sources={"fixed_stock": None}),
+    HelperTableInfo(name="is_fixed_new_capacity", sources={"fixed_new_capacity": None}),
+    HelperTableInfo(name="is_fixed_new_capacity", sources={"fixed_new_capacity": None}),
+    HelperTableInfo(name="is_fixed_capacity", sources={"fixed_capacity": None}),
+    HelperTableInfo(name="is_fixed_activity", sources={"fixed_activity": None}),
+    HelperTableInfo(name="is_fixed_land", sources={"fixed_land": None}),
+]
+
+REQUIRED_UNITS = [
+    "-",
+    "%",
+    "???",
+    "cases",
+    "kg",
+    "km",
+    "t",
+    "tC",
+    "tCO2",
+    "USD",
+    "y",
+    "G$",
+    "GW",
+    "GWa",
+    "MW",
+    "MWa",
+    "T$",
+    "kg/kWa",
+    "USD/GWa",
+    "USD/kg",
+    "USD/km",
+    "USD/kWa",
+    "USD/tC",
+    "USD/tCO2",
 ]
