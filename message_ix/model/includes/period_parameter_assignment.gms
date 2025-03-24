@@ -18,7 +18,7 @@ Sets
 
 Parameter
     duration_period_sum(year_all,year_all2) number of years between two periods ('year_all' must precede 'year_all2')
-    duration_time_rel(time,time2)         relative duration of subannual time slice 'time2' relative to parent 'time' (only for 'time' specified in set 'time_relative')')
+    duration_time_rel(time,time2)         relative duration of subannual time slice 'time2' relative to parent 'time' (only for 'time' specified in set 'time_relative')
     elapsed_years(year_all)    elapsed years since the start of the model horizon (not including 'year_all' period)
     remaining_years(year_all)  remaining years until the end of the model horizon (including last period)
     year_order(year_all)       order for members of set 'year_all'
