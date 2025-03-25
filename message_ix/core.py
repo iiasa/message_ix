@@ -83,7 +83,8 @@ class Scenario(ixmp.Scenario):
         assert self.scheme == "MESSAGE", self.scheme
 
         if isinstance(self.platform._backend, IXMP4Backend):
-            self.units_to_warn_about = REQUIRED_UNITS
+            if not self.platform._units_to_warn_about:
+                self.platform._units_to_warn_about = REQUIRED_UNITS.copy()
 
             # NOTE I tried transcribing this from ixmp_source as-is, but the MESSAGE
             # class defined in models.py takes care of setting up the Scenario -- except
@@ -340,11 +341,7 @@ class Scenario(ixmp.Scenario):
             if "unit" not in _data.columns:
                 _data["unit"] = unit or "???"
 
-            self.units_to_warn_about = check_existence_of_units(
-                platform=self.platform,
-                units_to_warn_about=self.units_to_warn_about,
-                data=_data,
-            )
+            check_existence_of_units(platform=self.platform, data=_data)
 
         super().add_par(name, key_or_data, value, unit, comment)  # type: ignore [arg-type]
 
