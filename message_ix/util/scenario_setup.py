@@ -93,10 +93,8 @@ def add_default_data(scenario: "Scenario") -> None:
     # Add Parameter data
     for parameter_data_info in DEFAULT_PARAMETER_DATA:
         # NOTE parameter_data_info.data *must* contain a 'unit' column
-        scenario.units_to_warn_about = check_existence_of_units(
-            platform=scenario.platform,
-            units_to_warn_about=scenario.units_to_warn_about,
-            data=pd.DataFrame(parameter_data_info.data),
+        check_existence_of_units(
+            platform=scenario.platform, data=pd.DataFrame(parameter_data_info.data)
         )
         run.optimization.parameters.get(name=parameter_data_info.name).add(
             data=parameter_data_info.data
@@ -281,9 +279,7 @@ def compose_period_map(scenario: "Scenario") -> None:
     )
 
 
-def check_existence_of_units(
-    platform: Platform, units_to_warn_about: list[str], data: pd.DataFrame
-) -> list[str]:
+def check_existence_of_units(platform: Platform, data: pd.DataFrame) -> None:
     """Check if all units requested for use exist on the Platform.
 
     Create them if they don't exist, but warn that this will be disabled in the future.
@@ -312,8 +308,12 @@ def check_existence_of_units(
     units = unit_column.astype(str).to_list()
     existing_units = platform.units()
 
+    # As long as this function is called after Scenario.__init__() sets
+    # '_units_to_warn_about' for this `platform`, this will always be true
+    assert platform._units_to_warn_about is not None
+
     for unit in units:
-        if unit in units_to_warn_about and unit not in existing_units:
+        if unit in platform._units_to_warn_about and unit not in existing_units:
             log.warning(
                 f"Unit '{unit}' does not exist on the Platform! Please adjust your "
                 "code to explicitly add all units to the Platform. This will be "
@@ -325,6 +325,4 @@ def check_existence_of_units(
             platform.add_unit(unit=unit)
 
             # Ensure each unit is only warned about once
-            units_to_warn_about.remove(unit)
-
-    return units_to_warn_about
+            platform._units_to_warn_about.remove(unit)
