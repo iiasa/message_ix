@@ -196,9 +196,8 @@ intersphinx_mapping = {
 
 # See https://github.com/iiasa/message_ix/pull/721#pullrequestreview-1497907368:
 # prefer to write \text{} explicitly
-# TODO read at least some of these from message_ix.models
-# TODO complete list
-# TODO also add these to a LaTeX preamble
+# TODO Populate these by reference to message_ix.models
+# TODO Also add these to a LaTeX preamble for PDF output
 text_macros = """ACT
 STORAGE
 STORAGE_CHARGE
@@ -212,6 +211,10 @@ mathjax3_config = dict(
     tex=dict(
         macros={k.replace("_", ""): r"\text{" + k + "}" for k in text_macros.split()},
     ),
+)
+# Example only for #811
+mathjax3_config["tex"]["macros"].update(
+    output=r"\text{output}_{c h h^D l m n^D n^L t y^A y^V}",
 )
 
 # -- Options for sphinx.ext.napoleon ---------------------------------------------------
