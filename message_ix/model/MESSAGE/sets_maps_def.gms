@@ -300,11 +300,12 @@ Sets
     cat_emission(type_emission,emission)    mapping of emissions to respective categories
     type_tec_land(type_tec)                 dynamic set whether emissions from land use are included in type_tec
     balance_equality(commodity,level)       mapping of commodities-level where the supply-demand balance must be maintained with equality
-    time_relative(time)                     flag for treating unit of ACT in sub-annual time slices relative to parent 'time' (activating parameter 'duration_time_rel')
-;
+    time_relative(time)                     flag for treating unit of ACT in sub-annual time slices relative to parent 'time' (activating parameter 'duration_time_rel'),
 
-Alias(type_tec,type_tec_share);
-Alias(type_tec,type_tec_total);
+    # Derived in data_load.gms
+    type_tec_share(type_tec)                "Subset of type_tec appearing in map_shares_commodity_share",
+    type_tec_total(type_tec)                "Subset of type_tec appearing in map_shares_commodity_total"
+;
 
 *----------------------------------------------------------------------------------------------------------------------*
 * Mapping sets                                                                                                         *

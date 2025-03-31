@@ -1836,7 +1836,9 @@ ACTIVITY_SOFT_CONSTRAINT_LO(node,tec,year,time)$( soft_activity_lo(node,tec,year
 *                   \text{ if } \widehat{t} \in \widehat{T}^{LAND} \Bigg)
 *
 ***
-EMISSION_EQUIVALENCE(node,emission,type_tec,year)..
+EMISSION_EQUIVALENCE(node,emission,type_tec,year)$(
+  NOT type_tec_share(type_tec) AND NOT type_tec_total(type_tec)
+)..
     EMISS(node,emission,type_tec,year)
     =E=
     SUM(location$( map_node(node,location) ),
