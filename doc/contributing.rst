@@ -49,8 +49,8 @@ __ https://github.com/iiasa/message_ix/issues?q=is:issue
 
 .. _contrib-pr:
 
-Contribute code via Github PRs
-==============================
+Contribute code via pull requests
+=================================
 
 1. Choose a repository
 ----------------------
@@ -60,59 +60,95 @@ Decide which part of the |MESSAGEix| software stack is the appropriate location 
 :mod:`ixmp`
    Contributions not specific to |MESSAGEix| model framework, e.g. that could be used for other, non-MESSAGE models.
 
-   `ixmp_source <https://github.com/iiasa/ixmp_source>`__ (closed source)
-      Java / JDBC backend for ``ixmp``.
+   Also:
+   - `genno <https://github.com/khaeru/genno>`__ —for core features underlying :doc:`reporting`.
+   - `ixmp_source <https://github.com/iiasa/ixmp_source>`__ (closed source) —Java / JDBC backend for ``ixmp``.
 
 :mod:`message_ix`
    Contributions not specific to *any particular MESSAGEix* model instance.
-   Additions to ``message_ix`` should be usable in any MESSAGE-scheme model.
+   Additions to this package should be usable in *any* MESSAGE-scheme model.
 
 :mod:`message_ix_models`
    Contributions to the MESSAGE-GLOBIOM family of models, including the global model, and its documentation.
 
+**Register** a GitHub account, if you do not already have one.
 
-2. Fork, branch, and open a pull request
-----------------------------------------
+**Choose** either a fork of the given repository (under your own GitHub account), or repository itself.
 
-Register a Github account, if you do not already have one.
-Fork the chosen repository to your own Github account.
+- IIASA staff and core contributors with ‘Write’ permissions on **may** use branches within the main repositories.
+  In some cases, these simplify testing and continuous integration checks.
+- All others, and core contributors in all others cases, **should** use forks.
+
+2. Create a branch and add commits
+----------------------------------
+
 Create a branch with an appropriate name:
 
-- ``all-lower-case-with-hyphens`` —underscores (``_``) are slower to type; don't use them.
-- ``issue/1234`` if you are addressing a specific issue.
-- ``feature/do-something`` if you are adding a new feature.
-- Don't use the ``main`` branch in your fork for a PR.
-  This makes it hard for others to check out and play with your code.
+- **Use** `'kebab case' <https://en.wikipedia.org/wiki/Letter_case#Kebab_case>`__ ``all-lower-case-with-hyphens``.
+  Underscores (``_``) and capital letters are slower to type; don't use them.
+- **Use** prefixes as appropriate:
 
-Open a PR (e.g. on `message_ix`__) to merge your code into the ``main`` branch.
-The ``message_ix`` and ``ixmp`` repositories each have a template for the text of the PR that is designed to help you write a clear description.
-It includes:
+  - If you are addressing or closing a specific issue: ``issue/1234``.
+  - If you are adding an entirely new feature: ``enh/do-something`` or ``feature/do-something``.
+  - If you are developing for a particular :mod:`message_ix_models` project: ``project/abc``.
+    For projects that have many PRs and branches over time, **use** a suffix as well, for instance with the year, month, or week: ``project/abc/2025-w14``.
+- **Do not** use the ``main`` branch in your fork for a PR.
+  This makes it difficult for others to check out, use, and contribute to your code.
+
+**Push** the branch to the main repository or your fork.
+
+3. Open a pull request
+----------------------
+
+- Open a pull request (e.g. on `message_ix`__) to merge your code into the ``main`` branch or other target branch.
+- **Assign** yourself and/or anyone else who will actually commit changes to the PR branch,
+  or be actively involved in discussing/designing the code.
+- **Choose** the `'draft'`__ status if the code on the branch is not yet complete and ready for review.
+  (Developing code in draft PRs is good development practice:
+  it ensures the automatic checks pass as you add to the code on your branch.)
+- **Apply** any appropriate labels.
+  If a PR is to close or address an issue, these labels **should** match the ones on the issue.
 
 __ https://github.com/iiasa/message_ix/pulls
-
-- A title and one-sentence summary of the change.
-  This is like the abstract of a publication: it should help a developer/reviewer/user quickly learn what the PR is about.
-- Confirm that unit or integration tests have been added or revised to cover the changed code, and that the tests pass (see below).
-- Confirm that documentation of the API and its usage is added or revised as necessary.
-- Add a line to :file:`RELEASE_NOTES.rst` describing the changes (use the same title or one-sentence summary as above) and linking to the PR.
-
-Optionally:
-
-- Assign yourself and anyone else who will actually commit changes to the PR branch, or be actively involved in discussing/designing the code.
-- Include a longer description of the design, or any changes whose purpose is not clear by inspecting code.
-- Put “WIP:” or the construction sign Unicode character (🚧) at the start of the PR title to indicate “work in progress” while you continue to add commits;
-  or use GitHub's `'draft' pull requests`__ feature.
-  This is good development practice: it ensures the automatic checks pass as you add to the code on your branch.
-
 __ https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests#draft-pull-requests
 
+.. _pr-template:
+
+3a. Use the template to write the PR description
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The repository contains a template for the pull request description that is designed to help you write a clear one.
+You **should** write this description at the moment you open a PR:
+it is useful even before code is started/finished as an expression of the intended scope of the PR.
+Failing this, **write** "TBA" ("To Be Added") or a similar placeholder where needed.
+In any case, **complete** the description before requesting review or taking the PR out of draft state (step (5) below).
+
+The template contains in-line comments (``<!-- like this -->``) with instructions that **should** be removed as you complete them.
+The "PR checklist" section and its individual items **must not** be removed.
+If an item is not relevant for your PR, **strike** it out partly or fully and **append** text to explain.
+For example:
+
+.. code-block:: rst
+
+   - [ ] ~Add or expand tests;~ coverage checks both ✅
+
+This indicates that there were no tests added or changed—perhaps because no code was changed—but the coverage checks still pass.
+
+.. code-block:: rst
+
+  - ~Add, expand, or update documentation.~ N/A, bug fix
+  - [x] Update release notes.
+
+This indicates that the documentation was not changed, because a bug fix changed the code to *match* the documented behaviour.
+However, the bugfix PR itself was added to the release notes.
 
 .. _ci-workflows:
 
-1. Ensure checks pass
+4. Ensure checks pass
 ---------------------
 
-|MESSAGEix| has several kinds of automatic, or *continuous integration*, checks:
+|MESSAGEix| has several kinds of automatic, or *continuous integration*, checks.
+Other repositories may have fewer or more checks.
 
 - The `CLA Assistant <https://github.com/cla-assistant/>`_ ensures you have signed the :doc:`contrib/cla` (follow link for text).
   All contributors are required to sign the CLA before any pull request can be reviewed.
@@ -123,15 +159,10 @@ __ https://help.github.com/en/github/collaborating-with-issues-and-pull-requests
 
   pytest
      This workflow runs all Python and R tests; on Linux, macOS, and Windows; and for multiple versions of Python.
-
-     It also:
-
-     - Checks that the documentation can be built without fatal errors.
-     - Checks that the `code style`_ is applied.
+     It also checks that the `code style`_ is applied.
 
   publish
      This workflow checks that the Python package (for upload to PyPI) can be built cleanly and without errors.
-
      The package is not actually uploaded, unless this workflow is started from a release candidate tag or on the creation of a new release on GitHub.
 
   nightly
@@ -144,30 +175,31 @@ __ https://help.github.com/en/github/collaborating-with-issues-and-pull-requests
 
   anaconda, miniconda
      These workflows check that the package can be installed from conda-forge using Anaconda and Miniconda, respectively, on Windows only.
+- Two checks from `Codecov <https://codecov.io>`_ ensure that coverage of the 'patch' (changed lines in the PR) is above a given threshold (the average of all other code in the package),
+  and that coverage of the overall package does not decrease.
+- ReadTheDocs automatically builds a preview version of the documentation, including any changes on the PR branch.
+  You **may** also build and view the HTML documentation on your machine to confirm that the generated HTML is as intended and conforms to the :ref:`doc-style` style.
 
-Resolve any non-passing checks—seeking help if needed.
+**Resolve** any non-passing checks.
 
-If your PR updates the documentation, the ``lint`` check will confirm that it can be built.
-However, you should also *manually* build and view the HTML documentation on your machine to confirm that the generated HTML is as expected,
-and address any warnings generated by Sphinx during the build phase.
-See ``doc/README.rst``.
+**Ask for help** if needed.
 
-
-4. Review
+5. Review
 ---------
 
-Using the GitHub sidebar on your PR, request a review from another |MESSAGEix| contributor.
+Using the GitHub sidebar on your PR, **request** review from another |MESSAGEix| contributor.
 GitHub suggests reviewers; optionally, contact the IIASA ECE Program to ask who should review your code.
 
 - If you want them to follow along with progress, tag them in the PR description, like “FYI @Alice @Bob”.
-- Only formally request review once the code is ready to review.
+- Per (3a) above, **complete** the "How to review" section of the PR template so that reviewers can understand what they should look at,
+  tasks they should perform, etc.
+- **Do not** request review until the code is ready to review.
   Doing this sends e-mail and other notifications (e.g. in Slack, the “Pull Reminders” bot sends notices every day).
-  If the code is not yet complete and ready for review, these notifications are noise.
+  If the code is not yet complete and ready for review, these notifications are noise, and the colleague may be confused as to what they should do.
 
-Address any comments raised by the reviewer.
+**Address** any comments raised by the reviewer(s).
 
-
-5. Merge
+6. Merge
 --------
 
 GitHub provides `three ways to incorporate a pull request`__: merge, rebase, and squash.
@@ -187,10 +219,10 @@ Current practice for the ``ixmp``, ``message_ix``, and ``message_data`` reposito
 
 - Use **merge pull request** (also written “create a merge commit”) in all other cases.
 
-  PR branches *should* be rebased on the HEAD of ``main`` before merging.
+  PR branches **must** be rebased on the HEAD of ``main`` before merging.
   This is because some git-based tools will display commits from ``main`` and the PR branch interleaved if their dates and times are mixed,
   which makes it harder to read the commit history.
-  Rebasing avoids this problem by ensuring each PR's commits are displayed together and in sequence.
+  Rebasing avoids this problem by ensuring each PR's commits are displayed in sequence.
 
 __ https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-request-merges
 
@@ -247,6 +279,8 @@ Code style
 
   - Use lower-case file names and extensions.
   - Except for Python source files, prefer hyphens to underscores.
+
+.. _doc-style:
 
 Documentation
 -------------
