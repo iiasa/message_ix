@@ -240,11 +240,11 @@ Documentation
 - Write documentation in ReStructuredText formats for:
 
   1. Python docstrings.
+     **Wrap** these at the same 88 characters as :command:`ruff` enforces for code.
   2. Documentation pages, :file:`doc/*.rst`.
   3. Inline documentation in :file:`message_ix/model/*.gms` files.
 
-  For (2) and (3), start each sentence on a new line, and do not hard-wrap within sentences.
-  For (1), wrap at the same 88 characters as :command:`ruff` enforces for code.
+  For (2) and (3), **use** `semantic line breaks <https://sembr.org>`_.
 
 - Ensure Sphinx does not give warnings about ReST syntax for new or modified documentation.
 
