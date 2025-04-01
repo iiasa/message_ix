@@ -77,7 +77,7 @@ Decide which part of the |MESSAGEix| software stack is the appropriate location 
 
 - IIASA staff and core contributors with ‘Write’ permissions on **may** use branches within the main repositories.
   In some cases, these simplify testing and continuous integration checks.
-- All others, and core contributors in all others cases, **should** use forks.
+- All others, and core contributors in all other cases, **should** use forks.
 
 2. Create a branch and add commits
 ----------------------------------
@@ -107,7 +107,8 @@ Create a branch with an appropriate name:
   (Developing code in draft PRs is good development practice:
   it ensures the automatic checks pass as you add to the code on your branch.)
 - **Apply** any appropriate labels.
-  If a PR is to close or address an issue, these labels **should** match the ones on the issue.
+  If a PR is to close or address an issue,
+  these labels **should** match the ones on the issue.
 
 __ https://github.com/iiasa/message_ix/pulls
 __ https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests#draft-pull-requests
@@ -169,7 +170,7 @@ Other repositories may have fewer or more checks.
      These tests run daily at 05:00 UTC.
      They download a particular package of full-scale, MESSAGEix-GLOBIOM global model scenarios from IIASA servers.
      Each scenario's outputs are compared to an expected value listed in :file:`message_ix/tests/data/scenarios.yaml`.
-     PRs that touch the GAMS code may cause the these objective function values to change;
+     PRs that touch the GAMS code may cause the objective function values to change;
      the values **must** be updated as part of such PRs.
      See the comments in the file for how to temporarily enable these checks for every commit on a PR branch.
 
@@ -195,7 +196,9 @@ GitHub suggests reviewers; optionally, contact the IIASA ECE Program to ask who 
   tasks they should perform, etc.
 - **Do not** request review until the code is ready to review.
   Doing this sends e-mail and other notifications (e.g. in Slack, the “Pull Reminders” bot sends notices every day).
-  If the code is not yet complete and ready for review, these notifications are noise, and the colleague may be confused as to what they should do.
+  If the code is not yet complete and ready for review,
+  these notifications are noise,
+  and the colleague may be confused as to what they should do.
 
 **Address** any comments raised by the reviewer(s).
 
@@ -250,9 +253,10 @@ Code style
   - **Add** type hints to new or changed functions, methods, and global variables.
     **Check** these using the `mypy <https://mypy.readthedocs.io>`_ static type checker.
 
-  To simplify the use of ruff and mypy, it is **recommended** to:
+  To simplify the use of ruff and mypy,
+  it is **recommended** to:
 
-  - Configure these run automatically within your code editor using an extension, plugin, or script.
+  - Configure these to run automatically within your code editor using an extension, plugin, or script.
     See their respective documentation for links and details.
     These extensions help apply the code style every time a file is saved, or even as you type.
   - Configure `pre-commit <https://pre-commit.com>`_ to invoke these and other checks every time you do a :program:`git commit`.
