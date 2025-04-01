@@ -119,7 +119,7 @@ __ https://help.github.com/en/github/collaborating-with-issues-and-pull-requests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The repository contains a template for the pull request description that is designed to help you write a clear one.
-You **should** write this description at the moment you open a PR:
+You **should** write at least a tentative description at the moment you open a PR:
 it is useful even before code is started/finished as an expression of the intended scope of the PR.
 Failing this, **write** "TBA" ("To Be Added") or a similar placeholder where needed.
 In any case, **complete** the description before requesting review or taking the PR out of draft state (step (5) below).
@@ -142,6 +142,9 @@ This indicates that there were no tests added or changed—perhaps because no co
 
 This indicates that the documentation was not changed, because a bug fix changed the code to *match* the documented behaviour.
 However, the bugfix PR itself was added to the release notes.
+
+**Revise** the description if the scope or goals of the PR change,
+so that it remains up-to-date and useful for understanding the branch contents.
 
 .. _ci-workflows:
 
