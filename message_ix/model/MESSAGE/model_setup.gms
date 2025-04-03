@@ -21,6 +21,12 @@ $IF NOT SET out      $SETGLOBAL out "output/MsgOutput.gdx"
 * rolling horizon (period-by-period, recursive-dynamic with limited foresight - 'number of years of foresight'
 $IF NOT SET foresight   $SETGLOBAL foresight "0"
 
+* Model commodity flows associated with CAP and CAP_NEW. This can take one of 2 values:
+*
+* - "0": solve without these commodity flows.
+* - "1": solve with these commodity flows.
+$IF NOT SET MESSAGE_CAP_COMM $SETGLOBAL MESSAGE_CAP_COMM "0"
+
 ** specify optional additional calibration output **
 $IF NOT SET calibration $SETGLOBAL calibration ""
 * mark with * to include detailed calibration information in outputs and get an extended GAMS listing (.lst) file
