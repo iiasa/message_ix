@@ -260,6 +260,14 @@ Model classes
    :exclude-members: items
    :show-inheritance:
 
+   The MACRO class solves only the MACRO model in “standalone” mode—that is, without MESSAGE.
+   It is also invoked from :class:`.MESSAGE_MACRO` to process *model_options* to control the behaviour of MACRO:
+
+   - **concurrent** (:class:`int` or :class:`float`, either :py:`0` or :py:`1`).
+     This corresponds to the GAMS compile-time variable ``MACRO_CONCURRENT``.
+     If set to :py:`0` (the default), MACRO is solved in a loop, once for each node in the Scenario.
+     If set to :py:`1`, MACRO is solved only once, for all nodes simultaneously.
+
    .. autoattribute:: items
       :no-value:
 
