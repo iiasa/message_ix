@@ -23,12 +23,13 @@ from .scenario_data import (
 
 log = logging.getLogger(__name__)
 
+
+# NOTE This is currently not in use because we don't use scenario_data for this, but
+# models.py. We may want to keep something like below's function should that change.
 # TODO If this is writing every single addition to the DB, the following is slow. Could
 # we tell sqlalchemy to only commit to the DB at the end of this function?
-
-
 def set_up_scenario(scenario: "Scenario") -> None:
-    """Create all optimization items required by MESSAGEix.
+    """Create all optimization items required by MESSAGEix in `scenario`.
 
     (According to ixmp_source.)
     """
@@ -161,7 +162,7 @@ def compose_dimension_map(
 ) -> None:
     """Add data to dimension maps.
 
-    This covers assignDisaggregationMaps() from ixmp_source.
+    This covers `assignDisaggregationMaps()` from ixmp_source.
 
     Parameters
     ----------
@@ -294,9 +295,9 @@ def _maybe_add_to_parameter(
 
 
 def compose_period_map(scenario: "Scenario") -> None:
-    """Add data to the `duration_period` Parameter in `scenario`.
+    """Add data to the 'duration_period' Parameter in `scenario`.
 
-    This covers assignPeriodMaps() from ixmp_source.
+    This covers `assignPeriodMaps()` from ixmp_source.
     """
     # NOTE this assumes an IXMP4Backend
     # Get the Run associated with the Scenario
@@ -370,7 +371,7 @@ def compose_period_map(scenario: "Scenario") -> None:
 
 
 def check_existence_of_units(platform: Platform, data: pd.DataFrame) -> None:
-    """Check if all units requested for use exist on the Platform.
+    """Check if all units requested for use in `data` exist on the `platform`.
 
     Create them if they don't exist, but warn that this will be disabled in the future.
 
@@ -378,16 +379,8 @@ def check_existence_of_units(platform: Platform, data: pd.DataFrame) -> None:
     ----------
     platform : ixmp.Platform
         The platform to check.
-    units_to_warn_about : list[str]
-        The list of unit names that are expected for historical reasons and have not
-        been checked before.
     data : pd.DataFrame
         The data containing the requested units.
-
-    Returns
-    -------
-    list[str]
-        The units_to_warn_about minus the ones that were checked.
     """
     # Handle singular and plural form; could there be others?
     try:
