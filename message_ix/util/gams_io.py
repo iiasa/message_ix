@@ -311,7 +311,7 @@ def add_auxiliary_items_to_container_data_list(
     stocks = scenario.set(name="level_stocks")
     resource_grade_map = _compose_resource_grade_map(scenario=scenario)
 
-    helpers = HELPER_INDEXSETS
+    helpers = HELPER_INDEXSETS.copy()
     helpers.extend(HELPER_TABLES)
 
     for item_info in helpers:
