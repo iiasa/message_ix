@@ -40,7 +40,7 @@ MESSAGE_IX_VERSION: dict[str, Union[list[float], list[int], list[str]]] = {
 
 
 def store_message_version(container_data: list[ContainerData]) -> None:
-    """Store `MESSAGE_ix_version` in `container_data` for validation by GAMS."""
+    """Store 'MESSAGE_ix_version' in `container_data` for validation by GAMS."""
     # Add a helper IndexSet
     container_data.append(
         ContainerData(
