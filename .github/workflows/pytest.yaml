@@ -2,11 +2,11 @@ name: Tests
 
 on:
   # Uncomment this entry only to debug the workflow
-  # pull_request:
-  #   branches: [ main ]
-  pull_request_target:
+  pull_request:
     branches: [ main ]
-    types: [ labeled, opened, reopened, synchronize ]
+  # pull_request_target:
+  #   branches: [ main ]
+  #   types: [ labeled, opened, reopened, synchronize ]
   # 05:00 UTC = 06:00 CET = 07:00 CEST
   schedule:
   - cron: "0 5 * * *"
@@ -115,7 +115,7 @@ jobs:
       # other code, e.g. other branches for open PRs), temporarily edit as
       # appropriate. DO NOT merge such changes to `main`.
       run: |
-        uv pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
+        uv pip install --upgrade "ixmp[ixmp4] @ git+https://github.com/iiasa/ixmp.git@enh/ixmp4-enable-westeros-baseline-completely"
         uv pip install .[tests]
 
     - name: Run test suite using pytest
@@ -194,7 +194,7 @@ jobs:
       # other code, e.g. other branches for open PRs), temporarily edit as
       # appropriate. DO NOT merge such changes to `main`.
       run: |
-        uv pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
+        uv pip install --upgrade "ixmp[ixmp4] @ git+https://github.com/iiasa/ixmp.git@enh/ixmp4-enable-westeros-baseline-completely"
         uv pip install .[tests]
 
     - name: Install R dependencies and tutorial requirements
