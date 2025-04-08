@@ -1,5 +1,5 @@
 import logging
-from typing import TYPE_CHECKING, Literal, TypeVar, cast
+from typing import TYPE_CHECKING, Any, Literal, TypeVar, Union, cast
 
 import pandas as pd
 
@@ -8,6 +8,7 @@ if TYPE_CHECKING:
 
 from ixmp import Platform
 from ixmp4 import Run
+from ixmp4.core import IndexSet, Parameter, Table
 
 from .scenario_data import (
     DEFAULT_INDEXSET_DATA,
@@ -80,25 +81,37 @@ def add_default_data(scenario: "Scenario") -> None:
 
     # Add IndexSet data
     for indexset_data_info in DEFAULT_INDEXSET_DATA:
-        run.optimization.indexsets.get(name=indexset_data_info.name).add(
-            data=indexset_data_info.data
-        )
+        indexset = run.optimization.indexsets.get(name=indexset_data_info.name)
+
+        # Only add default data if they are missing
+        # NOTE this works because all DEFAULT_INDEXSET_DATA items have str-type data
+        if missing := set(indexset_data_info.data) - set(
+            cast(list[str], indexset.data)
+        ):
+            indexset.add(data=list(missing))
 
     # Add Table data
     for table_data_info in DEFAULT_TABLE_DATA:
-        run.optimization.tables.get(name=table_data_info.name).add(
-            data=table_data_info.data
-        )
+        table = run.optimization.tables.get(name=table_data_info.name)
+
+        # Only add default data if they are missing
+        # NOTE this works because all DEFAULT_TABLE_DATA items have just one row
+        if not pd.DataFrame(table_data_info.data).isin(table.data).all(axis=None):
+            table.add(data=table_data_info.data)
 
     # Add Parameter data
     for parameter_data_info in DEFAULT_PARAMETER_DATA:
+        parameter_df = pd.DataFrame(parameter_data_info.data)
+
         # NOTE parameter_data_info.data *must* contain a 'unit' column
-        check_existence_of_units(
-            platform=scenario.platform, data=pd.DataFrame(parameter_data_info.data)
-        )
-        run.optimization.parameters.get(name=parameter_data_info.name).add(
-            data=parameter_data_info.data
-        )
+        check_existence_of_units(platform=scenario.platform, data=parameter_df)
+
+        parameter = run.optimization.parameters.get(name=parameter_data_info.name)
+
+        # Only add default data if they are missing
+        # NOTE this works because all DEFAULT_PARAMETER_DATA items have just one row
+        if not parameter_df.isin(parameter.data).all(axis=None):
+            parameter.add(data=parameter_data_info.data)
 
 
 # TODO Should this really be a ValueError?
@@ -124,6 +137,23 @@ def ensure_required_indexsets_have_data(scenario: "Scenario") -> None:
         # NOTE this is prone to failure should ixmp4 make indexset.data optional
         if indexset.data == []:
             raise ValueError(f"The required IndexSet {name} is empty!")
+
+
+def _maybe_add_to_table(
+    table: Table, data: Union[dict[str, Any], pd.DataFrame]
+) -> None:
+    """Add (parts of) `data` to `table` if they are missing."""
+    # NOTE This function doesn't handle empty data as internally, this won't happen
+
+    # Convert to DataFrame for subsequent logic
+    if isinstance(data, dict):
+        data = pd.DataFrame(data)
+
+    # Keep only rows that don't already exist
+    new_data = data[~data.isin(table.data).all(axis=1)]
+
+    # Add new rows to table data
+    table.add(data=new_data)
 
 
 def compose_dimension_map(
@@ -180,7 +210,6 @@ def compose_dimension_map(
         _descendants: list[T] = []
         base = grouped.get_group(parent)
         if len(base) == 1:
-            # descendants.append(parent)
             pass
         else:
             for _dim in base[base[f"{dimension}"] != base[f"{dimension}_parent"]][
@@ -203,8 +232,65 @@ def compose_dimension_map(
             descendant_data[f"{dimension}"].extend(descendants)
             descendant_data[f"{dimension}_parent"].extend([dim] * number)
 
-    # Add map_{dimension} data after merging descendant data to original map
-    map_parameter.add(data=data.merge(pd.DataFrame(descendant_data), how="outer"))
+    # Merge descendant data to original map
+    new_map_df = data.merge(pd.DataFrame(descendant_data), how="outer")
+
+    # Add new rows to map_{dimension} data
+    _maybe_add_to_table(table=map_parameter, data=new_map_df)
+
+
+def _maybe_add_single_item_to_indexset(
+    indexset: IndexSet, data: Union[float, int, str]
+) -> None:
+    """Add `data` to `indexset` if it is missing."""
+    if data not in list(indexset.data):
+        indexset.add(data=data)
+
+
+def _maybe_add_list_to_indexset(
+    indexset: IndexSet, data: Union[list[float], list[int], list[str]]
+) -> None:
+    """Add missing parts of `data` to `indexset`."""
+    # NOTE missing will always only have one type, but how to tell mypy?
+    # NOTE mypy recognizes missing as set[float | str]. If int indexsets mysteriously
+    # turn to float indexsets, look here
+    if missing := set(data) - set(indexset.data):
+        indexset.add(list(missing))  # type: ignore[arg-type]
+
+
+def _maybe_add_to_indexset(
+    indexset: IndexSet, data: Union[float, int, str, list[float], list[int], list[str]]
+) -> None:
+    """Add (parts of) `data` to `indexset` if they are missing."""
+    # NOTE This function doesn't handle empty data as internally, this won't happen
+    if not isinstance(data, list):
+        _maybe_add_single_item_to_indexset(indexset=indexset, data=data)
+    else:
+        _maybe_add_list_to_indexset(indexset=indexset, data=data)
+
+
+# NOTE this could be combined with `_maybe_add_to_table()`, but that function would be
+# slower than necessary (though likely not by much). Is the maintenance effort worth it?
+def _maybe_add_to_parameter(
+    parameter: Parameter, data: Union[dict[str, Any], pd.DataFrame]
+) -> None:
+    """Add (parts of) `data` to `parameter` if they are missing."""
+    # NOTE This function doesn't handle empty data as internally, this won't happen
+
+    # Convert to DataFrame for subsequent logic
+    if isinstance(data, dict):
+        data = pd.DataFrame(data)
+
+    # Only compare entries of specific columns (not of `values` and `units`)
+    columns = parameter.column_names or parameter.indexsets
+
+    # Keep only rows that don't already exist
+    new_data = data[
+        ~data[columns].isin(pd.DataFrame(parameter.data)[columns]).all(axis=1)
+    ]
+
+    # Add new rows to table data
+    parameter.add(data=new_data)
 
 
 def compose_period_map(scenario: "Scenario") -> None:
@@ -219,7 +305,7 @@ def compose_period_map(scenario: "Scenario") -> None:
     # TODO Included here in ixmp_source; this should likely move to add_default_data
     # Add one default item to 'type_year'
     type_year = run.optimization.indexsets.get(name="type_year")
-    type_year.add("cumulative")
+    _maybe_add_to_indexset(indexset=type_year, data="cumulative")
 
     cat_year = run.optimization.tables.get(name="cat_year")
     cat_year_df = pd.DataFrame(cat_year.data)
@@ -256,8 +342,11 @@ def compose_period_map(scenario: "Scenario") -> None:
     for y in sorted_years:
         if first_model_year is None or first_model_year <= y:
             y_str = str(y)
-            type_year.add(y_str)
-            cat_year.add({"type_year": ["cumulative", y_str], "year": [y_str, y_str]})
+            _maybe_add_to_indexset(indexset=type_year, data=y_str)
+            _maybe_add_to_table(
+                table=cat_year,
+                data={"type_year": ["cumulative", y_str], "year": [y_str, y_str]},
+            )
 
     # Initialize duration_period with this data
     duration_period = run.optimization.parameters.get(name="duration_period")
@@ -270,12 +359,13 @@ def compose_period_map(scenario: "Scenario") -> None:
     durations[0] = durations[1] if len(sorted_years) > 1 else 1
 
     # Add data to `duration_period`
-    duration_period.add(
+    _maybe_add_to_parameter(
+        parameter=duration_period,
         data={
             "year": [str(y) for y in sorted_years],
             "values": durations,
             "units": ["y"] * len(sorted_years),
-        }
+        },
     )
 
 
