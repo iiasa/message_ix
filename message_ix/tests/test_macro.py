@@ -200,28 +200,26 @@ def test_calc(westeros_solved, w_data_path, key, test, expected) -> None:
     assertion(c.get(key).values, expected)
 
 
-# Testing how macro handles zero values in PRICE_COMMODITY
-def test_calc_price_zero(westeros_solved, w_data_path):
-    clone = westeros_solved.clone(scenario="low_demand", keep_solution=False)
-    clone.check_out()
-    # Lowering demand in the first year
-    clone.add_par("demand", ["Westeros", "light", "useful", 700, "year"], 10, "GWa")
-    # Making investment and var cost zero for delivering light
-    # TODO: these units are based on testing.make_westeros: needs improvement
-    clone.add_par("inv_cost", ["Westeros", "bulb", 700], 0, "USD/GWa")
-    for y in [690, 700]:
-        clone.add_par(
-            "var_cost", ["Westeros", "grid", y, 700, "standard", "year"], 0, "USD/GWa"
-        )
+def test_calc_price_zero(westeros_not_solved: Scenario, w_data_path) -> None:
+    """MACRO raises an exception for zero values in PRICE_COMMODITY."""
+    # Prepare a Scenario
+    s = westeros_not_solved
+    y = list(s.set("year"))
+    yv = y[: y.index(720)]
 
-    clone.commit("demand reduced and zero cost for bulb")
-    clone.solve()
-    price = clone.var("PRICE_COMMODITY")
+    # Set costs to zero for technologies possibly active in the first period
+    filters = dict(technology=["bulb", "coal_ppl", "grid", "wind_ppl"], year_vtg=yv)
+    with s.transact("test_calc_price_zero"):
+        for name in "fix_cost", "inv_cost", "var_cost":
+            s.add_par(name, s.par(name, filters=filters).assign(value=0))
 
-    # Assert if there is no zero price (to make sure MACRO receives 0 price)
-    assert np.isclose(0, price["lvl"]).any()
+    s.solve()
 
-    c = macro.prepare_computer(clone, data=w_data_path)
+    # Confirm that there are zeroes in PRICE_COMMODITY to trigger the exception
+    pc = s.var("PRICE_COMMODITY")
+    assert np.isclose(0, pc["lvl"]).any(), f"No zero values in:\n{pc.to_string()}"
+
+    c = macro.prepare_computer(s, data=w_data_path)
     with pytest.raises(Exception, match="0-price found in MESSAGE variable PRICE_"):
         c.get("price_MESSAGE")
 
