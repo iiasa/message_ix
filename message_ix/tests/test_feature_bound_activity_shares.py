@@ -287,6 +287,35 @@ def test_commodity_share_up(test_mp, request, testrun_uid):
     new_obj = clone2.var("OBJ")["lvl"]
     assert new_obj >= orig_obj
 
+    # add emissions factor and check the emissions equivalence function
+    clone4 = clone.clone(
+        scenario=f"{scen.scenario}-{testrun_uid} share_and_emiss",
+        keep_solution=False,
+    )
+    with clone4.transact("Add emission factor"):
+        clone4.add_set("emission", "emiss")
+        clone4.add_cat("emission", "emiss_type", "emiss")
+        tec_specs = [
+            "seattle",
+            "canning_plant",
+            _year,
+            _year,
+            "production",
+        ]
+        dict_em_factor = {"canning_plant": 1.5}
+        clone4.add_par(
+            "emission_factor",
+            tec_specs + ["emiss"],
+            dict_em_factor["canning_plant"],
+            "kg/kWa",
+        )
+    clone4.solve(quiet=True)
+    # check EMISSION_EQUIVALENCE does not have the type_tec == "share"
+    obs4 = clone4.var("EMISS")["type_tec"]
+    assert not obs4.isin(
+        ["share", "total"]
+    ).any(), "EMISSION_EQUIVALENCE has type_tec == 'share' or 'total'"
+
 
 def test_commodity_share_lo(test_mp, request, testrun_uid):
     scen = make_dantzig(test_mp, request=request, solve=True, quiet=True)
