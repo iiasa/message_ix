@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 from message_ix import Scenario, make_df
+from message_ix.testing import make_westeros
 
 if TYPE_CHECKING:
     from ixmp import Platform
@@ -81,3 +82,44 @@ def test_gh_923(request, gh_923_scenario: Scenario, tl_value: list[int]) -> None
 
     # for name in "ACT", "CAP", "CAP_NEW":  # DEBUG
     #     print(name, s.var(name).to_string(), sep="\n", end="\n\n")
+
+
+@pytest.mark.parametrize(
+    "year_vtg, active_historical_techs",
+    (
+        pytest.param([690], {"coal_ppl", "wind_ppl", "grid"}, id="A"),
+        pytest.param([690, 700], set(), id="B"),
+    ),
+)
+def test_historical_new_capacity(
+    test_mp, request, year_vtg: list[int], active_historical_techs: set[str]
+) -> None:
+    """Test MESSAGE choice between ``historical_new_capacity`` and ``CAP_NEW``.
+
+    This test exists to confirm behaviour prior to :pull:`924` is not altered by the
+    change to ``map_tec_lifetime`` in that pull request.
+
+    In particular, when both historical (y=690) and in-model (y=700) vintages of a
+    technology have zero costs (case ‘B’), the model chooses to use the later vintage
+    and *not* to use existing historical capacity. This is because constructing a larger
+    amount of year_vtg=700 allows it to be used in year_act=710, which reduces overall
+    system cost.
+    """
+    s = make_westeros(test_mp, model_horizon=[700, 710, 720], request=request)
+
+    with s.transact(""):
+        # Reduce demand to a low magnitude that can be supplied with historical capacity
+        s.add_par("demand", s.par("demand").assign(value=1.0))
+
+        # Reduce all costs to zero for periods `year_vtg`
+        filters = dict(year_vtg=year_vtg)
+        for name in "fix_cost", "inv_cost", "var_cost":
+            s.add_par(name, s.par(name, filters=filters).assign(value=0.0))
+
+    s.solve()
+
+    # Identify technologies from the historical period that are active (i.e. within the
+    # model horizon); compare these to the expected set
+    assert active_historical_techs == set(
+        s.var("ACT").query("year_vtg == 690 and lvl > 1e-7").technology
+    )
