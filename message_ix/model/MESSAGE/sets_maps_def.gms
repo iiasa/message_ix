@@ -368,8 +368,24 @@ Sets
 *    * - map_time_commodity_storage(node,tec,level,commodity,mode,year_all,time)
 *      - Mapping of storage containers to their input commodity-level (not commodity-level of stored media)
 *
-* Some mapping sets are omitted from this table;
+* .. _map_tec_lifetime:
+*
+* map_tec_lifetime (dimensions :math:`n, t, y^V, y^A`)
+*    A particular combination :math:`(n, t, y^V, y^A)` is part of this set
+*    (that is, has value :any:`True` / ``yes``)
+*    if and only if capacity constructed in period |yV| may be active in |yA|.
+*    This requires that:
+*
+*    - :math:`y^V \leq y^A`, and
+*    - :math:`\tl_{n, t, y^V}` is greater than the sum of :math:`\dp_{y}` from |yV| to the period *before* |yA|, inclusive.
+*
+*    For historical periods (:math:`y^V \lt y_0`),
+*    map_tec_lifetime is only populated
+*    if there are corresponding entries in |historical_new_capacity|.
+*
+* Some mapping sets are omitted from this table and list;
 * for a complete list, see the file :file:`MESSAGE/sets_maps_def.gms`.
+*
 ***
 
 Sets

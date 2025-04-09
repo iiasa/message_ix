@@ -66,6 +66,12 @@ rst_prolog = r"""
 .. |IIASA| raw:: html
 
    <abbr title="International Institute for Applied Systems Analysis">IIASA</abbr>
+
+.. |yA| replace:: :math:`y^A`
+.. |yV| replace:: :math:`y^V`
+
+.. |historical_new_capacity| replace:: :ref:`historical_new_capacity <historical_new_capacity>`
+.. |map_tec_lifetime| replace:: :ref:`map_tec_lifetime <map_tec_lifetime>`
 """  # noqa: E501
 
 
@@ -199,20 +205,30 @@ intersphinx_mapping = {
 # TODO read at least some of these from message_ix.models
 # TODO complete list
 # TODO also add these to a LaTeX preamble
-text_macros = """ACT
+macros = {}
+macros.update(
+    {
+        k.replace("_", ""): r"\text{{{k}}}"
+        for k in """ACT
 STORAGE
 STORAGE_CHARGE
 duration_time_rel
 input
 map_time_commodity_storage
 storage_initial
-storage_self_discharge"""
-
-mathjax3_config = dict(
-    tex=dict(
-        macros={k.replace("_", ""): r"\text{" + k + "}" for k in text_macros.split()},
-    ),
+storage_self_discharge""".split()
+    }
 )
+macros.update(
+    {
+        "dp": r"\text{duration_period}",
+        "hnc": r"\text{historical_new_capacity}",
+        "mtl": r"\text{map_tec_lifetime}",
+        "tl": r"\text{technical_lifetime}",
+    }
+)
+
+mathjax3_config = dict(tex=dict(macros=macros))
 
 # -- Options for sphinx.ext.napoleon ---------------------------------------------------
 
