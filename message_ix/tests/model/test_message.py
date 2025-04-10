@@ -1,9 +1,12 @@
 from collections.abc import Generator
 from typing import TYPE_CHECKING
 
+import numpy.testing as npt
+import pandas as pd
+import pandas.testing as pdt
 import pytest
 
-from message_ix import Scenario, make_df
+from message_ix import ModelError, Scenario, make_df
 from message_ix.testing import make_westeros
 
 if TYPE_CHECKING:
@@ -123,3 +126,58 @@ def test_historical_new_capacity(
     assert active_historical_techs == set(
         s.var("ACT").query("year_vtg == 690 and lvl > 1e-7").technology
     )
+
+
+def test_soft_activity_up(request, test_mp):
+    """Test function of parameter ``soft_activity_up``.
+
+    This test was rewritten as part of :pull:`924` to confirm that behaviour was not
+    altered by the change to ``map_tec_lifetime`` in that pull request.
+    """
+    s = make_westeros(test_mp, solve=True, request=request)
+
+    # Record variable values prior to changes
+    OBJ_pre = s.var("OBJ")["lvl"]
+    ACT_pre = s.var("ACT")
+
+    n = "Westeros"
+    common = dict(node=n, technology="coal_ppl", time="year")
+
+    # Reduce dynamic constraint from 10% to 5% → scenario is infeasible
+    s.remove_solution()
+    with s.transact(""):
+        gau = "growth_activity_up"
+        s.add_par(gau, s.par(gau).eval("value = value / 2"))
+    with pytest.raises(ModelError):
+        s.solve()
+
+    # Add values to soft_activity_up → scenario is again feasible
+    with s.transact(""):
+        sau = "soft_activity_up"
+        data = make_df(sau, **common, node_loc=n, year_act=700, value=0.7, unit="-")
+        s.add_par(sau, data)
+    s.solve(var_list=["ACT_UP"])
+
+    # Equation ACTIVITY_SOFT_CONSTRAINT_UP is active, thus the ACT_UP variable used on
+    # its LHS is populated and has values equal to the historical activity of coal_ppl
+    ha = s.par("historical_activity", filters=dict(technology="coal_ppl"))
+    exp = pd.DataFrame(common | dict(year=[700], lvl=ha.at[0, "value"], mrg=[0.0]))
+    pdt.assert_frame_equal(exp, s.var("ACT_UP"), check_like=True, check_dtype=False)
+
+    # The objective function value is reduced by a specific amount
+    npt.assert_allclose(s.var("OBJ")["lvl"] - OBJ_pre, -1578.125)
+
+    # - Merge resulting ACT with data prior to changes.
+    # - Compute differences in lvl.
+    # - Select rows with non-zero differences.
+    dims = ["node_loc", "technology", "year_vtg", "year_act", "mode", "time"]
+    df = (
+        ACT_pre.merge(s.var("ACT"), on=dims)
+        .eval("change = lvl_y - lvl_x")
+        .query("abs(change) > 1e-7")
+    )
+
+    # No net change in ACT
+    npt.assert_allclose(df["change"].sum(), 0.0, atol=1e-7, rtol=0)
+    # Activity of wind_ppl decreases in every period (coal_ppl increases)
+    assert (df.query("technology == 'wind_ppl'")["change"] < 0.0).all()
