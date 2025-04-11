@@ -1,6 +1,7 @@
 from collections.abc import Generator
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
+import numpy as np
 import numpy.testing as npt
 import pandas as pd
 import pandas.testing as pdt
@@ -90,78 +91,95 @@ def test_gh_923(request, gh_923_scenario: Scenario, tl_value: list[int]) -> None
 @pytest.mark.parametrize(
     "model_horizon, exp_lvl",
     [
-        [[700, 710, 715, 720], [3.746712, 4.149163, 8.731826, 9.182337]],
+        [[720], None],  # Simplest possible case: 1 model period
+        [[691, 720], None],  # 2 periods of various durations
+        [[700, 720], None],
+        [[719, 720], None],
+        # Transition from duration_period=5 to duration_period=10
         [[695, 700, 710, 720], [3.560014, 3.746712, 2.074581, 2.302091]],
+        # Transition from duration_period=10 to duration_period=5
+        [[700, 710, 715, 720], [3.746712, 4.149163, 8.731826, 9.182337]],
     ],
 )
 def test_growth_new_capacity_up(request, test_mp, model_horizon, exp_lvl) -> None:
-    """This test ensures that the correct value for "CAP_NEW" is calculated.
+    """``CAP_NEW`` is correctly constrained according to ``growth_new_capacity_up``.
 
-    This test checks that when the period length changes within the model, the parameter
-    "CAP_NEW" is correctly calculated. We check this for the transition from 10 to
-    5-year timesteps, and from 5 to 10-year timesteps. The values against which the test
-    results are being compared are based on the assumption that due to the carbon price,
-    the capacity installation of `wind_ppl` is maximized. Hence the values are derived
-    by applying the parameters of `wind_ppl` directly to the `NEW_CAPACITY_BOUND_UP`
-    equation.
+    This test adds ``tax_emission`` values and removes all constraints except
+    ``growth_new_capacity_up`` on the technology "wind_ppl", such that the model chooses
+    ``CAP_NEW`` for this technology equal to the upper bound given by
+    ``NEW_CAPACITY_CONSTRAINT_UP``. Because the total model duration and constraint
+    value are the same in all cases, ``CAP`` added within the model horizon (the
+    discrete integral of ``CAP_NEW``) is also the same.
+
+    The final two cases for `model_horizon` check for transitions from 5- to 10-year
+    periods and vice versa, as occur in MESSAGEix-GLOBIOM (:mod:`message_ix_models`).
+    The `exp_lvl` values for these cases were set in :pull:`654` by applying the
+    parameters of `wind_ppl` directly to the ``NEW_CAPACITY_BOUND_UP`` [sic] equation.
     """
 
     # Create a Westeros baseline scenario including emissions; clone to a unique URL
-    s = make_westeros(test_mp, emissions=True, model_horizon=model_horizon).clone(
-        scenario=request.node.name
+    s = make_westeros(
+        test_mp, emissions=True, model_horizon=model_horizon, request=request
     )
 
-    tax_emission = make_df(
-        "tax_emission",
-        node="Westeros",
-        type_emission="GHG",
-        type_tec="all",
-        type_year=model_horizon,
-        value=30,
-        unit="???",
-    )
-    i_n_c_u = make_df(
-        "initial_new_capacity_up",
-        node_loc="Westeros",
-        technology="wind_ppl",
-        year_vtg=model_horizon,
-        unit="GW",
+    # Retrieve historical_new_capacity for the constrained technology
+    hnc = (
+        s.par("historical_new_capacity")
+        .query("technology == 'wind_ppl' and year_vtg == 690")["value"]
+        .item()
     )
 
-    # Make changes
+    # Modify the scenario
+    n = "Westeros"
+    common = dict(node=n, node_loc=n, technology="wind_ppl", year_vtg=model_horizon)
     with s.transact("prepare for test"):
-        # Add tax_emission
-        s.add_par("tax_emission", tax_emission)
+        # Remove Westeros default dynamic constraint on ACT
+        s.remove_par("growth_activity_up", s.par("growth_activity_up"))
 
-        # Remove `coal_ppl` related growth constraint to avoid infeasibility when
-        # applying the capacity constraint
-        rem_df = s.par("growth_activity_up", filters={"technology": "coal_ppl"})
-        s.remove_par("growth_activity_up", rem_df)
+        # Increase technical_lifetime of t="*_ppl". This is to cover cases where
+        # duration_period is up to 29 years; but we do it in all cases for parity.
+        name = "technical_lifetime"
+        filters: dict[str, Any] = dict(technology=["coal_ppl", "wind_ppl"])
+        s.add_par(name, s.par(name, filters=filters).assign(value=30.0))
 
-        # Add `initial_new_capacity_up` for `wind_ppl`
-        s.add_par("initial_new_capacity_up", i_n_c_u.assign(value=0.001))
+        # Add emission tax
+        name = "tax_emission"
+        kw = common | dict(type_emission="GHG", type_tec="all", type_year=model_horizon)
+        s.add_par(name, make_df(name, **kw, value=100.0, unit="???"))
 
         # Add `growth_new_capacity_up` for `wind_ppl`
-        s.add_par("growth_new_capacity_up", i_n_c_u.assign(value=0.01))
+        # NB no value is set for the historical period y=690; this means that additions
+        #    to capacity must be flat/constant until 0690-12-31, with growth only
+        #    possible after that point, i.e. from the start of the first model period.
+        name = "growth_new_capacity_up"
+        gncu = 0.01
+        s.add_par(name, make_df(name, **common, value=gncu, unit="-"))
 
-    # Solve scenario
-    s.solve()
+    # Scenario is feasible
+    s.solve(quiet=True, solve_options=dict(iis=1))
 
-    # Retrieve results
-    obs = s.var("CAP_NEW", filters={"technology": "wind_ppl"})
+    # Retrieve total capacity constructed during the model horizon = CAP for all 1+
+    # vintages within the model horizon. This is the product of CAP_NEW and the
+    # respective duration_period, i.e. its discrete integral over the period.
+    filters = dict(technology="wind_ppl", year_vtg=model_horizon, year_act=720)
+    obs = s.var("CAP", filters=filters)["lvl"].sum()
 
-    # Expected results
-    exp = pd.DataFrame(
-        {
-            "node_loc": "Westeros",
-            "technology": "wind_ppl",
-            "year_vtg": model_horizon,
-            "lvl": exp_lvl,
-            "mrg": 0.0,
-        }
-    )
+    # Expected value: integral of f(t) = a^t with a = gncu, on the interval from t = 0
+    # (start of the first model period, so 0691-01-01) to t = 30 (end of the period
+    # y=720 = 0720-12-31).
+    # This value is the same regardless of time discretization.
+    exp = hnc * ((1 + gncu) ** 30 - (1 + gncu) ** 0) / np.log(1 + gncu)
 
-    pdt.assert_frame_equal(exp, obs, check_dtype=False)
+    npt.assert_allclose(obs, exp)
+
+    # Expected values added in https://github.com/iiasa/message_ix/pull/654
+    # FIXME Remove once the new implementation is confirmed
+    if exp_lvl:
+        exp = pd.DataFrame(
+            {k: common[k] for k in ("node_loc", "technology", "year_vtg")}
+            | dict(lvl=exp_lvl, mrg=0.0)
+        )
+        pdt.assert_frame_equal(exp, obs, check_dtype=False)
 
 
 @pytest.mark.parametrize(
