@@ -120,8 +120,14 @@ cfl                  0.0  0.1   10   900
 )
 
 
-# FIXME reduce complexity 18 → ≤13
-def make_austria(mp, solve=False, quiet=True):  # noqa: C901
+# FIXME reduce complexity 19 → ≤13
+def make_austria(  # noqa: C901
+    mp,
+    solve: bool = False,
+    quiet: bool = True,
+    *,
+    request: Optional["pytest.FixtureRequest"] = None,
+) -> Scenario:
     """Return an :class:`message_ix.Scenario` for the Austrian energy system.
 
     This is the same model used in the ``austria.ipynb`` tutorial.
@@ -137,16 +143,18 @@ def make_austria(mp, solve=False, quiet=True):  # noqa: C901
     mp.add_unit("MtCO2")
     mp.add_unit("tCO2/kWa")
 
-    scen = Scenario(
-        mp,
+    args = SCENARIO["austria"] | dict(
         version="new",
-        **SCENARIO["austria"],
         annotation="A stylized energy system model for illustration and testing",
     )
+    if request:
+        args.update(scenario=request.node.name)
+
+    scen = Scenario(mp, **args)
 
     # Structure
 
-    year = dict(all=list(range(2010, 2041, 10)))
+    year: dict[str, Any] = dict(all=list(range(2010, 2041, 10)))
     scen.add_horizon(year=year["all"])
     year_df = scen.vintage_and_active_years()
     year["vtg"] = year_df["year_vtg"]
@@ -176,7 +184,7 @@ def make_austria(mp, solve=False, quiet=True):  # noqa: C901
     name = "interestrate"
     scen.add_par(name, make_df(name, year=year["all"], value=0.05, unit="-"))
 
-    common = dict(
+    common: dict[str, Any] = dict(
         mode="standard",
         node_dest=country,
         node_loc=country,
@@ -223,7 +231,7 @@ def make_austria(mp, solve=False, quiet=True):  # noqa: C901
             ),
         )
 
-    data = AUSTRIA_PAR
+    data = AUSTRIA_PAR.copy()
     # Convert GW·h to GW·a
     data["activity"] = data["activity"] / 8760.0
     # Convert USD / MW·h to USD / GW·a
@@ -295,19 +303,19 @@ def make_austria(mp, solve=False, quiet=True):  # noqa: C901
     scen.set_as_default()
 
     if solve:
-        scen.solve(quiet=quiet)
+        scen.solve(quiet=quiet, solve_options=dict(iis=1))
 
     return scen
 
 
 def make_dantzig(
     mp,
-    solve=False,
-    multi_year=False,
+    solve: bool = False,
+    multi_year: bool = False,
     *,
     request: Optional["pytest.FixtureRequest"] = None,
     **solve_opts,
-):
+) -> Scenario:
     """Return an :class:`message_ix.Scenario` for Dantzig's canning problem.
 
     Parameters
