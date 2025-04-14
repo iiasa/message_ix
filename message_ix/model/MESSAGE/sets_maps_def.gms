@@ -168,10 +168,12 @@ Alias(emission, emission2);
 Alias(level, l, level2);
 Alias(mode, m, mode2);
 Alias(node, location, n, node_share, node2, ns);
-Alias(tec, tec2);
+Alias(tec, t, tec2);
 Alias(time, time_act, time_od, time2, time3);
-Alias(year, year2, year3);
-Alias(year_all, vintage, year_all2, year_all3);
+* NB Cannot use 'y' as an alias because variable Y is defined in MACRO/macro_core.gms
+*    and GAMS is case-insensitive
+Alias(year, y_, year2, year3);
+Alias(year_all, vintage, y_all, y_prev, year_all2, year_all3);
 
 *----------------------------------------------------------------------------------------------------------------------*
 * Category types and mappings                                                                                                       *
