@@ -150,8 +150,8 @@ Sets
     emission        greenhouse gases - pollutants - etc.
     land_scenario   scenarios of land use (for land-use model emulator)
     land_type       types of land use
-    year_all        years (over entire model horizon)
-    year (year_all) years included in a model instance (for myopic or rolling-horizon optimization)
+    year_all        "All periods, including historical and future periods outside the horizon"
+    year (year_all) "Periods in model horizon, without historical and (for limited-foresight mode) future periods"
     time            subannual time periods (seasons - days - hours)
     shares          share constraint relations
     relation        generic linear relations
