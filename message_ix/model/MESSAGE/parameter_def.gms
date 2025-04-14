@@ -360,7 +360,12 @@ Parameters
 
     initial_activity_lo(node,tec,year_all,time)    dynamic lower bound on activity (fixed initial term)
     growth_activity_lo(node,tec,year_all,time)     dynamic lower bound on activity (growth rate)
-    soft_activity_lo(node,tec,year_all,time)       soft relaxation of dynamic lower bound on activity (growth rate)
+    soft_activity_lo(node,tec,year_all,time)       soft relaxation of dynamic lower bound on activity (growth rate),
+
+    # Auxiliaries for growth_new_capacity_up
+    gncu_1(node,tec,year_all)                      Auxiliary for growth_new_capacity_up,
+    gncu_2(node,tec,year_all)                      Auxiliary for growth_new_capacity_up,
+    k_gncu(node,tec,year_all2,year_all)            Auxiliary for growth_new_capacity_up
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
