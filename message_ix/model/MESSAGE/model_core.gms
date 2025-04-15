@@ -1835,6 +1835,11 @@ ACTIVITY_SOFT_CONSTRAINT_LO(node,tec,year,time)$( soft_activity_lo(node,tec,year
 *              + \sum_{s} \ \text{land_emission}_{n^L,s,y,e} \cdot \text{LAND}_{n^L,s,y}
 *                   \text{ if } \widehat{t} \in \widehat{T}^{LAND} \Bigg)
 *
+* .. versionchanged:: v3.11.0
+*
+*    ``type_tec`` elements that appear in either of the :ref:`mapping sets <section_maps_def>`
+*    ``map_shares_commodity_share`` or ``map_shares_commodity_total`` are excluded from this equation,
+*    and thus also from the domain of the ``EMISS`` :ref:`variable <section_decision_variable_def>`.
 ***
 EMISSION_EQUIVALENCE(node,emission,type_tec,year)$(
   NOT type_tec_share(type_tec) AND NOT type_tec_total(type_tec)

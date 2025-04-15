@@ -317,13 +317,15 @@ Sets
 * Mapping sets
 * ------------
 *
-* .. note::
+* These sets are used in the MESSAGE GAMS code
+* to reduce the size of the optimization problem by excluding non-relevant combinations of indices
+* (for example, activity of a technology in periods beyond its technical lifetime).
 *
-*    These sets are **generated automatically** when exporting a ``MESSAGE``-scheme :class:`ixmp.Scenario` to gdx using the API.
-*    They are used in the GAMS model to reduce model size by excluding non-relevant variables and equations
-*    (e.g., activity of a technology outside of its technical lifetime). These are **not** meant to be
-*    edited through the API when editing scenarios. Not all the ``Mapping sets`` are shown in the list below, to access
-*    the full list of mapping sets, please refer to the documentation file found in ``message_ix\model\MESSAGE\sets_maps_def.gms``.
+* In general, it is **not** necessary and thus not supported to modify their contents through the Python API.
+* Instead, members of these sets are populated automatically, either:
+*
+* 1. at the moment when a :class:`message_ix.Scenario` is written to a GDX file for GAMS input, or
+* 2. within the GAMS code itself, for instance in :file:`MESSAGE/data_load.gms`.
 *
 * .. list-table::
 *    :widths: 40 60
@@ -349,6 +351,10 @@ Sets
 *      - Mapping of commodity-level to node and time
 *    * - map_stocks(node,commodity,level,year_all)
 *      - Mapping of commodity-level to node and time
+*    * - map_shares_commodity_share(shares,node_share,node,type_tec,mode,commodity,level)
+*      - Identifies the set of technologies (``type_tec``) appearing in the numerator of a :ref:`commodity share constraint <section_share_constraints_commodities>`.
+*    * - map_shares_commodity_total(shares,node_share,node,type_tec,mode,commodity,level)
+*      - Identifies the set of technologies (``type_tec``) appearing in the denominator of a :ref:`commodity share constraint <section_share_constraints_commodities>`.
 *    * - map_tec(node,tec,year_all)
 *      - Mapping of technology to node and years
 *    * - map_tec_time(node,tec,year_all,time)
@@ -359,6 +365,9 @@ Sets
 *      - Mapping of charge-discharge technologies ``tec`` to their storage container ``tec2``, stored ``commodity`` and ``level``.
 *    * - map_time_commodity_storage(node,tec,level,commodity,mode,year_all,time)
 *      - Mapping of storage containers to their input commodity-level (not commodity-level of stored media)
+*
+* Some mapping sets are omitted from this table;
+* for a complete list, see the file :file:`MESSAGE/sets_maps_def.gms`.
 ***
 
 Sets
