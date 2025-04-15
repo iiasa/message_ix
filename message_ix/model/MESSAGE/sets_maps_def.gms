@@ -165,9 +165,9 @@ Sets
 
 Alias(commodity, commodity2);
 Alias(emission, emission2);
-Alias(level, level2);
-Alias(mode, mode2);
-Alias(node, location, node_share, node2);
+Alias(level, l, level2);
+Alias(mode, m, mode2);
+Alias(node, location, n, node_share, node2, ns);
 Alias(tec, tec2);
 Alias(time, time_act, time_od, time2, time3);
 Alias(year, year2, year3);
