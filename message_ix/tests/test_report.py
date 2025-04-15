@@ -115,10 +115,8 @@ def test_reporter_from_dantzig(test_mp, request):
     rep.get("all")
 
 
-def test_reporter_from_westeros(test_mp, request):
-    scen = make_westeros(
-        test_mp, emissions=True, solve=True, quiet=True, request=request
-    )
+def test_reporter_from_westeros(request, test_mp) -> None:
+    scen = make_westeros(test_mp, emissions=True, solve=True, request=request)
 
     # Reporter.from_scenario can handle Westeros example model
     rep = Reporter.from_scenario(scen)
@@ -137,30 +135,25 @@ def test_reporter_from_westeros(test_mp, request):
     assert len(obs.data) == 78
 
     # custom values are correct
-    obs = obs.filter(variable="total om*")
-    assert len(obs.data) == 9
-    assert all(
-        obs["variable"]
-        == ["total om cost|coal_ppl"] * 3  # noqa: W504
-        + ["total om cost|grid"] * 3  # noqa: W504
-        + ["total om cost|wind_ppl"] * 3  # noqa: W504
-    )
-    assert all(obs["year"] == [700, 710, 720] * 3)
+    obs = obs.filter(variable="total om*").as_pandas()
 
-    obs = obs.data["value"].values
-    exp = [
-        2842.457491,
-        5373.051098,
-        6933.333333,
-        880.0,
-        1312.0,
-        1664.0,
-        381.578322,
-        43.340541,
-        0.0,
-    ]
-    assert len(obs) == len(exp)
-    assert_allclose(obs, exp)
+    # Produce a merged data frame; this also implies that the same labels exist in `obs`
+    df = pd.DataFrame(
+        [
+            ["total om cost|coal_ppl", 700, 2842.457491],
+            ["total om cost|coal_ppl", 710, 5373.051098],
+            ["total om cost|coal_ppl", 720, 6933.333333],
+            ["total om cost|grid", 700, 880.0],
+            ["total om cost|grid", 710, 1312.0],
+            ["total om cost|grid", 720, 1664.0],
+            ["total om cost|wind_ppl", 700, 381.578322],
+            ["total om cost|wind_ppl", 710, 43.340541],
+            ["total om cost|wind_ppl", 720, 0.0],
+        ],
+        columns=["variable", "year", "value"],
+    ).merge(obs, on=["variable", "year"], how="outer")
+
+    assert_allclose(df["value_y"], df["value_x"], err_msg=df.to_string())
 
 
 def test_reporter_as_pyam(caplog, tmp_path, dantzig_reporter):
