@@ -160,25 +160,18 @@ Sets
     rating          identifies the 'quality' of the renewable energy potential (bins acc. to Sullivan)
 ;
 
-* definition of aliases
-Alias(node,location);
-Alias(node,node2);
-Alias(node,node_share);
-Alias(tec,tec2);
-Alias(commodity,commodity2);
-Alias(level,level2);
-Alias(emission,emission2);
-Alias(year_all,vintage);
-Alias(year_all,year_all2);
-Alias(year_all,year_all3);
-Alias(year,year2);
-Alias(year,year3);
-Alias(time,time2);
-Alias(time,time3);
-Alias(time,time_act);
-Alias(time,time_od);
-Alias(mode,mode2);
-Alias(commodity,commodity2);
+* Aliases for simple sets
+* These are used for multi-dimensional sets and parameters indexed 2+ times by the same basic set
+
+Alias(commodity, commodity2);
+Alias(emission, emission2);
+Alias(level, level2);
+Alias(mode, mode2);
+Alias(node, location, node_share, node2);
+Alias(tec, tec2);
+Alias(time, time_act, time_od, time2, time3);
+Alias(year, year2, year3);
+Alias(year_all, vintage, year_all2, year_all3);
 
 *----------------------------------------------------------------------------------------------------------------------*
 * Category types and mappings                                                                                                       *
