@@ -180,7 +180,9 @@ def test_calc_data_missing_datapoint(westeros_solved, w_data) -> None:
         ("rho", "equal", [-4.0]),
         ("historical_gdp", "equal", [500.0]),
         ("k0", "equal", [1500.0]),
-        ("cost_MESSAGE", "allclose", [6.18242, 8.44930447, 11.89512066, 12.84911389]),
+        # These values updated to align with changes in
+        # https://github.com/iiasa/message_ix/pull/924
+        ("cost_MESSAGE", "allclose", [6.18242, 8.801164, 11.845227, 12.845227]),
         (
             "price_MESSAGE",
             "allclose",
@@ -278,25 +280,18 @@ def test_calibrate(westeros_solved, w_data_path) -> None:
 
 
 def test_calibrate_roundtrip(westeros_solved, w_data_path) -> None:
-    # this is a regression test with values observed on May 23, 2024
+    """Ensure certain values occur after checking convergence.
+
+    The specific values used here were re-checked in :pull:`924`.
+    """
     with_macro = westeros_solved.add_macro(w_data_path, check_convergence=True)
-    aeei = with_macro.par("aeei")["value"].values
     npt.assert_allclose(
-        aeei,
-        1e-3 * np.array([20.0, -7.56480599206068, 43.6577, 21.18243]),
+        with_macro.par("aeei")["value"].values,
+        1e-3 * np.array([20.0, -7.5674349, 43.659505, 21.182828]),
     )
-    grow = with_macro.par("grow")["value"].values
     npt.assert_allclose(
-        grow,
-        1e-3
-        * np.array(
-            [
-                26.583631,
-                69.146018,
-                79.138644,
-                24.522467,
-            ]
-        ),
+        with_macro.par("grow")["value"].values,
+        1e-3 * np.array([26.58363, 69.14695, 79.13789, 24.52248]),
     )
 
 
