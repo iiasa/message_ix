@@ -160,25 +160,18 @@ Sets
     rating          identifies the 'quality' of the renewable energy potential (bins acc. to Sullivan)
 ;
 
-* definition of aliases
-Alias(node,location);
-Alias(node,node2);
-Alias(node,node_share);
-Alias(tec,tec2);
-Alias(commodity,commodity2);
-Alias(level,level2);
-Alias(emission,emission2);
-Alias(year_all,vintage);
-Alias(year_all,year_all2);
-Alias(year_all,year_all3);
-Alias(year,year2);
-Alias(year,year3);
-Alias(time,time2);
-Alias(time,time3);
-Alias(time,time_act);
-Alias(time,time_od);
-Alias(mode,mode2);
-Alias(commodity,commodity2);
+* Aliases for simple sets
+* These are used for multi-dimensional sets and parameters indexed 2+ times by the same basic set
+
+Alias(commodity, commodity2);
+Alias(emission, emission2);
+Alias(level, l, level2);
+Alias(mode, m, mode2);
+Alias(node, location, n, node_share, node2, ns);
+Alias(tec, tec2);
+Alias(time, time_act, time_od, time2, time3);
+Alias(year, year2, year3);
+Alias(year_all, vintage, year_all2, year_all3);
 
 *----------------------------------------------------------------------------------------------------------------------*
 * Category types and mappings                                                                                                       *
@@ -307,11 +300,12 @@ Sets
     cat_emission(type_emission,emission)    mapping of emissions to respective categories
     type_tec_land(type_tec)                 dynamic set whether emissions from land use are included in type_tec
     balance_equality(commodity,level)       mapping of commodities-level where the supply-demand balance must be maintained with equality
-    time_relative(time)                     flag for treating unit of ACT in sub-annual time slices relative to parent 'time' (activating parameter 'duration_time_rel')
-;
+    time_relative(time)                     flag for treating unit of ACT in sub-annual time slices relative to parent 'time' (activating parameter 'duration_time_rel'),
 
-Alias(type_tec,type_tec_share);
-Alias(type_tec,type_tec_total);
+    # Derived in data_load.gms
+    type_tec_share(type_tec)                "Subset of type_tec appearing in map_shares_commodity_share",
+    type_tec_total(type_tec)                "Subset of type_tec appearing in map_shares_commodity_total"
+;
 
 *----------------------------------------------------------------------------------------------------------------------*
 * Mapping sets                                                                                                         *
@@ -323,13 +317,15 @@ Alias(type_tec,type_tec_total);
 * Mapping sets
 * ------------
 *
-* .. note::
+* These sets are used in the MESSAGE GAMS code
+* to reduce the size of the optimization problem by excluding non-relevant combinations of indices
+* (for example, activity of a technology in periods beyond its technical lifetime).
 *
-*    These sets are **generated automatically** when exporting a ``MESSAGE``-scheme :class:`ixmp.Scenario` to gdx using the API.
-*    They are used in the GAMS model to reduce model size by excluding non-relevant variables and equations
-*    (e.g., activity of a technology outside of its technical lifetime). These are **not** meant to be
-*    edited through the API when editing scenarios. Not all the ``Mapping sets`` are shown in the list below, to access
-*    the full list of mapping sets, please refer to the documentation file found in ``message_ix\model\MESSAGE\sets_maps_def.gms``.
+* In general, it is **not** necessary and thus not supported to modify their contents through the Python API.
+* Instead, members of these sets are populated automatically, either:
+*
+* 1. at the moment when a :class:`message_ix.Scenario` is written to a GDX file for GAMS input, or
+* 2. within the GAMS code itself, for instance in :file:`MESSAGE/data_load.gms`.
 *
 * .. list-table::
 *    :widths: 40 60
@@ -355,6 +351,10 @@ Alias(type_tec,type_tec_total);
 *      - Mapping of commodity-level to node and time
 *    * - map_stocks(node,commodity,level,year_all)
 *      - Mapping of commodity-level to node and time
+*    * - map_shares_commodity_share(shares,node_share,node,type_tec,mode,commodity,level)
+*      - Identifies the set of technologies (``type_tec``) appearing in the numerator of a :ref:`commodity share constraint <section_share_constraints_commodities>`.
+*    * - map_shares_commodity_total(shares,node_share,node,type_tec,mode,commodity,level)
+*      - Identifies the set of technologies (``type_tec``) appearing in the denominator of a :ref:`commodity share constraint <section_share_constraints_commodities>`.
 *    * - map_tec(node,tec,year_all)
 *      - Mapping of technology to node and years
 *    * - map_tec_time(node,tec,year_all,time)
@@ -365,6 +365,9 @@ Alias(type_tec,type_tec_total);
 *      - Mapping of charge-discharge technologies ``tec`` to their storage container ``tec2``, stored ``commodity`` and ``level``.
 *    * - map_time_commodity_storage(node,tec,level,commodity,mode,year_all,time)
 *      - Mapping of storage containers to their input commodity-level (not commodity-level of stored media)
+*
+* Some mapping sets are omitted from this table;
+* for a complete list, see the file :file:`MESSAGE/sets_maps_def.gms`.
 ***
 
 Sets

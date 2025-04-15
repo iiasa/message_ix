@@ -1,5 +1,3 @@
-import logging
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -9,52 +7,17 @@ from pandas.testing import assert_frame_equal
 from message_ix import ModelError, Scenario, make_df
 from message_ix.testing import make_dantzig
 
-log = logging.getLogger(__name__)
+#: First model year of the :func:`.make_dantzig` scenario.
+Y0 = 1963
 
-# First model year of the Dantzig scenario
-_year = 1963
+#: Name of a members of the ``shares`` set.
+SHARES = "test-shares"
 
-
-def calculate_activity(scen, tec="transport_from_seattle") -> pd.Series:
-    """Sum ``ACT`` levels for `technology` and `mode` groups; return sums for `tec`."""
-    return scen.var("ACT").groupby(["technology", "mode"])["lvl"].sum().loc[tec]
-
-
-def test_add_bound_activity_up(request, test_mp, testrun_uid):
-    scen = make_dantzig(test_mp, request=request, solve=True, quiet=True)
-
-    # data for act bound
-    exp = 0.5 * calculate_activity(scen).sum()
-    name = "bound_activity_up"
-    data = make_df(
-        name,
-        node_loc="seattle",
-        technology="transport_from_seattle",
-        year_act=_year,
-        time="year",
-        unit="cases",
-        mode="to_chicago",
-        value=exp,
-    )
-
-    # test limiting one mode
-    clone = scen.clone(
-        scenario=f"{scen.scenario}-{testrun_uid} cloned", keep_solution=False
-    )
-
-    with clone.transact():
-        clone.add_par("bound_activity_up", data)
-
-    clone.solve(quiet=True)
-    obs = calculate_activity(clone).loc["to_chicago"]
-    assert np.isclose(obs, exp)
-
-    orig_obj = scen.var("OBJ")["lvl"]
-    new_obj = clone.var("OBJ")["lvl"]
-    assert new_obj >= orig_obj
+#: Fixed key-values for subsets and parameters in the :func:`.make_dantzig` scenario.
+COMMON = dict(commodity="cases", shares=SHARES, time="year", unit="cases")
 
 
-def assert_dantzig_solution(s: "Scenario", lp_method: int) -> None:
+def assert_dantzig_solution(s: Scenario, lp_method: int) -> None:
     """Assert that the Dantzig model contains the expected solution.
 
     The model has two solutions with equal objective function values.
@@ -93,13 +56,53 @@ def assert_dantzig_solution(s: "Scenario", lp_method: int) -> None:
     assert_frame_equal(exp, s.var("ACT")[cols])
 
 
+def calculate_activity(scen: Scenario, tec="transport_from_seattle") -> pd.Series:
+    """Sum ``ACT`` levels for `technology` and `mode` groups; return sums for `tec`."""
+    return scen.var("ACT").groupby(["technology", "mode"])["lvl"].sum().loc[tec]
+
+
+def test_b_a_u_1_mode(request, test_mp) -> None:
+    """Test effect of ``bound_activity_up`` on 1 mode of a tech with multiple modes."""
+    s0 = make_dantzig(test_mp, solve=True, request=request)
+
+    # Constraint value
+    exp = 0.5 * calculate_activity(s0).sum()
+
+    # Add constraint parameter data to a clone
+    s1 = s0.clone(keep_solution=False)
+
+    name = "bound_activity_up"
+    mode = "to_chicago"  # Only constrain this mode
+    data = make_df(
+        name,
+        **COMMON,
+        node_loc="seattle",
+        technology="transport_from_seattle",
+        year_act=Y0,
+        mode=mode,
+        value=exp,
+    )
+
+    with s1.transact():
+        s1.add_par(name, data)
+    s1.solve(quiet=True)
+
+    # Observed result matches the constrained value
+    assert np.isclose(calculate_activity(s1).loc[mode], exp)
+
+    # Meeting the constraint has increased the objective function value
+    assert s1.var("OBJ")["lvl"] >= s0.var("OBJ")["lvl"]
+
+
 @pytest.mark.parametrize("lp_method", [1, 2, 3, 4, 5])
 @pytest.mark.parametrize(
     "constraint_value",
     [pytest.param(299, marks=pytest.mark.xfail(raises=ModelError)), 301, 325],
 )
-def test_b_a_u_all_modes(request, test_mp, tmp_model_dir, lp_method, constraint_value):
-    """Test ``bound_activity_up`` values applied mode="all".
+def test_b_a_u_all_modes(
+    request, test_mp, tmp_model_dir, lp_method, constraint_value
+) -> None:
+    """Test ``bound_activity_up`` values applied to mode="all".
 
     - In the unconstrained Dantzig problem:
 
@@ -129,65 +132,108 @@ def test_b_a_u_all_modes(request, test_mp, tmp_model_dir, lp_method, constraint_
     so = dict(model_dir=tmp_model_dir, solve_options=dict(lpmethod=lp_method))
 
     # Create and solve the Dantzig model
-    scen = make_dantzig(test_mp, request=request, solve=True, **so)
+    s0 = make_dantzig(test_mp, solve=True, request=request, **so)
 
     # Ensure the solution is as expected given the LP method
-    assert_dantzig_solution(scen, lp_method)
+    assert_dantzig_solution(s0, lp_method)
 
-    clone = scen.clone(scenario=f"{scen.scenario} cloned", keep_solution=False)
-    with clone.transact("Bound all modes of t=transport_from_seattle"):
-        name = "bound_activity_up"
-        clone.add_par(
-            name,
-            make_df(
-                name,
-                node_loc="seattle",
-                technology="transport_from_seattle",
-                year_act=_year,
-                time="year",
-                mode="all",
-                value=constraint_value,
-                unit="cases",
-            ),
-        )
+    # Add constraint parameter data to a clone
+    s1 = s0.clone(keep_solution=False)
+    name = "bound_activity_up"
+    data = make_df(
+        name,
+        **COMMON,
+        node_loc="seattle",
+        technology="transport_from_seattle",
+        year_act=Y0,
+        mode="all",
+        value=constraint_value,
+    )
+
+    with s1.transact():
+        s1.add_par(name, data)
 
     # Scenario solves (not with constraint_value = 299)
-    clone.solve(quiet=True, **so)
+    s1.solve(quiet=True, **so)
 
     # Objective function value is equal to the unconstrained value
-    assert_equal(scen.var("OBJ")["lvl"], clone.var("OBJ")["lvl"])
+    assert_equal(s0.var("OBJ")["lvl"], s1.var("OBJ")["lvl"])
 
     # Constraint is effective
-    assert constraint_value >= calculate_activity(clone).sum()
+    assert constraint_value >= calculate_activity(s1).sum()
 
     if lp_method in {1, 2, 3}:
         # Constraint reduced the total ACT of t=transport_from_seattle
-        assert calculate_activity(scen).sum() > calculate_activity(clone).sum()
+        assert calculate_activity(s0).sum() > calculate_activity(s1).sum()
     else:
         # Constraint had no effect on total ACT of t=transport_from_seattle
-        assert_equal(calculate_activity(scen).sum(), calculate_activity(clone).sum())
+        assert_equal(calculate_activity(s0).sum(), calculate_activity(s1).sum())
 
 
-def test_commodity_share_up(test_mp, request, testrun_uid):
-    """Original Solution
-    ----------------
+def test_commodity_share_lo(request, test_mp) -> None:
+    """Test effect of ``share_commodity_lo``."""
+    n = "new-york"
+    common = COMMON | dict(mode="all", level="consumption", node_share=n, node=n)
 
-         lvl         mode    mrg   node_loc                technology
-    0  350.0   production  0.000    seattle             canning_plant
-    1   50.0  to_new-york  0.000    seattle    transport_from_seattle
-    2  300.0   to_chicago  0.000    seattle    transport_from_seattle
-    3    0.0    to_topeka  0.036    seattle    transport_from_seattle
-    4  600.0   production  0.000  san-diego             canning_plant
-    5  275.0  to_new-york  0.000  san-diego  transport_from_san-diego
-    6    0.0   to_chicago  0.009  san-diego  transport_from_san-diego
-    7  275.0    to_topeka  0.000  san-diego  transport_from_san-diego
+    s0 = make_dantzig(test_mp, solve=True, request=request)
 
-    Constraint Test
-    ---------------
+    # data for share bound
+    def calc_share(s: Scenario) -> float:
+        """Compute the share achieved on scenario `s`."""
+        a = calculate_activity(s, tec="transport_from_seattle").loc["to_new-york"]
+        b = calculate_activity(s, tec="transport_from_san-diego").loc["to_new-york"]
+        return a / (a + b)
+
+    # Constraint value
+    exp = 1.0 * calc_share(s0)
+
+    # Add constraint parameter data to a clone
+    s1 = s0.clone(keep_solution=False)
+
+    with s1.transact("Add share constraints"):
+        s1.add_set("shares", SHARES)
+
+        # Add category and mapping set elements
+        for tt, members in (
+            ("share", ["transport_from_seattle"]),
+            ("total", ["transport_from_seattle", "transport_from_san-diego"]),
+        ):
+            s1.add_cat("technology", tt, members)
+            name = f"map_shares_commodity_{tt}"
+            s1.add_set(name, make_df(name, **common, type_tec=tt))
+
+        # Add the value of the constraint
+        name = "share_commodity_lo"
+        s1.add_par(name, make_df(name, **common, value=exp, year_act=Y0))
+
+    s1.solve(quiet=True)
+
+    # The solution has the expected share
+    assert np.isclose(exp, calc_share(s1))
+
+    # Objective function value is larger in the clone (with constraints) than the
+    # original scenario (unconstrained)
+    assert s1.var("OBJ")["lvl"] >= s0.var("OBJ")["lvl"]
+
+
+def test_commodity_share_up(request, test_mp) -> None:
+    """Test effect of ``share_commodity_up``.
+
+    ``ACT`` variable values from the original solution::
+
+        technology                node_loc   mode         lvl    mrg
+        canning_plant             seattle    production   350.0  0.000
+        transport_from_seattle    seattle    to_new-york   50.0  0.000
+        transport_from_seattle    seattle    to_chicago   300.0  0.000
+        transport_from_seattle    seattle    to_topeka      0.0  0.036
+        canning_plant             san-diego  production   600.0  0.000
+        transport_from_san-diego  san-diego  to_new-york  275.0  0.000
+        transport_from_san-diego  san-diego  to_chicago     0.0  0.009
+        transport_from_san-diego  san-diego  to_topeka    275.0  0.000
 
     Seattle canning_plant production (original: 350) is limited to 50% of all
-    transport_from_san-diego (original: 550). Expected outcome: some increase
-    of transport_from_san-diego with some decrease of production in seattle.
+    transport_from_san-diego (original: 550). Expected outcome: some increase of
+    transport_from_san-diego with some decrease of production in seattle.
     """
 
     # data for share bound
@@ -198,232 +244,134 @@ def test_commodity_share_up(test_mp, request, testrun_uid):
         b = calculate_activity(s, tec="transport_from_san-diego").sum()
         return a / b
 
-    common = dict(shares="test-share", node_share="seattle")
+    common = COMMON | dict(level="supply", node_share="seattle")
+
+    # type_tec members
+    tt_share = "share"
+    tt_total = "total"
 
     # common operations for both subtests
-    def add_data(s, map_df):
+    def add_data(s, modes):
         with s.transact("Add share_commodity_up"):
-            s.add_cat("technology", "share", "canning_plant")
-            s.add_cat("technology", "total", "transport_from_san-diego")
+            s.add_set("shares", SHARES)
+            s.add_cat("technology", tt_share, "canning_plant")
+            s.add_cat("technology", tt_total, "transport_from_san-diego")
 
-            s.add_set("shares", "test-share")
+            name = "map_shares_commodity_share"
+            kw = common | dict(node="seattle", type_tec=tt_share, mode="production")
+            s.add_set(name, make_df(name, **kw))
 
-            s.add_set(
-                "map_shares_commodity_share",
-                make_df(
-                    "map_shares_commodity_share",
-                    **common,
-                    node="seattle",
-                    type_tec="share",
-                    mode="production",
-                    commodity="cases",
-                    level="supply",
-                ),
-            )
-            s.add_set("map_shares_commodity_total", map_df)
-            s.add_par(
-                "share_commodity_up",
-                make_df(
-                    "share_commodity_up",
-                    **common,
-                    year_act=_year,
-                    time="year",
-                    unit="%",
-                    value=0.5,
-                ),
-            )
+            name = "map_shares_commodity_total"
+            kw = common | dict(node="san-diego", type_tec=tt_total, mode=modes)
+            s.add_set(name, make_df(name, **kw))
+
+            name = "share_commodity_up"
+            kw = common | dict(unit="%")
+            s.add_par(name, make_df(name, **kw, year_act=Y0, value=0.5))
+
+        s.solve(quiet=True)
 
     # initial data
-    scen = make_dantzig(test_mp, solve=True, request=request)
+    s0 = make_dantzig(test_mp, solve=True, request=request)
 
     exp = 0.5
 
-    # check shares orig, should be bigger than expected bound
-    orig = calc_share(scen)
-    assert orig > exp
+    # In the unmodified Dantzig scenario, the share is larger than the value to be used
+    assert calc_share(s0) > exp
 
-    # add share constraints for modes explicitly
-    map_df = make_df(
-        "map_shares_commodity_total",
-        **common,
-        node="san-diego",
-        type_tec="total",
-        mode=["to_new-york", "to_chicago", "to_topeka"],
-        commodity="cases",
-        level="supply",
+    # Add share constraints for each mode explicitly
+    s1 = s0.clone(keep_solution=False)
+    add_data(s1, modes=["to_new-york", "to_chicago", "to_topeka"])
+
+    # Resulting shares are within the bound
+    obs1 = calc_share(s1)
+    assert obs1 <= exp
+
+    # Meeting the constraint has increased the objective function value
+    assert s1.var("OBJ")["lvl"] >= s0.var("OBJ")["lvl"]
+
+    # Add share constraints with mode='all'
+    s2 = s0.clone(keep_solution=False)
+    add_data(s2, modes="all")
+
+    # Shares are the same as constraining each mode individually, and within the bound
+    assert obs1 == calc_share(s2) <= exp
+
+    # Meeting the constraint has increased the objective function value
+    assert s2.var("OBJ")["lvl"] >= s0.var("OBJ")["lvl"]
+
+    # Test of https://github.com/iiasa/message_ix/pull/930
+
+    # Add emissions factor and check the emissions equivalence function
+    s3 = s1.clone(keep_solution=False)
+    name, e = "emission_factor", "emiss"
+    data = make_df(
+        name,
+        emission=e,
+        mode="production",
+        node_loc="seattle",
+        technology="canning_plant",
+        year_vtg=Y0,
+        year_act=Y0,
+        value=1.5,
+        unit="kg/kWa",
     )
-    clone = scen.clone(
-        scenario=f"{scen.scenario}-{testrun_uid} share_mode_list", keep_solution=False
+    with s3.transact("Add emission factor"):
+        s3.add_set("emission", e)
+        s3.add_cat("emission", "emiss_type", e)
+        s3.add_par(name, data)
+
+    s3.solve(quiet=True)
+
+    # EMISSION_EQUIVALENCE does not have the type_tec == "share"
+    obs = s3.var("EMISS")
+    assert not (set(obs["type_tec"].unique()) & {"share", "total"}), (
+        f"EMISSION_EQUIVALENCE contains type_tec='share' or 'total':\n{obs}"
     )
-    add_data(clone, map_df)
-    clone.solve(quiet=True)
-
-    # check shares new, should be lower than expected bound
-    obs = calc_share(clone)
-    assert obs <= exp
-
-    # check obj
-    orig_obj = scen.var("OBJ")["lvl"]
-    new_obj = clone.var("OBJ")["lvl"]
-    assert new_obj >= orig_obj
-
-    # add share constraints with mode == 'all'
-    map_df2 = map_df.assign(mode="all")
-    clone2 = scen.clone(
-        scenario=f"{scen.scenario}-{testrun_uid} share_all_modes", keep_solution=False
-    )
-    add_data(clone2, map_df2)
-    clone2.solve(quiet=True)
-
-    # check shares new, should be lower than expected bound
-    obs2 = calc_share(clone2)
-    assert obs2 <= exp
-
-    # it should also be the same as the share with explicit modes
-    assert obs == obs2
-
-    # check obj
-    orig_obj = scen.var("OBJ")["lvl"]
-    new_obj = clone2.var("OBJ")["lvl"]
-    assert new_obj >= orig_obj
 
 
-def test_commodity_share_lo(test_mp, request, testrun_uid):
-    scen = make_dantzig(test_mp, request=request, solve=True, quiet=True)
+@pytest.mark.parametrize(
+    "dir, node, mode, exp_value",
+    (
+        ("lo", "san-diego", "to_new-york", 1.05),
+        ("up", "seattle", "to_chicago", 0.95),
+    ),
+)
+def test_share_mode(request, test_mp, dir, node, mode, exp_value) -> None:
+    """Test effect of parameters ``share_mode_{lo,up}``."""
+    s0 = make_dantzig(test_mp, solve=True, request=request)
 
-    # data for share bound
+    tec = f"transport_from_{node}"
+
     def calc_share(s: Scenario) -> float:
-        """Compute the share achieved on scenario `s`."""
-        a = calculate_activity(s, tec="transport_from_seattle").loc["to_new-york"]
-        b = calculate_activity(s, tec="transport_from_san-diego").loc["to_new-york"]
-        return a / (a + b)
+        """Shorthand for calculating share of `mode` in total activity."""
+        tmp = calculate_activity(s, tec=tec)
+        return tmp.loc[mode] / tmp.sum()
 
-    exp = 1.0 * calc_share(scen)
+    # Constraint value
+    exp = exp_value * calc_share(s0)
 
-    # add share constraints
-    clone = scen.clone(
-        scenario=f"{scen.scenario}-{testrun_uid} cloned", keep_solution=False
+    # Add constraint parameter data to a clone
+    s1 = s0.clone(keep_solution=False)
+
+    name = f"share_mode_{dir}"
+    data = make_df(
+        name,
+        **COMMON,
+        node_share=node,
+        technology=tec,
+        mode=mode,
+        year_act=Y0,
+        value=exp,
     )
 
-    with clone.transact("Add share constraints"):
-        clone.add_set("shares", "test-share")
+    with s1.transact():
+        s1.add_set("shares", SHARES)
+        s1.add_par(name, data)
+    s1.solve(quiet=True)
 
-        common = dict(
-            mode="all", node="new-york", node_share="new-york", shares="test-share"
-        )
+    # Observed result matches the constrained value
+    assert np.isclose(calc_share(s1), exp)
 
-        # Add category and mapping set elements
-        for tt, members in (
-            ("share", ["transport_from_seattle"]),
-            ("total", ["transport_from_seattle", "transport_from_san-diego"]),
-        ):
-            clone.add_cat("technology", tt, members)
-            name = f"map_shares_commodity_{tt}"
-            clone.add_set(
-                name,
-                make_df(
-                    name, **common, type_tec=tt, commodity="cases", level="consumption"
-                ),
-            )
-
-        # Add the value of the constraint
-        name = "share_commodity_lo"
-        clone.add_par(
-            name,
-            make_df(
-                name, time="year", unit="cases", value=exp, year_act=_year, **common
-            ),
-        )
-
-    clone.solve(quiet=True)
-
-    # The solution has the expected share
-    assert np.isclose(exp, calc_share(clone))
-
-    # Objective function value is larger in the clone (with constraints) than the
-    # original scenario (unconstrained)
-    assert clone.var("OBJ")["lvl"] >= scen.var("OBJ")["lvl"]
-
-
-def test_add_share_mode_up(request, test_mp, testrun_uid):
-    scen = make_dantzig(test_mp, request=request, solve=True, quiet=True)
-
-    # data for share bound
-    def calc_share(s):
-        a = calculate_activity(s, tec="transport_from_seattle").loc["to_chicago"]
-        b = calculate_activity(s, tec="transport_from_seattle").sum()
-        return a / b
-
-    exp = 0.95 * calc_share(scen)
-
-    # add share constraints
-    clone = scen.clone(
-        scenario=f"{scen.scenario}-{testrun_uid} cloned", keep_solution=False
-    )
-
-    with clone.transact("Add share_mode_up"):
-        clone.add_set("shares", "test-share")
-        clone.add_par(
-            "share_mode_up",
-            make_df(
-                "share_mode_up",
-                shares="test-share",
-                node_share="seattle",
-                technology="transport_from_seattle",
-                mode="to_chicago",
-                year_act=_year,
-                time="year",
-                unit="cases",
-                value=exp,
-            ),
-        )
-
-    clone.solve(quiet=True)
-    obs = calc_share(clone)
-    assert np.isclose(obs, exp)
-
-    orig_obj = scen.var("OBJ")["lvl"]
-    new_obj = clone.var("OBJ")["lvl"]
-    assert new_obj >= orig_obj
-
-
-def test_add_share_mode_lo(request, test_mp, testrun_uid):
-    scen = make_dantzig(test_mp, solve=True, request=request, quiet=True)
-
-    # data for share bound
-    def calc_share(s):
-        a = calculate_activity(s, tec="transport_from_san-diego").loc["to_new-york"]
-        b = calculate_activity(s, tec="transport_from_san-diego").sum()
-        return a / b
-
-    exp = 1.05 * calc_share(scen)
-
-    # add share constraints
-    clone = scen.clone(
-        scenario=f"{scen.scenario}-{testrun_uid} cloned", keep_solution=False
-    )
-    with clone.transact():
-        clone.add_set("shares", "test-share")
-        clone.add_par(
-            "share_mode_lo",
-            make_df(
-                "share_mode_lo",
-                shares="test-share",
-                node_share="san-diego",
-                technology="transport_from_san-diego",
-                mode="to_new-york",
-                year_act=_year,
-                time="year",
-                unit="cases",
-                value=exp,
-            ),
-        )
-
-    clone.solve(quiet=True)
-
-    obs = calc_share(clone)
-    assert np.isclose(obs, exp)
-
-    orig_obj = scen.var("OBJ")["lvl"]
-    new_obj = clone.var("OBJ")["lvl"]
-    assert new_obj >= orig_obj
+    # Meeting the constraint has increased the objective function value
+    assert s1.var("OBJ")["lvl"] >= s0.var("OBJ")["lvl"]
