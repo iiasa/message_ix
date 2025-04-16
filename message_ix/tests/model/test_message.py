@@ -89,19 +89,19 @@ def test_gh_923(request, gh_923_scenario: Scenario, tl_value: list[int]) -> None
 
 
 @pytest.mark.parametrize(
-    "model_horizon, exp_lvl",
+    "model_horizon",
     [
-        [[720], None],  # Simplest possible case: 1 model period
-        [[691, 720], None],  # 2 periods of various durations
-        [[700, 720], None],
-        [[719, 720], None],
+        [720],  # Simplest possible case: 1 model period
+        [691, 720],  # 2 periods of various durations
+        [700, 720],
+        [719, 720],
         # Transition from duration_period=5 to duration_period=10
-        [[695, 700, 710, 720], [3.560014, 3.746712, 2.074581, 2.302091]],
+        [695, 700, 710, 720],
         # Transition from duration_period=10 to duration_period=5
-        [[700, 710, 715, 720], [3.746712, 4.149163, 8.731826, 9.182337]],
+        [700, 710, 715, 720],
     ],
 )
-def test_growth_new_capacity_up(request, test_mp, model_horizon, exp_lvl) -> None:
+def test_growth_new_capacity_up(request, test_mp, model_horizon) -> None:
     """``CAP_NEW`` is correctly constrained according to ``growth_new_capacity_up``.
 
     This test adds ``tax_emission`` values and removes all constraints except
@@ -171,15 +171,6 @@ def test_growth_new_capacity_up(request, test_mp, model_horizon, exp_lvl) -> Non
     exp = hnc * ((1 + gncu) ** 30 - (1 + gncu) ** 0) / np.log(1 + gncu)
 
     npt.assert_allclose(obs, exp)
-
-    # Expected values added in https://github.com/iiasa/message_ix/pull/654
-    # FIXME Remove once the new implementation is confirmed
-    if exp_lvl:
-        exp = pd.DataFrame(
-            {k: common[k] for k in ("node_loc", "technology", "year_vtg")}
-            | dict(lvl=exp_lvl, mrg=0.0)
-        )
-        pdt.assert_frame_equal(exp, obs, check_dtype=False)
 
 
 @pytest.mark.parametrize(
