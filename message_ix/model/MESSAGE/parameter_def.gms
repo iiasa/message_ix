@@ -12,6 +12,7 @@
 
 ***
 * .. _section_parameter_general:
+* .. _duration_period:
 * .. _duration_time_rel:
 *
 * General parameters of the |MESSAGEix| implementation
@@ -297,6 +298,7 @@ Parameters
 
 ***
 * .. _section_parameter_dynamic_constraints:
+* .. _growth_new_capacity_up:
 *
 * Dynamic constraints on new capacity and activity
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

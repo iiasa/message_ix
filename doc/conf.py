@@ -70,6 +70,8 @@ rst_prolog = r"""
 .. |yA| replace:: :math:`y^A`
 .. |yV| replace:: :math:`y^V`
 
+.. |duration_period| replace:: :ref:`duration_period <duration_period>`
+.. |growth_new_capacity_up| replace:: :ref:`growth_new_capacity_up <growth_new_capacity_up>`
 .. |historical_new_capacity| replace:: :ref:`historical_new_capacity <historical_new_capacity>`
 .. |map_tec_lifetime| replace:: :ref:`map_tec_lifetime <map_tec_lifetime>`
 """  # noqa: E501
