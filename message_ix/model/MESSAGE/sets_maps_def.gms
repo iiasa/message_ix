@@ -150,8 +150,8 @@ Sets
     emission        greenhouse gases - pollutants - etc.
     land_scenario   scenarios of land use (for land-use model emulator)
     land_type       types of land use
-    year_all        years (over entire model horizon)
-    year (year_all) years included in a model instance (for myopic or rolling-horizon optimization)
+    year_all        "All periods, including historical and future periods outside the horizon"
+    year (year_all) "Periods in model horizon, without historical and (for limited-foresight mode) future periods"
     time            subannual time periods (seasons - days - hours)
     shares          share constraint relations
     relation        generic linear relations
@@ -168,10 +168,12 @@ Alias(emission, emission2);
 Alias(level, l, level2);
 Alias(mode, m, mode2);
 Alias(node, location, n, node_share, node2, ns);
-Alias(tec, tec2);
+Alias(tec, t, tec2);
 Alias(time, time_act, time_od, time2, time3);
-Alias(year, year2, year3);
-Alias(year_all, vintage, year_all2, year_all3);
+* NB Cannot use 'y' as an alias because variable Y is defined in MACRO/macro_core.gms
+*    and GAMS is case-insensitive
+Alias(year, y_, year2, year3);
+Alias(year_all, vintage, y_all, y_prev, year_all2, year_all3);
 
 *----------------------------------------------------------------------------------------------------------------------*
 * Category types and mappings                                                                                                       *
@@ -366,8 +368,24 @@ Sets
 *    * - map_time_commodity_storage(node,tec,level,commodity,mode,year_all,time)
 *      - Mapping of storage containers to their input commodity-level (not commodity-level of stored media)
 *
-* Some mapping sets are omitted from this table;
+* .. _map_tec_lifetime:
+*
+* map_tec_lifetime (dimensions :math:`n, t, y^V, y^A`)
+*    A particular combination :math:`(n, t, y^V, y^A)` is part of this set
+*    (that is, has value :any:`True` / ``yes``)
+*    if and only if capacity constructed in period |yV| may be active in |yA|.
+*    This requires that:
+*
+*    - :math:`y^V \leq y^A`, and
+*    - :math:`\tl_{n, t, y^V}` is greater than the sum of :math:`\dp_{y}` from |yV| to the period *before* |yA|, inclusive.
+*
+*    For historical periods (:math:`y^V \lt y_0`),
+*    map_tec_lifetime is only populated
+*    if there are corresponding entries in |historical_new_capacity|.
+*
+* Some mapping sets are omitted from this table and list;
 * for a complete list, see the file :file:`MESSAGE/sets_maps_def.gms`.
+*
 ***
 
 Sets

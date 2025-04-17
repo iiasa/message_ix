@@ -15,6 +15,12 @@ Users **should**:
   For any such entries,
   users **should** reformulate to use distinct ``type_tec`` entries for these two purposes,
   and then confirm that model behaviour relative to v3.10.0 is as expected/not different.
+- (:pull:`924`) check that ``ACT`` of technologies within the model horizon is consistent with |historical_new_capacity| and ``technical_lifetime`` values for historical periods.
+
+  If ``input`` or ``output`` parameter values within the model horizon were used as a work-around for :issue:`923`,
+  these **may** be safely removed.
+- (:pull:`924`, :issue:`932`) check values of ``CAP_NEW`` in model periods that have a different duration than the preceding period,
+  and adjust |growth_new_capacity_up| values as necessary.
 
 All changes
 -----------
@@ -24,6 +30,15 @@ All changes
   This change reduces the size of the ``EMISS`` variable,
   which can improve memory use performance for large scenarios
   that make extensive use of commodity share constraints.
+- Bug fix for construction of |map_tec_lifetime| (:pull:`924`, :issue:`923`).
+  Previously, entries in |historical_new_capacity| did not correctly result in historical technology vintages
+  that could be active in periods within the model horizon.
+  The fix removes the need to use certain work-arounds for the bug; see the issue for details.
+  Add documentation for this set.
+- Bug fix for the application of |growth_new_capacity_up| in :ref:`equation_new_capacity_constraint_up` (:pull:`924`, :issue:`932`).
+  In :mod:`message_ix` v3.7.0 to v3.10.0, changes in |duration_period| between subsequent periods
+  would result in upper bounds applied to ``CAP_NEW``
+  that were artificially low (if period duration increased) or high (if period duration decreased).
 
 .. _v3.10.0:
 
