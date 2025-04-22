@@ -4,9 +4,26 @@
 * ------------------------------------------------------------------------------
 
 SVKN(node_macro, year) = ((potential_gdp(node_macro, year) - SUM(year2$( seq_period(year2,year) ), potential_gdp(node_macro, year2)) * (1 - depr(node_macro))**duration_period(year)) * kgdp(node_macro)) $ (NOT macro_base_period(year));
-SVNEWE(node_macro, sector, year) = (demand_base(node_macro, sector) * growth_factor(node_macro, year) - demand_base(node_macro, sector) * (1 - depr(node_macro))**(SUM(year2 $ macro_base_period(year2), duration_period_sum(year2, year)))) $ (NOT macro_base_period(year));
 
-NEWENE.L(node_macro, sector, macro_horizon)  = SVNEWE(node_macro, sector, macro_horizon)$(SVNEWE(node_macro, sector, macro_horizon) > 0) + epsilon ;
+* NB This value is an *estimate* provided to the solver as a initial value (NEWENE.L in the next statement) in the
+* problem domain. Depending on the interpretation of NEWENE (for instance, as an instantaneous value at the *start* or
+* *end* of a period, or some point between; or a mean/average over the whole period or the representative year) and of
+* base_demand, the value may be low or high. This affects solver performance but should not affect the optimal solution.
+* See also:
+* - The documentation of duration_period_sum.
+* - Comments at https://github.com/iiasa/message_ix/pull/926 and the related issue #925.
+
+SVNEWE(node_macro, sector, year) = (
+  demand_base(node_macro, sector) * growth_factor(node_macro, year)
+  - demand_base(node_macro, sector) * (1 - depr(node_macro)) ** (
+    SUM(year2$macro_base_period(year2), duration_period_sum(year2, year) + duration_period(year))
+  )
+)$(NOT macro_base_period(year));
+
+NEWENE.L(node_macro, sector, macro_horizon) = (
+  SVNEWE(node_macro, sector, macro_horizon)$(SVNEWE(node_macro, sector, macro_horizon) > 0) + epsilon
+);
+
 PHYSENE.L(node_macro, sector, year)  = enestart(node_macro, sector, year) ;
 KN.L(node_macro, macro_horizon)  = SVKN(node_macro, macro_horizon) $ (SVKN(node_macro, macro_horizon) > 0) + epsilon ;
 
@@ -64,4 +81,3 @@ LOOP(node $ node_macro(node),
 *    status(node,'objVal')    = MESSAGE_MACRO.objVal ;
 
 ) ;
-
