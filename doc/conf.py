@@ -79,7 +79,7 @@ rst_prolog = r"""
 for name in (
     "duration_period",
     "duration_period_sum",
-    "growth_new_capacity",
+    "growth_new_capacity_up",
     "historical_new_capacity",
     "map_tec_lifetime",
     "remaining_capacity",
