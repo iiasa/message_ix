@@ -66,6 +66,26 @@
 *    See :doc:`/time`.
 *
 * .. [#df_auto] These parameters are computed during the GAMS execution.
+*
+* .. _duration_period_sum:
+*
+* duration_period_sum (dimensions :math:`y_a, y_b`)
+*    This parameter measures the total time from the **start** of period :math:`y_a`
+*    until the **start** of any following period :math:`y_b`
+*    (equivalently: until the **end** of the period immediately preceding :math:`y_b`).
+*
+*    For example, with periods labelled '1000', '1010', '1015', and '1020':
+*
+*    - The period '1000' ends on and includes the day 1000-12-31.
+*    - The period '1010' starts on 1001-01-01 and ends on 1010-12-31.
+*    - The period '1020' starts on 1016-01-01.
+*    - Thus ``duration_period_sum(1010, 1020)`` measures the total time from 1001-01-01 to 1016-01-01,
+*      which is 15 years.
+*    - This is the same as ``duration_period(1010) + duration_period(1015)``.
+*
+*    This parameter is used,
+*    *inter alia*,
+*    to populate |map_tec_lifetime| and compute |remaining_capacity|.
 ***
 
 Parameters
@@ -556,6 +576,7 @@ Parameters
 
 ***
 * .. _section_parameter_investment:
+* .. _remaining_capacity:
 *
 * Auxiliary investment cost parameters and multipliers
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
