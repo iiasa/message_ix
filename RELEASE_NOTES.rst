@@ -25,7 +25,7 @@ Users **should**:
 All changes
 -----------
 
-- Adjust use of :ref:`type_tec <mapping-sets>` in :ref:`equation_emission_equivalence` (:pull:`930`, :issue:`929`).
+- Adjust use of :ref:`type_tec <mapping-sets>` in :ref:`equation_emission_equivalence` (:pull:`930`, :issue:`929`, :pull:`935`).
 
   This change reduces the size of the ``EMISS`` variable,
   which can improve memory use performance for large scenarios
