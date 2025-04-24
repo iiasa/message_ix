@@ -81,6 +81,19 @@ fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activit
 storage_initial, storage_self_discharge, time_order
 ;
 
+*----------------------------------------------------------------------------------------------------------------------*
+* Sets derived from input sets                                                                                         *
+*----------------------------------------------------------------------------------------------------------------------*
+
+* 'yes' for any type_tec that is a member of map_shares_commodity_share with any combination of other indices
+type_tec_share(type_tec) = SOR(
+    (shares, ns, n, m, commodity, l), map_shares_commodity_share(shares, ns, n, type_tec, m, commodity, l)
+);
+
+* Same, except with map_shares_commodity_total
+type_tec_total(type_tec) = SOR(
+    (shares, ns, n, m, commodity, l), map_shares_commodity_total(shares, ns, n, type_tec, m, commodity, l)
+);
 
 *----------------------------------------------------------------------------------------------------------------------*
 * ensure that each node is mapped to itself                                                                            *
@@ -129,10 +142,12 @@ map_tec_lifetime(node,tec,vintage,year_all)$( map_tec(node,tec,vintage) AND map_
     AND duration_period_sum(vintage,year_all) < technical_lifetime(node,tec,vintage) ) = yes ;
 
 * mapping of technology lifetime to all periods 'year_all' which were built prior to the beginning of the model horizon
-map_tec_lifetime(node,tec,historical,year_all)$( map_tec(node,tec,year_all) AND map_period(historical,year_all)
+map_tec_lifetime(node,tec,historical,year_all)$(
+    map_tec(node,tec,year_all)
+    AND map_period(historical,year_all)
     AND historical_new_capacity(node,tec,historical)
-    AND duration_period_sum(historical,year_all)
-        < sum(first_period, technical_lifetime(node,tec,first_period) ) ) = yes ;
+    AND duration_period_sum(historical,year_all) < technical_lifetime(node,tec,historical)
+) = yes ;
 
 * mapping of renewable technologies to their input commodities
 map_ren_com(node,renewable_tec,commodity,year_all)$(

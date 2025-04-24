@@ -4,11 +4,10 @@ import sys
 from functools import partial
 from pathlib import Path
 
+import genno
 import pandas as pd
 import pyam
 import pytest
-import xarray as xr
-from genno import Quantity
 from genno.testing import assert_qty_equal
 from ixmp.report import Reporter as ixmp_Reporter
 from ixmp.testing import assert_logs
@@ -34,7 +33,7 @@ class TestReporter:
         assert rep.check_keys(key)
 
 
-def test_reporter_no_solution(caplog, message_test_mp):
+def test_reporter_no_solution(caplog, message_test_mp) -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
     with assert_logs(
@@ -52,7 +51,7 @@ def test_reporter_no_solution(caplog, message_test_mp):
     assert 3 == len(result)
 
 
-def test_reporter_from_scenario(message_test_mp):
+def test_reporter_from_scenario(message_test_mp) -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
     # Varies between local & CI contexts
@@ -76,8 +75,8 @@ def test_reporter_from_scenario(message_test_mp):
     assert "demand:n-l-h" in rep, sorted(rep.graph)
 
     # Quantities contain expected data
-    dims = dict(coords=["chicago new-york topeka".split()], dims=["n"])
-    demand = Quantity(xr.DataArray([300, 325, 275], **dims), name="demand")
+    coords = dict(n="chicago new-york topeka".split())
+    demand = genno.Quantity([300, 325, 275], coords=coords, name="demand")
 
     # NB the call to squeeze() drops the length-1 dimensions c-l-y-h
     obs = rep.get("demand:n-c-l-y-h").squeeze(drop=True)
@@ -99,13 +98,12 @@ def test_reporter_from_scenario(message_test_mp):
     # …and expected values
     var_cost = rep.get(rep.full_key("var_cost"))
     ACT = rep.get(rep.full_key("ACT"))
-    mul = rep.get_operator("mul")
-    vom = mul(var_cost, ACT)
+    vom = var_cost * ACT
     # check_attrs false because `vom` multiply above does not add units
     assert_qty_equal(vom, rep.get(vom_key))
 
 
-def test_reporter_from_dantzig(test_mp, request):
+def test_reporter_from_dantzig(request, test_mp) -> None:
     scen = make_dantzig(test_mp, solve=True, quiet=True, request=request)
 
     # Reporter.from_scenario can handle Dantzig example model
@@ -115,10 +113,8 @@ def test_reporter_from_dantzig(test_mp, request):
     rep.get("all")
 
 
-def test_reporter_from_westeros(test_mp, request):
-    scen = make_westeros(
-        test_mp, emissions=True, solve=True, quiet=True, request=request
-    )
+def test_reporter_from_westeros(request, test_mp) -> None:
+    scen = make_westeros(test_mp, emissions=True, solve=True, request=request)
 
     # Reporter.from_scenario can handle Westeros example model
     rep = Reporter.from_scenario(scen)
@@ -137,33 +133,28 @@ def test_reporter_from_westeros(test_mp, request):
     assert len(obs.data) == 78
 
     # custom values are correct
-    obs = obs.filter(variable="total om*")
-    assert len(obs.data) == 9
-    assert all(
-        obs["variable"]
-        == ["total om cost|coal_ppl"] * 3  # noqa: W504
-        + ["total om cost|grid"] * 3  # noqa: W504
-        + ["total om cost|wind_ppl"] * 3  # noqa: W504
-    )
-    assert all(obs["year"] == [700, 710, 720] * 3)
+    obs = obs.filter(variable="total om*").as_pandas()
 
-    obs = obs.data["value"].values
-    exp = [
-        2842.457491,
-        5373.051098,
-        6933.333333,
-        880.0,
-        1312.0,
-        1664.0,
-        381.578322,
-        43.340541,
-        0.0,
-    ]
-    assert len(obs) == len(exp)
-    assert_allclose(obs, exp)
+    # Produce a merged data frame; this also implies that the same labels exist in `obs`
+    df = pd.DataFrame(
+        [
+            ["total om cost|coal_ppl", 700, 2801.242],
+            ["total om cost|coal_ppl", 710, 5321.242],
+            ["total om cost|coal_ppl", 720, 6933.333],
+            ["total om cost|grid", 700, 880.0],
+            ["total om cost|grid", 710, 1312.0],
+            ["total om cost|grid", 720, 1664.0],
+            ["total om cost|wind_ppl", 700, 400.6596],
+            ["total om cost|wind_ppl", 710, 67.32630],
+            ["total om cost|wind_ppl", 720, 0.0],
+        ],
+        columns=["variable", "year", "value"],
+    ).merge(obs, on=["variable", "year"], how="outer")
+
+    assert_allclose(df["value_y"], df["value_x"], err_msg=df.to_string())
 
 
-def test_reporter_as_pyam(caplog, tmp_path, dantzig_reporter):
+def test_reporter_as_pyam(caplog, tmp_path, dantzig_reporter) -> None:
     caplog.set_level(logging.INFO)
 
     rep = dantzig_reporter

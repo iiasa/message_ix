@@ -1534,42 +1534,67 @@ SHARE_CONSTRAINT_COMMODITY_LO(shares,node_share,year,time)$( share_commodity_lo(
 * annual growth of the existing 'capital stock', and a "soft" relaxation of the upper bound.
 *
 *  .. math::
-*     \text{CAP_NEW}_{n,t,y}
-*         \leq & \Bigg(~ \text{initial_new_capacity_up}_{n,t,y}
-*             \cdot \frac{ \Big( 1 + \text{growth_new_capacity_up}_{n,t,y} \Big)^{|y|} - 1 }
-*                        { \text{growth_new_capacity_up}_{n,t,y} } \\
-*              & + \Big( \text{CAP_NEW}_{n,t,y-1} + \text{historical_new_capacity}_{n,t,y-1} \Big) \\
-*              & \hspace{2 cm} \cdot \Big( 1 + \text{growth_new_capacity_up}_{n,t,y} \Big)^{|y|} \\
-*              & + \text{CAP_NEW_UP}_{n,t,y} \cdot \Bigg( \Big( 1 + \text{soft_new_capacity_up}_{n,t,y}\Big)^{|y|} - 1 \Bigg)\Bigg) \\
-*              & * \frac{|y-1|}{|y|} \\
-*         & \quad \forall \ t \ \in \ T^{\text{INV}}
+*     gncu^1_{n,t,y} =
+*       & \left( 1 + \text{growth_new_capacity_up}_{n,t,y} \right)^{|y|} \\
+*     gncu^2_{n,t,y} =
+*       & \frac{gncu^1_{n,t,y} -1 }{|y| \cdot \log{\left(1 + \text{growth_new_capacity_up}_{n,t,y} \right)}} \\
+*     k^{gncu}_{n,t,y_a,y_b} =
+*       & \frac{gncu^1_{n,t,y_a} \cdot gncu^2_{n,t,y_b}}{gncu^2_{n,t,y_a}} \\
+*     \text{CAP_NEW}_{n,t,y} \leq
+*       & \big(   \text{CAP_NEW}_{n,t,y_{-1}} + \text{historical_new_capacity}_{n,t,y_{-1}} \big. \\
+*       & \big. + \text{initial_new_capacity_up}_{n,t,y} \big) \cdot k^{gncu}_{n,t,y_{-1},y} \\
+*       & + \left(\text{CAP_NEW_UP}_{n,t,y} \cdot \left((1 + \text{soft_new_capacity_up}_{n,t,y})^{|y|} - 1 \right)\right) \\
+*     \forall & \ t \ \in \ T^{\text{INV}}
 *
 * Here, :math:`|y|` is the number of years in period :math:`y`, i.e., :math:`\text{duration_period}_{y}`.
 ***
-NEW_CAPACITY_CONSTRAINT_UP(node,inv_tec,year)$( map_tec(node,inv_tec,year)
-        AND is_dynamic_new_capacity_up(node,inv_tec,year) )..
-* actual new capacity
-    CAP_NEW(node,inv_tec,year) =L=
-* initial new capacity (compounded over the duration of the period)
-        (initial_new_capacity_up(node,inv_tec,year) * (
-            ( ( POWER( 1 + growth_new_capacity_up(node,inv_tec,year) , duration_period(year) ) - 1 )
-                / growth_new_capacity_up(node,inv_tec,year) )$( growth_new_capacity_up(node,inv_tec,year) )
-              + ( duration_period(year) )$( NOT growth_new_capacity_up(node,inv_tec,year) )
-            )
-* growth of 'capital stock' from previous period
-        + SUM(year_all2$( seq_period(year_all2,year) ),
-            CAP_NEW(node,inv_tec,year_all2)$( map_tec(node,inv_tec,year_all2) AND model_horizon(year_all2) )
-              + historical_new_capacity(node,inv_tec,year_all2) )
-              # placeholder for spillover across nodes, technologies, periods (other than immediate predecessor)
-            * POWER( 1 + growth_new_capacity_up(node,inv_tec,year) , duration_period(year) )
-* 'soft' relaxation of dynamic constraints
-        + ( CAP_NEW_UP(node,inv_tec,year)
-            * ( POWER( 1 + soft_new_capacity_up(node,inv_tec,year) , duration_period(year) ) - 1 )
-           )$( soft_new_capacity_up(node,inv_tec,year) ))
-       * SUM(year_all2$( seq_period(year_all2,year) ),
-            ( duration_period(year_all2) / duration_period(year) ))
-* optional relaxation for calibration and debugging
-%SLACK_CAP_NEW_DYNAMIC_UP% + SLACK_CAP_NEW_DYNAMIC_UP(node,inv_tec,year)
+
+* Compute auxiliary values
+gncu_1(n,t,y_all)$inv_tec(t) = POWER(1 + growth_new_capacity_up(n,t,y_all), duration_period(y_all));
+
+gncu_2(n,t,y_all) = 1;
+gncu_2(n,t,y_all)$growth_new_capacity_up(n,t,y_all) = (
+  (gncu_1(n,t,y_all) - 1) / (duration_period(y_all) * LOG(1 + growth_new_capacity_up(n,t,y_all)))
+);
+
+* Ratio of CAP_NEW(n,t,y_all) to CAP_NEW(n,t,y_prev)
+k_gncu(n,t,y_prev,y_all)$(
+    seq_period(y_prev,y_all)
+    # Same condition as the equation, below
+    AND inv_tec(t) AND map_tec(n,t,y_all) AND is_dynamic_new_capacity_up(n,t,y_all)
+) = gncu_1(n,t,y_prev) * gncu_2(n,t,y_all) / gncu_2(n,t,y_prev);
+
+NEW_CAPACITY_CONSTRAINT_UP(n,t,y_)$(
+    inv_tec(t) AND map_tec(n,t,y_) AND is_dynamic_new_capacity_up(n,t,y_)
+)..
+  CAP_NEW(n,t,y_)
+
+  =L=
+
+  # 'Hard' constraint value
+  SUM(
+    y_prev$seq_period(y_prev, y_),
+    (
+      # New capacity in previous model period
+      CAP_NEW(n,t,y_prev)$(model_horizon(y_prev) AND map_tec(n,t,y_prev))
+
+      # New capacity in previous historical period
+      + historical_new_capacity(n,t,y_prev)
+
+      # Otherwise, maximum initial value
+      # FIXME Do not use this if any of the above are non-zero
+      + initial_new_capacity_up(n,t,y_)
+    )
+    * k_gncu(n,t,y_prev,y_)
+  )
+
+  # 'Soft' relaxation of constraint
+  + (
+    CAP_NEW_UP(n,t,y_) * (POWER(1 + soft_new_capacity_up(n,t,y_), duration_period(y_)) - 1)
+  )$soft_new_capacity_up(n,t,y_)
+
+  # Additional relaxation for calibration and debugging
+%SLACK_CAP_NEW_DYNAMIC_UP% + SLACK_CAP_NEW_DYNAMIC_UP(n,t,y_)
 ;
 
 * GAMS implementation comment:
@@ -1835,8 +1860,15 @@ ACTIVITY_SOFT_CONSTRAINT_LO(node,tec,year,time)$( soft_activity_lo(node,tec,year
 *              + \sum_{s} \ \text{land_emission}_{n^L,s,y,e} \cdot \text{LAND}_{n^L,s,y}
 *                   \text{ if } \widehat{t} \in \widehat{T}^{LAND} \Bigg)
 *
+* .. versionchanged:: v3.11.0
+*
+*    ``type_tec`` elements that appear in either of the :ref:`mapping sets <section_maps_def>`
+*    ``map_shares_commodity_share`` or ``map_shares_commodity_total`` are excluded from this equation,
+*    and thus also from the domain of the ``EMISS`` :ref:`variable <section_decision_variable_def>`.
 ***
-EMISSION_EQUIVALENCE(node,emission,type_tec,year)..
+EMISSION_EQUIVALENCE(node,emission,type_tec,year)$(
+  NOT type_tec_share(type_tec) AND NOT type_tec_total(type_tec)
+)..
     EMISS(node,emission,type_tec,year)
     =E=
     SUM(location$( map_node(node,location) ),

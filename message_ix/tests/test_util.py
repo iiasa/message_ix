@@ -1,13 +1,14 @@
+from typing import Any
+
 import numpy.testing as npt
 import pandas as pd
 import pandas.testing as pdt
 import pytest
 
-from message_ix import Scenario, make_df
-from message_ix.testing import make_dantzig, make_westeros
+from message_ix import make_df
 
 
-def test_make_df():
+def test_make_df() -> None:
     # DataFrame prepared for the message_ix parameter 'input' has the correct
     # shape
     result = make_df("input")
@@ -25,12 +26,12 @@ def test_make_df():
     pdt.assert_series_equal(result["time_dest"], pd.Series("year", name="time_dest"))
 
 
-def test_make_df_deprecated():
+def test_make_df_deprecated() -> None:
     # Importing from the old location generates a warning
     with pytest.warns(DeprecationWarning, match="from 'message_ix.utils' instead of"):
         from message_ix.utils import make_df as make_df_unused  # noqa: F401
 
-    base = {"foo": "bar"}
+    base: dict[str, Any] = {"foo": "bar"}
     exp = pd.DataFrame({"foo": "bar", "baz": [42, 43]})
 
     # Deprecated signature generates a warning
@@ -44,18 +45,3 @@ def test_make_df_deprecated():
     # Equivalent
     base.update(baz=[42, 43])
     pdt.assert_frame_equal(pd.DataFrame.from_dict(base), exp)
-
-
-def test_testing_make_scenario(test_mp, request):
-    """Check the model creation functions in message_ix.testing."""
-    # MESSAGE-scheme Dantzig problem can be created
-    scen = make_dantzig(test_mp, True, request=request)
-    assert isinstance(scen, Scenario)
-
-    # Multi-year variant can be created
-    scen = make_dantzig(test_mp, solve=True, multi_year=True, request=request)
-    assert isinstance(scen, Scenario)
-
-    # Westeros model can be created
-    scen = make_westeros(test_mp, solve=True, request=request)
-    assert isinstance(scen, Scenario)

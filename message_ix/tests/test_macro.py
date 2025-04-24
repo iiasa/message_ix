@@ -32,12 +32,8 @@ def w_data(w_data_path):
 
 @pytest.fixture(scope="module")
 def _ws(test_mp, request):
-    """Reusable fixture with an instance of the Westeros model."""
-    scenario = make_westeros(test_mp, quiet=True, request=request).clone(
-        scenario=f"{request.node.name}_test_macro"
-    )
-    scenario.solve()
-    yield scenario
+    """Module-scoped fixture with a solved instance of the Westeros model."""
+    yield make_westeros(test_mp, solve=True, request=request)
 
 
 @pytest.fixture
@@ -55,14 +51,15 @@ def westeros_not_solved(request, _ws):
 # Tests
 
 
-def test_calc_valid_data_file(westeros_solved, w_data_path):
+def test_calc_valid_data_file(westeros_solved, w_data_path) -> None:
     c = macro.prepare_computer(westeros_solved, data=w_data_path)
     c.get("check all")
 
 
-def test_calc_invalid_data(westeros_solved):
+def test_calc_invalid_data(westeros_solved) -> None:
+    #  TypeError is raised with invalid input data type
     with pytest.raises(TypeError, match="neither a dict nor a valid path"):
-        macro.prepare_computer(westeros_solved, data=list())
+        macro.prepare_computer(westeros_solved, data=list())  # type: ignore [arg-type]
 
     with pytest.raises(ValueError, match="not an Excel data file"):
         macro.prepare_computer(
@@ -70,12 +67,12 @@ def test_calc_invalid_data(westeros_solved):
         )
 
 
-def test_calc_valid_data_dict(westeros_solved, w_data):
+def test_calc_valid_data_dict(westeros_solved, w_data) -> None:
     c = macro.prepare_computer(westeros_solved, data=w_data)
     c.get("check all")
 
 
-def test_calc_valid_years(westeros_solved, w_data):
+def test_calc_valid_years(westeros_solved, w_data) -> None:
     """Select desirable years from a config file in Excel format."""
     data = w_data
 
@@ -95,13 +92,13 @@ def test_calc_valid_years(westeros_solved, w_data):
     westeros_solved.add_macro(data=data)
 
 
-def test_calc_no_solution(westeros_not_solved, w_data_path):
+def test_calc_no_solution(westeros_not_solved, w_data_path) -> None:
     s = westeros_not_solved
     with pytest.raises(RuntimeError, match="solution"):
         macro.prepare_computer(s, data=w_data_path)
 
 
-def test_config(westeros_solved, w_data_path):
+def test_config(westeros_solved, w_data_path) -> None:
     c = macro.prepare_computer(westeros_solved, data=w_data_path)
     assert "config::macro" in c.graph
     assert "sector" in c.get("config::macro")
@@ -122,7 +119,7 @@ def test_config(westeros_solved, w_data_path):
         c.get("check all")
 
 
-def test_calc_data_missing_par(westeros_solved, w_data):
+def test_calc_data_missing_par(westeros_solved, w_data) -> None:
     data = w_data
 
     data.pop("gdp_calibrate")
@@ -132,7 +129,7 @@ def test_calc_data_missing_par(westeros_solved, w_data):
         c.get("check all")
 
 
-def test_calc_data_missing_ref(westeros_solved: Scenario, w_data):
+def test_calc_data_missing_ref(westeros_solved: Scenario, w_data) -> None:
     """When "price_ref" is missing, the code computes it by extrapolation."""
     data = w_data
 
@@ -148,7 +145,7 @@ def test_calc_data_missing_ref(westeros_solved: Scenario, w_data):
     westeros_solved.add_macro(data)
 
 
-def test_calc_data_missing_column(westeros_solved, w_data):
+def test_calc_data_missing_column(westeros_solved, w_data) -> None:
     data = w_data
 
     # Drop a column
@@ -159,7 +156,7 @@ def test_calc_data_missing_column(westeros_solved, w_data):
         c.get("check all")
 
 
-def test_calc_data_missing_datapoint(westeros_solved, w_data):
+def test_calc_data_missing_datapoint(westeros_solved, w_data) -> None:
     data = w_data
 
     # Skip first data point
@@ -183,7 +180,9 @@ def test_calc_data_missing_datapoint(westeros_solved, w_data):
         ("rho", "equal", [-4.0]),
         ("historical_gdp", "equal", [500.0]),
         ("k0", "equal", [1500.0]),
-        ("cost_MESSAGE", "allclose", [6.18242, 8.44930447, 11.89512066, 12.84911389]),
+        # These values updated to align with changes in
+        # https://github.com/iiasa/message_ix/pull/924
+        ("cost_MESSAGE", "allclose", [6.18242, 8.801164, 11.845227, 12.845227]),
         (
             "price_MESSAGE",
             "allclose",
@@ -194,41 +193,40 @@ def test_calc_data_missing_datapoint(westeros_solved, w_data):
         ("lakl", "allclose", [26.027323]),
     ),
 )
-def test_calc(westeros_solved, w_data_path, key, test, expected):
+def test_calc(westeros_solved, w_data_path, key, test, expected) -> None:
+    """Test calculation of intermediate values on a solved Westeros scenario."""
     c = macro.prepare_computer(westeros_solved, data=w_data_path)
 
     assertion = getattr(npt, f"assert_{test}")
 
-    assertion(expected, c.get(key).values)
+    assertion(c.get(key).values, expected)
 
 
-# Testing how macro handles zero values in PRICE_COMMODITY
-def test_calc_price_zero(westeros_solved, w_data_path):
-    clone = westeros_solved.clone(scenario="low_demand", keep_solution=False)
-    clone.check_out()
-    # Lowering demand in the first year
-    clone.add_par("demand", ["Westeros", "light", "useful", 700, "year"], 10, "GWa")
-    # Making investment and var cost zero for delivering light
-    # TODO: these units are based on testing.make_westeros: needs improvement
-    clone.add_par("inv_cost", ["Westeros", "bulb", 700], 0, "USD/GWa")
-    for y in [690, 700]:
-        clone.add_par(
-            "var_cost", ["Westeros", "grid", y, 700, "standard", "year"], 0, "USD/GWa"
-        )
+def test_calc_price_zero(westeros_not_solved: Scenario, w_data_path) -> None:
+    """MACRO raises an exception for zero values in PRICE_COMMODITY."""
+    # Prepare a Scenario
+    s = westeros_not_solved
+    y = list(s.set("year"))
+    yv = y[: y.index(720)]
 
-    clone.commit("demand reduced and zero cost for bulb")
-    clone.solve()
-    price = clone.var("PRICE_COMMODITY")
+    # Set costs to zero for technologies possibly active in the first period
+    filters = dict(technology=["bulb", "coal_ppl", "grid", "wind_ppl"], year_vtg=yv)
+    with s.transact("test_calc_price_zero"):
+        for name in "fix_cost", "inv_cost", "var_cost":
+            s.add_par(name, s.par(name, filters=filters).assign(value=0))
 
-    # Assert if there is no zero price (to make sure MACRO receives 0 price)
-    assert np.isclose(0, price["lvl"]).any()
+    s.solve()
 
-    c = macro.prepare_computer(clone, data=w_data_path)
+    # Confirm that there are zeroes in PRICE_COMMODITY to trigger the exception
+    pc = s.var("PRICE_COMMODITY")
+    assert np.isclose(0, pc["lvl"]).any(), f"No zero values in:\n{pc.to_string()}"
+
+    c = macro.prepare_computer(s, data=w_data_path)
     with pytest.raises(Exception, match="0-price found in MESSAGE variable PRICE_"):
         c.get("price_MESSAGE")
 
 
-def test_init(message_test_mp):
+def test_init(message_test_mp) -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
     scen = scen.clone("foo", "bar")
@@ -244,7 +242,7 @@ def test_init(message_test_mp):
     assert "COST_ACCOUNTING_NODAL" in scen.equ_list()
 
 
-def test_add_model_data(westeros_solved, w_data_path):
+def test_add_model_data(westeros_solved, w_data_path) -> None:
     base = westeros_solved
     clone = base.clone(scenario=f"{base.scenario} cloned", keep_solution=False)
     clone.check_out()
@@ -257,7 +255,8 @@ def test_add_model_data(westeros_solved, w_data_path):
     assert np.isclose(obs, exp)
 
 
-def test_calibrate(westeros_solved, w_data_path):
+def test_calibrate(westeros_solved, w_data_path) -> None:
+    """Test that :func:`.add_model_data` updates ``aeei`` and ``grow``."""
     base = westeros_solved
     clone = base.clone(base.model, "test macro calibration", keep_solution=False)
     clone.check_out()
@@ -273,34 +272,26 @@ def test_calibrate(westeros_solved, w_data_path):
     end_aeei = clone.par("aeei")["value"]
     end_grow = clone.par("grow")["value"]
 
-    # calibration should have changed some/all of these values and none should
-    # be NaNs
+    # calibration should have changed some/all of these values and none should be NaNs
     assert not np.allclose(start_aeei, end_aeei, rtol=1e-2)
     assert not np.allclose(start_grow, end_grow, rtol=1e-2)
     assert not end_aeei.isnull().any()
     assert not end_grow.isnull().any()
 
 
-def test_calibrate_roundtrip(westeros_solved, w_data_path):
-    # this is a regression test with values observed on May 23, 2024
+def test_calibrate_roundtrip(westeros_solved, w_data_path) -> None:
+    """Ensure certain values occur after checking convergence.
+
+    The specific values used here were re-checked in :pull:`924`.
+    """
     with_macro = westeros_solved.add_macro(w_data_path, check_convergence=True)
-    aeei = with_macro.par("aeei")["value"].values
     npt.assert_allclose(
-        aeei,
-        1e-3 * np.array([20.0, -7.56480599206068, 43.6577, 21.18243]),
+        with_macro.par("aeei")["value"].values,
+        1e-3 * np.array([20.0, -7.5674349, 43.659505, 21.182828]),
     )
-    grow = with_macro.par("grow")["value"].values
     npt.assert_allclose(
-        grow,
-        1e-3
-        * np.array(
-            [
-                26.583631,
-                69.146018,
-                79.138644,
-                24.522467,
-            ]
-        ),
+        with_macro.par("grow")["value"].values,
+        1e-3 * np.array([26.58363, 69.14695, 79.13789, 24.52248]),
     )
 
 
@@ -315,14 +306,14 @@ def mr_scenario(test_mp, request):
     yield scenario
 
 
-def test_multiregion_valid_data(mr_scenario):
+def test_multiregion_valid_data(mr_scenario) -> None:
     """Multi-region, multi-sector input data can be checked."""
     s = mr_scenario
     c = macro.prepare_computer(s, data=mr_data_path("2"))
     c.get("check all")
 
 
-def test_multiregion_derive_data(mr_scenario):
+def test_multiregion_derive_data(mr_scenario) -> None:
     s = mr_scenario
     path = mr_data_path("1")
     c = macro.prepare_computer(s, data=path)
@@ -365,7 +356,7 @@ def test_multiregion_derive_data(mr_scenario):
     pd.testing.assert_series_equal(obs, exp)
 
 
-def test_multiregion_derive_data_2(mr_scenario):
+def test_multiregion_derive_data_2(mr_scenario) -> None:
     """Multi-region multi-sector data can be computed."""
     s = mr_scenario
     c = macro.prepare_computer(s, data=mr_data_path("2"))
@@ -381,7 +372,7 @@ def test_multiregion_derive_data_2(mr_scenario):
     assert set(check["sector"].unique()) == set(sectors)
 
 
-def test_sector_map(westeros_solved, w_data):
+def test_sector_map(westeros_solved, w_data) -> None:
     """Calibration works when sector and commodity names are mismatched."""
     for table in "aeei", "config", "demand_ref", "price_ref":
         w_data[table] = w_data[table].replace({"sector": {"light": "FOO"}})

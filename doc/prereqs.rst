@@ -81,7 +81,7 @@ You should be able to:
 6. Understand the concept of **virtual environments** for Python, using either
    the built-in :mod:`venv` module (`docs <https://docs.python.org/3/library/venv.html>`__, `usage with pip`_), or `Anaconda environments`_ to create, activate, switch, and remove environments.
 
-   The :ref:`install-quick` and :ref:`install-adv` give instructions for the above two systems, but several others are in common use including
+   The :ref:`install-quick` and :doc:`install-adv` give instructions for the above two systems, but several others are in common use including
    `virtualenv <https://virtualenv.pypa.io/en/latest/index.html>`__ and `virtualfish <https://virtualfish.readthedocs.io/en/latest/>`__.
 
 7. **Manage Python packages**—that is, install, uninstall, upgrade, and check installed versions—using at least one of:
@@ -103,7 +103,9 @@ You should be able to:
      Many are available on other platforms.
    - An `in-depth tutorial <https://www.datacamp.com/community/tutorials/tutorial-jupyter-notebook>`_ by Karlijn Williams on DataCamp.
 
+.. _prereq-rfc2119:
 
+10. Know the :rfc:`2119` keywords **must**, **must not**, **required**, **shall**, **shall not**, **should**, **should not**, **recommended**,  **may**, and **optional**, and their meanings.
 
 Advanced usage
 ==============
@@ -153,7 +155,6 @@ You should be able to:
 5. Provide a complete and explicit description of a software error message and how to reproduce it.
 
 6. Read and understand GAMS code.
-
 
 .. _`usage with pip`: https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#create-and-use-virtual-environments
 .. _`Anaconda environments`: https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/environments.html
