@@ -80,12 +80,6 @@ exclude_also = [
   "if __name__ == '__main__':",
 ]
 
-[tool.coverage.run]
-omit = [
-  "message_ix/tests/test_nightly.py",
-  "message_ix/testing/nightly.py",
-]
-
 [tool.mypy]
 files = [
   "doc",
