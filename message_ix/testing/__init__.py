@@ -5,6 +5,7 @@ from itertools import product
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional, Union
 
+import ixmp
 import numpy as np
 import pandas as pd
 import pytest
@@ -47,6 +48,20 @@ SCENARIO = {
     },
     "westeros": {"model": "Westeros Electrified", "scenario": "baseline"},
 }
+
+#: Model names, scenario names, and file hashes for 'snapshots' of scenarios used in
+#: :mod:`.tests.test_snapshots`. These correspond to files in the Zenodo record at
+#: doi:`10.5281/zenodo.15277570 <https://doi.org/10.5281/zenodo.15277570>`_.
+SNAPSHOTS = (
+    (
+        dict(model="CD_Links_SSP2", scenario="baseline"),
+        "md5:ff57ee38defe2b983b22f26f696a6746",
+    ),
+    (
+        dict(model="CD_Links_SSP2_v2", scenario="NPi2020_1000-con-prim-dir-ncr"),
+        "md5:ae17c294c9479a2af14a9d3157f49257",
+    ),
+)
 
 
 # Create and populate ixmp databases
@@ -821,6 +836,58 @@ def make_subannual(
     scen.solve()
 
     return scen
+
+
+@pytest.fixture(scope="session")
+def snapshots_from_zenodo(pytestconfig) -> "Platform":  # pragma: no cover
+    """Platform with Scenarios from :data:`.SNAPSHOTS`.
+
+    This fixture:
+
+    1. Downloads the files from the Zenodo record to the pytest cache directory. If the
+       files are already present, this step is not repeated. The file hashes are
+       verified.
+    2. Creates a :class:`.Platform`, also in the pytest cache directory.
+    3. Adds the downloaded scenarios to the platform.
+    """
+    from pooch import HTTPDownloader, Pooch
+
+    from message_ix.models import MACRO
+
+    # Create a pooch 'registry' from `SCENARIOS`
+    cache_dir = pytestconfig.cache.mkdir("snapshots")
+    filename = "{0[model]}_{0[scenario]}_v1.xlsx"
+    p = Pooch(
+        base_url="https://zenodo.org/api/records/15277571/files/",
+        path=cache_dir,
+        registry={filename.format(si): h for si, h in SNAPSHOTS},
+    )
+
+    def zenodo_token_download(url, output_file, pooch):
+        token = os.environ["MESSAGE_IX_ZENODO_TOKEN"]
+        HTTPDownloader(params={"token": token})(f"{url}/content", output_file, pooch)
+
+    # Download (if needed) each file and store its full path
+    paths = [p.fetch(fn, downloader=zenodo_token_download) for fn in p.registry.keys()]
+
+    # Create a new Platform, also in the pytest cache directory
+    mp = ixmp.Platform(backend="jdbc", driver="hsqldb", path=cache_dir.joinpath("db"))
+
+    # Populate `mp` from the data files
+    for path, (scenario_info, _) in zip(paths, SNAPSHOTS):
+        try:
+            # Load an existing scenario
+            s = Scenario(mp, **scenario_info)
+        except ValueError:
+            s = Scenario(mp, **scenario_info, version="new")
+            MACRO.initialize(s)
+            s.read_excel(path, add_units=True, init_items=True)
+        else:
+            pass  # Already read from file → do not repeat
+
+    assert len(SNAPSHOTS) == len(mp.scenario_list(default=False))
+
+    return mp
 
 
 @pytest.fixture(scope="function")
