@@ -59,15 +59,14 @@ tutorial = ["jupyter", "matplotlib", "message_ix[report,sankey]"]
 report = ["ixmp[report]"]
 sankey = ["plotly"]
 tests = [
-  "asyncssh",
   "message_ix[docs,tutorial]",
   "pint",
+  "pooch",
   "pyam-iamc >= 0.6",
   "pytest >= 5",
   "pytest-cov",
   "pytest-rerunfailures",
   "pytest-xdist",
-  "requests",
 ]
 
 [project.scripts]
