@@ -86,14 +86,16 @@ storage_initial, storage_self_discharge, time_order
 *----------------------------------------------------------------------------------------------------------------------*
 
 * 'yes' for any type_tec that is a member of map_shares_commodity_share with any combination of other indices
-type_tec_share(type_tec) = SOR(
-    (shares, ns, n, m, commodity, l), map_shares_commodity_share(shares, ns, n, type_tec, m, commodity, l)
-);
+type_tec_share(type_tec)$SUM(
+  (shares, ns, n, m, commodity, l),
+  map_shares_commodity_share(shares, ns, n, type_tec, m, commodity, l)
+) = YES;
 
 * Same, except with map_shares_commodity_total
-type_tec_total(type_tec) = SOR(
-    (shares, ns, n, m, commodity, l), map_shares_commodity_total(shares, ns, n, type_tec, m, commodity, l)
-);
+type_tec_total(type_tec)$SUM(
+  (shares, ns, n, m, commodity, l),
+  map_shares_commodity_total(shares, ns, n, type_tec, m, commodity, l)
+) = YES;
 
 *----------------------------------------------------------------------------------------------------------------------*
 * ensure that each node is mapped to itself                                                                            *
