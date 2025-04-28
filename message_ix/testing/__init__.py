@@ -1,6 +1,6 @@
 import io
 import os
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from itertools import product
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional, Union
@@ -9,14 +9,17 @@ import ixmp
 import numpy as np
 import pandas as pd
 import pytest
+from click.testing import CliRunner
 from ixmp import IAMC_IDX
 
-from message_ix import Scenario, make_df
+from message_ix import Scenario, cli, make_df
+from message_ix.report import Reporter
 
 if TYPE_CHECKING:
     import pathlib
 
     from ixmp import Platform
+    from pint import UnitRegistry
 
 
 # Pytest hooks
@@ -842,6 +845,63 @@ def make_subannual(
     return scen
 
 
+# Fixtures
+
+
+@pytest.fixture
+def dantzig_reporter(
+    request, message_test_mp, ureg
+) -> Generator["Reporter", None, None]:
+    """A :class:`.Reporter` with a solved :func:`.make_dantzig` scenario."""
+    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
+        scenario=request.node.name
+    )
+
+    if not scen.has_solution():
+        scen.solve(quiet=True)
+
+    rep = Reporter.from_scenario(scen)
+
+    # The Dantzig model has no data in fix_cost, which creates an error adding the
+    # derived keys <fom:nl-t-yv-ya> and <vom:nl-t-yv-ya> because the former has no
+    # units. Force application of units to this empty quantity.
+    rep.configure(units=dict(apply=dict(fix_cost="USD/case")))
+
+    yield rep
+
+
+@pytest.fixture(scope="session")
+def message_ix_cli(tmp_env) -> Generator[Callable, None, None]:
+    """A CliRunner object that invokes the message_ix command-line interface.
+
+    :obj:`None` in *args* is automatically discarded.
+    """
+
+    class Runner(CliRunner):
+        def invoke(self, *args, **kwargs):
+            return super().invoke(
+                cli.main,
+                list(filter(None, args)),
+                env=tmp_env,
+                catch_exceptions=False,
+                color=True,
+                **kwargs,
+            )
+
+    yield Runner().invoke
+
+
+@pytest.fixture(scope="class")
+def message_test_mp(test_mp) -> Generator["Platform", None, None]:
+    """A test platform with two versions of the :func:`.make_dantzig` scenario.
+
+    One version has :py:`multi_year=False`, and the other :py:`multi_year=True`.
+    """
+    make_dantzig(test_mp)
+    make_dantzig(test_mp, multi_year=True)
+    yield test_mp
+
+
 @pytest.fixture(scope="session")
 def snapshots_from_zenodo(pytestconfig) -> "Platform":  # pragma: no cover
     """Platform with Scenarios from :data:`.SNAPSHOTS`.
@@ -894,6 +954,12 @@ def snapshots_from_zenodo(pytestconfig) -> "Platform":  # pragma: no cover
     return mp
 
 
+@pytest.fixture(scope="session")
+def test_data_path(request) -> Path:
+    """Path to the directory containing test data."""
+    return Path(__file__).parents[1] / "tests" / "data"
+
+
 @pytest.fixture(scope="function")
 def tmp_model_dir(tmp_path) -> Generator["pathlib.Path", None, None]:
     """Temporary directory containing a copy of the MESSAGE model files.
@@ -910,3 +976,26 @@ def tmp_model_dir(tmp_path) -> Generator["pathlib.Path", None, None]:
     copy_model(tmp_path, overwrite=False, set_default=False, quiet=True)
 
     yield tmp_path
+
+
+@pytest.fixture(scope="session")
+def tutorial_path(request) -> Path:
+    """Path to the directory containing the tutorials."""
+    return Path(__file__).parents[2] / "tutorial"
+
+
+@pytest.fixture(scope="session")
+def ureg() -> Generator["UnitRegistry", None, None]:
+    """Session-scoped :class:`pint.UnitRegistry` with units needed by tests."""
+    import pint
+
+    registry = pint.get_application_registry()
+
+    for unit in "USD", "case":
+        try:
+            registry.define(f"{unit} = [{unit}]")
+        except (pint.RedefinitionError, pint.DefinitionSyntaxError):
+            # Already defined
+            pass
+
+    yield registry
