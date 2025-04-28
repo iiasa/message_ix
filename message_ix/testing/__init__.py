@@ -683,7 +683,7 @@ def make_westeros(
 
 
 def make_subannual(
-    request,
+    mp: "Platform",
     tec_dict,
     time_steps,
     demand,
@@ -693,7 +693,9 @@ def make_subannual(
     capacity_factor={},
     var_cost={},
     operation_factor={},
-):
+    *,
+    request: Optional["pytest.FixtureRequest"] = None,
+) -> Scenario:
     """Return an :class:`message_ix.Scenario` with subannual time resolution.
 
     The scenario contains a simple model with two technologies, and a number of time
@@ -729,11 +731,13 @@ def make_subannual(
     operation_factor : dict, optional
         "operation_factor" with technology as key and "value" as value.
     """
-    # Get the `test_mp` fixture for the requesting test function
-    mp = request.getfixturevalue("test_mp")
-
     # Build an empty scenario
-    scen = Scenario(mp, request.node.name, scenario="test", version="new")
+    args = dict(model="Test subannual time steps", scenario="baseline", version="new")
+    if request:
+        # Use a distinct scenario name for a particular test
+        args.update(scenario=request.node.name)
+
+    scen = Scenario(mp, **args)
 
     # Add required sets
     scen.add_set("node", "node")
@@ -832,7 +836,7 @@ def make_subannual(
             common.update(relation="yearly_activity", technology=tec, value=1)
             scen.add_par("relation_activity", make_df("relation_activity", **common))
 
-    scen.commit(f"Scenario with subannual time resolution for {request.node.name}")
+    scen.commit("Scenario with subannual time resolution")
     scen.solve()
 
     return scen

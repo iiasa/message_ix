@@ -56,11 +56,11 @@ TD_0 = {
 }
 
 
-def test_capacity_factor_time(request):
+def test_capacity_factor_time(request, test_mp) -> None:
     """``capacity_factor`` is calculated correctly when it varies by time slice."""
     # Build model and solve
     scen = make_subannual(
-        request,
+        test_mp,
         TD_0,
         time_steps=[
             ("summer", 0.5, "season", "year"),
@@ -69,15 +69,16 @@ def test_capacity_factor_time(request):
         demand={"summer": 2, "winter": 1},
         capacity_factor={"gas_ppl": {"summer": 0.8, "winter": 0.6}},
         var_cost={"gas_ppl": {"summer": 0.2, "winter": 0.2}},
+        request=request,
     )
     check_solution(scen)
 
 
-def test_capacity_factor_unequal_time(request):
+def test_capacity_factor_unequal_time(request, test_mp) -> None:
     """``capacity_factor`` is calculated correctly when ``duration_time`` is uneven."""
     # Build model and solve
     scen = make_subannual(
-        request,
+        test_mp,
         TD_0,
         time_steps=[
             ("summer", 0.3, "season", "year"),
@@ -86,6 +87,7 @@ def test_capacity_factor_unequal_time(request):
         demand={"summer": 2, "winter": 1},
         capacity_factor={"gas_ppl": {"summer": 0.8, "winter": 0.8}},
         var_cost={"gas_ppl": {"summer": 0.2, "winter": 0.2}},
+        request=request,
     )
     check_solution(scen)
 
@@ -97,7 +99,7 @@ TS_0 = [
 ]
 
 
-def test_capacity_factor_zero(request):
+def test_capacity_factor_zero(request, test_mp) -> None:
     """Test zero capacity factor (CF) in a time slice.
 
     "solar_pv_ppl" is active in "day" and NOT at "night" (CF = 0). It is expected that
@@ -115,17 +117,18 @@ def test_capacity_factor_zero(request):
     # Build model and solve (should raise GAMS error)
     with pytest.raises(ModelError):
         make_subannual(
-            request,
+            test_mp,
             tec_dict,
             com_dict={"solar_pv_ppl": {"input": "fuel", "output": "electr"}},
             time_steps=TS_0,
             demand={"day": 2, "night": 1},
             capacity={"solar_pv_ppl": {"inv_cost": 0.2, "technical_lifetime": 5}},
             capacity_factor={"solar_pv_ppl": {"day": 0.8, "night": 0}},
+            request=request,
         )
 
 
-def test_capacity_factor_zero_two(request):
+def test_capacity_factor_zero_two(request, test_mp) -> None:
     """Test zero capacity factor (CF) in a time slice.
 
     "solar_pv_ppl" is active in "day" and NOT at "night" (CF = 0). The model output
@@ -148,7 +151,7 @@ def test_capacity_factor_zero_two(request):
 
     # Build model and solve
     scen = make_subannual(
-        request,
+        test_mp,
         tec_dict,
         com_dict={
             "solar_pv_ppl": {"input": "fuel", "output": "electr"},
@@ -168,16 +171,17 @@ def test_capacity_factor_zero_two(request):
             "solar_pv_ppl": {"day": 0, "night": 0},
             "gas_ppl": {"day": 0.2, "night": 0.2},
         },
+        request=request,
     )
     check_solution(scen)
 
 
-def test_capacity_factor_average(request):
+def test_capacity_factor_average(request, test_mp) -> None:
     """Weighted average of ``capacity_factor`` for "year" is calculated correctly,
     based on time slices, when there is no capacity factor defined for "year"."""
     # Build model and solve
     scen = make_subannual(
-        request,
+        test_mp,
         TD_0,
         time_steps=[
             ("summer", 0.5, "season", "year"),
@@ -187,5 +191,6 @@ def test_capacity_factor_average(request):
         capacity_factor={"gas_ppl": {"summer": 0.8, "winter": 0.6}},
         var_cost={"gas_ppl": {"summer": 0.2, "winter": 0.2}},
         operation_factor={"gas_ppl": 0.8},
+        request=request,
     )
     check_solution(scen)
