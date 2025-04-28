@@ -81,6 +81,7 @@ for name in (
     "duration_period_sum",
     "growth_new_capacity_up",
     "historical_new_capacity",
+    "initial_new_capacity_up",
     "map_tec_lifetime",
     "remaining_capacity",
 ):

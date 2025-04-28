@@ -19,8 +19,11 @@ Users **should**:
 
   If ``input`` or ``output`` parameter values within the model horizon were used as a work-around for :issue:`923`,
   these **may** be safely removed.
-- (:pull:`924`, :issue:`932`) check values of ``CAP_NEW`` in model periods that have a different duration than the preceding period,
-  and adjust |growth_new_capacity_up| values as necessary.
+- (:pull:`924`, :issue:`932`) check values of ``CAP_NEW``,
+  particularly in model periods that have a different duration than the preceding period,
+  and adjust |growth_new_capacity_up| or |initial_new_capacity_up| values as necessary.
+  For the latter, :func:`.initial_new_capacity_up_v311` may be used.
+
 
 All changes
 -----------
@@ -35,7 +38,7 @@ All changes
   that could be active in periods within the model horizon.
   The fix removes the need to use certain work-arounds for the bug; see the issue for details.
   Add documentation for this set.
-- Bug fix for the application of |growth_new_capacity_up| in :ref:`equation_new_capacity_constraint_up` (:pull:`924`, :issue:`932`).
+- Bug fix for the application of |growth_new_capacity_up| in :ref:`equation_new_capacity_constraint_up` (:pull:`924`, :issue:`932`, :pull:`936`).
   In :mod:`message_ix` v3.7.0 to v3.10.0, changes in |duration_period| between subsequent periods
   would result in upper bounds applied to ``CAP_NEW``
   that were artificially low (if period duration increased) or high (if period duration decreased).
