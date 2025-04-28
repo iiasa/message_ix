@@ -6,7 +6,11 @@ import matplotlib
 import pandas as pd
 import pyam
 from dask.core import literal
-from genno.testing import random_qty
+
+try:
+    from genno.operator import random_qty
+except ImportError:  # pragma: no cover — genno v1.27.1 and earlier
+    from genno.testing import random_qty  # type: ignore [no-redef]
 from ixmp.report import Quantity
 
 from message_ix import Scenario
