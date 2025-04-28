@@ -25,7 +25,7 @@ Users **should**:
 All changes
 -----------
 
-- Adjust use of :ref:`type_tec <mapping-sets>` in :ref:`equation_emission_equivalence` (:pull:`930`, :issue:`929`, :pull:`935`).
+- Adjust use of :ref:`type_tec <mapping-sets>` in :ref:`equation_emission_equivalence` (:pull:`930`, :issue:`929`).
 
   This change reduces the size of the ``EMISS`` variable,
   which can improve memory use performance for large scenarios
@@ -39,7 +39,6 @@ All changes
   In :mod:`message_ix` v3.7.0 to v3.10.0, changes in |duration_period| between subsequent periods
   would result in upper bounds applied to ``CAP_NEW``
   that were artificially low (if period duration increased) or high (if period duration decreased).
-- Improve documentation of |duration_period_sum| (:pull:`926`, :issue:`925`).
 
 .. _v3.10.0:
 
