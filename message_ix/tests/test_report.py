@@ -245,8 +245,13 @@ def test_reporter_as_pyam(caplog, tmp_path, dantzig_reporter) -> None:
     rep.write(key2, path)
 
     # File contents are as expected
+    # - With a parametrized `test_mp`, the `dantig_reporter` fixture has scenario name
+    #   like "test_reporter_as_pyam[jdbc]" with the backend module name. Truncate this
+    #   to compare with the expected data.
     expected = Path(__file__).parent / "data" / "report-pyam-write.csv"
-    assert path.read_text() == expected.read_text()
+    assert expected.read_text() == re.sub(
+        r"(test_reporter_as_pyam)\[(jdbc|ixmp4)\]", r"\1", path.read_text()
+    )
 
     # Use a name map to replace variable names
     replacements = {re.escape("Activity|canning_plant|production"): "Foo"}
