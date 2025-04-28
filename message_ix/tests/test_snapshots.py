@@ -5,15 +5,20 @@ import pytest
 
 import message_ix
 from message_ix.testing import SNAPSHOTS
+from message_ix.tools.migrate import v311
 
-#: Mapping from scenario URLs and to callables that perform assertions on the solved
-#: :class:`.Scenario`.
+#: Mapping from scenario URLs to tuples of:
+#:
+#: 1. Callable to prep the scenario.
+#: 2. Callable that perform assertions on the solved :class:`.Scenario`.
 CHECK = {
-    "CD_Links_SSP2/baseline#1": lambda s: npt.assert_allclose(
-        s.var("OBJ")["lvl"], 3869529.75, rtol=3e-6
+    "CD_Links_SSP2/baseline#1": (
+        v311,
+        lambda s: npt.assert_allclose(s.var("OBJ")["lvl"], 3871755.5),
     ),
-    "CD_Links_SSP2_v2/NPi2020_1000-con-prim-dir-ncr#1": lambda s: npt.assert_allclose(
-        s.var("OBJ")["lvl"], 3359089.0, rtol=3e-6
+    "CD_Links_SSP2_v2/NPi2020_1000-con-prim-dir-ncr#1": (
+        v311,
+        lambda s: npt.assert_allclose(s.var("OBJ")["lvl"], 3366415.25),
     ),
 }
 
@@ -35,10 +40,17 @@ def test_solve_and_check(
     """
     scen = message_ix.Scenario(snapshots_from_zenodo, **scenario_info)
 
-    # Retrieve the check to be applied to this scenario
-    check = CHECK[scen.url]
+    # Retrieve the preparation callback and check to be applied to this scenario
+    pre, check = CHECK[scen.url]
 
-    # Scenario solves
+    # Run the prep callback
+    try:
+        scen.remove_solution()
+    except ValueError:
+        pass
+    pre(scen)
+
+    # Scenario solves, i.e. is feasible
     scen.solve(model="MESSAGE-MACRO", solve_options=dict(lpmethod=4, tilim=300))
 
     # Check evaluates to True
