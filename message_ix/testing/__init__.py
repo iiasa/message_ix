@@ -3,7 +3,7 @@ import os
 from collections.abc import Generator
 from itertools import product
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -14,8 +14,6 @@ from message_ix import Scenario, make_df
 
 if TYPE_CHECKING:
     import pathlib
-
-    from ixmp import Platform
 
 
 # Pytest hooks
@@ -120,14 +118,8 @@ cfl                  0.0  0.1   10   900
 )
 
 
-# FIXME reduce complexity 19 → ≤13
-def make_austria(  # noqa: C901
-    mp,
-    solve: bool = False,
-    quiet: bool = True,
-    *,
-    request: Optional["pytest.FixtureRequest"] = None,
-) -> Scenario:
+# FIXME reduce complexity 18 → ≤13
+def make_austria(mp, solve=False, quiet=True):  # noqa: C901
     """Return an :class:`message_ix.Scenario` for the Austrian energy system.
 
     This is the same model used in the ``austria.ipynb`` tutorial.
@@ -143,18 +135,16 @@ def make_austria(  # noqa: C901
     mp.add_unit("MtCO2")
     mp.add_unit("tCO2/kWa")
 
-    args = SCENARIO["austria"] | dict(
+    scen = Scenario(
+        mp,
         version="new",
+        **SCENARIO["austria"],
         annotation="A stylized energy system model for illustration and testing",
     )
-    if request:
-        args.update(scenario=request.node.name)
-
-    scen = Scenario(mp, **args)
 
     # Structure
 
-    year: dict[str, Any] = dict(all=list(range(2010, 2041, 10)))
+    year = dict(all=list(range(2010, 2041, 10)))
     scen.add_horizon(year=year["all"])
     year_df = scen.vintage_and_active_years()
     year["vtg"] = year_df["year_vtg"]
@@ -184,7 +174,7 @@ def make_austria(  # noqa: C901
     name = "interestrate"
     scen.add_par(name, make_df(name, year=year["all"], value=0.05, unit="-"))
 
-    common: dict[str, Any] = dict(
+    common = dict(
         mode="standard",
         node_dest=country,
         node_loc=country,
@@ -231,7 +221,7 @@ def make_austria(  # noqa: C901
             ),
         )
 
-    data = AUSTRIA_PAR.copy()
+    data = AUSTRIA_PAR
     # Convert GW·h to GW·a
     data["activity"] = data["activity"] / 8760.0
     # Convert USD / MW·h to USD / GW·a
@@ -303,19 +293,19 @@ def make_austria(  # noqa: C901
     scen.set_as_default()
 
     if solve:
-        scen.solve(quiet=quiet, solve_options=dict(iis=1))
+        scen.solve(quiet=quiet)
 
     return scen
 
 
 def make_dantzig(
     mp,
-    solve: bool = False,
-    multi_year: bool = False,
+    solve=False,
+    multi_year=False,
     *,
     request: Optional["pytest.FixtureRequest"] = None,
     **solve_opts,
-) -> Scenario:
+):
     """Return an :class:`message_ix.Scenario` for Dantzig's canning problem.
 
     Parameters
@@ -479,78 +469,48 @@ def make_dantzig(
 
 
 def make_westeros(
-    mp: "Platform",
-    emissions: bool = False,
-    solve: bool = False,
-    quiet: bool = True,
-    model_horizon: list[int] = [700, 710, 720],
+    mp,
+    emissions=False,
+    solve=False,
+    quiet=True,
+    model_horizon=[700, 710, 720],
     *,
     request: Optional["pytest.FixtureRequest"] = None,
-) -> Scenario:
-    """Return a new :class:`message_ix.Scenario` containing the ‘Westeros’ model.
+):
+    """Return an :class:`message_ix.Scenario` for the Westeros model.
 
-    This is the same model used in the :file:`westeros_baseline.ipynb` tutorial. In
-    particular:
-
-    - There is always one historical period :py:`year = 690` with
-      :py:`duration_period = 10`, and one historical period :py:`year = 680` with a
-      duration that is undefined.
+    This is the same model used in the ``westeros_baseline.ipynb`` tutorial.
 
     Parameters
     ----------
-    mp :
+    mp : ixmp.Platform
         Platform on which to create the scenario.
-    emissions :
-        If :any:`True`, the ``emissions_factor`` parameter is also populated for CO2.
-    solve :
-        If :any:`True`, the scenario is solved.
-    quiet :
-        Passed to :meth:`Scenario.solve` if :py:`solve is True`.
-    model_horizon :
-        List of periods within the model horizon. The historical periods
-        :py:`year = [680, 690]` are always prepended.
-
-    Other parameters
-    ----------------
-    request :
-        For use with :mod:`pytest`. If given, the returned Scenario has a scenario name
-        constructed from the Pytest node name, which should be unique within a test
-        session.
+    emissions : bool, optional
+        If True, the ``emissions_factor`` parameter is also populated for CO2.
+    solve : bool, optional
+        If True, the scenario is solved.
     """
     mp.add_unit("USD/kW")
     mp.add_unit("tCO2/kWa")
 
     # Scenario identifiers
-    args = SCENARIO["westeros"] | dict(version="new")
+    args = SCENARIO["westeros"].copy()
+    args.setdefault("version", "new")
     if request:
         # Use a distinct scenario name for a particular test
         args.update(scenario=request.node.name)
 
     scen = Scenario(mp, **args)
 
-    # Common keyword arguments to make_df()
-    t = "year"
-    common: dict[str, Any] = dict(mode="standard", time=t, time_dest=t, time_origin=t)
+    # Sets
+    history = [690]
+    scen.add_horizon(year=history + model_horizon, firstmodelyear=model_horizon[0])
+    year_df = scen.vintage_and_active_years()
+    vintage_years, act_years = year_df["year_vtg"], year_df["year_act"]
 
-    # Periods
-    assert len(model_horizon) and 690 < min(model_horizon)
-    y = [680, 690] + model_horizon
-    ym1_index, y0_index = 1, 2
-    scen.add_horizon(year=y, firstmodelyear=y[y0_index])
-    dp0 = scen.par("duration_period").query("year == 690")["value"].item()
-    assert 10.0 == dp0
+    country = "Westeros"
+    scen.add_spatial_sets({"country": country})
 
-    # Retrieve valid (yV, yA) combinations
-    yv_ya = scen.vintage_and_active_years()
-    yV, yA = yv_ya["year_vtg"].tolist(), yv_ya["year_act"].tolist()
-    common |= dict(year=y[y0_index:], year_act=yA, year_vtg=yV)
-
-    # Nodes
-    n = "Westeros"
-    common |= dict(node=n, node_dest=n, node_loc=n, node_origin=n)
-    scen.add_spatial_sets({"country": n})
-
-    # Other sets
     for name, values in (
         ("technology", ["coal_ppl", "wind_ppl", "grid", "bulb"]),
         ("mode", ["standard"]),
@@ -559,30 +519,62 @@ def make_westeros(
     ):
         scen.add_set(name, values)
 
-    # Free parameters
-    demand_per_year = 40 * 12 * 1000 / 8760  # Base period demand value
-    gdp_index = {680: 0.5, 690: 0.5, 700: 1.0, 710: 1.5, 720: 1.9}
-    grid_efficiency = 0.9
-    coal_fraction = 0.6
+    # Parameters — copy & paste from the tutorial notebook
 
-    # Parameter data
-    name = "demand"
-    kw = common | dict(commodity="light", level="useful", year=y, unit="GWa")
-    # - Create a Series from some GDP indices and NaN for other `model_horizon` periods.
-    # - Multiply by base-period demand.
-    # - Interpolate.
-    # - Select only the indices from `model_horizon`.
-    demand = (
-        pd.Series({y_: None for y_ in y[y0_index:]} | gdp_index)
-        .mul(demand_per_year)
-        .sort_index()
-        .interpolate(method="index")
-        .round()
-        .loc[y]
+    common = dict(
+        mode="standard",
+        node_dest=country,
+        node_loc=country,
+        node_origin=country,
+        node=country,
+        time_dest="year",
+        time_origin="year",
+        time="year",
+        year_act=act_years,
+        year_vtg=vintage_years,
+        year=model_horizon,
     )
-    scen.add_par(name, make_df(name, **kw, value=demand.values))
 
-    for name, t, c, L, value in [
+    # Base GDP data
+    df_gdp = pd.DataFrame({"years": [700, 710, 720], "values": [1.0, 1.5, 1.9]})
+
+    # Identify periods in `model_horizon` for which no df_gdp data exists
+    # NB this could be done using genno.operator.interpolate
+    y_missing = sorted(set(model_horizon) - set(df_gdp.years.unique()))
+    if y_missing:
+        # Insert NaNs for missing periods, to be interpolated
+        df_gdp = pd.concat(
+            [
+                df_gdp,
+                pd.DataFrame({"years": y_missing, "values": [np.nan] * len(y_missing)}),
+            ]
+        ).sort_values(by="years")
+
+    # - Maybe interpolate missing years
+    # - Convert to series
+    s_gdp_profile = df_gdp.set_index("years").interpolate(
+        how="index", limit_direction="both"
+    )["values"]
+
+    # Base demand value
+    demand_per_year = 40 * 12 * 1000 / 8760
+
+    scen.add_par(
+        "demand",
+        make_df(
+            "demand",
+            **common,
+            commodity="light",
+            level="useful",
+            value=(demand_per_year * s_gdp_profile).round(),
+            unit="GWa",
+        ),
+    )
+
+    grid_efficiency = 0.9
+    common.update(unit="-")
+
+    for name, tec, c, L, value in [
         ("input", "bulb", "electricity", "final", 1.0),
         ("output", "bulb", "light", "useful", 1.0),
         ("input", "grid", "electricity", "secondary", 1.0 / grid_efficiency),
@@ -590,41 +582,52 @@ def make_westeros(
         ("output", "coal_ppl", "electricity", "secondary", 1.0),
         ("output", "wind_ppl", "electricity", "secondary", 1.0),
     ]:
-        kw = common | dict(technology=t, commodity=c, level=L, value=value, unit="-")
-        scen.add_par(name, make_df(name, **kw))
+        scen.add_par(
+            name,
+            make_df(name, **common, technology=tec, commodity=c, level=L, value=value),
+        )
 
     name = "capacity_factor"
     capacity_factor = dict(coal_ppl=1.0, wind_ppl=0.36, bulb=1.0, grid=1.0)
-    for t, value in capacity_factor.items():
-        kw = common | dict(technology=t, value=value, unit="-")
-        scen.add_par(name, make_df(name, **kw))
+    for tec, value in capacity_factor.items():
+        scen.add_par(name, make_df(name, **common, technology=tec, value=value))
 
     name = "technical_lifetime"
-    for t, value in dict(coal_ppl=20, wind_ppl=20, bulb=1, grid=30).items():
-        kw = common | dict(technology=t, year_vtg=y, value=value, unit="y")
-        scen.add_par(name, make_df(name, **kw))
+    common.update(year_vtg=model_horizon, unit="y")
+    for tec, value in dict(coal_ppl=20, wind_ppl=20, bulb=1, grid=30).items():
+        scen.add_par(name, make_df(name, **common, technology=tec, value=value))
 
     name = "growth_activity_up"
-    for t in "coal_ppl", "wind_ppl":
-        kw = common | dict(year_act=y[y0_index:], technology=t, value=0.1, unit="-")
-        scen.add_par(name, make_df(name, **kw))
+    common.update(year_act=model_horizon, unit="-")
+    for tec in "coal_ppl", "wind_ppl":
+        scen.add_par(name, make_df(name, **common, technology=tec, value=0.1))
 
-    historic_generation = demand.loc[y[ym1_index]] / grid_efficiency
-    for t, value in (
+    historic_demand = 0.5 * demand_per_year
+    historic_generation = historic_demand / grid_efficiency
+    coal_fraction = 0.6
+
+    common.update(year_act=history, year_vtg=history, unit="GWa")
+    for tec, value in (
         ("coal_ppl", coal_fraction * historic_generation),
         ("wind_ppl", (1 - coal_fraction) * historic_generation),
         ("grid", historic_generation),
     ):
-        kw = common | dict(
-            year_vtg=y[ym1_index], year_act=y[ym1_index], technology=t, unit="GWa"
-        )
         name = "historical_activity"
-        scen.add_par(name, make_df(name, **kw, value=value))
+        scen.add_par(name, make_df(name, **common, technology=tec, value=value))
+        # 20 year lifetime
         name = "historical_new_capacity"
-        scen.add_par(name, make_df(name, **kw, value=value / capacity_factor[t] / dp0))
+        scen.add_par(
+            name,
+            make_df(
+                name,
+                **common,
+                technology=tec,
+                value=value / capacity_factor[tec] / 10,
+            ),
+        )
 
     name = "interestrate"
-    scen.add_par(name, make_df(name, year=y, value=0.05, unit="-"))
+    scen.add_par(name, make_df(name, year=model_horizon, value=0.05, unit="-"))
 
     for name, tec, value in [
         ("inv_cost", "coal_ppl", 500),
@@ -636,12 +639,12 @@ def make_westeros(
         ("fix_cost", "grid", 16),
         ("var_cost", "coal_ppl", 30),
     ]:
-        kw = common | (
-            dict(year_vtg=y[y0_index:], unit="USD/kW")
+        common.update(
+            dict(year_vtg=model_horizon, unit="USD/kW")
             if name == "inv_cost"
-            else dict(year_vtg=yV, year_act=yA, unit="USD/kWa")
+            else dict(year_vtg=vintage_years, year_act=act_years, unit="USD/kWa")
         )
-        scen.add_par(name, make_df(name, **kw, technology=tec, value=value))
+        scen.add_par(name, make_df(name, **common, technology=tec, value=value))
 
     scen.commit("basic model of Westerosi electrification")
     scen.set_as_default()
@@ -650,14 +653,16 @@ def make_westeros(
         scen.check_out()
 
         # Introduce the emission species CO2 and the emission category GHG
-        e = "CO2"
-        scen.add_set("emission", e)
-        scen.add_cat("emission", "GHG", e)
+        scen.add_set("emission", "CO2")
+        scen.add_cat("emission", "GHG", "CO2")
 
         # we now add CO2 emissions to the coal powerplant
         name = "emission_factor"
-        kw = common | dict(emission=e, technology="coal_ppl")
-        scen.add_par(name, make_df(name, **kw, value=100.0, unit="tCO2/kWa"))
+        common.update(year_vtg=vintage_years, year_act=act_years, unit="tCO2/kWa")
+        scen.add_par(
+            name,
+            make_df(name, **common, technology="coal_ppl", emission="CO2", value=100.0),
+        )
 
         scen.commit("Added emissions sets/params to Westeros model.")
 
