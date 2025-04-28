@@ -19,7 +19,8 @@ concurrency:
 env:
   GAMS_VERSION: 43.4.1   # First version including a macOS arm64 distribution
   depth: 100  # Must be large enough to include the most recent release
-  label: "safe to test"
+  label: "safe to test"  # Label that must be applied to run on PRs from forks
+  python-version: "3.13"  # For non-matrixed jobs
 
 jobs:
   check:
@@ -89,7 +90,8 @@ jobs:
     - name: Set up uv, Python
       uses: astral-sh/setup-uv@v6
       with:
-        cache-dependency-glob: "**/pyproject.toml"
+        activate-environment: true
+        enable-cache: true
         python-version: ${{ matrix.python-version }}
 
     - uses: ts-graphviz/setup-graphviz@v2
@@ -160,8 +162,9 @@ jobs:
     - name: Set up uv, Python
       uses: astral-sh/setup-uv@v6
       with:
-        cache-dependency-glob: "**/pyproject.toml"
-        python-version: "3.13"
+        activate-environment: true
+        enable-cache: true
+        python-version: ${{ env.python-version }}
 
     - name: Set RETICULATE_PYTHON
       # Retrieve the Python executable set up above
@@ -227,10 +230,11 @@ jobs:
       with:
         ref: ${{ github.event_name != 'pull_request_target' && github.ref || github.event.pull_request.head.sha }}
     - uses: astral-sh/setup-uv@v6
-      with: { cache-dependency-glob: "**/pyproject.toml" }
-    - uses: actions/cache@v4
-      with:
-        path: ~/.cache/pre-commit
-        key: pre-commit|${{ env.UV_PYTHON }}|${{ hashFiles('.pre-commit-config.yaml') }}
-        lookup-only: ${{ github.event_name == 'schedule' }}  # Set 'true' to recreate cache
-    - run: uvx pre-commit run --all-files --color=always --show-diff-on-failure
+      with: { enable-cache: true, python-version: "${{ env.python-version }}" }
+    - name: Clear and re-create the pre-commit environments
+      run: uvx pre-commit clean
+      if: github.event_name == 'schedule'  # Comment this line to force clear
+    - run: |
+        uvx --with=pre-commit-uv \
+          pre-commit run \
+          --all-files --color=always --show-diff-on-failure --verbose
