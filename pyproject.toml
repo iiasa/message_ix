@@ -59,15 +59,15 @@ tutorial = ["jupyter", "matplotlib", "message_ix[report,sankey]"]
 report = ["ixmp[report]"]
 sankey = ["plotly"]
 tests = [
-  "asyncssh",
+  # "ixmp[tests]",  # TODO Uncomment after iiasa/ixmp#568
   "message_ix[docs,tutorial]",
   "pint",
+  "pooch",
   "pyam-iamc >= 0.6",
   "pytest >= 5",
   "pytest-cov",
   "pytest-rerunfailures",
   "pytest-xdist",
-  "requests",
 ]
 
 [project.scripts]
@@ -78,12 +78,6 @@ exclude_also = [
   # Imports only used by type checkers
   "if TYPE_CHECKING:",
   "if __name__ == '__main__':",
-]
-
-[tool.coverage.run]
-omit = [
-  "message_ix/tests/test_nightly.py",
-  "message_ix/testing/nightly.py",
 ]
 
 [tool.mypy]

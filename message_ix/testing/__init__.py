@@ -1,21 +1,25 @@
 import io
 import os
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from itertools import product
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional, Union
 
+import ixmp
 import numpy as np
 import pandas as pd
 import pytest
+from click.testing import CliRunner
 from ixmp import IAMC_IDX
 
-from message_ix import Scenario, make_df
+from message_ix import Scenario, cli, make_df
+from message_ix.report import Reporter
 
 if TYPE_CHECKING:
     import pathlib
 
     from ixmp import Platform
+    from pint import UnitRegistry
 
 
 # Pytest hooks
@@ -47,6 +51,20 @@ SCENARIO = {
     },
     "westeros": {"model": "Westeros Electrified", "scenario": "baseline"},
 }
+
+#: Model names, scenario names, and file hashes for 'snapshots' of scenarios used in
+#: :mod:`.tests.test_snapshots`. These correspond to files in the Zenodo record at
+#: doi:`10.5281/zenodo.15277570 <https://doi.org/10.5281/zenodo.15277570>`_.
+SNAPSHOTS = (
+    (
+        dict(model="CD_Links_SSP2", scenario="baseline"),
+        "md5:ff57ee38defe2b983b22f26f696a6746",
+    ),
+    (
+        dict(model="CD_Links_SSP2_v2", scenario="NPi2020_1000-con-prim-dir-ncr"),
+        "md5:ae17c294c9479a2af14a9d3157f49257",
+    ),
+)
 
 
 # Create and populate ixmp databases
@@ -668,7 +686,7 @@ def make_westeros(
 
 
 def make_subannual(
-    request,
+    mp: "Platform",
     tec_dict,
     time_steps,
     demand,
@@ -678,7 +696,9 @@ def make_subannual(
     capacity_factor={},
     var_cost={},
     operation_factor={},
-):
+    *,
+    request: Optional["pytest.FixtureRequest"] = None,
+) -> Scenario:
     """Return an :class:`message_ix.Scenario` with subannual time resolution.
 
     The scenario contains a simple model with two technologies, and a number of time
@@ -714,11 +734,13 @@ def make_subannual(
     operation_factor : dict, optional
         "operation_factor" with technology as key and "value" as value.
     """
-    # Get the `test_mp` fixture for the requesting test function
-    mp = request.getfixturevalue("test_mp")
-
     # Build an empty scenario
-    scen = Scenario(mp, request.node.name, scenario="test", version="new")
+    args = dict(model="Test subannual time steps", scenario="baseline", version="new")
+    if request:
+        # Use a distinct scenario name for a particular test
+        args.update(scenario=request.node.name)
+
+    scen = Scenario(mp, **args)
 
     # Add required sets
     scen.add_set("node", "node")
@@ -817,10 +839,125 @@ def make_subannual(
             common.update(relation="yearly_activity", technology=tec, value=1)
             scen.add_par("relation_activity", make_df("relation_activity", **common))
 
-    scen.commit(f"Scenario with subannual time resolution for {request.node.name}")
+    scen.commit("Scenario with subannual time resolution")
     scen.solve()
 
     return scen
+
+
+# Fixtures
+
+
+@pytest.fixture
+def dantzig_reporter(
+    request, message_test_mp, ureg
+) -> Generator["Reporter", None, None]:
+    """A :class:`.Reporter` with a solved :func:`.make_dantzig` scenario."""
+    scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
+        scenario=request.node.name
+    )
+
+    if not scen.has_solution():
+        scen.solve(quiet=True)
+
+    rep = Reporter.from_scenario(scen)
+
+    # The Dantzig model has no data in fix_cost, which creates an error adding the
+    # derived keys <fom:nl-t-yv-ya> and <vom:nl-t-yv-ya> because the former has no
+    # units. Force application of units to this empty quantity.
+    rep.configure(units=dict(apply=dict(fix_cost="USD/case")))
+
+    yield rep
+
+
+@pytest.fixture(scope="session")
+def message_ix_cli(tmp_env) -> Generator[Callable, None, None]:
+    """A CliRunner object that invokes the message_ix command-line interface.
+
+    :obj:`None` in *args* is automatically discarded.
+    """
+
+    class Runner(CliRunner):
+        def invoke(self, *args, **kwargs):
+            return super().invoke(
+                cli.main,
+                list(filter(None, args)),
+                env=tmp_env,
+                catch_exceptions=False,
+                color=True,
+                **kwargs,
+            )
+
+    yield Runner().invoke
+
+
+@pytest.fixture(scope="class")
+def message_test_mp(test_mp) -> Generator["Platform", None, None]:
+    """A test platform with two versions of the :func:`.make_dantzig` scenario.
+
+    One version has :py:`multi_year=False`, and the other :py:`multi_year=True`.
+    """
+    make_dantzig(test_mp)
+    make_dantzig(test_mp, multi_year=True)
+    yield test_mp
+
+
+@pytest.fixture(scope="session")
+def snapshots_from_zenodo(pytestconfig) -> "Platform":  # pragma: no cover
+    """Platform with Scenarios from :data:`.SNAPSHOTS`.
+
+    This fixture:
+
+    1. Downloads the files from the Zenodo record to the pytest cache directory. If the
+       files are already present, this step is not repeated. The file hashes are
+       verified.
+    2. Creates a :class:`.Platform`, also in the pytest cache directory.
+    3. Adds the downloaded scenarios to the platform.
+    """
+    from pooch import HTTPDownloader, Pooch
+
+    from message_ix.models import MACRO
+
+    # Create a pooch 'registry' from `SCENARIOS`
+    cache_dir = pytestconfig.cache.mkdir("snapshots")
+    filename = "{0[model]}_{0[scenario]}_v1.xlsx"
+    p = Pooch(
+        base_url="https://zenodo.org/api/records/15277571/files/",
+        path=cache_dir,
+        registry={filename.format(si): h for si, h in SNAPSHOTS},
+    )
+
+    def zenodo_token_download(url, output_file, pooch):
+        token = os.environ["MESSAGE_IX_ZENODO_TOKEN"]
+        HTTPDownloader(params={"token": token})(f"{url}/content", output_file, pooch)
+
+    # Download (if needed) each file and store its full path
+    paths = [p.fetch(fn, downloader=zenodo_token_download) for fn in p.registry.keys()]
+
+    # Create a new Platform, also in the pytest cache directory
+    mp = ixmp.Platform(backend="jdbc", driver="hsqldb", path=cache_dir.joinpath("db"))
+
+    # Populate `mp` from the data files
+    for path, (scenario_info, _) in zip(paths, SNAPSHOTS):
+        try:
+            # Load an existing scenario
+            s = Scenario(mp, **scenario_info)
+        except ValueError:
+            s = Scenario(mp, **scenario_info, version="new")
+            MACRO.initialize(s)
+            s.read_excel(path, add_units=True, init_items=True)
+        else:
+            pass  # Already read from file → do not repeat
+
+    assert len(SNAPSHOTS) == len(mp.scenario_list(default=False))
+
+    return mp
+
+
+@pytest.fixture(scope="session")
+def test_data_path(request) -> Path:
+    """Path to the directory containing test data."""
+    return Path(__file__).parents[1] / "tests" / "data"
 
 
 @pytest.fixture(scope="function")
@@ -839,3 +976,26 @@ def tmp_model_dir(tmp_path) -> Generator["pathlib.Path", None, None]:
     copy_model(tmp_path, overwrite=False, set_default=False, quiet=True)
 
     yield tmp_path
+
+
+@pytest.fixture(scope="session")
+def tutorial_path(request) -> Path:
+    """Path to the directory containing the tutorials."""
+    return Path(__file__).parents[2] / "tutorial"
+
+
+@pytest.fixture(scope="session")
+def ureg() -> Generator["UnitRegistry", None, None]:
+    """Session-scoped :class:`pint.UnitRegistry` with units needed by tests."""
+    import pint
+
+    registry = pint.get_application_registry()
+
+    for unit in "USD", "case":
+        try:
+            registry.define(f"{unit} = [{unit}]")
+        except (pint.RedefinitionError, pint.DefinitionSyntaxError):
+            # Already defined
+            pass
+
+    yield registry
