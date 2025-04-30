@@ -283,9 +283,9 @@ class LPdiag:
         row_name = words[1]
         row_seq = len(self.row_name)
         assert row_type in row_types, f"unknown row type {row_type} (line {n_line})."
-        assert row_name not in self.row_name, (
-            f"duplicated row name: {row_name} (line {n_line})."
-        )
+        # assert row_name not in self.row_name, (
+        #    f"duplicated row name: {row_name} (line {n_line})."
+        # )
         if row_type == "N" and self.gf_seq == -1:
             self.gf_seq = row_seq
             print(

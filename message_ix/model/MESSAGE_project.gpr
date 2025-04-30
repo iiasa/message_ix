@@ -1,2 +1,28 @@
 [PROJECT]
 
+[RP:MSGSCALER_SCALINGSSP_SSP2_DEVELOPMENT_BASELINE_DEFAULT_STEP_15_YWP]
+1=
+
+[RP:MSGSCALER_SCALINGSSP_SSP2_DEVELOPMENT_BASELINE_DEFAULT 1]
+1=
+
+[RP:MODEL_SETUP]
+1=
+
+[RP:MESSAGE_MASTER]
+1=
+
+[MRUFILES]
+1=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\scaler\MsgScaler_ScalingSSP_SSP2_development_baseline_DEFAULT 1.gms
+2=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\scaler\MsgScaler_ScalingSSP_SSP2_development_baseline_DEFAULT_step_15_ywp.gms
+
+[OPENWINDOW_1]
+FILE0=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\MESSAGE\model_setup.gms
+FILE1=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\MESSAGE_master.gms
+FILE2=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\MESSAGE_master.lst
+FILE3=C:\Users\pratama\Documents\GitHub\MESSAGEix\message_ix\message_ix\model\MESSAGE\model_setup.gms
+MAXIM=0
+TOP=21
+LEFT=84
+HEIGHT=400
+WIDTH=844
