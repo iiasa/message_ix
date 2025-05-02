@@ -6,7 +6,7 @@ import pytest
 from message_ix.models import MESSAGE, MESSAGE_MACRO
 
 
-def test_initialize(test_mp):
+def test_initialize(test_mp: ixmp.Platform) -> None:
     # Expected numbers of items by type
     exp = defaultdict(list)
     for name, spec in MESSAGE.items.items():
@@ -25,7 +25,7 @@ def test_initialize(test_mp):
         assert sorted(obs_names) == sorted(exp_names)
 
 
-def test_message_macro():
+def test_message_macro() -> None:
     # Constructor runs successfully
     MESSAGE_MACRO()
 

@@ -9,15 +9,13 @@ import ixmp
 import numpy as np
 import pandas as pd
 import pytest
-from click.testing import CliRunner
+from click.testing import CliRunner, Result
 from ixmp import IAMC_IDX
 
 from message_ix import Scenario, cli, make_df
 from message_ix.report import Reporter
 
 if TYPE_CHECKING:
-    import pathlib
-
     from ixmp import Platform
     from pint import UnitRegistry
 
@@ -25,14 +23,14 @@ if TYPE_CHECKING:
 # Pytest hooks
 
 
-def pytest_report_header(config, start_path):
+def pytest_report_header(config: pytest.Config, start_path: Path) -> str:
     """Add the message_ix import path to the pytest report header."""
     import message_ix
 
     return f"message_ix location: {Path(message_ix.__file__).parent}"
 
 
-def pytest_sessionstart():
+def pytest_sessionstart() -> None:
     """Use only 2 threads for CPLEX on GitHub Actions runners with 2 CPU cores."""
     import message_ix.models
 
@@ -43,13 +41,24 @@ def pytest_sessionstart():
 # Data for testing
 
 SCENARIO = {
-    "austria": dict(model="Austrian energy model", scenario="baseline"),
-    "dantzig": {"model": "Canning problem (MESSAGE scheme)", "scenario": "standard"},
+    "austria": dict(
+        model="Austrian energy model", scenario="baseline", scheme="MESSAGE"
+    ),
+    "dantzig": {
+        "model": "Canning problem (MESSAGE scheme)",
+        "scenario": "standard",
+        "scheme": "MESSAGE",
+    },
     "dantzig multi-year": {
         "model": "Canning problem (MESSAGE scheme)",
         "scenario": "multi-year",
+        "scheme": "MESSAGE",
     },
-    "westeros": {"model": "Westeros Electrified", "scenario": "baseline"},
+    "westeros": {
+        "model": "Westeros Electrified",
+        "scenario": "baseline",
+        "scheme": "MESSAGE",
+    },
 }
 
 #: Model names, scenario names, and file hashes for 'snapshots' of scenarios used in
@@ -850,8 +859,8 @@ def make_subannual(
 
 @pytest.fixture
 def dantzig_reporter(
-    request, message_test_mp, ureg
-) -> Generator["Reporter", None, None]:
+    request: pytest.FixtureRequest, message_test_mp: "Platform", ureg: "UnitRegistry"
+) -> Generator[Reporter, Any, None]:
     """A :class:`.Reporter` with a solved :func:`.make_dantzig` scenario."""
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
         scenario=request.node.name
@@ -871,14 +880,16 @@ def dantzig_reporter(
 
 
 @pytest.fixture(scope="session")
-def message_ix_cli(tmp_env) -> Generator[Callable, None, None]:
+def message_ix_cli(
+    tmp_env: os._Environ[str],
+) -> Generator[Callable[..., Result], Any, None]:
     """A CliRunner object that invokes the message_ix command-line interface.
 
     :obj:`None` in *args* is automatically discarded.
     """
 
     class Runner(CliRunner):
-        def invoke(self, *args, **kwargs):
+        def invoke(self, *args, **kwargs) -> Result:
             return super().invoke(
                 cli.main,
                 list(filter(None, args)),
@@ -892,7 +903,7 @@ def message_ix_cli(tmp_env) -> Generator[Callable, None, None]:
 
 
 @pytest.fixture(scope="class")
-def message_test_mp(test_mp) -> Generator["Platform", None, None]:
+def message_test_mp(test_mp: "Platform") -> Generator["Platform", Any, None]:
     """A test platform with two versions of the :func:`.make_dantzig` scenario.
 
     One version has :py:`multi_year=False`, and the other :py:`multi_year=True`.
@@ -903,7 +914,9 @@ def message_test_mp(test_mp) -> Generator["Platform", None, None]:
 
 
 @pytest.fixture(scope="session")
-def snapshots_from_zenodo(pytestconfig) -> "Platform":  # pragma: no cover
+def snapshots_from_zenodo(
+    pytestconfig: pytest.Config,
+) -> "Platform":  # pragma: no cover
     """Platform with Scenarios from :data:`.SNAPSHOTS`.
 
     This fixture:
@@ -919,6 +932,7 @@ def snapshots_from_zenodo(pytestconfig) -> "Platform":  # pragma: no cover
     from message_ix.models import MACRO
 
     # Create a pooch 'registry' from `SCENARIOS`
+    assert pytestconfig.cache, "Pytest config does not have `.cache` set!"
     cache_dir = pytestconfig.cache.mkdir("snapshots")
     filename = "{0[model]}_{0[scenario]}_v1.xlsx"
     p = Pooch(
@@ -955,13 +969,13 @@ def snapshots_from_zenodo(pytestconfig) -> "Platform":  # pragma: no cover
 
 
 @pytest.fixture(scope="session")
-def test_data_path(request) -> Path:
+def test_data_path(request: pytest.FixtureRequest) -> Path:
     """Path to the directory containing test data."""
     return Path(__file__).parents[1] / "tests" / "data"
 
 
 @pytest.fixture(scope="function")
-def tmp_model_dir(tmp_path) -> Generator["pathlib.Path", None, None]:
+def tmp_model_dir(tmp_path: Path) -> Generator[Path, Any, None]:
     """Temporary directory containing a copy of the MESSAGE model files.
 
     This may be used, among other purposes, to isolate the writing/reading of
@@ -979,13 +993,13 @@ def tmp_model_dir(tmp_path) -> Generator["pathlib.Path", None, None]:
 
 
 @pytest.fixture(scope="session")
-def tutorial_path(request) -> Path:
+def tutorial_path(request: pytest.FixtureRequest) -> Path:
     """Path to the directory containing the tutorials."""
     return Path(__file__).parents[2] / "tutorial"
 
 
 @pytest.fixture(scope="session")
-def ureg() -> Generator["UnitRegistry", None, None]:
+def ureg() -> Generator["UnitRegistry", Any, None]:
     """Session-scoped :class:`pint.UnitRegistry` with units needed by tests."""
     import pint
 

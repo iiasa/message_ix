@@ -9,6 +9,7 @@ import pandas as pd
 import pyam
 import pytest
 from genno.testing import assert_qty_equal
+from ixmp import Platform
 from ixmp.report import Reporter as ixmp_Reporter
 from ixmp.testing import assert_logs
 from numpy.testing import assert_allclose
@@ -18,9 +19,14 @@ from message_ix import Scenario
 from message_ix.report import Reporter, configure
 from message_ix.testing import SCENARIO, make_dantzig, make_westeros
 
+# NOTE These tests maybe don't need to be parametrized.
+# Does `Reporter.from_scenario()` depend on otherwise untested Scenario functions?
+
 
 class TestReporter:
-    def test_add_sankey(self, test_mp, request) -> None:
+    def test_add_sankey(
+        self, test_mp: Platform, request: pytest.FixtureRequest
+    ) -> None:
         scen = make_westeros(test_mp, solve=True, quiet=True, request=request)
         rep = Reporter.from_scenario(scen, units={"replace": {"-": ""}})
 
@@ -33,7 +39,9 @@ class TestReporter:
         assert rep.check_keys(key)
 
 
-def test_reporter_no_solution(caplog, message_test_mp) -> None:
+def test_reporter_no_solution(
+    caplog: pytest.LogCaptureFixture, message_test_mp: Platform
+) -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
     with assert_logs(
@@ -51,7 +59,7 @@ def test_reporter_no_solution(caplog, message_test_mp) -> None:
     assert 3 == len(result)
 
 
-def test_reporter_from_scenario(message_test_mp) -> None:
+def test_reporter_from_scenario(message_test_mp: Platform) -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
     # Varies between local & CI contexts
@@ -103,7 +111,9 @@ def test_reporter_from_scenario(message_test_mp) -> None:
     assert_qty_equal(vom, rep.get(vom_key))
 
 
-def test_reporter_from_dantzig(request, test_mp) -> None:
+def test_reporter_from_dantzig(
+    request: pytest.FixtureRequest, test_mp: Platform
+) -> None:
     scen = make_dantzig(test_mp, solve=True, quiet=True, request=request)
 
     # Reporter.from_scenario can handle Dantzig example model
@@ -113,7 +123,9 @@ def test_reporter_from_dantzig(request, test_mp) -> None:
     rep.get("all")
 
 
-def test_reporter_from_westeros(request, test_mp) -> None:
+def test_reporter_from_westeros(
+    request: pytest.FixtureRequest, test_mp: Platform
+) -> None:
     scen = make_westeros(test_mp, emissions=True, solve=True, request=request)
 
     # Reporter.from_scenario can handle Westeros example model
@@ -154,7 +166,9 @@ def test_reporter_from_westeros(request, test_mp) -> None:
     assert_allclose(df["value_y"], df["value_x"], err_msg=df.to_string())
 
 
-def test_reporter_as_pyam(caplog, tmp_path, dantzig_reporter) -> None:
+def test_reporter_as_pyam(
+    caplog: pytest.LogCaptureFixture, tmp_path: Path, dantzig_reporter: Reporter
+) -> None:
     caplog.set_level(logging.INFO)
 
     rep = dantzig_reporter
@@ -167,6 +181,7 @@ def test_reporter_as_pyam(caplog, tmp_path, dantzig_reporter) -> None:
     rename = dict(nl="region", ya="year")
 
     # Add a task that converts ACT to a pyam.IamDataFrame
+    assert as_pyam
     rep.add("ACT IAMC", (partial(as_pyam, rename=rename, drop=["yv"]), "scenario", ACT))
 
     # Result is an IamDataFrame
@@ -195,6 +210,7 @@ def test_reporter_as_pyam(caplog, tmp_path, dantzig_reporter) -> None:
     key2 = rep.add("as_pyam", ACT, "iamc", rename=rename, collapse=add_tm)
 
     # Keys of added node(s) are returned
+    assert isinstance(ACT, genno.Key)
     assert ACT.name + "::iamc" == key2
 
     caplog.clear()

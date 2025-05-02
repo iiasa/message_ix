@@ -1,16 +1,24 @@
+import os
 import re
+from collections.abc import Callable
 from pathlib import Path
 
 import click
 import pytest
+from click.testing import Result
 
 import message_ix
 from message_ix import config
 
 
 def test_copy_model(
-    monkeypatch, message_ix_cli, tmp_path, tmp_env, request, tmp_model_dir
-):
+    monkeypatch: pytest.MonkeyPatch,
+    message_ix_cli: Callable[..., Result],
+    tmp_path: Path,
+    tmp_env: os._Environ[str],
+    request: pytest.FixtureRequest,
+    tmp_model_dir: Path,
+) -> None:
     # Use Pytest monkeypatch fixture; this ensures the original value is restored at the
     # end of the test
     monkeypatch.setattr(
@@ -65,7 +73,12 @@ def test_copy_model(
         ),
     ],
 )
-def test_dl(message_ix_cli, opts, exit_code, tmp_path):
+def test_dl(
+    message_ix_cli: Callable[..., Result],
+    opts: list[str],
+    exit_code: int,
+    tmp_path: Path,
+) -> None:
     r = message_ix_cli("dl", *opts, str(tmp_path))
     assert r.exit_code == exit_code, (r.exception, r.output)
 
