@@ -1,1 +1,3 @@
 git+https://github.com/iiasa/ixmp.git@main#egg=ixmp
+git+https://github.com/iiasa/ixmp4@enh/remove-linked-items-when-removing-indexset-items
+gamsapi [core,transfer] >= 45.7.0
