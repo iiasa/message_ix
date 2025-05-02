@@ -1,9 +1,15 @@
+from collections.abc import Callable
+from pathlib import Path
+
 import pytest
+from click.testing import Result
 
 from message_ix.tools.lp_diag import LPdiag
 
 
-def test_cli(tmp_path, message_ix_cli, test_data_path):
+def test_cli(
+    tmp_path: Path, message_ix_cli: Callable[..., Result], test_data_path: Path
+) -> None:
     """Test lpdiag.main() script."""
 
     p = str(test_data_path.joinpath("lp_diag"))
@@ -26,7 +32,7 @@ def test_cli(tmp_path, message_ix_cli, test_data_path):
     assert "Path '/surely this dir cannot/exist/' does not exist" in result.output
 
 
-def test_aez(test_data_path):
+def test_aez(test_data_path: Path) -> None:
     """Test reading of aez.mps file
 
     Check that the number of lines, rows and columns are correct"""
@@ -58,7 +64,7 @@ def test_aez(test_data_path):
     assert lp.gf_seq != -1
 
 
-def test_diet(test_data_path):
+def test_diet(test_data_path: Path) -> None:
     """Test reading of diet.mps file
 
     Check that the number of lines, rows and columns are correct"""
@@ -90,7 +96,7 @@ def test_diet(test_data_path):
     assert lp.gf_seq != -1
 
 
-def test_jg_korh(test_data_path):
+def test_jg_korh(test_data_path: Path) -> None:
     """Test reading of jg_korh.mps file
 
     Check that the number of lines, rows and columns are correct"""
@@ -122,7 +128,7 @@ def test_jg_korh(test_data_path):
     assert lp.gf_seq != -1
 
 
-def test_lotfi(test_data_path):
+def test_lotfi(test_data_path: Path) -> None:
     """Test reading of lotfi.mps file
 
     Check that the number of lines, rows and columns are correct"""
@@ -197,7 +203,9 @@ def test_lotfi(test_data_path):
         ("error_bounds_unknown_type.mps", TypeError),
     ),
 )
-def test_error_cases(test_data_path, filename, exception) -> None:
+def test_error_cases(
+    test_data_path: Path, filename: str, exception: type[Exception]
+) -> None:
     """Test error cases"""
 
     lp = LPdiag()
@@ -207,7 +215,7 @@ def test_error_cases(test_data_path, filename, exception) -> None:
         lp.read_mps(test_data_path.joinpath("lp_diag", filename))
 
 
-def test_lpdiag_print_statistics(test_data_path):
+def test_lpdiag_print_statistics(test_data_path: Path) -> None:
     """Test auxiliary stat function."""
 
     # Read in the diet.mps file
@@ -227,7 +235,7 @@ def test_lpdiag_print_statistics(test_data_path):
     assert lp.mat.shape == (10, 5)
 
 
-def test_lpdiag_locate_outliers(test_data_path):
+def test_lpdiag_locate_outliers(test_data_path: Path) -> None:
     """Test locating outliers."""
 
     # Read in the diet.mps file

@@ -1,5 +1,8 @@
+from typing import Union
+
 import numpy as np
 import pandas as pd
+from ixmp import Platform
 
 from message_ix import Scenario
 from message_ix.testing import SCENARIO
@@ -25,7 +28,9 @@ f = {"technology": "canning_plant", "node_loc": "seattle"}
 g = {"technology": "canning_addon", "node_loc": "seattle"}
 
 
-def add_addon(s, costs=False, zero_output=False):
+def add_addon(
+    s: Scenario, costs: Union[bool, int] = False, zero_output: bool = False
+) -> None:
     s.check_out()
     s.add_set("technology", "canning_addon")
     s.add_set("addon", "canning_addon")
@@ -74,7 +79,7 @@ def add_addon(s, costs=False, zero_output=False):
 
 
 # reduce max activity from one canning plant, has to be compensated by addon
-def test_addon_tec(message_test_mp):
+def test_addon_tec(message_test_mp: Platform) -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
         scenario="addon", keep_solution=False
     )
@@ -95,7 +100,7 @@ def test_addon_tec(message_test_mp):
 
 
 # introduce addon technology with negatove costs, add maximum mitigation
-def test_addon_up(message_test_mp):
+def test_addon_up(message_test_mp: Platform) -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
         scenario="addon_up", keep_solution=False
     )
@@ -113,7 +118,7 @@ def test_addon_up(message_test_mp):
 
 
 # introduce addon technology with positive costs, add minimum mitigation
-def test_addon_lo(message_test_mp):
+def test_addon_lo(message_test_mp: Platform) -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
         scenario="addon_lo", keep_solution=False
     )

@@ -1,7 +1,7 @@
 import pandas as pd
+import pytest
 from ixmp import Platform
 from ixmp.util.ixmp4 import ContainerData
-from pytest import FixtureRequest
 
 from message_ix import Scenario
 from message_ix.testing import make_westeros
@@ -21,6 +21,7 @@ def test_store_message_version() -> None:
         assert item.name == expected_names[index]
 
 
+@pytest.mark.ixmp4
 def test_add_default_data_to_container_data_list(test_mp: Platform) -> None:
     scenario = Scenario(mp=test_mp, model="model", scenario="scenario", version="new")
 
@@ -59,9 +60,9 @@ def test_add_default_data_to_container_data_list(test_mp: Platform) -> None:
         pd.testing.assert_frame_equal(item.records, expected[index])
 
 
-# TODO Why is this test slower for IXMP4Backend?
+@pytest.mark.ixmp4
 def test_add_auxiliary_items_to_container_data_list(
-    test_mp: Platform, request: FixtureRequest
+    test_mp: Platform, request: pytest.FixtureRequest
 ) -> None:
     scenario = make_westeros(mp=test_mp, emissions=True, solve=False, request=request)
     data: list[ContainerData] = []

@@ -1,49 +1,67 @@
+from collections.abc import Generator
 from pathlib import Path
+from typing import Any, Literal, Union
 
 import numpy as np
 import numpy.testing as npt
 import pandas as pd
 import pytest
+from ixmp import Platform
 
 from message_ix import Scenario, macro
 from message_ix.models import MACRO
 from message_ix.report import Quantity
 from message_ix.testing import SCENARIO, make_westeros
 
+# NOTE These tests maybe don't need to be parametrized
+# Do the following depend on otherwise untested Scenario functions?
+# Scenario.add_macro()
+# macro.prepare_computer()
+# macro.add_model_data()
+# macro.calibrate()
+# MACRO.initialize()
+
+
 # Fixtures
 
 
-def mr_data_path(n):
+def mr_data_path(n: str) -> Path:
     """Path to the test data file for multi-region, multi-sector tests."""
     return Path(__file__).parent.joinpath("data", f"multiregion_macro_input-{n}.xlsx")
 
 
 @pytest.fixture(scope="session")
-def w_data_path():
+def w_data_path() -> Generator[Path, Any, None]:
     """Path to the test data file for Westeros tests."""
     yield Path(__file__).parent.joinpath("data", "westeros_macro_input.xlsx")
 
 
 @pytest.fixture(scope="function")
-def w_data(w_data_path):
+def w_data(w_data_path: Path) -> Generator[dict[str, pd.DataFrame], Any, None]:
     """Data from the Westeros test data file."""
     yield pd.read_excel(w_data_path, sheet_name=None, engine="openpyxl")
 
 
 @pytest.fixture(scope="module")
-def _ws(test_mp, request):
+def _ws(
+    test_mp: Platform, request: pytest.FixtureRequest
+) -> Generator[Scenario, Any, None]:
     """Module-scoped fixture with a solved instance of the Westeros model."""
     yield make_westeros(test_mp, solve=True, request=request)
 
 
 @pytest.fixture
-def westeros_solved(request, _ws):
+def westeros_solved(
+    request: pytest.FixtureRequest, _ws: Scenario
+) -> Generator[Scenario, Any, None]:
     """Fresh clone of the Westeros model."""
     yield _ws.clone(scenario=request.node.name)
 
 
 @pytest.fixture
-def westeros_not_solved(request, _ws):
+def westeros_not_solved(
+    request: pytest.FixtureRequest, _ws: Scenario
+) -> Generator[Scenario, Any, None]:
     """Fresh clone of the Westeros model, without a solution."""
     yield _ws.clone(scenario=request.node.name, keep_solution=False)
 
@@ -51,12 +69,12 @@ def westeros_not_solved(request, _ws):
 # Tests
 
 
-def test_calc_valid_data_file(westeros_solved, w_data_path) -> None:
+def test_calc_valid_data_file(westeros_solved: Scenario, w_data_path: Path) -> None:
     c = macro.prepare_computer(westeros_solved, data=w_data_path)
     c.get("check all")
 
 
-def test_calc_invalid_data(westeros_solved) -> None:
+def test_calc_invalid_data(westeros_solved: Scenario) -> None:
     #  TypeError is raised with invalid input data type
     with pytest.raises(TypeError, match="neither a dict nor a valid path"):
         macro.prepare_computer(westeros_solved, data=list())  # type: ignore [arg-type]
@@ -67,12 +85,16 @@ def test_calc_invalid_data(westeros_solved) -> None:
         )
 
 
-def test_calc_valid_data_dict(westeros_solved, w_data) -> None:
+def test_calc_valid_data_dict(
+    westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
+) -> None:
     c = macro.prepare_computer(westeros_solved, data=w_data)
     c.get("check all")
 
 
-def test_calc_valid_years(westeros_solved, w_data) -> None:
+def test_calc_valid_years(
+    westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
+) -> None:
     """Select desirable years from a config file in Excel format."""
     data = w_data
 
@@ -92,13 +114,13 @@ def test_calc_valid_years(westeros_solved, w_data) -> None:
     westeros_solved.add_macro(data=data)
 
 
-def test_calc_no_solution(westeros_not_solved, w_data_path) -> None:
+def test_calc_no_solution(westeros_not_solved: Scenario, w_data_path: Path) -> None:
     s = westeros_not_solved
     with pytest.raises(RuntimeError, match="solution"):
         macro.prepare_computer(s, data=w_data_path)
 
 
-def test_config(westeros_solved, w_data_path) -> None:
+def test_config(westeros_solved: Scenario, w_data_path: Path) -> None:
     c = macro.prepare_computer(westeros_solved, data=w_data_path)
     assert "config::macro" in c.graph
     assert "sector" in c.get("config::macro")
@@ -119,7 +141,9 @@ def test_config(westeros_solved, w_data_path) -> None:
         c.get("check all")
 
 
-def test_calc_data_missing_par(westeros_solved, w_data) -> None:
+def test_calc_data_missing_par(
+    westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
+) -> None:
     data = w_data
 
     data.pop("gdp_calibrate")
@@ -129,7 +153,9 @@ def test_calc_data_missing_par(westeros_solved, w_data) -> None:
         c.get("check all")
 
 
-def test_calc_data_missing_ref(westeros_solved: Scenario, w_data) -> None:
+def test_calc_data_missing_ref(
+    westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
+) -> None:
     """When "price_ref" is missing, the code computes it by extrapolation."""
     data = w_data
 
@@ -145,7 +171,9 @@ def test_calc_data_missing_ref(westeros_solved: Scenario, w_data) -> None:
     westeros_solved.add_macro(data)
 
 
-def test_calc_data_missing_column(westeros_solved, w_data) -> None:
+def test_calc_data_missing_column(
+    westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
+) -> None:
     data = w_data
 
     # Drop a column
@@ -156,7 +184,9 @@ def test_calc_data_missing_column(westeros_solved, w_data) -> None:
         c.get("check all")
 
 
-def test_calc_data_missing_datapoint(westeros_solved, w_data) -> None:
+def test_calc_data_missing_datapoint(
+    westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
+) -> None:
     data = w_data
 
     # Skip first data point
@@ -193,7 +223,13 @@ def test_calc_data_missing_datapoint(westeros_solved, w_data) -> None:
         ("lakl", "allclose", [26.027323]),
     ),
 )
-def test_calc(westeros_solved, w_data_path, key, test, expected) -> None:
+def test_calc(
+    westeros_solved: Scenario,
+    w_data_path: Path,
+    key: str,
+    test: Literal["allclose", "equal"],
+    expected: Union[list[float], list[int]],
+) -> None:
     """Test calculation of intermediate values on a solved Westeros scenario."""
     c = macro.prepare_computer(westeros_solved, data=w_data_path)
 
@@ -202,7 +238,7 @@ def test_calc(westeros_solved, w_data_path, key, test, expected) -> None:
     assertion(c.get(key).values, expected)
 
 
-def test_calc_price_zero(westeros_not_solved: Scenario, w_data_path) -> None:
+def test_calc_price_zero(westeros_not_solved: Scenario, w_data_path: Path) -> None:
     """MACRO raises an exception for zero values in PRICE_COMMODITY."""
     # Prepare a Scenario
     s = westeros_not_solved
@@ -226,7 +262,7 @@ def test_calc_price_zero(westeros_not_solved: Scenario, w_data_path) -> None:
         c.get("price_MESSAGE")
 
 
-def test_init(message_test_mp) -> None:
+def test_init(message_test_mp: Platform) -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
     scen = scen.clone("foo", "bar")
@@ -242,7 +278,7 @@ def test_init(message_test_mp) -> None:
     assert "COST_ACCOUNTING_NODAL" in scen.equ_list()
 
 
-def test_add_model_data(westeros_solved, w_data_path) -> None:
+def test_add_model_data(westeros_solved: Scenario, w_data_path: Path) -> None:
     base = westeros_solved
     clone = base.clone(scenario=f"{base.scenario} cloned", keep_solution=False)
     clone.check_out()
@@ -255,7 +291,7 @@ def test_add_model_data(westeros_solved, w_data_path) -> None:
     assert np.isclose(obs, exp)
 
 
-def test_calibrate(westeros_solved, w_data_path) -> None:
+def test_calibrate(westeros_solved: Scenario, w_data_path: Path) -> None:
     """Test that :func:`.add_model_data` updates ``aeei`` and ``grow``."""
     base = westeros_solved
     clone = base.clone(base.model, "test macro calibration", keep_solution=False)
@@ -279,7 +315,7 @@ def test_calibrate(westeros_solved, w_data_path) -> None:
     assert not end_grow.isnull().any()
 
 
-def test_calibrate_roundtrip(westeros_solved, w_data_path) -> None:
+def test_calibrate_roundtrip(westeros_solved: Scenario, w_data_path: Path) -> None:
     """Ensure certain values occur after checking convergence.
 
     The specific values used here were re-checked in :pull:`924`.
@@ -296,7 +332,9 @@ def test_calibrate_roundtrip(westeros_solved, w_data_path) -> None:
 
 
 @pytest.fixture
-def mr_scenario(test_mp, request):
+def mr_scenario(
+    test_mp: Platform, request: pytest.FixtureRequest
+) -> Generator[Scenario, Any, None]:
     """Fixture with a multi-region, multi-sector scenario."""
     scenario = make_westeros(test_mp, request=request)
     with scenario.transact():
@@ -306,14 +344,14 @@ def mr_scenario(test_mp, request):
     yield scenario
 
 
-def test_multiregion_valid_data(mr_scenario) -> None:
+def test_multiregion_valid_data(mr_scenario: Scenario) -> None:
     """Multi-region, multi-sector input data can be checked."""
     s = mr_scenario
     c = macro.prepare_computer(s, data=mr_data_path("2"))
     c.get("check all")
 
 
-def test_multiregion_derive_data(mr_scenario) -> None:
+def test_multiregion_derive_data(mr_scenario: Scenario) -> None:
     s = mr_scenario
     path = mr_data_path("1")
     c = macro.prepare_computer(s, data=path)
@@ -356,7 +394,7 @@ def test_multiregion_derive_data(mr_scenario) -> None:
     pd.testing.assert_series_equal(obs, exp)
 
 
-def test_multiregion_derive_data_2(mr_scenario) -> None:
+def test_multiregion_derive_data_2(mr_scenario: Scenario) -> None:
     """Multi-region multi-sector data can be computed."""
     s = mr_scenario
     c = macro.prepare_computer(s, data=mr_data_path("2"))
@@ -372,7 +410,7 @@ def test_multiregion_derive_data_2(mr_scenario) -> None:
     assert set(check["sector"].unique()) == set(sectors)
 
 
-def test_sector_map(westeros_solved, w_data) -> None:
+def test_sector_map(westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]) -> None:
     """Calibration works when sector and commodity names are mismatched."""
     for table in "aeei", "config", "demand_ref", "price_ref":
         w_data[table] = w_data[table].replace({"sector": {"light": "FOO"}})

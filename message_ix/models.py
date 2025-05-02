@@ -239,7 +239,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         return result
 
 
-def _check_structure(scenario: "Scenario"):
+def _check_structure(scenario: "IXMPScenario"):
     """Check dimensionality of some items related to the storage representation.
 
     Yields a sequence of 4-tuples:
@@ -319,7 +319,7 @@ class MESSAGE(GAMSModel):
                 scenario.add_set(set_name, expected)
 
     @classmethod
-    def initialize(cls, scenario: "Scenario") -> None:
+    def initialize(cls, scenario: "IXMPScenario") -> None:
         """Set up `scenario` with required sets and parameters for MESSAGE.
 
         See Also

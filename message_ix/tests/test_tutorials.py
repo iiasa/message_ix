@@ -1,8 +1,10 @@
 import logging
 import os
 import sys
+from collections.abc import Generator
+from pathlib import Path
 from shutil import copyfile
-from typing import Union
+from typing import Any, Optional, Union
 
 import numpy as np
 import pytest
@@ -37,7 +39,14 @@ pytestmark = [
 ]
 
 
-def _t(group: Union[str, None], basename: str, *, check=None, marks=None):
+# NOTE Pytest.param returns ParamSet, which is private and hard to type hint
+def _t(
+    group: Union[str, None],
+    basename: str,
+    *,
+    check: Optional[list[tuple[str, Union[float, int]]]] = None,
+    marks: Optional[list[pytest.MarkDecorator]] = None,
+) -> tuple:
     """Shorthand for defining tutorial test cases.
 
     Parameters
@@ -114,13 +123,15 @@ DATA_FILES = [
 
 
 @pytest.fixture
-def nb_path(request, tutorial_path):
+def nb_path(
+    request: pytest.FixtureRequest, tutorial_path: Path
+) -> Generator[Path, Any, None]:
     """Prepare the `nb_path` fixture to `test_tutorial`."""
     # Combine the filename parts with the tutorial_path fixture
     yield tutorial_path.joinpath(*request.param).with_suffix(".ipynb")
 
 
-def default_args():
+def default_args() -> dict[str, Union[int, str]]:
     """Default arguments for :func:`.run_notebook."""
     if GHA:
         # Use a longer timeout
@@ -129,10 +140,20 @@ def default_args():
         return dict()
 
 
+# NOTE The tutorials are not parametrized directly. The files run on JDBC per default,
+# though.
+
+
 # Parametrize the first 3 arguments using the variables *TUTORIALS* and *IDS*.
 # Argument 'nb_path' is indirect so that the above function can modify it.
 @pytest.mark.parametrize("nb_path,checks", TUTORIALS, ids=IDS, indirect=["nb_path"])
-def test_tutorial(caplog, nb_path, checks, tmp_path, tmp_env):
+def test_tutorial(
+    caplog: pytest.LogCaptureFixture,
+    nb_path: Path,
+    checks: list[tuple[str, Union[float, int]]],
+    tmp_path: Path,
+    tmp_env: os._Environ[str],
+) -> None:
     """Test tutorial in the IPython or IR notebook at `nb_path`.
 
     If `checks` are given, values in the specified cells are tested.
