@@ -59,7 +59,7 @@ tutorial = ["jupyter", "matplotlib", "message_ix[report,sankey]"]
 report = ["ixmp[report]"]
 sankey = ["plotly"]
 tests = [
-  # "ixmp[tests]",  # TODO Uncomment after iiasa/ixmp#568
+  "ixmp[tests]",
   "message_ix[docs,tutorial]",
   "pint",
   "pooch",
