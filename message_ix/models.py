@@ -21,6 +21,8 @@ DEFAULT_CPLEX_OPTIONS = {
     "lpmethod": 4,
     "threads": 4,
     "epopt": 1e-6,
+    "scaind": -1,
+    "memoryemphasis": "true",
 }
 
 #: Common dimension name abbreviations mapped to tuples with:
@@ -176,7 +178,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
 
     #: Mapping from model item (equation, parameter, set, or variable) names to
     #: :class:`.Item` describing the item.
-    items: Mapping[str, Item]
+    items: MutableMapping[str, Item]
 
     def __init__(self, name=None, **model_options):
         # Update the default options with any user-provided options
@@ -212,7 +214,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         optfile.write_text("\n".join(lines))
         log.info(f"Use CPLEX options {self.cplex_opts}")
 
-        self.cplex_opts.update({"barcrossalg": 2})
+        self.cplex_opts.update({"predual": 1})
         optfile2 = Path(self.model_dir).joinpath("cplex.op2")
         lines2 = ("{} = {}".format(*kv) for kv in self.cplex_opts.items())
         optfile2.write_text("\n".join(lines2))
@@ -559,6 +561,11 @@ var(
     "PRICE_EMISSION",
     "n type_emission type_tec y",
     "Emission price (derived from marginals of EMISSION_EQUIVALENCE constraint)",
+)
+var(
+    "PRICE_EMISSION_NEW",
+    "n type_emission type_tec y",
+    "TEMPORARY test for Emission price fix",
 )
 var(
     "REL",
