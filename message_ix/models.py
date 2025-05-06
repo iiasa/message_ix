@@ -22,6 +22,7 @@ DEFAULT_CPLEX_OPTIONS = {
     "threads": 4,
     "epopt": 1e-6,
     "scaind": -1,
+    "memoryemphasis": "true",
 }
 
 #: Common dimension name abbreviations mapped to tuples with:
