@@ -1,4 +1,5 @@
 from collections.abc import Generator
+from copy import deepcopy
 from pathlib import Path
 from subprocess import run
 from typing import Any, Optional
@@ -294,8 +295,12 @@ def test_add_horizon(
 ) -> None:
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
 
+    # Running on both backends; add_horizon() manipulates these items
+    _args = deepcopy(args)
+    _kwargs = deepcopy(kwargs)
+
     # Call completes successfully
-    if isinstance(args[0], dict) and "data" not in kwargs:
+    if isinstance(_args[0], dict) and "data" not in _kwargs:
         with pytest.warns(
             DeprecationWarning,
             match=(
@@ -303,9 +308,9 @@ def test_add_horizon(
                 "firstmodelyear="
             ),
         ):
-            scen.add_horizon(*args, **kwargs)
+            scen.add_horizon(*_args, **_kwargs)
     else:
-        scen.add_horizon(*args, **kwargs)
+        scen.add_horizon(*_args, **_kwargs)
 
     # For type checkers
     assert exp
