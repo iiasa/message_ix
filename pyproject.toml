@@ -106,6 +106,8 @@ addopts = """
   -m "not nightly and not rmessageix"
   -p no:faulthandler"""
 markers = [
+  "ixmp4: tests exclusive to IXMP4Backend.",
+  "jdbc: tests exclusive to JDBCBackend.",
   "nightly: Slow-running nightly tests of particular scenarios.",
   "rmessageix: test of the message_ix R interface.",
   "tutorial: Tests of the tutorial Jupyter notebooks",
