@@ -14,11 +14,6 @@ from .scenario_data import (
     DEFAULT_INDEXSET_DATA,
     DEFAULT_PARAMETER_DATA,
     DEFAULT_TABLE_DATA,
-    REQUIRED_EQUATIONS,
-    REQUIRED_INDEXSETS,
-    REQUIRED_PARAMETERS,
-    REQUIRED_TABLES,
-    REQUIRED_VARIABLES,
 )
 
 log = logging.getLogger(__name__)
@@ -28,50 +23,50 @@ log = logging.getLogger(__name__)
 # models.py. We may want to keep something like below's function should that change.
 # TODO If this is writing every single addition to the DB, the following is slow. Could
 # we tell sqlalchemy to only commit to the DB at the end of this function?
-def set_up_scenario(scenario: "Scenario") -> None:
-    """Create all optimization items required by MESSAGEix in `scenario`.
+# def set_up_scenario(scenario: "Scenario") -> None:
+#     """Create all optimization items required by MESSAGEix in `scenario`.
 
-    (According to ixmp_source.)
-    """
-    # NOTE this assumes an IXMP4Backend
-    # Get the Run associated with the Scenario
-    run = cast(Run, scenario.platform._backend.index[scenario])
+#     (According to ixmp_source.)
+#     """
+#     # NOTE this assumes an IXMP4Backend
+#     # Get the Run associated with the Scenario
+#     run = cast(Run, scenario.platform._backend.index[scenario])
 
-    # Add all required IndexSets
-    for indexset_name in REQUIRED_INDEXSETS:
-        run.optimization.indexsets.create(name=indexset_name)
+#     # Add all required IndexSets
+#     for indexset_name in REQUIRED_INDEXSETS:
+#         run.optimization.indexsets.create(name=indexset_name)
 
-    # Add all required Tables
-    for table_info in REQUIRED_TABLES:
-        run.optimization.tables.create(
-            name=table_info.name,
-            constrained_to_indexsets=table_info.indexsets,
-            column_names=table_info.column_names,
-        )
+#     # Add all required Tables
+#     for table_info in REQUIRED_TABLES:
+#         run.optimization.tables.create(
+#             name=table_info.name,
+#             constrained_to_indexsets=table_info.indexsets,
+#             column_names=table_info.column_names,
+#         )
 
-    # Add all required Parameters
-    for parameter_info in REQUIRED_PARAMETERS:
-        run.optimization.parameters.create(
-            name=parameter_info.name,
-            constrained_to_indexsets=parameter_info.indexsets,
-            column_names=parameter_info.column_names,
-        )
+#     # Add all required Parameters
+#     for parameter_info in REQUIRED_PARAMETERS:
+#         run.optimization.parameters.create(
+#             name=parameter_info.name,
+#             constrained_to_indexsets=parameter_info.indexsets,
+#             column_names=parameter_info.column_names,
+#         )
 
-    # Add all required Variables
-    for variable_info in REQUIRED_VARIABLES:
-        run.optimization.variables.create(
-            name=variable_info.name,
-            constrained_to_indexsets=variable_info.indexsets,
-            column_names=variable_info.column_names,
-        )
+#     # Add all required Variables
+#     for variable_info in REQUIRED_VARIABLES:
+#         run.optimization.variables.create(
+#             name=variable_info.name,
+#             constrained_to_indexsets=variable_info.indexsets,
+#             column_names=variable_info.column_names,
+#         )
 
-    # Add all required Equations
-    for equation_info in REQUIRED_EQUATIONS:
-        run.optimization.equations.create(
-            name=equation_info.name,
-            constrained_to_indexsets=equation_info.indexsets,
-            column_names=equation_info.column_names,
-        )
+#     # Add all required Equations
+#     for equation_info in REQUIRED_EQUATIONS:
+#         run.optimization.equations.create(
+#             name=equation_info.name,
+#             constrained_to_indexsets=equation_info.indexsets,
+#             column_names=equation_info.column_names,
+#         )
 
 
 def add_default_data(scenario: "Scenario") -> None:
