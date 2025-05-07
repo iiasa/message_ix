@@ -9,6 +9,7 @@ import numpy.testing as npt
 import pandas as pd
 import pandas.testing as pdt
 import pytest
+from ixmp.backend.jdbc import JDBCBackend
 
 import message_ix
 from message_ix import Scenario
@@ -79,7 +80,7 @@ class TestScenario:
         # Check if OBJ value remains unchanged when "old" is removed (keep=False); or
         # twice as high when "old" note is kept (keep=True)
         exp = scen_ref.var("OBJ")["lvl"] * (1 + int(keep and set_name == "node"))
-        assert exp == scen.var("OBJ")["lvl"]
+        assert np.isclose(exp, scen.var("OBJ")["lvl"])
 
     @pytest.mark.parametrize("check_out", (True, False))
     @pytest.mark.parametrize("keep", (True, False))
@@ -344,7 +345,16 @@ def test_cat_list(test_mp: ixmp.Platform) -> None:
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
 
     # cat_list() returns default 'year' categories in a new message_ix.Scenario
+    # NOTE JDBC sets up default items in the DB backend, including the base expected
+    # data and then finds nothing new when calling models.MESSAGE.initialize(). Thus, no
+    # `commit()` is issued and ixmp_source doesn't `assignPeriodMaps()`, which would add
+    # 'cumulative'.
+    # IXMP4Backend only reads in the items here and thus `commit()`s, which adds
+    # 'cumulative'. This can't change without adapting the `commit()` logic, which we
+    # rely on elsewhere. So we have to adapt the expectation instead.
     exp = ["firstmodelyear", "lastmodelyear", "initializeyear_macro"]
+    if not isinstance(test_mp._backend, JDBCBackend):
+        exp.insert(0, "cumulative")
     assert exp == scen.cat_list("year")
 
 
@@ -574,7 +584,7 @@ def test_excel_read_write(
     message_test_mp: ixmp.Platform, tmp_path: Path, request: pytest.FixtureRequest
 ) -> None:
     # Path to temporary file
-    fname = tmp_path / request.node.name + "_excel_read_write.xlsx"
+    fname = tmp_path / (request.node.name + "_excel_read_write.xlsx")
 
     scen1 = Scenario(message_test_mp, **SCENARIO["dantzig"])
     scen1 = make_dantzig(mp=message_test_mp, request=request)
