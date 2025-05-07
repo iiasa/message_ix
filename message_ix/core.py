@@ -983,3 +983,18 @@ class Scenario(ixmp.Scenario):
             self.remove_set(name, list(mapping.keys()))
 
         maybe_commit(self, commit, f"Rename {name!r} using mapping {mapping}")
+
+    def commit(self, comment: str) -> None:
+        if isinstance(self.platform._backend, IXMP4Backend):
+            # JDBC calls these functions as part of every commit, but they have moved
+            # to message_ix because they handle message-specific data
+
+            # The sanity checks fail for some tests (e.g. 'node' being empty)
+            # ensure_required_indexsets_have_data(scenario=self)
+
+            # Compose some auxiliary tables
+            for dimension in ("node", "time"):
+                compose_dimension_map(scenario=self, dimension=dimension)
+            compose_period_map(scenario=self)
+
+        return super().commit(comment)
