@@ -286,9 +286,11 @@ def _maybe_add_to_parameter(
     columns = parameter.column_names or parameter.indexsets
 
     # Keep only rows that don't already exist
-    new_data = data[
-        ~data[columns].isin(pd.DataFrame(parameter.data)[columns]).all(axis=1)
-    ]
+    new_data = (
+        data[~data[columns].isin(pd.DataFrame(parameter.data)[columns]).all(axis=1)]
+        if bool(parameter.data)
+        else data
+    )
 
     # Add new rows to table data
     parameter.add(data=new_data)
