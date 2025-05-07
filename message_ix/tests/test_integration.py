@@ -51,6 +51,9 @@ def test_run_clone(tmpdir: Path, request: pytest.FixtureRequest) -> None:
     )
 
 
+# TODO ixmp4-remove_solution() doesn't seem to remove the timeseries values for
+# 1963 and 1964 yet
+@pytest.mark.jdbc
 def test_run_remove_solution(test_mp: Platform, request: pytest.FixtureRequest) -> None:
     # create a new instance of the transport problem and solve it
     scen = make_dantzig(test_mp, solve=True, quiet=True, request=request)
@@ -72,6 +75,8 @@ def test_run_remove_solution(test_mp: Platform, request: pytest.FixtureRequest) 
     )
 
 
+# TODO IXMP4Backend doesn't support clone(shift_first_model_year=...) yet
+@pytest.mark.jdbc
 def test_shift_first_model_year(
     test_mp: Platform, request: pytest.FixtureRequest
 ) -> None:

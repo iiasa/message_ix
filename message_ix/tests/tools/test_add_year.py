@@ -94,6 +94,11 @@ def assert_function(
 YEARS_NEW = [2025, 2035]
 
 
+# NOTE This should work on IXMP4Backend already, but somehow, add_year() does not seem
+# to add years to scen_new. In assert_function(), this means that the filtered
+# `var_cost` is empty and .at[] fails.
+# TODO Experiment in a notebook why add_year() doesn't work.
+@pytest.mark.jdbc
 def test_add_year(base_scen_mp: tuple[Scenario, Platform]) -> None:
     scen_ref, test_mp = base_scen_mp
 
@@ -108,6 +113,10 @@ def test_add_year(base_scen_mp: tuple[Scenario, Platform]) -> None:
     assert_function(scen_ref, scen_new, YEARS_NEW, yr_test=2025)
 
 
+# NOTE This should work on IXMP4Backend already, but with version=None, we can't find a
+# default Run for scen_ref. Not sure if JDBC sets this as default before deletion
+# (if so, how?) or if it doesn't need a default to load a scen (in contrast to ixmp4).
+@pytest.mark.jdbc
 def test_add_year_cli(
     message_ix_cli: Callable[..., Result], base_scen_mp: tuple[Scenario, Platform]
 ) -> None:
