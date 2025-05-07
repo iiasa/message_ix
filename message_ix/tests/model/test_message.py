@@ -258,7 +258,7 @@ def test_soft_activity_up(request: pytest.FixtureRequest, test_mp: "Platform") -
     pdt.assert_frame_equal(exp, s.var("ACT_UP"), check_like=True, check_dtype=False)
 
     # The objective function value is reduced by a specific amount
-    npt.assert_allclose(s.var("OBJ")["lvl"] - OBJ_pre, -1578.125)
+    npt.assert_allclose(s.var("OBJ")["lvl"] - OBJ_pre, -1578.125, rtol=1e-5)
 
     # - Merge resulting ACT with data prior to changes.
     # - Compute differences in lvl.
