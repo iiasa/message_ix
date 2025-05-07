@@ -9,6 +9,7 @@ from message_ix.testing import make_westeros
 from message_ix.tools.migrate import v311
 
 
+@pytest.mark.jdbc
 @pytest.mark.xfail(
     condition=sys.version_info < (3, 10),
     raises=ImportError,
