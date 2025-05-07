@@ -81,9 +81,9 @@ def add_default_data(scenario: "Scenario") -> None:
 
         # Only add default data if they are missing
         # NOTE this works because all DEFAULT_INDEXSET_DATA items have str-type data
-        if missing := set(indexset_data_info.data) - set(
-            cast(list[str], indexset.data)
-        ):
+        if missing := [
+            item for item in indexset_data_info.data if item not in indexset.data
+        ]:
             indexset.add(data=list(missing))
 
     # Add Table data
