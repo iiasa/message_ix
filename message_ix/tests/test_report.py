@@ -10,6 +10,7 @@ import pyam
 import pytest
 from genno.testing import assert_qty_equal
 from ixmp import Platform
+from ixmp.backend.jdbc import JDBCBackend
 from ixmp.report import Reporter as ixmp_Reporter
 from ixmp.testing import assert_logs
 from numpy.testing import assert_allclose
@@ -59,7 +60,9 @@ def test_reporter_no_solution(
     assert 3 == len(result)
 
 
-def test_reporter_from_scenario(message_test_mp: Platform) -> None:
+def test_reporter_from_scenario(
+    message_test_mp: Platform, test_data_path: Path
+) -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
     # Varies between local & CI contexts
@@ -73,8 +76,10 @@ def test_reporter_from_scenario(message_test_mp: Platform) -> None:
     # message_ix.Reporter can also be initialized
     rep = Reporter.from_scenario(scen)
 
-    # Number of quantities available in a rudimentary MESSAGEix Scenario
-    assert 268 == len(rep.graph["all"])
+    # NOTE Used to write out the expected data
+    # Path(test_data_path / "reportergraph.txt").write_text(
+    #     "\n".join(list(map(str, sorted(rep.graph))))
+    # )
 
     # Quantities have short dimension names
     assert "demand:n-c-l-y-h" in rep, sorted(rep.graph)
@@ -91,12 +96,25 @@ def test_reporter_from_scenario(message_test_mp: Platform) -> None:
     # check_attrs False because we don't get the unit addition in bare xarray
     assert_qty_equal(obs, demand, check_attrs=False)
 
+    # Prepare the expected items in the graphs
+    # IXMP4Backend is currently not storing the MACRO variables 'C' and 'I' for MESSAGE
+    # models
+    missing = {"C:", "C:n", "C:n-y", "C:y", "I:", "I:n", "I:n-y", "I:y"}
+    expected_rep_ix_graph_keys = set(
+        Path(test_data_path / "reporterixgraph.txt").read_text().split("\n")
+    )
+    expected_rep_graph_keys = set(
+        Path(test_data_path / "reportergraph.txt").read_text().split("\n")
+    )
+    if not isinstance(message_test_mp._backend, JDBCBackend):
+        expected_rep_ix_graph_keys -= missing
+        expected_rep_graph_keys -= missing
+
     # ixmp.Reporter pre-populated with only model quantities and aggregates
-    assert 6477 == len(rep_ix.graph)
+    assert set(map(str, sorted(rep_ix.graph))) == expected_rep_ix_graph_keys
 
     # message_ix.Reporter pre-populated with additional, derived quantities
-    # This is the same value as in test_tutorials.py
-    assert 13739 == len(rep.graph)
+    assert set(map(str, sorted(rep.graph))) == expected_rep_graph_keys
 
     # Derived quantities have expected dimensions
     vom_key = rep.full_key("vom")
