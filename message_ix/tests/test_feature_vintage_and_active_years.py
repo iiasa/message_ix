@@ -41,7 +41,7 @@ def _setup(
     mp: Platform,
     years: Sequence[int],
     firstmodelyear: int,
-    tl_years: Optional[filter[int]] = None,
+    tl_years: Optional[filter] = None,
 ) -> tuple[Scenario, pd.DataFrame]:
     """Common setup for test of :meth:`.vintage_and_active_years`.
 

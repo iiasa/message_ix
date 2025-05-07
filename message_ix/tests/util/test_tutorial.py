@@ -34,7 +34,7 @@ def test_prepare_plots(dantzig_reporter: Reporter) -> None:
 
 
 def test_solve_modified(
-    caplog: pytest.LogCaptureFixture, message_test_mp: "Platform"
+    caplog: "pytest.LogCaptureFixture", message_test_mp: "Platform"
 ) -> None:
     base = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
