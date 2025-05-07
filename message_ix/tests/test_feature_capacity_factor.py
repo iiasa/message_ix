@@ -58,12 +58,12 @@ TD_0 = {
 
 
 def test_capacity_factor_time(
-    request: pytest.FixtureRequest, test_mp: Platform
+    request: pytest.FixtureRequest, _test_mp: Platform
 ) -> None:
     """``capacity_factor`` is calculated correctly when it varies by time slice."""
     # Build model and solve
     scen = make_subannual(
-        test_mp,
+        _test_mp,
         TD_0,
         time_steps=[
             ("summer", 0.5, "season", "year"),
@@ -78,12 +78,12 @@ def test_capacity_factor_time(
 
 
 def test_capacity_factor_unequal_time(
-    request: pytest.FixtureRequest, test_mp: Platform
+    request: pytest.FixtureRequest, _test_mp: Platform
 ) -> None:
     """``capacity_factor`` is calculated correctly when ``duration_time`` is uneven."""
     # Build model and solve
     scen = make_subannual(
-        test_mp,
+        _test_mp,
         TD_0,
         time_steps=[
             ("summer", 0.3, "season", "year"),
@@ -105,7 +105,7 @@ TS_0 = [
 
 
 def test_capacity_factor_zero(
-    request: pytest.FixtureRequest, test_mp: Platform
+    request: pytest.FixtureRequest, _test_mp: Platform
 ) -> None:
     """Test zero capacity factor (CF) in a time slice.
 
@@ -124,7 +124,7 @@ def test_capacity_factor_zero(
     # Build model and solve (should raise GAMS error)
     with pytest.raises(ModelError):
         make_subannual(
-            test_mp,
+            _test_mp,
             tec_dict,
             com_dict={"solar_pv_ppl": {"input": "fuel", "output": "electr"}},
             time_steps=TS_0,
@@ -136,7 +136,7 @@ def test_capacity_factor_zero(
 
 
 def test_capacity_factor_zero_two(
-    request: pytest.FixtureRequest, test_mp: Platform
+    request: pytest.FixtureRequest, _test_mp: Platform
 ) -> None:
     """Test zero capacity factor (CF) in a time slice.
 
@@ -160,7 +160,7 @@ def test_capacity_factor_zero_two(
 
     # Build model and solve
     scen = make_subannual(
-        test_mp,
+        _test_mp,
         tec_dict,
         com_dict={
             "solar_pv_ppl": {"input": "fuel", "output": "electr"},
@@ -186,13 +186,13 @@ def test_capacity_factor_zero_two(
 
 
 def test_capacity_factor_average(
-    request: pytest.FixtureRequest, test_mp: Platform
+    request: pytest.FixtureRequest, _test_mp: Platform
 ) -> None:
     """Weighted average of ``capacity_factor`` for "year" is calculated correctly,
     based on time slices, when there is no capacity factor defined for "year"."""
     # Build model and solve
     scen = make_subannual(
-        test_mp,
+        _test_mp,
         TD_0,
         time_steps=[
             ("summer", 0.5, "season", "year"),

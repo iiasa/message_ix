@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 # NOTE These tests likely don't need to be parametrized
 
 
-def test_as_message_df(test_mp: "Platform") -> None:
+def test_as_message_df(_test_mp: "Platform") -> None:
     q = random_qty(dict(c=3, h=2, nl=5))
     q.units = "kg"
 
@@ -56,7 +56,7 @@ def test_as_message_df(test_mp: "Platform") -> None:
     # Works together with ixmp.report.operator.update_scenario
 
     # Prepare a Scenario
-    s = Scenario(test_mp, "m", "s", version="new")
+    s = Scenario(_test_mp, "m", "s", version="new")
 
     # Minimal structure to accept the data in `q`
     for col, values in result0.items():
