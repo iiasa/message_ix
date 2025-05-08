@@ -200,11 +200,11 @@ class ParameterInfo:
     name: str
     gams_name: str  # could default to None  and use name in that case, maybe?
     indexsets: list[str]
-    column_names: list[str] | None = None
+    column_names: Optional[list[str]] = None
     write_to_gdx: bool = True
     is_tec: bool = False
     is_tec_act: bool = False
-    section: (
+    section: Optional[
         Literal[
             "energyforms:",
             "demand:",
@@ -213,8 +213,7 @@ class ParameterInfo:
             "variables:",
             "relationsX:",
         ]
-        | None
-    ) = None
+    ] = None
     # NOTE changing '2LDB' to 'toLDB'
     toLDB: bool = False
     mode: bool = False
