@@ -16,6 +16,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+defaults:
+  run:
+    shell: bash
+
 env:
   GAMS_VERSION: 43.4.1   # First version including a macOS arm64 distribution
   depth: 100  # Must be large enough to include the most recent release
@@ -130,7 +134,6 @@ jobs:
           --color=yes --durations=20 -rA --verbose \
           --cov-report=xml \
           --numprocesses=auto --dist=loadgroup
-      shell: bash
 
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v5
@@ -169,7 +172,6 @@ jobs:
     - name: Set RETICULATE_PYTHON
       # Retrieve the Python executable set up above
       run: echo "RETICULATE_PYTHON=$(uv python find)" >> "$GITHUB_ENV"
-      shell: bash
 
     - uses: r-lib/actions/setup-r@v2
       id: setup-r
@@ -213,7 +215,6 @@ jobs:
           --color=yes --durations=20 -rA --verbose \
           --cov-report=xml \
           --numprocesses=auto --dist=loadgroup
-      shell: bash
 
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v5
