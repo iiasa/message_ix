@@ -278,7 +278,7 @@ def _maybe_add_to_parameter(
         data = pd.DataFrame(data)
 
     # Only compare entries of specific columns (not of `values` and `units`)
-    columns = parameter.column_names or parameter.indexsets
+    columns = parameter.column_names or parameter.indexset_names
 
     # Keep only rows that don't already exist
     new_data = (
