@@ -15,11 +15,7 @@ from ixmp.backend.jdbc import JDBCBackend
 from ixmp.util import maybe_check_out, maybe_commit
 
 from message_ix.util.ixmp4 import on_ixmp4backend
-from message_ix.util.scenario_data import (
-    REQUIRED_EQUATIONS,
-    REQUIRED_UNITS,
-    REQUIRED_VARIABLES,
-)
+from message_ix.util.scenario_data import REQUIRED_EQUATIONS, REQUIRED_VARIABLES
 
 if TYPE_CHECKING:
     import ixmp.core.scenario
@@ -336,7 +332,13 @@ class MESSAGE(GAMSModel):
         :attr:`items`
         """
         from message_ix.core import Scenario
+        from message_ix.util.ixmp4 import platform_compat
         from message_ix.util.scenario_setup import add_default_data
+
+        # Adjust the Platform on which `scenario` is stored for compatibility between
+        # ixmp.{IXMP4,JDBC}Backend. Because message_ix does not subclass Platform, this
+        # is the earliest opportunity to make these adjustments.
+        platform_compat(scenario.platform)
 
         # Check for storage items that may contain incompatible data or need to be
         # re-initialized
@@ -365,9 +367,6 @@ class MESSAGE(GAMSModel):
             #    scheme="MESSAGE"), instead of message_ix.Scenario directly. User code
             #    *should* never do this, but it occurs in .test_models.test_initialize()
             return
-
-        if not scenario.platform._units_to_warn_about:
-            scenario.platform._units_to_warn_about = REQUIRED_UNITS.copy()
 
         # NOTE I tried transcribing this from ixmp_source as-is, but the MESSAGE class
         # defined in models.py takes care of setting up the Scenario -- except for
