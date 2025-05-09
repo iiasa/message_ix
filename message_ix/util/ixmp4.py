@@ -1,4 +1,4 @@
-from typing import Any, Literal, Union
+from typing import Union
 
 import ixmp
 import ixmp.backend
@@ -18,13 +18,3 @@ def on_ixmp4backend(obj: Union["ixmp.Platform", "ixmp.TimeSeries"]) -> bool:
         (obj if isinstance(obj, ixmp.Platform) else obj.platform)._backend,
         IXMP4Backend,
     )
-
-
-def add_or_extend_item_list(
-    kwargs: dict[str, Any], key: Literal["equ_list", "var_list"], item_list: list[str]
-) -> None:
-    """Add `key` to `kwargs` and set it to or expand it with `item_list`."""
-    if key not in kwargs:
-        kwargs[key] = item_list
-    else:
-        kwargs[key].extend(item_list)
