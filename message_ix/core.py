@@ -12,16 +12,10 @@ import pandas as pd
 from ixmp.backend import ItemType
 from ixmp.backend.jdbc import JDBCBackend
 from ixmp.util import as_str_list, maybe_check_out, maybe_commit
-from ixmp.util.ixmp4 import ContainerData
 
-from message_ix.util.ixmp4 import add_or_extend_item_list, on_ixmp4backend
+from message_ix.util.ixmp4 import on_ixmp4backend
 
 # from message_ix.util.scenario_data import PARAMETERS
-from message_ix.util.scenario_data import (
-    REQUIRED_EQUATIONS,
-    REQUIRED_UNITS,
-    REQUIRED_VARIABLES,
-)
 
 log = logging.getLogger(__name__)
 
@@ -69,51 +63,6 @@ class Scenario(ixmp.Scenario):
 
         # Scheme returned by database
         assert self.scheme == "MESSAGE", self.scheme
-
-        if on_ixmp4backend(self):
-            from message_ix.util.scenario_setup import add_default_data
-
-            if not self.platform._units_to_warn_about:
-                self.platform._units_to_warn_about = REQUIRED_UNITS.copy()
-
-            # NOTE I tried transcribing this from ixmp_source as-is, but the MESSAGE
-            # class defined in models.py takes care of setting up the Scenario -- except
-            # for adding default data.
-            # ixmp_source does other things, too, which I don't think we need here, but
-            # I've kept them in for completeness for now.
-
-            # ixmp_source first sets up a Scenario and adds default data
-            # models.MESSAGE seems to do the setup for us in all cases, while
-            # add_default_data() only adds missing items, so can always run.
-            # TODO Is this correct?
-            # if version == "new":
-            #     # If the Scenario already exists, we don't need these two
-            # set_up_scenario(s=self)
-            add_default_data(scenario=self)
-
-            # TODO We don't seem to need this, but if we do, give them better names
-            # self.tecParList = [
-            #     parameter_info for parameter_info in PARAMETERS if parameter_info.is_tec # noqa: E501
-            # ]
-            # self.tecActParList = [
-            #     parameter_info
-            #     for parameter_info in PARAMETERS
-            #     if parameter_info.is_tec_act
-            # ]
-
-            # TODO the following could be activated in ixmp_source through the flag
-            # parameter `sanity_checks`. This 'sanity_check' (there are more, s.b.) is
-            # generally only active when loading a scenario from the DB (unless
-            # explicitly loading via ID, in which case it's also inactive). We don't
-            # distinguish loading from the DB and some tutorials failed, so disable.
-            # ensure_required_indexsets_have_data(s=self)
-
-            # TODO It does not seem useful to construct these because some required
-            # indexsets won't have any data in them yet. They do get run in imxp_source
-            # at this point, though.
-            # compose_dimension_map(s=self, dimension="node")
-            # compose_dimension_map(s=self, dimension="time")
-            # compose_period_map(s=self)
 
     # Utility methods used by .equ(), .par(), .set(), and .var()
 
@@ -801,61 +750,6 @@ class Scenario(ixmp.Scenario):
             Other options control the execution of the underlying GAMS code; see the
             :class:`.MESSAGE_MACRO` class and :class:`.GAMSModel`.
         """
-        if on_ixmp4backend(self):
-            from message_ix.util.gams_io import (
-                add_auxiliary_items_to_container_data_list,
-                add_default_data_to_container_data_list,
-                store_message_version,
-            )
-            from message_ix.util.scenario_setup import (
-                compose_dimension_map,
-                compose_period_map,
-                ensure_required_indexsets_have_data,
-            )
-
-            # Run the sanity checks
-            ensure_required_indexsets_have_data(scenario=self)
-
-            # Compose some auxiliary tables
-            for dimension in ("node", "time"):
-                compose_dimension_map(scenario=self, dimension=dimension)
-
-            compose_period_map(scenario=self)
-
-            # Create a list of `ContainerData` to collect MESSAGE-specific data that
-            # ixmp should write to GAMS
-            container_data: list[ContainerData] = []
-
-            # Add `MESSAGE_ix_version` parameter for validation by GAMS
-            store_message_version(container_data=container_data)
-
-            # TODO Why is this a dedicated function?
-            # Add default data for some `Table`s to container data
-            for name in ("cat_tec", "type_tec_land"):
-                add_default_data_to_container_data_list(
-                    container_data=container_data, name=name, scenario=self
-                )
-
-            # Add automatically created helper items to container data
-            add_auxiliary_items_to_container_data_list(
-                container_data=container_data, scenario=self
-            )
-
-            # Add container data to model_options
-            kwargs["container_data"] = container_data
-
-            # Request only required Equations per default
-            equation_names = [equation.gams_name for equation in REQUIRED_EQUATIONS]
-            add_or_extend_item_list(
-                kwargs=kwargs, key="equ_list", item_list=equation_names
-            )
-
-            # Request only required Variables per default
-            variable_names = [variable.gams_name for variable in REQUIRED_VARIABLES]
-            add_or_extend_item_list(
-                kwargs=kwargs, key="var_list", item_list=variable_names
-            )
-
         super().solve(model=model, solve_options=solve_options, **kwargs)
 
     def add_macro(
@@ -992,6 +886,7 @@ class Scenario(ixmp.Scenario):
 
     def commit(self, comment: str) -> None:
         if on_ixmp4backend(self):
+            # NB The following statements are similar to part of MESSAGE.run()
             from message_ix.util.scenario_setup import (
                 compose_dimension_map,
                 compose_period_map,
