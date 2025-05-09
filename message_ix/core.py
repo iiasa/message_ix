@@ -885,21 +885,14 @@ class Scenario(ixmp.Scenario):
         maybe_commit(self, commit, f"Rename {name!r} using mapping {mapping}")
 
     def commit(self, comment: str) -> None:
-        if on_ixmp4backend(self):
-            # NB The following statements are similar to part of MESSAGE.run()
-            from message_ix.util.scenario_setup import (
-                compose_dimension_map,
-                compose_period_map,
-            )
-            # JDBCBackend calls these functions as part of every commit, but they have
-            # moved to message_ix because they handle message-specific data
+        from message_ix.util.scenario_setup import compose_maps
 
-            # The sanity checks fail for some tests (e.g. 'node' being empty)
-            # ensure_required_indexsets_have_data(scenario=self)
+        # JDBCBackend calls these functions as part of every commit, but they have moved
+        # to message_ix because they handle message-specific data
 
-            # Compose some auxiliary tables
-            for dimension in ("node", "time"):
-                compose_dimension_map(scenario=self, dimension=dimension)
-            compose_period_map(scenario=self)
+        # The sanity checks fail for some tests (e.g. 'node' being empty)
+        # ensure_required_indexsets_have_data(scenario=self)
+
+        compose_maps(self)
 
         return super().commit(comment)
