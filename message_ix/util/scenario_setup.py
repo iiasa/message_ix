@@ -4,11 +4,14 @@ from typing import TYPE_CHECKING, Any, Literal, TypeVar, Union, cast
 import pandas as pd
 
 if TYPE_CHECKING:
+    from ixmp4 import Run
+    from ixmp4.core import IndexSet, Parameter, Table
+
     from message_ix.core import Scenario
 
 from ixmp import Platform
-from ixmp4 import Run
-from ixmp4.core import IndexSet, Parameter, Table
+
+from message_ix.util.ixmp4 import on_ixmp4backend
 
 from .scenario_data import (
     DEFAULT_INDEXSET_DATA,
@@ -28,9 +31,11 @@ log = logging.getLogger(__name__)
 
 #     (According to ixmp_source.)
 #     """
-#     # NOTE this assumes an IXMP4Backend
+#     if not on_ixmp4backend(scenario):
+#         return
+#
 #     # Get the Run associated with the Scenario
-#     run = cast(Run, scenario.platform._backend.index[scenario])
+#     run = cast("Run", scenario.platform._backend.index[scenario])
 
 #     # Add all required IndexSets
 #     for indexset_name in REQUIRED_INDEXSETS:
@@ -71,9 +76,11 @@ log = logging.getLogger(__name__)
 
 def add_default_data(scenario: "Scenario") -> None:
     """Add default data expected in a MESSAGEix Scenario."""
-    # NOTE this assumes an IXMP4Backend
+    if not on_ixmp4backend(scenario):
+        return
+
     # Get the Run associated with the Scenario
-    run = cast(Run, scenario.platform._backend.index[scenario])
+    run = cast("Run", scenario.platform._backend.index[scenario])
 
     # Add IndexSet data
     for indexset_data_info in DEFAULT_INDEXSET_DATA:
@@ -121,11 +128,13 @@ def ensure_required_indexsets_have_data(scenario: "Scenario") -> None:
     ValueError
         If the required IndexSets are empty.
     """
+    if not on_ixmp4backend(scenario):
+        return
+
     indexsets_to_check = ("node", "technology", "year", "time")
 
-    # NOTE this assumes an IXMP4Backend
     # Get the Run associated with the Scenario
-    run = cast(Run, scenario.platform._backend.index[scenario])
+    run = cast("Run", scenario.platform._backend.index[scenario])
 
     # Raise an error if any of the checked IndexSets are empty
     for name in indexsets_to_check:
@@ -136,7 +145,7 @@ def ensure_required_indexsets_have_data(scenario: "Scenario") -> None:
 
 
 def _maybe_add_to_table(
-    table: Table, data: Union[dict[str, Any], pd.DataFrame]
+    table: "Table", data: Union[dict[str, Any], pd.DataFrame]
 ) -> None:
     """Add (parts of) `data` to `table` if they are missing."""
     # NOTE This function doesn't handle empty data as internally, this won't happen
@@ -166,9 +175,11 @@ def compose_dimension_map(
     dimension: 'node' or 'time'
         Whether to handle the spatial or temporal dimension.
     """
-    # NOTE this assumes an IXMP4Backend
+    if not on_ixmp4backend(scenario):
+        return
+
     # Get the Run associated with the Scenario
-    run = cast(Run, scenario.platform._backend.index[scenario])
+    run = cast("Run", scenario.platform._backend.index[scenario])
 
     # Handle both spatial and temporal dimensions
     name_part = "spatial" if dimension == "node" else "temporal"
@@ -236,7 +247,7 @@ def compose_dimension_map(
 
 
 def _maybe_add_single_item_to_indexset(
-    indexset: IndexSet, data: Union[float, int, str]
+    indexset: "IndexSet", data: Union[float, int, str]
 ) -> None:
     """Add `data` to `indexset` if it is missing."""
     if data not in list(indexset.data):
@@ -244,7 +255,7 @@ def _maybe_add_single_item_to_indexset(
 
 
 def _maybe_add_list_to_indexset(
-    indexset: IndexSet, data: Union[list[float], list[int], list[str]]
+    indexset: "IndexSet", data: Union[list[float], list[int], list[str]]
 ) -> None:
     """Add missing parts of `data` to `indexset`."""
     # NOTE missing will always only have one type, but how to tell mypy?
@@ -255,7 +266,8 @@ def _maybe_add_list_to_indexset(
 
 
 def _maybe_add_to_indexset(
-    indexset: IndexSet, data: Union[float, int, str, list[float], list[int], list[str]]
+    indexset: "IndexSet",
+    data: Union[float, int, str, list[float], list[int], list[str]],
 ) -> None:
     """Add (parts of) `data` to `indexset` if they are missing."""
     # NOTE This function doesn't handle empty data as internally, this won't happen
@@ -268,7 +280,7 @@ def _maybe_add_to_indexset(
 # NOTE this could be combined with `_maybe_add_to_table()`, but that function would be
 # slower than necessary (though likely not by much). Is the maintenance effort worth it?
 def _maybe_add_to_parameter(
-    parameter: Parameter, data: Union[dict[str, Any], pd.DataFrame]
+    parameter: "Parameter", data: Union[dict[str, Any], pd.DataFrame]
 ) -> None:
     """Add (parts of) `data` to `parameter` if they are missing."""
     # NOTE This function doesn't handle empty data as internally, this won't happen
@@ -291,14 +303,33 @@ def _maybe_add_to_parameter(
     parameter.add(data=new_data)
 
 
+def compose_maps(scenario: "Scenario") -> None:
+    """Compose maps.
+
+    - Call :func:`compose_dimension_map` for:
+
+      - :py:`dimension="node"`
+      - :py:`dimension="time"`
+
+    - Call :func:`compose_period_map`.
+    """
+    # Compose some auxiliary tables
+    for dimension in ("node", "time"):
+        compose_dimension_map(scenario=scenario, dimension=dimension)
+
+    compose_period_map(scenario=scenario)
+
+
 def compose_period_map(scenario: "Scenario") -> None:
     """Add data to the 'duration_period' Parameter in `scenario`.
 
     This covers `assignPeriodMaps()` from ixmp_source.
     """
-    # NOTE this assumes an IXMP4Backend
+    if not on_ixmp4backend(scenario):
+        return
+
     # Get the Run associated with the Scenario
-    run = cast(Run, scenario.platform._backend.index[scenario])
+    run = cast("Run", scenario.platform._backend.index[scenario])
 
     # TODO Included here in ixmp_source; this should likely move to add_default_data
     # Add one default item to 'type_year'
