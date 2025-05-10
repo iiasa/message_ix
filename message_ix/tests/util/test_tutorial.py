@@ -1,11 +1,18 @@
+from typing import TYPE_CHECKING
+
 from ixmp.report import Key
 
-from message_ix import Scenario, make_df
+from message_ix import Reporter, Scenario, make_df
 from message_ix.testing import SCENARIO
 from message_ix.util.tutorial import prepare_plots, solve_modified
 
+if TYPE_CHECKING:
+    import pytest
+    from ixmp import Platform
 
-def test_prepare_plots(dantzig_reporter):
+
+# NOTE This test likely doesn't need to be parametrized
+def test_prepare_plots(dantzig_reporter: Reporter) -> None:
     # Function runs without error
     prepare_plots(dantzig_reporter)
 
@@ -26,7 +33,9 @@ def test_prepare_plots(dantzig_reporter):
     assert Key("CAP_NEW", ["nl", "t", "yv"]) == key
 
 
-def test_solve_modified(caplog, message_test_mp):
+def test_solve_modified(
+    caplog: "pytest.LogCaptureFixture", message_test_mp: "Platform"
+) -> None:
     base = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
     # Base objective value

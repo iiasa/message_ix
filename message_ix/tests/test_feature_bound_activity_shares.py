@@ -1,6 +1,10 @@
+from pathlib import Path
+from typing import Union
+
 import numpy as np
 import pandas as pd
 import pytest
+from ixmp import Platform
 from numpy.testing import assert_equal
 from pandas.testing import assert_frame_equal
 
@@ -61,7 +65,7 @@ def calculate_activity(scen: Scenario, tec="transport_from_seattle") -> pd.Serie
     return scen.var("ACT").groupby(["technology", "mode"])["lvl"].sum().loc[tec]
 
 
-def test_b_a_u_1_mode(request, test_mp) -> None:
+def test_b_a_u_1_mode(request: pytest.FixtureRequest, test_mp: Platform) -> None:
     """Test effect of ``bound_activity_up`` on 1 mode of a tech with multiple modes."""
     s0 = make_dantzig(test_mp, solve=True, request=request)
 
@@ -100,7 +104,11 @@ def test_b_a_u_1_mode(request, test_mp) -> None:
     [pytest.param(299, marks=pytest.mark.xfail(raises=ModelError)), 301, 325],
 )
 def test_b_a_u_all_modes(
-    request, test_mp, tmp_model_dir, lp_method, constraint_value
+    request: pytest.FixtureRequest,
+    test_mp: Platform,
+    tmp_model_dir: Path,
+    lp_method: int,
+    constraint_value: int,
 ) -> None:
     """Test ``bound_activity_up`` values applied to mode="all".
 
@@ -132,7 +140,8 @@ def test_b_a_u_all_modes(
     so = dict(model_dir=tmp_model_dir, solve_options=dict(lpmethod=lp_method))
 
     # Create and solve the Dantzig model
-    s0 = make_dantzig(test_mp, solve=True, request=request, **so)
+    # FIXME Resolve this by using TypedDict for make_dantzig kwargs
+    s0 = make_dantzig(test_mp, solve=True, request=request, **so)  # type: ignore[arg-type]
 
     # Ensure the solution is as expected given the LP method
     assert_dantzig_solution(s0, lp_method)
@@ -170,7 +179,7 @@ def test_b_a_u_all_modes(
         assert_equal(calculate_activity(s0).sum(), calculate_activity(s1).sum())
 
 
-def test_commodity_share_lo(request, test_mp) -> None:
+def test_commodity_share_lo(request: pytest.FixtureRequest, test_mp: Platform) -> None:
     """Test effect of ``share_commodity_lo``."""
     n = "new-york"
     common = COMMON | dict(mode="all", level="consumption", node_share=n, node=n)
@@ -216,7 +225,7 @@ def test_commodity_share_lo(request, test_mp) -> None:
     assert s1.var("OBJ")["lvl"] >= s0.var("OBJ")["lvl"]
 
 
-def test_commodity_share_up(request, test_mp) -> None:
+def test_commodity_share_up(request: pytest.FixtureRequest, test_mp: Platform) -> None:
     """Test effect of ``share_commodity_up``.
 
     ``ACT`` variable values from the original solution::
@@ -251,7 +260,7 @@ def test_commodity_share_up(request, test_mp) -> None:
     tt_total = "total"
 
     # common operations for both subtests
-    def add_data(s, modes):
+    def add_data(s: Scenario, modes: Union[str, list[str]]) -> None:
         with s.transact("Add share_commodity_up"):
             s.add_set("shares", SHARES)
             s.add_cat("technology", tt_share, "canning_plant")
@@ -262,8 +271,8 @@ def test_commodity_share_up(request, test_mp) -> None:
             s.add_set(name, make_df(name, **kw))
 
             name = "map_shares_commodity_total"
-            kw = common | dict(node="san-diego", type_tec=tt_total, mode=modes)
-            s.add_set(name, make_df(name, **kw))
+            _kw = common | dict(node="san-diego", type_tec=tt_total, mode=modes)
+            s.add_set(name, make_df(name, **_kw))
 
             name = "share_commodity_up"
             kw = common | dict(unit="%")
@@ -337,7 +346,14 @@ def test_commodity_share_up(request, test_mp) -> None:
         ("up", "seattle", "to_chicago", 0.95),
     ),
 )
-def test_share_mode(request, test_mp, dir, node, mode, exp_value) -> None:
+def test_share_mode(
+    request: pytest.FixtureRequest,
+    test_mp: Platform,
+    dir: str,
+    node: str,
+    mode: str,
+    exp_value: float,
+) -> None:
     """Test effect of parameters ``share_mode_{lo,up}``."""
     s0 = make_dantzig(test_mp, solve=True, request=request)
 

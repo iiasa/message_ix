@@ -1,6 +1,7 @@
 """Test ``capacity_factor`` effects, mainly for models with sub-annual resolution."""
 
 import pytest
+from ixmp import Platform
 
 from message_ix import ModelError, Scenario
 from message_ix.testing import make_subannual
@@ -56,11 +57,13 @@ TD_0 = {
 }
 
 
-def test_capacity_factor_time(request, test_mp) -> None:
+def test_capacity_factor_time(
+    request: pytest.FixtureRequest, _test_mp: Platform
+) -> None:
     """``capacity_factor`` is calculated correctly when it varies by time slice."""
     # Build model and solve
     scen = make_subannual(
-        test_mp,
+        _test_mp,
         TD_0,
         time_steps=[
             ("summer", 0.5, "season", "year"),
@@ -74,11 +77,13 @@ def test_capacity_factor_time(request, test_mp) -> None:
     check_solution(scen)
 
 
-def test_capacity_factor_unequal_time(request, test_mp) -> None:
+def test_capacity_factor_unequal_time(
+    request: pytest.FixtureRequest, _test_mp: Platform
+) -> None:
     """``capacity_factor`` is calculated correctly when ``duration_time`` is uneven."""
     # Build model and solve
     scen = make_subannual(
-        test_mp,
+        _test_mp,
         TD_0,
         time_steps=[
             ("summer", 0.3, "season", "year"),
@@ -99,7 +104,9 @@ TS_0 = [
 ]
 
 
-def test_capacity_factor_zero(request, test_mp) -> None:
+def test_capacity_factor_zero(
+    request: pytest.FixtureRequest, _test_mp: Platform
+) -> None:
     """Test zero capacity factor (CF) in a time slice.
 
     "solar_pv_ppl" is active in "day" and NOT at "night" (CF = 0). It is expected that
@@ -117,7 +124,7 @@ def test_capacity_factor_zero(request, test_mp) -> None:
     # Build model and solve (should raise GAMS error)
     with pytest.raises(ModelError):
         make_subannual(
-            test_mp,
+            _test_mp,
             tec_dict,
             com_dict={"solar_pv_ppl": {"input": "fuel", "output": "electr"}},
             time_steps=TS_0,
@@ -128,7 +135,9 @@ def test_capacity_factor_zero(request, test_mp) -> None:
         )
 
 
-def test_capacity_factor_zero_two(request, test_mp) -> None:
+def test_capacity_factor_zero_two(
+    request: pytest.FixtureRequest, _test_mp: Platform
+) -> None:
     """Test zero capacity factor (CF) in a time slice.
 
     "solar_pv_ppl" is active in "day" and NOT at "night" (CF = 0). The model output
@@ -151,7 +160,7 @@ def test_capacity_factor_zero_two(request, test_mp) -> None:
 
     # Build model and solve
     scen = make_subannual(
-        test_mp,
+        _test_mp,
         tec_dict,
         com_dict={
             "solar_pv_ppl": {"input": "fuel", "output": "electr"},
@@ -176,12 +185,14 @@ def test_capacity_factor_zero_two(request, test_mp) -> None:
     check_solution(scen)
 
 
-def test_capacity_factor_average(request, test_mp) -> None:
+def test_capacity_factor_average(
+    request: pytest.FixtureRequest, _test_mp: Platform
+) -> None:
     """Weighted average of ``capacity_factor`` for "year" is calculated correctly,
     based on time slices, when there is no capacity factor defined for "year"."""
     # Build model and solve
     scen = make_subannual(
-        test_mp,
+        _test_mp,
         TD_0,
         time_steps=[
             ("summer", 0.5, "season", "year"),

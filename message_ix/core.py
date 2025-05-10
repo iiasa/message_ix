@@ -3,14 +3,19 @@ import os
 from collections.abc import Iterable, Mapping, Sequence
 from functools import lru_cache, partial
 from itertools import chain, product, zip_longest
-from typing import Optional, Union
+from typing import Optional, TypeVar, Union
 from warnings import warn
 
 import ixmp
 import numpy as np
 import pandas as pd
 from ixmp.backend import ItemType
+from ixmp.backend.jdbc import JDBCBackend
 from ixmp.util import as_str_list, maybe_check_out, maybe_commit
+
+from message_ix.util.ixmp4 import on_ixmp4backend
+
+# from message_ix.util.scenario_data import PARAMETERS
 
 log = logging.getLogger(__name__)
 
@@ -62,7 +67,7 @@ class Scenario(ixmp.Scenario):
     # Utility methods used by .equ(), .par(), .set(), and .var()
 
     @lru_cache()
-    def _year_idx(self, name):
+    def _year_idx(self, name: str):
         """Return a sequence of (idx_set, idx_name) for 'year'-indexed dims.
 
         Since item dimensionality does not change, the the return value is
@@ -78,7 +83,10 @@ class Scenario(ixmp.Scenario):
             )
         )
 
-    def _year_as_int(self, name, df):
+    data_type = TypeVar("data_type", pd.Series, pd.DataFrame, dict)
+
+    # NOTE super().equ() etc hint that pd objects return, but they may also return dict
+    def _year_as_int(self, name: str, data: data_type) -> data_type:
         """Convert 'year'-indexed columns of *df* to :obj:`int` dtypes.
 
         :meth:`_year_idx` is used to retrieve a sequence of (idx_set, idx_name)
@@ -90,12 +98,18 @@ class Scenario(ixmp.Scenario):
         year_idx = self._year_idx(name)
 
         if len(year_idx):
-            return df.astype({col_name: "int" for _, col_name in year_idx})
+            assert isinstance(data, pd.DataFrame)
+            # NOTE With the IXMP4Backend, we call scenario.par() for parameters that
+            # might be empty, which fails df.astype() below.
+            if data.empty:
+                return data
+            return data.astype({col_name: "int" for _, col_name in year_idx})
         elif name == "year":
             # The 'year' set itself
-            return df.astype(int)
+            assert isinstance(data, pd.Series)
+            return data.astype(int)
         else:
-            return df
+            return data
 
     # Override ixmp methods to convert 'year'-indexed columns to int
 
@@ -251,6 +265,28 @@ class Scenario(ixmp.Scenario):
         # accepts int for "year"-like dimensions. Proxy the call to avoid type check
         # failures.
         # TODO Move this upstream, to ixmp
+
+        if on_ixmp4backend(self):
+            from message_ix.util.scenario_setup import check_existence_of_units
+
+            # Check for existence of required units
+            # NOTE these checks are similar to those in super().add_par(), but we
+            # need them here for access to self
+            # NOTE it seems to me that only dict or pd.DataFrame key_or_data could
+            # contain 'unit' already, else it's supplied by keyword or defaults to
+            # "???"
+            if isinstance(key_or_data, dict):
+                _data = pd.DataFrame.from_dict(key_or_data, orient="columns")
+            elif isinstance(key_or_data, pd.DataFrame):
+                _data = key_or_data
+            else:
+                _data = pd.DataFrame()
+
+            if "unit" not in _data.columns:
+                _data["unit"] = unit or "???"
+
+            check_existence_of_units(platform=self.platform, data=_data)
+
         super().add_par(name, key_or_data, value, unit, comment)  # type: ignore [arg-type]
 
     add_par.__doc__ = ixmp.Scenario.add_par.__doc__
@@ -323,6 +359,7 @@ class Scenario(ixmp.Scenario):
             recurse(k, v)
 
         self.add_set("node", nodes)
+        # TODO do we handle levels being added multiple times correctly for ixmp4?
         self.add_set("lvl_spatial", levels)
         self.add_set("map_spatial_hierarchy", hierarchy)
 
@@ -420,8 +457,11 @@ class Scenario(ixmp.Scenario):
         # Add the year set elements and first model year
         year = sorted(year)
         self.add_set("year", year)
+
+        # Avoid removing default data on IXMP4Backend
+        is_unique = True if isinstance(self.platform._backend, JDBCBackend) else False
         self.add_cat(
-            "year", "firstmodelyear", firstmodelyear or year[0], is_unique=True
+            "year", "firstmodelyear", firstmodelyear or year[0], is_unique=is_unique
         )
 
         # Calculate the duration of all periods
@@ -560,7 +600,7 @@ class Scenario(ixmp.Scenario):
             vintages = sorted(
                 self.par(
                     "technical_lifetime",
-                    filters={"node_loc": ya_args[0], "technology": ya_args[1]},
+                    filters={"node_loc": [ya_args[0]], "technology": [ya_args[1]]},
                 )["year_vtg"].unique()
             )
             ya_max = max(vintages) if tl_only else np.inf
@@ -585,6 +625,7 @@ class Scenario(ixmp.Scenario):
 
         # Minimum value for year_act
         if "in_horizon" in kwargs:
+            # FIXME I don't receive this in the tutorials
             warn(
                 "'in_horizon' argument to .vintage_and_active_years() will be removed "
                 "in message_ix>=4.0. Use .query(…) instead per documentation examples.",
@@ -842,3 +883,16 @@ class Scenario(ixmp.Scenario):
             self.remove_set(name, list(mapping.keys()))
 
         maybe_commit(self, commit, f"Rename {name!r} using mapping {mapping}")
+
+    def commit(self, comment: str) -> None:
+        from message_ix.util.scenario_setup import compose_maps
+
+        # JDBCBackend calls these functions as part of every commit, but they have moved
+        # to message_ix because they handle message-specific data
+
+        # The sanity checks fail for some tests (e.g. 'node' being empty)
+        # ensure_required_indexsets_have_data(scenario=self)
+
+        compose_maps(self)
+
+        return super().commit(comment)

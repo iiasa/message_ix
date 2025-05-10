@@ -1,4 +1,8 @@
+from typing import Union
+
 import numpy.testing as npt
+import pytest
+from ixmp import Platform
 
 from message_ix import Scenario, make_df
 
@@ -7,7 +11,7 @@ MODEL = "test_emissions_price"
 solve_args = {"equ_list": ["EMISSION_EQUIVALENCE"]}
 
 
-def model_setup(scen, years, simple_tecs=True):
+def model_setup(scen: Scenario, years: list[int], simple_tecs: bool = True) -> None:
     """generate a minimal model to test the behaviour of the emission prices"""
     scen.add_spatial_sets({"country": "node"})
     scen.add_set("commodity", "comm")
@@ -29,7 +33,7 @@ def model_setup(scen, years, simple_tecs=True):
         add_many_tecs(scen, years)
 
 
-def add_two_tecs(scen, years):
+def add_two_tecs(scen: Scenario, years: list[int]) -> None:
     """add two technologies to the scenario"""
     scen.add_set("technology", ["dirty_tec", "clean_tec"])
 
@@ -88,15 +92,15 @@ def add_two_tecs(scen, years):
     )
 
 
-def add_many_tecs(scen, years, n=50):
+def add_many_tecs(scen: Scenario, years: list[int], n: int = 50) -> None:
     """add a range of dirty-to-clean technologies to the scenario"""
-    output_specs = ["node", "comm", "level", "year", "year"]
+    output_specs: list[Union[int, str]] = ["node", "comm", "level", "year", "year"]
 
     for i in range(n + 1):
         t = "tec{}".format(i)
         scen.add_set("technology", t)
         for y in years:
-            tec_specs = ["node", t, y, y, "mode"]
+            tec_specs: list[Union[int, str]] = ["node", t, y, y, "mode"]
             # variable costs grow quadratically over technologies
             # to get rid of the curse of linearity
             c = (10 * i / n) ** 2 * (1.045) ** (y - years[0])
@@ -106,7 +110,7 @@ def add_many_tecs(scen, years, n=50):
             scen.add_par("emission_factor", tec_specs + ["CO2"], e, "tCO2")
 
 
-def test_no_constraint(test_mp, request):
+def test_no_constraint(test_mp: Platform, request: pytest.FixtureRequest) -> None:
     scen = Scenario(test_mp, MODEL, scenario=request.node.name, version="new")
     model_setup(scen, [2020, 2030])
     scen.commit("initialize test scenario")
@@ -118,7 +122,9 @@ def test_no_constraint(test_mp, request):
     assert scen.var("PRICE_EMISSION").empty
 
 
-def test_cumulative_equidistant(test_mp, request):
+def test_cumulative_equidistant(
+    test_mp: Platform, request: pytest.FixtureRequest
+) -> None:
     scen = Scenario(test_mp, MODEL, scenario=request.node.name, version="new")
     years = [2020, 2030, 2040]
 
@@ -136,7 +142,9 @@ def test_cumulative_equidistant(test_mp, request):
     npt.assert_allclose(obs, [1.05 ** (y - years[0]) for y in years])
 
 
-def test_per_period_equidistant(test_mp, request):
+def test_per_period_equidistant(
+    test_mp: Platform, request: pytest.FixtureRequest
+) -> None:
     scen = Scenario(test_mp, MODEL, scenario=request.node.name, version="new")
     years = [2020, 2030, 2040]
 
@@ -154,7 +162,9 @@ def test_per_period_equidistant(test_mp, request):
     npt.assert_allclose(scen.var("PRICE_EMISSION")["lvl"], [1] * 3)
 
 
-def test_cumulative_variable_periodlength(test_mp, request):
+def test_cumulative_variable_periodlength(
+    test_mp: Platform, request: pytest.FixtureRequest
+) -> None:
     scen = Scenario(test_mp, MODEL, scenario=request.node.name, version="new")
     years = [2020, 2025, 2030, 2040]
 
@@ -181,7 +191,9 @@ def test_cumulative_variable_periodlength(test_mp, request):
     npt.assert_allclose(obs, exp)
 
 
-def test_per_period_variable_periodlength(test_mp, request):
+def test_per_period_variable_periodlength(
+    test_mp: Platform, request: pytest.FixtureRequest
+) -> None:
     scen = Scenario(test_mp, MODEL, scenario=request.node.name, version="new")
     years = [2020, 2025, 2030, 2040]
 
@@ -199,7 +211,9 @@ def test_per_period_variable_periodlength(test_mp, request):
     npt.assert_allclose(scen.var("PRICE_EMISSION")["lvl"].values, [1] * 4)
 
 
-def test_custom_type_variable_periodlength(test_mp, request):
+def test_custom_type_variable_periodlength(
+    test_mp: Platform, request: pytest.FixtureRequest
+) -> None:
     scen = Scenario(test_mp, MODEL, scenario=request.node.name, version="new")
     years = [2020, 2025, 2030, 2040, 2050]
     custom = [2025, 2030, 2040]
@@ -230,12 +244,15 @@ def test_custom_type_variable_periodlength(test_mp, request):
     npt.assert_allclose(obs, exp)
 
 
-def test_price_duality(test_mp, request):
+def test_price_duality(test_mp: Platform, request: pytest.FixtureRequest) -> None:
     years = [2020, 2025, 2030, 2040, 2050]
     for c in [0.25, 0.5, 0.75]:
         # set up a scenario for cumulative constraints
         scen = Scenario(
-            test_mp, MODEL, scenario=request.node.name + "_cum_many_tecs", version="new"
+            test_mp,
+            MODEL,
+            scenario=request.node.name + "_cum_many_tecs",
+            version="new",
         )
         model_setup(scen, years, simple_tecs=False)
         scen.add_cat("year", "cumulative", years)
@@ -247,7 +264,10 @@ def test_price_duality(test_mp, request):
 
         # set up a new scenario with emissions taxes
         tax_scen = Scenario(
-            test_mp, MODEL, scenario=request.node.name + "_tax_many_tecs", version="new"
+            test_mp,
+            MODEL,
+            scenario=request.node.name + "_tax_many_tecs",
+            version="new",
         )
         model_setup(tax_scen, years, simple_tecs=False)
         for y in years:
