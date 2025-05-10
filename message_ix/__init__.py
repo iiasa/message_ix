@@ -11,6 +11,7 @@ from .core import Scenario
 from .models import MACRO, MESSAGE, MESSAGE_MACRO
 from .report import Reporter
 from .util import make_df
+from .util.ixmp4 import configure_logging_and_warnings
 
 __all__ = [
     "MACRO",
@@ -53,3 +54,6 @@ MODELS["MESSAGE-MACRO"] = MESSAGE_MACRO
 
 # Create the top-level logger
 log = logging.getLogger(__name__)
+
+# Silence verbose log messages and warnings from ixmp4
+configure_logging_and_warnings()

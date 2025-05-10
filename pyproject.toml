@@ -105,6 +105,14 @@ addopts = """
   --cov=message_ix --cov-report=
   -m "not nightly and not rmessageix"
   -p no:faulthandler"""
+# Parallel to .util.ixmp4.configure_logging_and_warnings(), prevent warnings
+# from appearing in the test output
+filterwarnings = [
+  "ignore:Accessing the 'model_fields' :DeprecationWarning:ixmp4.db.filters",
+  # NB The following don't work if a message regex is added
+  "ignore::pandas.errors.SettingWithCopyWarning:ixmp4.data.db.base",
+  "ignore::DeprecationWarning:sqlalchemy.sql.schema",
+]
 markers = [
   "ixmp4: tests exclusive to IXMP4Backend.",
   "jdbc: tests exclusive to JDBCBackend.",
