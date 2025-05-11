@@ -60,6 +60,11 @@ def test_reporter_no_solution(
     assert 3 == len(result)
 
 
+# IXMP4Backend is currently not storing the MACRO variables 'C' and 'I' for MESSAGE
+# models.
+MISSING_IXMP4 = {"C:", "C:n", "C:n-y", "C:y", "I:", "I:n", "I:n-y", "I:y"}
+
+
 def test_reporter_from_scenario(
     message_test_mp: Platform, test_data_path: Path
 ) -> None:
@@ -97,9 +102,6 @@ def test_reporter_from_scenario(
     assert_qty_equal(obs, demand, check_attrs=False)
 
     # Prepare the expected items in the graphs
-    # IXMP4Backend is currently not storing the MACRO variables 'C' and 'I' for MESSAGE
-    # models
-    missing = {"C:", "C:n", "C:n-y", "C:y", "I:", "I:n", "I:n-y", "I:y"}
     expected_rep_ix_graph_keys = set(
         Path(test_data_path / "reporterixgraph.txt").read_text().split("\n")
     )
@@ -107,8 +109,8 @@ def test_reporter_from_scenario(
         Path(test_data_path / "reportergraph.txt").read_text().split("\n")
     )
     if not isinstance(message_test_mp._backend, JDBCBackend):
-        expected_rep_ix_graph_keys -= missing
-        expected_rep_graph_keys -= missing
+        expected_rep_ix_graph_keys -= MISSING_IXMP4
+        expected_rep_graph_keys -= MISSING_IXMP4
 
     # ixmp.Reporter pre-populated with only model quantities and aggregates
     assert set(map(str, sorted(rep_ix.graph))) == expected_rep_ix_graph_keys
