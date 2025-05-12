@@ -12,6 +12,7 @@ import pytest
 from ixmp.testing import get_cell_output, run_notebook
 from nbclient.exceptions import CellExecutionError, CellTimeoutError
 
+from message_ix.testing import GHA
 from message_ix.tests.test_report import MISSING_IXMP4
 
 log = logging.getLogger(__name__)
@@ -21,7 +22,6 @@ AT = "Austrian_energy_system"
 W = "westeros"
 
 # Common marks for some test cases
-GHA = "GITHUB_ACTIONS" in os.environ
 MARK = [
     pytest.mark.skipif(  # 0
         condition=GHA and sys.platform == "linux",

@@ -1,3 +1,4 @@
+import sys
 from collections.abc import Generator
 from copy import deepcopy
 from pathlib import Path
@@ -14,7 +15,7 @@ from ixmp.backend.jdbc import JDBCBackend
 
 import message_ix
 from message_ix import Scenario
-from message_ix.testing import SCENARIO, make_dantzig, make_westeros
+from message_ix.testing import GHA, SCENARIO, make_dantzig, make_westeros
 
 
 @pytest.fixture
@@ -145,6 +146,15 @@ class TestScenario:
             # ixmp_version contains the expected contents
             assert "'message_ix'.'3-" in result.stdout.decode()
             assert "'ixmp'.'3-" in result.stdout.decode()
+
+
+@pytest.mark.skipif(not GHA, reason="Check for GitHub Actions workflows only")
+def test_backends_available() -> None:
+    """Check that the expected set of backends are available within GHA workflows."""
+    from ixmp.backend import available
+
+    exp = {"ixmp4", "jdbc"} if sys.version_info >= (3, 10) else {"jdbc"}
+    assert exp <= set(available())
 
 
 def test_year_int(test_mp: ixmp.Platform, request: pytest.FixtureRequest) -> None:

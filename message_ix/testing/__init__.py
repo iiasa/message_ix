@@ -20,6 +20,8 @@ if TYPE_CHECKING:
     from pint import UnitRegistry
 
 
+GHA = "GITHUB_ACTIONS" in os.environ
+
 # Pytest hooks
 
 
