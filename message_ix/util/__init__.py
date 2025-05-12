@@ -4,14 +4,16 @@ import warnings
 from collections import ChainMap, defaultdict
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 import pandas as pd
 from ixmp.backend import ItemType
 from pandas.api.types import is_scalar
 
-from message_ix.core import Scenario
 from message_ix.models import MACRO, MESSAGE
+
+if TYPE_CHECKING:
+    from message_ix.core import Scenario
 
 
 def copy_model(
@@ -277,7 +279,7 @@ def _deprecated_make_df(base, **kwargs):
     return pd.DataFrame(base)
 
 
-def expand_dims(scenario: Scenario, name, **data):
+def expand_dims(scenario: "Scenario", name, **data):
     """Expand dimensions of parameter `name` on `scenario`, filling with `data`.
 
     This function is for use when an existing parameter `name` has dimensions that are a

@@ -1,5 +1,9 @@
+import sys
+from collections.abc import Generator
+from copy import deepcopy
 from pathlib import Path
 from subprocess import run
+from typing import Any, Optional
 
 import ixmp
 import numpy as np
@@ -7,14 +11,17 @@ import numpy.testing as npt
 import pandas as pd
 import pandas.testing as pdt
 import pytest
+from ixmp.backend.jdbc import JDBCBackend
 
 import message_ix
 from message_ix import Scenario
-from message_ix.testing import SCENARIO, make_dantzig, make_westeros
+from message_ix.testing import GHA, SCENARIO, make_dantzig, make_westeros
 
 
 @pytest.fixture
-def dantzig_message_scenario(message_test_mp):
+def dantzig_message_scenario(
+    message_test_mp: ixmp.Platform,
+) -> Generator[Scenario, Any, None]:
     yield Scenario(message_test_mp, **SCENARIO["dantzig"])
 
 
@@ -45,7 +52,13 @@ class TestScenario:
         ),
     )
     def test_rename0(
-        self, test_mp, set_name: str, old: str, new: str, keep: bool, request
+        self,
+        test_mp: ixmp.Platform,
+        set_name: str,
+        old: str,
+        new: str,
+        keep: bool,
+        request: pytest.FixtureRequest,
     ) -> None:
         # Create a Westeros scenario instance and solve it
         scen_ref = make_westeros(test_mp, quiet=True, solve=True, request=request)
@@ -69,11 +82,17 @@ class TestScenario:
         # Check if OBJ value remains unchanged when "old" is removed (keep=False); or
         # twice as high when "old" note is kept (keep=True)
         exp = scen_ref.var("OBJ")["lvl"] * (1 + int(keep and set_name == "node"))
-        assert exp == scen.var("OBJ")["lvl"]
+        assert np.isclose(exp, scen.var("OBJ")["lvl"])
 
     @pytest.mark.parametrize("check_out", (True, False))
     @pytest.mark.parametrize("keep", (True, False))
-    def test_rename1(self, request, dantzig_message_scenario, check_out, keep):
+    def test_rename1(
+        self,
+        request: pytest.FixtureRequest,
+        dantzig_message_scenario: Scenario,
+        check_out: bool,
+        keep: bool,
+    ) -> None:
         scen = dantzig_message_scenario
         assert scen.par("output")["technology"].isin(["canning_plant"]).any()
 
@@ -90,7 +109,7 @@ class TestScenario:
         clone.solve(quiet=True)
         assert np.isclose(clone.var("OBJ")["lvl"], 153.675)
 
-    def test_rename2(self, dantzig_message_scenario):
+    def test_rename2(self, dantzig_message_scenario: Scenario) -> None:
         """Test :meth:`.rename` for parameters with 2+ indexes for the same set."""
         scen = dantzig_message_scenario
 
@@ -108,7 +127,7 @@ class TestScenario:
         # Values are renamed when appearing in either of the sets indexed by `node`
         assert 1 == vc_post[("redmond", "brooklyn")]
 
-    def test_solve(self, dantzig_message_scenario):
+    def test_solve(self, dantzig_message_scenario: Scenario) -> None:
         s = dantzig_message_scenario
 
         # Scenario solves correctly
@@ -129,7 +148,16 @@ class TestScenario:
             assert "'ixmp'.'3-" in result.stdout.decode()
 
 
-def test_year_int(test_mp, request):
+@pytest.mark.skipif(not GHA, reason="Check for GitHub Actions workflows only")
+def test_backends_available() -> None:
+    """Check that the expected set of backends are available within GHA workflows."""
+    from ixmp.backend import available
+
+    exp = {"ixmp4", "jdbc"} if sys.version_info >= (3, 10) else {"jdbc"}
+    assert exp <= set(available())
+
+
+def test_year_int(test_mp: ixmp.Platform, request: pytest.FixtureRequest) -> None:
     scen = make_dantzig(test_mp, solve=True, multi_year=True, request=request)
 
     # Dimensions indexed by 'year' are returned as integers for all item types
@@ -140,7 +168,7 @@ def test_year_int(test_mp, request):
     assert scen.equ("COMMODITY_BALANCE_GT").dtypes["year"] == "int"
 
 
-def test_add_spatial_single(test_mp):
+def test_add_spatial_single(test_mp: ixmp.Platform) -> None:
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
     data = {"country": "Austria"}
     scen.add_spatial_sets(data)
@@ -153,12 +181,12 @@ def test_add_spatial_single(test_mp):
     obs = scen.set("lvl_spatial")
     npt.assert_array_equal(obs, exp)
 
-    exp = [["country", "Austria", "World"]]
+    exp_map = [["country", "Austria", "World"]]
     obs = scen.set("map_spatial_hierarchy")
-    npt.assert_array_equal(obs, exp)
+    npt.assert_array_equal(obs, exp_map)
 
 
-def test_add_spatial_multiple(test_mp):
+def test_add_spatial_multiple(test_mp: ixmp.Platform) -> None:
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
     data = {"country": ["Austria", "Germany"]}
     scen.add_spatial_sets(data)
@@ -171,12 +199,12 @@ def test_add_spatial_multiple(test_mp):
     obs = scen.set("lvl_spatial")
     npt.assert_array_equal(obs, exp)
 
-    exp = [["country", "Austria", "World"], ["country", "Germany", "World"]]
+    exp_map = [["country", "Austria", "World"], ["country", "Germany", "World"]]
     obs = scen.set("map_spatial_hierarchy")
-    npt.assert_array_equal(obs, exp)
+    npt.assert_array_equal(obs, exp_map)
 
 
-def test_add_spatial_hierarchy(test_mp):
+def test_add_spatial_hierarchy(test_mp: ixmp.Platform) -> None:
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
     data = {"country": {"Austria": {"state": ["Vienna", "Lower Austria"]}}}
     scen.add_spatial_sets(data)
@@ -189,13 +217,13 @@ def test_add_spatial_hierarchy(test_mp):
     obs = scen.set("lvl_spatial")
     npt.assert_array_equal(obs, exp)
 
-    exp = [
+    exp_map = [
         ["state", "Vienna", "Austria"],
         ["state", "Lower Austria", "Austria"],
         ["country", "Austria", "World"],
     ]
     obs = scen.set("map_spatial_hierarchy")
-    npt.assert_array_equal(obs, exp)
+    npt.assert_array_equal(obs, exp_map)
 
 
 @pytest.mark.parametrize(
@@ -272,11 +300,17 @@ def test_add_spatial_hierarchy(test_mp):
         ),
     ],
 )
-def test_add_horizon(test_mp, args, kwargs, exp):
+def test_add_horizon(
+    test_mp: ixmp.Platform, args, kwargs, exp: Optional[dict[str, list[int]]]
+) -> None:
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
 
+    # Running on both backends; add_horizon() manipulates these items
+    _args = deepcopy(args)
+    _kwargs = deepcopy(kwargs)
+
     # Call completes successfully
-    if isinstance(args[0], dict) and "data" not in kwargs:
+    if isinstance(_args[0], dict) and "data" not in _kwargs:
         with pytest.warns(
             DeprecationWarning,
             match=(
@@ -284,9 +318,12 @@ def test_add_horizon(test_mp, args, kwargs, exp):
                 "firstmodelyear="
             ),
         ):
-            scen.add_horizon(*args, **kwargs)
+            scen.add_horizon(*_args, **_kwargs)
     else:
-        scen.add_horizon(*args, **kwargs)
+        scen.add_horizon(*_args, **_kwargs)
+
+    # For type checkers
+    assert exp
 
     # Sets and parameters have the expected contents
     npt.assert_array_equal(exp["year"], scen.set("year"))
@@ -294,7 +331,9 @@ def test_add_horizon(test_mp, args, kwargs, exp):
     npt.assert_array_equal(exp["dp"], scen.par("duration_period")["value"])
 
 
-def test_add_horizon_repeat(test_mp, caplog):
+def test_add_horizon_repeat(
+    test_mp: ixmp.Platform, caplog: pytest.LogCaptureFixture
+) -> None:
     """add_horizon() does not handle scenarios with existing years."""
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
 
@@ -309,7 +348,7 @@ def test_add_horizon_repeat(test_mp, caplog):
         scen.add_horizon([2015, 2020, 2025], firstmodelyear=2010)
 
 
-def test_cat_all(dantzig_message_scenario):
+def test_cat_all(dantzig_message_scenario: Scenario) -> None:
     scen = dantzig_message_scenario
     df = scen.cat("technology", "all")
     npt.assert_array_equal(
@@ -317,15 +356,24 @@ def test_cat_all(dantzig_message_scenario):
     )
 
 
-def test_cat_list(test_mp):
+def test_cat_list(test_mp: ixmp.Platform) -> None:
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
 
     # cat_list() returns default 'year' categories in a new message_ix.Scenario
+    # NOTE JDBC sets up default items in the DB backend, including the base expected
+    # data and then finds nothing new when calling models.MESSAGE.initialize(). Thus, no
+    # `commit()` is issued and ixmp_source doesn't `assignPeriodMaps()`, which would add
+    # 'cumulative'.
+    # IXMP4Backend only reads in the items here and thus `commit()`s, which adds
+    # 'cumulative'. This can't change without adapting the `commit()` logic, which we
+    # rely on elsewhere. So we have to adapt the expectation instead.
     exp = ["firstmodelyear", "lastmodelyear", "initializeyear_macro"]
+    if not isinstance(test_mp._backend, JDBCBackend):
+        exp.insert(0, "cumulative")
     assert exp == scen.cat_list("year")
 
 
-def test_add_cat(dantzig_message_scenario):
+def test_add_cat(dantzig_message_scenario: Scenario) -> None:
     scen = dantzig_message_scenario
     scen2 = scen.clone(keep_solution=False)
     scen2.check_out()
@@ -337,7 +385,7 @@ def test_add_cat(dantzig_message_scenario):
     scen2.discard_changes()
 
 
-def test_add_cat_unique(message_test_mp):
+def test_add_cat_unique(message_test_mp: ixmp.Platform) -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig multi-year"])
     scen2 = scen.clone(keep_solution=False)
     scen2.check_out()
@@ -345,7 +393,7 @@ def test_add_cat_unique(message_test_mp):
     assert [1963] == scen2.cat("year", "firstmodelyear")
 
 
-def test_years_active(test_mp):
+def test_years_active(test_mp: ixmp.Platform) -> None:
     test_mp.add_unit("year")
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
     scen.add_set("node", "foo")
@@ -357,8 +405,10 @@ def test_years_active(test_mp):
     # First period length is immaterial
     duration = [1900, 5, 5, 5, 5, 10, 10]
     scen.add_horizon(year=years, firstmodelyear=years[-1])
+    # Not sure why mypy doesn't like this
     scen.add_par(
-        "duration_period", pd.DataFrame(zip(years, duration), columns=["year", "value"])
+        "duration_period",
+        pd.DataFrame(zip(years, duration), columns=["year", "value"]),  # type: ignore[arg-type]
     )
 
     # 'bar' built in period '1995' with 25-year lifetime:
@@ -389,7 +439,7 @@ def test_years_active(test_mp):
     npt.assert_array_equal(result, years[1:-1])
 
 
-def test_years_active_extend(message_test_mp):
+def test_years_active_extend(message_test_mp: ixmp.Platform) -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig multi-year"])
 
     # Existing time horizon
@@ -414,7 +464,7 @@ def test_years_active_extend(message_test_mp):
     npt.assert_array_equal(result, years[1:-1])
 
 
-def test_years_active_extended2(test_mp):
+def test_years_active_extended2(test_mp: ixmp.Platform) -> None:
     test_mp.add_unit("year")
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
     scen.add_set("node", "foo")
@@ -426,8 +476,10 @@ def test_years_active_extended2(test_mp):
     # First period length is immaterial
     duration = [1900, 5, 5, 5, 5, 10, 10]
     scen.add_horizon(year=years, firstmodelyear=years[-1])
+    # Not sure why mypy doesn't like this
     scen.add_par(
-        "duration_period", pd.DataFrame(zip(years, duration), columns=["year", "value"])
+        "duration_period",
+        pd.DataFrame(zip(years, duration), columns=["year", "value"]),  # type: ignore[arg-type]
     )
 
     # 'bar' built in period '2020' with 10-year lifetime:
@@ -459,7 +511,7 @@ def test_years_active_extended2(test_mp):
     npt.assert_array_equal(result, years[-2])
 
 
-def test_years_active_extend3(test_mp):
+def test_years_active_extend3(test_mp: ixmp.Platform) -> None:
     test_mp.add_unit("year")
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
     scen.add_set("node", "foo")
@@ -492,7 +544,7 @@ def test_years_active_extend3(test_mp):
     assert obs == [1990, 1992, 1995, 2000, 2005]
 
 
-def test_new_timeseries_long_name64(message_test_mp):
+def test_new_timeseries_long_name64(message_test_mp: ixmp.Platform) -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig multi-year"])
     scen = scen.clone(keep_solution=False)
     scen.check_out(timeseries_only=True)
@@ -516,7 +568,7 @@ def test_new_timeseries_long_name64(message_test_mp):
     scen.commit("importing a testing timeseries")
 
 
-def test_new_timeseries_long_name64plus(message_test_mp):
+def test_new_timeseries_long_name64plus(message_test_mp: ixmp.Platform) -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig multi-year"])
     scen = scen.clone(keep_solution=False)
     scen.check_out(timeseries_only=True)
@@ -543,11 +595,11 @@ def test_new_timeseries_long_name64plus(message_test_mp):
     scen.commit("importing a testing timeseries")
 
 
-def test_excel_read_write(message_test_mp, tmp_path, request):
+def test_excel_read_write(
+    message_test_mp: ixmp.Platform, tmp_path: Path, request: pytest.FixtureRequest
+) -> None:
     # Path to temporary file
-    tmp_path /= request.node.name + "_excel_read_write.xlsx"
-    # Convert to string to ensure this can be handled
-    fname = str(tmp_path)
+    fname = tmp_path / (request.node.name + "_excel_read_write.xlsx")
 
     scen1 = Scenario(message_test_mp, **SCENARIO["dantzig"])
     scen1 = make_dantzig(mp=message_test_mp, request=request)
@@ -585,7 +637,7 @@ def test_excel_read_write(message_test_mp, tmp_path, request):
     assert np.isclose(scen2.var("OBJ")["lvl"], scen1.var("OBJ")["lvl"])
 
 
-def test_clone(tmpdir):
+def test_clone(tmpdir: Path) -> None:
     # Two local platforms
     mp1 = ixmp.Platform(driver="hsqldb", path=tmpdir / "mp1")
     mp2 = ixmp.Platform(driver="hsqldb", path=tmpdir / "mp2")

@@ -4,6 +4,7 @@ from collections.abc import Callable
 
 import numpy.testing as npt
 import pytest
+from ixmp import Platform
 
 import message_ix
 from message_ix.testing import SNAPSHOTS
@@ -31,7 +32,7 @@ CHECK: dict[str, tuple[Callable, dict, Callable]] = {
 @pytest.mark.nightly
 @pytest.mark.parametrize("scenario_info, hash", SNAPSHOTS)
 def test_solve_and_check(
-    snapshots_from_zenodo, scenario_info, hash
+    snapshots_from_zenodo: Platform, scenario_info: dict[str, str], hash: str
 ) -> None:  # pragma: no cover
     """Test that snapshots scenario solve and satisfy :data:`CHECK`.
 

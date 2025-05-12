@@ -16,11 +16,27 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+defaults:
+  run:
+    shell: bash
+
 env:
-  GAMS_VERSION: 43.4.1   # First version including a macOS arm64 distribution
+  GAMS_VERSION: 45.7.0 # Oldest version of gamsapi allowed by pyproject.toml
   depth: 100  # Must be large enough to include the most recent release
   label: "safe to test"  # Label that must be applied to run on PRs from forks
   python-version: "3.13"  # For non-matrixed jobs
+  # Install:
+  # - ixmp: from its `main` branch.
+  # - all other dependencies from PyPI.
+  #
+  # To test against other code, such as other branches for open PRs, temporarily
+  # add lines as appropriate. These lines SHOULD NOT be merged to `main`.
+  #
+  # - ixmp4: pending https://github.com/iiasa/ixmp4/pull/171.
+  #   TODO Remove once the PR is merged and a new version is released.
+  upstream-versions: |
+    "ixmp4 @ git+https://github.com/iiasa/ixmp4@enh/remove-linked-items-when-removing-indexset-items; python_version > '3.9'" \
+    "ixmp @ git+https://github.com/iiasa/ixmp.git@main" \
 
 jobs:
   check:
@@ -113,12 +129,7 @@ jobs:
         license: ${{ secrets.GAMS_LICENSE }}
 
     - name: Install the package and dependencies
-      # By default, the below installs ixmp from the main branch. To run against
-      # other code, e.g. other branches for open PRs), temporarily edit as
-      # appropriate. DO NOT merge such changes to `main`.
-      run: |
-        uv pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
-        uv pip install .[tests]
+      run: uv pip install --upgrade ${{ env.upstream-versions }} .[tests]
 
     - name: Run test suite using pytest
       env:
@@ -130,7 +141,6 @@ jobs:
           --color=yes --durations=20 -rA --verbose \
           --cov-report=xml \
           --numprocesses=auto --dist=loadgroup
-      shell: bash
 
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v5
@@ -169,7 +179,6 @@ jobs:
     - name: Set RETICULATE_PYTHON
       # Retrieve the Python executable set up above
       run: echo "RETICULATE_PYTHON=$(uv python find)" >> "$GITHUB_ENV"
-      shell: bash
 
     - uses: r-lib/actions/setup-r@v2
       id: setup-r
@@ -193,12 +202,7 @@ jobs:
         license: ${{ secrets.GAMS_LICENSE }}
 
     - name: Install the package and dependencies
-      # By default, the below installs ixmp from the main branch. To run against
-      # other code, e.g. other branches for open PRs), temporarily edit as
-      # appropriate. DO NOT merge such changes to `main`.
-      run: |
-        uv pip install --upgrade "ixmp @ git+https://github.com/iiasa/ixmp.git@main"
-        uv pip install .[tests]
+      run: uv pip install --upgrade ${{ env.upstream-versions }} .[tests]
 
     - name: Install R dependencies and tutorial requirements
       run: |
@@ -213,7 +217,6 @@ jobs:
           --color=yes --durations=20 -rA --verbose \
           --cov-report=xml \
           --numprocesses=auto --dist=loadgroup
-      shell: bash
 
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v5

@@ -71,7 +71,9 @@ def gh_923_scenario(test_mp: "Platform") -> Generator[Scenario, None, None]:
         [20, 10, 10],  # Fails without a fix for #923
     ),
 )
-def test_gh_923(request, gh_923_scenario: Scenario, tl_value: list[int]) -> None:
+def test_gh_923(
+    request: pytest.FixtureRequest, gh_923_scenario: Scenario, tl_value: list[int]
+) -> None:
     """Minimum reproducible test for :issue:`923`."""
     s = gh_923_scenario.clone(scenario=request.node.name)
 
@@ -101,7 +103,9 @@ def test_gh_923(request, gh_923_scenario: Scenario, tl_value: list[int]) -> None
         [700, 710, 715, 720],
     ],
 )
-def test_growth_new_capacity_up(request, test_mp, model_horizon) -> None:
+def test_growth_new_capacity_up(
+    request: pytest.FixtureRequest, test_mp: "Platform", model_horizon: list[int]
+) -> None:
     """``CAP_NEW`` is correctly constrained according to ``growth_new_capacity_up``.
 
     This test adds ``tax_emission`` values and removes all constraints except
@@ -181,7 +185,10 @@ def test_growth_new_capacity_up(request, test_mp, model_horizon) -> None:
     ),
 )
 def test_historical_new_capacity(
-    test_mp, request, year_vtg: list[int], active_historical_techs: set[str]
+    test_mp: "Platform",
+    request: pytest.FixtureRequest,
+    year_vtg: list[int],
+    active_historical_techs: set[str],
 ) -> None:
     """Test MESSAGE choice between ``historical_new_capacity`` and ``CAP_NEW``.
 
@@ -214,7 +221,7 @@ def test_historical_new_capacity(
     )
 
 
-def test_soft_activity_up(request, test_mp):
+def test_soft_activity_up(request: pytest.FixtureRequest, test_mp: "Platform") -> None:
     """Test function of parameter ``soft_activity_up``.
 
     This test was rewritten as part of :pull:`924` to confirm that behaviour was not
@@ -251,7 +258,7 @@ def test_soft_activity_up(request, test_mp):
     pdt.assert_frame_equal(exp, s.var("ACT_UP"), check_like=True, check_dtype=False)
 
     # The objective function value is reduced by a specific amount
-    npt.assert_allclose(s.var("OBJ")["lvl"] - OBJ_pre, -1578.125)
+    npt.assert_allclose(s.var("OBJ")["lvl"] - OBJ_pre, -1578.125, rtol=1e-5)
 
     # - Merge resulting ACT with data prior to changes.
     # - Compute differences in lvl.

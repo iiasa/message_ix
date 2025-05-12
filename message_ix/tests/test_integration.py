@@ -1,6 +1,8 @@
 import copy
+from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import pytest
 from ixmp import Platform
 from numpy import testing as npt
@@ -10,7 +12,7 @@ from message_ix import Scenario
 from message_ix.testing import SCENARIO, TS_DF, TS_DF_CLEARED, make_dantzig
 
 
-def test_run_clone(tmpdir, request):
+def test_run_clone(tmpdir: Path, request: pytest.FixtureRequest) -> None:
     # this test is designed to cover the full functionality of the GAMS API
     # - initialize a new ixmp platform instance
     # - create a new scenario based on Dantzigs tutorial transport model
@@ -49,7 +51,10 @@ def test_run_clone(tmpdir, request):
     )
 
 
-def test_run_remove_solution(test_mp, request):
+# TODO ixmp4-remove_solution() doesn't seem to remove the timeseries values for
+# 1963 and 1964 yet
+@pytest.mark.jdbc
+def test_run_remove_solution(test_mp: Platform, request: pytest.FixtureRequest) -> None:
     # create a new instance of the transport problem and solve it
     scen = make_dantzig(test_mp, solve=True, quiet=True, request=request)
     assert np.isclose(scen.var("OBJ")["lvl"], 153.675)
@@ -70,7 +75,11 @@ def test_run_remove_solution(test_mp, request):
     )
 
 
-def test_shift_first_model_year(test_mp, request):
+# TODO IXMP4Backend doesn't support clone(shift_first_model_year=...) yet
+@pytest.mark.jdbc
+def test_shift_first_model_year(
+    test_mp: Platform, request: pytest.FixtureRequest
+) -> None:
     scen = make_dantzig(
         test_mp, solve=True, multi_year=True, quiet=True, request=request
     )
@@ -95,15 +104,16 @@ def test_shift_first_model_year(test_mp, request):
     assert not clone.par("historical_activity").empty
 
 
-def scenario_list(mp):
+def scenario_list(mp: Platform) -> pd.DataFrame:
     return mp.scenario_list(default=False)[["model", "scenario"]]
 
 
-def assert_multi_db(mp1, mp2):
+def assert_multi_db(mp1: Platform, mp2: Platform) -> None:
     assert_frame_equal(scenario_list(mp1), scenario_list(mp2))
 
 
-def test_multi_db_run(tmpdir, request):
+# NOTE This is not parametrized, but likely should be
+def test_multi_db_run(tmpdir: Path, request: pytest.FixtureRequest) -> None:
     # create a new instance of the transport problem and solve it
     mp1 = Platform(driver="hsqldb", path=tmpdir / "mp1")
     scen1 = make_dantzig(mp1, solve=True, quiet=True, request=request)

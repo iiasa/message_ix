@@ -1,4 +1,8 @@
+from collections.abc import Callable, Generator
+from typing import Any, Union
+
 import pytest
+from click.testing import Result
 from ixmp import Platform
 
 from message_ix import Scenario
@@ -6,7 +10,9 @@ from message_ix.tools.add_year import add_year
 
 
 @pytest.fixture
-def base_scen_mp(test_mp, request):
+def base_scen_mp(
+    test_mp: Platform, request: pytest.FixtureRequest
+) -> Generator[tuple[Scenario, Platform], Any, None]:
     scen = Scenario(
         test_mp, "model", scenario=request.node.name + "_standard", version="new"
     )
@@ -21,12 +27,12 @@ def base_scen_mp(test_mp, request):
         scen.add_set("year", years)
         scen.add_set("technology", "tec")
         scen.add_set("mode", "mode")
-        output_specs = ["node", "comm", "level", "year", "year"]
+        output_specs: list[Union[int, str]] = ["node", "comm", "level", "year", "year"]
 
         for yr, value in data.items():
             scen.add_par("demand", ["node", "comm", "level", yr, "year"], 1, "GWa")
             scen.add_par("technical_lifetime", ["node", "tec", yr], 10, "y")
-            tec_specs = ["node", "tec", yr, yr, "mode"]
+            tec_specs: list[Union[int, str]] = ["node", "tec", yr, yr, "mode"]
             scen.add_par("output", tec_specs + output_specs, 1, "-")
             scen.add_par("var_cost", tec_specs + ["year"], value, "USD/GWa")
 
@@ -35,7 +41,9 @@ def base_scen_mp(test_mp, request):
     yield scen, test_mp
 
 
-def adding_years(test_mp, scen_ref, years_new):
+def adding_years(
+    test_mp: Platform, scen_ref: Scenario, years_new: list[int]
+) -> Scenario:
     scen_new = Scenario(
         test_mp, model="add_year", scenario="standard", version="new", annotation=" "
     )
@@ -43,7 +51,9 @@ def adding_years(test_mp, scen_ref, years_new):
     return scen_new
 
 
-def assert_function(scen_ref, scen_new, years_new, yr_test):
+def assert_function(
+    scen_ref: Scenario, scen_new: Scenario, years_new: list[int], yr_test: int
+) -> None:
     # 1. Testing the set "year" for the new years
     horizon_old = sorted([int(x) for x in scen_ref.set("year")])
     horizon_test = sorted(horizon_old + years_new)
@@ -84,7 +94,12 @@ def assert_function(scen_ref, scen_new, years_new, yr_test):
 YEARS_NEW = [2025, 2035]
 
 
-def test_add_year(base_scen_mp):
+# NOTE This should work on IXMP4Backend already, but somehow, add_year() does not seem
+# to add years to scen_new. In assert_function(), this means that the filtered
+# `var_cost` is empty and .at[] fails.
+# TODO Experiment in a notebook why add_year() doesn't work.
+@pytest.mark.jdbc
+def test_add_year(base_scen_mp: tuple[Scenario, Platform]) -> None:
     scen_ref, test_mp = base_scen_mp
 
     # Adding new years
@@ -98,7 +113,13 @@ def test_add_year(base_scen_mp):
     assert_function(scen_ref, scen_new, YEARS_NEW, yr_test=2025)
 
 
-def test_add_year_cli(message_ix_cli, base_scen_mp):
+# NOTE This should work on IXMP4Backend already, but with version=None, we can't find a
+# default Run for scen_ref. Not sure if JDBC sets this as default before deletion
+# (if so, how?) or if it doesn't need a default to load a scen (in contrast to ixmp4).
+@pytest.mark.jdbc
+def test_add_year_cli(
+    message_ix_cli: Callable[..., Result], base_scen_mp: tuple[Scenario, Platform]
+) -> None:
     scen_ref, test_mp = base_scen_mp
 
     # Information about the base Scenario
