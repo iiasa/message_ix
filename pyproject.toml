@@ -10,12 +10,12 @@ maintainers = [
   { name = "Paul Natsuo Kishimoto", email = "mail@paul.kishimoto.name" },
   { name = "Fridolin Glatter", email = "glatter@iiasa.ac.at" },
 ]
+license = "Apache-2.0"
 readme = "README.md"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
-  "License :: OSI Approved :: Apache Software License",
   "Natural Language :: English",
   "Operating System :: OS Independent",
   "Programming Language :: Python",
@@ -41,9 +41,10 @@ dependencies = [
 ]
 
 [project.urls]
-homepage = "https://github.com/iiasa/message_ix"
-repository = "https://github.com/iiasa/message_ix"
-documentation = "https://docs.messageix.org"
+Documentation = "https://docs.messageix.org"
+"Release notes" = "https://docs.messageix.org/en/stable/whatsnew.html"
+Repository = "https://github.com/iiasa/message_ix"
+"Issue tracker" = "https://github.com/iiasa/message_ix/issues"
 
 [project.optional-dependencies]
 docs = [

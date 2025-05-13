@@ -31,11 +31,7 @@ env:
   #
   # To test against other code, such as other branches for open PRs, temporarily
   # add lines as appropriate. These lines SHOULD NOT be merged to `main`.
-  #
-  # - ixmp4: pending https://github.com/iiasa/ixmp4/pull/171.
-  #   TODO Remove once the PR is merged and a new version is released.
   upstream-versions: |
-    "ixmp4 @ git+https://github.com/iiasa/ixmp4@enh/remove-linked-items-when-removing-indexset-items; python_version > '3.9'" \
     "ixmp @ git+https://github.com/iiasa/ixmp.git@main" \
 
 jobs:
