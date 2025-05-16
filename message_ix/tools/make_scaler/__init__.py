@@ -3,6 +3,8 @@ import os
 import ixmp
 import numpy as np
 import pandas as pd
+import re
+
 
 from message_ix.tools.lp_diag import LPdiag
 
@@ -120,6 +122,13 @@ def get_scaler_args(scenario_ref=None, model="", scenario=""):
         print("The referred scenario doesn't have prescaler file!")
         print("Please use make_prescaler() function to create one")
 
+def replace_spaces_in_quotes(match):
+    inner_text = match.group(1)
+    return f"'{inner_text.replace(' ', '___')}'"
+
+def return_spaces_in_quotes(match):
+    inner_text = match.group(1)
+    return f"'{inner_text.replace('---', ' ')}'"
 
 def make_scaler(path, scen, bounds=4, steps=1, display_range=True):
     """
@@ -152,6 +161,20 @@ def make_scaler(path, scen, bounds=4, steps=1, display_range=True):
     prescale_args: dict
         A dictionary of prescale arguments to be passed to the GAMS model.
     """
+
+    # Aligning mps file content with lp_diag naming formats
+    quoted_pattern = re.compile(r"'([^']*)'")
+
+    with open(path, 'r+') as f:
+        old = f.readlines()  # Pull the file contents to a list
+        f.seek(0)  # Jump to start, so we overwrite instead of appending
+        f.truncate()  # Clear the file before writing
+        for line in old:
+            # Replace spaces inside single-quoted substrings
+            new_line = quoted_pattern.sub(replace_spaces_in_quotes, line)
+            f.write(new_line)
+
+    # Start making the scaler
     lp.read_mps(path)
 
     data = lp.read_matrix()
@@ -226,6 +249,7 @@ def make_scaler(path, scen, bounds=4, steps=1, display_range=True):
                 k_ = k.replace("(", ".scale('")
                 k_ = k_.replace(")", "')")
                 k_ = k_.replace(",", "','")
+            k_.replace("___"," ")
             scaler_dict.update({k_: v})
 
     # add this line to active scaling option
