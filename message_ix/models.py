@@ -5,13 +5,23 @@ from copy import copy
 from dataclasses import InitVar, dataclass, field
 from functools import partial
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 from warnings import warn
 
 import ixmp.model.gams
 from ixmp import config
 from ixmp.backend import ItemType
+from ixmp.backend.jdbc import JDBCBackend
 from ixmp.util import maybe_check_out, maybe_commit
+
+from message_ix.util.ixmp4 import on_ixmp4backend
+from message_ix.util.scenario_data import REQUIRED_EQUATIONS, REQUIRED_VARIABLES
+
+if TYPE_CHECKING:
+    import ixmp.core.scenario
+
+    import message_ix.core
+
 
 log = logging.getLogger(__name__)
 
@@ -29,11 +39,15 @@ DEFAULT_CPLEX_OPTIONS = {
 #: 2. the full dimension name.
 DIMS = {
     "c": ("commodity", "commodity"),
+    "c2": ("commodity", "commodity2"),
     "e": ("emission", "emission"),
+    "first_period": ("year", "first_period"),
     "g": ("grade", "grade"),
     "h": ("time", "time"),
+    "h2": ("time", "time2"),
     "hd": ("time", "time_dest"),
     "ho": ("time", "time_origin"),
+    "inv_tec": ("technology", "inv_tec"),
     "l": ("level", "level"),
     "m": ("mode", "mode"),
     "ms": ("mode", "storage_mode"),
@@ -46,6 +60,7 @@ DIMS = {
     "ns": ("node", "node_share"),
     "q": ("rating", "rating"),
     "r": ("relation", "relation"),
+    "renewable_tec": ("technology", "renewable_tec"),
     "s": ("land_scenario", "land_scenario"),
     "t": ("technology", "technology"),
     "ta": ("technology", "technology_addon"),
@@ -178,6 +193,9 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
     #: :class:`.Item` describing the item.
     items: Mapping[str, Item]
 
+    # Make default model options known to the class
+    model_dir: Path
+
     def __init__(self, name=None, **model_options):
         # Update the default options with any user-provided options
         model_options.setdefault("model_dir", config.get("message model dir"))
@@ -187,7 +205,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
 
         super().__init__(name, **model_options)
 
-    def run(self, scenario):
+    def run(self, scenario: "ixmp.core.scenario.Scenario") -> None:
         """Execute the model.
 
         GAMSModel creates a file named ``cplex.opt`` in the model directory containing
@@ -226,7 +244,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         return result
 
 
-def _check_structure(scenario):
+def _check_structure(scenario: "ixmp.core.scenario.Scenario"):
     """Check dimensionality of some items related to the storage representation.
 
     Yields a sequence of 4-tuples:
@@ -245,13 +263,14 @@ def _check_structure(scenario):
     for name in ("storage_initial", "storage_self_discharge", "map_tec_storage"):
         info = MESSAGE.items[name]
         message = ""
+        N = -1  # Item does not exist; default
 
         try:
             # Retrieve the index names and data length of the item
             idx_names = tuple(scenario.idx_names(name))
             N = len(getattr(scenario, info.ix_type)(name))
         except KeyError:
-            N = -1  # Item does not exist
+            pass
         else:
             # Item exists
             expected_names = info.dims or info.coords
@@ -273,11 +292,13 @@ class MESSAGE(GAMSModel):
     items: MutableMapping[str, Item] = dict()
 
     @staticmethod
-    def enforce(scenario):
+    def enforce(scenario: "message_ix.core.Scenario") -> None:
         """Enforce data consistency in `scenario`."""
         # Raise an exception if any of the storage items have incorrect dimensions, i.e.
         # non-empty error messages
-        messages = list(filter(None, [msg for *_, msg in _check_structure(scenario)]))
+        messages: list[str] = list(
+            filter(None, [msg for *_, msg in _check_structure(scenario)])
+        )
         if messages:
             raise ValueError("\n".join(messages))
 
@@ -303,13 +324,22 @@ class MESSAGE(GAMSModel):
                 scenario.add_set(set_name, expected)
 
     @classmethod
-    def initialize(cls, scenario):
+    def initialize(cls, scenario: "ixmp.core.scenario.Scenario") -> None:
         """Set up `scenario` with required sets and parameters for MESSAGE.
 
         See Also
         --------
         :attr:`items`
         """
+        from message_ix.core import Scenario
+        from message_ix.util.ixmp4 import platform_compat
+        from message_ix.util.scenario_setup import add_default_data
+
+        # Adjust the Platform on which `scenario` is stored for compatibility between
+        # ixmp.{IXMP4,JDBC}Backend. Because message_ix does not subclass Platform, this
+        # is the earliest opportunity to make these adjustments.
+        platform_compat(scenario.platform)
+
         # Check for storage items that may contain incompatible data or need to be
         # re-initialized
         state = None
@@ -321,11 +351,110 @@ class MESSAGE(GAMSModel):
                 state = maybe_check_out(scenario, state)
                 getattr(scenario, f"remove_{ix_type}")(name)
 
+        # Collect items to initialize
+        items = {k: v.to_dict() for k, v in cls.items.items()}
+
+        # Remove balance_equality for JDBC, where it seems to cause errors
+        if isinstance(scenario.platform._backend, JDBCBackend):
+            items.pop("balance_equality")
+
         # Initialize the ixmp items for MESSAGE
-        cls.initialize_items(scenario, {k: v.to_dict() for k, v in cls.items.items()})
+        cls.initialize_items(scenario, items)
+
+        if not isinstance(scenario, Scenario):
+            # Narrow type of `scenario`
+            # NB This should only occur if code constructs ixmp.Scenario(…,
+            #    scheme="MESSAGE"), instead of message_ix.Scenario directly. User code
+            #    *should* never do this, but it occurs in .test_models.test_initialize()
+            return
+
+        # NOTE I tried transcribing this from ixmp_source as-is, but the MESSAGE class
+        # defined in models.py takes care of setting up the Scenario -- except for
+        # adding default data.
+        # ixmp_source does other things, too, which I don't think we need here, but I've
+        # kept them in for completeness for now.
+
+        # ixmp_source first sets up a Scenario and adds default data
+        # models.MESSAGE seems to do the setup for us in all cases, while
+        # add_default_data() only adds missing items, so can always run.
+        # TODO Is this correct?
+        # if version == "new":
+        #     # If the Scenario already exists, we don't need these two
+        # set_up_scenario(s=self)
+        add_default_data(scenario=scenario)
+
+        # TODO We don't seem to need this, but if we do, give them better names
+        # self.tecParList = [
+        #     parameter_info for parameter_info in PARAMETERS if parameter_info.is_tec
+        # ]
+        # self.tecActParList = [
+        #     parameter_info
+        #     for parameter_info in PARAMETERS
+        #     if parameter_info.is_tec_act
+        # ]
+
+        # TODO the following could be activated in ixmp_source through the flag
+        # parameter `sanity_checks`. This 'sanity_check' (there are more, s.b.) is
+        # generally only active when loading a scenario from the DB (unless explicitly
+        # loading via ID, in which case it's also inactive). We don't distinguish
+        # loading from the DB and some tutorials failed, so disable.
+        # ensure_required_indexsets_have_data(s=self)
+
+        # TODO It does not seem useful to construct these because some required
+        # indexsets won't have any data in them yet. They do get run in imxp_source at
+        # this point, though.
+        # compose_maps(scenario=scenario)
 
         # Commit if anything was removed
         maybe_commit(scenario, state, f"{cls.__name__}.initialize")
+
+    def run(self, scenario: "ixmp.core.scenario.Scenario") -> None:
+        from message_ix.core import Scenario
+        from message_ix.util.gams_io import (
+            add_auxiliary_items_to_container_data_list,
+            add_default_data_to_container_data_list,
+            store_message_version,
+        )
+        from message_ix.util.scenario_setup import (
+            compose_maps,
+            ensure_required_indexsets_have_data,
+        )
+
+        assert isinstance(scenario, Scenario)  # Narrow type
+
+        # Run the sanity checks
+        ensure_required_indexsets_have_data(scenario=scenario)
+
+        compose_maps(scenario=scenario)
+
+        if on_ixmp4backend(scenario):
+            # ixmp.model.gams.GAMSModel.__init__() creates the container_data attribute
+            # from its .defaults and any user kwargs
+
+            # Add `MESSAGE_ix_version` parameter for validation by GAMS
+            store_message_version(container_data=self.container_data)
+
+            # TODO Why is this a dedicated function?
+            # Add default data for some `Table`s to container data
+            for name in ("cat_tec", "type_tec_land"):
+                add_default_data_to_container_data_list(
+                    container_data=self.container_data, name=name, scenario=scenario
+                )
+
+            # Add automatically created helper items to container data
+            add_auxiliary_items_to_container_data_list(
+                container_data=self.container_data, scenario=scenario
+            )
+
+            # Request only required Equations per default
+            self.equ_list = self.equ_list or []
+            self.equ_list.extend(equation.gams_name for equation in REQUIRED_EQUATIONS)
+
+            # Request only required Variables per default
+            self.var_list = self.var_list or []
+            self.var_list.extend(variable.gams_name for variable in REQUIRED_VARIABLES)
+
+        super().run(scenario)
 
 
 equ = partial(_item_shorthand, MESSAGE, ItemType.EQU)
@@ -363,7 +492,7 @@ _set("year")
 
 # Indexed sets
 _set("addon", "t")
-# _set("balance_equality", "c l")
+_set("balance_equality", "c l")
 _set("cat_addon", "type_addon ta")
 _set("cat_emission", "type_emission e")
 _set("cat_node", "type_node n")
@@ -666,7 +795,6 @@ var(
 )
 
 # Equations
-# FIXME Many of these lack coords and dims; transcribe from the GAMS code
 equ(
     "ACTIVITY_BOUND_ALL_MODES_LO",
     "n t y h",
@@ -677,91 +805,106 @@ equ(
     "n t y h",
     "Upper bound on activity summed over all vintages and modes",
 )
-equ("ACTIVITY_BOUND_LO", "", "Lower bound on activity summed over all vintages")
-equ("ACTIVITY_BOUND_UP", "", "Upper bound on activity summed over all vintages")
+equ(
+    "ACTIVITY_BOUND_LO", "n t y m h", "Lower bound on activity summed over all vintages"
+)
+equ(
+    "ACTIVITY_BOUND_UP", "n t y m h", "Upper bound on activity summed over all vintages"
+)
 equ(
     "ACTIVITY_BY_RATING",
-    "",
+    "n t y c l h q",
     "Constraint on auxiliary rating-specific activity variable by rating bin",
 )
 equ(
     "ACTIVITY_CONSTRAINT_LO",
-    "",
+    "n t y h",
     "Dynamic constraint on the market penetration of a technology activity"
     " (lower bound)",
 )
 equ(
     "ACTIVITY_CONSTRAINT_UP",
-    "",
+    "n t y h",
     "Dynamic constraint on the market penetration of a technology activity"
     " (upper bound)",
 )
-equ("ACTIVITY_RATING_TOTAL", "", "Equivalence of `ACT_RATING` to `ACT`")
+equ("ACTIVITY_RATING_TOTAL", "n t yv y c l h", "Equivalence of `ACT_RATING` to `ACT`")
 equ(
     "ACTIVITY_SOFT_CONSTRAINT_LO",
-    "",
+    "n t y h",
     "Bound on relaxation of the dynamic constraint on market penetration (lower bound)",
 )
 equ(
     "ACTIVITY_SOFT_CONSTRAINT_UP",
-    "",
+    "n t y h",
     "Bound on relaxation of the dynamic constraint on market penetration (upper bound)",
 )
-equ("ADDON_ACTIVITY_LO", "", "Addon technology activity lower constraint")
-equ("ADDON_ACTIVITY_UP", "", "Addon-technology activity upper constraint")
+equ(
+    "ADDON_ACTIVITY_LO",
+    "n type_addon y m h",
+    "Addon technology activity lower constraint",
+)
+equ(
+    "ADDON_ACTIVITY_UP",
+    "n type_addon y m h",
+    "Addon-technology activity upper constraint",
+)
+# TODO I think inv_tec is defined only when writing out to GAMS, while this equation
+# will need it to exist first -- but not populated, so just create it as a required set
+# without data?
 equ(
     "CAPACITY_CONSTRAINT",
-    "",
+    "n inv_tec yv y h",
     "Capacity constraint for technology (by sub-annual time slice)",
 )
 equ(
     "CAPACITY_MAINTENANCE_HIST",
-    "",
+    "n inv_tec yv first_period",
     "Constraint for capacity maintenance  historical installation (built before "
     "start of model horizon)",
 )
 equ(
     "CAPACITY_MAINTENANCE_NEW",
-    "",
+    "n inv_tec yv ya",
     "Constraint for capacity maintenance of new capacity built in the current "
     "period (vintage == year)",
 )
 equ(
     "CAPACITY_MAINTENANCE",
-    "",
+    "n inv_tec yv y",
     "Constraint for capacity maintenance over the technical lifetime",
 )
-# equ("COMMODITY_BALANCE_GT", "", "Commodity supply greater than or equal demand")
-equ("COMMODITY_BALANCE_LT", "", "Commodity supply lower than or equal demand")
+# equ("COMMODITY_BALANCE_GT", "n c l y h", "Commodity supply greater than or equal demand") # noqa: E501
+equ("COMMODITY_BALANCE_LT", "n c l y h", "Commodity supply lower than or equal demand")
 equ(
     "COMMODITY_USE_LEVEL",
-    "",
+    "n c l y h",
     "Aggregate use of commodity by level as defined by total input into technologies",
 )
 equ("COST_ACCOUNTING_NODAL", "n y", "Cost accounting aggregated to the node")
 equ(
     "DYNAMIC_LAND_SCEN_CONSTRAINT_LO",
-    "",
+    "n s y",
     "Dynamic constraint on land scenario change (lower bound)",
 )
 equ(
     "DYNAMIC_LAND_SCEN_CONSTRAINT_UP",
-    "",
+    "n s y",
     "Dynamic constraint on land scenario change (upper bound)",
 )
 equ(
     "DYNAMIC_LAND_TYPE_CONSTRAINT_LO",
-    "",
+    "n y u",
     "Dynamic constraint on land-use change (lower bound)",
 )
 equ(
     "DYNAMIC_LAND_TYPE_CONSTRAINT_UP",
-    "",
+    "n y u",
     "Dynamic constraint on land-use change (upper bound)",
 )
 equ(
     "EMISSION_CONSTRAINT",
-    "",
+    "n type_emission type_tec type_year",
     "Nodal-regional-global constraints on emissions (by category)",
 )
 equ(
@@ -769,72 +912,88 @@ equ(
     "n e type_tec y",
     "Auxiliary equation to simplify the notation of emissions",
 )
-equ("EXTRACTION_BOUND_UP", "", "Upper bound on extraction (by grade)")
+equ("EXTRACTION_BOUND_UP", "n c g y", "Upper bound on extraction (by grade)")
 equ(
     "EXTRACTION_EQUIVALENCE",
-    "",
+    "n c y",
     "Auxiliary equation to simplify the resource extraction formulation",
 )
 equ(
     "FIRM_CAPACITY_PROVISION",
-    "",
+    "n inv_tec y c l h",
     "Contribution of dispatchable technologies to auxiliary firm-capacity variable",
 )
 equ(
     "LAND_CONSTRAINT",
-    "",
+    "n y",
     "Constraint on total land use (partial sum of `LAND` on `land_scenario` is 1)",
 )
 equ(
     "MIN_UTILIZATION_CONSTRAINT",
-    "",
+    "n inv_tec yv y",
     "Constraint for minimum yearly operation (aggregated over the course of a year)",
 )
-equ("NEW_CAPACITY_BOUND_LO", "", "Lower bound on technology capacity investment")
-equ("NEW_CAPACITY_BOUND_UP", "", "Upper bound on technology capacity investment")
+equ(
+    "NEW_CAPACITY_BOUND_LO",
+    "n inv_tec y",
+    "Lower bound on technology capacity investment",
+)
+equ(
+    "NEW_CAPACITY_BOUND_UP",
+    "n inv_tec y",
+    "Upper bound on technology capacity investment",
+)
 equ(
     "NEW_CAPACITY_CONSTRAINT_LO",
-    "",
+    "n inv_tec y",
     "Dynamic constraint on capacity investment (lower bound)",
 )
 equ(
     "NEW_CAPACITY_CONSTRAINT_UP",
-    "",
+    "n inv_tec y",
     "Dynamic constraint for capacity investment (learning and spillovers upper bound)",
 )
 equ(
     "NEW_CAPACITY_SOFT_CONSTRAINT_LO",
-    "",
+    "n inv_tec y",
     "Bound on soft relaxation of dynamic new capacity constraints (downwards)",
 )
 equ(
     "NEW_CAPACITY_SOFT_CONSTRAINT_UP",
-    "",
+    "n inv_tec y",
     "Bound on soft relaxation of dynamic new capacity constraints (upwards)",
 )
 equ("OBJECTIVE", "", "Objective value of the optimisation problem")
 equ(
     "OPERATION_CONSTRAINT",
-    "",
+    "n inv_tec yv y",
     "Constraint on maximum yearly operation (scheduled down-time for maintenance)",
 )
-equ("RELATION_CONSTRAINT_LO", "", "Lower bound of relations (linear constraints)")
-equ("RELATION_CONSTRAINT_UP", "", "Upper bound of relations (linear constraints)")
+equ("RELATION_CONSTRAINT_LO", "r n y", "Lower bound of relations (linear constraints)")
+equ("RELATION_CONSTRAINT_UP", "r n y", "Upper bound of relations (linear constraints)")
 equ(
     "RELATION_EQUIVALENCE",
-    "",
+    "r n y",
     "Auxiliary equation to simplify the implementation of relations",
 )
 equ(
     "RENEWABLES_CAPACITY_REQUIREMENT",
-    "",
+    "n inv_tec c y",
     "Lower bound on required overcapacity when using lower grade potentials",
 )
-equ("RENEWABLES_EQUIVALENCE", "", "Equation to define the renewables extraction")
-equ("RENEWABLES_POTENTIAL_CONSTRAINT", "", "Constraint on renewable resource potential")
+equ(
+    "RENEWABLES_EQUIVALENCE",
+    "n renewable_tec c y h",
+    "Equation to define the renewables extraction",
+)
+equ(
+    "RENEWABLES_POTENTIAL_CONSTRAINT",
+    "n c g y",
+    "Constraint on renewable resource potential",
+)
 equ(
     "RESOURCE_CONSTRAINT",
-    "",
+    "n c g y",
     "Constraint on resources remaining in each period (maximum extraction per period)",
 )
 equ(
@@ -844,47 +1003,61 @@ equ(
 )
 equ(
     "SHARE_CONSTRAINT_COMMODITY_LO",
-    "",
+    "shares ns y h",
     "Lower bounds on share constraints for commodities",
 )
 equ(
     "SHARE_CONSTRAINT_COMMODITY_UP",
-    "",
+    "shares ns y h",
     "Upper bounds on share constraints for commodities",
 )
 equ(
     "SHARE_CONSTRAINT_MODE_LO",
-    "",
+    "shares n t m y h",
     "Lower bounds on share constraints for modes of a given technology",
 )
 equ(
     "SHARE_CONSTRAINT_MODE_UP",
-    "",
+    "shares n t m y h",
     "Upper bounds on share constraints for modes of a given technology",
 )
-equ("STOCKS_BALANCE", "", "Commodity inter-temporal balance of stocks")
+equ("STOCKS_BALANCE", "n c l y", "Commodity inter-temporal balance of stocks")
+# FIXME 'h2' or 'time2' are not indicative names, come up with better ones
 equ(
     "STORAGE_BALANCE_INIT",
-    "",
+    "n ts m l c y h h2",
     "Balance of the state of charge of storage at sub-annual time slices with "
     "initial storage content",
 )
-equ("STORAGE_BALANCE", "", "Balance of the state of charge of storage")
-equ("STORAGE_CHANGE", "", "Change in the state of charge of storage")
+# TODO Why is this using h2 and not h?
+equ(
+    "STORAGE_BALANCE",
+    "n ts m l c y h2 lvl_temporal",
+    "Balance of the state of charge of storage",
+)
+equ(
+    "STORAGE_CHANGE",
+    "n ts m level_storage c y h",
+    "Change in the state of charge of storage",
+)
 equ(
     "STORAGE_INPUT",
-    "",
+    "n ts l c level_storage c2 m y h",
     "Connecting an input commodity to maintain the activity of storage container "
     "(not stored commodity)",
 )
-equ("SYSTEM_FLEXIBILITY_CONSTRAINT", "", "Constraint on total system flexibility")
+equ(
+    "SYSTEM_FLEXIBILITY_CONSTRAINT",
+    "n c l y h",
+    "Constraint on total system flexibility",
+)
 equ(
     "SYSTEM_RELIABILITY_CONSTRAINT",
-    "",
+    "n c l y h",
     "Constraint on total system reliability (firm capacity)",
 )
-equ("TOTAL_CAPACITY_BOUND_LO", "", "Lower bound on total installed capacity")
-equ("TOTAL_CAPACITY_BOUND_UP", "", "Upper bound on total installed capacity")
+equ("TOTAL_CAPACITY_BOUND_LO", "n inv_tec y", "Lower bound on total installed capacity")
+equ("TOTAL_CAPACITY_BOUND_UP", "n inv_tec y", "Upper bound on total installed capacity")
 
 
 #: ixmp items (sets, parameters, variables, and equations) for :class:`.MESSAGE`.

@@ -11,78 +11,65 @@ on:
   - cron: "0 5 * * *"
   pull_request_target:
     paths:
-      - '**.gms'
-      - '**.gpr'
-      - '**.gdx'
+    - '**.gms'
+    - '**.gpr'
+    - '**.gdx'
     types:
-     - labeled
+    - labeled
 
 env:
+  depth: 100  # See description in pytest.yaml
   # Version used until 2024-11-20; disabled
-  # GAMS_VERSION: 29.1.0
+  # gams-version: 29.1.0
   # First version including a macOS arm64 distribution
-  GAMS_VERSION: 43.4.1
-  # See description in lint.yml
-  depth: 100
+  gams-version: 43.4.1
+  os: ubuntu-latest
+  python-version: "3.13"
+
+permissions: {contents: read}
 
 jobs:
   nightly:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out ixmp
-      uses: actions/checkout@v4
-      with:
-        repository: iiasa/ixmp
-        path: ixmp
-        fetch-depth: ${{ env.depth }}
-
     - name: Check out message_ix
       uses: actions/checkout@v4
       with:
-        path: message_ix
         fetch-depth: ${{ env.depth }}
 
     - name: Fetch tags (for setuptools-scm)
-      run: |
-        (cd ixmp; git fetch --tags --depth=${{ env.depth }})
-        (cd message_ix; git fetch --tags --depth=${{ env.depth }})
+      run: git fetch --tags --depth=${{ env.depth }}
 
-    - uses: actions/setup-python@v5
+    - name: Set up uv, Python
+      uses: astral-sh/setup-uv@v6
       with:
-        # If the "Latest version testable on GitHub Actions" in pytest.yaml
-        # is not the latest 3.x stable version, adjust here to match:
-        python-version: "3.12"
-        cache: pip
-        cache-dependency-path: "**/setup.cfg"
+        activate-environment: true
+        enable-cache: true
+        python-version: ${{ matrix.python-version }}
 
-    - name: Upgrade pip, setuptools-scm, wheel
-      run: python -m pip install --upgrade pip setuptools-scm wheel
-
-    - name: Cache GAMS installer and Python packages
+    - name: Cache GAMS installer and snapshot files
       uses: actions/cache@v4
       with:
-        path: gams
-        key: ubuntu-latest-gams${{ env.GAMS_VERSION }}
+        path: |
+          gams
+          .pytest_cache/d/snapshots
+        key: nightly-gams${{ env.gams-version }}
 
     - uses: iiasa/actions/setup-gams@main
       with:
-        version: ${{ env.GAMS_VERSION }}
+        version: ${{ env.gams-version }}
         license: ${{ secrets.GAMS_LICENSE }}
 
-    - name: Install Python packages and dependencies
+    - name: Install package and dependencies
       run: |
-        python -m pip install --upgrade pip wheel setuptools-scm
-        (cd ixmp; pip install .[tests])
-        (cd message_ix; pip install .[tests])
-
-        # TEMPORARY Work around dask v2024.11.0;
-        # see https://github.com/khaeru/genno/issues/149
-        pip install "dask < 2024.11.0"
+        uv pip install --upgrade \
+          "ixmp[tests] @ git+https://github.com/iiasa/ixmp.git@main" \
+          .[tests]
 
     - name: Run test suite using pytest
       env:
-        MESSAGE_IX_CI_USER: ${{ secrets.ENE_DATA_USER }}
-        MESSAGE_IX_CI_PW: ${{ secrets.ENE_DATA_PASS }}
-      working-directory: message_ix
-      run: pytest message_ix -m nightly -rA --verbose
+        MESSAGE_IX_ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
+      run: |
+        pytest message_ix -m nightly \
+          --color=yes --durations=20 -rA --verbose

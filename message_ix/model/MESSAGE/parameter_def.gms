@@ -297,6 +297,8 @@ Parameters
 
 ***
 * .. _section_parameter_dynamic_constraints:
+* .. _growth_new_capacity_up:
+* .. _initial_new_capacity_up:
 *
 * Dynamic constraints on new capacity and activity
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

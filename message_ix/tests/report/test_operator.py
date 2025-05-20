@@ -1,20 +1,31 @@
 from collections.abc import Mapping
 from functools import partial
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import matplotlib
 import pandas as pd
 import pyam
 from dask.core import literal
-from genno.testing import random_qty
+
+try:
+    from genno.operator import random_qty
+except ImportError:  # pragma: no cover — genno v1.27.1 and earlier
+    from genno.testing import random_qty  # type: ignore [no-redef]
 from ixmp.report import Quantity
 
 from message_ix import Scenario
 from message_ix.report import Reporter, operator
 from message_ix.testing import SCENARIO
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
-def test_as_message_df(test_mp) -> None:
+    from ixmp import Platform
+
+# NOTE These tests likely don't need to be parametrized
+
+
+def test_as_message_df(test_mp: "Platform") -> None:
     q = random_qty(dict(c=3, h=2, nl=5))
     q.units = "kg"
 
@@ -73,7 +84,7 @@ def test_as_message_df(test_mp) -> None:
     assert q.size == len(s.par("demand"))
 
 
-def test_as_pyam(message_test_mp):
+def test_as_pyam(message_test_mp: "Platform") -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
     if not scen.has_solution():
         scen.solve(quiet=True)
@@ -84,11 +95,13 @@ def test_as_pyam(message_test_mp):
 
     # Call as_pyam() with an empty quantity
     as_pyam = rep.get_operator("as_pyam")
+    # For type checkers:
+    assert as_pyam
     p = as_pyam(scen, qty[0:0], rename=dict(nl="region", ya="year"))
     assert isinstance(p, pyam.IamDataFrame)
 
 
-def test_concat(dantzig_reporter):
+def test_concat(dantzig_reporter: Reporter) -> None:
     """pyam.concat() correctly passes through to ixmp…concat()."""
     rep = dantzig_reporter
 
@@ -96,7 +109,7 @@ def test_concat(dantzig_reporter):
     rep.get(key)
 
 
-def test_plot_cumulative(tmp_path):
+def test_plot_cumulative(tmp_path: "Path") -> None:
     x = pd.Series(
         {
             ("region", "a"): 500,
@@ -124,7 +137,7 @@ def test_plot_cumulative(tmp_path):
     matplotlib.pyplot.savefig(tmp_path / "plot_cumulative.svg")
 
 
-def test_stacked_bar():
+def test_stacked_bar() -> None:
     data = pd.Series(
         {
             ("region", "foo", 2020): 1.0,
@@ -135,5 +148,5 @@ def test_stacked_bar():
     )
     data.index.names = ["r", "t", "year"]
 
-    result = operator.stacked_bar(Quantity(data), dims=["r", "t", "year"])
+    result = operator.stacked_bar(Quantity(data), dims=("r", "t", "year"))
     assert isinstance(result, matplotlib.axes.Axes)

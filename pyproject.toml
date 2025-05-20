@@ -10,12 +10,12 @@ maintainers = [
   { name = "Paul Natsuo Kishimoto", email = "mail@paul.kishimoto.name" },
   { name = "Fridolin Glatter", email = "glatter@iiasa.ac.at" },
 ]
+license = "Apache-2.0"
 readme = "README.md"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
-  "License :: OSI Approved :: Apache Software License",
   "Natural Language :: English",
   "Operating System :: OS Independent",
   "Programming Language :: Python",
@@ -41,9 +41,10 @@ dependencies = [
 ]
 
 [project.urls]
-homepage = "https://github.com/iiasa/message_ix"
-repository = "https://github.com/iiasa/message_ix"
-documentation = "https://docs.messageix.org"
+Documentation = "https://docs.messageix.org"
+"Release notes" = "https://docs.messageix.org/en/stable/whatsnew.html"
+Repository = "https://github.com/iiasa/message_ix"
+"Issue tracker" = "https://github.com/iiasa/message_ix/issues"
 
 [project.optional-dependencies]
 docs = [
@@ -59,15 +60,15 @@ tutorial = ["jupyter", "matplotlib", "message_ix[report,sankey]"]
 report = ["ixmp[report]"]
 sankey = ["plotly"]
 tests = [
-  "asyncssh",
+  "ixmp[tests]",
   "message_ix[docs,tutorial]",
   "pint",
+  "pooch",
   "pyam-iamc >= 0.6",
   "pytest >= 5",
   "pytest-cov",
   "pytest-rerunfailures",
   "pytest-xdist",
-  "requests",
 ]
 
 [project.scripts]
@@ -78,12 +79,6 @@ exclude_also = [
   # Imports only used by type checkers
   "if TYPE_CHECKING:",
   "if __name__ == '__main__':",
-]
-
-[tool.coverage.run]
-omit = [
-  "message_ix/tests/test_nightly.py",
-  "message_ix/testing/nightly.py",
 ]
 
 [tool.mypy]
@@ -111,7 +106,17 @@ addopts = """
   --cov=message_ix --cov-report=
   -m "not nightly and not rmessageix"
   -p no:faulthandler"""
+# Parallel to .util.ixmp4.configure_logging_and_warnings(), prevent warnings
+# from appearing in the test output
+filterwarnings = [
+  "ignore:Accessing the 'model_fields' :DeprecationWarning:ixmp4.db.filters",
+  # NB The following don't work if a message regex is added
+  "ignore::pandas.errors.SettingWithCopyWarning:ixmp4.data.db.base",
+  "ignore::DeprecationWarning:sqlalchemy.sql.schema",
+]
 markers = [
+  "ixmp4: tests exclusive to IXMP4Backend.",
+  "jdbc: tests exclusive to JDBCBackend.",
   "nightly: Slow-running nightly tests of particular scenarios.",
   "rmessageix: test of the message_ix R interface.",
   "tutorial: Tests of the tutorial Jupyter notebooks",

@@ -1,1 +1,7 @@
+# Requirements for documentation build on RTD
+#
+# These *should* generally align with env.upstream-versions
+# in .github/workflows/pytest.yaml
+
+gamsapi [core,transfer] >= 45.7.0
 git+https://github.com/iiasa/ixmp.git@main#egg=ixmp
