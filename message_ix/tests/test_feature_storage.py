@@ -11,12 +11,10 @@ functionality of storage equations. The workflow is as follows:
 
 import logging
 from itertools import product
-from typing import Union
 
 import pandas as pd
 import pandas.testing as pdt
 import pytest
-from ixmp import Platform
 from ixmp.testing import assert_logs
 
 from message_ix import Scenario
@@ -26,7 +24,7 @@ from message_ix.util import expand_dims
 
 
 # A function for generating a simple MESSAGEix model with two technologies
-def model_setup(scen: Scenario, years: list[int]) -> None:
+def model_setup(scen, years):
     scen.add_set("node", "node")
     scen.add_set("commodity", "electr")
     scen.add_set("level", "level")
@@ -34,18 +32,18 @@ def model_setup(scen: Scenario, years: list[int]) -> None:
     scen.add_set("type_year", years)
     scen.add_set("technology", ["wind_ppl", "gas_ppl"])
     scen.add_set("mode", "M1")
-    output_specs: list[Union[int, str]] = ["node", "electr", "level", "year", "year"]
+    output_specs = ["node", "electr", "level", "year", "year"]
     # Two technologies, one cheaper than the other
     var_cost = {"wind_ppl": 0, "gas_ppl": 2}
     for year, (tec, cost) in product(years, var_cost.items()):
         scen.add_par("demand", ["node", "electr", "level", year, "year"], 1, "GWa")
-        tec_specs: list[Union[int, str]] = ["node", tec, year, year, "M1"]
+        tec_specs = ["node", tec, year, year, "M1"]
         scen.add_par("output", tec_specs + output_specs, 1, "GWa")
         scen.add_par("var_cost", tec_specs + ["year"], cost, "USD/GWa")
 
 
 # A function for adding sub-annual time steps to a MESSAGEix model
-def add_seasonality(scen: Scenario, time_duration: dict[str, float]) -> None:
+def add_seasonality(scen, time_duration):
     scen.add_set("time", sorted(list(set(time_duration.keys()))))
     scen.add_set("lvl_temporal", "season")
     for h, duration in time_duration.items():
@@ -54,9 +52,7 @@ def add_seasonality(scen: Scenario, time_duration: dict[str, float]) -> None:
 
 
 # A function for modifying model parameters after adding sub-annual time steps
-def year_to_time(
-    scen: Scenario, parname: str, time_share: Union[dict[str, float], dict[str, int]]
-) -> None:
+def year_to_time(scen, parname, time_share):
     old = scen.par(parname)
     scen.remove_par(parname, old)
     time_idx = [x for x in scen.idx_names(parname) if "time" in x]
@@ -69,7 +65,7 @@ def year_to_time(
 
 
 # A function for adding storage technologies and parameterization
-def add_storage_data(scen: Scenario, time_order: dict[str, int]) -> None:
+def add_storage_data(scen, time_order):
     # Adding level of storage
     scen.add_set("level", "storage")
 
@@ -128,9 +124,7 @@ def add_storage_data(scen: Scenario, time_order: dict[str, int]) -> None:
 
 
 # Main function for building a model with storage and testing the functionality
-def storage_setup(
-    test_mp: Platform, time_duration: dict[str, float], comment: str
-) -> None:
+def storage_setup(test_mp, time_duration, comment):
     # First, building a simple model and adding seasonality
     scen = Scenario(test_mp, "no_storage", "standard", version="new")
     model_setup(scen, [2020])
@@ -245,7 +239,7 @@ def storage_setup(
 
 
 # Storage test for different duration times
-def test_storage(test_mp: Platform) -> None:
+def test_storage(test_mp):
     """
     Testing storage setup with equal and unequal duration of seasons"
 
@@ -257,9 +251,7 @@ def test_storage(test_mp: Platform) -> None:
     storage_setup(test_mp, time_duration, "_unequal_time")
 
 
-def test_structure(
-    caplog: pytest.LogCaptureFixture, test_mp: Platform, request: pytest.FixtureRequest
-) -> None:
+def test_structure(caplog, test_mp, request):
     """:meth:`MESSAGE.initialize` and :meth:`MESSAGE.enforce` handle old structure."""
     scen = make_dantzig(test_mp, request=request)
 
@@ -273,7 +265,7 @@ def test_structure(
         index=dims + ["value", "unit"],
     )
 
-    def prepare(scen: Scenario, with_data: bool = False) -> None:
+    def prepare(s, with_data=False):
         """Re-initialize to the former definition, i.e. omitting mode."""
         with scen.transact():
             scen.remove_par(name)

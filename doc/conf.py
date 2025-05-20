@@ -66,26 +66,7 @@ rst_prolog = r"""
 .. |IIASA| raw:: html
 
    <abbr title="International Institute for Applied Systems Analysis">IIASA</abbr>
-
-.. |yA| replace:: :math:`y^A`
-.. |yV| replace:: :math:`y^V`
-"""
-
-# Add reST replacements for references to particular MESSAGE/MACRO model items. These
-# are of the form ".. |foo| replace:: :ref:`foo <foo>`", such that |foo| in reST links
-# to the hyperlink target #foo with the text 'foo'. The explicit text is needed because
-# sometimes multiple targets appear above a single heading, and that heading text would
-# be automatically used for the link text.
-for name in (
-    "duration_period",
-    "duration_period_sum",
-    "growth_new_capacity_up",
-    "historical_new_capacity",
-    "initial_new_capacity_up",
-    "map_tec_lifetime",
-    "remaining_capacity",
-):
-    rst_prolog += f"\n.. |{name}| replace:: :ref:`{name} <{name}>`"
+"""  # noqa: E501
 
 
 # -- Options for HTML output -----------------------------------------------------------

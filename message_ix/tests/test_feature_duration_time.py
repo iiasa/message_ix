@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This test ensures that the parameter "duration_time" is specified correctly,
 and that the GAMS formulation checks pass.
@@ -7,23 +8,20 @@ months; and different number of time slices at each level are tested.
 """
 
 from itertools import product
-from typing import Union
-
-from ixmp import Platform
 
 from message_ix import Scenario
 
 
 # A function for generating a simple model with sub-annual time slices
 def model_generator(
-    test_mp: Platform,
-    comment: str,
-    tec_time: dict[str, list[str]],
-    demand_time: dict[str, int],
-    time_steps: list[tuple[str, int, str]],
-    com_dict: dict[str, dict[str, str]],
-    yr: int = 2020,
-) -> None:
+    test_mp,
+    comment,
+    tec_time,
+    demand_time,
+    time_steps,
+    com_dict,
+    yr=2020,
+):
     """
 
     Generates a simple model with a few technologies, and a flexible number of
@@ -64,7 +62,7 @@ def model_generator(
 
     # Adding "time" related info to the model: "lvl_temporal", "time",
     # "map_temporal_hierarchy", and "duration_time"
-    map_time: dict[str, list[str]] = {}
+    map_time = {}
     for [tmp_lvl, number, parent] in time_steps:
         scen.add_set("lvl_temporal", tmp_lvl)
         times = (
@@ -126,16 +124,7 @@ def model_generator(
         # "output"
         for h in times_out:
             out = com_dict[tec]["output"]
-            out_spec: list[Union[int, str]] = [
-                yr,
-                yr,
-                "standard",
-                "fairyland",
-                out,
-                "final",
-                h,
-                h,
-            ]
+            out_spec = [yr, yr, "standard", "fairyland", out, "final", h, h]
             scen.add_par("output", ["fairyland", tec] + out_spec, 1, "-")
 
     # Committing
@@ -161,9 +150,9 @@ def model_generator(
 
 
 # Testing one temporal level ("season") and different number of time slices
-def test_season(test_mp: Platform, n_time: list[int] = [4, 12, 50]) -> None:
+def test_season(test_mp, n_time=[4, 12, 50]):
     comment = "season"
-    com_dict = {"power-plant": {"input": "", "output": "electr"}}
+    com_dict = {"power-plant": {"input": [], "output": "electr"}}
     tec_time = {"power-plant": ["season", "season"]}
     demand_time = {"season": 100}
 
@@ -174,11 +163,11 @@ def test_season(test_mp: Platform, n_time: list[int] = [4, 12, 50]) -> None:
 
 
 # Testing one temporal level ("season") linked to "year" with a technology
-def test_year_season(test_mp: Platform, n_time: list[int] = [5, 15, 27]) -> None:
+def test_year_season(test_mp, n_time=[5, 15, 27]):
     comment = "year_season"
     com_dict = {
         "power-plant": {"input": "fuel", "output": "electr"},
-        "fuel-supply": {"input": "", "output": "fuel"},
+        "fuel-supply": {"input": [], "output": "fuel"},
     }
     tec_time = {"power-plant": ["year", "season"], "fuel-supply": ["year", "year"]}
     demand_time = {"season": 100}
@@ -189,9 +178,9 @@ def test_year_season(test_mp: Platform, n_time: list[int] = [5, 15, 27]) -> None
 
 
 # Testing two temporal levels with one technology
-def test_season_day(test_mp: Platform) -> None:
+def test_season_day(test_mp):
     comment = "4-season_24-days"
-    com_dict = {"power-plant": {"input": "", "output": "electr"}}
+    com_dict = {"power-plant": {"input": [], "output": "electr"}}
     tec_time = {"power-plant": ["day", "day"]}
     demand_time = {"day": 100}
     time_steps = [("season", 4, "year"), ("day", 24, "season")]
@@ -201,11 +190,11 @@ def test_season_day(test_mp: Platform) -> None:
 
 
 # Testing 24 days linked to four seasons, with two technologies
-def test_season_day_2tech(test_mp: Platform) -> None:
+def test_season_day_2tech(test_mp):
     comment = "4-season_24-days_2-tech"
     com_dict = {
         "power-plant": {"input": "fuel", "output": "electr"},
-        "fuel-supply": {"input": "", "output": "fuel"},
+        "fuel-supply": {"input": [], "output": "fuel"},
     }
     tec_time = {"power-plant": ["season", "day"], "fuel-supply": ["season", "season"]}
     demand_time = {"day": 100}
@@ -216,12 +205,12 @@ def test_season_day_2tech(test_mp: Platform) -> None:
 
 
 # Testing 60 days linked to 4 seasons linked to year, with three technology
-def test_year_season_day(test_mp: Platform) -> None:
+def test_year_season_day(test_mp):
     comment = "year_4-season_30-days_3-tech"
     com_dict = {
         "power-plant": {"input": "fuel", "output": "electr"},
         "fuel-transport": {"input": "fuel", "output": "fuel"},
-        "fuel-supply": {"input": "", "output": "fuel"},
+        "fuel-supply": {"input": [], "output": "fuel"},
     }
     tec_time = {
         "power-plant": ["season", "day"],
@@ -236,7 +225,7 @@ def test_year_season_day(test_mp: Platform) -> None:
 
 
 # Testing four temporal levels (year, season, day, hour) with four technologies
-def test_year_season_day_hour(test_mp: Platform) -> None:
+def test_year_season_day_hour(test_mp):
     n_season = 4
     n_day = 2
     n_hour = 6
@@ -245,7 +234,7 @@ def test_year_season_day_hour(test_mp: Platform) -> None:
         "power-plant": {"input": "fuel", "output": "electr"},
         "fuel-transport": {"input": "fuel", "output": "fuel"},
         "fuel-processing": {"input": "raw fuel", "output": "fuel"},
-        "fuel-supply": {"input": "", "output": "raw fuel"},
+        "fuel-supply": {"input": [], "output": "raw fuel"},
     }
     tec_time = {
         "power-plant": ["day", "hour"],

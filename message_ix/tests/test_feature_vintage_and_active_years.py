@@ -11,10 +11,6 @@ from pandas.testing import assert_frame_equal
 from message_ix import Scenario, make_df
 from message_ix.testing import SCENARIO
 
-# NOTE If we really need to save runtime, these tests might not need to be parametrized.
-# vintage_and_active_years() seems composite, but not sure if individual parts are
-# tested here (and not just in ixmp).
-
 
 @lru_cache()
 def _generate_yv_ya(periods: tuple[int, ...]) -> pd.DataFrame:
@@ -38,10 +34,7 @@ def _generate_yv_ya(periods: tuple[int, ...]) -> pd.DataFrame:
 
 
 def _setup(
-    mp: Platform,
-    years: Sequence[int],
-    firstmodelyear: int,
-    tl_years: Optional[filter] = None,
+    mp: Platform, years: Sequence[int], firstmodelyear: int, tl_years=None
 ) -> tuple[Scenario, pd.DataFrame]:
     """Common setup for test of :meth:`.vintage_and_active_years`.
 
@@ -93,7 +86,7 @@ def _q(
     return result
 
 
-def test_vintage_and_active_years1(test_mp: Platform) -> None:
+def test_vintage_and_active_years1(test_mp):
     """Basic functionality of :meth:`.vintage_and_active_years`."""
     years = (2000, 2010, 2020)
     fmy = years[1]
@@ -144,10 +137,10 @@ def test_vintage_and_active_years1(test_mp: Platform) -> None:
 
     # Exception is raised for incorrect arguments
     with pytest.raises(ValueError, match=r"got \('foo',\) of length 1"):
-        scen.vintage_and_active_years(ya_args=("foo",))  # type: ignore[arg-type]
+        scen.vintage_and_active_years(ya_args=("foo",))
 
 
-def test_vintage_and_active_years2(test_mp: Platform) -> None:
+def test_vintage_and_active_years2(test_mp):
     """:meth:`.vintage_and_active_years` with periods of uneven duration."""
     years = (2000, 2005, 2010, 2015, 2020, 2030)
     fmy = years[2]
@@ -188,7 +181,7 @@ def test_vintage_and_active_years2(test_mp: Platform) -> None:
     assert_frame_equal(exp, obs.reset_index(drop=True))
 
 
-def test_vintage_and_active_years3(test_mp: Platform) -> None:
+def test_vintage_and_active_years3(test_mp):
     """Technology with ``technical_lifetime`` not defined to the end of the horizon."""
     years = (2000, 2005, 2010, 2015, 2020, 2030)
     fmy = years[2]
@@ -214,7 +207,7 @@ def test_vintage_and_active_years3(test_mp: Platform) -> None:
     assert_frame_equal(exp, obs)
 
 
-def test_vintage_and_active_years4(test_mp: Platform) -> None:
+def test_vintage_and_active_years4(test_mp):
     """Technology with 'gaps'.
 
     In this test, no ``technical_lifetime`` is designated for the 2020 and 2030

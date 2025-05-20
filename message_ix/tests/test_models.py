@@ -2,20 +2,15 @@ from collections import defaultdict
 
 import ixmp
 import pytest
-from ixmp.backend.jdbc import JDBCBackend
 
 from message_ix.models import MESSAGE, MESSAGE_MACRO
 
 
-def test_initialize(test_mp: ixmp.Platform) -> None:
+def test_initialize(test_mp):
     # Expected numbers of items by type
     exp = defaultdict(list)
     for name, spec in MESSAGE.items.items():
         exp[str(spec.type.name).lower()].append(name)
-
-    # balance_equality is removed in initialize() for JDBC
-    if isinstance(test_mp._backend, JDBCBackend):
-        exp["set"].remove("balance_equality")
 
     # Use ixmp.Scenario to avoid invoking ixmp_source/Java code that
     # automatically populates empty scenarios
@@ -30,7 +25,7 @@ def test_initialize(test_mp: ixmp.Platform) -> None:
         assert sorted(obs_names) == sorted(exp_names)
 
 
-def test_message_macro() -> None:
+def test_message_macro():
     # Constructor runs successfully
     MESSAGE_MACRO()
 

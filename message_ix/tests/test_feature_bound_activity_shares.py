@@ -1,10 +1,8 @@
-from pathlib import Path
-from typing import Union
+import logging
 
 import numpy as np
 import pandas as pd
 import pytest
-from ixmp import Platform
 from numpy.testing import assert_equal
 from pandas.testing import assert_frame_equal
 
@@ -95,57 +93,13 @@ def assert_dantzig_solution(s: "Scenario", lp_method: int) -> None:
     assert_frame_equal(exp, s.var("ACT")[cols])
 
 
-def calculate_activity(scen: Scenario, tec="transport_from_seattle") -> pd.Series:
-    """Sum ``ACT`` levels for `technology` and `mode` groups; return sums for `tec`."""
-    return scen.var("ACT").groupby(["technology", "mode"])["lvl"].sum().loc[tec]
-
-
-def test_b_a_u_1_mode(request: pytest.FixtureRequest, test_mp: Platform) -> None:
-    """Test effect of ``bound_activity_up`` on 1 mode of a tech with multiple modes."""
-    s0 = make_dantzig(test_mp, solve=True, request=request)
-
-    # Constraint value
-    exp = 0.5 * calculate_activity(s0).sum()
-
-    # Add constraint parameter data to a clone
-    s1 = s0.clone(keep_solution=False)
-
-    name = "bound_activity_up"
-    mode = "to_chicago"  # Only constrain this mode
-    data = make_df(
-        name,
-        **COMMON,
-        node_loc="seattle",
-        technology="transport_from_seattle",
-        year_act=Y0,
-        mode=mode,
-        value=exp,
-    )
-
-    with s1.transact():
-        s1.add_par(name, data)
-    s1.solve(quiet=True)
-
-    # Observed result matches the constrained value
-    assert np.isclose(calculate_activity(s1).loc[mode], exp)
-
-    # Meeting the constraint has increased the objective function value
-    assert s1.var("OBJ")["lvl"] >= s0.var("OBJ")["lvl"]
-
-
 @pytest.mark.parametrize("lp_method", [1, 2, 3, 4, 5])
 @pytest.mark.parametrize(
     "constraint_value",
     [pytest.param(299, marks=pytest.mark.xfail(raises=ModelError)), 301, 325],
 )
-def test_b_a_u_all_modes(
-    request: pytest.FixtureRequest,
-    test_mp: Platform,
-    tmp_model_dir: Path,
-    lp_method: int,
-    constraint_value: int,
-) -> None:
-    """Test ``bound_activity_up`` values applied to mode="all".
+def test_b_a_u_all_modes(request, test_mp, tmp_model_dir, lp_method, constraint_value):
+    """Test ``bound_activity_up`` values applied mode="all".
 
     - In the unconstrained Dantzig problem:
 
@@ -175,8 +129,7 @@ def test_b_a_u_all_modes(
     so = dict(model_dir=tmp_model_dir, solve_options=dict(lpmethod=lp_method))
 
     # Create and solve the Dantzig model
-    # FIXME Resolve this by using TypedDict for make_dantzig kwargs
-    s0 = make_dantzig(test_mp, solve=True, request=request, **so)  # type: ignore[arg-type]
+    scen = make_dantzig(test_mp, request=request, solve=True, **so)
 
     # Ensure the solution is as expected given the LP method
     assert_dantzig_solution(scen, lp_method)
@@ -215,10 +168,9 @@ def test_b_a_u_all_modes(
         assert_equal(calculate_activity(scen).sum(), calculate_activity(clone).sum())
 
 
-def test_commodity_share_lo(request: pytest.FixtureRequest, test_mp: Platform) -> None:
-    """Test effect of ``share_commodity_lo``."""
-    n = "new-york"
-    common = COMMON | dict(mode="all", level="consumption", node_share=n, node=n)
+def test_commodity_share_up(test_mp, request, testrun_uid):
+    """Original Solution
+    ----------------
 
          lvl         mode    mrg   node_loc                technology
     0  350.0   production  0.000    seattle             canning_plant
@@ -230,59 +182,8 @@ def test_commodity_share_lo(request: pytest.FixtureRequest, test_mp: Platform) -
     6    0.0   to_chicago  0.009  san-diego  transport_from_san-diego
     7  275.0    to_topeka  0.000  san-diego  transport_from_san-diego
 
-    # data for share bound
-    def calc_share(s: Scenario) -> float:
-        """Compute the share achieved on scenario `s`."""
-        a = calculate_activity(s, tec="transport_from_seattle").loc["to_new-york"]
-        b = calculate_activity(s, tec="transport_from_san-diego").loc["to_new-york"]
-        return a / (a + b)
-
-    # Constraint value
-    exp = 1.0 * calc_share(s0)
-
-    # Add constraint parameter data to a clone
-    s1 = s0.clone(keep_solution=False)
-
-    with s1.transact("Add share constraints"):
-        s1.add_set("shares", SHARES)
-
-        # Add category and mapping set elements
-        for tt, members in (
-            ("share", ["transport_from_seattle"]),
-            ("total", ["transport_from_seattle", "transport_from_san-diego"]),
-        ):
-            s1.add_cat("technology", tt, members)
-            name = f"map_shares_commodity_{tt}"
-            s1.add_set(name, make_df(name, **common, type_tec=tt))
-
-        # Add the value of the constraint
-        name = "share_commodity_lo"
-        s1.add_par(name, make_df(name, **common, value=exp, year_act=Y0))
-
-    s1.solve(quiet=True)
-
-    # The solution has the expected share
-    assert np.isclose(exp, calc_share(s1))
-
-    # Objective function value is larger in the clone (with constraints) than the
-    # original scenario (unconstrained)
-    assert s1.var("OBJ")["lvl"] >= s0.var("OBJ")["lvl"]
-
-
-def test_commodity_share_up(request: pytest.FixtureRequest, test_mp: Platform) -> None:
-    """Test effect of ``share_commodity_up``.
-
-    ``ACT`` variable values from the original solution::
-
-        technology                node_loc   mode         lvl    mrg
-        canning_plant             seattle    production   350.0  0.000
-        transport_from_seattle    seattle    to_new-york   50.0  0.000
-        transport_from_seattle    seattle    to_chicago   300.0  0.000
-        transport_from_seattle    seattle    to_topeka      0.0  0.036
-        canning_plant             san-diego  production   600.0  0.000
-        transport_from_san-diego  san-diego  to_new-york  275.0  0.000
-        transport_from_san-diego  san-diego  to_chicago     0.0  0.009
-        transport_from_san-diego  san-diego  to_topeka    275.0  0.000
+    Constraint Test
+    ---------------
 
     Seattle canning_plant production (original: 350) is limited to 50% of all
     transport_from_san-diego (original: 550). Expected outcome: some increase
@@ -300,22 +201,37 @@ def test_commodity_share_up(request: pytest.FixtureRequest, test_mp: Platform) -
     common = dict(shares="test-share", node_share="seattle")
 
     # common operations for both subtests
-    def add_data(s: Scenario, modes: Union[str, list[str]]) -> None:
+    def add_data(s, map_df):
         with s.transact("Add share_commodity_up"):
             s.add_cat("technology", "share", "canning_plant")
             s.add_cat("technology", "total", "transport_from_san-diego")
 
             s.add_set("shares", "test-share")
 
-            name = "map_shares_commodity_total"
-            _kw = common | dict(node="san-diego", type_tec=tt_total, mode=modes)
-            s.add_set(name, make_df(name, **_kw))
-
-            name = "share_commodity_up"
-            kw = common | dict(unit="%")
-            s.add_par(name, make_df(name, **kw, year_act=Y0, value=0.5))
-
-        s.solve(quiet=True)
+            s.add_set(
+                "map_shares_commodity_share",
+                make_df(
+                    "map_shares_commodity_share",
+                    **common,
+                    node="seattle",
+                    type_tec="share",
+                    mode="production",
+                    commodity="cases",
+                    level="supply",
+                ),
+            )
+            s.add_set("map_shares_commodity_total", map_df)
+            s.add_par(
+                "share_commodity_up",
+                make_df(
+                    "share_commodity_up",
+                    **common,
+                    year_act=_year,
+                    time="year",
+                    unit="%",
+                    value=0.5,
+                ),
+            )
 
     # initial data
     scen = make_dantzig(test_mp, solve=True, request=request)
@@ -372,25 +288,8 @@ def test_commodity_share_up(request: pytest.FixtureRequest, test_mp: Platform) -
     assert new_obj >= orig_obj
 
 
-@pytest.mark.parametrize(
-    "dir, node, mode, exp_value",
-    (
-        ("lo", "san-diego", "to_new-york", 1.05),
-        ("up", "seattle", "to_chicago", 0.95),
-    ),
-)
-def test_share_mode(
-    request: pytest.FixtureRequest,
-    test_mp: Platform,
-    dir: str,
-    node: str,
-    mode: str,
-    exp_value: float,
-) -> None:
-    """Test effect of parameters ``share_mode_{lo,up}``."""
-    s0 = make_dantzig(test_mp, solve=True, request=request)
-
-    tec = f"transport_from_{node}"
+def test_commodity_share_lo(test_mp, request, testrun_uid):
+    scen = make_dantzig(test_mp, request=request, solve=True, quiet=True)
 
     # data for share bound
     def calc_share(s: Scenario) -> float:

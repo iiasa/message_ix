@@ -4,13 +4,12 @@ import sys
 from functools import partial
 from pathlib import Path
 
-import genno
 import pandas as pd
 import pyam
 import pytest
+import xarray as xr
+from genno import Quantity
 from genno.testing import assert_qty_equal
-from ixmp import Platform
-from ixmp.backend.jdbc import JDBCBackend
 from ixmp.report import Reporter as ixmp_Reporter
 from ixmp.testing import assert_logs
 from numpy.testing import assert_allclose
@@ -20,14 +19,9 @@ from message_ix import Scenario
 from message_ix.report import Reporter, configure
 from message_ix.testing import SCENARIO, make_dantzig, make_westeros
 
-# NOTE These tests maybe don't need to be parametrized.
-# Does `Reporter.from_scenario()` depend on otherwise untested Scenario functions?
-
 
 class TestReporter:
-    def test_add_sankey(
-        self, test_mp: Platform, request: pytest.FixtureRequest
-    ) -> None:
+    def test_add_sankey(self, test_mp, request) -> None:
         scen = make_westeros(test_mp, solve=True, quiet=True, request=request)
         rep = Reporter.from_scenario(scen, units={"replace": {"-": ""}})
 
@@ -40,9 +34,7 @@ class TestReporter:
         assert rep.check_keys(key)
 
 
-def test_reporter_no_solution(
-    caplog: pytest.LogCaptureFixture, message_test_mp: Platform
-) -> None:
+def test_reporter_no_solution(caplog, message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
     with assert_logs(
@@ -60,14 +52,7 @@ def test_reporter_no_solution(
     assert 3 == len(result)
 
 
-# IXMP4Backend is currently not storing the MACRO variables 'C' and 'I' for MESSAGE
-# models.
-MISSING_IXMP4 = {"C:", "C:n", "C:n-y", "C:y", "I:", "I:n", "I:n-y", "I:y"}
-
-
-def test_reporter_from_scenario(
-    message_test_mp: Platform, test_data_path: Path
-) -> None:
+def test_reporter_from_scenario(message_test_mp):
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
     # Varies between local & CI contexts
@@ -81,10 +66,8 @@ def test_reporter_from_scenario(
     # message_ix.Reporter can also be initialized
     rep = Reporter.from_scenario(scen)
 
-    # NOTE Used to write out the expected data
-    # Path(test_data_path / "reportergraph.txt").write_text(
-    #     "\n".join(list(map(str, sorted(rep.graph))))
-    # )
+    # Number of quantities available in a rudimentary MESSAGEix Scenario
+    assert 268 == len(rep.graph["all"])
 
     # Quantities have short dimension names
     assert "demand:n-c-l-y-h" in rep, sorted(rep.graph)
@@ -93,30 +76,20 @@ def test_reporter_from_scenario(
     assert "demand:n-l-h" in rep, sorted(rep.graph)
 
     # Quantities contain expected data
-    coords = dict(n="chicago new-york topeka".split())
-    demand = genno.Quantity([300, 325, 275], coords=coords, name="demand")
+    dims = dict(coords=["chicago new-york topeka".split()], dims=["n"])
+    demand = Quantity(xr.DataArray([300, 325, 275], **dims), name="demand")
 
     # NB the call to squeeze() drops the length-1 dimensions c-l-y-h
     obs = rep.get("demand:n-c-l-y-h").squeeze(drop=True)
     # check_attrs False because we don't get the unit addition in bare xarray
     assert_qty_equal(obs, demand, check_attrs=False)
 
-    # Prepare the expected items in the graphs
-    expected_rep_ix_graph_keys = set(
-        Path(test_data_path / "reporterixgraph.txt").read_text().split("\n")
-    )
-    expected_rep_graph_keys = set(
-        Path(test_data_path / "reportergraph.txt").read_text().split("\n")
-    )
-    if not isinstance(message_test_mp._backend, JDBCBackend):
-        expected_rep_ix_graph_keys -= MISSING_IXMP4
-        expected_rep_graph_keys -= MISSING_IXMP4
-
     # ixmp.Reporter pre-populated with only model quantities and aggregates
-    assert set(map(str, sorted(rep_ix.graph))) == expected_rep_ix_graph_keys
+    assert 6477 == len(rep_ix.graph)
 
     # message_ix.Reporter pre-populated with additional, derived quantities
-    assert set(map(str, sorted(rep.graph))) == expected_rep_graph_keys
+    # This is the same value as in test_tutorials.py
+    assert 13739 == len(rep.graph)
 
     # Derived quantities have expected dimensions
     vom_key = rep.full_key("vom")
@@ -126,14 +99,13 @@ def test_reporter_from_scenario(
     # …and expected values
     var_cost = rep.get(rep.full_key("var_cost"))
     ACT = rep.get(rep.full_key("ACT"))
-    vom = var_cost * ACT
+    mul = rep.get_operator("mul")
+    vom = mul(var_cost, ACT)
     # check_attrs false because `vom` multiply above does not add units
     assert_qty_equal(vom, rep.get(vom_key))
 
 
-def test_reporter_from_dantzig(
-    request: pytest.FixtureRequest, test_mp: Platform
-) -> None:
+def test_reporter_from_dantzig(test_mp, request):
     scen = make_dantzig(test_mp, solve=True, quiet=True, request=request)
 
     # Reporter.from_scenario can handle Dantzig example model
@@ -143,10 +115,10 @@ def test_reporter_from_dantzig(
     rep.get("all")
 
 
-def test_reporter_from_westeros(
-    request: pytest.FixtureRequest, test_mp: Platform
-) -> None:
-    scen = make_westeros(test_mp, emissions=True, solve=True, request=request)
+def test_reporter_from_westeros(test_mp, request):
+    scen = make_westeros(
+        test_mp, emissions=True, solve=True, quiet=True, request=request
+    )
 
     # Reporter.from_scenario can handle Westeros example model
     rep = Reporter.from_scenario(scen)
@@ -165,30 +137,33 @@ def test_reporter_from_westeros(
     assert len(obs.data) == 78
 
     # custom values are correct
-    obs = obs.filter(variable="total om*").as_pandas()
+    obs = obs.filter(variable="total om*")
+    assert len(obs.data) == 9
+    assert all(
+        obs["variable"]
+        == ["total om cost|coal_ppl"] * 3  # noqa: W504
+        + ["total om cost|grid"] * 3  # noqa: W504
+        + ["total om cost|wind_ppl"] * 3  # noqa: W504
+    )
+    assert all(obs["year"] == [700, 710, 720] * 3)
 
-    # Produce a merged data frame; this also implies that the same labels exist in `obs`
-    df = pd.DataFrame(
-        [
-            ["total om cost|coal_ppl", 700, 2801.242],
-            ["total om cost|coal_ppl", 710, 5321.242],
-            ["total om cost|coal_ppl", 720, 6933.333],
-            ["total om cost|grid", 700, 880.0],
-            ["total om cost|grid", 710, 1312.0],
-            ["total om cost|grid", 720, 1664.0],
-            ["total om cost|wind_ppl", 700, 400.6596],
-            ["total om cost|wind_ppl", 710, 67.32630],
-            ["total om cost|wind_ppl", 720, 0.0],
-        ],
-        columns=["variable", "year", "value"],
-    ).merge(obs, on=["variable", "year"], how="outer")
-
-    assert_allclose(df["value_y"], df["value_x"], err_msg=df.to_string())
+    obs = obs.data["value"].values
+    exp = [
+        2842.457491,
+        5373.051098,
+        6933.333333,
+        880.0,
+        1312.0,
+        1664.0,
+        381.578322,
+        43.340541,
+        0.0,
+    ]
+    assert len(obs) == len(exp)
+    assert_allclose(obs, exp)
 
 
-def test_reporter_as_pyam(
-    caplog: pytest.LogCaptureFixture, tmp_path: Path, dantzig_reporter: Reporter
-) -> None:
+def test_reporter_as_pyam(caplog, tmp_path, dantzig_reporter):
     caplog.set_level(logging.INFO)
 
     rep = dantzig_reporter
@@ -201,7 +176,6 @@ def test_reporter_as_pyam(
     rename = dict(nl="region", ya="year")
 
     # Add a task that converts ACT to a pyam.IamDataFrame
-    assert as_pyam
     rep.add("ACT IAMC", (partial(as_pyam, rename=rename, drop=["yv"]), "scenario", ACT))
 
     # Result is an IamDataFrame
@@ -230,7 +204,6 @@ def test_reporter_as_pyam(
     key2 = rep.add("as_pyam", ACT, "iamc", rename=rename, collapse=add_tm)
 
     # Keys of added node(s) are returned
-    assert isinstance(ACT, genno.Key)
     assert ACT.name + "::iamc" == key2
 
     caplog.clear()
@@ -281,13 +254,8 @@ def test_reporter_as_pyam(
     rep.write(key2, path)
 
     # File contents are as expected
-    # - With a parametrized `test_mp`, the `dantig_reporter` fixture has scenario name
-    #   like "test_reporter_as_pyam[jdbc]" with the backend module name. Truncate this
-    #   to compare with the expected data.
     expected = Path(__file__).parent / "data" / "report-pyam-write.csv"
-    assert expected.read_text() == re.sub(
-        r"(test_reporter_as_pyam)\[(jdbc|ixmp4)\]", r"\1", path.read_text()
-    )
+    assert path.read_text() == expected.read_text()
 
     # Use a name map to replace variable names
     replacements = {re.escape("Activity|canning_plant|production"): "Foo"}

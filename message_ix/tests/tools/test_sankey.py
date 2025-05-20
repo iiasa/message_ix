@@ -1,7 +1,5 @@
 from typing import TYPE_CHECKING, cast
 
-import pytest
-from ixmp import Platform
 from ixmp.testing import assert_logs
 
 from message_ix.report import Reporter
@@ -11,12 +9,8 @@ from message_ix.tools.sankey import map_for_sankey
 if TYPE_CHECKING:
     import pyam
 
-# NOTE This test likely doesn't need to be parametrized
 
-
-def test_map_for_sankey(
-    caplog: pytest.LogCaptureFixture, test_mp: Platform, request: pytest.FixtureRequest
-) -> None:
+def test_map_for_sankey(caplog, test_mp, request) -> None:
     from genno.operator import concat
 
     scen = make_westeros(test_mp, solve=True, request=request)

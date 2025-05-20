@@ -3,7 +3,7 @@ from pathlib import Path
 from message_ix.util.sphinx_gams import files, transcribe_docs
 
 
-def test_files(tmp_path: Path) -> None:
+def test_files(tmp_path):
     # Names of input files
     in_exp = [tmp_path.joinpath(n).with_suffix(".gms") for n in ("foo", "bar")]
     # Touch files
@@ -31,7 +31,7 @@ bz * baz2
 """
 
 
-def test_transcribe_docs(tmp_path: Path) -> None:
+def test_transcribe_docs(tmp_path):
     """Full unit tests are a bit much for the nonce.."""
 
     f_in = tmp_path / "in.gms"

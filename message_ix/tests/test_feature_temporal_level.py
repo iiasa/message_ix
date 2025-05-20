@@ -10,7 +10,6 @@ tested, by linkages of "ACT" with "demand" and "CAP".
 """
 
 import pytest
-from ixmp import Platform
 
 from message_ix import ModelError, Scenario
 from message_ix.testing import make_subannual
@@ -61,9 +60,7 @@ TD_0 = {
 }
 
 
-def test_temporal_levels_not_linked(
-    request: pytest.FixtureRequest, test_mp: Platform
-) -> None:
+def test_temporal_levels_not_linked(request):
     """Test two unlinked temporal levels.
 
     "gas_ppl" is active in "summer" and NOT linked to "gas_supply" in "year". This
@@ -75,16 +72,15 @@ def test_temporal_levels_not_linked(
     # Check the model not solve if there is no link between fuel supply and power plant
     with pytest.raises(ModelError):
         make_subannual(
-            test_mp,
+            request,
             tec_dict,
             time_steps=[("summer", 1, "season", "year")],
             demand={"summer": 2},
             com_dict=COM_DICT,
-            request=request,
         )
 
 
-def test_season_to_year(request: pytest.FixtureRequest, test_mp: Platform) -> None:
+def test_season_to_year(request):
     """Test two linked temporal levels.
 
     Linking "gas_ppl" and "gas_supply" at one temporal level (e.g., "year")
@@ -95,12 +91,11 @@ def test_season_to_year(request: pytest.FixtureRequest, test_mp: Platform) -> No
     tec_dict["gas_ppl"]["time_origin"] = ["year"]
 
     scen = make_subannual(
-        test_mp,
+        request,
         tec_dict,
         time_steps=[("summer", 1, "season", "year")],
         demand={"summer": 2},
         com_dict=COM_DICT,
-        request=request,
     )
     check_solution(scen)
 
@@ -121,46 +116,42 @@ TS_0 = [
 ]
 
 
-def test_two_seasons_to_year(request: pytest.FixtureRequest, test_mp: Platform) -> None:
+def test_two_seasons_to_year(request):
     """Test two linked temporal levels with two seasons.
 
     "demand" in two time slices: "summer" and "winter" (duration = 0.5). Model solves
     and "gas_supply" is active.
     """
     scen = make_subannual(
-        test_mp,
+        request,
         TD_1,
         time_steps=TS_0,
         demand={"summer": 1, "winter": 1},
         com_dict=COM_DICT,
-        request=request,
     )
     check_solution(scen)
 
 
-def test_two_seasons_to_year_relative(
-    request: pytest.FixtureRequest, test_mp: Platform
-) -> None:
+def test_two_seasons_to_year_relative(request):
     """Test two linked temporal levels with two seasons and a relative time.
 
     "demand" in two time slices: "summer" and "winter" (duration = 0.5). Model solves,
     but assertions fail.
     """
     scen = make_subannual(
-        test_mp,
+        request,
         TD_1,
         time_steps=TS_0,
         time_relative=["year"],
         demand={"summer": 1, "winter": 1},
         com_dict=COM_DICT,
-        request=request,
     )
     # Shouldn't pass the test, if adding relative duration time
     with pytest.raises(AssertionError):
         check_solution(scen)
 
 
-def test_seasons_to_seasons(request: pytest.FixtureRequest, test_mp: Platform) -> None:
+def test_seasons_to_seasons(request):
     """Test two seasons at one temporal level.
 
     "demand" in two time slices: "summer" and "winter" (duration = 0.5). Model solves
@@ -181,12 +172,11 @@ def test_seasons_to_seasons(request: pytest.FixtureRequest, test_mp: Platform) -
     }
 
     scen = make_subannual(
-        test_mp,
+        request,
         tec_dict,
         time_steps=TS_0,
         demand={"summer": 1, "winter": 1},
         com_dict=COM_DICT,
-        request=request,
     )
     check_solution(scen)
 
@@ -211,9 +201,7 @@ TS_1 = [
 ]
 
 
-def test_unlinked_three_temporal_levels(
-    request: pytest.FixtureRequest, test_mp: Platform
-) -> None:
+def test_unlinked_three_temporal_levels(request):
     """Test three unlinked temporal levels.
 
     "month" is defined under "season" BUT "season" not linked to "year". Model should
@@ -223,49 +211,42 @@ def test_unlinked_three_temporal_levels(
     # Check the model shouldn't solve
     with pytest.raises(ModelError):
         make_subannual(
-            test_mp,
+            request,
             TD_2,
             time_steps=TS_1[2:],  # Exclude the definitions of "summer" and "winter"
             demand={"Jan": 1, "Feb": 1},
             com_dict=COM_DICT,
-            request=request,
         )
 
 
-def test_linked_three_temporal_levels(
-    request: pytest.FixtureRequest, test_mp: Platform
-) -> None:
+def test_linked_three_temporal_levels(request):
     """Test three linked temporal levels.
 
     "month" is defined under "season", and "season" is linked to "year". Model solves.
     """
     scen = make_subannual(
-        test_mp,
+        request,
         TD_2,
         time_steps=TS_1,
         demand={"Jan": 1, "Feb": 1},
         com_dict=COM_DICT,
-        request=request,
     )
     check_solution(scen)
 
 
-def test_linked_three_temporal_levels_relative(
-    request: pytest.FixtureRequest, test_mp: Platform
-) -> None:
+def test_linked_three_temporal_levels_relative(request):
     """Test three linked temporal levels with a relative time.
 
     "month" is defined under "season", and "season" is linked to "year". Model solves,
     but assertions fail.
     """
     scen = make_subannual(
-        test_mp,
+        request,
         TD_2,
         time_steps=TS_1,
         time_relative=["year", "summer"],
         demand={"Jan": 1, "Feb": 1},
         com_dict=COM_DICT,
-        request=request,
     )
     # Shouldn't pass with a relative time duration
     with pytest.raises(AssertionError):
@@ -287,28 +268,23 @@ TD_3 = {
 }
 
 
-def test_linked_three_temporal_levels_month_to_year(
-    request: pytest.FixtureRequest, test_mp: Platform
-) -> None:
+def test_linked_three_temporal_levels_month_to_year(request):
     """Test three linked temporal levels from month to season and year.
 
     "month" is linked to "season", and "season" is linked to "year". Model solves.
     """
 
     scen = make_subannual(
-        test_mp,
+        request,
         TD_3,
         time_steps=TS_1,
         demand={"year": 2},
         com_dict=COM_DICT,
-        request=request,
     )
     check_solution(scen)
 
 
-def test_linked_three_temporal_levels_season_to_year(
-    request: pytest.FixtureRequest, test_mp: Platform
-) -> None:
+def test_linked_three_temporal_levels_season_to_year(request):
     """Test three linked temporal levels from season to year.
 
     "season" is linked to "year". Model solves.
@@ -327,19 +303,16 @@ def test_linked_three_temporal_levels_season_to_year(
         },
     }
     scen = make_subannual(
-        test_mp,
+        request,
         tec_dict,
         time_steps=TS_1,
         demand={"year": 2},
         com_dict=COM_DICT,
-        request=request,
     )
     check_solution(scen)
 
 
-def test_linked_three_temporal_levels_time_act(
-    request: pytest.FixtureRequest, test_mp: Platform
-) -> None:
+def test_linked_three_temporal_levels_time_act(request):
     """Test three linked temporal levels, with activity only at "time".
 
     Model solves.
@@ -359,29 +332,25 @@ def test_linked_three_temporal_levels_time_act(
     }
 
     scen = make_subannual(
-        test_mp,
+        request,
         tec_dict,
         time_steps=TS_0,
         demand={"year": 2},
         com_dict=COM_DICT,
-        request=request,
     )
     check_solution(scen)
 
 
-def test_linked_three_temporal_levels_different_duration(
-    request: pytest.FixtureRequest, test_mp: Platform
-) -> None:
+def test_linked_three_temporal_levels_different_duration(request):
     """Test three linked temporal levels with different duration times.
 
     Model solves, linking "month" through "season" to "year".
     """
     scen = make_subannual(
-        test_mp,
+        request,
         TD_3,
         time_steps=TS_1,
         demand={"year": 2},
         com_dict=COM_DICT,
-        request=request,
     )
     check_solution(scen)
