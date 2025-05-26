@@ -246,27 +246,27 @@ Parameter
 *    * - input_cap [#tecvintage]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` |
 *        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
-*      - relative share of input per unit of capacity
+*      - Commodity input for operation of 1 unit of CAP.
 *    * - output_cap [#tecvintage]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` |
 *        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
-*      - relative share of output per unit of capacity
+*      - Commodity output due to operation of 1 unit of CAP.
 *    * - input_cap_new [#tecvintage]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` |
 *        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
-*      - relative share of input per unit of new capacity built
+*      - Commodity input per unit of |CAP_NEW|.
 *    * - output_cap_new [#tecvintage]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` |
 *        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
-*      - relative share of output per unit of new capacity built
+*      - Commodity output per unit of |CAP_NEW|.
 *    * - input_cap_ret [#tecvintage]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` |
 *        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
-*      - relative share of input per unit of capacity retired
+*      - Commodity input per unit of |CAP| retired.
 *    * - output_cap_ret [#tecvintage]_
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` |
 *        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
-*      - relative share of output per unit of capacity retired
+*      - Commodity output per unit of |CAP| retired.
 *
 * .. [#tecvintage] Fixed and variable cost parameters and technical specifications are indexed over both
 *    the year of construction (vintage) and the year of operation (actual).
@@ -295,17 +295,17 @@ Parameters
     input(node,tec,vintage,year_all,mode,node,commodity,level,time,time)  relative share of input per unit of activity
     output(node,tec,vintage,year_all,mode,node,commodity,level,time,time) relative share of output per unit of activity
 
+    # Commodity input and output associated with operation of capacity
+    input_cap(node,tec,vintage,year_all,node,commodity,level,time)   'Commodity input for operation of 1 unit of CAP'
+    output_cap(node,tec,vintage,year_all,node,commodity,level,time)  'Commodity output due to operation of 1 unit of CAP'
+
     # Commodity input and output associated with construction of capacity
-    input_cap_new(node,tec,vintage,node,commodity,level,time)  relative share of input per unit of new capacity built
-    output_cap_new(node,tec,vintage,node,commodity,level,time) relative share of output per unit of new capacity built
+    input_cap_new(node,tec,vintage,node,commodity,level,time)   'Commodity input per unit of CAP_NEW'
+    output_cap_new(node,tec,vintage,node,commodity,level,time)  'Commodity output per unit of CAP_NEW'
 
     # Commodity input and output associated with retirement of capacity
-    input_cap_ret(node,tec,vintage,node,commodity,level,time)  relative share of input per unit of capacity retired
-    output_cap_ret(node,tec,vintage,node,commodity,level,time) relative share of output per unit of capacity retired
-
-    # Commodity input and output associated with operation of capacity at any period
-    input_cap(node,tec,vintage,year_all,node,commodity,level,time)  relative share of input per unit of capacity
-    output_cap(node,tec,vintage,year_all,node,commodity,level,time) relative share of output per unit of capacity
+    input_cap_ret(node,tec,vintage,node,commodity,level,time)   'Commodity input per unit of retired CAP'
+    output_cap_ret(node,tec,vintage,node,commodity,level,time)  'Commodity output per unit of retired CAP'
 
     inv_cost(node,tec,year_all)                         investment costs (per unit of new capacity)
     fix_cost(node,tec,vintage,year_all)                 fixed costs per year (per unit of capacity maintained)
@@ -631,10 +631,13 @@ Parameters
 * Auxiliary investment cost parameters and multipliers
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
-* Auxiliary investment cost parameters include the remaining technical lifetime at the end of model horizon (``beyond_horizon_lifetime``) in addition to the
-* different scaling factors and multipliers as listed below. These factors account for remaining capacity (``remaining_capacity``) or construction time of new capacity (``construction_time_factor``),
-* the value of investment at the end of model horizon (``end_of_horizon_factor``) or the discount factor of remaining lifetime beyond model horizon (``beyond_horizon_factor``). ``remaining_capacity_extended``
-* is defined the same as ``remaining_capacity`` but extended to historical periods as well.
+* Auxiliary investment cost parameters include the remaining technical lifetime at the end of model horizon
+* (``beyond_horizon_lifetime``) in addition to the different scaling factors and multipliers as listed below.
+* These factors account for remaining capacity (``remaining_capacity``)
+* or construction time of new capacity (``construction_time_factor``),
+* the value of investment at the end of model horizon (``end_of_horizon_factor``)
+* or the discount factor of remaining lifetime beyond model horizon (``beyond_horizon_factor``).
+* ``remaining_capacity_extended`` is identical to ``remaining_capacity`` but extended to include historical periods.
 *
 * .. list-table::
 *    :widths: 35 50
@@ -655,16 +658,15 @@ Parameters
 *    * - beyond_horizon_factor
 *      - ``node`` | ``tec`` | ``year``
 *
-*
 ***
 
 Parameters
-    construction_time_factor(node,tec,year_all) scaling factor to account for construction time of new capacity
-    remaining_capacity(node,tec,year_all,year_all) scaling factor to account for remaining capacity in period
-    remaining_capacity_extended(node,tec,year_all,year_all) scaling factor to account for remaining capacity in period (including historical periods)
-    end_of_horizon_factor(node,tec,year_all)    multiplier for value of investment at end of model horizon
-    beyond_horizon_lifetime(node,tec,year_all)  remaining technical lifetime at the end of model horizon
-    beyond_horizon_factor(node,tec,year_all)    discount factor of remaining lifetime beyond model horizon
+  construction_time_factor(node,tec,year_all)              'Scaling factor to account for construction time of new capacity'
+  remaining_capacity(node,tec,year_all,year_all)           'Scaling factor to account for remaining capacity in period'
+  remaining_capacity_extended(node,tec,year_all,year_all)  'Same as remaining_capacity, but including historical periods'
+  end_of_horizon_factor(node,tec,year_all)                 'Multiplier for value of investment at end of model horizon'
+  beyond_horizon_lifetime(node,tec,year_all)               'Remaining technical lifetime at the end of model horizon'
+  beyond_horizon_factor(node,tec,year_all)                 'Discount factor of remaining lifetime beyond model horizon'
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
