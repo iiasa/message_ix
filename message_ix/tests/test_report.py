@@ -104,8 +104,11 @@ def test_reporter_from_scenario(
     rep = Reporter.from_scenario(scen)
 
     # NOTE Used to write out the expected data
-    # Path(test_data_path / "reportergraph.txt").write_text(
-    #     "\n".join(list(map(str, sorted(rep.graph))))
+    # Path("reporter-keys-ixmp.txt").write_text(
+    #     "\n".join(map(str, sorted(rep_ix.graph)))
+    # )
+    # Path("reporter-keys-message-ix.txt").write_text(
+    #     "\n".join(sorted(map(str, set(rep.graph) - set(rep_ix.graph))))
     # )
 
     # Quantities have short dimension names
