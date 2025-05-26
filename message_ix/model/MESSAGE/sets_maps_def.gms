@@ -360,9 +360,9 @@ Sets
 *    * - map_tec(node,tec,year_all)
 *      - Mapping of technology to node and years
 *    * - map_tec_extended(node,tec,year_all)
-*      - Mapping of technology to node and years including all historical years
+*      - Mapping of technology to node and years including all historical periods
 *    * - map_tec_lifetime_extended(node,tec,year_all)
-*      - Mapping of technologies to periods within technical lifetime including all historical years
+*      - Mapping of technologies to periods within technical lifetime including all historical periods
 *    * - map_tec_time(node,tec,year_all,time)
 *      - Mapping of technology to temporal dissagregation (time)
 *    * - map_tec_mode(node,tec,year_all,mode)
@@ -406,7 +406,7 @@ Sets
     map_stocks(node,commodity,level,year_all)    mapping of commodity-level to node and time
 
     map_tec(node,tec,year_all)                      mapping of technology to node and years
-    map_tec_extended(node,tec,year_all)             mapping of technology to node and years (including all historical years)
+    map_tec_extended(node,tec,year_all)             mapping of technology to node and years (including all historical periods)
     map_tec_time(node,tec,year_all,time)            mapping of technology to temporal dissagregation (time)
     map_tec_mode(node,tec,year_all,mode)            mapping of technology to modes
     map_tec_act(node,tec,year_all,mode,time)        mapping of technology to modes AND temporal dissagregation
@@ -423,9 +423,11 @@ Sets
 
     map_land(node,land_scenario,year_all)            mapping of land-use model emulator scenarios to nodes and years
     map_relation(relation,node,year_all)             mapping of generic (user-defined) relations to nodes and years
-*    map_retirement(tec,location,vintage,year_all2,year_all)                    mapping set of the if calculation for the capacity retirement flows
-*    map_retirement_induration_period(tec,location,vintage,year_all2,year_all)  mapping set of the if calculation for the capacity retirement flows with lifetime within the duration period
-*    map_retirement_outduration_period(tec,location,vintage,year_all2,year_all) mapping set of the if calculation for the capacity retirement flows with lifetime outside the duration period
+
+    # NB Added in iiasa/message_ix#451; currently unused
+    # map_retirement(tec,location,vintage,year_all2,year_all)                    mapping set of the if calculation for the capacity retirement flows
+    # map_retirement_induration_period(tec,location,vintage,year_all2,year_all)  mapping set of the if calculation for the capacity retirement flows with lifetime within the duration period
+    # map_retirement_outduration_period(tec,location,vintage,year_all2,year_all) mapping set of the if calculation for the capacity retirement flows with lifetime outside the duration period
 
 * Storage
     map_time_commodity_storage(node,tec,level,commodity,mode,year_all,time)  mapping of storage containers to their input commodity-level (not commodity-level of stored media)
@@ -434,7 +436,7 @@ Sets
 * additional sets created in GAMS to make notation more concise
 Sets
     map_tec_lifetime(node,tec,vintage,year_all)  mapping of technologies to periods within technical lifetime
-    map_tec_lifetime_extended(node,tec,vintage,year_all)  mapping of technologies to periods within technical lifetime (including all historical years)
+    map_tec_lifetime_extended(node,tec,vintage,year_all)  mapping of technologies to periods within technical lifetime (including all historical periods)
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
