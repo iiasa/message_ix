@@ -28,12 +28,9 @@ beyond_horizon_lifetime(node,inv_tec,vintage)$( beyond_horizon_lifetime(node,inv
 * where :math:`|y| = \text{technical_lifetime}_{n,t,y}`. This formulation implicitly assumes constant fixed
 * and variable costs over time.
 *
-* **Warning:**
-* Levelized capital costs do not include fuel-related costs.
-* All soft relaxations of the dynamic activity constraint are
-* disabled if the levelized costs are negative!
+* .. warning:: Levelized capital costs do not include fuel-related costs.
+*    All soft relaxations of the dynamic activity constraint are disabled if the levelized costs are negative.
 ***
-
 levelized_cost(node,tec,year,time)$( map_tec_time(node,tec,year,time)) =
     (inv_cost(node,tec,year)
         * (
@@ -169,24 +166,44 @@ end_of_horizon_factor(node,inv_tec,vintage)$( map_tec(node,inv_tec,vintage) ) =
 *
 ***
 
-# set default to 1 (assume that the full capacity is available over the entire period)
-remaining_capacity(node,tec,vintage,year_all)$( map_tec_lifetime(node,tec,vintage,year_all) ) = 1 ;
-remaining_capacity_extended(node,tec,vintage,year_all)$(
-  map_tec_lifetime_extended(node,tec,vintage,year_all) AND cap_comm
-) = 1;
+* Default 1: the full capacity is available over the entire period
+remaining_capacity(node,tec,vintage,year_all)$map_tec_lifetime(node,tec,vintage,year_all) = 1;
 
-# if technical lifetime ends in the respective period, set remaining_capacity factor as share of lifetime in that period
-remaining_capacity(node,tec,vintage,year_all)$( map_tec_lifetime(node,tec,vintage,year_all)
-        AND ( technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) < duration_period(year_all) )
-        AND ( technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) > 0 ) )
-    = ( technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) ) / duration_period(year_all) ;
+* If the technical_lifetime ends within the respective period (year_all), the remaining capacity is computed as the
+* ratio of the remaining lifetime as of the beginning of the period and the duration of the period.
+remaining_capacity(node,tec,vintage,year_all)$(
+  map_tec_lifetime(node,tec,vintage,year_all)
+  AND (technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) < duration_period(year_all))
+  AND (technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) > 0)
+) = (technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all)) / duration_period(year_all);
 
+* Same conditions as remaining_capacity, except inclusive of historic periods via map_tec_lifetime_extended.
+* If MESSAGE_CAP_COMM is "0", map_tec_lifetime_extended is empty and all these are no-ops.
+remaining_capacity_extended(node,tec,vintage,year_all)$map_tec_lifetime_extended(node,tec,vintage,year_all) = 1;
 remaining_capacity_extended(node,tec,vintage,year_all)$(
   map_tec_lifetime_extended(node,tec,vintage,year_all)
   AND (technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) < duration_period(year_all))
   AND (technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) > 0)
-  AND cap_comm
 ) = (technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all)) / duration_period(year_all);
+
+* Mapping sets used in COMMODITY_BALANCE_AUX that are conditional on remaining_capacity_extended
+map_cap_ret_hist_1(node,tec,vintage,y_prev,y_all)$(
+  first_period(y_all)
+  AND seq_period(y_prev,y_all)
+  AND inv_tec(tec)
+  AND map_tec_lifetime_extended(node,tec,vintage,y_prev)
+  AND NOT map_tec_lifetime_extended(node,tec,vintage,y_all)
+  AND (remaining_capacity_extended(node,tec,vintage,y_all) = 0)
+) = yes;
+map_cap_ret_hist_2(node,tec,vintage,y_prev,y_all)$(
+  first_period(y_all)
+  AND seq_period(y_prev,y_all)
+  AND inv_tec(tec)
+  AND map_tec_lifetime_extended(node,tec,vintage,y_prev)
+  AND (remaining_capacity_extended(node,tec,vintage,y_all) < 1)
+  AND (remaining_capacity_extended(node,tec,vintage,y_all) > 0)
+) = yes;
+
 
 * unassign the dynamic set 'year'
 year(year_all) = no;
