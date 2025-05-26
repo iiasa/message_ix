@@ -294,17 +294,19 @@ Parameters
 * technology input-output mapping and costs parameters
     input(node,tec,vintage,year_all,mode,node,commodity,level,time,time)  relative share of input per unit of activity
     output(node,tec,vintage,year_all,mode,node,commodity,level,time,time) relative share of output per unit of activity
-* +++++
-* commodity input and output associated with construction of capacity
+
+    # Commodity input and output associated with construction of capacity
     input_cap_new(node,tec,vintage,node,commodity,level,time)  relative share of input per unit of new capacity built
     output_cap_new(node,tec,vintage,node,commodity,level,time) relative share of output per unit of new capacity built
-* commodity input and output associated with retirement of capacity
+
+    # Commodity input and output associated with retirement of capacity
     input_cap_ret(node,tec,vintage,node,commodity,level,time)  relative share of input per unit of capacity retired
     output_cap_ret(node,tec,vintage,node,commodity,level,time) relative share of output per unit of capacity retired
-* commodity input and output associated with operation of capacity at any period
+
+    # Commodity input and output associated with operation of capacity at any period
     input_cap(node,tec,vintage,year_all,node,commodity,level,time)  relative share of input per unit of capacity
     output_cap(node,tec,vintage,year_all,node,commodity,level,time) relative share of output per unit of capacity
-* +++++
+
     inv_cost(node,tec,year_all)                         investment costs (per unit of new capacity)
     fix_cost(node,tec,vintage,year_all)                 fixed costs per year (per unit of capacity maintained)
     var_cost(node,tec,vintage,year_all,mode,time)       variable costs of operation (per unit of capacity maintained)
@@ -659,7 +661,7 @@ Parameters
 Parameters
     construction_time_factor(node,tec,year_all) scaling factor to account for construction time of new capacity
     remaining_capacity(node,tec,year_all,year_all) scaling factor to account for remaining capacity in period
-    remaining_capacity_extended(node,tec,year_all,year_all) scaling factor to account for remaining capacity in period (including historical years)
+    remaining_capacity_extended(node,tec,year_all,year_all) scaling factor to account for remaining capacity in period (including historical periods)
     end_of_horizon_factor(node,tec,year_all)    multiplier for value of investment at end of model horizon
     beyond_horizon_lifetime(node,tec,year_all)  remaining technical lifetime at the end of model horizon
     beyond_horizon_factor(node,tec,year_all)    discount factor of remaining lifetime beyond model horizon

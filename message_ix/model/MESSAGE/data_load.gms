@@ -20,7 +20,10 @@ $LOAD balance_equality, time_relative
 $LOAD shares
 $LOAD addon, type_addon, cat_addon, map_tec_addon
 $LOAD storage_tec, level_storage, map_tec_storage
+
+* NB Added in iiasa/message_ix#451; currently unused
 * $LOAD map_retirement, map_retirement_induration_period, map_retirement_outduration_period
+
 * Version information; conditional load to allow older GDX files
 $ifthen gdxSetType ixmp_version
 $load ixmp_version
@@ -214,14 +217,24 @@ rating_unrated('unrated') = no ;
 $INCLUDE includes/period_parameter_assignment.gms
 
 * Assign the if conditions related to capacity retirement material flows
-*map_retirement(tec,location,vintage,year_all2,year_all) $ (inv_tec(tec) AND map_tec_lifetime_extended(location,tec,vintage,year_all2)
-*                                                       AND first_period(year_all) AND seq_period(year_all2,year_all) AND cap_comm) = yes ;
-*map_retirement_induration_period(tec,location,vintage,year_all2,year_all) $ (map_retirement(tec,location,vintage,year_all2,year_all)
-*                                                                       AND (remaining_capacity_extended(location,tec,vintage,year_all) = 0)
-*                                                                        AND NOT map_tec_lifetime_extended(location,tec,vintage,year_all) AND cap_comm) = yes;
-*map_retirement_outduration_period(tec,location,vintage,year_all2,year_all) $ (map_retirement(tec,location,vintage,year_all2,year_all)
-*                                                                          AND (remaining_capacity_extended(location,tec,vintage,year_all)< 1)
-*                                                                          AND (remaining_capacity_extended(location,tec,vintage,year_all)>0) AND cap_comm) = yes;
+* NB Added in iiasa/message_ix#451; currently unused
+* map_retirement(tec,location,vintage,year_all2,year_all)$(
+*   inv_tec(tec)
+*   AND map_tec_lifetime_extended(location,tec,vintage,year_all2)
+*   AND first_period(year_all)
+*   AND seq_period(year_all2,year_all)
+*   AND cap_comm
+* ) = yes;
+* map_retirement_induration_period(tec,location,vintage,year_all2,year_all)$(
+*   map_retirement(tec,location,vintage,year_all2,year_all)
+*   AND (remaining_capacity_extended(location,tec,vintage,year_all) = 0)
+*   AND NOT map_tec_lifetime_extended(location,tec,vintage,year_all)
+* ) = yes;
+* map_retirement_outduration_period(tec,location,vintage,year_all2,year_all)$(
+*   map_retirement(tec,location,vintage,year_all2,year_all)
+*   AND (remaining_capacity_extended(location,tec,vintage,year_all) < 1)
+*   AND (remaining_capacity_extended(location,tec,vintage,year_all) > 0)
+* ) = yes;
 
 * compute auxiliary parameters for relative duration of subannual time periods
 duration_time_rel(time,time2)$( map_time(time,time2) ) = duration_time(time2) / duration_time(time) ;
@@ -234,7 +247,7 @@ map_tec_act(node,tec,year_all,mode,time)$( map_tec_time(node,tec,year_all,time) 
 
 * mapping of technology lifetime to all 'current' periods (for all non-investment technologies)
 map_tec_lifetime(node,tec,year_all,year_all)$( map_tec(node,tec,year_all) ) = yes ;
-map_tec_lifetime_extended(node,tec,year_all,year_all)$( map_tec_extended(node,tec,year_all) AND cap_comm) = yes ;
+map_tec_lifetime_extended(node,tec,year_all,year_all)$(map_tec_extended(node,tec,year_all) AND cap_comm) = yes ;
 
 * mapping of technology lifetime to all periods 'year_all' which are within the economic lifetime
 * (if built in period 'vintage')
@@ -244,10 +257,13 @@ map_tec_lifetime(node,tec,vintage,year_all)$( map_tec(node,tec,vintage) AND map_
 
 * mapping of technology lifetime to all periods 'year_all' which are within the economic lifetime
 * (if built in period 'vintage')
-map_tec_lifetime_extended(node,tec,vintage,year_all)$( map_tec_extended(node,tec,vintage) AND map_tec_extended(node,tec,year_all)
-    AND map_period(vintage,year_all)
-    AND duration_period_sum(vintage,year_all) < technical_lifetime(node,tec,vintage)
-    AND cap_comm) = yes ;
+map_tec_lifetime_extended(node,tec,vintage,year_all)$(
+  map_tec_extended(node,tec,vintage)
+  AND map_tec_extended(node,tec,year_all)
+  AND map_period(vintage,year_all)
+  AND duration_period_sum(vintage,year_all) < technical_lifetime(node,tec,vintage)
+  AND cap_comm
+) = yes;
 
 * mapping of technology lifetime to all periods 'year_all' which were built prior to the beginning of the model horizon
 map_tec_lifetime(node,tec,historical,year_all)$(
@@ -258,11 +274,13 @@ map_tec_lifetime(node,tec,historical,year_all)$(
 ) = yes;
 
 * mapping of technology lifetime to all periods 'year_all' which were built prior to the beginning of the model horizon
-map_tec_lifetime_extended(node,tec,historical,year_all)$( map_tec_extended(node,tec,year_all) AND map_period(historical,year_all)
-    AND historical_new_capacity(node,tec,historical)
-    AND duration_period_sum(historical,year_all)
-        < sum(first_period, technical_lifetime(node,tec,first_period) )
-    AND cap_comm) = yes ;
+map_tec_lifetime_extended(node,tec,historical,year_all)$(
+  map_tec_extended(node,tec,year_all)
+  AND map_period(historical,year_all)
+  AND historical_new_capacity(node,tec,historical)
+  AND duration_period_sum(historical,year_all) < sum(first_period, technical_lifetime(node,tec,first_period))
+  AND cap_comm
+) = yes;
 
 * mapping of renewable technologies to their input commodities
 map_ren_com(node,renewable_tec,commodity,year_all)$(

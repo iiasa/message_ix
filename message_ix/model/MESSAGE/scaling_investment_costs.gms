@@ -28,7 +28,7 @@ beyond_horizon_lifetime(node,inv_tec,vintage)$( beyond_horizon_lifetime(node,inv
 * where :math:`|y| = \text{technical_lifetime}_{n,t,y}`. This formulation implicitly assumes constant fixed
 * and variable costs over time.
 *
-* **Warning:** 
+* **Warning:**
 * Levelized capital costs do not include fuel-related costs.
 * All soft relaxations of the dynamic activity constraint are
 * disabled if the levelized costs are negative!
@@ -171,7 +171,9 @@ end_of_horizon_factor(node,inv_tec,vintage)$( map_tec(node,inv_tec,vintage) ) =
 
 # set default to 1 (assume that the full capacity is available over the entire period)
 remaining_capacity(node,tec,vintage,year_all)$( map_tec_lifetime(node,tec,vintage,year_all) ) = 1 ;
-remaining_capacity_extended(node,tec,vintage,year_all)$( map_tec_lifetime_extended(node,tec,vintage,year_all) AND cap_comm) = 1 ;
+remaining_capacity_extended(node,tec,vintage,year_all)$(
+  map_tec_lifetime_extended(node,tec,vintage,year_all) AND cap_comm
+) = 1;
 
 # if technical lifetime ends in the respective period, set remaining_capacity factor as share of lifetime in that period
 remaining_capacity(node,tec,vintage,year_all)$( map_tec_lifetime(node,tec,vintage,year_all)
@@ -179,11 +181,12 @@ remaining_capacity(node,tec,vintage,year_all)$( map_tec_lifetime(node,tec,vintag
         AND ( technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) > 0 ) )
     = ( technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) ) / duration_period(year_all) ;
 
-remaining_capacity_extended(node,tec,vintage,year_all)$( map_tec_lifetime_extended(node,tec,vintage,year_all)
-        AND ( technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) < duration_period(year_all) )
-        AND ( technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) > 0 )
-        AND cap_comm)
-    = ( technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) ) / duration_period(year_all) ;
+remaining_capacity_extended(node,tec,vintage,year_all)$(
+  map_tec_lifetime_extended(node,tec,vintage,year_all)
+  AND (technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) < duration_period(year_all))
+  AND (technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all) > 0)
+  AND cap_comm
+) = (technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all)) / duration_period(year_all);
 
 * unassign the dynamic set 'year'
 year(year_all) = no;
