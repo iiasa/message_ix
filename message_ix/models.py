@@ -1085,7 +1085,20 @@ class MACRO(GAMSModel):
                 f"{self.name} requires GAMS >= {self.GAMS_min_version}; found {version}"
             )
 
+        # Additional command-line arguments to GAMS
+        solve_args = []
+        try:
+            concurrent = str(kwargs.pop("concurrent"))
+        except KeyError:
+            pass
+        else:
+            if concurrent not in ("0", "1"):
+                raise ValueError(f"{concurrent = }")
+            solve_args.append(f"--MACRO_CONCURRENT={concurrent}")
+
         super().__init__(*args, **kwargs)
+
+        self.solve_args.extend(solve_args)
 
     @classmethod
     def initialize(cls, scenario, with_data=False):

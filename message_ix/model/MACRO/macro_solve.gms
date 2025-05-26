@@ -55,29 +55,40 @@ C.FX(node_macro, macro_base_period) = c0(node_macro) ;
 I.FX(node_macro, macro_base_period) = i0(node_macro) ;
 EC.FX(node_macro, macro_base_period) = y0(node_macro) - i0(node_macro) - c0(node_macro) ;
 
-* ------------------------------------------------------------------------------
-* solving the model region by region
-* ------------------------------------------------------------------------------
+$IFTHEN %MACRO_CONCURRENT% == "0"
 
-node_active(node) = no ;
+DISPLAY "Solve MACRO for each node in sequence";
 
-LOOP(node $ node_macro(node),
+node_active(node) = NO ;
 
-    node_active(node_macro) = no ;
-    node_active(node) = YES;
-*    DISPLAY node_active ;
+LOOP(node$node_macro(node),
+  node_active(node_macro) = NO ;
+  node_active(node) = YES ;
+*  DISPLAY node_active ;
 
-* ------------------------------------------------------------------------------
-* solve statement
-* ------------------------------------------------------------------------------
+  SOLVE MESSAGE_MACRO MAXIMIZING UTILITY USING NLP ;
 
-    SOLVE MESSAGE_MACRO MAXIMIZING UTILITY USING NLP ;
+* Write model status summary for the current node
+*  status(node,'modelstat') = MESSAGE_MACRO.modelstat ;
+*  status(node,'solvestat') = MESSAGE_MACRO.solvestat ;
+*  status(node,'resUsd')    = MESSAGE_MACRO.resUsd ;
+*  status(node,'objEst')    = MESSAGE_MACRO.objEst ;
+*  status(node,'objVal')    = MESSAGE_MACRO.objVal ;
+);
 
-* write model status summary (by node)
-*    status(node,'modelstat') = MESSAGE_MACRO.modelstat ;
-*    status(node,'solvestat') = MESSAGE_MACRO.solvestat ;
-*    status(node,'resUsd')    = MESSAGE_MACRO.resUsd ;
-*    status(node,'objEst')    = MESSAGE_MACRO.objEst ;
-*    status(node,'objVal')    = MESSAGE_MACRO.objVal ;
+$ELSE
 
-) ;
+DISPLAY "Solve MACRO for all nodes concurrently";
+
+node_active(node_macro) = YES;
+
+SOLVE MESSAGE_MACRO MAXIMIZING UTILITY USING NLP;
+
+* Write model status summary for all nodes
+* status('all','modelstat') = MESSAGE_MACRO.modelstat;
+* status('all','solvestat') = MESSAGE_MACRO.solvestat;
+* status('all','resUsd')    = MESSAGE_MACRO.resUsd;
+* status('all','objEst')    = MESSAGE_MACRO.objEst;
+* status('all','objVal')    = MESSAGE_MACRO.objVal;
+
+$ENDIF
