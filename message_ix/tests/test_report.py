@@ -2,6 +2,7 @@ import logging
 import re
 import sys
 from collections import defaultdict
+from collections.abc import Generator
 from functools import partial
 from pathlib import Path
 
@@ -67,8 +68,27 @@ def test_reporter_no_solution(
 MISSING_IXMP4 = {"C:", "C:n", "C:n-y", "C:y", "I:", "I:n", "I:n-y", "I:y"}
 
 
+@pytest.fixture
+def keys(test_data_path: Path) -> Generator[set[str]]:
+    """Read two files with lists of keys expected in a :class:`.Reporter` graph.
+
+    Returns
+    -------
+    list
+        with 2 sets including the contents of:
+
+        1. :file:`reporter-keys-ixmp.txt`.
+        1. :file:`reporter-keys-message-ix.txt`.
+    """
+    fn = "reporter-keys-{}.txt"
+    return (
+        set(test_data_path.joinpath(fn.format(p)).read_text().split("\n")) - {""}
+        for p in ("ixmp", "message-ix")
+    )
+
+
 def test_reporter_from_scenario(
-    message_test_mp: Platform, test_data_path: Path
+    message_test_mp: Platform, keys: Generator[set[str]]
 ) -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
@@ -104,21 +124,17 @@ def test_reporter_from_scenario(
     assert_qty_equal(obs, demand, check_attrs=False)
 
     # Prepare the expected items in the graphs
-    expected_rep_ix_graph_keys = set(
-        Path(test_data_path / "reporterixgraph.txt").read_text().split("\n")
-    )
-    expected_rep_graph_keys = set(
-        Path(test_data_path / "reportergraph.txt").read_text().split("\n")
-    )
+    expected_rep_ix_graph_keys = next(keys)
+    expected_rep_graph_keys = expected_rep_ix_graph_keys | next(keys)
     if not isinstance(message_test_mp._backend, JDBCBackend):
         expected_rep_ix_graph_keys -= MISSING_IXMP4
         expected_rep_graph_keys -= MISSING_IXMP4
 
     # ixmp.Reporter pre-populated with only model quantities and aggregates
-    assert set(map(str, sorted(rep_ix.graph))) == expected_rep_ix_graph_keys
+    assert expected_rep_ix_graph_keys == set(map(str, rep_ix.graph))
 
     # message_ix.Reporter pre-populated with additional, derived quantities
-    assert set(map(str, sorted(rep.graph))) == expected_rep_graph_keys
+    assert expected_rep_graph_keys == set(map(str, rep.graph))
 
     # Derived quantities have expected dimensions
     vom_key = rep.full_key("vom")
