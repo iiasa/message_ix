@@ -1,14 +1,22 @@
 The |MESSAGEix| framework
 *************************
 
-|MESSAGEix| is a versatile, dynamic systems-optimization modelling framework developed by the |IIASA| Energy, Climate, and Environment (ECE) Program [#rename]_ since the 1980s.
+|MESSAGEix| is a systems-optimization modelling framework developed by the |IIASA| Energy, Climate, and Environment (ECE) Program [#rename]_ since the 1970s.
 
-This is the documentation for :mod:`message_ix`, a Python package that ties together all components of the framework.
-:mod:`message_ix` and :mod:`ixmp` are free and open source software, licensed under the `APACHE 2.0 license`_.
+This is the documentation for :mod:`message_ix`,
+a Python package that ties together all components of the framework.
+:mod:`message_ix` is free and open source software,
+licensed under the `Apache 2.0 license`_.
 
-- For the scientific reference of the framework, see Huppmann et al. (2019) :cite:`Huppmann-2018`.
-- For an overview and recent publications related to the specific |MESSAGEix|-GLOBIOM global model instance used at the IIASA ECE Program, see the `MESSAGEix-GLOBIOM documentation`_.
-
+- :mod:`message_ix` supports creation and use of *any* energy-system model with the MESSAGE core equations.
+  One *specific* model is “MESSAGEix-GLOBIOM”,
+  a global model instance used in IIASA ECE Program research and sometimes informally called “MESSAGE”.
+  MESSAGEix-GLOBIOM is documented as part of the separate :mod:`message_ix_models` package,
+  in particular on the page “:doc:`message-ix-models:global/index`”.
+- For peer-reviewed academic literature about |MESSAGEix| and specific models and applications,
+  see :ref:`section 2 of the “User guidelines and notice” page <notice-cite>`,
+  the :doc:`Usage <usage>` page,
+  and again the :doc:`MESSAGEix-GLOBIOM <message-ix-models:global/index>` page in the message_ix_models documentation.
 
 .. _getting-started:
 
@@ -55,7 +63,8 @@ Then, continue with the:
 Mathematical specification
 ==========================
 
-These pages provide comprehensive description of the variables and equations in the core MESSAGEix mathematical implementation.
+These pages provide comprehensive description of variables and equations
+in the GAMS implementation of MESSAGE that is included with and used via :mod:`message_ix`.
 
 - :doc:`model/MESSAGE/sets_maps_def`
 - :doc:`time`
@@ -158,7 +167,7 @@ You can also:
    faq
 
 .. _`MESSAGEix-GLOBIOM documentation`: http://data.ene.iiasa.ac.at/message-globiom/
-.. _`APACHE 2.0 open-source license`: https://github.com/iiasa/message_ix/blob/main/LICENSE
+.. _`Apache 2.0 license`: https://github.com/iiasa/message_ix/blob/main/LICENSE
 
 .. [#rename] Known as the “Energy Program” until 2020-12-31.
 .. [#osguides] `Our usage <https://github.com/iiasa/message_ix/community>`_ of files like CODE_OF_CONDUCT, GOVERNANCE, SECURITY, and SUPPORT follows the `Open Source Guides <https://opensource.guide/>`_ recommendations.
