@@ -184,18 +184,26 @@ Use :program:`pip`
 Choose optional dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When installing using :program:`pip` (but not :program:`conda`), there is a distinction between **required** and **optional dependencies**.
+When installing using :program:`pip` (but not :program:`conda`),
+there is a distinction between **required** and **optional dependencies**.
 For example :mod:`ixmp` is a required dependency of :mod:`message_ix`.
-Whenever the latter is installed, a compatible version of the former will also be installed.
+Whenever the latter is installed,
+a compatible version of the former will also be installed.
 
 Optional dependencies (also called “extra requirements”) are gathered in groups.
-The example commands below include a string like ``[docs,report,tests,tutorial]``.
-This implies four groups of extra requirements:
+The example commands below include a string like ``[tests]``.
+This implies five of the six available groups of extra requirements:
 
 - ``docs`` includes packages required to build this documentation locally,
+  including ``message_ix[report]`` and all *its* requirements,
+- ``ixmp4`` includes packages require to use :class:`ixmp.IXMP4Backend <.IXMP4Backend>`,
 - ``report`` includes packages required to use the built-in :doc:`reporting <reporting>` features of :mod:`message_ix`,
-- ``tests`` includes packages required to run the test suite, and
-- ``tutorial`` includes packages required to run the :doc:`tutorials <tutorials>`.
+- ``sankey`` includes packages required to use :meth:`.Reporter.add_sankey`,
+- ``tests`` includes packages required to run the test suite,
+  including ``message_ix[docs]``, ``message_ix[tutorial]``,
+  and all the requirements in those groups, and
+- ``tutorial`` includes packages required to run the :doc:`tutorials <tutorials>`,
+  including ``message_ix[report]``, ``message_ix[sankey]``, etc.
 
 The set of extras used can be freely adjusted according to your needs.
 
@@ -204,9 +212,9 @@ Install the latest release from PyPI
 
 8. Install |MESSAGEix| [4]_::
 
-    pip install message_ix[docs,report,tests,tutorial]
+    pip install message_ix[tests]
 
-.. [4] If using the (non-standard) :program:`zsh` shell, note or recall that ``[...]`` is a `glob operator <https://zsh.sourceforge.io/Doc/Release/Expansion.html#Glob-Operators>`__, so the argument to pip must be quoted appropriately: ``pip install -e '.[docs,tests,tutorial]'``.
+.. [4] If using the (non-standard) :program:`zsh` shell, note or recall that ``[...]`` is a `glob operator <https://zsh.sourceforge.io/Doc/Release/Expansion.html#Glob-Operators>`__, so the argument to pip must be quoted appropriately: ``pip install -e '.[tests]'``.
 
 At this point, installation is complete.
 Next, you can `Check that installation was successful`_.
@@ -220,12 +228,12 @@ If you are instead interested in installing a specific version of the code such 
 8. Run the following.
    Replace ``<ref>`` with a specific Git reference such as a branch name (for instance, the ``main`` development branch, or a branch associated with a pull request), a tag, or a commit hash::
 
-    pip install git+ssh://git@github.com:iiasa/message_ix.git@<ref>[docs,report,tests,tutorial]
+    pip install git+ssh://git@github.com:iiasa/message_ix.git@<ref>[tests]
 
    ``git+ssh://`` assumes that you `use SSH to authenticate to GitHub <https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent>`__, which we recommend.
    If you instead use personal access tokens, then run::
 
-    pip install git+https://github.com/iiasa/message_ix.git@<ref>[docs,report,tests,tutorial]
+    pip install git+https://github.com/iiasa/message_ix.git@<ref>[tests]
 
 At this point, installation is complete.
 Next, you can `Check that installation was successful`_.
@@ -258,10 +266,10 @@ Install from a :program:`git` clone of the source code
      git remote add upstream git@github.com:iiasa/message_ix.git
      git fetch upstream --tags
 
-12. Navigate to the ``message_ix`` directory created by :program:`git clone`.
+12. Navigate to the :file:`message_ix/` directory created by :program:`git clone`.
     Run [4]_::
 
-     pip install --editable .[docs,report,tests,tutorial]
+     pip install --editable .[tests]
 
     The :program:`--editable` flag ensures that changes to the source code are picked up every time :py:`import message_ix` is used in Python code.
 
@@ -378,12 +386,12 @@ If you run into an issue during installation that is not listed below, check the
 “No JVM shared library file (jvm.dll) found”
 --------------------------------------------
 
-Error messages like this when running ``message-ix --platform=default list`` or when creating a :class:`ixmp.Platform` object (for instance, :py:`ixmp.Platform()` in Python) indicate that :mod:`message_ix` (via :mod:`ixmp` and JPype) cannot find Java on your machine, in particular the Java Virtual Machine (JVM).
+Error messages like this when running :program:`message-ix --platform=default list` or when creating a :class:`ixmp.Platform` object (for instance, :py:`ixmp.Platform()` in Python) indicate that :mod:`message_ix` (via :mod:`ixmp` and JPype) cannot find Java on your machine, in particular the Java Virtual Machine (JVM).
 There are multiple ways to resolve this issue:
 
 1. If you have installed Java manually, ensure that the ``JAVA_HOME`` environment variable is set system-wide; see for example `these instructions`_ for Windows users.
 2. If using Anaconda, install the ``openjdk`` package in the same environment as the ``message-ix`` package.
-   When the Windows Anaconda Prompt is opened, ``conda activate`` then ensures the ``JAVA_HOME`` variable is correctly set.
+   When the Windows Anaconda Prompt is opened, :program:`conda activate` then ensures the ``JAVA_HOME`` variable is correctly set.
 
 To check which JVM will be used by ixmp, run the following in any prompt or terminal::
 
@@ -416,7 +424,7 @@ If you installed this package accidentally, remove it using::
 Copy GAMS model files for editing
 ---------------------------------
 
-By default, the GAMS files containing the mathematical model core are installed with :mod:`message_ix` (e.g., in your Python ``site-packages`` directory).
+By default, the GAMS files containing the mathematical model core are installed with :mod:`message_ix` (e.g., in your Python :file:`site-packages` directory).
 Many users will simply want to run |MESSAGEix|, or use the Python or R APIs to manipulate data, parameters and scenarios.
 For these uses, direct editing of the GAMS files is not necessary.
 

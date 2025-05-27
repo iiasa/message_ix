@@ -56,7 +56,7 @@ docs = [
   "sphinx_rtd_theme",
   "sphinxcontrib-bibtex",
 ]
-tutorial = ["jupyter", "matplotlib", "message_ix[report,sankey]"]
+ixmp4 = ["ixmp[ixmp4]"]
 report = ["ixmp[report]"]
 sankey = ["plotly"]
 tests = [
@@ -69,6 +69,11 @@ tests = [
   "pytest-cov",
   "pytest-rerunfailures",
   "pytest-xdist",
+]
+tutorial = [
+  "message_ix[report,sankey]",
+  "jupyter",
+  "matplotlib",
 ]
 
 [project.scripts]
