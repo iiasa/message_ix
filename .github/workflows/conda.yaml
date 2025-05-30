@@ -109,4 +109,4 @@ jobs:
 
         # Run a single test from the test suite to touch JDBCBackend Java code,
         # via JPype
-        pytest --pyargs message_ix -p ixmp.testing -p no:faulthandler -k "test_add_cat" --verbose -rA --color=yes
+        pytest --pyargs message_ix -p ixmp.testing -p message_ix.testing -p no:faulthandler -k "test_add_cat" --verbose -rA --color=yes
