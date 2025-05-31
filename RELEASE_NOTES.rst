@@ -1,8 +1,10 @@
-.. Next release
-.. ============
+Next release
+============
 
-.. All changes
-.. -----------
+All changes
+-----------
+
+- Filter log noise generated when loading scenarios created with :mod:`message_ix`/:mod:`ixmp` v3.10 and earlier (:pull:`946`).
 
 .. _v3.11.0:
 
@@ -31,7 +33,6 @@ Users **should**:
   particularly in model periods that have a different duration than the preceding period,
   and adjust |growth_new_capacity_up| or |initial_new_capacity_up| values as necessary.
   For the latter, :func:`.initial_new_capacity_up_v311` may be used.
-
 
 All changes
 -----------
