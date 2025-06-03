@@ -38,15 +38,39 @@ Before making this choice, see :ref:`install-pip-or-conda`, below, for further c
 Java (required)
 ---------------
 
-A `Java Runtime Environment (JRE) <https://en.wikipedia.org/wiki/Java_(software_platform)#Java_Runtime_Environment>`_ is required to use the current default :class:`ixmp.JDBCBackend <ixmp.backend.jdbc.JDBCBackend>` in the :mod:`ixmp` package that handles data storage for :mod:`message_ix`.
+A `Java Runtime Environment (JRE) <https://en.wikipedia.org/wiki/Java_(software_platform)#Java_Runtime_Environment>`_ is required
+to use :class:`ixmp.JDBCBackend <ixmp.backend.jdbc.JDBCBackend>`,
+the current default in the :mod:`ixmp` package that handles data storage for :mod:`message_ix`.
 
-Common ways to install Java include:
+There are many ways to install a JRE.
+Most often this is done by installing a Java Development Kit (JDK),
+of which the most popular is OpenJDK.
 
-- Use the official releases of `Java <https://www.java.com>`_.
-- Use a version of Java bundled or packaged for your operating system (for example, Ubuntu and other Linux distributions).
+- Linux operating systems like Ubuntu often have specific packages containing OpenJDK/the JRE,
+  with names like ``openjdk-25-jre``.
+- OpenJDK is also `built and packaged by many providers <https://en.wikipedia.org/wiki/OpenJDK#OpenJDK_builds>`_;
+  these packages are known by different names
+  and are available for operating systems including Windows and macOS.
+  Some of these known to work with JDBCBackend include:
 
-If using Anaconda or Miniconda, installing Java manually is *not required*.
-This is because the ``message-ix`` conda-forge package depends on the `openjdk <https://anaconda.org/conda-forge/openjdk>`_ package, so the latter is automatically installed with the former.
+  - `Temurin <https://adoptium.net/temurin/releases/>`_.
+  - `Zulu <https://www.azul.com/downloads/?package=jre#zulu>`_.
+  - `Corretto <https://aws.amazon.com/corretto/>`_.
+
+.. caution::
+
+   Oracle provides releases branded simply “Java” at https://www.java.com,
+   as well as `Oracle OpenJDK builds <https://jdk.java.net/>`_.
+   Not all of these are free to use;
+   for instance, use by several people in the same organization may require a paid license.
+   `This news article <https://www.theregister.com/2025/05/09/users_advised_to_review_oracle_java_use/>`__ and other coverage
+   explain how license fee demands may come as a surprise to users.
+
+   We recommend one of the above, non-Oracle alternatives, which do not use paid licensing.
+
+If using Anaconda or Miniconda, installing a JDK/JRE manually is *not required*.
+This is because the ``message-ix`` conda-forge package depends on the `openjdk <https://anaconda.org/conda-forge/openjdk>`_ package,
+so the latter is automatically installed with the former.
 
 
 .. _install-gams:
