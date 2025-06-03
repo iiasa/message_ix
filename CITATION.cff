@@ -5,12 +5,11 @@ cff-version: 1.2.0
 title: MESSAGEix
 message: >-
   Thank you for using the MESSAGEix framework! Please cite
-  the GitHub repository and the MESSAGEix framework manuscript 
+  the GitHub repository and the MESSAGEix framework manuscript
   (https://doi.org/10.1016/j.envsoft.2018.11.012).
 type: software
-version: 3.11.0
-# Format: "yyyy-mm-dd"
-date-released: "2025-05-26"
+version: 3.11.1
+date-released: "2025-06-03"  # Format: "yyyy-mm-dd"
 authors:
   - given-names: Paul Natsuo
     family-names: Kishimoto
@@ -195,4 +194,3 @@ references:
     start: 143
     end: 156
     type: article
-    
