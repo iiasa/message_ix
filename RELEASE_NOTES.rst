@@ -1,8 +1,13 @@
-Next release
-============
+.. Next release
+.. ============
 
-All changes
------------
+.. All changes
+.. -----------
+
+.. _v3.11.1:
+
+v3.11.1 (2025-06-03)
+====================
 
 - Filter log noise generated when loading scenarios created with :mod:`message_ix`/:mod:`ixmp` v3.10 and earlier (:pull:`946`).
 
@@ -97,9 +102,6 @@ All changes
 v3.9.0 (2024-06-04)
 ===================
 
-All changes
------------
-
 - Split installation instructions to a basic :ref:`install-quick` and detailed :doc:`install-adv` (:pull:`843`).
 - Ensure compatibility with pandas upcoming 3.0 Copy-on-Write behaviour (:pull:`842`).
 - Improve tutorial Westeros baseline for correct lifetime, units, and vintage-activity years (:pull:`815`).
@@ -183,7 +185,6 @@ Migration notes
       # Re-use the existing data in `scen`, adding the `mode` dimension
       expand_dims(scen, "storage_initial", mode="an existing mode")
 
-
 All changes
 -----------
 
@@ -263,9 +264,6 @@ All changes
 v3.4.0 (2022-01-27)
 ===================
 
-All changes
------------
-
 - Expand the documentation with an outlook of the MESSAGEix usage (:pull:`520`).
 - Adjust test suite for pyam v1.1.0 compatibility (:pull:`499`).
 - Add Westeros :doc:`tutorial <tutorials>` on historical parameters (:pull:`478`).
@@ -287,7 +285,6 @@ Migration notes
 ``rmessageix`` (and ``rixmp``) are deprecated and removed, as newer versions of the R `reticulate <https://rstudio.github.io/reticulate/>`_ package allow direct import and use of the Python modules with full functionality.
 See the updated page for :doc:`rmessageix`, and the updated instructions on how to :ref:`install-r`.
 
-
 All changes
 -----------
 
@@ -304,7 +301,6 @@ All changes
 - Expand documentation of :ref:`dynamic constraint parameters <section_parameter_dynamic_constraints>` (:pull:`454`).
 - Adjust :mod:`message_ix.report` to use :mod:`genno` / :mod:`ixmp.report` changes in `ixmp PR #397 <https://github.com/iiasa/ixmp/pull/397>`_ (:pull:`441`).
 
-
 v3.2.0 (2021-01-24)
 ===================
 
@@ -319,7 +315,6 @@ Migration notes
 
      from message_ix import make_df
 
-
 All changes
 -----------
 
@@ -328,7 +323,6 @@ All changes
 - :pull:`415`: Improve :func:`.make_df` to generate empty, partially-, or fully-filled data frames with the correct columns for any MESSAGE or MACRO parameter.
 - :pull:`415`: Make complete lists of :attr:`.MESSAGE_ITEMS <.MESSAGE.items>`, :attr:`.MACRO_ITEMS <.MACRO.items>` and their dimensions accessible through the Python API.
 - :pull:`421`: Fix discounting from forward-looking to backward-looking and provide an explanation of the period structure and discounting in documentation of :doc:`time`.
-
 
 v3.1.0 (2020-08-28)
 ===================
@@ -363,7 +357,6 @@ When loading a Scenario created with a version of `message_ix` older than 3.0.0,
 See also the `migration notes for ixmp 3.0.0`_.
 
 .. _migration notes for ixmp 3.0.0: https://docs.messageix.org/projects/ixmp/en/latest/whatsnew.html#v3-0-0-2020-06-05
-
 
 All changes
 -----------
