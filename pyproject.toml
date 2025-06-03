@@ -50,7 +50,7 @@ Repository = "https://github.com/iiasa/message_ix"
 docs = [
   "genno >= 1.26",  # For sphinx extensions; see doc/conf.py
   "GitPython",
-  "message_ix[report]",
+  "message_ix[ixmp4,report]",
   "numpydoc",
   "sphinx >= 4.0",
   "sphinx_rtd_theme",
