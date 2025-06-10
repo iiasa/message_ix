@@ -1,8 +1,16 @@
-# Input file for pip-compile 
+# Input file for pip-compile
 # Only specify the packages necessary for [docs]
 
 gitpython==3.1.44
 numpydoc==1.8.0
-sphinx==8.2.1
+
+# Work around https://github.com/iiasa/ixmp/issues/582
+# TODO Remove once gamsapi packaging is fixed
+pandas<2.3
+
+# Per https://github.com/iiasa/ixmp/security/dependabot/17
+requests>=2.32.4
+
+sphinx==8.2.3
 sphinx-rtd-theme==3.0.2
 sphinxcontrib-bibtex==2.6.3
