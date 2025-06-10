@@ -1,8 +1,11 @@
-.. Next release
-.. ============
+Next release
+============
 
-.. All changes
-.. -----------
+All changes
+-----------
+
+- Improve the :file:`westeros_report.ipynb` tutorial :doc:`tutorial <tutorials>`
+  for the 2025-06 MESSAGEix Training Workshop (:pull:`953`).
 
 .. _v3.11.1:
 
