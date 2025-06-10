@@ -2,11 +2,11 @@ name: Tests
 
 on:
   # Uncomment this entry only to debug the workflow
-  # pull_request:
-  #   branches: [ main ]
-  pull_request_target:
+  pull_request:
     branches: [ main ]
-    types: [ labeled, opened, reopened, synchronize ]
+  # pull_request_target:
+  #   branches: [ main ]
+  #   types: [ labeled, opened, reopened, synchronize ]
   # 05:00 UTC = 06:00 CET = 07:00 CEST
   schedule:
   - cron: "0 5 * * *"
