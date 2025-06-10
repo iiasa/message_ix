@@ -48,6 +48,11 @@ All changes
 - Document the :ref:`minimum version of Java <install-java>` required for :class:`ixmp.JDBCBackend <ixmp.backend.jdbc.JDBCBackend>` (:pull:`962`).
 - Improve type hinting (:pull:`963`).
 - Fix capitalization in auxiliary_settings.gms to enable GDX output file compression on MacOS and Linux. (:pull:`965`) 
+All changes
+-----------
+
+- Improve the :file:`westeros_report.ipynb` tutorial :doc:`tutorial <tutorials>`
+  for the 2025-06 MESSAGEix Training Workshop (:pull:`953`).
 
 .. _v3.11.1:
 
