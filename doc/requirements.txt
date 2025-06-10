@@ -46,7 +46,7 @@ pygments==2.18.0
     # via sphinx
 pyyaml==6.0.1
     # via pybtex
-requests==2.32.0
+requests==2.32.4
     # via sphinx
 roman-numerals-py==3.1.0
     # via sphinx
