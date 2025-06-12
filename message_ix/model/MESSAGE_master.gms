@@ -45,8 +45,7 @@ $ONGLOBAL
 *----------------------------------------------------------------------------------------------------------------------*
 
 ** scenario/case selection - this must match the name of the MsgData_<%%%>.gdx input data file **
-*$SETGLOBAL data "<your datafile name here>"
-$SETGLOBAL data "SSP_SSP2_development_baseline_DEFAULT_1"
+$SETGLOBAL data "<your datafile name here>"
 
 ** MACRO mode
 * "none": MESSAGEix is run in stand-alone mode
@@ -61,7 +60,6 @@ $SETGLOBAL foresight "0"
 
 ** include scaler commands
 $SETGLOBAL scaler "MsgScaler_Default"
-*$SETGLOBAL scaler "MsgScaler_SSP_SSP2_development_baseline_DEFAULT_1"
 
 ** add a comment and name extension for model report files (e.g. run-specific info, calibration notes) - optional **
 $SETGLOBAL comment ""

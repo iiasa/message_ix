@@ -23,7 +23,6 @@ $IF NOT SET foresight   $SETGLOBAL foresight "0"
 
 ** include scaler commands
 $IF NOT SET scaler $SETGLOBAL scaler "MsgScaler_Default"
-*$IF NOT SET scaler $SETGLOBAL scaler "MsgScaler_SSP_SSP2_development_baseline_DEFAULT_1"
 
 ** specify optional additional calibration output **
 $IF NOT SET calibration $SETGLOBAL calibration ""
