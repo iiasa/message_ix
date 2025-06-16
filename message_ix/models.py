@@ -386,6 +386,7 @@ _set(
 )
 _set("map_temporal_hierarchy", "lvl_temporal h time_parent")
 _set("map_time", "time_parent h")
+_set("newtec", "t")
 _set("type_tec_land", "type_tec")
 
 # Parameters
@@ -497,6 +498,17 @@ par("tax", "nl type_tec ya")
 par("technical_lifetime", "nl t yv")
 par("time_order", "lvl_temporal h", "Order of sub-annual time slices")
 par("var_cost", "nl t yv ya m h")
+
+### learning related parameters
+par("alpha", "t")
+par("beta_unit", "t")
+par("beta_proj", "t")
+par("gamma_unit", "t")
+par("gamma_proj", "t")
+par("inv_cost_refidx", "t")
+par("knref_unit", "t")
+par("sizeref_unit", "t")
+par("sizeref_proj", "t")
 
 # Variables
 var(
@@ -665,6 +677,13 @@ var(
     "State of charge (SoC) of storage at each sub-annual time slice (positive)",
 )
 
+## Learning related variables
+var(
+    "IC",
+    "t y",
+    "Investment cost index",
+)
+
 # Equations
 # FIXME Many of these lack coords and dims; transcribe from the GAMS code
 equ(
@@ -700,14 +719,12 @@ equ("ACTIVITY_RATING_TOTAL", "", "Equivalence of `ACT_RATING` to `ACT`")
 equ(
     "ACTIVITY_SOFT_CONSTRAINT_LO",
     "",
-    "Bound on relaxation of the dynamic constraint on market penetration"
-    " (lower bound)",
+    "Bound on relaxation of the dynamic constraint on market penetration (lower bound)",
 )
 equ(
     "ACTIVITY_SOFT_CONSTRAINT_UP",
     "",
-    "Bound on relaxation of the dynamic constraint on market penetration"
-    " (upper bound)",
+    "Bound on relaxation of the dynamic constraint on market penetration (upper bound)",
 )
 equ("ADDON_ACTIVITY_LO", "", "Addon technology activity lower constraint")
 equ("ADDON_ACTIVITY_UP", "", "Addon-technology activity upper constraint")
@@ -738,8 +755,7 @@ equ("COMMODITY_BALANCE_LT", "", "Commodity supply lower than or equal demand")
 equ(
     "COMMODITY_USE_LEVEL",
     "",
-    "Aggregate use of commodity by level as defined by total input into "
-    "technologies",
+    "Aggregate use of commodity by level as defined by total input into technologies",
 )
 equ("COST_ACCOUNTING_NODAL", "n y", "Cost accounting aggregated to the node")
 equ(
@@ -791,7 +807,7 @@ equ(
 equ(
     "MIN_UTILIZATION_CONSTRAINT",
     "",
-    "Constraint for minimum yearly operation (aggregated over the course of a " "year)",
+    "Constraint for minimum yearly operation (aggregated over the course of a year)",
 )
 equ("NEW_CAPACITY_BOUND_LO", "", "Lower bound on technology capacity investment")
 equ("NEW_CAPACITY_BOUND_UP", "", "Upper bound on technology capacity investment")
@@ -803,8 +819,7 @@ equ(
 equ(
     "NEW_CAPACITY_CONSTRAINT_UP",
     "",
-    "Dynamic constraint for capacity investment (learning and spillovers upper "
-    "bound)",
+    "Dynamic constraint for capacity investment (learning and spillovers upper bound)",
 )
 equ(
     "NEW_CAPACITY_SOFT_CONSTRAINT_LO",
@@ -839,8 +854,7 @@ equ("RENEWABLES_POTENTIAL_CONSTRAINT", "", "Constraint on renewable resource pot
 equ(
     "RESOURCE_CONSTRAINT",
     "",
-    "Constraint on resources remaining in each period (maximum extraction per "
-    "period)",
+    "Constraint on resources remaining in each period (maximum extraction per period)",
 )
 equ(
     "RESOURCE_HORIZON",

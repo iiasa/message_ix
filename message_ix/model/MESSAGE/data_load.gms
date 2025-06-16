@@ -20,6 +20,7 @@ $LOAD balance_equality, time_relative
 $LOAD shares
 $LOAD addon, type_addon, cat_addon, map_tec_addon
 $LOAD storage_tec, level_storage, map_tec_storage
+$LOAD newtec
 
 * Version information; conditional load to allow older GDX files
 $ifthen gdxSetType ixmp_version
@@ -79,6 +80,13 @@ is_fixed_extraction, is_fixed_stock, is_fixed_new_capacity, is_fixed_capacity, i
 fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activity, fixed_land
 * storage parameters
 storage_initial, storage_self_discharge, time_order
+
+* - - - - - - - - - - - - - -
+* learning related Parameters
+*** learning and economies of scale parameters
+alpha, beta_unit, beta_proj, gamma_unit, gamma_proj
+*** initial condition
+inv_cost_refidx, knref_unit, sizeref_unit, sizeref_proj
 ;
 
 
