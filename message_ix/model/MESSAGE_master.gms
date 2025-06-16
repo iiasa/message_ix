@@ -63,6 +63,9 @@ $SETGLOBAL foresight "0"
 * activate technology learning - 1
 $SETGLOBAL learningmode "0"
 
+** include scaler commands
+$SETGLOBAL scaler "MsgScaler_Default"
+
 ** add a comment and name extension for model report files (e.g. run-specific info, calibration notes) - optional **
 $SETGLOBAL comment ""
 
