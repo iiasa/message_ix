@@ -21,8 +21,8 @@ env:
   depth: 100  # See description in pytest.yaml
   # Version used until 2024-11-20; disabled
   # gams-version: 29.1.0
-  # First version including a macOS arm64 distribution
-  gams-version: 43.4.1
+  # Oldest version that can reliably be downloaded
+  gams-version: 48.6.1
   os: ubuntu-latest
   python-version: "3.13"
 

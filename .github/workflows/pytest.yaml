@@ -21,7 +21,7 @@ defaults:
     shell: bash
 
 env:
-  GAMS_VERSION: 48.6.1 # Oldest version of GAMS that one can download
+  GAMS_VERSION: 48.6.1 # Oldest version of GAMS that can reliably be downloaded
   depth: 100  # Must be large enough to include the most recent release
   label: "safe to test"  # Label that must be applied to run on PRs from forks
   python-version: "3.13"  # For non-matrixed jobs
