@@ -11,8 +11,8 @@ on:
   #   branches: [ main ]
 
 env:
-  # First version including a macOS arm64 distribution
-  GAMS_VERSION: 43.4.1
+  # Oldest version that can reliably be downloaded
+  GAMS_VERSION: 48.6.1
 
 jobs:
   conda:
