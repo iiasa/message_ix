@@ -497,3 +497,490 @@ def get_report(
     plt.show()
 
     return var_dict
+
+
+# ---------------------------------------------------------------------------------------------
+# Functions to add individual CDRs
+
+
+def add_erw(scen, yamlpath="", xlsxpath=""):
+    """
+    This function add ERW as a CDR option to a MESSAGEix scenario
+    scen        : MESSAGEix scenario
+    yamlpath    : filepath in which ERW technology data input is stored
+    xlsxpath    : filepath in which ERW removal data input is stored
+
+    """
+    # list of common sets
+    len_periods = {
+        2030: 5,
+        2035: 5,
+        2040: 5,
+        2045: 5,
+        2050: 5,
+        2055: 5,
+        2060: 5,
+        2070: 10,
+        2080: 10,
+        2090: 10,
+        2100: 10,
+        2110: 10,
+    }
+    years = [key for key in len_periods.keys() if key >= 2030]
+    nodes = [
+        "R12_AFR",
+        "R12_EEU",
+        "R12_LAM",
+        "R12_MEA",
+        "R12_NAM",
+        "R12_SAS",
+        "R12_WEU",
+        "R12_FSU",
+        "R12_PAO",
+        "R12_PAS",
+        "R12_CHN",
+        "R12_RCPA",
+    ]
+
+    # Checking out the scenario
+    scen.check_out()
+
+    # Registering new modes needed for ERW
+    modes = ["M_10micron", "M_25micron", "M_50micron", "M_100micron"]
+
+    new_modes = modes + ["M4", "M5"]
+    for mode in new_modes:
+        scen.add_set("mode", mode)
+
+    # Add technology and removal rate data
+    add_tech(scen, filepath=yamlpath)
+
+    df_relation = pd.read_excel(xlsxpath, index_col=[0])
+
+    # Add removal relation activity and bounds
+    rel_eqs = ["ERW_removal", "ERW_mpen_c"]
+    list_rel_eq = []
+    for node in nodes:
+        for mode in modes:
+            for rel in rel_eqs:
+                rel_eq = make_df(
+                    "relation_upper",
+                    relation=rel,
+                    node_rel=node,
+                    year_rel=years,
+                    value=0,
+                    unit="-",
+                )
+                list_rel_eq += [rel_eq]
+    df_rel_eq = pd.concat(list_rel_eq)
+
+    scen.add_par("relation_activity", df_relation)
+    scen.add_par("relation_upper", df_rel_eq)
+    scen.add_par("relation_lower", df_rel_eq)
+
+    # Commit the change
+    scen.commit(comment="ERW is added")
+
+    # adding commodity balance
+    with scen.transact(""):
+        scen.add_set("balance_equality", ["erw_basalt", "primary"])
+        scen.add_set("balance_equality", ["erw_basalt", "secondary"])
+        scen.add_set("balance_equality", ["erw_basalt_10micron", "final"])
+        scen.add_set("balance_equality", ["erw_basalt_25micron", "final"])
+        scen.add_set("balance_equality", ["erw_basalt_50micron", "final"])
+        scen.add_set("balance_equality", ["erw_basalt_100micron", "final"])
+
+
+def add_oae(scen, yamlpath=""):
+    """
+    This function add OAE as a CDR option to a MESSAGEix scenario
+    scen        : MESSAGEix scenario
+    yamlpath    : filepath in which OAE technology data input is stored
+
+    """
+    # list of common sets
+    len_periods = {
+        2030: 5,
+        2035: 5,
+        2040: 5,
+        2045: 5,
+        2050: 5,
+        2055: 5,
+        2060: 5,
+        2070: 10,
+        2080: 10,
+        2090: 10,
+        2100: 10,
+        2110: 10,
+    }
+    years = [key for key in len_periods.keys() if key >= 2030]
+    nodes = [
+        "R12_AFR",
+        "R12_EEU",
+        "R12_LAM",
+        "R12_MEA",
+        "R12_NAM",
+        "R12_SAS",
+        "R12_WEU",
+        "R12_FSU",
+        "R12_PAO",
+        "R12_PAS",
+        "R12_CHN",
+        "R12_RCPA",
+    ]
+
+    # Checking out the scenario
+    scen.check_out()
+
+    # Add OAE data
+    add_tech(scen, filepath=yamlpath)
+
+    # Add OAE market penetration relation bounds
+    ## create relation bounds
+    rel_eqs = ["OAE_mpen_c"]
+    list_rel_eq = []
+    for node in nodes:
+        for rel in rel_eqs:
+            rel_eq = make_df(
+                "relation_upper",
+                relation=rel,
+                node_rel=node,
+                year_rel=years,
+                value=0,
+                unit="-",
+            )
+            list_rel_eq += [rel_eq]
+    df_rel_eq = pd.concat(list_rel_eq)
+
+    ## adding parameters
+    scen.add_par("relation_upper", df_rel_eq)
+    scen.add_par("relation_lower", df_rel_eq)
+
+    # Add limeston mining limit for OAE
+    ## assume 1.2 tons of limestone per ton of cement
+    ## assume 0.5 tons of quicklime per ton of limestone
+    ## assume max limestone for oae is double the limestone for cement
+
+    d_cement = scen.par("demand", {"commodity": "cement"})
+
+    df_list = []
+    for node in nodes:
+        data = d_cement.copy()
+        data = data[data["node"] == node]
+        data = data.sort_values(by="year").value.to_list()[2:14]
+
+        vals = [np.round(d * 1.2 * 0.5, 4) for d in data]
+
+        df = make_df(
+            "bound_activity_up",
+            node_loc=node,
+            technology="OAE_mpen",
+            year_act=[yr for yr in len_periods.keys()],
+            mode="M1",
+            time="year",
+            value=max(vals),
+            unit="???",
+        )
+
+        df_list += [df]
+
+    df2add = pd.concat(df_list)
+
+    ## adding parameters
+    scen.add_par("bound_activity_up", df2add)
+
+    # Commit the change
+    scen.commit(comment="OAE is added")
+
+    # adding commodity balance
+    with scen.transact(""):
+        scen.add_set("balance_equality", ["oae_limestone", "primary"])
+        scen.add_set("balance_equality", ["oae_limestone", "secondary"])
+        scen.add_set("balance_equality", ["oae_quicklime", "final"])
+
+
+def add_bioburial(scen, yamlpath=""):
+    """
+    This function add OAE as a CDR option to a MESSAGEix scenario
+    scen        : MESSAGEix scenario
+    yamlpath    : filepath in which OAE technology data input is stored
+
+    """
+    # list of common sets
+    len_periods = {
+        2030: 5,
+        2035: 5,
+        2040: 5,
+        2045: 5,
+        2050: 5,
+        2055: 5,
+        2060: 5,
+        2070: 10,
+        2080: 10,
+        2090: 10,
+        2100: 10,
+        2110: 10,
+    }
+    years = [key for key in len_periods.keys() if key >= 2030]
+    nodes = [
+        "R12_AFR",
+        "R12_EEU",
+        "R12_LAM",
+        "R12_MEA",
+        "R12_NAM",
+        "R12_SAS",
+        "R12_WEU",
+        "R12_FSU",
+        "R12_PAO",
+        "R12_PAS",
+        "R12_CHN",
+        "R12_RCPA",
+    ]
+
+    R12_potentials = {  # based on 0.1 MtCO2-eq per ha of cropland and 0.1% fraction
+        "R12_AFR": 5463.4,
+        "R12_CHN": 4488.0,
+        "R12_EEU": 1623.0,
+        "R12_FSU": 5479.8,
+        "R12_LAM": 4420.2,
+        "R12_MEA": 2482.6,
+        "R12_NAM": 4919.3,
+        "R12_PAO": 1100.5,
+        "R12_PAS": 1572.1,
+        "R12_RCPA": 648.5,
+        "R12_SAS": 6203.4,
+        "R12_WEU": 2953.9,
+    }
+
+    # Checking out the scenario
+    scen.check_out()
+
+    # Add biomass-burial data
+    add_tech(scen, filepath=yamlpath)
+
+    # Setup technology and relations to track cumulative storage
+    ## adding new relation and technology
+    scen.add_set("technology", "biomass-burial_storcumulative")
+    scen.add_set("relation", "biomass-burial_storcum")
+
+    ## create relation activity
+    list_relation = []
+    for node in nodes:
+        for yr in years:
+            ya = [y for y in years if y <= yr]
+            relact_biomass_burial = make_df(
+                "relation_activity",
+                relation="biomass-burial_storcum",
+                node_rel=node,
+                year_rel=yr,
+                node_loc=node,
+                technology="biomass-burial",
+                year_act=ya,
+                mode="M1",
+                value=[-1 * len_periods[y] for y in ya],
+                unit="-",
+            )
+
+            relact_biomass_burialcumulative = make_df(
+                "relation_activity",
+                relation="biomass-burial_storcum",
+                node_rel=node,
+                year_rel=yr,
+                node_loc=node,
+                technology="biomass-burial_storcumulative",
+                year_act=yr,
+                mode="M1",
+                value=1,
+                unit="-",
+            )
+            list_relation += [relact_biomass_burial, relact_biomass_burialcumulative]
+    df_relation = pd.concat(list_relation)
+
+    ## create relation bounds
+    list_rel_eq = []
+    for node in nodes:
+        rel_eq = make_df(
+            "relation_upper",
+            relation="biomass-burial_storcum",
+            node_rel=node,
+            year_rel=years,
+            value=0,
+            unit="-",
+        )
+        list_rel_eq += [rel_eq]
+    df_rel_eq = pd.concat(list_rel_eq)
+
+    ## adding parameters
+    scen.add_par("relation_activity", df_relation)
+    scen.add_par("relation_upper", df_rel_eq)
+    scen.add_par("relation_lower", df_rel_eq)
+
+    # adding set up for limiting CO2 storage availabilities
+    df_list = []
+    for node in nodes:
+        for year in years:
+            df = make_df(
+                "bound_activity_up",
+                node_loc=node,
+                technology="biomass-burial_storcumulative",
+                year_act=year,
+                mode="all",
+                time="year",
+                value=R12_potentials[node],
+                unit="???",
+            )
+            df_list += [df]
+    df_stor = pd.concat(df_list)
+
+    scen.add_par("bound_activity_up", df_stor)
+
+    # Commit the change
+    scen.commit(comment="Biomass-burial is added")
+
+
+def add_biochar(scen, yamlpath=""):
+    """
+    This function add OAE as a CDR option to a MESSAGEix scenario
+    scen        : MESSAGEix scenario
+    yamlpath    : filepath in which OAE technology data input is stored
+
+    """
+    # list of common sets
+    len_periods = {
+        2030: 5,
+        2035: 5,
+        2040: 5,
+        2045: 5,
+        2050: 5,
+        2055: 5,
+        2060: 5,
+        2070: 10,
+        2080: 10,
+        2090: 10,
+        2100: 10,
+        2110: 10,
+    }
+    years = [key for key in len_periods.keys() if key >= 2030]
+    nodes = [
+        "R12_AFR",
+        "R12_EEU",
+        "R12_LAM",
+        "R12_MEA",
+        "R12_NAM",
+        "R12_SAS",
+        "R12_WEU",
+        "R12_FSU",
+        "R12_PAO",
+        "R12_PAS",
+        "R12_CHN",
+        "R12_RCPA",
+    ]
+
+    # Checking out the scenario
+    scen.check_out()
+
+    # Add Biochar data
+    add_tech(scen, filepath=yamlpath)
+
+    # Add Biochar market penetration relation bounds
+    ## create relation bounds
+    rel_eqs = ["biochar_mpen_c"]
+    list_rel_eq = []
+    for node in nodes:
+        for rel in rel_eqs:
+            rel_eq = make_df(
+                "relation_upper",
+                relation=rel,
+                node_rel=node,
+                year_rel=years,
+                value=0,
+                unit="-",
+            )
+            list_rel_eq += [rel_eq]
+    df_rel_eq = pd.concat(list_rel_eq)
+
+    ## adding parameters
+    scen.add_par("relation_upper", df_rel_eq)
+    scen.add_par("relation_lower", df_rel_eq)
+
+    # Add Biochar removal in non permanent application
+    df_list = []
+
+    for year in len_periods.keys():
+        for node in nodes:
+            # relation for first period
+            df0 = make_df(
+                "relation_activity",
+                relation="CO2_Emission",
+                node_rel=node,
+                node_loc=node,
+                year_act=year,
+                year_rel=[yr for yr in len_periods.keys() if yr >= year and yr == year],
+                technology="biochar_apply",
+                mode="M2",
+                value=(-1 + np.round((0.055 + (len_periods[year] - 2) * 0.003), 4)),
+                unit="???",
+            )
+
+            # relation for the following periods
+            df1 = make_df(
+                "relation_activity",
+                relation="CO2_Emission",
+                node_rel=node,
+                node_loc=node,
+                year_act=year,
+                year_rel=[yr for yr in len_periods.keys() if yr > year],
+                technology="biochar_apply",
+                mode="M2",
+                value=[
+                    0.0030 * len_periods[yr] for yr in len_periods.keys() if yr > year
+                ],
+                unit="???",
+            )
+
+            # collect all periods as a list
+            df_list += [df0, df1]
+
+    df2add = pd.concat(df_list)
+    df2add["year_rel"] = df2add["year_rel"].astype(int)
+
+    ## adding parameters
+    scen.add_par("relation_activity", df2add)
+
+    # Add biochar application limit in permanent storage
+    ## limit biochar in concrete application
+    d_cement = scen.par("demand", {"commodity": "cement"})
+
+    df_list = []
+    for node in nodes:
+        data = d_cement.copy()
+        data = data[data["node"] == node]
+        data = data.sort_values(by="year").value.to_list()[2:14]
+
+        vals = [np.round(d * (1.0 / 100), 4) for d in data]
+
+        df = make_df(
+            "bound_activity_up",
+            node_loc=node,
+            technology="biochar_apply",
+            year_act=[yr for yr in len_periods.keys()],
+            mode="M1",
+            time="year",
+            value=vals,
+            unit="???",
+        )
+
+        df_list += [df]
+
+    df2add = pd.concat(df_list)
+
+    ## adding parameters
+    scen.add_par("bound_activity_up", df2add)
+
+    # Commit the change
+    scen.commit(comment="Biochar is added")
+
+    # adding commodity balance
+    with scen.transact(""):
+        scen.add_set("balance_equality", ["biochar", "secondary"])
+        scen.add_set("balance_equality", ["biochar", "final"])
