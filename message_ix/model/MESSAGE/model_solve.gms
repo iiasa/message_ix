@@ -68,14 +68,8 @@ if (%foresight% = 0,
     ELSE
 *       write a status update to the log file, solve the model
         put_utility 'log' /'+++ Solve the perfect-foresight version of MESSAGEix +++ ' ;
-        option threads = 4 ;
         Solve MESSAGE_LP using LP minimizing OBJ ;
-        display year,year_all,year_all2,model_horizon,inv_cost_ini ;
     );
-
-* write a status update to the log file, solve the model
-    put_utility 'log' /'+++ Solve the perfect-foresight version of MESSAGEix +++ ' ;
-    Solve MESSAGE_LP using LP minimizing OBJ ;
 
 * write model status summary
     status('perfect_foresight','modelstat') = MESSAGE_LP.modelstat ;
