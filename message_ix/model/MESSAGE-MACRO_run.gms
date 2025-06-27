@@ -84,6 +84,7 @@ Parameters
     price_diff_rel(*,node,sector,year_all)
 
     report_iteration(iteration,*)
+    trade_cost_detail(node, commodity, year_all)              'net of commodity import costs and commodity export revenues by node,commodity and year'
 ;
 
 * variables to report back to user if needed
@@ -170,6 +171,8 @@ DISPLAY enestart, eneprice, total_cost ;
 *----------------------------------------------------------------------------------------------------------------------*
 
 total_cost(node_macro, year) = COST_NODAL_NET.L(node_macro, year) / 1000 ;
+
+trade_cost_detail(node, commodity, year) = import_cost(node, commodity, year) - export_cost(node, commodity, year) ;
 
 $INCLUDE MACRO/macro_solve.gms
 

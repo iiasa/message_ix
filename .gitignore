@@ -64,3 +64,4 @@ prof/
 # LPdiag
 message_ix/tests/data/lp_diag/diet_output.txt
 message_ix/tools/lp_diag/data/mps/*
+/message_ix/model/output
