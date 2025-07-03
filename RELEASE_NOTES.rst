@@ -1,8 +1,10 @@
-.. Next release
-.. ============
+Next release
+============
 
-.. All changes
-.. -----------
+All changes
+-----------
+
+- - Add a tool for implementing (sub-annual) time slices (:pull:`852`)
 
 .. _v3.11.1:
 
