@@ -64,12 +64,15 @@ TASKS0: tuple[tuple, ...] = (
     # Products
     ("out", "mul", "output", "ACT"),
     ("in", "mul", "input", "ACT"),
+    ("in_cap_new", "mul", "input_cap_new", "CAP_NEW"),
+    ("out_cap_new", "mul", "output_cap_new", "CAP_NEW"),
     ("rel", "mul", "relation_activity", "ACT"),
     ("emi", "mul", "emission_factor", "ACT"),
     ("inv", "mul", "inv_cost", "CAP_NEW"),
     ("fom", "mul", "fix_cost", "CAP"),
     ("vom", "mul", "var_cost", "ACT"),
     ("land_out", "mul", "land_output", "LAND"),
+    ("land_in", "mul", "land_input", "LAND"),
     ("land_use_qty", "mul", "land_use", "LAND"),  # TODO: better name!
     ("land_emi", "mul", "land_emission", "LAND"),
     #
