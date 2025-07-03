@@ -12,12 +12,15 @@ $ONGLOBAL
 ** scenario/case selection - this must match the name of the MsgData_<%%%>.gdx input data file **
 $SETGLOBAL data "<your datafile name here>"
 
-* MACRO mode. This can take 3 possible values, only 2 of which are usable with this file:
-*
-* - "none": MACRO is not run, MESSAGE is run in stand-alone mode.
-* - "linked": MESSAGE and MACRO are run in linked/iterative mode.
-* - "standalone": MACRO is run without MESSAGE. Not valid when using this file; use MACRO_run.gms instead.
-$IF NOT SET macromode $SETGLOBAL macromode "none"
+** MACRO mode
+* "none": MESSAGEix is run in stand-alone mode
+* "linked": MESSAGEix-MACRO is run in iterative mode **
+$SETGLOBAL macromode "none"
+
+** MAgPIE connection
+* "0": MESSAGEix default is run
+* "1": MESSAGEix is run with connection to MAgPIE
+$SETGLOBAL magpiemode "0"
 
 ** define the time horizon over which the model optimizes (perfect foresight, myopic or rolling horizon) **
 * perfect foresight - 0
@@ -26,7 +29,7 @@ $IF NOT SET macromode $SETGLOBAL macromode "none"
 $SETGLOBAL foresight "0"
 
 ** add a comment and name extension for model report files (e.g. run-specific info, calibration notes) - optional **
-$SETGLOBAL comment ""
+$SETGLOBAL comment "SLACK"
 
 ** specify optional calibration output **
 $SETGLOBAL calibration ""
@@ -45,12 +48,12 @@ $SETGLOBAL AUX_BOUND_VALUE "1e9"
 * by adding 'slack' variables in the constraints and associated penalty factors in the objective function
 $SETGLOBAL SLACK_COMMODITY_EQUIVALENCE "*"
 
-$SETGLOBAL SLACK_CAP_NEW_BOUND_UP "*"
-$SETGLOBAL SLACK_CAP_NEW_BOUND_LO "*"
-$SETGLOBAL SLACK_CAP_TOTAL_BOUND_UP "*"
-$SETGLOBAL SLACK_CAP_TOTAL_BOUND_LO "*"
-$SETGLOBAL SLACK_CAP_NEW_DYNAMIC_UP "*"
-$SETGLOBAL SLACK_CAP_NEW_DYNAMIC_LO "*"
+$SETGLOBAL SLACK_CAP_NEW_BOUND_UP ""
+$SETGLOBAL SLACK_CAP_NEW_BOUND_LO ""
+$SETGLOBAL SLACK_CAP_TOTAL_BOUND_UP ""
+$SETGLOBAL SLACK_CAP_TOTAL_BOUND_LO ""
+$SETGLOBAL SLACK_CAP_NEW_DYNAMIC_UP ""
+$SETGLOBAL SLACK_CAP_NEW_DYNAMIC_LO ""
 
 $SETGLOBAL SLACK_ACT_BOUND_UP "*"
 $SETGLOBAL SLACK_ACT_BOUND_LO "*"
