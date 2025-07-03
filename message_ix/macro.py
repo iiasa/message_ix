@@ -262,8 +262,6 @@ def extrapolate(
         The index does *not* have a ``year`` dimension; the data are implicitly for
         `ym1`.
     """
-    from sys import version_info
-
     from scipy.optimize import curve_fit
 
     def f(x, b, m):
@@ -278,11 +276,8 @@ def extrapolate(
 
     # Apply fitted_intercept to grouped data
     groupby_cols = set(model_data.columns) - {"year", "value"}
-    apply_kwargs = {"include_groups": False} if version_info.minor > 8 else {}
     result = (
-        model_data.groupby(list(groupby_cols))
-        .apply(fitted_intercept, **apply_kwargs)
-        .rename("value")
+        model_data.groupby(list(groupby_cols)).apply(fitted_intercept).rename("value")
     )
 
     # Convert "commodity" and "level" to "sector"
