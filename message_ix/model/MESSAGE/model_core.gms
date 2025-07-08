@@ -111,16 +111,7 @@ Positive Variables
 
 * content of storage
     STORAGE(node,tec,mode,level,commodity,year_all,time)       state of charge (SoC) of storage at each sub-annual time slice (positive)
-
-*    LAND_COST_DYN(node,year_all)                     dynamically calculated cost from the land-use emulator
-    LAND_COST_NEW(node, year_all)     Land cost including debt from scenario switching
-    LAND_COST_DEBT(node, year_all,year_all2) Land cost debt from scenario switching 
-    EMISS_LU_AUX(node,emission,type_tec,year_all,year_all2)    positive emissions overshoot of historic emissions compared to chosen land scenario mix
-
-* content of storage
-    STORAGE(node,tec,mode,level,commodity,year_all,time)       state of charge (SoC) of storage at each sub-annual time slice (positive)
 ;
-
 
 Variables
 * intertemporal stock variables (input or output quantity into the stock)
@@ -306,7 +297,7 @@ Equations
     DYNAMIC_LAND_SCEN_CONSTRAINT_LO dynamic constraint on land scenario change (lower bound)
     DYNAMIC_LAND_TYPE_CONSTRAINT_UP dynamic constraint on land-use change (upper bound)
     DYNAMIC_LAND_TYPE_CONSTRAINT_LO dynamic constraint on land-use change (lower bound)
-*    TAU_CONSTRAINT                  constraint on land-use intensity growth (regional tau is not allowed to shrink)
+    TAU_CONSTRAINT                  constraint on land-use intensity growth (regional tau is not allowed to shrink)
     RELATION_EQUIVALENCE            auxiliary equation to simplify the implementation of relations
     RELATION_CONSTRAINT_UP          upper bound of relations (linear constraints)
     RELATION_CONSTRAINT_LO          lower bound of relations (linear constraints)
@@ -1955,7 +1946,17 @@ EMISSION_EQUIVALENCE_AUX_CUMU(location,emission,type_tec,year) $ emission_cumula
     ;
 
 
-* find positive emissions overshoot for history of current land scenario mix compared to mix of earlier time steps
+* find positive emissions overshoot for history of current land scenario mix compared to mix of earlier time steps by
+* applying both the current and previously chosen land mix to the previous time steps.
+*
+*
+*   .. math::
+*      \text{EMISS_LU_AUX}_{n^L,e^c,\widehat{t},y,\widehat{y}} \text{ if } \widehat{y} < y >=
+*               \sum_{s} \Bigg( \text{land_emission}_{n^L,s,\widehat{y},e^c} \cdot \text{LAND}_{n^L,s,y} \\
+*              - \text{land_emission}_{n^L,s,\widehat{y},e^c} \cdot \text{LAND}_{n^L,s,\widehat{y}} \Bigg) \\
+*              - \sum_{\dot{y}} \text{EMISS_LU_AUX}_{n^L,e^c,\widehat{t},\dot{y},\widehat{y}} \text{ if } \widehat{y} < \dot{y} \text{ and } \dot{y} < y
+*
+***
 EMISSION_EQUIVALENCE_AUX_CUMU_AUX(location,emission,type_tec,year,year2) $ (emission_cumulative(emission) AND model_horizon(year) AND year2.pos < year.pos)..
     EMISS_LU_AUX(location,emission,type_tec,year,year2) $ ( year2.pos < year.pos ) 
     =G=
@@ -1964,8 +1965,22 @@ EMISSION_EQUIVALENCE_AUX_CUMU_AUX(location,emission,type_tec,year,year2) $ (emis
             - LAND(location, land_scenario, year2) * land_emission(location, land_scenario, year2, emission) )
         - SUM(year3 $ ( year3.pos < year.pos AND year2.pos < year3.pos ), EMISS_LU_AUX(location, emission,type_tec, year3, year2) ) ;
 
-* calculate scenario cost of current land scenario mix under consideration of its path dependencies and 
-* associated cost differences compared to the land scenario mix of earlier time steps
+* .. _equation_land_cost_cumu:
+*
+* Equation LAND_COST_CUMU
+* """""""""""""""""""""""""""""
+* This auxillary equation calculated the true cost of a specific land-use scenario by adding the path-dependency cost
+* of the current land scenario mix on top of the base cost. This is done by comparing the cost of the current land scenario mix
+* if followed over the whole model horizon up to this time step to the cost in every time step stemming from the chosen scenario
+* mix minus any debt that has been accounted for already.
+*
+*
+*   .. math::
+*      \text{LAND_COST_NEW}_{n^L,y} =
+*               \sum_{s} \text{land_cost}_{n^L,s,y} \cdot \text{LAND}_{n^L,s,y} \\
+*              + \sum_{\widehat{y}} \text{LAND_COST_DEBT}_{n^L,y,\widehat{y}}
+*
+***
 LAND_COST_CUMU(location, year)$( model_horizon(year) )..
        LAND_COST_NEW(location, year) =E=
        SUM(land_scenario$( land_cost(location,land_scenario,year) ),
@@ -1974,6 +1989,18 @@ LAND_COST_CUMU(location, year)$( model_horizon(year) )..
             LAND_COST_DEBT(location, year, year2)
             ) ; 
 
+* Calculate scenario cost debt of current land scenario mix by comparing the current land scenario mix application to the actually applied
+* mix in previous time steps. To avoid double accounting of any scenario cost debt, subtract the debt associated with a previous step accounted
+* for in other time steps.
+*
+*
+*   .. math::
+*      \text{LAND_COST_DEBT}_{n^L,y,\widehat{y}} \text{ if } \widehat{y} < y >=
+*               \sum_{s} \Bigg(  \text{LAND}_{n^L,s,y} \cdot \text{land_cost}_{n^L,s,\widehat{y}} \\
+*               - \text{LAND}_{n^L,s,\widehat{y}} \cdot \text{land_cost}_{n^L,s,\widehat{y}} \Bigg) \cdot \text{df_period}_{\widehat{y}} \ \text{df_period}_{y} \\
+*              - \sum_{\dot{y}} \text{LAND_COST_DEBT}_{n^L,\dot{y},\widehat{y}} \text{ if } \widehat{y} < \dot{y} \text{ and } \dot{y} < y
+*
+***
 LAND_COST_CUMU_DEBT(location, year, year2) $ (model_horizon(year) AND year2.pos < year.pos)..
         LAND_COST_DEBT(location, year, year2) $ ( year2.pos < year.pos ) =G=
         SUM(land_scenario$( land_cost(location,land_scenario,year) ),
@@ -2203,20 +2230,36 @@ DYNAMIC_LAND_TYPE_CONSTRAINT_LO(node,year,land_type)$( is_dynamic_land_lo(node,y
 %SLACK_LAND_TYPE_LO% - SLACK_LAND_TYPE_LO(node,year,land_type)
 ;
 
+***
+*
+* To ensure correct replication of MAgPIE behavior, the following constraint ensures that
+* land-use intensity cannot decrease over time
+*
+* .. _equation_tau_constraint:
+*
+* Equation TAU_CONSTRAINT
+* """"""""""""""""""""""""""""""""""""""""
+*
+*  .. math::
+*     \sum_{s \in S} \text{land_output Tau}_{n,s,y,l,h} &\cdot \text{LAND}_{n,s,y}
+*         \geq \sum_{s \in S} \big( \text{land_output Tau}_{n,s,y-1,l,h}
+*                            & \quad \quad \cdot \big( \text{LAND}_{n,s,y-1} + \text{historical_land}_{n,s,y-1} \big) \big)
+*
+***
 
-* TAU_CONSTRAINT(node, year, level, time) .. 
-*    SUM(land_scenario$( map_land(node,land_scenario,year) ),
-*         land_output(node, land_scenario, year, "Landuse intensity indicator Tau", level, time) 
-*           * LAND(node, land_scenario, year)
-*         ) =G=
-*     SUM((year_all2)$( seq_period(year_all2,year) ),
-*         SUM(land_scenario$( map_land(node,land_scenario,year) ),
-*             land_output(node, land_scenario, year_all2, "Landuse intensity indicator Tau", level, time) 
-*               * ( LAND(node, land_scenario, year_all2) $ ( model_horizon(year_all2) ) 
-*                   + historical_land(node,land_scenario,year_all2) )
-*             )
-*       )
-* ;
+ TAU_CONSTRAINT(node, year, level, time) ..
+    SUM(land_scenario$( map_land(node,land_scenario,year) ),
+         land_output(node, land_scenario, year, "Landuse intensity indicator Tau", level, time)
+           * LAND(node, land_scenario, year)
+         ) =G=
+     SUM((year_all2)$( seq_period(year_all2,year) ),
+         SUM(land_scenario$( map_land(node,land_scenario,year) ),
+             land_output(node, land_scenario, year_all2, "Landuse intensity indicator Tau", level, time)
+               * ( LAND(node, land_scenario, year_all2) $ ( model_horizon(year_all2) )
+                   + historical_land(node,land_scenario,year_all2) )
+             )
+       )
+ ;
 
 
 *----------------------------------------------------------------------------------------------------------------------*
