@@ -97,11 +97,9 @@ local_partial_types = true
 [[tool.mypy.overrides]]
 # Packages/modules for which no type hints are available.
 module = [
+  "pooch",
   "pyam.*",
   "scipy.*",
-  # Indirectly via ixmp; this should be a subset of the list in ixmp's pyproject.toml
-  "jpype",
-  "memory_profiler",
 ]
 ignore_missing_imports = true
 

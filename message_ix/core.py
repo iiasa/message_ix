@@ -1,7 +1,7 @@
 import logging
 import os
 from collections.abc import Iterable, Mapping, Sequence
-from functools import lru_cache, partial
+from functools import lru_cache
 from itertools import chain, product, zip_longest
 from typing import Optional, TypeVar, Union
 from warnings import warn
@@ -256,9 +256,9 @@ class Scenario(ixmp.Scenario):
         key_or_data: Optional[
             Union[int, str, Sequence[Union[int, str]], dict, pd.DataFrame]
         ] = None,
-        value=None,
-        unit: Optional[str] = None,
-        comment: Optional[str] = None,
+        value: Union[float, Iterable[float], None] = None,
+        unit: Union[str, Iterable[str], None] = None,
+        comment: Union[str, Iterable[str], None] = None,
     ) -> None:
         # ixmp.Scenario.add_par() is typed as accepting only str, but this method also
         # accepts int for "year"-like dimensions. Proxy the call to avoid type check
@@ -293,7 +293,13 @@ class Scenario(ixmp.Scenario):
     def add_set(
         self,
         name: str,
-        key: Union[int, str, Sequence[Union[str, int]], dict, pd.DataFrame],
+        key: Union[
+            int,
+            str,
+            Iterable[object],
+            dict[str, Union[Sequence[int], Sequence[str]]],
+            pd.DataFrame,
+        ],
         comment: Union[str, Sequence[str], None] = None,
     ) -> None:
         # ixmp.Scenario.add_par() is typed as accepting only str, but this method also
@@ -840,10 +846,9 @@ class Scenario(ixmp.Scenario):
 
         # - Iterate over tuples of (item_name, ix_type); only those indexed by `name`.
         # - First all sets indexed sets; then all parameters.
-        items = partial(self.items, indexed_by=name, par_data=False)
         for item_name, ix_type in chain(
-            zip_longest(items(ItemType.SET), [], fillvalue="set"),
-            zip_longest(items(ItemType.PAR), [], fillvalue="par"),
+            zip_longest(self.items(ItemType.SET, indexed_by=name), [], fillvalue="set"),
+            zip_longest(self.items(ItemType.PAR, indexed_by=name), [], fillvalue="par"),
         ):
             # Identify some index names of this set; only those where the corresponding
             # index set is `name`

@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Optional
 from warnings import warn
 
 import ixmp.model.gams
+import pandas as pd
 from ixmp import config
 from ixmp.backend import ItemType
 from ixmp.backend.jdbc import JDBCBackend
@@ -22,9 +23,7 @@ from message_ix.util.scenario_data import REQUIRED_EQUATIONS, REQUIRED_VARIABLES
 if TYPE_CHECKING:
     from logging import LogRecord
 
-    import ixmp.core.scenario
-
-    import message_ix.core
+    from ixmp.types import InitializeItemsKwargs
 
 
 log = logging.getLogger(__name__)
@@ -127,19 +126,13 @@ class Item:
         """
         return str(self.type.name).lower()
 
-    def to_dict(self) -> dict:
-        """Return the :class:`dict` representation used internally in :mod:`ixmp`.
-
-        This has the keys:
-
-        - :py:`ix_type`: same as :attr:`ix_type`.
-        - :py:`idx_sets`: same as :attr:`coords`.
-        - :py:`idx_names`: same as :attr:`dims`, but only included if these are (a)
-          non-empty and (b) different from :attr:`coords`.
-        """
-        result = dict(ix_type=self.ix_type, idx_sets=self.coords)
+    def to_dict(self) -> "InitializeItemsKwargs":
+        """Return the :class:`dict` representation used internally in :mod:`ixmp`."""
+        result: "InitializeItemsKwargs" = dict(
+            ix_type=self.ix_type, idx_sets=self.coords
+        )
         if self.dims:
-            result.update(idx_names=self.dims)
+            result["idx_names"] = self.dims
         return result
 
 
@@ -149,7 +142,7 @@ def _item_shorthand(cls, type, name, expr="", description=None, **kwargs):
     cls.items[name] = Item(name, type, expr, description=description, **kwargs)
 
 
-def item(ix_type, expr, description: Optional[str] = None) -> dict:
+def item(ix_type, expr, description: Optional[str] = None) -> "InitializeItemsKwargs":
     """Return a dict with idx_sets and idx_names, given a string `expr`.
 
     .. deprecated:: 3.8.0
@@ -209,7 +202,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
 
         super().__init__(name, **model_options)
 
-    def run(self, scenario: "ixmp.core.scenario.Scenario") -> None:
+    def run(self, scenario: "ixmp.Scenario") -> None:
         """Execute the model.
 
         GAMSModel creates a file named ``cplex.opt`` in the model directory containing
@@ -248,7 +241,7 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         return result
 
 
-def _check_structure(scenario: "ixmp.core.scenario.Scenario"):
+def _check_structure(scenario: "ixmp.Scenario"):
     """Check dimensionality of some items related to the storage representation.
 
     Yields a sequence of 4-tuples:
@@ -338,7 +331,7 @@ class MESSAGE(GAMSModel):
     items: MutableMapping[str, Item] = dict()
 
     @staticmethod
-    def enforce(scenario: "message_ix.core.Scenario") -> None:
+    def enforce(scenario: "ixmp.Scenario") -> None:
         """Enforce data consistency in `scenario`."""
         # Raise an exception if any of the storage items have incorrect dimensions, i.e.
         # non-empty error messages
@@ -359,7 +352,11 @@ class MESSAGE(GAMSModel):
 
             # Existing and expected contents
             existing = scenario.set(set_name)
-            expected = scenario.par(par_name).drop(columns=["value", "unit"])
+            par_data = scenario.par(par_name)
+            assert isinstance(par_data, pd.DataFrame) and isinstance(
+                existing, pd.DataFrame
+            )
+            expected = par_data.drop(columns=["value", "unit"])
 
             if existing.equals(expected):
                 continue  # Contents are as expected; do nothing
@@ -370,7 +367,7 @@ class MESSAGE(GAMSModel):
                 scenario.add_set(set_name, expected)
 
     @classmethod
-    def initialize(cls, scenario: "ixmp.core.scenario.Scenario") -> None:
+    def initialize(cls, scenario: "ixmp.Scenario") -> None:
         """Set up `scenario` with required sets and parameters for MESSAGE.
 
         See Also
@@ -455,9 +452,9 @@ class MESSAGE(GAMSModel):
         # compose_maps(scenario=scenario)
 
         # Commit if anything was removed
-        maybe_commit(scenario, state, f"{cls.__name__}.initialize")
+        maybe_commit(scenario, bool(state), f"{cls.__name__}.initialize")
 
-    def run(self, scenario: "ixmp.core.scenario.Scenario") -> None:
+    def run(self, scenario: "ixmp.Scenario") -> None:
         from message_ix.core import Scenario
         from message_ix.util.gams_io import (
             add_auxiliary_items_to_container_data_list,
