@@ -15,8 +15,8 @@ from ixmp import config
 from ixmp.backend import ItemType
 from ixmp.backend.jdbc import JDBCBackend
 from ixmp.util import maybe_check_out, maybe_commit
+from ixmp.util.ixmp4 import is_ixmp4backend
 
-from message_ix.util.ixmp4 import on_ixmp4backend
 from message_ix.util.scenario_data import REQUIRED_EQUATIONS, REQUIRED_VARIABLES
 
 if TYPE_CHECKING:
@@ -476,7 +476,7 @@ class MESSAGE(GAMSModel):
 
         compose_maps(scenario=scenario)
 
-        if on_ixmp4backend(scenario):
+        if is_ixmp4backend(scenario.platform._backend):
             # ixmp.model.gams.GAMSModel.__init__() creates the container_data attribute
             # from its .defaults and any user kwargs
 

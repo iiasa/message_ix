@@ -12,8 +12,7 @@ import pandas as pd
 from ixmp.backend import ItemType
 from ixmp.backend.jdbc import JDBCBackend
 from ixmp.util import as_str_list, maybe_check_out, maybe_commit
-
-from message_ix.util.ixmp4 import on_ixmp4backend
+from ixmp.util.ixmp4 import is_ixmp4backend
 
 # from message_ix.util.scenario_data import PARAMETERS
 
@@ -266,7 +265,7 @@ class Scenario(ixmp.Scenario):
         # failures.
         # TODO Move this upstream, to ixmp
 
-        if on_ixmp4backend(self):
+        if is_ixmp4backend(self.platform._backend):
             from message_ix.util.scenario_setup import check_existence_of_units
 
             # Check for existence of required units
