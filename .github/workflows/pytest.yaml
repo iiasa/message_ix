@@ -110,6 +110,13 @@ jobs:
       # Work around ts-graphviz/setup-graphviz#630
       if: matrix.os != 'macos-13'
 
+    - name: Set Java version on Windows
+      if: startsWith(matrix.os, 'windows-')
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '21'
+
     - name: Cache GAMS installer
       uses: actions/cache@v4
       with:
@@ -171,6 +178,13 @@ jobs:
         activate-environment: true
         enable-cache: true
         python-version: ${{ env.python-version }}
+
+    - name: Set Java version on Windows
+      if: startsWith(matrix.os, 'windows-')
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '21'
 
     - name: Set RETICULATE_PYTHON
       # Retrieve the Python executable set up above
