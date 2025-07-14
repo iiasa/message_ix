@@ -20,66 +20,150 @@ $LOAD balance_equality, time_relative
 $LOAD shares
 $LOAD addon, type_addon, cat_addon, map_tec_addon
 $LOAD storage_tec, level_storage, map_tec_storage
-
 * Version information; conditional load to allow older GDX files
 $ifthen gdxSetType ixmp_version
 $load ixmp_version
 $endif
-
 $GDXIN
 
-Execute_load '%in%'
-* general parameters
-duration_period, duration_time, interestrate,
-* resources parameters
-resource_volume, resource_cost, is_bound_extraction_up, bound_extraction_up, resource_remaining,
-* technology technical-engineering parameters and economic costs
-input, output, construction_time, technical_lifetime
-capacity_factor, operation_factor, min_utilization_factor, inv_cost, fix_cost, var_cost,
-* upper and lower bounds on new capacity investment, total installed capacity and activity (including mapping sets)
-is_bound_new_capacity_up, is_bound_new_capacity_lo, bound_new_capacity_up, bound_new_capacity_lo,
-is_bound_total_capacity_up, is_bound_total_capacity_lo, bound_total_capacity_up, bound_total_capacity_lo,
-is_bound_activity_up, bound_activity_up, bound_activity_lo,
-* dynamic constraints on new capacity investment and activity of technologies
-is_dynamic_new_capacity_up, initial_new_capacity_up, growth_new_capacity_up,
-is_dynamic_new_capacity_lo, initial_new_capacity_lo, growth_new_capacity_lo,
-is_dynamic_activity_up, initial_activity_up, growth_activity_up,
-is_dynamic_activity_lo, initial_activity_lo, growth_activity_lo,
-* parameters for soft relaxation of dynamic constraints
-abs_cost_new_capacity_soft_up, abs_cost_new_capacity_soft_lo, level_cost_new_capacity_soft_up, level_cost_new_capacity_soft_lo,
-abs_cost_activity_soft_up, abs_cost_activity_soft_lo, level_cost_activity_soft_up, level_cost_activity_soft_lo,
-soft_new_capacity_up, soft_new_capacity_lo, soft_activity_up, soft_activity_lo,
-* share constraints
-map_shares_commodity_share,map_shares_commodity_total,share_commodity_up,share_commodity_lo
-share_mode_up,share_mode_lo,
-* addon technologies
-addon_conversion, addon_up, addon_lo
-* parameters for reliability, flexibility and renewable potential constraints
-rating_bin, reliability_factor, peak_load_factor, flexibility_factor
-renewable_capacity_factor, renewable_potential
-* emission factors, bounds and taxes on emissions (including mapping sets)
-historical_emission, emission_factor, emission_scaling, is_bound_emission, bound_emission, tax_emission,
-* historical values of new capacity investment, activity and extraction
-historical_new_capacity, historical_activity, historical_extraction
-* parameters for land-use model emulator
-historical_land, land_cost, land_input, land_output, land_use, land_emission,
-is_dynamic_land_scen_up, initial_land_scen_up, growth_land_scen_up,
-is_dynamic_land_scen_lo, initial_land_scen_lo, growth_land_scen_lo,
-is_dynamic_land_up, initial_land_up, dynamic_land_up, growth_land_up,
-is_dynamic_land_lo, initial_land_lo, dynamic_land_lo, growth_land_lo, growth_land_lo,
-* parameters for generic relations (linear constraints)
-is_relation_upper, is_relation_lower, relation_upper, relation_lower,
-relation_cost, relation_total_capacity, relation_new_capacity, relation_activity,
-* energy stocks
-commodity_stock,
-* demand parameters
-demand_fixed=demand
-* fixing variables to pre-specified values
-is_fixed_extraction, is_fixed_stock, is_fixed_new_capacity, is_fixed_capacity, is_fixed_activity, is_fixed_land
-fixed_extraction, fixed_stock, fixed_new_capacity, fixed_capacity, fixed_activity, fixed_land
-* storage parameters
-storage_initial, storage_self_discharge, time_order
+* Load indexed sets and parameters
+Execute_load '%in%',
+  abs_cost_activity_soft_lo,
+  abs_cost_activity_soft_up,
+  abs_cost_new_capacity_soft_lo,
+  abs_cost_new_capacity_soft_up,
+  addon_conversion,
+  addon_lo,
+  addon_up,
+  bound_activity_lo,
+  bound_activity_up,
+  bound_emission,
+  bound_extraction_up,
+  bound_new_capacity_lo,
+  bound_new_capacity_up,
+  bound_total_capacity_lo,
+  bound_total_capacity_up,
+  capacity_factor,
+  commodity_stock,
+  construction_time,
+  demand_fixed = demand,
+  duration_period,
+  duration_time,
+  dynamic_land_lo,
+  dynamic_land_up,
+  emission_factor,
+  emission_scaling,
+  fix_cost,
+  fixed_activity,
+  fixed_capacity,
+  fixed_extraction,
+  fixed_land,
+  fixed_new_capacity,
+  fixed_stock,
+  flexibility_factor,
+  growth_activity_lo,
+  growth_activity_up,
+  growth_land_lo,
+  growth_land_scen_lo,
+  growth_land_scen_up,
+  growth_land_up,
+  growth_new_capacity_lo,
+  growth_new_capacity_up,
+  historical_activity,
+  historical_emission,
+  historical_extraction,
+  historical_land,
+  historical_new_capacity,
+  initial_activity_lo,
+  initial_activity_up,
+  initial_land_lo,
+  initial_land_scen_lo,
+  initial_land_scen_up,
+  initial_land_up,
+  initial_new_capacity_lo,
+  initial_new_capacity_up,
+  input,
+  interestrate,
+  inv_cost,
+  is_bound_activity_up,
+  is_bound_emission,
+  is_bound_extraction_up,
+  is_bound_new_capacity_lo,
+  is_bound_new_capacity_up,
+  is_bound_total_capacity_lo,
+  is_bound_total_capacity_up,
+  is_dynamic_activity_lo,
+  is_dynamic_activity_up,
+  is_dynamic_land_lo,
+  is_dynamic_land_scen_lo,
+  is_dynamic_land_scen_up,
+  is_dynamic_land_up,
+  is_dynamic_new_capacity_lo,
+  is_dynamic_new_capacity_up,
+  is_fixed_activity,
+  is_fixed_capacity,
+  is_fixed_extraction,
+  is_fixed_land,
+  is_fixed_new_capacity,
+  is_fixed_stock,
+  is_relation_lower,
+  is_relation_upper,
+  land_cost,
+  land_emission,
+  land_input,
+  land_output,
+  land_use,
+  level_cost_activity_soft_lo,
+  level_cost_activity_soft_up,
+  level_cost_new_capacity_soft_lo,
+  level_cost_new_capacity_soft_up,
+  map_shares_commodity_share,
+  map_shares_commodity_total,
+  min_utilization_factor,
+  operation_factor,
+  output,
+  peak_load_factor,
+  rating_bin,
+  relation_activity,
+  relation_cost,
+  relation_lower,
+  relation_new_capacity,
+  relation_total_capacity,
+  relation_upper,
+  reliability_factor,
+  renewable_capacity_factor,
+  renewable_potential,
+  resource_cost,
+  resource_remaining,
+  resource_volume,
+  share_commodity_lo,
+  share_commodity_up,
+  share_mode_lo,
+  share_mode_up,
+  soft_activity_lo,
+  soft_activity_up,
+  soft_new_capacity_lo,
+  soft_new_capacity_up,
+  storage_initial,
+  storage_self_discharge,
+  tax_emission,
+  technical_lifetime,
+  time_order,
+  var_cost
 ;
+
+$IFTHEN %MESSAGE_CAP_COMM% == "1"
+
+execute_load '%in%',
+  input_cap,
+  input_cap_new,
+  input_cap_ret,
+  output_cap,
+  output_cap_new,
+  output_cap_ret
+;
+
+$ENDIF
 
 *----------------------------------------------------------------------------------------------------------------------*
 * Sets derived from input sets                                                                                         *
@@ -102,6 +186,16 @@ type_tec_total(type_tec)$SUM(
 *----------------------------------------------------------------------------------------------------------------------*
 
 map_node(node,node) = yes ;
+
+*----------------------------------------------------------------------------------------------------------------------*
+* ensure that map_tec_extended includes entire model horizon when lifetime is defined.
+*----------------------------------------------------------------------------------------------------------------------*
+
+$IFTHEN %MESSAGE_CAP_COMM% == "1"
+
+map_tec_extended(node,tec,year_all)$technical_lifetime(node,tec,year_all) = yes;
+
+$ENDIF
 
 *----------------------------------------------------------------------------------------------------------------------*
 * auxiliary mappings for the implementation of bounds over all modes and system reliability/flexibility constraints    *
@@ -135,21 +229,48 @@ map_tec_act(node,tec,year_all,mode,time)$( map_tec_time(node,tec,year_all,time) 
    map_tec_mode(node,tec,year_all,mode) ) = yes ;
 
 * mapping of technology lifetime to all 'current' periods (for all non-investment technologies)
-map_tec_lifetime(node,tec,year_all,year_all)$( map_tec(node,tec,year_all) ) = yes ;
+map_tec_lifetime(node,tec,year_all,year_all)$map_tec(node,tec,year_all) = yes;
 
 * mapping of technology lifetime to all periods 'year_all' which are within the economic lifetime
 * (if built in period 'vintage')
-map_tec_lifetime(node,tec,vintage,year_all)$( map_tec(node,tec,vintage) AND map_tec(node,tec,year_all)
-    AND map_period(vintage,year_all)
-    AND duration_period_sum(vintage,year_all) < technical_lifetime(node,tec,vintage) ) = yes ;
+map_tec_lifetime(node,tec,vintage,year_all)$(
+  map_tec(node,tec,vintage)
+  AND map_tec(node,tec,year_all)
+  AND map_period(vintage,year_all)
+  AND duration_period_sum(vintage,year_all) < technical_lifetime(node,tec,vintage)
+) = yes;
 
 * mapping of technology lifetime to all periods 'year_all' which were built prior to the beginning of the model horizon
 map_tec_lifetime(node,tec,historical,year_all)$(
-    map_tec(node,tec,year_all)
-    AND map_period(historical,year_all)
-    AND historical_new_capacity(node,tec,historical)
-    AND duration_period_sum(historical,year_all) < technical_lifetime(node,tec,historical)
-) = yes ;
+  map_tec(node,tec,year_all)
+  AND map_period(historical,year_all)
+  AND historical_new_capacity(node,tec,historical)
+  AND duration_period_sum(historical,year_all) < technical_lifetime(node,tec,historical)
+) = yes;
+
+* Same conditions as map_tec_lifetime, except inclusive of historic periods via map_tec_extended.
+* If MESSAGE_CAP_COMM is "0", map_tec_extended is empty and all these are no-ops.
+map_tec_lifetime_extended(node,tec,year_all,year_all)$map_tec_extended(node,tec,year_all) = yes;
+map_tec_lifetime_extended(node,tec,vintage,year_all)$(
+  map_tec_extended(node,tec,vintage)
+  AND map_tec_extended(node,tec,year_all)
+  AND map_period(vintage,year_all)
+  AND duration_period_sum(vintage,year_all) < technical_lifetime(node,tec,vintage)
+) = yes;
+map_tec_lifetime_extended(node,tec,historical,year_all)$(
+  map_tec_extended(node,tec,year_all)
+  AND map_period(historical,year_all)
+  AND historical_new_capacity(node,tec,historical)
+  AND duration_period_sum(historical,year_all) < technical_lifetime(node,tec,historical)
+) = yes;
+
+* NB map_cap_ret_hist_* are populated after remaining_capacity_extended in scaling_investment_costs.gms
+map_cap_ret(node,tec,vintage,y_prev,y_all)$(
+  inv_tec(tec)
+  AND map_tec_lifetime(node,tec,vintage,y_prev)
+  AND NOT first_period(y_all)
+  AND seq_period(y_prev,y_all)
+) = yes;
 
 * mapping of renewable technologies to their input commodities
 map_ren_com(node,renewable_tec,commodity,year_all)$(
