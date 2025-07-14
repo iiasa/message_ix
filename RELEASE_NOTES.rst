@@ -1,8 +1,10 @@
-.. Next release
-.. ============
+Next release
+============
 
-.. All changes
-.. -----------
+All changes
+-----------
+
+- Document the :ref:`minimum version of Java <install-java>` required for :class:`ixmp.JDBCBackend <ixmp.backend.jdbc.JDBCBackend>` (:pull:`962`).
 
 .. _v3.11.1:
 

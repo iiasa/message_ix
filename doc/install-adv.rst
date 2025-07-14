@@ -57,16 +57,26 @@ of which the most popular is OpenJDK.
   - `Zulu <https://www.azul.com/downloads/?package=jre#zulu>`_.
   - `Corretto <https://aws.amazon.com/corretto/>`_.
 
-.. caution::
+  .. caution::
 
-   Oracle provides releases branded simply “Java” at https://www.java.com,
-   as well as `Oracle OpenJDK builds <https://jdk.java.net/>`_.
-   Not all of these are free to use;
-   for instance, use by several people in the same organization may require a paid license.
-   `This news article <https://www.theregister.com/2025/05/09/users_advised_to_review_oracle_java_use/>`__ and other coverage
-   explain how license fee demands may come as a surprise to users.
+     Oracle provides releases branded simply “Java” at https://www.java.com,
+     as well as `Oracle OpenJDK builds <https://jdk.java.net/>`_.
+     Not all of these are free to use;
+     for instance, use by several people in the same organization may require a paid license.
+     `This news article <https://www.theregister.com/2025/05/09/users_advised_to_review_oracle_java_use/>`__ and other coverage
+     explain how license fee demands may come as a surprise to users.
 
-   We recommend one of the above, non-Oracle alternatives, which do not use paid licensing.
+     We recommend one of the above, non-Oracle alternatives, which do not use paid licensing.
+
+- JDBCBackend uses the :mod:`jpype` package (`‘JPype1’`_ on PyPI) to interact with the JRE.
+
+  From JPype version 1.6.0 (released 2025-07-07),
+  :ref:`its requirements <jpype:userguide:key requirements>` include **JRE version 11 or greater**.
+  You **should** use such a JRE version;
+  in general it is good practice to use the *latest* available version.
+
+  If it is only possible to use JRE version 8,
+  then install JPype version 1.5.2 or earlier.
 
 If using Anaconda or Miniconda, installing a JDK/JRE manually is *not required*.
 This is because the ``message-ix`` conda-forge package depends on the `openjdk <https://anaconda.org/conda-forge/openjdk>`_ package,
@@ -481,6 +491,7 @@ See the `Git documentation`_ for more details.
 .. _`Graphviz`: https://www.graphviz.org/
 .. _`its conda-forge package`: https://anaconda.org/conda-forge/graphviz
 .. _`Graphviz download page`: https://www.graphviz.org/download/
+.. _`‘JPype1’`: https://pypi.org/project/jpype1
 .. _`conda`: https://docs.conda.io/projects/conda/en/stable/
 .. _`IIASA YouTube channel`: https://www.youtube.com/user/IIASALive
 .. _`Miniconda`: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
