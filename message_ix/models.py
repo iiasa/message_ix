@@ -18,8 +18,6 @@ from ixmp.backend.jdbc import JDBCBackend
 from ixmp.util import maybe_check_out, maybe_commit
 from ixmp.util.ixmp4 import is_ixmp4backend
 
-from message_ix.util.scenario_data import REQUIRED_EQUATIONS, REQUIRED_VARIABLES
-
 if TYPE_CHECKING:
     from logging import LogRecord
 
@@ -461,6 +459,7 @@ class MESSAGE(GAMSModel):
             add_default_data_to_container_data_list,
             store_message_version,
         )
+        from message_ix.util.scenario_data import REQUIRED_EQUATIONS, REQUIRED_VARIABLES
         from message_ix.util.scenario_setup import (
             compose_maps,
             ensure_required_indexsets_have_data,
