@@ -1,7 +1,7 @@
 import logging
 import os
 from collections.abc import Iterable, Mapping, Sequence
-from functools import lru_cache, partial
+from functools import lru_cache
 from itertools import chain, product, zip_longest
 from typing import Optional, TypeVar, Union
 from warnings import warn
@@ -12,8 +12,7 @@ import pandas as pd
 from ixmp.backend import ItemType
 from ixmp.backend.jdbc import JDBCBackend
 from ixmp.util import as_str_list, maybe_check_out, maybe_commit
-
-from message_ix.util.ixmp4 import on_ixmp4backend
+from ixmp.util.ixmp4 import is_ixmp4backend
 
 # from message_ix.util.scenario_data import PARAMETERS
 
@@ -210,7 +209,7 @@ class Scenario(ixmp.Scenario):
         -------
         list of str
         """
-        return self._backend("cat_list", name)
+        return self.platform._backend.cat_list(self, name)
 
     def add_cat(self, name, cat, keys, is_unique=False):
         """Map elements from *keys* to category *cat* within set *name*.
@@ -227,7 +226,9 @@ class Scenario(ixmp.Scenario):
             If `True`, then *cat* must have only one element. An exception is
             raised if *cat* already has an element, or if ``len(keys) > 1``.
         """
-        self._backend("cat_set_elements", name, str(cat), as_str_list(keys), is_unique)
+        self.platform._backend.cat_set_elements(
+            self, name, str(cat), as_str_list(keys), is_unique
+        )
 
     def cat(self, name, cat):
         """Return a list of all set elements mapped to a category.
@@ -247,7 +248,7 @@ class Scenario(ixmp.Scenario):
         return list(
             map(
                 int if name == "year" else lambda v: v,
-                self._backend("cat_get_elements", name, cat),
+                self.platform._backend.cat_get_elements(self, name, cat),
             )
         )
 
@@ -257,16 +258,16 @@ class Scenario(ixmp.Scenario):
         key_or_data: Optional[
             Union[int, str, Sequence[Union[int, str]], dict, pd.DataFrame]
         ] = None,
-        value=None,
-        unit: Optional[str] = None,
-        comment: Optional[str] = None,
+        value: Union[float, Iterable[float], None] = None,
+        unit: Union[str, Iterable[str], None] = None,
+        comment: Union[str, Iterable[str], None] = None,
     ) -> None:
         # ixmp.Scenario.add_par() is typed as accepting only str, but this method also
         # accepts int for "year"-like dimensions. Proxy the call to avoid type check
         # failures.
         # TODO Move this upstream, to ixmp
 
-        if on_ixmp4backend(self):
+        if is_ixmp4backend(self.platform._backend):
             from message_ix.util.scenario_setup import check_existence_of_units
 
             # Check for existence of required units
@@ -294,7 +295,13 @@ class Scenario(ixmp.Scenario):
     def add_set(
         self,
         name: str,
-        key: Union[int, str, Sequence[Union[str, int]], dict, pd.DataFrame],
+        key: Union[
+            int,
+            str,
+            Iterable[object],
+            dict[str, Union[Sequence[int], Sequence[str]]],
+            pd.DataFrame,
+        ],
         comment: Union[str, Sequence[str], None] = None,
     ) -> None:
         # ixmp.Scenario.add_par() is typed as accepting only str, but this method also
@@ -841,10 +848,9 @@ class Scenario(ixmp.Scenario):
 
         # - Iterate over tuples of (item_name, ix_type); only those indexed by `name`.
         # - First all sets indexed sets; then all parameters.
-        items = partial(self.items, indexed_by=name, par_data=False)
         for item_name, ix_type in chain(
-            zip_longest(items(ItemType.SET), [], fillvalue="set"),
-            zip_longest(items(ItemType.PAR), [], fillvalue="par"),
+            zip_longest(self.items(ItemType.SET, indexed_by=name), [], fillvalue="set"),
+            zip_longest(self.items(ItemType.PAR, indexed_by=name), [], fillvalue="par"),
         ):
             # Identify some index names of this set; only those where the corresponding
             # index set is `name`

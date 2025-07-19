@@ -10,8 +10,7 @@ if TYPE_CHECKING:
     from message_ix.core import Scenario
 
 from ixmp import Platform
-
-from message_ix.util.ixmp4 import on_ixmp4backend
+from ixmp.util.ixmp4 import is_ixmp4backend
 
 from .scenario_data import (
     DEFAULT_INDEXSET_DATA,
@@ -76,7 +75,7 @@ log = logging.getLogger(__name__)
 
 def add_default_data(scenario: "Scenario") -> None:
     """Add default data expected in a MESSAGEix Scenario."""
-    if not on_ixmp4backend(scenario):
+    if not is_ixmp4backend(scenario.platform._backend):
         return
 
     # Get the Run associated with the Scenario
@@ -128,7 +127,7 @@ def ensure_required_indexsets_have_data(scenario: "Scenario") -> None:
     ValueError
         If the required IndexSets are empty.
     """
-    if not on_ixmp4backend(scenario):
+    if not is_ixmp4backend(scenario.platform._backend):
         return
 
     indexsets_to_check = ("node", "technology", "year", "time")
@@ -175,7 +174,7 @@ def compose_dimension_map(
     dimension: 'node' or 'time'
         Whether to handle the spatial or temporal dimension.
     """
-    if not on_ixmp4backend(scenario):
+    if not is_ixmp4backend(scenario.platform._backend):
         return
 
     # Get the Run associated with the Scenario
@@ -325,7 +324,7 @@ def compose_period_map(scenario: "Scenario") -> None:
 
     This covers `assignPeriodMaps()` from ixmp_source.
     """
-    if not on_ixmp4backend(scenario):
+    if not is_ixmp4backend(scenario.platform._backend):
         return
 
     # Get the Run associated with the Scenario

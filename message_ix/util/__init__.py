@@ -60,15 +60,13 @@ def copy_model(
     )
 
     def _exclude_path(p: Path) -> bool:
-        # Skip certain files
+        """Skip certain files."""
         if p.suffix in (".gdx", ".log", ".lst") or re.search("225[a-z]+", str(p)):
             return False
         return True
 
-    paths = filter(_exclude_path, list(src_dir.rglob("*")))
-
     # Iterate over pre-filtered paths in `src_dir`
-    for original_path in paths:
+    for original_path in filter(_exclude_path, src_dir.rglob("*")):
         # Construct the destination path
         dst = path / original_path.relative_to(src_dir)
 

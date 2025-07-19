@@ -1,23 +1,6 @@
-from typing import Union
-
 import ixmp
 import ixmp.backend
-
-
-def on_ixmp4backend(obj: Union["ixmp.Platform", "ixmp.TimeSeries"]) -> bool:
-    """:any:`True` if `ts` is stored on :class:`IXMP4Backend`.
-
-    .. todo:: Move upstream, to :mod:`ixmp`.
-    """
-    if "ixmp4" not in ixmp.backend.available():
-        return False
-
-    from ixmp.backend.ixmp4 import IXMP4Backend
-
-    return isinstance(
-        (obj if isinstance(obj, ixmp.Platform) else obj.platform)._backend,
-        IXMP4Backend,
-    )
+from ixmp.util.ixmp4 import is_ixmp4backend
 
 
 def platform_compat(platform: "ixmp.Platform") -> None:
@@ -28,7 +11,7 @@ def platform_compat(platform: "ixmp.Platform") -> None:
     """
     from message_ix.util.scenario_data import REQUIRED_UNITS
 
-    if not on_ixmp4backend(platform):
+    if not is_ixmp4backend(platform._backend):
         return
 
     if not platform._units_to_warn_about:
