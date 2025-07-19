@@ -209,7 +209,7 @@ class Scenario(ixmp.Scenario):
         -------
         list of str
         """
-        return self._backend("cat_list", name)
+        return self.platform._backend.cat_list(self, name)
 
     def add_cat(self, name, cat, keys, is_unique=False):
         """Map elements from *keys* to category *cat* within set *name*.
@@ -226,7 +226,9 @@ class Scenario(ixmp.Scenario):
             If `True`, then *cat* must have only one element. An exception is
             raised if *cat* already has an element, or if ``len(keys) > 1``.
         """
-        self._backend("cat_set_elements", name, str(cat), as_str_list(keys), is_unique)
+        self.platform._backend.cat_set_elements(
+            self, name, str(cat), as_str_list(keys), is_unique
+        )
 
     def cat(self, name, cat):
         """Return a list of all set elements mapped to a category.
@@ -246,7 +248,7 @@ class Scenario(ixmp.Scenario):
         return list(
             map(
                 int if name == "year" else lambda v: v,
-                self._backend("cat_get_elements", name, cat),
+                self.platform._backend.cat_get_elements(self, name, cat),
             )
         )
 
