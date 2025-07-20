@@ -494,6 +494,7 @@ class MESSAGE(GAMSModel):
             # Request only required Equations per default
             self.equ_list = self.equ_list or []
             self.equ_list.extend(equation.gams_name for equation in REQUIRED_EQUATIONS)
+            self.equ_list.append("OBJECTIVE")
 
             # Request only required Variables per default
             self.var_list = self.var_list or []
