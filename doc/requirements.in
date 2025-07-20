@@ -1,7 +1,8 @@
-# Input file for pip-compile 
+# Input file for uv pip compile
 # Only specify the packages necessary for [docs]
 
 gitpython==3.1.44
+ixmp @ git+https://github.com/iiasa/ixmp.git@main
 numpydoc==1.8.0
 pandas==2.2.3
 sphinx==8.2.3
