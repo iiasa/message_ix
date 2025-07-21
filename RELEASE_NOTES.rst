@@ -5,6 +5,7 @@ All changes
 -----------
 
 - Document the :ref:`minimum version of Java <install-java>` required for :class:`ixmp.JDBCBackend <ixmp.backend.jdbc.JDBCBackend>` (:pull:`962`).
+- Improve type hinting (:pull:`963`).
 
 .. _v3.11.1:
 
