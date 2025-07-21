@@ -1,6 +1,7 @@
 import logging
 import re
 import sys
+from collections import defaultdict
 from functools import partial
 from pathlib import Path
 
@@ -13,6 +14,7 @@ from ixmp import Platform
 from ixmp.backend.jdbc import JDBCBackend
 from ixmp.report import Reporter as ixmp_Reporter
 from ixmp.testing import assert_logs
+from ixmp.util.ixmp4 import is_ixmp4backend
 from numpy.testing import assert_allclose
 from pandas.testing import assert_frame_equal, assert_series_equal
 
@@ -131,6 +133,28 @@ def test_reporter_from_scenario(
     assert_qty_equal(vom, rep.get(vom_key))
 
 
+#: Expected number of data points for items in the make_dantzig() scenario.
+EXP_LEN_DANTZIG = defaultdict(
+    lambda: 0,
+    ACT=8,
+    COMMODITY_BALANCE_GT=5,
+    COST_NODAL=6,
+    DEMAND=3,
+    OBJ=1,
+    OBJECTIVE=1,
+    PRICE_COMMODITY=3,
+    bound_activity_up=2,
+    demand=3,
+    duration_period=2,
+    duration_time=1,
+    input=6,
+    output=8,
+    ref_activity=2,
+    var_cost=6,
+)
+EXP_LEN_DANTZIG.update({"COMMODITY_BALANCE_GT-margin": 5, "OBJECTIVE-margin": 1})
+
+
 def test_reporter_from_dantzig(
     request: pytest.FixtureRequest, test_mp: Platform
 ) -> None:
@@ -140,7 +164,47 @@ def test_reporter_from_dantzig(
     rep = Reporter.from_scenario(scen)
 
     # Default target can be calculated
-    rep.get("all")
+    result = rep.get("all")
+
+    # Result contains data for expected number of model data items
+    # With IXMP4Backend, `scen` and thus `result` does not include variables 'C' and 'I'
+    assert 268 + (0 if is_ixmp4backend(test_mp._backend) else 2) == len(result)
+
+    # Items have expected length
+    for qty in result:
+        assert EXP_LEN_DANTZIG[qty.name] == len(qty)
+
+
+#: Expected number of data points for items in the make_westeros() scenario.
+EXP_LEN_WESTEROS = defaultdict(
+    lambda: 0,
+    ACT=23,
+    CAP=23,
+    CAP_NEW=12,
+    COST_NODAL=6,
+    COST_NODAL_NET=3,
+    DEMAND=3,
+    EMISS=6,
+    OBJ=1,
+    OBJECTIVE=1,
+    PRICE_COMMODITY=9,
+    capacity_factor=48,
+    demand=5,
+    duration_period=5,
+    duration_time=1,
+    emission_factor=12,
+    fix_cost=36,
+    growth_activity_up=6,
+    historical_activity=3,
+    historical_new_capacity=3,
+    input=24,
+    interestrate=5,
+    inv_cost=12,
+    output=48,
+    technical_lifetime=20,
+    var_cost=12,
+)
+EXP_LEN_WESTEROS.update({"OBJECTIVE-margin": 1})
 
 
 def test_reporter_from_westeros(
@@ -155,10 +219,18 @@ def test_reporter_from_westeros(
     configure(units={"replace": {"-": ""}})
 
     # Default target can be calculated
-    rep.get("all")
+    result = rep.get("all")
+
+    # Result contains data for expected number of model data items
+    # With IXMP4Backend, `scen` and thus `result` does not include variables 'C' and 'I'
+    assert 266 + (0 if is_ixmp4backend(test_mp._backend) else 2) == len(result)
+
+    # Items have expected length
+    for qty in result:
+        assert EXP_LEN_WESTEROS[qty.name] == len(qty)
 
     # message default target can be calculated
-    # TODO if df is empty, year is cast to float
+    # FIXME if df is empty, year is cast to float
     obs = rep.get("message::default")
 
     # all expected reporting exists

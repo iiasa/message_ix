@@ -43,6 +43,7 @@ tests/data/nightly
 # Python tooling, pytest, etc.
 .benchmarks
 .coverage*
+.dmypy*
 .mypy_cache
 .pytest_cache
 .ruff_cache

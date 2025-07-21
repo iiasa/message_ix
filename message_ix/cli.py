@@ -130,11 +130,3 @@ def dl(branch, tag, path):
 # Add subcommands
 main.add_command(message_ix.tools.add_year.cli.main)
 main.add_command(message_ix.tools.lp_diag.cli.main)
-
-try:
-    import message_ix.testing.nightly
-except ImportError:
-    # Dependencies of testing.nightly are missing; don't show the command
-    pass
-else:
-    main.add_command(message_ix.testing.nightly.cli)
