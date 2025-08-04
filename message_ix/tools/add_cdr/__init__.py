@@ -115,7 +115,7 @@ def generate_df(
 
             if "mode" in par_idx[tec][name]:
                 mode = list(tech_data[tec][name]["mode"].keys())[0]
-                if commodity not in scenario.set("mode"):
+                if mode not in scenario.set("mode"):
                     scenario.add_set("mode", mode)
 
             kwargs = {}
