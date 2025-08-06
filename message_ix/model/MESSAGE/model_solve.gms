@@ -55,7 +55,7 @@ EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
             / df_period(year) ;
 
 * calculate PRICE_EMISSION based on the marginals of EMISSION_EQUIVALENCE
-$ifthen.tag_magpie %landusemode% == "magpie"
+$ifthen %landusemode% == "magpie"
     PRICE_EMISSION.l(node,type_emission,type_tec,year)$( SUM(emission$( cat_emission(type_emission,emission) ),
          EMISSION_EQUIVALENCE_MAgPIE.m(node,emission,type_tec,year) ) ) =
         SMAX(emission$( cat_emission(type_emission,emission) ),
@@ -73,7 +73,7 @@ $else
     PRICE_EMISSION.l(node,type_emission,type_tec,year)$(
         ( PRICE_EMISSION.l(node,type_emission,type_tec,year) = eps ) or
         ( PRICE_EMISSION.l(node,type_emission,type_tec,year) = -inf ) ) = 0 ;
-$endif.tag_magpie
+$endif
 
 %AUX_BOUNDS% AUX_ACT_BOUND_LO(node,tec,year_all,year_all2,mode,time)$( ACT.l(node,tec,year_all,year_all2,mode,time) < 0 AND
 %AUX_BOUNDS%    ACT.l(node,tec,year_all,year_all2,mode,time) = -%AUX_BOUND_VALUE% ) = yes ;
