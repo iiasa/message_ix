@@ -3,7 +3,7 @@ Canning problem (MESSAGE scheme),test_reporter_as_pyam,san-diego,Activity|cannin
 Canning problem (MESSAGE scheme),test_reporter_as_pyam,san-diego,Activity|transport_from_san-diego|to_chicago,,0.0
 Canning problem (MESSAGE scheme),test_reporter_as_pyam,san-diego,Activity|transport_from_san-diego|to_new-york,,325.0
 Canning problem (MESSAGE scheme),test_reporter_as_pyam,san-diego,Activity|transport_from_san-diego|to_topeka,,275.0
-Canning problem (MESSAGE scheme),test_reporter_as_pyam,seattle,Activity|canning_plant|production,,350.0
+Canning problem (MESSAGE scheme),test_reporter_as_pyam,seattle,Activity|canning_plant|production,,300.0
 Canning problem (MESSAGE scheme),test_reporter_as_pyam,seattle,Activity|transport_from_seattle|to_chicago,,300.0
 Canning problem (MESSAGE scheme),test_reporter_as_pyam,seattle,Activity|transport_from_seattle|to_new-york,,0.0
 Canning problem (MESSAGE scheme),test_reporter_as_pyam,seattle,Activity|transport_from_seattle|to_topeka,,0.0
