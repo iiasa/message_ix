@@ -50,9 +50,9 @@ EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
     DEMAND.l(node,commodity,level,year,time) = demand_fixed(node,commodity,level,year,time) ;
 
 * assign auxiliary variables PRICE_COMMODITY and PRICE_EMISSION for reporting
-    PRICE_COMMODITY.l(node,commodity,level,year,time) =
-        ( COMMODITY_BALANCE_GT.m(node,commodity,level,year,time) + COMMODITY_BALANCE_LT.m(node,commodity,level,year,time) )
-            / df_period(year) ;
+    PRICE_COMMODITY.l(node,commodity,level,year,time) = (
+      - COMMODITY_BALANCE_AUX.M(node,commodity,level,year,time) / df_period(year)
+    );
 
 * calculate PRICE_EMISSION based on the marginals of EMISSION_EQUIVALENCE
     PRICE_EMISSION.l(node,type_emission,type_tec,year)$( SUM(emission$( cat_emission(type_emission,emission) ),

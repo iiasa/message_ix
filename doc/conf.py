@@ -67,6 +67,7 @@ rst_prolog = r"""
 
    <abbr title="International Institute for Applied Systems Analysis">IIASA</abbr>
 
+.. |y0| replace:: :math:`y_0`
 .. |yA| replace:: :math:`y^A`
 .. |yV| replace:: :math:`y^V`
 """
@@ -77,13 +78,29 @@ rst_prolog = r"""
 # sometimes multiple targets appear above a single heading, and that heading text would
 # be automatically used for the link text.
 for name in (
+    "ACT",
+    "CAP",
+    "CAP_NEW",
+    "LAND",
+    "STOCK_CHG",
     "duration_period",
     "duration_period_sum",
     "growth_new_capacity_up",
     "historical_new_capacity",
     "initial_new_capacity_up",
+    "input",
+    "input_cap",
+    "input_cap_new",
+    "input_cap_ret",
+    "output",
+    "output_cap",
+    "output_cap_new",
+    "output_cap_ret",
+    "land_input",
+    "land_output",
     "map_tec_lifetime",
     "remaining_capacity",
+    "technical_lifetime",
 ):
     rst_prolog += f"\n.. |{name}| replace:: :ref:`{name} <{name}>`"
 
@@ -222,8 +239,9 @@ intersphinx_mapping = {
 macros = {}
 macros.update(
     {
-        k.replace("_", ""): r"\text{{{k}}}"
+        k.replace("_", ""): rf"\text{{{k}}}"
         for k in """ACT
+COMMODITY_BALANCE
 STORAGE
 STORAGE_CHARGE
 duration_time_rel

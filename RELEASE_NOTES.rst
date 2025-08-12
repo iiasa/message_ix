@@ -4,6 +4,22 @@ Next release
 All changes
 -----------
 
+- Add representation of commodity flows associated with construction and retirement of technology capacity (:pull:`451`).
+
+  - New parameters
+    |input_cap|,
+    |input_cap_new|,
+    |input_cap_ret|,
+    |output_cap|,
+    |output_cap_new|, and
+    |output_cap_ret|.
+    When loading a Scenario created with :mod:`message_ix` version 3.11.0 or earlier,
+    these items are automatically initialized (and left empty),
+    using at most one call to :meth:`~message_ix.Scenario.commit`.
+    See :meth:`.MESSAGE.initialize`.
+  - Revise :ref:`equation_commodity_balance_aux` to include input and output flows based on |CAP| and |CAP_NEW|.
+  - New :class:`.MESSAGE` / :meth:`.Scenario.solve` option :py:`cap_comm=True` to enable this representation.
+
 - Document the :ref:`minimum version of Java <install-java>` required for :class:`ixmp.JDBCBackend <ixmp.backend.jdbc.JDBCBackend>` (:pull:`962`).
 - Improve type hinting (:pull:`963`).
 

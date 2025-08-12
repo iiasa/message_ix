@@ -755,7 +755,8 @@ class Scenario(ixmp.Scenario):
             See the :class:`.MESSAGE` class and :obj:`.DEFAULT_CPLEX_OPTIONS`.
         kwargs :
             Other options control the execution of the underlying GAMS code; see the
-            :class:`.MESSAGE_MACRO` class and :class:`.GAMSModel`.
+            *model_options* described for :class:`.MESSAGE`, :class:`.MACRO`,
+            :class:`.MESSAGE_MACRO`, and :class:`.GAMSModel`.
         """
         super().solve(model=model, solve_options=solve_options, **kwargs)
 

@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Union
 
 import numpy as np
+import numpy.testing as npt
 import pandas as pd
 import pytest
 from ixmp import Platform
@@ -43,11 +44,11 @@ def assert_dantzig_solution(s: Scenario, lp_method: int) -> None:
     exp = (
         pd.DataFrame(
             [
-                ["seattle", "production", 350.0, 350.0],
+                ["seattle", "production", 350.0, 300.0],
                 ["seattle", "to_new-york", 50.0, 0.0],
                 ["seattle", "to_chicago", 300.0, 300.0],
                 ["seattle", "to_topeka", 0.0, 0.0],
-                ["san-diego", "production", 600.0, 600.0],
+                ["san-diego", "production", 550.0, 600.0],
                 ["san-diego", "to_new-york", 275.0, 325.0],
                 ["san-diego", "to_chicago", 0.0, 0.0],
                 ["san-diego", "to_topeka", 275.0, 275.0],
@@ -231,17 +232,13 @@ def test_commodity_share_up(request: pytest.FixtureRequest, test_mp: Platform) -
     ``ACT`` variable values from the original solution::
 
         technology                node_loc   mode         lvl    mrg
-        canning_plant             seattle    production   350.0  0.000
-        transport_from_seattle    seattle    to_new-york   50.0  0.000
-        transport_from_seattle    seattle    to_chicago   300.0  0.000
-        transport_from_seattle    seattle    to_topeka      0.0  0.036
-        canning_plant             san-diego  production   600.0  0.000
-        transport_from_san-diego  san-diego  to_new-york  275.0  0.000
+        canning_plant             seattle    production   300.0  0.000
+        transport_from_san-diego  san-diego  to_new-york  325.0  0.000
         transport_from_san-diego  san-diego  to_chicago     0.0  0.009
         transport_from_san-diego  san-diego  to_topeka    275.0  0.000
 
-    Seattle canning_plant production (original: 350) is limited to 50% of all
-    transport_from_san-diego (original: 550). Expected outcome: some increase of
+    Seattle canning_plant production (original: 300) is limited to 45% of all
+    transport_from_san-diego (original: 600). Expected outcome: some increase of
     transport_from_san-diego with some decrease of production in seattle.
     """
 
@@ -258,6 +255,8 @@ def test_commodity_share_up(request: pytest.FixtureRequest, test_mp: Platform) -
     # type_tec members
     tt_share = "share"
     tt_total = "total"
+
+    VALUE = 0.45
 
     # common operations for both subtests
     def add_data(s: Scenario, modes: Union[str, list[str]]) -> None:
@@ -276,38 +275,46 @@ def test_commodity_share_up(request: pytest.FixtureRequest, test_mp: Platform) -
 
             name = "share_commodity_up"
             kw = common | dict(unit="%")
-            s.add_par(name, make_df(name, **kw, year_act=Y0, value=0.5))
+            s.add_par(name, make_df(name, **kw, year_act=Y0, value=VALUE))
 
         s.solve(quiet=True)
 
-    # initial data
+    # Initial scenario
     s0 = make_dantzig(test_mp, solve=True, request=request)
-
-    exp = 0.5
+    # Objective function value
+    OBJ_s0 = s0.var("OBJ")["lvl"]
 
     # In the unmodified Dantzig scenario, the share is larger than the value to be used
-    assert calc_share(s0) > exp
+    assert calc_share(s0) > VALUE
 
+    # Work around #968: allow production in n=san-diego to go as high as 650 (not 600)
+    s0.remove_solution()
+    with s0.transact("Modify scenario for test_commodity_share_up"):
+        name = "bound_activity_up"
+        s0.add_par(
+            name, s0.par(name, filters={"node_loc": "san-diego"}).assign(value=650)
+        )
     # Add share constraints for each mode explicitly
     s1 = s0.clone(keep_solution=False)
     add_data(s1, modes=["to_new-york", "to_chicago", "to_topeka"])
 
     # Resulting shares are within the bound
     obs1 = calc_share(s1)
-    assert obs1 <= exp
+    npt.assert_allclose(VALUE - obs1, 0.0, atol=1e-7)
 
     # Meeting the constraint has increased the objective function value
-    assert s1.var("OBJ")["lvl"] >= s0.var("OBJ")["lvl"]
+    assert s1.var("OBJ")["lvl"] >= OBJ_s0
 
     # Add share constraints with mode='all'
     s2 = s0.clone(keep_solution=False)
     add_data(s2, modes="all")
 
     # Shares are the same as constraining each mode individually, and within the bound
-    assert obs1 == calc_share(s2) <= exp
+    assert obs1 == calc_share(s2)
+    npt.assert_allclose(VALUE - calc_share(s2), 0.0, atol=1e-7)
 
     # Meeting the constraint has increased the objective function value
-    assert s2.var("OBJ")["lvl"] >= s0.var("OBJ")["lvl"]
+    assert s2.var("OBJ")["lvl"] >= OBJ_s0
 
     # Test of https://github.com/iiasa/message_ix/pull/930
 

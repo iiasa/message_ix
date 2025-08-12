@@ -7,7 +7,7 @@ from copy import copy
 from dataclasses import InitVar, dataclass, field
 from functools import cache, partial
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Optional
 from warnings import warn
 
 import ixmp.model.gams
@@ -191,7 +191,30 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
     # Make default model options known to the class
     model_dir: Path
 
-    def __init__(self, name=None, **model_options):
+    #: Optional minimum version of GAMS.
+    GAMS_min_version: Optional[str] = None
+
+    #: Keyword arguments to map to GAMS `solve_args`.
+    keyword_to_solve_arg: list[tuple[str, type, str]]
+
+    def __init__(self, name: Optional[str] = None, **model_options) -> None:
+        if gmv := self.GAMS_min_version:
+            # Check the minimum GAMS version.
+            version = ixmp.model.gams.gams_version() or ""
+            if version < gmv:
+                raise RuntimeError(f"{self.name} requires GAMS >= {gmv}; got {version}")
+
+        # Convert optional `keyword` arguments to GAMS CLI arguments like ``--{target}``
+        solve_args = []
+        for keyword, callback, target in self.keyword_to_solve_arg:
+            try:
+                raw = model_options.pop(keyword)
+                solve_args.append(f"--{target}={callback(raw)!s}")
+            except KeyError:
+                pass
+            except ValueError:
+                raise ValueError(f"{keyword} = {raw}")
+
         # Update the default options with any user-provided options
         model_options.setdefault("model_dir", config.get("message model dir"))
         self.cplex_opts = copy(DEFAULT_CPLEX_OPTIONS)
@@ -199,6 +222,8 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         self.cplex_opts.update(model_options.pop("solve_options", {}))
 
         super().__init__(name, **model_options)
+
+        self.solve_args.extend(solve_args)
 
     def run(self, scenario: "ixmp.Scenario") -> None:
         """Execute the model.
@@ -237,6 +262,18 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         # scenarios asynchronously.
 
         return result
+
+
+class _boollike(str):
+    """Handle a :class:`bool`-like argument; return :py:`"0"` or :py:`"1"`."""
+
+    def __new__(cls, value: Any):
+        if value in {"0", 0, False, "False"}:
+            return "0"
+        elif value in {"1", 1, True, "True"}:
+            return "1"
+        else:
+            raise ValueError
 
 
 def _check_structure(scenario: "ixmp.Scenario"):
@@ -328,6 +365,8 @@ class MESSAGE(GAMSModel):
     #: All equations, parameters, sets, and variables in the MESSAGE formulation.
     items: MutableMapping[str, Item] = dict()
 
+    keyword_to_solve_arg = [("cap_comm", _boollike, "MESSAGE_CAP_COMM")]
+
     @staticmethod
     def enforce(scenario: "ixmp.Scenario") -> None:
         """Enforce data consistency in `scenario`."""
@@ -394,6 +433,14 @@ class MESSAGE(GAMSModel):
 
         # Collect items to initialize
         items = {k: v.to_dict() for k, v in cls.items.items()}
+
+        # Prior to message_ix v1.2.0, COMMODITY_BALANCE was the name of an equation in
+        # the GAMS source (see .tests.test_legacy_version for an example). From v1.2.0
+        # to v3.11.0, it was a GAMS macro, and thus not stored using ixmp. From v3.12.0
+        # it is a variable. Do not try to initialize the variable if the equation is
+        # present.
+        if scenario.has_equ("COMMODITY_BALANCE"):
+            items.pop("COMMODITY_BALANCE")
 
         # Remove balance_equality for JDBC, where it seems to cause errors
         if isinstance(scenario.platform._backend, JDBCBackend):
@@ -620,6 +667,9 @@ par("initial_land_up", "n y u")
 par("initial_new_capacity_lo", "nl t yv")
 par("initial_new_capacity_up", "nl t yv")
 par("input", "nl t yv ya m no c l h ho")
+par("input_cap_new", "nl t yv no c l h")
+par("input_cap_ret", "nl t yv no c l h")
+par("input_cap", "nl t yv ya no c l h")
 par("interestrate", "year")
 par("inv_cost", "nl t yv")
 par("land_cost", "n s y")
@@ -633,6 +683,9 @@ par("level_cost_new_capacity_soft_lo", "nl t yv")
 par("level_cost_new_capacity_soft_up", "nl t yv")
 par("min_utilization_factor", "nl t yv ya")
 par("operation_factor", "nl t yv ya")
+par("output_cap_new", "nl t yv nd c l h")
+par("output_cap_ret", "nl t yv nd c l h")
+par("output_cap", "nl t yv ya nd c l h")
 par("output", "nl t yv ya m nd c l h hd")
 par("peak_load_factor", "n c l y h")
 par("rating_bin", "n t ya c l h q")
@@ -704,6 +757,7 @@ var(
 )
 var("CAP_NEW", "nl t yv", "New capacity")
 var("CAP", "nl t yv ya", "Total installed capacity")
+var("COMMODITY_BALANCE", "n c l y h", "Balance of commodity flow")
 var(
     "COMMODITY_USE",
     "n c l y",
@@ -920,7 +974,11 @@ equ(
     "n inv_tec yv y",
     "Constraint for capacity maintenance over the technical lifetime",
 )
-# equ("COMMODITY_BALANCE_GT", "n c l y h", "Commodity supply greater than or equal demand") # noqa: E501
+equ(
+    "COMMODITY_BALANCE_GT",
+    "n c l y h",
+    "Commodity supply greater than or equal demand",
+)
 equ("COMMODITY_BALANCE_LT", "n c l y h", "Commodity supply lower than or equal demand")
 equ(
     "COMMODITY_USE_LEVEL",
@@ -1124,27 +1182,7 @@ class MACRO(GAMSModel):
     #: MACRO uses the GAMS ``break;`` statement, and thus requires GAMS 24.8.1 or later.
     GAMS_min_version = "24.8.1"
 
-    def __init__(self, *args, **kwargs):
-        version = ixmp.model.gams.gams_version()
-        if version < self.GAMS_min_version:
-            raise RuntimeError(
-                f"{self.name} requires GAMS >= {self.GAMS_min_version}; found {version}"
-            )
-
-        # Additional command-line arguments to GAMS
-        solve_args = []
-        try:
-            concurrent = str(kwargs.pop("concurrent"))
-        except KeyError:
-            pass
-        else:
-            if concurrent not in ("0", "1"):
-                raise ValueError(f"{concurrent = }")
-            solve_args.append(f"--MACRO_CONCURRENT={concurrent}")
-
-        super().__init__(*args, **kwargs)
-
-        self.solve_args.extend(solve_args)
+    keyword_to_solve_arg = [("concurrent", _boollike, "MACRO_CONCURRENT")]
 
     @classmethod
     def initialize(cls, scenario, with_data=False):
@@ -1217,21 +1255,15 @@ class MESSAGE_MACRO(MESSAGE, MACRO):
     #: All equations, parameters, sets, and variables in the MESSAGE-MACRO formulation.
     items = ChainMap(MESSAGE.items, MACRO.items)
 
-    def __init__(self, *args, **kwargs):
-        # Remove M-M iteration options from kwargs and convert to GAMS command-line
-        # options
-        mm_iter_args = []
-        for name in "convergence_criterion", "max_adjustment", "max_iteration":
-            try:
-                mm_iter_args.append(f"--{name.upper()}={kwargs.pop(name)}")
-            except KeyError:
-                continue
-
-        # Let the parent constructor handle other solve_args
-        super().__init__(*args, **kwargs)
-
-        # Append to the prepared solve_args
-        self.solve_args.extend(mm_iter_args)
+    keyword_to_solve_arg = (
+        MACRO.keyword_to_solve_arg
+        + MESSAGE.keyword_to_solve_arg
+        + [
+            ("convergence_criterion", float, "CONVERGENCE_CRITERION"),
+            ("max_adjustment", float, "MAX_ADJUSTMENT"),
+            ("max_iteration", int, "MAX_ITERATION"),
+        ]
+    )
 
     @classmethod
     def initialize(cls, scenario, with_data=False):

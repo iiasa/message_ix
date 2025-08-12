@@ -190,6 +190,10 @@ Parameter
 * Input/output mapping, costs and engineering specifications
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
+* .. _input:
+* .. _output:
+* .. _technical_lifetime:
+*
 * .. list-table::
 *    :widths: 25 60
 *    :header-rows: 1
@@ -233,9 +237,52 @@ Parameter
 *    * - emission_factor
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``emission``
 *
+* .. _input_cap:
+* .. _input_cap_new:
+* .. _input_cap_ret:
+* .. _output_cap:
+* .. _output_cap_new:
+* .. _output_cap_ret:
+*
+* Input/output mapping related to technology capacities
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*
+* .. list-table::
+*    :widths: 25 60 55
+*    :header-rows: 1
+*
+*    * - Parameter name
+*      - Index dimensions
+*      - Explanatory comments
+*    * - input_cap [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` |
+*        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
+*      - Commodity input for operation of 1 unit of CAP.
+*    * - output_cap [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` |
+*        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
+*      - Commodity output due to operation of 1 unit of CAP.
+*    * - input_cap_new [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
+*        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
+*      - Commodity input per unit of |CAP_NEW|.
+*    * - output_cap_new [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
+*        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
+*      - Commodity output per unit of |CAP_NEW|.
+*    * - input_cap_ret [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
+*        ``node_origin`` | ``commodity`` | ``level`` | ``time_origin``
+*      - Commodity input per unit of |CAP| retired.
+*    * - output_cap_ret [#tecvintage]_
+*      - ``node_loc`` | ``tec`` | ``year_vtg`` |
+*        ``node_dest`` | ``commodity`` | ``level`` | ``time_dest``
+*      - Commodity output per unit of |CAP| retired.
+*
 * .. [#tecvintage] Fixed and variable cost parameters and technical specifications are indexed over both
 *    the year of construction (vintage) and the year of operation (actual).
 *    This allows to represent changing technology characteristics depending on the age of the plant.
+*    Material flows can also vary based on the vintage and active years.
 *
 * .. [#levelizedcost] The parameter ``levelized_cost`` is computed in the GAMS pre-processing under the assumption of
 *    full capacity utilization until the end of the technical lifetime.
@@ -258,6 +305,19 @@ Parameters
 * technology input-output mapping and costs parameters
     input(node,tec,vintage,year_all,mode,node,commodity,level,time,time)  relative share of input per unit of activity
     output(node,tec,vintage,year_all,mode,node,commodity,level,time,time) relative share of output per unit of activity
+
+    # Commodity input and output associated with operation of capacity
+    input_cap(node,tec,vintage,year_all,node,commodity,level,time)   'Commodity input for operation of 1 unit of CAP'
+    output_cap(node,tec,vintage,year_all,node,commodity,level,time)  'Commodity output due to operation of 1 unit of CAP'
+
+    # Commodity input and output associated with construction of capacity
+    input_cap_new(node,tec,vintage,node,commodity,level,time)   'Commodity input per unit of CAP_NEW'
+    output_cap_new(node,tec,vintage,node,commodity,level,time)  'Commodity output per unit of CAP_NEW'
+
+    # Commodity input and output associated with retirement of capacity
+    input_cap_ret(node,tec,vintage,node,commodity,level,time)   'Commodity input per unit of retired CAP'
+    output_cap_ret(node,tec,vintage,node,commodity,level,time)  'Commodity output per unit of retired CAP'
+
     inv_cost(node,tec,year_all)                         investment costs (per unit of new capacity)
     fix_cost(node,tec,vintage,year_all)                 fixed costs per year (per unit of capacity maintained)
     var_cost(node,tec,vintage,year_all,mode,time)       variable costs of operation (per unit of capacity maintained)
@@ -582,9 +642,13 @@ Parameters
 * Auxiliary investment cost parameters and multipliers
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
-* Auxiliary investment cost parameters include the remaining technical lifetime at the end of model horizon (``beyond_horizon_lifetime``) in addition to the
-* different scaling factors and multipliers as listed below. These factors account for remaining capacity (``remaining_capacity``) or construction time of new capacity (``construction_time_factor``),
-* the value of investment at the end of model horizon (``end_of_horizon_factor``) or the discount factor of remaining lifetime beyond model horizon (``beyond_horizon_factor``).
+* Auxiliary investment cost parameters include the remaining technical lifetime at the end of model horizon
+* (``beyond_horizon_lifetime``) in addition to the different scaling factors and multipliers as listed below.
+* These factors account for remaining capacity (``remaining_capacity``)
+* or construction time of new capacity (``construction_time_factor``),
+* the value of investment at the end of model horizon (``end_of_horizon_factor``)
+* or the discount factor of remaining lifetime beyond model horizon (``beyond_horizon_factor``).
+* ``remaining_capacity_extended`` is identical to ``remaining_capacity`` but extended to include historical periods.
 *
 * .. list-table::
 *    :widths: 35 50
@@ -596,6 +660,8 @@ Parameters
 *      - ``node`` | ``tec`` | ``year``
 *    * -  remaining_capacity
 *      - ``node`` | ``tec`` | ``year``
+*    * -  remaining_capacity_extended
+*      - ``node`` | ``tec`` | ``year``
 *    * - end_of_horizon_factor
 *      - ``node`` | ``tec`` | ``year``
 *    * - beyond_horizon_lifetime
@@ -603,15 +669,15 @@ Parameters
 *    * - beyond_horizon_factor
 *      - ``node`` | ``tec`` | ``year``
 *
-*
 ***
 
 Parameters
-    construction_time_factor(node,tec,year_all) scaling factor to account for construction time of new capacity
-    remaining_capacity(node,tec,year_all,year_all) scaling factor to account for remaining capacity in period
-    end_of_horizon_factor(node,tec,year_all)    multiplier for value of investment at end of model horizon
-    beyond_horizon_lifetime(node,tec,year_all)  remaining technical lifetime at the end of model horizon
-    beyond_horizon_factor(node,tec,year_all)    discount factor of remaining lifetime beyond model horizon
+  construction_time_factor(node,tec,year_all)              'Scaling factor to account for construction time of new capacity'
+  remaining_capacity(node,tec,year_all,year_all)           'Scaling factor to account for remaining capacity in period'
+  remaining_capacity_extended(node,tec,year_all,year_all)  'Same as remaining_capacity, but including historical periods'
+  end_of_horizon_factor(node,tec,year_all)                 'Multiplier for value of investment at end of model horizon'
+  beyond_horizon_lifetime(node,tec,year_all)               'Remaining technical lifetime at the end of model horizon'
+  beyond_horizon_factor(node,tec,year_all)                 'Discount factor of remaining lifetime beyond model horizon'
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
@@ -668,6 +734,9 @@ Parameters
 * The implementation of |MESSAGEix| includes a land-use model emulator, which draws on exogenous land-use scenarios
 * (provided by another model) to derive supply of commodities (e.g., biomass) and emissions
 * from agriculture and forestry. The parameters listed below refer to the assigned land scenario.
+*
+* .. _land_input:
+* .. _land_output:
 *
 * .. list-table::
 *    :widths: 25 75
@@ -902,6 +971,7 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 
 Parameters
+    cap_comm          'Equivalent to MESSAGE_CAP_COMM'                 / %MESSAGE_CAP_COMM% /
     ctr               counter parameter for loops
     status(*,*)       model solution status parameter for log writing
 ;

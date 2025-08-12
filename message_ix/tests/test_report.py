@@ -2,6 +2,7 @@ import logging
 import re
 import sys
 from collections import defaultdict
+from collections.abc import Generator
 from functools import partial
 from pathlib import Path
 
@@ -11,6 +12,7 @@ import pyam
 import pytest
 from genno.testing import assert_qty_equal
 from ixmp import Platform
+from ixmp.backend import ItemType
 from ixmp.backend.jdbc import JDBCBackend
 from ixmp.report import Reporter as ixmp_Reporter
 from ixmp.testing import assert_logs
@@ -19,6 +21,7 @@ from numpy.testing import assert_allclose
 from pandas.testing import assert_frame_equal, assert_series_equal
 
 from message_ix import Scenario
+from message_ix.models import MESSAGE
 from message_ix.report import Reporter, configure
 from message_ix.testing import SCENARIO, make_dantzig, make_westeros
 
@@ -67,8 +70,27 @@ def test_reporter_no_solution(
 MISSING_IXMP4 = {"C:", "C:n", "C:n-y", "C:y", "I:", "I:n", "I:n-y", "I:y"}
 
 
+@pytest.fixture
+def keys(test_data_path: Path) -> Generator[set[str]]:
+    """Read two files with lists of keys expected in a :class:`.Reporter` graph.
+
+    Returns
+    -------
+    list
+        with 2 sets including the contents of:
+
+        1. :file:`reporter-keys-ixmp.txt`.
+        1. :file:`reporter-keys-message-ix.txt`.
+    """
+    fn = "reporter-keys-{}.txt"
+    return (
+        set(test_data_path.joinpath(fn.format(p)).read_text().split("\n")) - {""}
+        for p in ("ixmp", "message-ix")
+    )
+
+
 def test_reporter_from_scenario(
-    message_test_mp: Platform, test_data_path: Path
+    message_test_mp: Platform, keys: Generator[set[str]]
 ) -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
@@ -84,8 +106,11 @@ def test_reporter_from_scenario(
     rep = Reporter.from_scenario(scen)
 
     # NOTE Used to write out the expected data
-    # Path(test_data_path / "reportergraph.txt").write_text(
-    #     "\n".join(list(map(str, sorted(rep.graph))))
+    # Path("reporter-keys-ixmp.txt").write_text(
+    #     "\n".join(map(str, sorted(rep_ix.graph)))
+    # )
+    # Path("reporter-keys-message-ix.txt").write_text(
+    #     "\n".join(sorted(map(str, set(rep.graph) - set(rep_ix.graph))))
     # )
 
     # Quantities have short dimension names
@@ -104,21 +129,17 @@ def test_reporter_from_scenario(
     assert_qty_equal(obs, demand, check_attrs=False)
 
     # Prepare the expected items in the graphs
-    expected_rep_ix_graph_keys = set(
-        Path(test_data_path / "reporterixgraph.txt").read_text().split("\n")
-    )
-    expected_rep_graph_keys = set(
-        Path(test_data_path / "reportergraph.txt").read_text().split("\n")
-    )
+    expected_rep_ix_graph_keys = next(keys)
+    expected_rep_graph_keys = expected_rep_ix_graph_keys | next(keys)
     if not isinstance(message_test_mp._backend, JDBCBackend):
         expected_rep_ix_graph_keys -= MISSING_IXMP4
         expected_rep_graph_keys -= MISSING_IXMP4
 
     # ixmp.Reporter pre-populated with only model quantities and aggregates
-    assert set(map(str, sorted(rep_ix.graph))) == expected_rep_ix_graph_keys
+    assert expected_rep_ix_graph_keys == set(map(str, rep_ix.graph))
 
     # message_ix.Reporter pre-populated with additional, derived quantities
-    assert set(map(str, sorted(rep.graph))) == expected_rep_graph_keys
+    assert expected_rep_graph_keys == set(map(str, rep.graph))
 
     # Derived quantities have expected dimensions
     vom_key = rep.full_key("vom")
@@ -133,6 +154,22 @@ def test_reporter_from_scenario(
     assert_qty_equal(vom, rep.get(vom_key))
 
 
+@pytest.fixture(scope="module")
+def exp_len_all(test_mp: Platform) -> int:
+    """Expected items collected under the "all" reporting key."""
+
+    # - Sets not included in "all".
+    # - 1 item each for PAR and VAR.
+    # - 2 items (values and marginals) for EQU.
+    count = {ItemType.SET: 0, ItemType.PAR: 1, ItemType.EQU: 2, ItemType.VAR: 1}
+    N = sum(count[i.type] for i in MESSAGE.items.values())
+
+    # With IXMP4Backend, scenarios do not include variables 'C' and 'I'
+    N += 0 if is_ixmp4backend(test_mp._backend) else 2
+
+    return N
+
+
 #: Expected number of data points for items in the make_dantzig() scenario.
 EXP_LEN_DANTZIG = defaultdict(
     lambda: 0,
@@ -142,7 +179,7 @@ EXP_LEN_DANTZIG = defaultdict(
     DEMAND=3,
     OBJ=1,
     OBJECTIVE=1,
-    PRICE_COMMODITY=3,
+    PRICE_COMMODITY=5,
     bound_activity_up=2,
     demand=3,
     duration_period=2,
@@ -156,7 +193,7 @@ EXP_LEN_DANTZIG.update({"COMMODITY_BALANCE_GT-margin": 5, "OBJECTIVE-margin": 1}
 
 
 def test_reporter_from_dantzig(
-    request: pytest.FixtureRequest, test_mp: Platform
+    request: pytest.FixtureRequest, test_mp: Platform, exp_len_all: int
 ) -> None:
     scen = make_dantzig(test_mp, solve=True, quiet=True, request=request)
 
@@ -167,12 +204,11 @@ def test_reporter_from_dantzig(
     result = rep.get("all")
 
     # Result contains data for expected number of model data items
-    # With IXMP4Backend, `scen` and thus `result` does not include variables 'C' and 'I'
-    assert 268 + (0 if is_ixmp4backend(test_mp._backend) else 2) == len(result)
+    assert exp_len_all == len(result)
 
     # Items have expected length
     for qty in result:
-        assert EXP_LEN_DANTZIG[qty.name] == len(qty)
+        assert EXP_LEN_DANTZIG[qty.name] == len(qty), f"{qty.name}: {qty.to_string()}"
 
 
 #: Expected number of data points for items in the make_westeros() scenario.
@@ -208,7 +244,7 @@ EXP_LEN_WESTEROS.update({"OBJECTIVE-margin": 1})
 
 
 def test_reporter_from_westeros(
-    request: pytest.FixtureRequest, test_mp: Platform
+    request: pytest.FixtureRequest, test_mp: Platform, exp_len_all: int
 ) -> None:
     scen = make_westeros(test_mp, emissions=True, solve=True, request=request)
 
@@ -223,7 +259,7 @@ def test_reporter_from_westeros(
 
     # Result contains data for expected number of model data items
     # With IXMP4Backend, `scen` and thus `result` does not include variables 'C' and 'I'
-    assert 266 + (0 if is_ixmp4backend(test_mp._backend) else 2) == len(result)
+    assert exp_len_all == len(result)
 
     # Items have expected length
     for qty in result:

@@ -86,7 +86,7 @@ def test_message_macro() -> None:
 
     # Constructor complains about an insufficient GAMS version
     with pytest.raises(
-        RuntimeError, match="MESSAGE-MACRO requires GAMS >= 99.9.9; found "
+        RuntimeError, match="MESSAGE-MACRO requires GAMS >= 99.9.9; got "
     ):
         _MM()
 
