@@ -434,6 +434,14 @@ class MESSAGE(GAMSModel):
         # Collect items to initialize
         items = {k: v.to_dict() for k, v in cls.items.items()}
 
+        # Prior to message_ix v1.2.0, COMMODITY_BALANCE was the name of an equation in
+        # the GAMS source (see .tests.test_legacy_version for an example). From v1.2.0
+        # to v3.11.0, it was a GAMS macro, and thus not stored using ixmp. From v3.12.0
+        # it is a variable. Do not try to initialize the variable if the equation is
+        # present.
+        if scenario.has_equ("COMMODITY_BALANCE"):
+            items.pop("COMMODITY_BALANCE")
+
         # Remove balance_equality for JDBC, where it seems to cause errors
         if isinstance(scenario.platform._backend, JDBCBackend):
             items.pop("balance_equality")
@@ -749,6 +757,7 @@ var(
 )
 var("CAP_NEW", "nl t yv", "New capacity")
 var("CAP", "nl t yv ya", "Total installed capacity")
+var("COMMODITY_BALANCE", "n c l y h", "Balance of commodity flow")
 var(
     "COMMODITY_USE",
     "n c l y",
@@ -965,7 +974,11 @@ equ(
     "n inv_tec yv y",
     "Constraint for capacity maintenance over the technical lifetime",
 )
-# equ("COMMODITY_BALANCE_GT", "n c l y h", "Commodity supply greater than or equal demand") # noqa: E501
+equ(
+    "COMMODITY_BALANCE_GT",
+    "n c l y h",
+    "Commodity supply greater than or equal demand",
+)
 equ("COMMODITY_BALANCE_LT", "n c l y h", "Commodity supply lower than or equal demand")
 equ(
     "COMMODITY_USE_LEVEL",

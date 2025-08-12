@@ -485,9 +485,6 @@ def make_dantzig(
 
     if solve:
         # Always read one equation. Used by test_core.test_year_int.
-        scen.init_equ(
-            "COMMODITY_BALANCE_GT", ["node", "commodity", "level", "year", "time"]
-        )
         solve_opts["equ_list"] = solve_opts.get("equ_list", []) + [
             "COMMODITY_BALANCE_GT"
         ]
