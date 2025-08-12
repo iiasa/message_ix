@@ -28,6 +28,13 @@
 *
 * Decision variables
 * ^^^^^^^^^^^^^^^^^^
+*
+* .. _ACT:
+* .. _CAP:
+* .. _CAP_NEW:
+* .. _LAND:
+* .. _STOCK_CHG:
+*
 * =============================================================== ====================================================================================
 * Variable                                                        Explanatory text
 * =============================================================== ====================================================================================
@@ -554,19 +561,25 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 * Constraints on commodities and stocks
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
-* .. _commodity_balance:
+* .. _equation_commodity_balance_aux:
 *
-* Auxiliary COMMODITY_BALANCE
-* """""""""""""""""""""""""""
-* For the commodity balance constraints below, we introduce an auxiliary variable called :math:`COMMODITY\_BALANCE`.
-* This is implemented as a GAMS ``$macro`` function.
-* This variable also includes the material flows upon construction and retirement of the technology capacities.
-* For the material flows, the formulation is valid for the model years that are different than the first model year.
-* The formulation for the first model year requires the use of the ``historical_new_capacity`` parameter
-* instead of the ``CAP`` variable,
-* and depends on conditions for ``remaining_capacity`` to determine
-* whether the end of a technology's technical lifetime falls within the duration of a model period
-* (|duration_period|) or not.
+* Equation COMMODITY_BALANCE_AUX
+* """"""""""""""""""""""""""""""
+*
+* This equation sets the value of variable :math:`\COMMODITYBALANCE`,
+* which is then constrained by :ref:`commodity_balance_gt` and :ref:`commodity_balance_lt`.
+*
+* For each :math:`(n, c, l, y, h)`, this variable includes:
+*
+* - Net |input| minus |output| of commodities based on technology activity (|ACT|).
+* - Net |land_input| minus |land_output| of commodities based on |LAND|.
+* - Inter-period transfers via |STOCK_CHG|.
+* - If the :class:`MESSAGE` option :py:`cap_comm=True` is given,
+*   flows of commodities (e.g. ‘materials’)
+*   associated with construction and retirement of technology capacity (|CAP|).
+*   For |y0|, this representation requires |historical_new_capacity| parameter values,
+*   and depends on conditions for |remaining_capacity|, |duration_period|, and |technical_lifetime|
+*   to determine when a technology is retired and account for the relevant flows.
 *
 *  .. math::
 *     \sum_{\substack{n^L,t,m,h^A \\ y^V \leq y}} output_{n^L,t,y^V,y,m,n,c,l,h^A,h}
@@ -587,7 +600,7 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 *         \cdot CAP_{n^L,t,y^V,y} & \\
 *     + \ STOCK\_CHG_{n,c,l,y,h} + \ \sum_s \Big( land\_output_{n,s,y,c,l,h} - land\_input_{n,s,y,c,l,h} \Big) \cdot & LAND_{n,s,y} \\[4pt]
 *     - \ demand\_fixed_{n,c,l,y,h}
-*     = COMMODITY\_BALANCE_{n,c,l,y,h} \quad \forall \ l \notin (L^{RES}, & L^{REN}, L^{STOR} \subseteq L)
+*     = \COMMODITYBALANCE_{n,c,l,y,h} \quad \forall \ l \notin (L^{RES}, & L^{REN}, L^{STOR} \subseteq L)
 *
 * The commodity balance constraint at the resource level is included in the `Equation RESOURCE_CONSTRAINT`_,
 * while at the renewable level, it is included in the `Equation RENEWABLES_EQUIVALENCE`_,
@@ -698,7 +711,7 @@ $ENDIF
 * This constraint ensures that supply is greater or equal than demand for every commodity-level combination.
 *
 *  .. math::
-*     \text{COMMODITY_BALANCE}_{n,c,l,y,h} \geq 0
+*     \COMMODITYBALANCE_{n,c,l,y,h} \geq 0
 *
 ***
 COMMODITY_BALANCE_GT(node,commodity,level,year,time)$(
@@ -722,7 +735,7 @@ COMMODITY_BALANCE_GT(node,commodity,level,year,time)$(
 * is (exactly) equal to demand.
 *
 *  .. math::
-*     \text{COMMODITY_BALANCE}_{n,c,l,y,h} \leq 0
+*     \COMMODITYBALANCE_{n,c,l,y,h} \leq 0
 *
 ***
 COMMODITY_BALANCE_LT(node,commodity,level,year,time)$(

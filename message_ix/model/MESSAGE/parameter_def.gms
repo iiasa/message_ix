@@ -190,6 +190,10 @@ Parameter
 * Input/output mapping, costs and engineering specifications
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 *
+* .. _input:
+* .. _output:
+* .. _technical_lifetime:
+*
 * .. list-table::
 *    :widths: 25 60
 *    :header-rows: 1
@@ -232,6 +236,13 @@ Parameter
 *      - ``node`` | ``commodity`` | ``grade`` | ``level`` | ``year``
 *    * - emission_factor
 *      - ``node_loc`` | ``tec`` | ``year_vtg`` | ``year_act`` | ``mode`` | ``emission``
+*
+* .. _input_cap:
+* .. _input_cap_new:
+* .. _input_cap_ret:
+* .. _output_cap:
+* .. _output_cap_new:
+* .. _output_cap_ret:
 *
 * Input/output mapping related to technology capacities
 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -723,6 +734,9 @@ Parameters
 * The implementation of |MESSAGEix| includes a land-use model emulator, which draws on exogenous land-use scenarios
 * (provided by another model) to derive supply of commodities (e.g., biomass) and emissions
 * from agriculture and forestry. The parameters listed below refer to the assigned land scenario.
+*
+* .. _land_input:
+* .. _land_output:
 *
 * .. list-table::
 *    :widths: 25 75

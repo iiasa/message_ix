@@ -249,6 +249,18 @@ Model classes
    :exclude-members: defaults
    :show-inheritance:
 
+   MESSAGE accepts the following *model_options* to control its behaviour:
+
+   - **cap_comm** (:class:`bool` or equivalent :class:`int` or :class:`float`):
+     If :any:`True`, include **comm** odity flows associated with **cap** acity changes of technologies
+     in :ref:`equation_commodity_balance_aux`.
+     If :any:`False` (the default), these flow are omitted,
+     and values of the associated parameters have no effect.
+     This corresponds to the GAMS compile-time variable ``MESSAGE_CAP_COMM``.
+
+     .. note:: For some models, this can significantly increase the linear program (LP) size
+        and thus the solve time.
+
    .. autoattribute:: items
       :no-value:
 
@@ -263,10 +275,10 @@ Model classes
    The MACRO class solves only the MACRO model in “standalone” mode—that is, without MESSAGE.
    It is also invoked from :class:`.MESSAGE_MACRO` to process *model_options* to control the behaviour of MACRO:
 
-   - **concurrent** (:class:`int` or :class:`float`, either :py:`0` or :py:`1`).
+   - **concurrent** (:class:`bool` or equivalent :class:`int` or :class:`float`).
      This corresponds to the GAMS compile-time variable ``MACRO_CONCURRENT``.
-     If set to :py:`0` (the default), MACRO is solved in a loop, once for each node in the Scenario.
-     If set to :py:`1`, MACRO is solved only once, for all nodes simultaneously.
+     If :any:`False` (the default), MACRO is solved in a loop, once for each node in the Scenario.
+     If :any:`True`, MACRO is solved only once, for all nodes simultaneously.
 
    .. autoattribute:: items
       :no-value:
@@ -279,7 +291,8 @@ Model classes
    MESSAGE_MACRO solves the MESSAGE and MACRO models iteratively, connecting changes in technology activity and resource demands (from MESSAGE) to changes in final demands and prices (from MACRO).
    This iteration continues until the solution *converges*; i.e. the two models reach a stable point for the values of these parameters.
 
-   MESSAGE_MACRO accepts three additional *model_options* that control the behaviour of this iteration algorithm:
+   MESSAGE_MACRO accepts all of the *model_options* recognized by :class:`.MESSAGE` and :class:`.MACRO`,
+   plus additional options that control the behaviour of this iteration algorithm:
 
    - **max_adjustment** (:class:`float`, default 0.2): the maximum absolute relative change in final demands between iterations.
      If MACRO returns demands that have changed by more than a factor outside the range (1 - `max_adjustment`, 1 + `max_adjustment`) since the previous iteration, then the change is confined to the limits of that range for the next run of MESSAGE.
