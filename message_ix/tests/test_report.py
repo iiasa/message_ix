@@ -12,6 +12,7 @@ import pyam
 import pytest
 from genno.testing import assert_qty_equal
 from ixmp import Platform
+from ixmp.backend import ItemType
 from ixmp.backend.jdbc import JDBCBackend
 from ixmp.report import Reporter as ixmp_Reporter
 from ixmp.testing import assert_logs
@@ -20,6 +21,7 @@ from numpy.testing import assert_allclose
 from pandas.testing import assert_frame_equal, assert_series_equal
 
 from message_ix import Scenario
+from message_ix.models import MESSAGE
 from message_ix.report import Reporter, configure
 from message_ix.testing import SCENARIO, make_dantzig, make_westeros
 
@@ -152,6 +154,22 @@ def test_reporter_from_scenario(
     assert_qty_equal(vom, rep.get(vom_key))
 
 
+@pytest.fixture(scope="module")
+def exp_len_all(test_mp: Platform) -> int:
+    """Expected items collected under the "all" reporting key."""
+
+    # - Sets not included in "all".
+    # - 1 item each for PAR and VAR.
+    # - 2 items (values and marginals) for EQU.
+    count = {ItemType.SET: 0, ItemType.PAR: 1, ItemType.EQU: 2, ItemType.VAR: 1}
+    N = sum(count[i.type] for i in MESSAGE.items.values())
+
+    # With IXMP4Backend, scenarios do not include variables 'C' and 'I'
+    N += 0 if is_ixmp4backend(test_mp._backend) else 2
+
+    return N
+
+
 #: Expected number of data points for items in the make_dantzig() scenario.
 EXP_LEN_DANTZIG = defaultdict(
     lambda: 0,
@@ -175,7 +193,7 @@ EXP_LEN_DANTZIG.update({"COMMODITY_BALANCE_GT-margin": 5, "OBJECTIVE-margin": 1}
 
 
 def test_reporter_from_dantzig(
-    request: pytest.FixtureRequest, test_mp: Platform
+    request: pytest.FixtureRequest, test_mp: Platform, exp_len_all: int
 ) -> None:
     scen = make_dantzig(test_mp, solve=True, quiet=True, request=request)
 
@@ -186,12 +204,11 @@ def test_reporter_from_dantzig(
     result = rep.get("all")
 
     # Result contains data for expected number of model data items
-    # With IXMP4Backend, `scen` and thus `result` does not include variables 'C' and 'I'
-    assert 268 + (0 if is_ixmp4backend(test_mp._backend) else 2) == len(result)
+    assert exp_len_all == len(result)
 
     # Items have expected length
     for qty in result:
-        assert EXP_LEN_DANTZIG[qty.name] == len(qty)
+        assert EXP_LEN_DANTZIG[qty.name] == len(qty), f"{qty.name}: {qty.to_string()}"
 
 
 #: Expected number of data points for items in the make_westeros() scenario.
@@ -227,7 +244,7 @@ EXP_LEN_WESTEROS.update({"OBJECTIVE-margin": 1})
 
 
 def test_reporter_from_westeros(
-    request: pytest.FixtureRequest, test_mp: Platform
+    request: pytest.FixtureRequest, test_mp: Platform, exp_len_all: int
 ) -> None:
     scen = make_westeros(test_mp, emissions=True, solve=True, request=request)
 
@@ -242,7 +259,7 @@ def test_reporter_from_westeros(
 
     # Result contains data for expected number of model data items
     # With IXMP4Backend, `scen` and thus `result` does not include variables 'C' and 'I'
-    assert 266 + (0 if is_ixmp4backend(test_mp._backend) else 2) == len(result)
+    assert exp_len_all == len(result)
 
     # Items have expected length
     for qty in result:
