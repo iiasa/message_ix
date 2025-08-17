@@ -91,7 +91,7 @@ jobs:
 
     steps:
     - name: Check out message_ix
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: ${{ env.depth }}
         ref: ${{ github.event_name != 'pull_request_target' && github.ref || github.event.pull_request.head.sha }}
@@ -167,7 +167,7 @@ jobs:
 
     steps:
     - name: Check out message_ix
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: ${{ env.depth }}
         ref: ${{ github.event_name != 'pull_request_target' && github.ref || github.event.pull_request.head.sha }}
@@ -239,7 +239,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         ref: ${{ github.event_name != 'pull_request_target' && github.ref || github.event.pull_request.head.sha }}
     - uses: astral-sh/setup-uv@v6
