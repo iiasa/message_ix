@@ -8,7 +8,8 @@ import ixmp
 import pytest
 from ixmp.backend.jdbc import JDBCBackend
 
-from message_ix.models import MESSAGE, MESSAGE_MACRO
+from message_ix.message import MESSAGE
+from message_ix.message_macro import MESSAGE_MACRO
 
 if TYPE_CHECKING:
     from ixmp import Platform

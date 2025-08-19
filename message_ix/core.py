@@ -793,8 +793,8 @@ class Scenario(ixmp.Scenario):
         --------
         :ref:`macro-input-data`
         """
+        from .macro import MACRO
         from .macro.calibrate import EXPERIMENTAL, add_model_data, calibrate
-        from .models import MACRO
 
         # Display a warning
         log.warning(EXPERIMENTAL)

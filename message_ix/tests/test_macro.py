@@ -9,8 +9,8 @@ import pytest
 from ixmp import Platform
 
 from message_ix import Scenario
+from message_ix.macro import MACRO
 from message_ix.macro.calibrate import add_model_data, calibrate, prepare_computer
-from message_ix.models import MACRO
 from message_ix.report import Quantity
 from message_ix.testing import SCENARIO, make_westeros
 

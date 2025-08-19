@@ -21,7 +21,7 @@ from numpy.testing import assert_allclose
 from pandas.testing import assert_frame_equal, assert_series_equal
 
 from message_ix import Scenario
-from message_ix.models import MESSAGE
+from message_ix.message import MESSAGE
 from message_ix.report import Reporter, configure
 from message_ix.testing import SCENARIO, make_dantzig, make_westeros
 
