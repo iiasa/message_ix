@@ -139,19 +139,27 @@ Variables
 *
 * Auxiliary variables
 * ^^^^^^^^^^^^^^^^^^^
-* =========================================================================== =======================================================================================================
-* Variable                                                                    Explanatory text
-* =========================================================================== =======================================================================================================
-* :math:`\text{DEMAND}_{n,c,l,y,h} \in \mathbb{R}`                            Demand level (in equilibrium with MACRO integration)
-* :math:`\text{PRICE_COMMODITY}_{n,c,l,y,h} \in \mathbb{R}`                   Commodity price (undiscounted marginals of :ref:`commodity_balance_gt` and :ref:`commodity_balance_lt`)
-* :math:`\text{PRICE_EMISSION}_{n,\widehat{e},\widehat{t},y} \in \mathbb{R}`  Emission price (undiscounted marginals of :ref:`emission_equivalence`)
-* :math:`\text{COST_NODAL_NET}_{n,y} \in \mathbb{R}`                          System costs at the node level net of energy trade revenues/cost
-* :math:`\text{GDP}_{n,y} \in \mathbb{R}`                                     Gross domestic product (GDP) in market exchange rates for MACRO reporting
-* =========================================================================== ======================================================================================================
+*
+* .. list-table::
+*    :header-rows: 1
+*
+*    * - Variable
+*      - Explanatory text
+*    * - :math:`\text{DEMAND}_{n,c,l,y,h} \in \mathbb{R}`
+*      - Demand level (in equilibrium with MACRO integration)
+*    * - :math:`\text{PRICE_COMMODITY}_{n,c,l,y,h} \in \mathbb{R}`
+*      - Commodity price (undiscounted marginals of :ref:`commodity_balance_gt` and :ref:`commodity_balance_lt`)
+*    * - :math:`\text{PRICE_EMISSION}_{n,\widehat{e},\widehat{t},y} \in \mathbb{R}`
+*      - Emission price (undiscounted marginals of :ref:`emission_equivalence`)
+*    * - :math:`\text{COST_NODAL_NET}_{n,y} \in \mathbb{R}`
+*      - System costs at the node level net of energy trade revenues/cost
+*    * - :math:`\text{GDP}_{n,y} \in \mathbb{R}`
+*      - Gross domestic product (GDP) in market exchange rates for MACRO reporting
 *
 * .. warning::
-*    Please be aware that transitioning from one period length to another for consecutive periods may result in false values of :math:`\text{PRICE_EMISSION}`.
-*    Please see `this issue <https://github.com/iiasa/message_ix/issues/723>`_ for further information. We are currently working on a fix.
+*    Please be aware that transitioning from one period length to another
+*    for consecutive periods may result in incorrect value for :math:`\text{PRICE_EMISSION}`.
+*    See :issue:`723` for further information and :pull:`726` for a potential resolution.
 ***
 
 Variables
@@ -574,7 +582,7 @@ RESOURCE_HORIZON(node,commodity,grade)$( SUM(year$map_resource(node,commodity,gr
 * - Net |input| minus |output| of commodities based on technology activity (|ACT|).
 * - Net |land_input| minus |land_output| of commodities based on |LAND|.
 * - Inter-period transfers via |STOCK_CHG|.
-* - If the :class:`MESSAGE` option :py:`cap_comm=True` is given,
+* - If the :class:`.MESSAGE` option :py:`cap_comm=True` is given,
 *   flows of commodities (e.g. ‘materials’)
 *   associated with construction and retirement of technology capacity (|CAP|).
 *   For |y0|, this representation requires |historical_new_capacity| parameter values,

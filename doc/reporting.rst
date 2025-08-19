@@ -179,7 +179,7 @@ These include:
 
 Other added keys include:
 
-- :mod:`message_ix` adds the standard short symbols for |MESSAGEix| dimensions (sets) based on :data:`.models.DIMS`.
+- :mod:`message_ix` adds the standard short symbols for |MESSAGEix| dimensions (sets) based on :data:`.common.DIMS`.
   Each of these is also available in a Reporter: for example :py:`rep.get("n")` returns a list with the elements of the |MESSAGEix| set named "node";
   :py:`rep.get("t")` returns the elements of the set "technology", and so on.
   These keys can be used as input to other computations.

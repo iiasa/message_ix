@@ -1,6 +1,24 @@
 Next release
 ============
 
+Migration notes
+---------------
+
+Adjust any imports like the following:
+
+.. code-block:: python
+
+    from message_ix.models import DIMS, Item, MACRO, MESSAGE, MESSAGE_MACRO
+
+…to:
+
+.. code-block:: python
+
+    from message_ix.common import DIMS, Item
+    from message_ix.macro import MACRO
+    from message_ix.message import MESSAGE
+    from message_ix.message_macro import MESSAGE_MACRO
+
 All changes
 -----------
 
@@ -19,6 +37,13 @@ All changes
     See :meth:`.MESSAGE.initialize`.
   - Revise :ref:`equation_commodity_balance_aux` to include input and output flows based on |CAP| and |CAP_NEW|.
   - New :class:`.MESSAGE` / :meth:`.Scenario.solve` option :py:`cap_comm=True` to enable this representation.
+
+- The former module :py:`message_ix.models` is split to distinct submodules (:pull:`972`):
+
+  - :mod:`message_ix.common` includes :class:`.GAMSModel` and related code.
+  - :mod:`message_ix.macro` includes :class:`.MACRO`.
+  - :mod:`message_ix.message` includes :class:`.MESSAGE`.
+  - :mod:`message_ix.message_macro` includes :class:`.MESSAGE_MACRO`.
 
 - Document the :ref:`minimum version of Java <install-java>` required for :class:`ixmp.JDBCBackend <ixmp.backend.jdbc.JDBCBackend>` (:pull:`962`).
 - Improve type hinting (:pull:`963`).
@@ -61,7 +86,7 @@ Users **should**:
 All changes
 -----------
 
-- Some MESSAGEix :doc:`tutorials <tutorials>` are runnable with the :class:`.IXMP4Backend` introduced in :mod:`ixmp` version 3.11 (:pull:`894`, :pull:`941`).
+- Some MESSAGEix :doc:`tutorials <tutorials>` are runnable with the :class:`~ixmp.backend.ixmp4.IXMP4Backend` introduced in :mod:`ixmp` version 3.11 (:pull:`894`, :pull:`941`).
   See `Support roadmap for ixmp4 <https://github.com/iiasa/message_ix/discussions/939>`__ for details.
 - Add the :py:`concurrent=...` model option to :class:`.MACRO` (:pull:`808`).
 - Adjust use of :ref:`type_tec <mapping-sets>` in :ref:`equation_emission_equivalence` (:pull:`930`, :issue:`929`, :pull:`935`).
@@ -174,7 +199,7 @@ Migration notes
   NOTE: this may result in changes to the solution.
   In order to use the previous default `lpmethod`, the user-specific default setting can be set through the user's ixmp configuration file.
   Alternatively, the `lpmethod` can be specified directly as an argument when solving a scenario.
-  Both of these configuration methods are further explained :meth:`here <message_ix.models.GAMSModel>`.
+  Both of these configuration methods are further documented at :class:`.GAMSModel`.
 
 - The dimensionality of one set and two parameters (``map_tec_storage``, ``storage_initial``, and ``storage_self_discharge``) are extended to allow repesentation of the mode of operation of storage technologies and the temporal level of storage containers.
   If these items are already populated with data in a Scenario, this data will be incompatible with the MESSAGE GAMS implementation in this release; a :class:`UserWarning` will be emitted when the :class:`.Scenario` is instantiated, and :meth:`~.message_ix.Scenario.solve` will raise a :class:`ValueError`.
@@ -421,7 +446,7 @@ All changes
 - :pull:`281`: Test and improve logic of :meth:`.years_active` and :meth:`.vintage_and_active_years`.
 - :pull:`269`: Enforce ``year``-indexed columns as integers.
 - :pull:`256`: Update to use :obj:`ixmp.config` and improve CLI.
-- :pull:`255`: Add :mod:`message_ix.testing.nightly` and ``message-ix nightly`` CLI command group for slow-running tests.
+- :pull:`255`: Add :py:`message_ix.testing.nightly` and ``message-ix nightly`` CLI command group for slow-running tests.
 - :pull:`249`, :pull:`259`: Build MESSAGE and MESSAGE_MACRO classes on ixmp model API; adjust Scenario.
 - :pull:`235`: Add a reporting tutorial.
 - :pull:`236`, :pull:`242`, :pull:`263`: Enhance reporting.
