@@ -230,7 +230,7 @@ This implies five of the six available groups of extra requirements:
 
 - ``docs`` includes packages required to build this documentation locally,
   including ``message_ix[report]`` and all *its* requirements,
-- ``ixmp4`` includes packages require to use :class:`ixmp.IXMP4Backend <.IXMP4Backend>`,
+- ``ixmp4`` includes packages require to use :class:`ixmp.IXMP4Backend <ixmp.backend.ixmp4.IXMP4Backend>`,
 - ``report`` includes packages required to use the built-in :doc:`reporting <reporting>` features of :mod:`message_ix`,
 - ``sankey`` includes packages required to use :meth:`.Reporter.add_sankey`,
 - ``tests`` includes packages required to run the test suite,

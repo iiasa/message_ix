@@ -165,6 +165,7 @@ reference_aliases = {
     # top-level module in objects.inv. Resolve these using :doc:`index` or similar for
     # each project.
     "dask$": ":std:doc:`dask:index`",
+    "jpype$": ":std:doc:`jpype:index`",
     "plotnine$": ":class:`plotnine.ggplot`",
 }
 

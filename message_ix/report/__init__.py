@@ -15,7 +15,7 @@ from ixmp.report import (
 )
 from ixmp.report import Reporter as IXMPReporter
 
-from message_ix.models import DIMS
+from message_ix.common import DIMS
 
 from .pyam import collapse_message_cols
 

@@ -20,7 +20,7 @@ from ixmp import Platform
 from ixmp.testing import assert_logs
 
 from message_ix import Scenario
-from message_ix.models import MESSAGE
+from message_ix.message import MESSAGE
 from message_ix.testing import make_dantzig
 from message_ix.util import expand_dims
 

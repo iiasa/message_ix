@@ -10,7 +10,8 @@ import pandas as pd
 from ixmp.backend import ItemType
 from pandas.api.types import is_scalar
 
-from message_ix.models import MACRO, MESSAGE
+from message_ix.macro import MACRO
+from message_ix.message import MESSAGE
 
 if TYPE_CHECKING:
     from message_ix.core import Scenario

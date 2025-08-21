@@ -129,17 +129,21 @@ The full API is also available from R; see :doc:`rmessageix`.
 Model classes
 -------------
 
-.. currentmodule:: message_ix.models
+.. currentmodule:: message_ix
 
 .. autosummary::
 
-   MESSAGE
-   MACRO
-   MESSAGE_MACRO
-   GAMSModel
-   DEFAULT_CPLEX_OPTIONS
-   Item
-   ItemType
+   ~message.MESSAGE
+   ~macro.MACRO
+   ~message_macro.MESSAGE_MACRO
+   ~common.GAMSModel
+   ~common.DEFAULT_CPLEX_OPTIONS
+   ~common.Item
+   ~ixmp.backend.ItemType
+
+.. currentmodule:: message_ix.common
+
+.. automodule:: message_ix.common
 
 .. autodata:: DEFAULT_CPLEX_OPTIONS
 
@@ -149,7 +153,8 @@ Model classes
    :members:
    :exclude-members: defaults
 
-   The :class:`.MESSAGE`, :class:`MACRO`, and :class:`MESSAGE_MACRO` child classes encapsulate the GAMS code for the core MESSAGE (or MACRO) mathematical formulation.
+   The :class:`.MESSAGE`, :class:`.MACRO`, and :class:`.MESSAGE_MACRO` child classes
+   encapsulate the GAMS code for the core MESSAGE (or MACRO) mathematical formulation.
 
    The class receives `model_options` via :meth:`.Scenario.solve`. Some of these are passed on to the parent class :class:`ixmp.model.gams.GAMSModel` (see there for a list); others are handled as described below.
 
@@ -244,6 +249,10 @@ Model classes
       * - **var_list**
         - :obj:`None`
 
+.. currentmodule:: message_ix.message
+
+.. automodule:: message_ix.message
+
 .. autoclass:: MESSAGE
    :members: initialize
    :exclude-members: defaults
@@ -267,6 +276,10 @@ Model classes
       Keys are the names of items (sets, parameters, variables, and equations); values are :class:`.Item` instances.
       These include all items listed in the MESSAGE mathematical specification, i.e. :ref:`sets_maps_def` and :ref:`parameter_def`.
 
+.. currentmodule:: message_ix.macro
+
+.. automodule:: message_ix.macro
+
 .. autoclass:: MACRO
    :members:
    :exclude-members: items
@@ -282,6 +295,10 @@ Model classes
 
    .. autoattribute:: items
       :no-value:
+
+.. currentmodule:: message_ix.message_macro
+
+.. automodule:: message_ix.message_macro
 
 .. autoclass:: MESSAGE_MACRO
    :members:
@@ -307,11 +324,9 @@ Model classes
    .. autoattribute:: items
       :no-value:
 
-.. autodata:: DIMS
-.. autoclass:: Item
+.. autodata:: message_ix.common.DIMS
+.. autoclass:: message_ix.common.Item
    :members:
-
-.. currentmodule:: message_ix.macro
 
 .. _utils:
 
@@ -321,14 +336,8 @@ Utility methods
 .. automodule:: message_ix.util
    :members: expand_dims, copy_model, make_df
 
-.. automodule:: message_ix.util.sankey
-   :members: map_for_sankey
-
 Testing utilities
 -----------------
 
 .. automodule:: message_ix.testing
    :members: make_austria, make_dantzig, make_westeros, tmp_model_dir
-
-.. automodule:: message_ix.testing.nightly
-   :members:

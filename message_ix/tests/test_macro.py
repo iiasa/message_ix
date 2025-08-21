@@ -8,17 +8,18 @@ import pandas as pd
 import pytest
 from ixmp import Platform
 
-from message_ix import Scenario, macro
-from message_ix.models import MACRO
+from message_ix import Scenario
+from message_ix.macro import MACRO
+from message_ix.macro.calibrate import add_model_data, calibrate, prepare_computer
 from message_ix.report import Quantity
 from message_ix.testing import SCENARIO, make_westeros
 
 # NOTE These tests maybe don't need to be parametrized
 # Do the following depend on otherwise untested Scenario functions?
 # Scenario.add_macro()
-# macro.prepare_computer()
-# macro.add_model_data()
-# macro.calibrate()
+# macro.calibrate.prepare_computer()
+# macro.calibrate.add_model_data()
+# macro.calibrate.calibrate()
 # MACRO.initialize()
 
 
@@ -70,25 +71,23 @@ def westeros_not_solved(
 
 
 def test_calc_valid_data_file(westeros_solved: Scenario, w_data_path: Path) -> None:
-    c = macro.prepare_computer(westeros_solved, data=w_data_path)
+    c = prepare_computer(westeros_solved, data=w_data_path)
     c.get("check all")
 
 
 def test_calc_invalid_data(westeros_solved: Scenario) -> None:
     #  TypeError is raised with invalid input data type
     with pytest.raises(TypeError, match="neither a dict nor a valid path"):
-        macro.prepare_computer(westeros_solved, data=list())  # type: ignore [arg-type]
+        prepare_computer(westeros_solved, data=list())  # type: ignore [arg-type]
 
     with pytest.raises(ValueError, match="not an Excel data file"):
-        macro.prepare_computer(
-            westeros_solved, data=Path(__file__).joinpath("other.zip")
-        )
+        prepare_computer(westeros_solved, data=Path(__file__).joinpath("other.zip"))
 
 
 def test_calc_valid_data_dict(
     westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
 ) -> None:
-    c = macro.prepare_computer(westeros_solved, data=w_data)
+    c = prepare_computer(westeros_solved, data=w_data)
     c.get("check all")
 
 
@@ -117,11 +116,11 @@ def test_calc_valid_years(
 def test_calc_no_solution(westeros_not_solved: Scenario, w_data_path: Path) -> None:
     s = westeros_not_solved
     with pytest.raises(RuntimeError, match="solution"):
-        macro.prepare_computer(s, data=w_data_path)
+        prepare_computer(s, data=w_data_path)
 
 
 def test_config(westeros_solved: Scenario, w_data_path: Path) -> None:
-    c = macro.prepare_computer(westeros_solved, data=w_data_path)
+    c = prepare_computer(westeros_solved, data=w_data_path)
     assert "config::macro" in c.graph
     assert "sector" in c.get("config::macro")
     assert {"Westeros"} == c.get("node::macro")
@@ -130,13 +129,13 @@ def test_config(westeros_solved: Scenario, w_data_path: Path) -> None:
     # Missing columns in config raises an exception
     data = c.get("data")
     data["config"] = data["config"][["node", "sector", "commodity", "year"]]
-    c = macro.prepare_computer(westeros_solved, data=data)
+    c = prepare_computer(westeros_solved, data=data)
     with pytest.raises(Exception, match="level"):
         c.get("check all")
 
     # Entirely missing config raises an exception
     data.pop("config")
-    c = macro.prepare_computer(westeros_solved, data=data)
+    c = prepare_computer(westeros_solved, data=data)
     with pytest.raises(Exception, match="config"):
         c.get("check all")
 
@@ -148,7 +147,7 @@ def test_calc_data_missing_par(
 
     data.pop("gdp_calibrate")
 
-    c = macro.prepare_computer(westeros_solved, data=data)
+    c = prepare_computer(westeros_solved, data=data)
     with pytest.raises(Exception, match="gdp_calibrate"):
         c.get("check all")
 
@@ -165,7 +164,7 @@ def test_calc_data_missing_ref(
 
     data.pop("price_ref")
 
-    c = macro.prepare_computer(westeros_solved, data=data)
+    c = prepare_computer(westeros_solved, data=data)
     c.get("check all")
 
     westeros_solved.add_macro(data)
@@ -179,7 +178,7 @@ def test_calc_data_missing_column(
     # Drop a column
     data["gdp_calibrate"] = data["gdp_calibrate"].drop("year", axis=1)
 
-    c = macro.prepare_computer(westeros_solved, data=data)
+    c = prepare_computer(westeros_solved, data=data)
     with pytest.raises(Exception, match="Missing expected columns.*year"):
         c.get("check all")
 
@@ -192,7 +191,7 @@ def test_calc_data_missing_datapoint(
     # Skip first data point
     data["gdp_calibrate"] = data["gdp_calibrate"][1:]
 
-    c = macro.prepare_computer(westeros_solved, data=data)
+    c = prepare_computer(westeros_solved, data=data)
     with pytest.raises(Exception, match="Must provide two gdp_calibrate data points"):
         c.get("check all")
 
@@ -231,7 +230,7 @@ def test_calc(
     expected: Union[list[float], list[int]],
 ) -> None:
     """Test calculation of intermediate values on a solved Westeros scenario."""
-    c = macro.prepare_computer(westeros_solved, data=w_data_path)
+    c = prepare_computer(westeros_solved, data=w_data_path)
 
     assertion = getattr(npt, f"assert_{test}")
 
@@ -257,7 +256,7 @@ def test_calc_price_zero(westeros_not_solved: Scenario, w_data_path: Path) -> No
     pc = s.var("PRICE_COMMODITY")
     assert np.isclose(0, pc["lvl"]).any(), f"No zero values in:\n{pc.to_string()}"
 
-    c = macro.prepare_computer(s, data=w_data_path)
+    c = prepare_computer(s, data=w_data_path)
     with pytest.raises(Exception, match="0-price found in MESSAGE variable PRICE_"):
         c.get("price_MESSAGE")
 
@@ -283,7 +282,7 @@ def test_add_model_data(westeros_solved: Scenario, w_data_path: Path) -> None:
     clone = base.clone(scenario=f"{base.scenario} cloned", keep_solution=False)
     clone.check_out()
     MACRO.initialize(clone)
-    macro.add_model_data(base, clone, w_data_path)
+    add_model_data(base, clone, w_data_path)
     clone.commit("finished adding macro")
     clone.solve(quiet=True)
     obs = clone.var("OBJ")["lvl"]
@@ -297,13 +296,13 @@ def test_calibrate(westeros_solved: Scenario, w_data_path: Path) -> None:
     clone = base.clone(base.model, "test macro calibration", keep_solution=False)
     clone.check_out()
     MACRO.initialize(clone)
-    macro.add_model_data(base, clone, w_data_path)
+    add_model_data(base, clone, w_data_path)
     clone.commit("finished adding macro")
 
     start_aeei = clone.par("aeei")["value"]
     start_grow = clone.par("grow")["value"]
 
-    macro.calibrate(clone, check_convergence=True)
+    calibrate(clone, check_convergence=True)
 
     end_aeei = clone.par("aeei")["value"]
     end_grow = clone.par("grow")["value"]
@@ -364,14 +363,14 @@ def mr_scenario(
 def test_multiregion_valid_data(mr_scenario: Scenario) -> None:
     """Multi-region, multi-sector input data can be checked."""
     s = mr_scenario
-    c = macro.prepare_computer(s, data=mr_data_path("2"))
+    c = prepare_computer(s, data=mr_data_path("2"))
     c.get("check all")
 
 
 def test_multiregion_derive_data(mr_scenario: Scenario) -> None:
     s = mr_scenario
     path = mr_data_path("1")
-    c = macro.prepare_computer(s, data=path)
+    c = prepare_computer(s, data=path)
 
     # Fake some data; this emulates the behaviour of the MockScenario class formerly
     # used in this file
@@ -414,7 +413,7 @@ def test_multiregion_derive_data(mr_scenario: Scenario) -> None:
 def test_multiregion_derive_data_2(mr_scenario: Scenario) -> None:
     """Multi-region multi-sector data can be computed."""
     s = mr_scenario
-    c = macro.prepare_computer(s, data=mr_data_path("2"))
+    c = prepare_computer(s, data=mr_data_path("2"))
 
     c.get("check all")
 

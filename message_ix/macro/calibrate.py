@@ -483,7 +483,7 @@ def _validate_data(name: Optional[str], df: "DataFrame", s: Structures) -> list:
     list of str
         Dimensions/index sets of the validated MESSAGEix parameter.
     """
-    from .models import MACRO
+    from . import MACRO
 
     # Check required dimensions
     if name is None:
@@ -670,7 +670,7 @@ def prepare_computer(
     """
     from ixmp.backend import ItemType
 
-    from .models import MACRO
+    from . import MACRO
 
     if not base.has_solution():
         raise RuntimeError("Scenario must have a solution to add MACRO")

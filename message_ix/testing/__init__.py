@@ -34,10 +34,10 @@ def pytest_report_header(config: pytest.Config, start_path: Path) -> str:
 
 def pytest_sessionstart() -> None:
     """Use only 2 threads for CPLEX on GitHub Actions runners with 2 CPU cores."""
-    import message_ix.models
+    import message_ix.common
 
     if "GITHUB_ACTIONS" in os.environ:
-        message_ix.models.DEFAULT_CPLEX_OPTIONS["threads"] = 2
+        message_ix.common.DEFAULT_CPLEX_OPTIONS["threads"] = 2
 
 
 # Data for testing
@@ -928,7 +928,7 @@ def snapshots_from_zenodo(
     """
     from pooch import HTTPDownloader, Pooch
 
-    from message_ix.models import MACRO
+    from message_ix.macro import MACRO
 
     # Create a pooch 'registry' from `SCENARIOS`
     assert pytestconfig.cache, "Pytest config does not have `.cache` set!"

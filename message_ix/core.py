@@ -46,7 +46,7 @@ class Scenario(ixmp.Scenario):
         if version == "new":
             scheme = scheme or "MESSAGE"
 
-        if scheme not in ("MESSAGE", None):
+        if scheme not in ("MESSAGE", "MESSAGE-MACRO", None):
             msg = f"Instantiate message_ix.Scenario with scheme {scheme}"
             raise ValueError(msg)
 
@@ -61,7 +61,7 @@ class Scenario(ixmp.Scenario):
         )
 
         # Scheme returned by database
-        assert self.scheme == "MESSAGE", self.scheme
+        assert self.scheme in ("MESSAGE", "MESSAGE-MACRO"), self.scheme
 
     # Utility methods used by .equ(), .par(), .set(), and .var()
 
@@ -793,8 +793,8 @@ class Scenario(ixmp.Scenario):
         --------
         :ref:`macro-input-data`
         """
-        from .macro import EXPERIMENTAL, add_model_data, calibrate
-        from .models import MACRO
+        from .macro import MACRO
+        from .macro.calibrate import EXPERIMENTAL, add_model_data, calibrate
 
         # Display a warning
         log.warning(EXPERIMENTAL)

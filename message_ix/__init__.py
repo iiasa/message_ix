@@ -8,7 +8,9 @@ from ixmp.model import MODELS
 from ixmp.util import DeprecatedPathFinder
 
 from .core import Scenario
-from .models import MACRO, MESSAGE, MESSAGE_MACRO
+from .macro import MACRO
+from .message import MESSAGE
+from .message_macro import MESSAGE_MACRO
 from .report import Reporter
 from .util import make_df
 

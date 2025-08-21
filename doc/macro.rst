@@ -73,10 +73,12 @@ The required dimensions or symbol of each item are given in the same notation us
 
 - ``price_ref`` (:math:`n, s`): prices of MACRO sector output in the reference year.
   These can be constructed from the MESSAGE variable ``PRICE_COMMODITY``, using the ``config`` mapping.
-  If not provided, :mod:`message_ix.macro` will identify the reference year and extrapolate reference values using an exponential function fitted to ``PRICE_COMMODITY`` values; see :func:`.macro.extrapolate`.
+  If not provided, :mod:`message_ix.macro.calibrate` will identify the reference year
+  and extrapolate reference values using an exponential function fitted to ``PRICE_COMMODITY`` values.
+  See :func:`~.macro.calibrate.extrapolate`.
 - ``cost_ref`` (:math:`n`): total cost of the energy system in the reference year.
   These can be constructed from the MESSAGE variable ``COST_NODAL_NET``, including dividing by a factor of 1000.
-  If not provided, :mod:`message_ix.macro` will extrapolate using :func:`.macro.extrapolate`.
+  If not provided, :mod:`message_ix.macro.calibrate` will extrapolate using :func:`~.macro.calibrate.extrapolate`.
 - ``demand_ref`` (:math:`n, s`): demand for MACRO sector output in the reference year.
 - ``lotol`` (:math:`n`): tolerance factor for lower bounds on MACRO variables.
 - ``esub`` (:math:`\epsilon_n`): elasticity of substitution between capital-labor and energy.
@@ -228,9 +230,9 @@ Alternatively the arguments can be specified either in :file:`models.py`.
 Code documentation
 ==================
 
-.. currentmodule:: message_ix.macro
+.. currentmodule:: message_ix.macro.calibrate
 
-.. automodule:: message_ix.macro
+.. automodule:: message_ix.macro.calibrate
    :members:
 
    The functions :func:`add_model_data` and :func:`calibrate` are used by :meth:`.Scenario.add_macro`.
