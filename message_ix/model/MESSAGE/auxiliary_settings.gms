@@ -26,7 +26,7 @@ option MCP = PATH ;
 
 *option solveopt=clear ;# remove results of previous runs in memory
 option solveopt=merge ; # keep results of previous runs in memory
-$SETENV GdxCompress 1   # reduces the size of the gdx export file
+$SETENV GDXCOMPRESS 1   # reduces the size of the gdx export file
 
 %calibration%$ONTEXT
 $ONLISTING
