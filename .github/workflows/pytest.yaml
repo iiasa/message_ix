@@ -134,6 +134,9 @@ jobs:
     - name: Install the package and dependencies
       run: uv pip install --upgrade ${{ env.upstream-versions }} .[tests]
 
+    - name: TEMPORARY workaround https://github.com/iiasa/message_ix/issues/975
+      run: uv pip install "ixmp4==0.11.1"
+
     - name: Run test suite using pytest
       env:
         # For test_cli.test_dl; see code in message_ix.cli.dl
@@ -213,6 +216,9 @@ jobs:
 
     - name: Install the package and dependencies
       run: uv pip install --upgrade ${{ env.upstream-versions }} .[tests]
+
+    - name: TEMPORARY workaround https://github.com/iiasa/message_ix/issues/975
+      run: uv pip install "ixmp4==0.11.1"
 
     - name: Install R dependencies and tutorial requirements
       run: |

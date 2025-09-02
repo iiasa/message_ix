@@ -67,6 +67,9 @@ jobs:
           "ixmp[tests] @ git+https://github.com/iiasa/ixmp.git@main" \
           .[tests]
 
+    - name: TEMPORARY workaround https://github.com/iiasa/message_ix/issues/975
+      run: uv pip install "ixmp4==0.11.1"
+
     - name: Run test suite using pytest
       env:
         MESSAGE_IX_ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
