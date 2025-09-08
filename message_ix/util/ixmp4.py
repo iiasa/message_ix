@@ -1,5 +1,4 @@
 import ixmp
-import ixmp.backend
 from ixmp.util.ixmp4 import is_ixmp4backend
 
 
