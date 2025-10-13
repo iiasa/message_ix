@@ -42,7 +42,7 @@ jobs:
       run: git fetch --tags --depth=${{ env.depth }}
 
     - name: Set up uv, Python
-      uses: astral-sh/setup-uv@v6
+      uses: astral-sh/setup-uv@v7
       with:
         activate-environment: true
         enable-cache: true
