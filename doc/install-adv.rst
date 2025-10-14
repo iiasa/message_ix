@@ -137,6 +137,46 @@ If you want to use :meth:`.visualize` or run the test suite, the Graphviz progra
 If you install MESSAGEix :ref:`using conda <using-conda>`, Graphviz is installed automatically via `its conda-forge package`_.
 For other methods of installation (such as :program:`pip`) see the `Graphviz download page`_ for downloads and instructions for your system.
 
+.. _install-postgres:
+
+PostgreSQL (optional)
+---------------------
+
+.. caution::
+    Using PostgreSQL is still in development/experimental! 
+    If you notice minor differences in behaviour or performance, 
+    please let us know by opening an issue on GitHub.
+
+The new ixmp4 package is `only feature-complete <https://github.com/iiasa/ixmp4/pull/190>`__ when using `PostgreSQL <https://www.postgresql.org/>`__.
+If you want to work on such a database locally, 
+you need to get an instance running locally.
+This is explained `in ixmp4 <https://github.com/iiasa/ixmp4/blob/main/DEVELOPING.md#running-tests-with-postgresql>`__, 
+but here are the most important points:
+
+- The easiest way to do that is by using `docker <https://www.docker.com/>`__, so make sure it is installed on your system or follow `their instructions <https://docs.docker.com/engine/install/>`__.
+- Get the latest version of the official PostgreSQL image by running in your terminal::
+
+    docker pull postgres
+
+- Finally, run the container using::
+
+    docker run -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=ixmp-test -p 5432:5432 -d postgres
+
+  .. note::
+    The values for ``POSTGRES_PASSWORD`` and ``POSTGRES_DB`` are chosen to set up a database instance that is found by :mod:`ixmp`'s default configuration.
+    You are free to choose different values here, 
+    but will have to adapt the configuration, too, in that case.
+
+.. tip::
+    ixmp4 provides `a docker compose file <https://github.com/iiasa/ixmp4/blob/main/tests/docker-compose.yml>`__ that lets you achieve the above in a single command (once everything is installed).
+    If you install ixmp4 from source, 
+    you have the file on your system and can use it straight away.
+    Alternatively, you can copy the contents of this file to a location of your choosing.
+    To use it, run this in your terminal (with the appropriate path to the file)::
+
+        docker-compose -f docker-compose.yml up
+
+
 Install |MESSAGEix|
 ===================
 
