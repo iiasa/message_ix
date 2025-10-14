@@ -760,6 +760,36 @@ class Scenario(ixmp.Scenario):
         """
         super().solve(model=model, solve_options=solve_options, **kwargs)
 
+    def create_model_instance(self, model="MESSAGE", **model_options):
+        """Create a persistent GAMS model instance for efficient resolving.
+
+        This is a thin wrapper around :meth:`ixmp.Scenario.create_model_instance`
+        that defaults to the MESSAGE model.
+
+        Parameters
+        ----------
+        model : str, optional
+            Model to compile. Default is "MESSAGE".
+        model_options :
+            Additional keyword arguments passed to the model.
+
+        Returns
+        -------
+        tuple of (GamsModelInstance, GamsWorkspace)
+            The model instance and workspace that can be used for efficient resolving.
+
+        Examples
+        --------
+        >>> mi, ws = scen.create_model_instance()
+        >>> mi.solve()
+        >>> obj_value = mi.sync_db["OBJ"].first_record().level
+
+        See Also
+        --------
+        ixmp.Scenario.create_model_instance
+        """
+        return super().create_model_instance(model=model, **model_options)
+
     def add_macro(
         self,
         data: Union[Mapping, os.PathLike],
