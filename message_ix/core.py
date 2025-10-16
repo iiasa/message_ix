@@ -808,6 +808,7 @@ class Scenario(ixmp.Scenario):
         self,
         model="MESSAGE",
         modifiable_pars=None,
+        fixable_vars=None,
         use_defaults=True,
         **model_options,
     ):
@@ -823,6 +824,8 @@ class Scenario(ixmp.Scenario):
         modifiable_pars : list of str, optional
             List of parameter names that can be modified between solves.
             If None and use_defaults=True, uses DEFAULT_MODIFIABLE_PARS.
+        fixable_vars : list of str, optional
+            List of variable names that can be fixed between solves.
         use_defaults : bool, optional
             If True and modifiable_pars is None, uses DEFAULT_MODIFIABLE_PARS.
             Set to False to create instance with no modifiable parameters.
@@ -859,7 +862,10 @@ class Scenario(ixmp.Scenario):
             modifiable_pars = DEFAULT_MODIFIABLE_PARS
 
         return super().create_model_instance(
-            model=model, modifiable_pars=modifiable_pars, **model_options
+            model=model,
+            modifiable_pars=modifiable_pars,
+            fixable_vars=fixable_vars,
+            **model_options,
         )
 
     def add_macro(
