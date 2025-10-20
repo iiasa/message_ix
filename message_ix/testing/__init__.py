@@ -25,6 +25,16 @@ GHA = "GITHUB_ACTIONS" in os.environ
 # Pytest hooks
 
 
+def pytest_configure(config: pytest.Config) -> None:
+    """Force iam-units to use a distinct cache for each worker.
+
+    Work around for https://github.com/hgrecco/flexcache/issues/6 /
+    https://github.com/IAMconsortium/units/issues/54.
+    """
+    name = f"iam-units-{os.environ.get('PYTEST_XDIST_WORKER', '')}".rstrip("-")
+    os.environ["IAM_UNITS_CACHE"] = str(config.cache.mkdir(name))
+
+
 def pytest_report_header(config: pytest.Config, start_path: Path) -> str:
     """Add the message_ix import path to the pytest report header."""
     import message_ix
