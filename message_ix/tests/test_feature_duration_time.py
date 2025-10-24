@@ -8,9 +8,12 @@ months; and different number of time slices at each level are tested.
 
 from itertools import product
 
+import pytest
 from ixmp import Platform
 
 from message_ix import Scenario
+
+pytestmark = pytest.mark.ixmp4_209
 
 
 # A function for generating a simple model with sub-annual time slices

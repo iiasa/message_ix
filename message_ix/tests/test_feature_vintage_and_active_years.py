@@ -15,6 +15,9 @@ from message_ix.testing import SCENARIO
 # tested here (and not just in ixmp).
 
 
+pytestmark = pytest.mark.ixmp4_209
+
+
 @lru_cache()
 def _generate_yv_ya(periods: tuple[int, ...]) -> pd.DataFrame:
     """All meaningful combinations of (vintage year, active year) given `periods`."""

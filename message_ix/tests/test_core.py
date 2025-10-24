@@ -17,6 +17,8 @@ import message_ix
 from message_ix import Scenario
 from message_ix.testing import GHA, SCENARIO, make_dantzig, make_westeros
 
+pytestmark = pytest.mark.ixmp4_209
+
 
 @pytest.fixture
 def dantzig_message_scenario(
@@ -393,7 +395,7 @@ def test_add_cat_unique(message_test_mp: ixmp.Platform) -> None:
     assert [1963] == scen2.cat("year", "firstmodelyear")
 
 
-def test_years_active(test_mp: ixmp.Platform) -> None:
+def test_years_active0(test_mp: ixmp.Platform) -> None:
     test_mp.add_unit("year")
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
     scen.add_set("node", "foo")
@@ -439,7 +441,7 @@ def test_years_active(test_mp: ixmp.Platform) -> None:
     npt.assert_array_equal(result, years[1:-1])
 
 
-def test_years_active_extend(message_test_mp: ixmp.Platform) -> None:
+def test_years_active1(message_test_mp: ixmp.Platform) -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig multi-year"])
 
     # Existing time horizon
@@ -464,7 +466,7 @@ def test_years_active_extend(message_test_mp: ixmp.Platform) -> None:
     npt.assert_array_equal(result, years[1:-1])
 
 
-def test_years_active_extended2(test_mp: ixmp.Platform) -> None:
+def test_years_active2(test_mp: ixmp.Platform) -> None:
     test_mp.add_unit("year")
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
     scen.add_set("node", "foo")
@@ -511,7 +513,7 @@ def test_years_active_extended2(test_mp: ixmp.Platform) -> None:
     npt.assert_array_equal(result, years[-2])
 
 
-def test_years_active_extend3(test_mp: ixmp.Platform) -> None:
+def test_years_active3(test_mp: ixmp.Platform) -> None:
     test_mp.add_unit("year")
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
     scen.add_set("node", "foo")

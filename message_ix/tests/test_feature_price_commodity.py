@@ -3,6 +3,8 @@ from ixmp import Platform
 
 from message_ix import ModelError, Scenario
 
+pytestmark = pytest.mark.ixmp4_209
+
 
 def model_setup(scen: Scenario, var_cost: int | None = 1) -> None:
     scen.add_set("node", "node")

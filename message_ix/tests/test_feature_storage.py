@@ -23,6 +23,8 @@ from message_ix.message import MESSAGE
 from message_ix.testing import make_dantzig
 from message_ix.util import expand_dims
 
+pytestmark = pytest.mark.ixmp4_209
+
 
 # A function for generating a simple MESSAGEix model with two technologies
 def model_setup(scen: Scenario, years: list[int]) -> None:

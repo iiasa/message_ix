@@ -13,6 +13,8 @@ from message_ix.testing import make_westeros
 if TYPE_CHECKING:
     from ixmp import Platform
 
+pytestmark = pytest.mark.ixmp4_209
+
 #: Periods: one historical, two in the time horizon
 Y = [0, 10, 20]
 

@@ -11,6 +11,8 @@ from message_ix.tools.sankey import map_for_sankey
 if TYPE_CHECKING:
     import pyam
 
+pytestmark = pytest.mark.ixmp4_209
+
 # NOTE This test likely doesn't need to be parametrized
 
 

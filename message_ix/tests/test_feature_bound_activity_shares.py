@@ -11,6 +11,8 @@ from pandas.testing import assert_frame_equal
 from message_ix import ModelError, Scenario, make_df
 from message_ix.testing import make_dantzig
 
+pytestmark = pytest.mark.ixmp4_209
+
 #: First model year of the :func:`.make_dantzig` scenario.
 Y0 = 1963
 

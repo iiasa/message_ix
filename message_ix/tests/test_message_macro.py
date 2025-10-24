@@ -41,6 +41,7 @@ class TestMESSAGE_MACRO:
         ):
             _MM()
 
+    @pytest.mark.ixmp4_209
     def test_initialize(self, test_mp: Platform) -> None:
         # MESSAGE_MACRO.initialize() runs
         Scenario(

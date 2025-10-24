@@ -1,6 +1,9 @@
+import pytest
 from ixmp import Platform
 
 from message_ix import Scenario
+
+pytestmark = pytest.mark.ixmp4_209
 
 
 def model_setup(scen: Scenario, years: list[int]) -> None:

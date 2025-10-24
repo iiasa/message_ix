@@ -14,6 +14,8 @@ from message_ix.macro.calibrate import add_model_data, calibrate, prepare_comput
 from message_ix.report import Quantity
 from message_ix.testing import SCENARIO, make_westeros
 
+pytestmark = pytest.mark.ixmp4_209
+
 # NOTE These tests maybe don't need to be parametrized
 # Do the following depend on otherwise untested Scenario functions?
 # Scenario.add_macro()
