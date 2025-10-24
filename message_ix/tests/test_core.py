@@ -1,4 +1,3 @@
-import sys
 from collections.abc import Generator
 from copy import deepcopy
 from pathlib import Path
@@ -155,8 +154,7 @@ def test_backends_available() -> None:
     """Check that the expected set of backends are available within GHA workflows."""
     from ixmp.backend import available
 
-    exp = {"ixmp4", "jdbc"} if sys.version_info >= (3, 10) else {"jdbc"}
-    assert exp <= set(available())
+    assert {"ixmp4", "jdbc"} <= set(available())
 
 
 def test_year_int(test_mp: ixmp.Platform, request: pytest.FixtureRequest) -> None:

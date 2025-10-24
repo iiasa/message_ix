@@ -1,11 +1,7 @@
 import logging
 from typing import TYPE_CHECKING
 
-try:
-    from pyam.str import get_variable_components
-except ImportError:  # Python < 3.10 → pyam-iamc < 3
-    from pyam.utils import get_variable_components
-
+from pyam.str import get_variable_components
 
 if TYPE_CHECKING:
     import pyam
