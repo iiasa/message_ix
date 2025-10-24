@@ -22,6 +22,8 @@ Adjust any imports like the following:
 All changes
 -----------
 
+- :mod:`message_ix` is tested and compatible with `Python 3.14 <https://www.python.org/downloads/release/python-3140/>`__ (:pull:`985`).
+- Support for Python 3.9 is dropped (:pull:`985`), as it has reached end-of-life.
 - Add representation of commodity flows associated with construction and retirement of technology capacity (:pull:`451`).
 
   - New parameters
@@ -48,6 +50,7 @@ All changes
 - Document the :ref:`minimum version of Java <install-java>` required for :class:`ixmp.JDBCBackend <ixmp.backend.jdbc.JDBCBackend>` (:pull:`962`).
 - Improve type hinting (:pull:`963`).
 - Fix capitalization in auxiliary_settings.gms to enable GDX output file compression on MacOS and Linux. (:pull:`965`) 
+
 All changes
 -----------
 
