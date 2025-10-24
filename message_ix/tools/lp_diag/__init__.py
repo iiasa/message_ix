@@ -647,19 +647,18 @@ class LPdiag:
                 print(f"{sec_name} value {val} ignored for neutral row {row_name}.")
                 return
             attr = self.seq_row.get(row_seq)  # [row_name, lo_bnd, up_bnd, row_type]
-            if sec_name == "rhs":  # process the RHS value
-                if row_type == "G":  # update lo_bnd
+            match sec_name, row_type:
+                case "rhs", "G":  # update lo_bnd
                     attr[1] = val
-                elif row_type == "L":  # update up_bnd
+                case "rhs", "L":  # update up_bnd
                     attr[2] = val
-                elif row_type == "E":  # update both bounds
+                case "rhs", "E":  # update both bounds
                     attr[1] = attr[2] = val
-            else:  # process the ranges value
-                if row_type == "G":  # update up_bnd
+                case "ranges", "G":  # update up_bnd
                     attr[2] = attr[1] + abs(val)
-                elif row_type == "L":  # update lo_bnd
+                case "ranges", "L":  # update lo_bnd
                     attr[1] = attr[2] - abs(val)
-                elif row_type == "E":  # update both bounds
+                case "ranges", "E":  # update both bounds
                     if val > 0:
                         attr[2] = attr[1] + val
                     else:
