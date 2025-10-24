@@ -3,7 +3,7 @@ import os
 from collections.abc import Callable, Generator
 from itertools import product
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 import ixmp
 import numpy as np
@@ -90,7 +90,7 @@ SNAPSHOTS = (
 
 # Create and populate ixmp databases
 
-_ms: list[Union[str, float]] = [
+_ms: list[str | float] = [
     SCENARIO["dantzig"]["model"],
     SCENARIO["dantzig"]["scenario"],
 ]
@@ -165,7 +165,7 @@ def make_austria(  # noqa: C901
     solve: bool = False,
     quiet: bool = True,
     *,
-    request: Optional["pytest.FixtureRequest"] = None,
+    request: "pytest.FixtureRequest | None" = None,
 ) -> Scenario:
     """Return an :class:`message_ix.Scenario` for the Austrian energy system.
 
@@ -352,7 +352,7 @@ def make_dantzig(
     solve: bool = False,
     multi_year: bool = False,
     *,
-    request: Optional["pytest.FixtureRequest"] = None,
+    request: "pytest.FixtureRequest | None" = None,
     **solve_opts,
 ) -> Scenario:
     """Return an :class:`message_ix.Scenario` for Dantzig's canning problem.
@@ -521,7 +521,7 @@ def make_westeros(
     quiet: bool = True,
     model_horizon: list[int] = [700, 710, 720],
     *,
-    request: Optional["pytest.FixtureRequest"] = None,
+    request: "pytest.FixtureRequest | None" = None,
 ) -> Scenario:
     """Return a new :class:`message_ix.Scenario` containing the ‘Westeros’ model.
 
@@ -715,7 +715,7 @@ def make_subannual(
     var_cost={},
     operation_factor={},
     *,
-    request: Optional["pytest.FixtureRequest"] = None,
+    request: "pytest.FixtureRequest | None" = None,
 ) -> Scenario:
     """Return an :class:`message_ix.Scenario` with subannual time resolution.
 

@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from ixmp import Platform
 
 
-COMMON: dict[str, Union[int, str]] = dict(
+COMMON: dict[str, int | str] = dict(
     commodity="coal",
     level="end_of_life",
     node_dest="World",

@@ -1,12 +1,10 @@
-from typing import Optional, Union
-
 import pytest
 from ixmp import Platform
 
 from message_ix import ModelError, Scenario
 
 
-def model_setup(scen: Scenario, var_cost: Optional[int] = 1) -> None:
+def model_setup(scen: Scenario, var_cost: int | None = 1) -> None:
     scen.add_set("node", "node")
     scen.add_set("commodity", "comm")
     scen.add_set("level", "level")
@@ -16,8 +14,8 @@ def model_setup(scen: Scenario, var_cost: Optional[int] = 1) -> None:
 
     scen.add_set("technology", "tec")
     scen.add_set("mode", "mode")
-    tec_specs: list[Union[int, str]] = ["node", "tec", 2020, 2020, "mode"]
-    output_specs: list[Union[int, str]] = ["node", "comm", "level", "year", "year"]
+    tec_specs: list[int | str] = ["node", "tec", 2020, 2020, "mode"]
+    output_specs: list[int | str] = ["node", "comm", "level", "year", "year"]
     scen.add_par("output", tec_specs + output_specs, 1, "GWa")
     scen.add_par("var_cost", tec_specs + ["year"], var_cost, "USD/GWa")
 

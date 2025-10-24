@@ -1,5 +1,3 @@
-from typing import Union
-
 import numpy as np
 import pandas as pd
 from ixmp import Platform
@@ -29,7 +27,7 @@ g = {"technology": "canning_addon", "node_loc": "seattle"}
 
 
 def add_addon(
-    s: Scenario, costs: Union[bool, int] = False, zero_output: bool = False
+    s: Scenario, costs: bool | int = False, zero_output: bool = False
 ) -> None:
     s.check_out()
     s.add_set("technology", "canning_addon")

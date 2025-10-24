@@ -3,7 +3,7 @@ from collections.abc import Generator
 from copy import deepcopy
 from pathlib import Path
 from subprocess import run
-from typing import Any, Optional
+from typing import Any
 
 import ixmp
 import numpy as np
@@ -301,7 +301,7 @@ def test_add_spatial_hierarchy(test_mp: ixmp.Platform) -> None:
     ],
 )
 def test_add_horizon(
-    test_mp: ixmp.Platform, args, kwargs, exp: Optional[dict[str, list[int]]]
+    test_mp: ixmp.Platform, args, kwargs, exp: dict[str, list[int]] | None
 ) -> None:
     scen = Scenario(test_mp, **SCENARIO["dantzig"], version="new")
 

@@ -1,5 +1,5 @@
 import logging
-from typing import TYPE_CHECKING, Any, Literal, TypeVar, Union, cast
+from typing import TYPE_CHECKING, Any, Literal, TypeVar, cast
 
 import pandas as pd
 from ixmp import Platform
@@ -161,7 +161,7 @@ def ensure_required_indexsets_have_data(scenario: "Scenario") -> None:
 
 def _maybe_add_to_table(
     table: "Table",
-    data: Union[dict[str, Any], pd.DataFrame],
+    data: dict[str, Any] | pd.DataFrame,
     backend: "Backend",
 ) -> None:
     """Add (parts of) `data` to `table` if they are missing."""
@@ -268,7 +268,7 @@ def compose_dimension_map(
 
 
 def _maybe_add_single_item_to_indexset(
-    indexset: "IndexSet", data: Union[float, int, str], backend: "Backend"
+    indexset: "IndexSet", data: float | int | str, backend: "Backend"
 ) -> None:
     """Add `data` to `indexset` if it is missing."""
     if data not in list(indexset.data):
@@ -277,7 +277,7 @@ def _maybe_add_single_item_to_indexset(
 
 def _maybe_add_list_to_indexset(
     indexset: "IndexSet",
-    data: Union[list[float], list[int], list[str]],
+    data: list[float] | list[int] | list[str],
     backend: "Backend",
 ) -> None:
     """Add missing parts of `data` to `indexset`."""
@@ -290,7 +290,7 @@ def _maybe_add_list_to_indexset(
 
 def _maybe_add_to_indexset(
     indexset: "IndexSet",
-    data: Union[float, int, str, list[float], list[int], list[str]],
+    data: float | int | str | list[float] | list[int] | list[str],
     backend: "Backend",
 ) -> None:
     """Add (parts of) `data` to `indexset` if they are missing."""
@@ -307,7 +307,7 @@ def _maybe_add_to_indexset(
 # slower than necessary (though likely not by much). Is the maintenance effort worth it?
 def _maybe_add_to_parameter(
     parameter: "Parameter",
-    data: Union[dict[str, Any], pd.DataFrame],
+    data: dict[str, Any] | pd.DataFrame,
     backend: "Backend",
 ) -> None:
     """Add (parts of) `data` to `parameter` if they are missing."""

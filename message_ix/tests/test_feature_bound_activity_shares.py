@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Union
 
 import numpy as np
 import numpy.testing as npt
@@ -259,7 +258,7 @@ def test_commodity_share_up(request: pytest.FixtureRequest, test_mp: Platform) -
     VALUE = 0.45
 
     # common operations for both subtests
-    def add_data(s: Scenario, modes: Union[str, list[str]]) -> None:
+    def add_data(s: Scenario, modes: str | list[str]) -> None:
         with s.transact("Add share_commodity_up"):
             s.add_set("shares", SHARES)
             s.add_cat("technology", tt_share, "canning_plant")

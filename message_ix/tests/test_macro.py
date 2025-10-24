@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from pathlib import Path
-from typing import Any, Literal, Union
+from typing import Any, Literal
 
 import numpy as np
 import numpy.testing as npt
@@ -227,7 +227,7 @@ def test_calc(
     w_data_path: Path,
     key: str,
     test: Literal["allclose", "equal"],
-    expected: Union[list[float], list[int]],
+    expected: list[float] | list[int],
 ) -> None:
     """Test calculation of intermediate values on a solved Westeros scenario."""
     c = prepare_computer(westeros_solved, data=w_data_path)

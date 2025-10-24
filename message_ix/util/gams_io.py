@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Literal, Optional, Union, cast
+from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
 
@@ -33,7 +33,7 @@ from .scenario_data import (
 # 	}
 
 # This must be convertible to pd.DataFrame
-MESSAGE_IX_VERSION: dict[str, Union[list[float], list[int], list[str]]] = {
+MESSAGE_IX_VERSION: dict[str, list[float] | list[int] | list[str]] = {
     "version_part": ["major", "minor"],
     "value": [2, 0],
 }
@@ -115,9 +115,7 @@ def _compose_resource_grade_map(
     return resource_grade_map
 
 
-def _handle_renames(
-    df: pd.DataFrame, renames: Optional[dict[str, str]]
-) -> pd.DataFrame:
+def _handle_renames(df: pd.DataFrame, renames: dict[str, str] | None) -> pd.DataFrame:
     """Rename columns from `df` according to `renames`, if present."""
     return df.rename(columns=renames) if renames else df
 
@@ -125,8 +123,8 @@ def _handle_renames(
 def _handle_empty_parameter(
     scenario: "Scenario",
     source_name: str,
-    columns: Optional[list[str]],
-    renames: Optional[dict[str, str]] = None,
+    columns: list[str] | None,
+    renames: dict[str, str] | None = None,
 ) -> pd.DataFrame:
     """Create an empty pd.DataFrame with correct column names."""
     _columns = columns or scenario.idx_names(name=source_name)
@@ -136,9 +134,9 @@ def _handle_empty_parameter(
 
 def _compose_records(
     scenario: "Scenario",
-    sources: dict[str, Optional[list[str]]],
-    filters: Optional[HelperFilterInfo],
-    renames: Optional[dict[str, str]],
+    sources: dict[str, list[str] | None],
+    filters: HelperFilterInfo | None,
+    renames: dict[str, str] | None,
 ) -> pd.DataFrame:
     """Compose the records for an auxiliary IndexSet/Table.
 
@@ -149,9 +147,9 @@ def _compose_records(
     sources: dict
         A mapping to specify the sources. Keys are parameter names, values are optional
         columns to limit the data to.
-    filters: Optional[HelperFilterInfo]
+    filters: HelperFilterInfo
         Optionally, specify a filter that limits a single column to specific values.
-    renames: Optional[dict[str, str]]
+    renames: dict[str, str]
         Optionally, rename columns of the records to align them properly.
     """
     # Create a list to collect records
@@ -195,7 +193,7 @@ def _compose_records(
 
 
 def _compose_map_tec_time(
-    scenario: "Scenario", sources: dict[str, Optional[list[str]]]
+    scenario: "Scenario", sources: dict[str, list[str] | None]
 ) -> pd.DataFrame:
     """Compose the records for an auxiliary IndexSet/Table.
 
@@ -235,8 +233,8 @@ def _compose_map_tec_time(
 
 def _compose_map_resource(
     scenario: "Scenario",
-    sources: dict[str, Optional[list[str]]],
-    filters: Optional[HelperFilterInfo],
+    sources: dict[str, list[str] | None],
+    filters: HelperFilterInfo | None,
     resource_grade_map: dict[tuple[str, str], list[str]],
 ) -> pd.DataFrame:
     """Compose the records for an auxiliary IndexSet/Table.
@@ -248,7 +246,7 @@ def _compose_map_resource(
     sources: dict
         A mapping to specify the sources. Keys are parameter names, values are optional
         columns to limit the data to.
-    filters: Optional[HelperFilterInfo]
+    filters: HelperFilterInfo
         Optionally, specify a filter that limits a single column to specific values.
     resource_grade_map: dict[list[str], list[str]]
         An auxiliary mapping from (`node`, `commodity`) to list of `grade` to construct

@@ -7,7 +7,6 @@ months; and different number of time slices at each level are tested.
 """
 
 from itertools import product
-from typing import Union
 
 from ixmp import Platform
 
@@ -126,7 +125,7 @@ def model_generator(
         # "output"
         for h in times_out:
             out = com_dict[tec]["output"]
-            out_spec: list[Union[int, str]] = [
+            out_spec: list[int | str] = [
                 yr,
                 yr,
                 "standard",

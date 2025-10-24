@@ -1,5 +1,3 @@
-from typing import Union
-
 from ixmp import Platform
 
 from message_ix import Scenario
@@ -18,14 +16,14 @@ def model_setup(scen: Scenario, years: list[int]) -> None:
 
     scen.add_set("technology", ["tec1", "tec2"])
     scen.add_set("mode", "mode")
-    output_specs: list[Union[int, str]] = ["node", "comm", "level", "year", "year"]
+    output_specs: list[int | str] = ["node", "comm", "level", "year", "year"]
     dict_var_cost = {"tec1": 1, "tec2": 2}
     dict_em_factor = {"tec1": 1.5, "tec2": 1}
 
     for yr in years:
         scen.add_par("demand", ["node", "comm", "level", yr, "year"], 1, "GWa")
         for t in dict_var_cost.keys():
-            tec_specs: list[Union[int, str]] = ["node", t, yr, yr, "mode"]
+            tec_specs: list[int | str] = ["node", t, yr, yr, "mode"]
             scen.add_par("output", tec_specs + output_specs, 1, "GWa")
             scen.add_par("var_cost", tec_specs + ["year"], dict_var_cost[t], "USD/GWa")
             scen.add_par(
@@ -34,14 +32,14 @@ def model_setup(scen: Scenario, years: list[int]) -> None:
 
 
 def add_bound_emission(
-    scen: Scenario, bound: float, year: Union[int, str] = "cumulative"
+    scen: Scenario, bound: float, year: int | str = "cumulative"
 ) -> None:
     scen.check_out()
     scen.add_par("bound_emission", ["node", "emiss_type", "all", year], bound, "kg")
     scen.commit("Emission bound added")
 
 
-def assert_function(scen: Scenario, year: Union[int, str]) -> None:
+def assert_function(scen: Scenario, year: int | str) -> None:
     var_em = scen.var("EMISS", {"node": "node"}).set_index(["year"])["lvl"]
     bound_em = scen.par("bound_emission", {"type_year": year}).at[0, "value"]
 

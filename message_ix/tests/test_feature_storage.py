@@ -11,7 +11,6 @@ functionality of storage equations. The workflow is as follows:
 
 import logging
 from itertools import product
-from typing import Union
 
 import pandas as pd
 import pandas.testing as pdt
@@ -34,12 +33,12 @@ def model_setup(scen: Scenario, years: list[int]) -> None:
     scen.add_set("type_year", years)
     scen.add_set("technology", ["wind_ppl", "gas_ppl"])
     scen.add_set("mode", "M1")
-    output_specs: list[Union[int, str]] = ["node", "electr", "level", "year", "year"]
+    output_specs: list[int | str] = ["node", "electr", "level", "year", "year"]
     # Two technologies, one cheaper than the other
     var_cost = {"wind_ppl": 0, "gas_ppl": 2}
     for year, (tec, cost) in product(years, var_cost.items()):
         scen.add_par("demand", ["node", "electr", "level", year, "year"], 1, "GWa")
-        tec_specs: list[Union[int, str]] = ["node", tec, year, year, "M1"]
+        tec_specs: list[int | str] = ["node", tec, year, year, "M1"]
         scen.add_par("output", tec_specs + output_specs, 1, "GWa")
         scen.add_par("var_cost", tec_specs + ["year"], cost, "USD/GWa")
 
@@ -55,7 +54,7 @@ def add_seasonality(scen: Scenario, time_duration: dict[str, float]) -> None:
 
 # A function for modifying model parameters after adding sub-annual time steps
 def year_to_time(
-    scen: Scenario, parname: str, time_share: Union[dict[str, float], dict[str, int]]
+    scen: Scenario, parname: str, time_share: dict[str, float] | dict[str, int]
 ) -> None:
     old = scen.par(parname)
     scen.remove_par(parname, old)

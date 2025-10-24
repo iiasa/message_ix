@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from functools import partial
 from operator import itemgetter, mul
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
@@ -460,7 +460,7 @@ def validate_transform(
     return df.set_index(idx)["value"]
 
 
-def _validate_data(name: Optional[str], df: "DataFrame", s: Structures) -> list:
+def _validate_data(name: str | None, df: "DataFrame", s: Structures) -> list:
     """Validate input `df` against `s` for MACRO parameter `name` calibration .
 
     Parameters
@@ -553,7 +553,7 @@ def ym1(df: "Series", macro_periods: Collection[int]) -> int:
 
 
 def add_model_data(
-    base: "Scenario", clone: "Scenario", data: Union[Mapping, os.PathLike]
+    base: "Scenario", clone: "Scenario", data: Mapping | os.PathLike
 ) -> None:
     """Calculate and add MACRO structure and data to `clone`.
 
@@ -643,8 +643,8 @@ def calibrate(s, check_convergence: bool = True, **kwargs):
 
 def prepare_computer(
     base: "Scenario",
-    target: Optional["Scenario"] = None,
-    data: Union[Mapping, os.PathLike, None] = None,
+    target: "Scenario | None" = None,
+    data: Mapping | os.PathLike | None = None,
 ) -> "genno.Computer":
     """Prepare a :class:`.Reporter` to perform MACRO calibration calculations.
 
