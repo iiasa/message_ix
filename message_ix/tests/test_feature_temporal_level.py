@@ -15,6 +15,8 @@ from ixmp import Platform
 from message_ix import ModelError, Scenario
 from message_ix.testing import make_subannual
 
+pytestmark = pytest.mark.ixmp4_209
+
 # Values for the com_dict argument to make_subannual
 COM_DICT = {
     "gas_ppl": {"input": "fuel", "output": "electr"},

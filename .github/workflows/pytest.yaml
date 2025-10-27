@@ -24,7 +24,7 @@ env:
   GAMS_VERSION: 48.6.1 # Oldest version of GAMS that can reliably be downloaded
   depth: 100  # Must be large enough to include the most recent release
   label: "safe to test"  # Label that must be applied to run on PRs from forks
-  python-version: "3.13"  # For non-matrixed jobs
+  python-version: "3.14"  # For non-matrixed jobs
   # Install:
   # - dask: to work around https://github.com/khaeru/genno/issues/171
   # - ixmp: from its `main` branch.
@@ -57,16 +57,15 @@ jobs:
     strategy:
       matrix:
         os:
-        - macos-13
         - macos-latest
         - ubuntu-latest
         - windows-latest
         python-version:
-        - "3.9"   # Earliest version supported by message_ix
-        - "3.10"
+        - "3.10"  # Earliest version supported by message_ix
         - "3.11"
         - "3.12"
-        - "3.13"  # Latest version supported by message_ix
+        - "3.13"
+        - "3.14"  # Latest version supported by message_ix
 
         # Below this comment are newly released or development versions of
         # Python. For these versions, binary wheels are not available for some
@@ -74,17 +73,7 @@ jobs:
         # these on the job runner requires a more elaborate build environment,
         # currently out of scope for the message_ix project.
 
-        # - "3.14.0-alpha.1"  # Development version
-
-        exclude:
-        # Specific version combinations that are invalid / not to be used
-        # No arm64 distributions of JPype for these Pythons
-        - { os: macos-latest, python-version: "3.9" }
-        # Redundant with macos-latest
-        - { os: macos-13, python-version: "3.10" }
-        - { os: macos-13, python-version: "3.11" }
-        - { os: macos-13, python-version: "3.12" }
-        - { os: macos-13, python-version: "3.13" }
+        # - "3.15.0-alpha.1"  # Development version
 
       fail-fast: false
 

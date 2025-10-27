@@ -1,6 +1,7 @@
 """Tools for migrating :class:`Scenario` data across versions of :mod:`message_ix`."""
 
 import logging
+from itertools import pairwise
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -25,8 +26,6 @@ def initial_new_capacity_up_v311(
 
     *All* values in initial_new_capacity_up are rewritten in this way.
     """
-    # TODO Move this to top level when dropping support for Python 3.9
-    from itertools import pairwise
 
     if migration_applied(s, "initial_new_capacity_up_v311"):
         log.info(

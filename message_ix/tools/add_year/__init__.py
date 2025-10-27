@@ -12,7 +12,7 @@
 
 # %% I) Importing required packages
 import logging
-from typing import Literal, Optional, Union
+from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -24,12 +24,12 @@ log = logging.getLogger(__name__)
 
 # %% II) Utility functions for dataframe manupulation
 def intpol(
-    y1: Union[float, pd.Series, pd.DataFrame],
-    y2: Union[float, pd.Series, pd.DataFrame],
+    y1: float | pd.Series | pd.DataFrame,
+    y2: float | pd.Series | pd.DataFrame,
     x1: int,
     x2: int,
     x: int,
-) -> Union[float, pd.Series, pd.DataFrame]:
+) -> float | pd.Series | pd.DataFrame:
     """Interpolate between (*x1*, *y1*) and (*x2*, *y2*) at *x*.
 
     Parameters
@@ -52,7 +52,7 @@ def slice_df(
     idx: list[str],
     level: str,
     locator: list,
-    value: Union[int, str, None],
+    value: int | str | None,
 ) -> pd.DataFrame:
     """Slice a MultiIndex DataFrame and set a value to a specific level.
 
@@ -76,9 +76,7 @@ def slice_df(
     return df.set_index(idx)
 
 
-def mask_df(
-    df: pd.DataFrame, index: tuple[Union[int, str], ...], count: int, value
-) -> None:
+def mask_df(df: pd.DataFrame, index: tuple[int | str, ...], count: int, value) -> None:
     """Create a mask for removing extra values from *df*."""
     df.loc[
         index,
@@ -110,15 +108,15 @@ def add_year(
     sc_ref: Scenario,
     sc_new: Scenario,
     years_new: list[int],
-    firstyear_new: Optional[int] = None,
-    lastyear_new: Optional[int] = None,
+    firstyear_new: int | None = None,
+    lastyear_new: int | None = None,
     macro: bool = False,
-    baseyear_macro: Optional[int] = None,
-    parameter: Union[list[str], Literal["all"]] = "all",
-    region: Union[list[str], Literal["all"]] = "all",
+    baseyear_macro: int | None = None,
+    parameter: list[str] | Literal["all"] = "all",
+    region: list[str] | Literal["all"] = "all",
     rewrite: bool = True,
     unit_check: bool = True,
-    extrapol_neg: Optional[float] = None,
+    extrapol_neg: float | None = None,
     bound_extend: bool = True,
 ) -> None:
     """Add years to *sc_ref* to produce *sc_new*.
@@ -292,9 +290,9 @@ def add_year_set(  # noqa: C901
     sc_ref: Scenario,
     sc_new: Scenario,
     years_new: list[int],
-    firstyear_new: Optional[int] = None,
-    lastyear_new: Optional[int] = None,
-    baseyear_macro: Optional[int] = None,
+    firstyear_new: int | None = None,
+    lastyear_new: int | None = None,
+    baseyear_macro: int | None = None,
 ) -> None:
     """Add new years to sets.
 
@@ -340,7 +338,7 @@ def add_year_set(  # noqa: C901
                 baseyear_macro
             )
 
-    yr_pair: list[list[Union[int, str]]] = []
+    yr_pair: list[list[int | str]] = []
     for yr in years_new:
         yr_pair.append([yr, yr])
         yr_pair.append(["cumulative", yr])
@@ -404,7 +402,7 @@ def add_year_par(
     extrapolate: bool = False,
     rewrite: bool = True,
     unit_check: bool = True,
-    extrapol_neg: Optional[float] = None,
+    extrapol_neg: float | None = None,
     bound_extend: bool = True,
 ) -> None:
     """Add new years to parameters.
@@ -570,7 +568,7 @@ def interpolate_1d(  # noqa: C901
     year_col: str,
     value_col: str = "value",
     extrapolate: bool = False,
-    extrapol_neg: Optional[float] = None,
+    extrapol_neg: float | None = None,
     bound_extend: bool = True,
 ):
     """Interpolate data with one year dimension.
@@ -729,8 +727,8 @@ def interpolate_2d(  # noqa: C901
     par_tec: pd.DataFrame,
     value_col: str = "value",
     extrapolate: bool = False,
-    extrapol_neg: Optional[float] = None,
-    year_diff: Optional[list[int]] = None,
+    extrapol_neg: float | None = None,
+    year_diff: list[int] | None = None,
     bound_extend: bool = True,
 ):
     """Interpolate parameters with two dimensions related year.

@@ -2,7 +2,7 @@ import logging
 from collections.abc import Mapping
 from functools import lru_cache, partial
 from operator import itemgetter
-from typing import TYPE_CHECKING, Union, cast
+from typing import TYPE_CHECKING, cast
 
 from genno.operator import broadcast_map
 from ixmp.report import (
@@ -220,7 +220,7 @@ class Reporter(IXMPReporter):
                 f'Scenario "{scenario.model}/{scenario.scenario}" has no solution'
             )
             log.warning("Some reporting may not function as expected")
-            fail_action: Union[int, str] = logging.DEBUG
+            fail_action: int | str = logging.DEBUG
         else:
             fail_action = "raise"
 
@@ -288,7 +288,7 @@ class Reporter(IXMPReporter):
         # Generate the plotly.Figure object; return the key
         return str(self.add(f"sankey figure {unique}", sankey, k[1], k[2]))
 
-    def add_tasks(self, fail_action: Union[int, str] = "raise") -> None:
+    def add_tasks(self, fail_action: int | str = "raise") -> None:
         """Add the pre-defined MESSAGEix reporting tasks to the Reporter.
 
         Parameters

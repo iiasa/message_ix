@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Union
 
 import numpy as np
 import numpy.testing as npt
@@ -11,6 +10,8 @@ from pandas.testing import assert_frame_equal
 
 from message_ix import ModelError, Scenario, make_df
 from message_ix.testing import make_dantzig
+
+pytestmark = pytest.mark.ixmp4_209
 
 #: First model year of the :func:`.make_dantzig` scenario.
 Y0 = 1963
@@ -259,7 +260,7 @@ def test_commodity_share_up(request: pytest.FixtureRequest, test_mp: Platform) -
     VALUE = 0.45
 
     # common operations for both subtests
-    def add_data(s: Scenario, modes: Union[str, list[str]]) -> None:
+    def add_data(s: Scenario, modes: str | list[str]) -> None:
         with s.transact("Add share_commodity_up"):
             s.add_set("shares", SHARES)
             s.add_cat("technology", tt_share, "canning_plant")

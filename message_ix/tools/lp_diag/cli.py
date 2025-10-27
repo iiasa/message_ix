@@ -16,7 +16,6 @@ import os
 import sys  # for redirecting stdout
 from datetime import datetime as dt
 from pathlib import Path
-from typing import Optional
 
 import click
 
@@ -52,7 +51,7 @@ import click
     help="Magnitude order of the upper tail (default: 5).",
 )
 @click.option("--outp", "fn_outp", metavar="PATH", help="Path for file output.")
-def main(w_dir: Path, prob_id: Path, fn_outp: Optional[Path], lo_tail, up_tail) -> None:
+def main(w_dir: Path, prob_id: Path, fn_outp: Path | None, lo_tail, up_tail) -> None:
     """Diagnostics of basic properties of LP problems stored in the MPS format.
 
     \b

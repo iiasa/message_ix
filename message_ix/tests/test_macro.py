@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from pathlib import Path
-from typing import Any, Literal, Union
+from typing import Any, Literal
 
 import numpy as np
 import numpy.testing as npt
@@ -13,6 +13,8 @@ from message_ix.macro import MACRO
 from message_ix.macro.calibrate import add_model_data, calibrate, prepare_computer
 from message_ix.report import Quantity
 from message_ix.testing import SCENARIO, make_westeros
+
+pytestmark = pytest.mark.ixmp4_209
 
 # NOTE These tests maybe don't need to be parametrized
 # Do the following depend on otherwise untested Scenario functions?
@@ -227,7 +229,7 @@ def test_calc(
     w_data_path: Path,
     key: str,
     test: Literal["allclose", "equal"],
-    expected: Union[list[float], list[int]],
+    expected: list[float] | list[int],
 ) -> None:
     """Test calculation of intermediate values on a solved Westeros scenario."""
     c = prepare_computer(westeros_solved, data=w_data_path)

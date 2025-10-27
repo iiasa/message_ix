@@ -1,11 +1,12 @@
-from typing import Union
-
 import numpy as np
 import pandas as pd
+import pytest
 from ixmp import Platform
 
 from message_ix import Scenario
 from message_ix.testing import SCENARIO
+
+pytestmark = pytest.mark.ixmp4_209
 
 # First model year of the Dantzig scenario
 _year = 1963
@@ -29,7 +30,7 @@ g = {"technology": "canning_addon", "node_loc": "seattle"}
 
 
 def add_addon(
-    s: Scenario, costs: Union[bool, int] = False, zero_output: bool = False
+    s: Scenario, costs: bool | int = False, zero_output: bool = False
 ) -> None:
     s.check_out()
     s.add_set("technology", "canning_addon")

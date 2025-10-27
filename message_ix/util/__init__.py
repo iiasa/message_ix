@@ -4,7 +4,7 @@ import warnings
 from collections import ChainMap, defaultdict
 from collections.abc import Mapping
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import pandas as pd
 from ixmp.backend import ItemType
@@ -23,7 +23,7 @@ def copy_model(
     set_default: bool = False,
     quiet: bool = False,
     *,
-    source_dir: Optional[Path] = None,
+    source_dir: Path | None = None,
 ) -> None:
     """Copy the MESSAGE GAMS files to a new `path`.
 

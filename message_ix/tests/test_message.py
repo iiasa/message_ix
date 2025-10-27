@@ -3,12 +3,16 @@ from collections import defaultdict
 from typing import TYPE_CHECKING
 
 import ixmp
+import pytest
 from ixmp.backend.jdbc import JDBCBackend
 
 from message_ix.message import MESSAGE
 
 if TYPE_CHECKING:
     from ixmp import Platform
+
+
+pytestmark = pytest.mark.ixmp4_209
 
 
 class TestMESSAGE:

@@ -7,7 +7,6 @@
 import os
 from importlib.metadata import version as get_version
 from pathlib import Path
-from typing import Optional
 
 # -- Project information ---------------------------------------------------------------
 
@@ -193,7 +192,7 @@ extlinks = {
 # -- Options for sphinx.ext.intersphinx ------------------------------------------------
 
 
-def local_inv(name: str, *parts: str) -> Optional[str]:
+def local_inv(name: str, *parts: str) -> str | None:
     """Construct the path to a local intersphinx inventory."""
 
     from importlib.util import find_spec

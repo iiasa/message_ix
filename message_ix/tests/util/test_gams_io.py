@@ -1,13 +1,10 @@
 import pandas as pd
 import pytest
 from ixmp import Platform
-from ixmp.testing import min_ixmp4_version
 
 from message_ix import Scenario
 from message_ix.testing import make_westeros
 from message_ix.util.scenario_data import HELPER_INDEXSETS, HELPER_TABLES
-
-pytestmark = min_ixmp4_version
 
 
 def test_store_message_version() -> None:
@@ -23,6 +20,7 @@ def test_store_message_version() -> None:
 
 
 @pytest.mark.ixmp4
+@pytest.mark.ixmp4_209
 def test_add_default_data_to_container_data_list(test_mp: Platform) -> None:
     from ixmp.util.ixmp4 import ContainerData
 
@@ -66,6 +64,7 @@ def test_add_default_data_to_container_data_list(test_mp: Platform) -> None:
 
 
 @pytest.mark.ixmp4
+@pytest.mark.ixmp4_209
 def test_add_auxiliary_items_to_container_data_list(
     test_mp: Platform, request: pytest.FixtureRequest
 ) -> None:

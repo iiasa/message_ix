@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Literal, Optional, Union
+from typing import Literal
 
 # NOTE on transcribing from ixmp_source:
 # The data in this file is based on
@@ -64,7 +64,7 @@ DEFAULT_INDEXSET_DATA = [
 class TableInfo:
     name: str
     indexsets: list[str]
-    column_names: Optional[list[str]] = None
+    column_names: list[str] | None = None
 
 
 # List of required table names and indexsets they are linked to, including column_names
@@ -200,11 +200,11 @@ class ParameterInfo:
     name: str
     gams_name: str  # could default to None  and use name in that case, maybe?
     indexsets: list[str]
-    column_names: Optional[list[str]] = None
+    column_names: list[str] | None = None
     write_to_gdx: bool = True
     is_tec: bool = False
     is_tec_act: bool = False
-    section: Optional[
+    section: (
         Literal[
             "energyforms:",
             "demand:",
@@ -213,7 +213,8 @@ class ParameterInfo:
             "variables:",
             "relationsX:",
         ]
-    ] = None
+        | None
+    ) = None
     # NOTE changing '2LDB' to 'toLDB'
     toLDB: bool = False
     mode: bool = False
@@ -1372,7 +1373,7 @@ REQUIRED_PARAMETERS = [parameter for parameter in PARAMETERS if parameter.write_
 @dataclass
 class DefaultParameterData:
     name: str
-    data: dict[str, Union[list[int], list[str]]]  # based on current usage
+    data: dict[str, list[int] | list[str]]  # based on current usage
 
 
 DEFAULT_PARAMETER_DATA = [
@@ -1386,8 +1387,8 @@ DEFAULT_PARAMETER_DATA = [
 class VariableInfo:
     name: str
     gams_name: str
-    indexsets: Optional[list[str]] = None
-    column_names: Optional[list[str]] = None
+    indexsets: list[str] | None = None
+    column_names: list[str] | None = None
 
 
 # List of required variable names and indexsets they are linked to, including
@@ -1534,14 +1535,14 @@ REQUIRED_EQUATIONS = [
 class HelperFilterInfo:
     column_name: str
     target_name: Literal["resource", "renewables", "stocks"]
-    target: Optional[list[str]] = None
+    target: list[str] | None = None
 
 
 @dataclass
 class HelperIndexSetInfo:
     name: str
-    sources: dict[str, Optional[list[str]]]
-    filters: Optional[HelperFilterInfo] = None
+    sources: dict[str, list[str] | None]
+    filters: HelperFilterInfo | None = None
 
 
 HELPER_INDEXSETS = [
@@ -1568,7 +1569,7 @@ HELPER_INDEXSETS = [
 
 @dataclass
 class HelperTableInfo(HelperIndexSetInfo):
-    renames: Optional[dict[str, str]] = None
+    renames: dict[str, str] | None = None
 
 
 # NOTE on transcribing from ixmp_source: ixmp.Element.getVector() only returns keys,

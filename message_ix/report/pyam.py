@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional, TypedDict
+from typing import TYPE_CHECKING, TypedDict
 
 if TYPE_CHECKING:
     import pandas
@@ -8,15 +8,15 @@ class CollapseMessageColsKw(TypedDict, total=False):
     """Type hint for :class:`dict` of keyword args to :func:`collapse_message_cols`."""
 
     df: "pandas.DataFrame"
-    var: Optional[str]
-    kind: Optional[str]
+    var: str | None
+    kind: str | None
     var_cols: list[str]
 
 
 def collapse_message_cols(
     df: "pandas.DataFrame",
-    var: Optional[str] = None,
-    kind: Optional[str] = None,
+    var: str | None = None,
+    kind: str | None = None,
     var_cols=[],
 ) -> "pandas.DataFrame":
     """:mod:`genno.compat.pyam` `collapse=...` callback for MESSAGEix quantities.

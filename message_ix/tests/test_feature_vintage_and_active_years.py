@@ -1,6 +1,5 @@
 from collections.abc import Sequence
 from functools import lru_cache
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -14,6 +13,9 @@ from message_ix.testing import SCENARIO
 # NOTE If we really need to save runtime, these tests might not need to be parametrized.
 # vintage_and_active_years() seems composite, but not sure if individual parts are
 # tested here (and not just in ixmp).
+
+
+pytestmark = pytest.mark.ixmp4_209
 
 
 @lru_cache()
@@ -41,7 +43,7 @@ def _setup(
     mp: Platform,
     years: Sequence[int],
     firstmodelyear: int,
-    tl_years: Optional[filter] = None,
+    tl_years: filter | None = None,
 ) -> tuple[Scenario, pd.DataFrame]:
     """Common setup for test of :meth:`.vintage_and_active_years`.
 
@@ -75,7 +77,7 @@ def _setup(
 
 
 def _q(
-    df: pd.DataFrame, query: str, append: Optional[pd.DataFrame] = None
+    df: pd.DataFrame, query: str, append: pd.DataFrame | None = None
 ) -> pd.DataFrame:
     """Shorthand to query the results of :func:`_generate_yv_ya`.
 

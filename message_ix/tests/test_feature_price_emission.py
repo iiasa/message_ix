@@ -1,10 +1,10 @@
-from typing import Union
-
 import numpy.testing as npt
 import pytest
 from ixmp import Platform
 
 from message_ix import Scenario, make_df
+
+pytestmark = pytest.mark.ixmp4_209
 
 MODEL = "test_emissions_price"
 
@@ -94,13 +94,13 @@ def add_two_tecs(scen: Scenario, years: list[int]) -> None:
 
 def add_many_tecs(scen: Scenario, years: list[int], n: int = 50) -> None:
     """add a range of dirty-to-clean technologies to the scenario"""
-    output_specs: list[Union[int, str]] = ["node", "comm", "level", "year", "year"]
+    output_specs: list[int | str] = ["node", "comm", "level", "year", "year"]
 
     for i in range(n + 1):
         t = "tec{}".format(i)
         scen.add_set("technology", t)
         for y in years:
-            tec_specs: list[Union[int, str]] = ["node", t, y, y, "mode"]
+            tec_specs: list[int | str] = ["node", t, y, y, "mode"]
             # variable costs grow quadratically over technologies
             # to get rid of the curse of linearity
             c = (10 * i / n) ** 2 * (1.045) ** (y - years[0])

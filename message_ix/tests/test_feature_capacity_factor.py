@@ -6,6 +6,8 @@ from ixmp import Platform
 from message_ix import ModelError, Scenario
 from message_ix.testing import make_subannual
 
+pytestmark = pytest.mark.ixmp4_209
+
 
 def check_solution(scen: Scenario) -> None:
     """Perform several assertions about the solution of `scen`."""

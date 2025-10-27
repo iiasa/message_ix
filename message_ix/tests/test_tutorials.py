@@ -4,7 +4,7 @@ import sys
 from collections.abc import Generator
 from pathlib import Path
 from shutil import copyfile
-from typing import Any, Optional, Union
+from typing import Any
 
 import ixmp.backend
 import numpy.testing as npt
@@ -47,11 +47,11 @@ pytestmark = [
 
 # NOTE Pytest.param returns ParamSet, which is private and hard to type hint
 def _t(
-    group: Union[str, None],
+    group: str | None,
     basename: str,
     *,
-    check: Optional[list[tuple]] = None,
-    marks: Optional[list[pytest.MarkDecorator]] = None,
+    check: list[tuple] | None = None,
+    marks: list[pytest.MarkDecorator] | None = None,
 ) -> tuple:
     """Shorthand for defining tutorial test cases.
 
@@ -144,7 +144,7 @@ def nb_path(
     yield tutorial_path.joinpath(*request.param).with_suffix(".ipynb")
 
 
-def default_args() -> dict[str, Union[int, str]]:
+def default_args() -> dict[str, int | str]:
     """Default arguments for :func:`.run_notebook."""
     if GHA:
         # Use a longer timeout

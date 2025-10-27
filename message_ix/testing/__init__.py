@@ -1,9 +1,10 @@
 import io
 import os
+import platform
 from collections.abc import Callable, Generator
 from itertools import product
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 import ixmp
 import numpy as np
@@ -28,11 +29,20 @@ GHA = "GITHUB_ACTIONS" in os.environ
 def pytest_configure(config: pytest.Config) -> None:
     """Force iam-units to use a distinct cache for each worker.
 
-    Work around for https://github.com/hgrecco/flexcache/issues/6 /
-    https://github.com/IAMconsortium/units/issues/54.
+    Work arounds for:
+
+    1. https://github.com/hgrecco/flexcache/issues/6 /
+       https://github.com/IAMconsortium/units/issues/54.
+    2. https://github.com/python/cpython/issues/125235,
+       https://github.com/astral-sh/uv/issues/7036, or similar.
     """
     name = f"iam-units-{os.environ.get('PYTEST_XDIST_WORKER', '')}".rstrip("-")
     os.environ["IAM_UNITS_CACHE"] = str(config.cache.mkdir(name))
+
+    if GHA and platform.system() == "Windows":
+        import matplotlib
+
+        matplotlib.use("agg")
 
 
 def pytest_report_header(config: pytest.Config, start_path: Path) -> str:
@@ -90,7 +100,7 @@ SNAPSHOTS = (
 
 # Create and populate ixmp databases
 
-_ms: list[Union[str, float]] = [
+_ms: list[str | float] = [
     SCENARIO["dantzig"]["model"],
     SCENARIO["dantzig"]["scenario"],
 ]
@@ -165,7 +175,7 @@ def make_austria(  # noqa: C901
     solve: bool = False,
     quiet: bool = True,
     *,
-    request: Optional["pytest.FixtureRequest"] = None,
+    request: "pytest.FixtureRequest | None" = None,
 ) -> Scenario:
     """Return an :class:`message_ix.Scenario` for the Austrian energy system.
 
@@ -352,7 +362,7 @@ def make_dantzig(
     solve: bool = False,
     multi_year: bool = False,
     *,
-    request: Optional["pytest.FixtureRequest"] = None,
+    request: "pytest.FixtureRequest | None" = None,
     **solve_opts,
 ) -> Scenario:
     """Return an :class:`message_ix.Scenario` for Dantzig's canning problem.
@@ -521,7 +531,7 @@ def make_westeros(
     quiet: bool = True,
     model_horizon: list[int] = [700, 710, 720],
     *,
-    request: Optional["pytest.FixtureRequest"] = None,
+    request: "pytest.FixtureRequest | None" = None,
 ) -> Scenario:
     """Return a new :class:`message_ix.Scenario` containing the ‘Westeros’ model.
 
@@ -715,7 +725,7 @@ def make_subannual(
     var_cost={},
     operation_factor={},
     *,
-    request: Optional["pytest.FixtureRequest"] = None,
+    request: "pytest.FixtureRequest | None" = None,
 ) -> Scenario:
     """Return an :class:`message_ix.Scenario` with subannual time resolution.
 

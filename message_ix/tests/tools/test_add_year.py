@@ -1,5 +1,5 @@
 from collections.abc import Callable, Generator
-from typing import Any, Union
+from typing import Any
 
 import pytest
 from click.testing import Result
@@ -27,12 +27,12 @@ def base_scen_mp(
         scen.add_set("year", years)
         scen.add_set("technology", "tec")
         scen.add_set("mode", "mode")
-        output_specs: list[Union[int, str]] = ["node", "comm", "level", "year", "year"]
+        output_specs: list[int | str] = ["node", "comm", "level", "year", "year"]
 
         for yr, value in data.items():
             scen.add_par("demand", ["node", "comm", "level", yr, "year"], 1, "GWa")
             scen.add_par("technical_lifetime", ["node", "tec", yr], 10, "y")
-            tec_specs: list[Union[int, str]] = ["node", "tec", yr, yr, "mode"]
+            tec_specs: list[int | str] = ["node", "tec", yr, yr, "mode"]
             scen.add_par("output", tec_specs + output_specs, 1, "-")
             scen.add_par("var_cost", tec_specs + ["year"], value, "USD/GWa")
 

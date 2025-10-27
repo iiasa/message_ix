@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 import matplotlib
 import pandas as pd
 import pyam
+import pytest
 from dask.core import literal
 
 try:
@@ -25,6 +26,7 @@ if TYPE_CHECKING:
 # NOTE These tests likely don't need to be parametrized
 
 
+@pytest.mark.ixmp4_209
 def test_as_message_df(test_mp: "Platform") -> None:
     q = random_qty(dict(c=3, h=2, nl=5))
     q.units = "kg"
@@ -84,6 +86,7 @@ def test_as_message_df(test_mp: "Platform") -> None:
     assert q.size == len(s.par("demand"))
 
 
+@pytest.mark.ixmp4_209
 def test_as_pyam(message_test_mp: "Platform") -> None:
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
     if not scen.has_solution():
@@ -101,6 +104,7 @@ def test_as_pyam(message_test_mp: "Platform") -> None:
     assert isinstance(p, pyam.IamDataFrame)
 
 
+@pytest.mark.ixmp4_209
 def test_concat(dantzig_reporter: Reporter) -> None:
     """pyam.concat() correctly passes through to ixmp…concat()."""
     rep = dantzig_reporter
