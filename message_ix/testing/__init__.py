@@ -1,5 +1,6 @@
 import io
 import os
+import platform
 from collections.abc import Callable, Generator
 from itertools import product
 from pathlib import Path
@@ -28,11 +29,20 @@ GHA = "GITHUB_ACTIONS" in os.environ
 def pytest_configure(config: pytest.Config) -> None:
     """Force iam-units to use a distinct cache for each worker.
 
-    Work around for https://github.com/hgrecco/flexcache/issues/6 /
-    https://github.com/IAMconsortium/units/issues/54.
+    Work arounds for:
+
+    1. https://github.com/hgrecco/flexcache/issues/6 /
+       https://github.com/IAMconsortium/units/issues/54.
+    2. https://github.com/python/cpython/issues/125235,
+       https://github.com/astral-sh/uv/issues/7036, or similar.
     """
     name = f"iam-units-{os.environ.get('PYTEST_XDIST_WORKER', '')}".rstrip("-")
     os.environ["IAM_UNITS_CACHE"] = str(config.cache.mkdir(name))
+
+    if GHA and platform.system() == "Windows":
+        import matplotlib
+
+        matplotlib.use("agg")
 
 
 def pytest_report_header(config: pytest.Config, start_path: Path) -> str:
