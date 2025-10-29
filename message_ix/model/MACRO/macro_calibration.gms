@@ -9,7 +9,7 @@ Parameters
 
 Scalar
          max_scale / 0.2 /
-         max_it    / 100 /
+         max_it    / 300 /
 ;
 
 Variables
