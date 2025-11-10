@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 DEFAULT_CPLEX_OPTIONS = {
     "advind": 0,
     "lpmethod": 4,
-    "threads": 4,
+    "threads": 8,
     "epopt": 1e-6,
     "scaind": -1,
     "memoryemphasis": "false",
