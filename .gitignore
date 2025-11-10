@@ -64,3 +64,7 @@ prof/
 # LPdiag
 message_ix/tests/data/lp_diag/diet_output.txt
 message_ix/tools/lp_diag/data/mps/*
+
+# don't track checkpoints 
+message_ix/model/MACRO/.ipynb_checkpoints/
+message_ix/model/MESSAGE/.ipynb_checkpoints/
