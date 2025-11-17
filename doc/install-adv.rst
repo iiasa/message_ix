@@ -143,39 +143,76 @@ PostgreSQL (optional)
 ---------------------
 
 .. caution::
-    Using PostgreSQL is still in development/experimental! 
-    If you notice minor differences in behaviour or performance, 
-    please let us know by opening an issue on GitHub.
+   Support for PostgreSQL via :class:`ixmp.IXMP4Backend <ixmp.backend.ixmp4.IXMP4Backend>` experimental,
+   and still under development.
+   If you notice differences in behaviour or performance, 
+   please let us know by opening an issue on GitHub.
 
-The new ixmp4 package is `only feature-complete <https://github.com/iiasa/ixmp4/pull/190>`__ when using `PostgreSQL <https://www.postgresql.org/>`__.
-If you want to work on such a database locally, 
-you need to get an instance running locally.
-This is explained `in ixmp4 <https://github.com/iiasa/ixmp4/blob/main/DEVELOPING.md#running-tests-with-postgresql>`__, 
-but here are the most important points:
+While the :mod:`ixmp4` package supports both SQLite and `PostgreSQL <https://www.postgresql.org/>`__ databases
+it and thus :class:`~ixmp.backend.ixmp4.IXMP4Backend` only provide complete support for |MESSAGEix| when using PostgreSQL.
+(See `iiasa/ixmp4#190 <https://github.com/iiasa/ixmp4/pull/190>`__ for details.)
+In order to use IXMP4Backend, ixmp4, and PostgreSQL for local storage of :class:`message_ix.Scenario` data,
+you must have a running instance of PostgreSQL.
 
-- The easiest way to do that is by using `docker <https://www.docker.com/>`__, so make sure it is installed on your system or follow `their instructions <https://docs.docker.com/engine/install/>`__.
-- Get the latest version of the official PostgreSQL image by running in your terminal::
+There are multiple ways to install and configure PostgreSQL;
+`the ixmp4 developer documentation <https://github.com/iiasa/ixmp4/blob/main/DEVELOPING.md#running-tests-with-postgresql>`__ contains some discussion.
+One way that suffices for local testing is to use `Docker <https://docker.com>`__:
+
+- Ensure Docker is installed.
+  If necessary,
+  follow the `the Docker install instructions <https://docs.docker.com/engine/install>`__.
+- Pull (retrieve) the latest version of the official PostgreSQL Docker image.
+  In a terminal, run::
 
     docker pull postgres
 
-- Finally, run the container using::
+- Run the container::
 
-    docker run -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=ixmp-test -p 5432:5432 -d postgres
+    docker run -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=ixmp_test -p 5432:5432 -d postgres
 
-  .. note::
-    The values for ``POSTGRES_PASSWORD`` and ``POSTGRES_DB`` are chosen to set up a database instance that is found by :mod:`ixmp`'s default configuration.
-    You are free to choose different values here, 
-    but will have to adapt the configuration, too, in that case.
+  As of version 3.12, the :mod:`ixmp` default configuration includes a Platform named ``ixmp4-local``
+  that uses IXMP4Backend with the setting :py:`dsn="postgresql+psycopg://postgres:postgres@localhost:5432/ixmp_test"`.
+  In the above :program:`docker run` call,
+  the particular values for the ``POSTGRES_PASSWORD`` and ``POSTGRES_DB`` environment variables 
+  result in a database instance that matches this setting.
+  You may choose different values for these environment variables;
+  if so, then use a setting like :py:`dsn="postgresql+psycopg://postgres:{POSTGRES_PASSWORD}@localhost:5432/{POSTGRES_DB}"`
+  for the given Platform.
+
+The container must continue running while using :mod:`message_ix` with any PostgreSQL-backed Platform(s).
+Afterwards:
+
+- Show information about the running container(s)::
+
+    docker ps
+
+  This will show CONTAINER ID like "9d80a28ce850" and NAMES like "foo_bar".
+
+- Stop the PostgreSQL container using either its ID or name::
+
+    docker stop [CONTAINER ID]
+
+  .. warning:: When the container is stopped
+     —for instance, if the computer is turned off or rebooted—
+     **no data is preserved**.
+     In order for the contents of PostgreSQL database(s) in the container
+     to persist across container restarts,
+     the Docker :program:`--volume` option or similiar configuration must be used
+     to 'mount' or 'bind' a directory outside the container.
+
+  .. todo:: Expand the above commands to include :program:`--volume` examples.
 
 .. tip::
-    ixmp4 provides `a docker compose file <https://github.com/iiasa/ixmp4/blob/main/tests/docker-compose.yml>`__ that lets you achieve the above in a single command (once everything is installed).
-    If you install ixmp4 from source, 
-    you have the file on your system and can use it straight away.
-    Alternatively, you can copy the contents of this file to a location of your choosing.
-    To use it, run this in your terminal (with the appropriate path to the file)::
+   If :mod:`ixmp4` is installed or available from source
+   a `Docker Compose <https://docs.docker.com/compose/>`__ file,
+   :file:`tests/docker-compose.yaml`
+   (`view on GitHub <https://github.com/iiasa/ixmp4/blob/main/tests/docker-compose.yml>`__)
+   is available.
+   This allows to combine the :program:`docker pull` and :program:`docker run` steps
+   and use enviroment variables set by the file contents.
+   In a terminal, run::
 
-        docker-compose -f docker-compose.yml up
-
+     docker-compose -f docker-compose.yml up
 
 Install |MESSAGEix|
 ===================

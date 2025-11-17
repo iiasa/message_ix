@@ -214,6 +214,7 @@ intersphinx_mapping = {
         "https://docs.messageix.org/projects/ixmp/en/latest/",
         (local_inv("ixmp"), None),
     ),
+    "ixmp4": ("https://docs.ece.iiasa.ac.at/projects/ixmp4/en/latest", None),
     "jpype": ("https://jpype.readthedocs.io/en/stable", None),
     "message-ix-models": (
         "https://docs.messageix.org/projects/models/en/latest/",
