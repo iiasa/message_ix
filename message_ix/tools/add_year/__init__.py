@@ -790,7 +790,7 @@ def interpolate_2d(  # noqa: C901
     value_col: str = "value",
     extrapolate: bool = False,
     extrapol_neg: float | None = None,
-    year_diff: list[int] | None = None,
+    year_diff: list[int] = [],
     bound_extend: bool = True,
 ):
     """Interpolate parameters with two dimensions related year.
@@ -851,16 +851,22 @@ def interpolate_2d(  # noqa: C901
         if next_step_bigger_than_previous(horizon_new, horizon_new.index(x))
     ]
 
+    if year_diff and tec_list:
+        yr_diff_new = [x for x in yr_diff_new if x not in year_diff]
+
     # Generate duration_period_sum matrix for masking
+    dur_list = list(np.diff(horizon_new))
+    dur_list.insert(0, dur_list[0])
+    dur = pd.DataFrame(index=horizon_new, data=dur_list)
     df_dur = pd.DataFrame(
         index=horizon_new[:-1], columns=[str(year) for year in horizon_new[1:]]
     )
     for i in df_dur.index.astype(str):
         for j in [x for x in df_dur.columns if x > i]:
-            df_dur.loc[i, j] = int(j) - int(i)
+            df_dur.loc[i, j] = int(dur.loc[(dur.index >= i) & (dur.index < j)].sum())
 
     # Add data for new transition year
-    if yr_diff_new and tec_list and year_diff not in yr_diff_new:
+    if yr_diff_new and tec_list:
         yrs = [x for x in horizon if x <= yr_diff_new[0]]
         year_next = min([x for x in df2_int_column_list if x > yr_diff_new[0]])
         df_yrs = slice_df(df2_tec, idx, year_ref, yrs, None)
@@ -892,11 +898,6 @@ def interpolate_2d(  # noqa: C901
             d = d.loc[d.index.isin(d_n.index), :]
             d[d.isnull() & d_n.notnull()] = d_n
             df2.loc[df2.index.isin(d.index), :] = d
-
-        cond1 = df_dur.index <= yr_diff_new[0]
-        cond2 = df_dur.columns.astype(int) >= year_next
-        subt = yr_diff_new[0] - horizon_new[horizon_new.index(yr_diff_new[0]) - 1]
-        df_dur.loc[cond1, cond2] = df_dur.loc[cond1, cond2] - subt
 
     # Second, add year_act of new years if year_vtg is in existing years
     for yr in yrs_new:
