@@ -73,7 +73,7 @@ def dl(branch, tag, path):
     else:
         # Get tag information using GitHub API
         args = dict(
-            url="https://api.github.com/repos/iiasa/message_ix/tags",
+            url="https://api.github.com/repos/iiasa/message_ix/tags?per_page=100",
             headers=dict(),
         )
 
