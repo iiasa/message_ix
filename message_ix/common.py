@@ -5,6 +5,7 @@ from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from copy import copy
 from dataclasses import InitVar, dataclass, field
+from functools import cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -15,6 +16,7 @@ from ixmp.backend import ItemType
 if TYPE_CHECKING:
     from logging import LogRecord
 
+    from genno import Key
     from ixmp.types import InitializeItemsKwargs
 
 
@@ -68,9 +70,11 @@ DIMS = {
     "yr": ("year", "year_rel"),
     "yv": ("year", "year_vtg"),
 }
+# Inverse mapping
+DIMS_INVERSE = {v[1]: k for k, v in DIMS.items()}
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class Item:
     """Description of an :mod:`ixmp` item: equation, parameter, set, or variable.
 
@@ -117,6 +121,18 @@ class Item:
         Read-only.
         """
         return str(self.type.name).lower()
+
+    @property
+    @cache
+    def key(self) -> "Key":
+        """:class:`genno.Key` for this Item in a :class:`.Reporter`.
+
+        Read-only.
+        """
+        from genno import Key
+
+        dims = [DIMS_INVERSE.get(d, d) for d in self.dims or self.coords]
+        return Key(self.name, dims)
 
     def to_dict(self) -> "InitializeItemsKwargs":
         """Return the :class:`dict` representation used internally in :mod:`ixmp`."""
