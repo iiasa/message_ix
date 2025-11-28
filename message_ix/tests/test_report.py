@@ -9,6 +9,7 @@ import genno
 import pandas as pd
 import pyam
 import pytest
+from genno import Key
 from genno.testing import assert_qty_equal
 from ixmp import Platform
 from ixmp.backend import ItemType
@@ -140,6 +141,45 @@ class TestReporter:
         assert key.startswith("sankey figure ")
 
         assert rep.check_keys(key)
+
+    def test_gh_988(
+        self,
+        caplog: pytest.LogCaptureFixture,
+        request: pytest.FixtureRequest,
+        test_mp: Platform,
+    ) -> None:
+        """Test of https://github.com/iiasa/message_ix#988."""
+        scen = make_dantzig(test_mp, quiet=True, request=request)
+
+        # Remove parameters that were added in iiasa/message_ix#451
+        # Not removed: equ COMMODDITY_BALANCE_[GL]T, var COMMODITY_BALANCE
+        with scen.transact():
+            for name in (
+                "input_cap",
+                "input_cap_new",
+                "input_cap_ret",
+                "output_cap",
+                "output_cap_new",
+                "output_cap_ret",
+            ):
+                scen.remove_par(name)
+
+        # Reporter.from_scenario() works, despite the missing parameters
+        # iiasa/message_ix#988: this raises MissingKeyError
+        rep = Reporter.from_scenario(scen, fail_action="raise")
+
+        # Warnings are logged
+        pattern = re.compile("is missing 6 parameter.*input_cap_new", re.DOTALL)
+        assert any(map(pattern.search, caplog.messages))
+
+        # A full key is available for the task that depends on input_cap_new
+        k_full = rep.full_key("in_cap_new")
+        # The key has expected dimensions
+        assert Key("in_cap_new:nl-t-yv-no-c-l-h") == k_full
+
+        # The key can be computed; the result is an empty Quantity
+        result = rep.get(k_full)
+        assert 0 == len(result)
 
     def test_from_scenario(
         self, message_test_mp: Platform, keys: Generator[set[str]]
