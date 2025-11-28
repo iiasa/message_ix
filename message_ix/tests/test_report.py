@@ -29,148 +29,6 @@ pytestmark = pytest.mark.ixmp4_209
 # NOTE These tests maybe don't need to be parametrized.
 # Does `Reporter.from_scenario()` depend on otherwise untested Scenario functions?
 
-
-class TestReporter:
-    def test_add_sankey(
-        self, test_mp: Platform, request: pytest.FixtureRequest
-    ) -> None:
-        scen = make_westeros(test_mp, solve=True, quiet=True, request=request)
-        rep = Reporter.from_scenario(scen, units={"replace": {"-": ""}})
-
-        # Method runs
-        key = rep.add_sankey(year=700, node="Westeros")
-
-        # Returns an existing key of the expected form
-        assert key.startswith("sankey figure ")
-
-        assert rep.check_keys(key)
-
-
-def test_reporter_no_solution(
-    caplog: pytest.LogCaptureFixture, message_test_mp: Platform
-) -> None:
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
-
-    with assert_logs(
-        caplog,
-        [
-            'Scenario "Canning problem (MESSAGE scheme)/standard" has no solution',
-            "Some reporting may not function as expected",
-        ],
-    ):
-        rep = Reporter.from_scenario(scen)
-
-    # Input parameters are still available
-    demand = rep.full_key("demand")
-    result = rep.get(demand)
-    assert 3 == len(result)
-
-
-# IXMP4Backend is currently not storing the MACRO variables 'C' and 'I' for MESSAGE
-# models.
-MISSING_IXMP4 = {"C:", "C:n", "C:n-y", "C:y", "I:", "I:n", "I:n-y", "I:y"}
-
-
-@pytest.fixture
-def keys(test_data_path: Path) -> Generator[set[str]]:
-    """Read two files with lists of keys expected in a :class:`.Reporter` graph.
-
-    Returns
-    -------
-    list
-        with 2 sets including the contents of:
-
-        1. :file:`reporter-keys-ixmp.txt`.
-        1. :file:`reporter-keys-message-ix.txt`.
-    """
-    fn = "reporter-keys-{}.txt"
-    return (
-        set(test_data_path.joinpath(fn.format(p)).read_text().split("\n")) - {""}
-        for p in ("ixmp", "message-ix")
-    )
-
-
-def test_reporter_from_scenario(
-    message_test_mp: Platform, keys: Generator[set[str]]
-) -> None:
-    scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
-
-    # Varies between local & CI contexts
-    # DEBUG may be due to reuse of test_mp in a non-deterministic order
-    if not scen.has_solution():
-        scen.solve(quiet=True)
-
-    # IXMPReporter can be initialized on a MESSAGE Scenario
-    rep_ix = ixmp_Reporter.from_scenario(scen)
-
-    # message_ix.Reporter can also be initialized
-    rep = Reporter.from_scenario(scen)
-
-    # NOTE Used to write out the expected data
-    # Path("reporter-keys-ixmp.txt").write_text(
-    #     "\n".join(map(str, sorted(rep_ix.graph)))
-    # )
-    # Path("reporter-keys-message-ix.txt").write_text(
-    #     "\n".join(sorted(map(str, set(rep.graph) - set(rep_ix.graph))))
-    # )
-
-    # Quantities have short dimension names
-    assert "demand:n-c-l-y-h" in rep, sorted(rep.graph)
-
-    # Aggregates are available
-    assert "demand:n-l-h" in rep, sorted(rep.graph)
-
-    # Quantities contain expected data
-    coords = dict(n="chicago new-york topeka".split())
-    demand = genno.Quantity([300, 325, 275], coords=coords, name="demand")
-
-    # NB the call to squeeze() drops the length-1 dimensions c-l-y-h
-    obs = rep.get("demand:n-c-l-y-h").squeeze(drop=True)
-    # check_attrs False because we don't get the unit addition in bare xarray
-    assert_qty_equal(obs, demand, check_attrs=False)
-
-    # Prepare the expected items in the graphs
-    expected_rep_ix_graph_keys = next(keys)
-    expected_rep_graph_keys = expected_rep_ix_graph_keys | next(keys)
-    if not isinstance(message_test_mp._backend, JDBCBackend):
-        expected_rep_ix_graph_keys -= MISSING_IXMP4
-        expected_rep_graph_keys -= MISSING_IXMP4
-
-    # ixmp.Reporter pre-populated with only model quantities and aggregates
-    assert expected_rep_ix_graph_keys == set(map(str, rep_ix.graph))
-
-    # message_ix.Reporter pre-populated with additional, derived quantities
-    assert expected_rep_graph_keys == set(map(str, rep.graph))
-
-    # Derived quantities have expected dimensions
-    vom_key = rep.full_key("vom")
-    assert vom_key not in rep_ix
-    assert vom_key == "vom:nl-t-yv-ya-m-h"
-
-    # …and expected values
-    var_cost = rep.get(rep.full_key("var_cost"))
-    ACT = rep.get(rep.full_key("ACT"))
-    vom = var_cost * ACT
-    # check_attrs false because `vom` multiply above does not add units
-    assert_qty_equal(vom, rep.get(vom_key))
-
-
-@pytest.fixture(scope="module")
-def exp_len_all(test_mp: Platform) -> int:
-    """Expected items collected under the "all" reporting key."""
-
-    # - Sets not included in "all".
-    # - 1 item each for PAR and VAR.
-    # - 2 items (values and marginals) for EQU.
-    count = {ItemType.SET: 0, ItemType.PAR: 1, ItemType.EQU: 2, ItemType.VAR: 1}
-    N = sum(count[i.type] for i in MESSAGE.items.values())
-
-    # With IXMP4Backend, scenarios do not include variables 'C' and 'I'
-    N += 0 if is_ixmp4backend(test_mp._backend) else 2
-
-    return N
-
-
 #: Expected number of data points for items in the make_dantzig() scenario.
 EXP_LEN_DANTZIG = defaultdict(
     lambda: 0,
@@ -191,26 +49,6 @@ EXP_LEN_DANTZIG = defaultdict(
     var_cost=6,
 )
 EXP_LEN_DANTZIG.update({"COMMODITY_BALANCE_GT-margin": 5, "OBJECTIVE-margin": 1})
-
-
-def test_reporter_from_dantzig(
-    request: pytest.FixtureRequest, test_mp: Platform, exp_len_all: int
-) -> None:
-    scen = make_dantzig(test_mp, solve=True, quiet=True, request=request)
-
-    # Reporter.from_scenario can handle Dantzig example model
-    rep = Reporter.from_scenario(scen)
-
-    # Default target can be calculated
-    result = rep.get("all")
-
-    # Result contains data for expected number of model data items
-    assert exp_len_all == len(result)
-
-    # Items have expected length
-    for qty in result:
-        assert EXP_LEN_DANTZIG[qty.name] == len(qty), f"{qty.name}: {qty.to_string()}"
-
 
 #: Expected number of data points for items in the make_westeros() scenario.
 EXP_LEN_WESTEROS = defaultdict(
@@ -243,56 +81,219 @@ EXP_LEN_WESTEROS = defaultdict(
 )
 EXP_LEN_WESTEROS.update({"OBJECTIVE-margin": 1})
 
+# IXMP4Backend is currently not storing the MACRO variables 'C' and 'I' for MESSAGE
+# models.
+MISSING_IXMP4 = {"C:", "C:n", "C:n-y", "C:y", "I:", "I:n", "I:n-y", "I:y"}
 
-def test_reporter_from_westeros(
-    request: pytest.FixtureRequest, test_mp: Platform, exp_len_all: int
-) -> None:
-    scen = make_westeros(test_mp, emissions=True, solve=True, request=request)
+# Fixtures
 
-    # Reporter.from_scenario can handle Westeros example model
-    rep = Reporter.from_scenario(scen)
 
-    # Westeros-specific configuration: '-' is a reserved character in pint
-    configure(units={"replace": {"-": ""}})
+@pytest.fixture(scope="module")
+def exp_len_all(test_mp: Platform) -> int:
+    """Expected items collected under the "all" reporting key."""
 
-    # Default target can be calculated
-    result = rep.get("all")
+    # - Sets not included in "all".
+    # - 1 item each for PAR and VAR.
+    # - 2 items (values and marginals) for EQU.
+    count = {ItemType.SET: 0, ItemType.PAR: 1, ItemType.EQU: 2, ItemType.VAR: 1}
+    N = sum(count[i.type] for i in MESSAGE.items.values())
 
-    # Result contains data for expected number of model data items
-    # With IXMP4Backend, `scen` and thus `result` does not include variables 'C' and 'I'
-    assert exp_len_all == len(result)
+    # With IXMP4Backend, scenarios do not include variables 'C' and 'I'
+    N += 0 if is_ixmp4backend(test_mp._backend) else 2
 
-    # Items have expected length
-    for qty in result:
-        assert EXP_LEN_WESTEROS[qty.name] == len(qty)
+    return N
 
-    # message default target can be calculated
-    # FIXME if df is empty, year is cast to float
-    obs = rep.get("message::default")
 
-    # all expected reporting exists
-    assert len(obs.data) == 78
+@pytest.fixture
+def keys(test_data_path: Path) -> Generator[set[str]]:
+    """Read two files with lists of keys expected in a :class:`.Reporter` graph.
 
-    # custom values are correct
-    obs = obs.filter(variable="total om*").as_pandas()
+    Returns
+    -------
+    list
+        with 2 sets including the contents of:
 
-    # Produce a merged data frame; this also implies that the same labels exist in `obs`
-    df = pd.DataFrame(
-        [
-            ["total om cost|coal_ppl", 700, 2801.242],
-            ["total om cost|coal_ppl", 710, 5321.242],
-            ["total om cost|coal_ppl", 720, 6933.333],
-            ["total om cost|grid", 700, 880.0],
-            ["total om cost|grid", 710, 1312.0],
-            ["total om cost|grid", 720, 1664.0],
-            ["total om cost|wind_ppl", 700, 400.6596],
-            ["total om cost|wind_ppl", 710, 67.32630],
-            ["total om cost|wind_ppl", 720, 0.0],
-        ],
-        columns=["variable", "year", "value"],
-    ).merge(obs, on=["variable", "year"], how="outer")
+        1. :file:`reporter-keys-ixmp.txt`.
+        1. :file:`reporter-keys-message-ix.txt`.
+    """
+    fn = "reporter-keys-{}.txt"
+    return (
+        set(test_data_path.joinpath(fn.format(p)).read_text().split("\n")) - {""}
+        for p in ("ixmp", "message-ix")
+    )
 
-    assert_allclose(df["value_y"], df["value_x"], err_msg=df.to_string())
+
+# Tests
+
+
+class TestReporter:
+    def test_add_sankey(
+        self, test_mp: Platform, request: pytest.FixtureRequest
+    ) -> None:
+        scen = make_westeros(test_mp, solve=True, quiet=True, request=request)
+        rep = Reporter.from_scenario(scen, units={"replace": {"-": ""}})
+
+        # Method runs
+        key = rep.add_sankey(year=700, node="Westeros")
+
+        # Returns an existing key of the expected form
+        assert key.startswith("sankey figure ")
+
+        assert rep.check_keys(key)
+
+    def test_from_scenario(
+        self, message_test_mp: Platform, keys: Generator[set[str]]
+    ) -> None:
+        scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
+
+        # Varies between local & CI contexts
+        # DEBUG may be due to reuse of test_mp in a non-deterministic order
+        if not scen.has_solution():
+            scen.solve(quiet=True)
+
+        # IXMPReporter can be initialized on a MESSAGE Scenario
+        rep_ix = ixmp_Reporter.from_scenario(scen)
+
+        # message_ix.Reporter can also be initialized
+        rep = Reporter.from_scenario(scen)
+
+        # NOTE Used to write out the expected data
+        # Path("reporter-keys-ixmp.txt").write_text(
+        #     "\n".join(map(str, sorted(rep_ix.graph)))
+        # )
+        # Path("reporter-keys-message-ix.txt").write_text(
+        #     "\n".join(sorted(map(str, set(rep.graph) - set(rep_ix.graph))))
+        # )
+
+        # Quantities have short dimension names
+        assert "demand:n-c-l-y-h" in rep, sorted(rep.graph)
+
+        # Aggregates are available
+        assert "demand:n-l-h" in rep, sorted(rep.graph)
+
+        # Quantities contain expected data
+        coords = dict(n="chicago new-york topeka".split())
+        demand = genno.Quantity([300, 325, 275], coords=coords, name="demand")
+
+        # NB the call to squeeze() drops the length-1 dimensions c-l-y-h
+        obs = rep.get("demand:n-c-l-y-h").squeeze(drop=True)
+        # check_attrs False because we don't get the unit addition in bare xarray
+        assert_qty_equal(obs, demand, check_attrs=False)
+
+        # Prepare the expected items in the graphs
+        expected_rep_ix_graph_keys = next(keys)
+        expected_rep_graph_keys = expected_rep_ix_graph_keys | next(keys)
+        if not isinstance(message_test_mp._backend, JDBCBackend):
+            expected_rep_ix_graph_keys -= MISSING_IXMP4
+            expected_rep_graph_keys -= MISSING_IXMP4
+
+        # ixmp.Reporter pre-populated with only model quantities and aggregates
+        assert expected_rep_ix_graph_keys == set(map(str, rep_ix.graph))
+
+        # message_ix.Reporter pre-populated with additional, derived quantities
+        assert expected_rep_graph_keys == set(map(str, rep.graph))
+
+        # Derived quantities have expected dimensions
+        vom_key = rep.full_key("vom")
+        assert vom_key not in rep_ix
+        assert vom_key == "vom:nl-t-yv-ya-m-h"
+
+        # …and expected values
+        var_cost = rep.get(rep.full_key("var_cost"))
+        ACT = rep.get(rep.full_key("ACT"))
+        vom = var_cost * ACT
+        # check_attrs false because `vom` multiply above does not add units
+        assert_qty_equal(vom, rep.get(vom_key))
+
+    def test_from_scenario_no_solution(
+        self, caplog: pytest.LogCaptureFixture, message_test_mp: Platform
+    ) -> None:
+        scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
+
+        with assert_logs(
+            caplog,
+            [
+                'Scenario "Canning problem (MESSAGE scheme)/standard" has no solution',
+                "Some reporting may not function as expected",
+            ],
+        ):
+            rep = Reporter.from_scenario(scen)
+
+        # Input parameters are still available
+        demand = rep.full_key("demand")
+        result = rep.get(demand)
+        assert 3 == len(result)
+
+    def test_from_dantzig(
+        self, request: pytest.FixtureRequest, test_mp: Platform, exp_len_all: int
+    ) -> None:
+        scen = make_dantzig(test_mp, solve=True, quiet=True, request=request)
+
+        # Reporter.from_scenario can handle Dantzig example model
+        rep = Reporter.from_scenario(scen)
+
+        # Default target can be calculated
+        result = rep.get("all")
+
+        # Result contains data for expected number of model data items
+        assert exp_len_all == len(result)
+
+        # Items have expected length
+        for qty in result:
+            assert EXP_LEN_DANTZIG[qty.name] == len(qty), (
+                f"{qty.name}: {qty.to_string()}"
+            )
+
+    def test_from_westeros(
+        self, request: pytest.FixtureRequest, test_mp: Platform, exp_len_all: int
+    ) -> None:
+        scen = make_westeros(test_mp, emissions=True, solve=True, request=request)
+
+        # Reporter.from_scenario can handle Westeros example model
+        rep = Reporter.from_scenario(scen)
+
+        # Westeros-specific configuration: '-' is a reserved character in pint
+        configure(units={"replace": {"-": ""}})
+
+        # Default target can be calculated
+        result = rep.get("all")
+
+        # Result contains data for expected number of model data items. On IXMP4Backend,
+        # `scen` and thus `result` does not include variables 'C' and 'I'.
+        assert exp_len_all == len(result)
+
+        # Items have expected length
+        for qty in result:
+            assert EXP_LEN_WESTEROS[qty.name] == len(qty)
+
+        # message default target can be calculated
+        # FIXME if df is empty, year is cast to float
+        obs = rep.get("message::default")
+
+        # all expected reporting exists
+        assert len(obs.data) == 78
+
+        # custom values are correct
+        obs = obs.filter(variable="total om*").as_pandas()
+
+        # Produce a merged data frame. This also implies that the same labels exist in
+        # `obs`.
+        df = pd.DataFrame(
+            [
+                ["total om cost|coal_ppl", 700, 2801.242],
+                ["total om cost|coal_ppl", 710, 5321.242],
+                ["total om cost|coal_ppl", 720, 6933.333],
+                ["total om cost|grid", 700, 880.0],
+                ["total om cost|grid", 710, 1312.0],
+                ["total om cost|grid", 720, 1664.0],
+                ["total om cost|wind_ppl", 700, 400.6596],
+                ["total om cost|wind_ppl", 710, 67.32630],
+                ["total om cost|wind_ppl", 720, 0.0],
+            ],
+            columns=["variable", "year", "value"],
+        ).merge(obs, on=["variable", "year"], how="outer")
+
+        assert_allclose(df["value_y"], df["value_x"], err_msg=df.to_string())
 
 
 def test_reporter_as_pyam(
