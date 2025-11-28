@@ -162,9 +162,8 @@ def get_tasks() -> list[tuple[tuple, Mapping]]:
 
     for t in TASKS0:
         if len(t) == 2 and isinstance(t[1], dict):
-            # (args, kwargs) → update kwargs with strict
-            t[1].update(strict)
-            to_add.append(cast(tuple[tuple, Mapping], t))
+            # (args, kwargs) → use strict unless already set
+            to_add.append((t[0], strict | t[1]))
         else:
             # args only → use strict as kwargs
             to_add.append((t, strict))
