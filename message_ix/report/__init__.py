@@ -5,6 +5,8 @@ from operator import itemgetter
 from typing import TYPE_CHECKING, cast
 
 from genno.operator import broadcast_map
+from ixmp.backend import ItemType
+from ixmp.model import get_model
 from ixmp.report import (
     ComputationError,
     Key,
@@ -20,6 +22,8 @@ from message_ix.common import DIMS
 from .pyam import collapse_message_cols
 
 if TYPE_CHECKING:
+    from message_ix.common import GAMSModel
+
     from .pyam import CollapseMessageColsKw
 
 __all__ = [
@@ -212,9 +216,9 @@ class Reporter(IXMPReporter):
         .Reporter
             A reporter for `scenario`.
         """
-        solved = scenario.has_solution()
+        import genno
 
-        if not solved:
+        if not scenario.has_solution():
             log.warning(
                 f'Scenario "{scenario.model}/{scenario.scenario}" has no solution'
             )
@@ -225,6 +229,22 @@ class Reporter(IXMPReporter):
 
         # Invoke the ixmp method
         rep = cast("Reporter", super().from_scenario(scenario, **kwargs))
+
+        # Handle missing parameters
+        missing = set()
+        for name, item in cast("GAMSModel", get_model(scenario.scheme)).items.items():
+            if item.type is not ItemType.PAR or item.key in rep:
+                continue
+            rep.add(item.key, lambda: genno.Quantity())
+            missing.add(item.name)
+
+        if missing:
+            log.warning(
+                f"Scenario {scenario.url!r} is missing {len(missing)} parameter(s):"
+                + "\n- ".join(sorted({""} | missing))
+                + "\n…possibly added by a newer version of message_ix. These keys will "
+                "return empty Quantity()."
+            )
 
         # Add the MESSAGEix calculations
         rep.add_tasks(fail_action)
