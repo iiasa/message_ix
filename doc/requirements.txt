@@ -40,9 +40,7 @@ idna==3.7
     # via requests
 imagesize==1.4.1
     # via sphinx
-importlib-metadata==8.7.0
-    # via ixmp
-ixmp @ git+https://github.com/iiasa/ixmp.git@1730afd24238b4dad88a89c2d58d0fed2cd19dd0
+ixmp @ git+https://github.com/iiasa/ixmp.git@51ccb3276ea1d85a437ad14232890f3f3e8dec70
     # via -r requirements.in
 jinja2==3.1.6
     # via sphinx
@@ -165,5 +163,3 @@ xarray==2025.7.1
     # via
     #   genno
     #   ixmp
-zipp==3.23.0
-    # via importlib-metadata

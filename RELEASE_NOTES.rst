@@ -47,6 +47,11 @@ All changes
   - :mod:`message_ix.message` includes :class:`.MESSAGE`.
   - :mod:`message_ix.message_macro` includes :class:`.MESSAGE_MACRO`.
 
+- Improve :class:`.Reporter` and its documentation (:pull:`991`).
+
+  - Handle older scenarios—for instance, those without |input_cap|—in :meth:`.Reporter.from_scenario` (:issue:`988`).
+  - Expand and test keys for multiple methods of calculating :ref:`reporter-historical` (:issue:`989`).
+
 - Document the :ref:`minimum version of Java <install-java>` required for :class:`ixmp.JDBCBackend <ixmp.backend.jdbc.JDBCBackend>` (:pull:`962`).
 - Document :ref:`how to run a local PostgreSQL instance <install-postgres>`
   for local testing using :class:`ixmp.IXMP4Backend <ixmp.backend.ixmp4.IXMP4Backend>` (:pull:`981`).
