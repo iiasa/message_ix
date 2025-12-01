@@ -1009,6 +1009,14 @@ def tmp_model_dir(tmp_path: Path) -> Iterator[Path]:
     yield tmp_path
 
 
+@pytest.fixture
+def tmp_scenario(
+    request: pytest.FixtureRequest, test_mp: "Platform"
+) -> Iterator[Scenario]:
+    """A temporary scenario, unique to a particular test."""
+    yield Scenario(test_mp, model=request.node.name, scenario="TEST", version="new")
+
+
 @pytest.fixture(scope="session")
 def tutorial_path(request: pytest.FixtureRequest) -> Path:
     """Path to the directory containing the tutorials."""
