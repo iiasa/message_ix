@@ -6,10 +6,11 @@ import pandas as pd
 from message_ix.util import make_df
 
 if TYPE_CHECKING:
-    from genno.types import AnyQuantity
+    from genno.types import AnyQuantity, KeyLike
 
 __all__ = [
     "as_message_df",
+    "missing_data",
     "model_periods",
     "plot_cumulative",
     "stacked_bar",
@@ -78,6 +79,16 @@ def as_message_df(qty, name, dims, common, wrap=True):
         **common,
     )
     return {name: df} if wrap else df
+
+
+def missing_data(key: "KeyLike", description: str = "") -> None:
+    """Raise an exception for missing user-supplied data."""
+    raise RuntimeError(
+        f"Must supply data for {key!r}. Replace {key!r} in the Reporter with a task "
+        "returning genno.Quantity with the same dimensions"
+        + (f" representing {description}" if description else "")
+        + "."
+    )
 
 
 def model_periods(y: list[int], cat_year: pd.DataFrame) -> list[int]:
