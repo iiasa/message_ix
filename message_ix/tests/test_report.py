@@ -6,10 +6,11 @@ from functools import partial
 from pathlib import Path
 
 import genno
+import numpy as np
+import numpy.testing as npt
 import pandas as pd
 import pyam
 import pytest
-from genno import Key
 from genno.testing import assert_qty_equal
 from ixmp import Platform
 from ixmp.backend import ItemType
@@ -20,9 +21,9 @@ from ixmp.util.ixmp4 import is_ixmp4backend
 from numpy.testing import assert_allclose
 from pandas.testing import assert_frame_equal, assert_series_equal
 
-from message_ix import Scenario
+from message_ix import Scenario, make_df
 from message_ix.message import MESSAGE
-from message_ix.report import Reporter, configure
+from message_ix.report import ComputationError, Key, Reporter, configure
 from message_ix.testing import SCENARIO, make_dantzig, make_westeros
 
 pytestmark = pytest.mark.ixmp4_209
@@ -334,6 +335,123 @@ class TestReporter:
         ).merge(obs, on=["variable", "year"], how="outer")
 
         assert_allclose(df["value_y"], df["value_x"], err_msg=df.to_string())
+
+
+def test_hist(tmp_scenario: Scenario) -> None:
+    """Test of https://github.com/iiasa/message_ix#989."""
+    s = tmp_scenario
+
+    Y = [-3, -2, -1, 0, 1]
+    common = dict(
+        commodity="c",
+        level="l",
+        mode="m",
+        node="n",
+        node_dest="n",
+        node_loc="n",
+        technology="t",
+        time="h",
+        time_dest="h",
+        unit="-",
+    )
+    with s.transact():
+        s.add_horizon(Y, 0)
+        for name in "commodity", "level", "mode", "node", "technology", "time":
+            s.add_set(name, common[name])
+
+        # Add different values for {historical,ref}_activity in each ya:
+        # - ya = -3 → historical_activity 1.0, ref_activity 1.1
+        # - ya = -2 → historical_activity 2.0, ref_activity 2.2
+        # - ya = -1 → historical_activity 3.0, ref_activity 3.3
+        ACT = np.array([1.0, 2, 3])
+        for k, name in (1.0, "historical_activity"), (1.1, "ref_activity"):
+            s.add_par(
+                name, make_df(name, year_act=[-3, -2, -1], value=k * ACT, **common)
+            )
+
+        # Add output values, distinct for every (yv, ya):
+        # - yv = -3 → output = 1.0 in ya==yv, increasing by 0.1 every period
+        # - yv = -2 → output = 2.0 in ya==yv, increasing by 0.1 every period
+        # - etc.
+        name = "output"
+        data = common | s.vintage_and_active_years().to_dict() | dict(unit="GWa")
+        output = make_df(name, **data).assign(  # type: ignore
+            value=lambda df: df.year_vtg + 4 + 0.1 * (df.year_act - df.year_vtg)
+        )
+        s.add_par(name, output)
+
+    rep = Reporter.from_scenario(s, units=dict(replace={"-": ""}))
+
+    # Full products can be computed without error
+    q_hist_full = rep.get("out:*:historical+full")
+    q_ref_full = rep.get("out:*:ref+full")
+
+    # Particular values are computed correctly. For (yv, ya) = (-3, -1):
+    # - output = 1.2
+    # - historical_activity = 3.0
+    # - ref_activity = 3.3
+    npt.assert_allclose(q_hist_full.sel(yv=-3, ya=-1).item(), 1.2 * 3.0)
+    npt.assert_allclose(q_ref_full.sel(yv=-3, ya=-1).item(), 1.2 * 3.3)
+
+    # Values assuming current-year I/O intensitites
+    q_hist_current = rep.get("out:*:historical+current")
+    q_ref_current = rep.get("out:*:ref+current")
+
+    for q in q_hist_current, q_ref_current:
+        assert 3 == len(q)
+        # Only values for ya == yv are included
+        assert q.to_frame().reset_index().eval("ya == yv").all()
+
+    # Particular values are computed correctly
+    npt.assert_allclose(q_hist_full.sel(yv=-2, ya=-2).item(), 2.0 * 2.0)
+    npt.assert_allclose(q_ref_full.sel(yv=-2, ya=-2).item(), 2.0 * 2.2)
+
+    # Tasks with +weighted give errors without explicitly supplied weights
+    for act in "historical", "ref":
+        with pytest.raises(ComputationError, match="Must supply data"):
+            rep.get(f"out:*:{act}+weighted")
+
+    # Now add some weights
+    df = pd.DataFrame(
+        [
+            [-3, -3, 1.0],  # Active in ya = -3
+            [-3, -2, 0.6],  # Active in ya = -2
+            [-2, -2, 0.4],
+            [-3, -1, 0.5],  # Active in ya = -1
+            [-2, -1, 0.3],
+            [-1, -1, 0.2],
+        ],
+        columns=["yv", "ya", "value"],
+    )
+    q = genno.Quantity(df.set_index(["yv", "ya"])["value"])
+
+    for act in "historical", "ref":
+        # Retrieve full key for shares
+        k_share = rep.full_key(f"share:*:out+{act}")
+        # Replace the existing key with a task that returns the shares
+        rep.add(k_share, q)
+
+    # Full keys, partial sum on "yv" dimension
+    k_hist_weighted = rep.full_key("out:*:historical+weighted")
+    k_ref_weighted = rep.full_key("out:*:ref+weighted")
+    assert "yv" not in Key(k_hist_weighted).dims
+    assert "yv" not in Key(k_ref_weighted).dims
+
+    q_hist_weighted = rep.get(k_hist_weighted)
+    q_ref_weighted = rep.get(k_ref_weighted)
+
+    # Particular values are computed correctly
+    # - historical_activity (ya=-1) = 3.0 multiplied by
+    # - output (yv=-3, ya=-1) = 1.2 × share
+    #          (yv=-2, ya=-1) = 2.1 × share
+    #          (yv=-1, ya=-1) = 3.0 × share
+    npt.assert_allclose(
+        q_hist_weighted.sel(ya=-1).item(), 3.0 * (0.5 * 1.2 + 0.3 * 2.1 + 0.2 * 3.0)
+    )
+    # Same shares, different ref_activity
+    npt.assert_allclose(
+        q_ref_weighted.sel(ya=-1).item(), 3.3 * (0.5 * 1.2 + 0.3 * 2.1 + 0.2 * 3.0)
+    )
 
 
 def test_reporter_as_pyam(
