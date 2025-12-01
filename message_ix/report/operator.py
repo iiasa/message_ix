@@ -1,6 +1,7 @@
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Literal, overload
 
+import genno
 import pandas as pd
 
 from message_ix.util import make_df
@@ -14,6 +15,7 @@ __all__ = [
     "model_periods",
     "plot_cumulative",
     "stacked_bar",
+    "yv_ya_current",
 ]
 
 
@@ -211,3 +213,9 @@ def stacked_bar(
     ax.legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
 
     return ax
+
+
+def yv_ya_current(years: list[int]) -> "AnyQuantity":
+    """2-dimensional Quantity with value 1.0 where :math:`y^V = y^A`."""
+    idx = pd.MultiIndex.from_tuples([(y, y) for y in years], names=["yv", "ya"])
+    return genno.Quantity(pd.Series(1.0, index=idx))
