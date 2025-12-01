@@ -4,17 +4,11 @@ from functools import lru_cache, partial
 from operator import itemgetter
 from typing import TYPE_CHECKING, cast
 
+from genno import ComputationError, Key, KeyExistsError, Keys, MissingKeyError
 from genno.operator import broadcast_map
 from ixmp.backend import ItemType
 from ixmp.model import get_model
-from ixmp.report import (
-    ComputationError,
-    Key,
-    KeyExistsError,
-    MissingKeyError,
-    Quantity,
-    configure,
-)
+from ixmp.report import Quantity, configure
 from ixmp.report import Reporter as IXMPReporter
 
 from message_ix.common import DIMS
@@ -29,6 +23,7 @@ if TYPE_CHECKING:
 __all__ = [
     "ComputationError",
     "Key",
+    "Keys",
     "KeyExistsError",
     "MissingKeyError",
     "Quantity",
