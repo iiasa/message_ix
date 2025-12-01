@@ -24,7 +24,7 @@ from pandas.testing import assert_frame_equal, assert_series_equal
 from message_ix import Scenario, make_df
 from message_ix.message import MESSAGE
 from message_ix.report import ComputationError, Key, Reporter, configure
-from message_ix.testing import SCENARIO, make_dantzig, make_westeros
+from message_ix.testing import SCENARIO, assert_keys, make_dantzig, make_westeros
 
 pytestmark = pytest.mark.ixmp4_209
 
@@ -183,7 +183,7 @@ class TestReporter:
         assert 0 == len(result)
 
     def test_from_scenario(
-        self, message_test_mp: Platform, keys: Generator[set[str]]
+        self, tmp_path: Path, message_test_mp: Platform, keys: Generator[set[str]]
     ) -> None:
         scen = Scenario(message_test_mp, **SCENARIO["dantzig"])
 
@@ -229,10 +229,10 @@ class TestReporter:
             expected_rep_graph_keys -= MISSING_IXMP4
 
         # ixmp.Reporter pre-populated with only model quantities and aggregates
-        assert expected_rep_ix_graph_keys == set(map(str, rep_ix.graph))
+        assert_keys(rep_ix, expected_rep_ix_graph_keys, tmp_path)
 
         # message_ix.Reporter pre-populated with additional, derived quantities
-        assert expected_rep_graph_keys == set(map(str, rep.graph))
+        assert_keys(rep, expected_rep_graph_keys, tmp_path)
 
         # Derived quantities have expected dimensions
         vom_key = rep.full_key("vom")

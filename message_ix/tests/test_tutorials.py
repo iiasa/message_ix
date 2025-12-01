@@ -108,7 +108,7 @@ TUTORIALS: list[tuple] = [
     # NB This is the same count as in test_report.test_reporter_from_scenario.
     #    Using len(MISSING_IXMP4) for atol allows the test to pass when the value is
     #    N - 8.
-    _t(None, f"{W}_report", check=[("len-rep-graph", 17419, 1e-7, len(MISSING_IXMP4))]),
+    _t(None, f"{W}_report", check=[("len-rep-graph", 28764, 1e-7, len(MISSING_IXMP4))]),
     _t("at0", "austria", check=[("solve-objective-value", 206321.90625)]),
     _t(
         "at0", "austria_single_policy", check=[("solve-objective-value", 205310.34375)]
