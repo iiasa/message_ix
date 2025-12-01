@@ -1,6 +1,7 @@
 import logging
 from collections.abc import Mapping
 from functools import lru_cache, partial
+from itertools import product
 from operator import itemgetter
 from typing import TYPE_CHECKING, cast
 
@@ -60,6 +61,9 @@ TASKS0: tuple[tuple, ...] = (
     ("map_tec", "map_as_qty", "cat_tec", "t"),
     ("map_year", "map_as_qty", "cat_year", "y"),
     #
+    # Derived set contents
+    ("current:ya-yv", "yv_ya_current", "y"),
+    #
     # Products
     ("out", "mul", "output", "ACT"),
     ("in", "mul", "input", "ACT"),
@@ -68,6 +72,8 @@ TASKS0: tuple[tuple, ...] = (
     ("rel", "mul", "relation_activity", "ACT"),
     ("emi", "mul", "emission_factor", "ACT"),
     ("inv", "mul", "inv_cost", "CAP_NEW"),
+    ("inv::historical", "mul", "inv_cost", "historical_activity"),
+    ("inv::ref", "mul", "inv_cost", "ref_activity"),
     ("fom", "mul", "fix_cost", "CAP"),
     ("vom", "mul", "var_cost", "ACT"),
     ("land_out", "mul", "land_output", "LAND"),
@@ -153,6 +159,8 @@ TASKS1 = (
 @lru_cache(1)
 def get_tasks() -> list[tuple[tuple, Mapping]]:
     """Return a list of tasks describing MESSAGE reporting calculations."""
+    from message_ix.message import MESSAGE
+
     # Assemble queue of items to add. Each element is a 2-tuple of (positional, keyword)
     # arguments for Reporter.add()
     to_add: list[tuple[tuple, Mapping]] = []
@@ -167,8 +175,40 @@ def get_tasks() -> list[tuple[tuple, Mapping]]:
             # args only → use strict as kwargs
             to_add.append((t, strict))
 
-    # Conversions to IAMC data structure and pyam objects
+    # Products using {historical,ref}_activity instead of ACT
+    for (name, io), act in product(
+        [
+            ("emi", "emission_factor"),
+            ("in", "input"),
+            ("out", "output"),
+            ("vom", "var_cost"),
+        ],
+        ["historical", "ref"],
+    ):
+        # Construct some keys
+        k_io = MESSAGE.items[io].key
+        k_act = MESSAGE.items[f"{act}_activity"].key
+        k_share = Key("share", k_act.dims, f"{name}+{act}") * "yv"
+        k = Key(name, sorted(set(k_io.dims + k_act.dims)), act)
+        desc = f"share of contribution of each vy to {k_act.name} in each ya"
 
+        to_add.extend(
+            [
+                ((k["full"], "mul", k_io, k_act), strict),
+                ((k["current"], "mul", k["full"], "current:ya-yv"), strict),
+                ((k_share, "missing_data"), dict(key=k_share, description=desc)),
+                (
+                    (k["weighted+full"], "mul", k["full"], k_share),
+                    dict(sums=False) | strict,
+                ),
+                (
+                    (k["weighted"] / "yv", "sum", k["weighted+full"]),
+                    dict(dimensions=["yv"], sums=True) | strict,
+                ),
+            ]
+        )
+
+    # Conversions to IAMC data structure and pyam objects
     for qty, collapse_kw in PYAM_CONVERT:
         # Column to set as year dimension + standard renames from MESSAGE to IAMC dims
         rename = {
