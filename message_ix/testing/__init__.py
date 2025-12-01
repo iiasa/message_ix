@@ -1,8 +1,9 @@
 import io
+import logging
 import os
 import platform
 from collections.abc import Callable, Iterator
-from itertools import product
+from itertools import count, product
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -18,8 +19,10 @@ from message_ix.report import Reporter
 
 if TYPE_CHECKING:
     from ixmp import Platform
+    from ixmp import Reporter as IXMPReporter
     from pint import UnitRegistry
 
+log = logging.getLogger(__name__)
 
 GHA = "GITHUB_ACTIONS" in os.environ
 
@@ -167,6 +170,26 @@ bulb                      0.1    1     5
 cfl                  0.0  0.1   10   900
 """,
 )
+
+
+def assert_keys(rep: "IXMPReporter", expected: set[str], dump_dir: "Path") -> None:
+    """Assert that the keys in `rep` match `expected`.
+
+    If there is not an exact match, the keys in `rep` are dumped to a text file and
+    :class:`AssertionError` is raised including the path to the file.
+    """
+    obs = set(map(str, rep.graph))
+    try:
+        assert expected == obs
+    except AssertionError:
+        # Find a path for a dump that does not yet exist
+        for path in map(lambda i: dump_dir / f"dump-{i}.txt", count()):
+            if not path.exists():
+                break
+
+        path.write_text("\n".join(sorted(obs)))
+
+        assert len(expected) == len(obs) and False, f"Wrote observed keys to {path}"
 
 
 # FIXME reduce complexity 19 → ≤13
