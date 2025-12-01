@@ -1,7 +1,7 @@
 import io
 import os
 import platform
-from collections.abc import Callable, Generator
+from collections.abc import Callable, Iterator
 from itertools import product
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -879,7 +879,7 @@ def make_subannual(
 @pytest.fixture
 def dantzig_reporter(
     request: pytest.FixtureRequest, message_test_mp: "Platform", ureg: "UnitRegistry"
-) -> Generator[Reporter, Any, None]:
+) -> Iterator[Reporter]:
     """A :class:`.Reporter` with a solved :func:`.make_dantzig` scenario."""
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
         scenario=request.node.name
@@ -899,9 +899,7 @@ def dantzig_reporter(
 
 
 @pytest.fixture(scope="session")
-def message_ix_cli(
-    tmp_env: os._Environ[str],
-) -> Generator[Callable[..., Result], Any, None]:
+def message_ix_cli(tmp_env: os._Environ[str]) -> Iterator[Callable[..., Result]]:
     """A CliRunner object that invokes the message_ix command-line interface.
 
     :obj:`None` in *args* is automatically discarded.
@@ -922,7 +920,7 @@ def message_ix_cli(
 
 
 @pytest.fixture(scope="class")
-def message_test_mp(test_mp: "Platform") -> Generator["Platform", Any, None]:
+def message_test_mp(test_mp: "Platform") -> Iterator["Platform"]:
     """A test platform with two versions of the :func:`.make_dantzig` scenario.
 
     One version has :py:`multi_year=False`, and the other :py:`multi_year=True`.
@@ -994,7 +992,7 @@ def test_data_path(request: pytest.FixtureRequest) -> Path:
 
 
 @pytest.fixture(scope="function")
-def tmp_model_dir(tmp_path: Path) -> Generator[Path, Any, None]:
+def tmp_model_dir(tmp_path: Path) -> Iterator[Path]:
     """Temporary directory containing a copy of the MESSAGE model files.
 
     This may be used, among other purposes, to isolate the writing/reading of
@@ -1018,7 +1016,7 @@ def tutorial_path(request: pytest.FixtureRequest) -> Path:
 
 
 @pytest.fixture(scope="session")
-def ureg() -> Generator["UnitRegistry", Any, None]:
+def ureg() -> Iterator["UnitRegistry"]:
     """Session-scoped :class:`pint.UnitRegistry` with units needed by tests."""
     import pint
 
