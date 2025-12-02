@@ -261,9 +261,9 @@ class Scenario(ixmp.Scenario):
         | dict
         | pd.DataFrame
         | None = None,
-        value: float | Iterable[float] | None = None,
-        unit: str | Iterable[str] | None = None,
-        comment: str | Iterable[str] | None = None,
+        value: float | Sequence[float] | None = None,
+        unit: str | Sequence[str] | None = None,
+        comment: str | Sequence[str] | None = None,
     ) -> None:
         # ixmp.Scenario.add_par() is typed as accepting only str, but this method also
         # accepts int for "year"-like dimensions. Proxy the call to avoid type check
