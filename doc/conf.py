@@ -184,7 +184,7 @@ gams_target_dir = "model"
 gh_ref = "main" if ".dev" in version else f"v{version}"
 
 extlinks = {
-    "issue": ("https://github.com/iiasa/message_ix/issue/%s", "#%s"),
+    "issue": ("https://github.com/iiasa/message_ix/issues/%s", "#%s"),
     "pull": ("https://github.com/iiasa/message_ix/pull/%s", "PR #%s"),
     "tut": (f"https://github.com/iiasa/message_ix/blob/{gh_ref}/tutorial/%s", None),
 }

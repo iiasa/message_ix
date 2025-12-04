@@ -1,8 +1,9 @@
 import io
+import logging
 import os
 import platform
-from collections.abc import Callable, Generator
-from itertools import product
+from collections.abc import Callable, Iterator
+from itertools import count, product
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -18,8 +19,10 @@ from message_ix.report import Reporter
 
 if TYPE_CHECKING:
     from ixmp import Platform
+    from ixmp import Reporter as IXMPReporter
     from pint import UnitRegistry
 
+log = logging.getLogger(__name__)
 
 GHA = "GITHUB_ACTIONS" in os.environ
 
@@ -167,6 +170,26 @@ bulb                      0.1    1     5
 cfl                  0.0  0.1   10   900
 """,
 )
+
+
+def assert_keys(rep: "IXMPReporter", expected: set[str], dump_dir: "Path") -> None:
+    """Assert that the keys in `rep` match `expected`.
+
+    If there is not an exact match, the keys in `rep` are dumped to a text file and
+    :class:`AssertionError` is raised including the path to the file.
+    """
+    obs = set(map(str, rep.graph))
+    try:
+        assert expected == obs
+    except AssertionError:
+        # Find a path for a dump that does not yet exist
+        for path in map(lambda i: dump_dir / f"dump-{i}.txt", count()):
+            if not path.exists():
+                break
+
+        path.write_text("\n".join(sorted(obs)))
+
+        assert len(expected) == len(obs) and False, f"Wrote observed keys to {path}"
 
 
 # FIXME reduce complexity 19 → ≤13
@@ -879,7 +902,7 @@ def make_subannual(
 @pytest.fixture
 def dantzig_reporter(
     request: pytest.FixtureRequest, message_test_mp: "Platform", ureg: "UnitRegistry"
-) -> Generator[Reporter, Any, None]:
+) -> Iterator[Reporter]:
     """A :class:`.Reporter` with a solved :func:`.make_dantzig` scenario."""
     scen = Scenario(message_test_mp, **SCENARIO["dantzig"]).clone(
         scenario=request.node.name
@@ -899,9 +922,7 @@ def dantzig_reporter(
 
 
 @pytest.fixture(scope="session")
-def message_ix_cli(
-    tmp_env: os._Environ[str],
-) -> Generator[Callable[..., Result], Any, None]:
+def message_ix_cli(tmp_env: os._Environ[str]) -> Iterator[Callable[..., Result]]:
     """A CliRunner object that invokes the message_ix command-line interface.
 
     :obj:`None` in *args* is automatically discarded.
@@ -922,7 +943,7 @@ def message_ix_cli(
 
 
 @pytest.fixture(scope="class")
-def message_test_mp(test_mp: "Platform") -> Generator["Platform", Any, None]:
+def message_test_mp(test_mp: "Platform") -> Iterator["Platform"]:
     """A test platform with two versions of the :func:`.make_dantzig` scenario.
 
     One version has :py:`multi_year=False`, and the other :py:`multi_year=True`.
@@ -994,7 +1015,7 @@ def test_data_path(request: pytest.FixtureRequest) -> Path:
 
 
 @pytest.fixture(scope="function")
-def tmp_model_dir(tmp_path: Path) -> Generator[Path, Any, None]:
+def tmp_model_dir(tmp_path: Path) -> Iterator[Path]:
     """Temporary directory containing a copy of the MESSAGE model files.
 
     This may be used, among other purposes, to isolate the writing/reading of
@@ -1011,6 +1032,14 @@ def tmp_model_dir(tmp_path: Path) -> Generator[Path, Any, None]:
     yield tmp_path
 
 
+@pytest.fixture
+def tmp_scenario(
+    request: pytest.FixtureRequest, test_mp: "Platform"
+) -> Iterator[Scenario]:
+    """A temporary scenario, unique to a particular test."""
+    yield Scenario(test_mp, model=request.node.name, scenario="TEST", version="new")
+
+
 @pytest.fixture(scope="session")
 def tutorial_path(request: pytest.FixtureRequest) -> Path:
     """Path to the directory containing the tutorials."""
@@ -1018,7 +1047,7 @@ def tutorial_path(request: pytest.FixtureRequest) -> Path:
 
 
 @pytest.fixture(scope="session")
-def ureg() -> Generator["UnitRegistry", Any, None]:
+def ureg() -> Iterator["UnitRegistry"]:
     """Session-scoped :class:`pint.UnitRegistry` with units needed by tests."""
     import pint
 
