@@ -113,19 +113,18 @@ Variables
 
 EQUATIONS
     UTILITY_FUNCTION                      Utility function (discounted log of consumption summed over all projection periods)
-    CAPITAL_CONSTRAINT(node, year_all)    Capital constraint
+    
+    CAPITAL(node, year_all)               Capital (wealth) formation
 
-    NEW_CAPITAL(node, year_all)           New capital
-    NEW_PRODUCTION(node, year_all)        New production
+    PRODUCTION(node, year_all)            Total production across all vintages
 
-    TOTAL_CAPITAL(node, year_all)         Total capital stock across all vintages
-    TOTAL_PRODUCTION(node, year_all)      Total production across all vintages
+    ENERGY_ACCOUNTING(node, sector, *)    New Energy Accounting Equations: Splitting TE into E and YE
+    ENERGY_ACCOUNTING2(node, sector, *)   New Energy Accounting Equations: Defining E as share of the total energy TE
+    TE_EQUATION(node, sector, *)          New Energy Accounting Equations: Determining TE based on optimal direct energy consumption of the households
 
-    NEW_ENERGY(node, sector, year_all)    New end-use services or commodities (production function)
-    ENERGY_SUPPLY(node, sector, *)        Supply of end-use services or commodities
+    ENERGY_SUPPLY(node, sector, year_all) New Energy Accounting Equations: PHYSENE - TE relation with aeei
 
-    COST_ENERGY(node, year_all)           system costs approximation based on MESSAGE input
-    TERMINAL_CONDITION(node, year_all)    Terminal condition
+    TERMINAL_CONDITION(node, year_all)    New terminal condition
 ;
 
 * ------------------------------------------------------------------------------
