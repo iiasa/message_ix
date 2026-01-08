@@ -139,9 +139,11 @@ $LABEL macro_data
 
 $LOAD type_node,cat_node
 $LOAD sector,mapping_macro_sector
-$LOAD kpvs,kgdp,esub,depr,drate,lotol
+$LOAD kpvs,kgdp,esub,depr,drate,lotol,alpha,EMIN,beta_rc_spec,beta_rc_therm,beta_transport
 $LOAD lakl,prfconst
 $LOAD aeei,grow
+$LOAD wage
+$LOAD h
 $LOAD gdp_calibrate,historical_gdp
 $LOAD demand_MESSAGE,price_MESSAGE,cost_MESSAGE
 $GDXIN
