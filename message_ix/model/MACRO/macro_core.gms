@@ -134,17 +134,14 @@ EQUATIONS
 ***
 * Equation UTILITY_FUNCTION
 * ---------------------------------
-* The utility function which is maximized sums up the discounted logarithm of consumption of a single representative producer-consumer over the entire time horizon
-* of the model.
+* The utility function, which is maximized, sums the discounted logarithm of consumption :math:`\text{C}_{n,y}` and direct energy consumption 
+* of end-use services :math:`\text{E}_{n,s,y}` of a single representative household over the entire time horizon of the model.
 *
-* .. math:: \text{UTILITY} = \sum_{n} \bigg( &  \sum_{y |  (  (  {ord}( y )   >  1 )  \wedge  (  {ord}( y )   <   | y |  )  )} \text{udf}_{n, y} \cdot {\log}( \text{C}_{n, y} ) \cdot \text{duration_period}_{y} \\
-*                                 + &\sum_{y |  (  {ord}( y ) =  | y | ) } \text{udf}_{n, y} \cdot {\log}( \text{C}_{n, y} ) \cdot \big( \text{duration_period}_{y-1} + \frac{1}{\text{fin_time}_{n, y}} \big) \bigg)
+* The utility function and the capital formulation of the optimization problem are derived in previously (See equations 10 and 13 of the model documentation). 
 *
-* The utility discount rate for period :math:`y` is set to :math:`\text{drate}_{n} - \text{grow}_{n,y}`, where :math:`\text{drate}_{n}` is the discount rate used in MESSAGE, typically set to 5%,
-* and :math:`\text{grow}` is the potential GDP growth rate. This choice ensures that in the steady state, the optimal growth rate is identical to the potential GDP growth rates :math:`\text{grow}`.
-* The values for the utility discount rates are chosen for descriptive rather than normative reasons. The term :math:`\frac{\text{duration_period}_{y} + \text{duration_period}_{y-1}}{2}` mutliples the
-* discounted logarithm of consumption with the period length. The final period is treated separately to include a correction factor :math:`\frac{1}{\text{fin_time}_{n, y}}` reflecting
-* the finite time horizon of the model. Note that the sum over nodes :math:`\text{node_active}` is artificial, because :math:`\text{node_active}` only contains one element.
+* .. math:: \text{UTILITY} = \sum_{n} \bigg( &  \sum_{y |  (  (  {ord}( y )   >  1 )  \wedge  (  {ord}( y )   <   | y |  )  )} \text{udf}_{n, y} \cdot \bigg( (\beta_n + \sum_{s=1}^{3} \sigma_{s,n}) \log(\text{C}_{n, y}) - \sum_{s=1}^{3} \sigma_{s,n} \log(\text{p}_{n,s,y}) + \sum_{s=1}^{3} \sigma_{s,n} \log\left(\frac{\sigma_{s,n}}{\beta_n}\right) \bigg) \cdot \text{duration_period}_{y} \\
+*                                 + &\sum_{y |  (  {ord}( y ) =  | y | ) } \text{udf}_{n, y} \cdot \bigg( (\beta_n + \sum_{s=1}^{3} \sigma_{s,n}) \log(\text{C}_{n, y}) - \sum_{s=1}^{3} \sigma_{s,n} \log(\text{p}_{n,s,y}) + \sum_{s=1}^{3} \sigma_{s,n} \log\left(\frac{\sigma_{s,n}}{\beta_n}\right) \bigg) \cdot \big( \text{duration_period}_{y-1} + \frac{1}{\text{fin_time}_{n, y}} \big) \bigg)
+*
 *
 ***
 
@@ -152,50 +149,49 @@ UTILITY_FUNCTION..
 UTILITY =E=
 SUM(node_active,
     1000 * (SUM(year $ (NOT macro_base_period(year) AND NOT last_period(year)),
-                udf(node_active, year) * LOG(C(node_active, year)) * duration_period(year))
-          + SUM(year $ last_period(year),
-                udf(node_active, year) * LOG(C(node_active, year)) * (duration_period(year) + 1/finite_time_corr(node_active, year))))
+            udf(node_active, year) * ( (alpha(node_active) + beta_rc_spec(node_active) + beta_rc_therm(node_active) + beta_transport(node_active)) * LOG(C(node_active, year)) 
+            - beta_rc_spec(node_active) * LOG(eneprice(node_active, 'rc_spec', year)/1000) + beta_rc_spec(node_active) * LOG(beta_rc_spec(node_active)/alpha(node_active)) 
+            - beta_rc_therm(node_active) * LOG(eneprice(node_active, 'rc_therm', year)/1000) + beta_rc_therm(node_active) * LOG(beta_rc_therm(node_active)/alpha(node_active))
+            - beta_transport(node_active) * LOG(eneprice(node_active, 'transport', year)/1000) + beta_transport(node_active) * LOG(beta_transport(node_active)/alpha(node_active)) ) * duration_period(year) )
+        + SUM(year $ last_period(year),
+            udf(node_active, year) * ( (alpha(node_active) + beta_rc_spec(node_active) + beta_rc_therm(node_active) + beta_transport(node_active)) * LOG(C(node_active, year)) 
+            - beta_rc_spec(node_active) * LOG(eneprice(node_active, 'rc_spec', year)/1000) + beta_rc_spec(node_active) * LOG(beta_rc_spec(node_active)/alpha(node_active)) 
+            - beta_rc_therm(node_active) * LOG(eneprice(node_active, 'rc_therm', year)/1000) + beta_rc_therm(node_active) * LOG(beta_rc_therm(node_active)/alpha(node_active))
+            - beta_transport(node_active) * LOG(eneprice(node_active, 'transport', year)/1000) + beta_transport(node_active) * LOG(beta_transport(node_active)/alpha(node_active)) ) * (duration_period(year) ) + 1/finite_time_corr(node_active, year)) )
 )
 ;
 
 ***
-* Equation CAPITAL_CONSTRAINT
+* Equation CAPITAL
 * ---------------------------------
-* The following equation specifies the allocation of total production among current consumption :math:`\text{C}_{n, y}`, investment into building up capital stock excluding
-* the sectors represented in MESSAGE :math:`\text{I}_{n, y}` and the MESSAGE system costs :math:`\text{EC}_{n, y}` which are derived from a previous MESSAGE model run. As described in :cite:`Manne-Richels-1992`, the first-order
-* optimality conditions lead to the Ramsey rule for the optimal allocation of savings, investment and consumption over time.
 *
-* .. math:: \text{Y}_{n, y} = \text{C}_{n, y} + \text{I}_{r, y} + \text{EC}_{n, y} \qquad \forall{n, y}
+* The household maximizes its utility subject to the constraint on wealth accumulation of capital in the sectors not represented in the energy model MESSAGE.
+* The net capital (or wealth) formation :math:`\text{K}_{n,t}` is derived from the existing capital stock, returns on capital, labor income, minus the expenses
+* for direct energy consumption and all other consumption goods, as well as depreciation of the previous capital stock.
+*
+* .. math:: \text{K}_{t+1,n} = (1 - \delta_{n})^{\text{period}_{t}} \text{K}_{t,n} + ((1 + r_{t,n})^{\text{period}_{t}} - 1) \text{K}_{t,n} + \text{period}_{t} \left( w_{t,n} L_{t,n} - \sum_{s=1}^{3} p_{t,s,n} L_{n,t} E_{min,t,s,n} - \frac{\beta + \sum_{s=1}^{3} \sigma_{s,n}}{\beta} C_{t,n} \right) \qquad (15)
 *
 ***
 
-CAPITAL_CONSTRAINT(node_active, year)..
-Y(node_active, year) =E=
-C(node_active, year) + I(node_active, year) + EC(node_active, year)
+CAPITAL(node_active, year) $ (NOT macro_base_period(year))..
+K(node_active, year) =E=
+SUM(year2$( seq_period(year2,year) ), K(node_active, year2) * (1 - depr(node_active))**duration_period(year2) + K(node_active, year2) * ((1 + interestrate(year2))**duration_period(year2) - 1) 
++ duration_period(year2) * labor(node_active, year2) * wage(node_active, year2) 
+- duration_period(year2) * eneprice(node_active, 'rc_spec', year2)/1000 * labor(node_active, year2) * EMIN(node_active)
+- duration_period(year2) * eneprice(node_active, 'rc_therm', year2)/1000 * labor(node_active, year2) * EMIN(node_active) 
+- duration_period(year2) * eneprice(node_active, 'transport', year2)/1000 * labor(node_active, year2) * EMIN(node_active) 
+- duration_period(year2) * (((alpha(node_active) + beta_rc_spec(node_active) + beta_rc_therm(node_active) + beta_transport(node_active))/alpha(node_active))) * C(node_active, year2)
+) 
 ;
 
 ***
-* Equation NEW_CAPITAL
+* Equation PRODUCTION
 * ---------------------------------
-* The accumulation of capital in the sectors not represented in MESSAGE is governed by new capital stock equation. Net capital formation :math:`\text{KN}_{n,y}` is derived from gross
-* investments :math:`\text{I}_{n,y}` minus depreciation of previsouly existing capital stock.
 *
-* .. math:: \text{KN}_{n,y} = \text{duration_period}_{y} \cdot \text{I}_{n,y} \qquad \forall{n, y > 1}
+* We implement a nested constant elasticity of substitution (CES) production function with capital, labor, and the (commercial) end-use services 
+* represented in MESSAGE as inputs. :math:`\text{Y}_{n,t}` should correspond to gross domestic product (GDP).
 *
-* Here, the initial boundary condition for the base year :math:`y_0` implies for the investments that :math:`\text{I}_{n,y_0} = (\text{grow}_{n,y_0} + \text{depr}_{n}) \cdot \text{kgdp}_{n} \cdot \text{gdp}_{n,y_0}`.
-***
-
-NEW_CAPITAL(node_active, year) $ (NOT macro_base_period(year))..
-KN(node_active, year) =E= duration_period(year) * I(node_active, year)
-;
-
-***
-* Equation NEW_PRODUCTION
-* ---------------------------------
-* MACRO employs a nested constant elasticity of substitution (CES) production function with capital, labor and the (commercial) end-use services
-* represented in MESSAGE as inputs. This version of the production function is equaivalent to that in MARKAL-MACRO.
-*
-* .. math:: \text{YN}_{n,y} =  { \left( {a}_{n} \cdot \text{KN}_{n, y}^{ ( {\rho}_{n} \cdot {\alpha}_{n} ) } \cdot \text{newlab}_{n, y}^{ ( {\rho}_{n} \cdot ( 1 - {\alpha}_{n} ) ) } + \displaystyle \sum_{s} ( {b}_{n, s} \cdot \text{NEWENE}_{n, s, y}^{{\rho}_{n}} )  \right) }^{ \frac{1}{{\rho}_{n}} } \qquad \forall{ n, y > 1}
+* .. math:: \text{Y}_{n,t} = \left( a_{n} \cdot \text{K}_{n, t}^{ ( \rho_{n} \cdot \alpha_{n} ) } \cdot \text{L}_{n, t}^{ ( \rho_{n} \cdot ( 1 - \alpha_{n} ) ) } + \sum_{s} ( b_{n, s} \cdot \text{YE}_{n, s, t}^{\rho_{n}} ) \right)^{ \frac{1}{\rho_{n}} } \qquad \forall n, t > 1 \qquad (16)
 *
 ***
 
