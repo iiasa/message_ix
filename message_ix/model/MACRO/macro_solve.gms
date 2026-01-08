@@ -44,13 +44,10 @@ E.LO(node_macro, sector, macro_horizon) = h(node_macro, sector) * LOTOL(node_mac
 * ------------------------------------------------------------------------------
 
 * division by aeei_factor is necesary in case MACRO starts after initialize_period (in case of slicing)
-PRODENE.FX(node_macro, sector, macro_base_period) = demand_base(node_macro, sector) / aeei_factor(node_macro, sector, macro_base_period) ;
 
 Y.FX(node_macro, macro_base_period) = y0(node_macro) ;
 K.FX(node_macro, macro_base_period) = k0(node_macro) ;
 C.FX(node_macro, macro_base_period) = c0(node_macro) ;
-I.FX(node_macro, macro_base_period) = i0(node_macro) ;
-EC.FX(node_macro, macro_base_period) = y0(node_macro) - i0(node_macro) - c0(node_macro) ;
 
 $IFTHEN %MACRO_CONCURRENT% == "0"
 
