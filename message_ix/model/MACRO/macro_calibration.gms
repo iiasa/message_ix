@@ -43,7 +43,7 @@ demand_new(node_macro,sector,year) = demand_scale(node_macro,sector,year) * dema
 
 If (mod(ctr, 2) eq 0,
 * calculate correction factor for labour force growth rate and apply for next iteration of MACRO
-    gdp_mer_macro(node_macro,year) = (I.L(node_macro,year) + C.L(node_macro,year) + EC.L(node_macro,year)) * 1000 ;
+    gdp_mer_macro(node_macro,year) = Y.L(node_macro,year) * 1000 ;
     gdp_scale(node_macro,year) = gdp_mer_macro(node_macro,year)/gdp_calibrate(node_macro,year) ;
     growth_correction(node_macro,year) $ (NOT macro_base_period(year)) = SUM(year2 $ seq_period(year2,year), ((gdp_calibrate(node_macro,year)/gdp_calibrate(node_macro,year2))**(1/duration_period(year)))
                                                                                                            - ((gdp_mer_macro(node_macro,year)/gdp_mer_macro(node_macro,year2))**(1/duration_period(year))) ) ;
