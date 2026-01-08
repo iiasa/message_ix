@@ -88,21 +88,18 @@
 
 POSITIVE VARIABLES
     K(node, year_all)                Capital stock in period year
-    KN(node, year_all)               New Capital vintage in period year
-    Y(node, year_all)                Production in period year
-    YN(node, year_all)               New production vintage in period year
+    Y(node, year_all)                Total GDP
 
-    PHYSENE(node, sector, year_all)  Physical end-use service or commodity use
-    PRODENE(node, sector, year_all)  Value of end-use services or commodities in the production function
-    NEWENE(node, sector, year_all)   New end-use service or commodity (production function value)
+    PHYSENE(node, sector, year_all)
+    TE(node, sector, year_all)  Value of end-use services or commodities in the production function
+    E(node, sector, year_all)
+    YE(node, sector, year_all)
 
     C(node, year_all)                Consumption (Trillion $)
-    I(node, year_all)                Investment (Trillion $)
 ;
 
 VARIABLES
     UTILITY                          Utility function (discounted log of consumption)
-    EC(node, year_all)               System costs (Trillion $) based on MESSAGE model run
 ;
 
 Variables
