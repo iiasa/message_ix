@@ -195,109 +195,60 @@ SUM(year2$( seq_period(year2,year) ), K(node_active, year2) * (1 - depr(node_act
 *
 ***
 
-NEW_PRODUCTION(node_active, year) $ (NOT macro_base_period(year))..
-YN(node_active, year) =E=
-( LAKL(node_active) * KN(node_active, year)**(rho(node_active) * kpvs(node_active)) * newlab(node_active, year)**(RHO(node_active) * (1 - kpvs(node_active)))
-+ SUM(sector, PRFCONST(node_active, sector) * NEWENE(node_active, sector, year)**rho(node_active)) )**(1/rho(node_active))
-;
-
-***
-* Equation TOTAL_CAPITAL
-* ---------------------------------
-* Equivalent to the total production equation above, the total capital stock, again excluding those sectors which are modeled in MESSAGE, is then simply a summation
-* of capital stock in the previous period :math:`y-1`, depreciated with the depreciation rate :math:`\text{depr}_{n}`, and the capital stock added in the current period :math:`y`.
-*
-* .. math:: \text{K}_{n, y} = \text{K}_{n, y-1} \cdot { \left( 1 - \text{depr}_n \right) }^{\text{duration_period}_{y}} + \text{KN}_{n, y} \qquad \forall{ n, y > 1}
-*
-***
-
-TOTAL_CAPITAL(node_active, year) $ (NOT macro_base_period(year))..
-K(node_active, year) =E=
-SUM(year2$( seq_period(year2,year) ), K(node_active, year2)) * (1 - depr(node_active))**duration_period(year) + KN(node_active, year)
-;
-
-***
-* Equation TOTAL_PRODUCTION
-* ---------------------------------
-* Total production in the economy (excluding energy sectors) is the sum of production from  assets that were already existing in the previous period :math:`y-1`,
-* depreciated with the depreciation rate :math:`\text{depr}_{n}`, and the new vintage of production from period :math:`y`.
-*
-* .. math:: \text{Y}_{n, y} = \text{Y}_{n, y-1} \cdot { \left( 1 - \text{depr}_n \right) }^{\text{duration_period}_{y}} + \text{YN}_{n, y} \qquad \forall{ n, y > 1}
-*
-***
-
-TOTAL_PRODUCTION(node_active, year) $ (NOT macro_base_period(year))..
+PRODUCTION(node_active, year) $ (NOT macro_base_period(year))..
 Y(node_active, year) =E=
-SUM(year2$( seq_period(year2,year) ), Y(node_active, year2)) * (1 - depr(node_active))**duration_period(year) + YN(node_active, year)
+(LAKL(node_active) * K(node_active, year)**(rho(node_active) * kpvs(node_active)) * labor(node_active, year)**(RHO(node_active) * (1 - kpvs(node_active)))
++ PRFCONST(node_active, 'i_spec') * YE(node_active, 'i_spec', year)**rho(node_active)
++ PRFCONST(node_active, 'i_therm') * YE(node_active, 'i_therm', year)**rho(node_active)
++ (1-h(node_active, 'rc_spec')) * PRFCONST(node_active, 'rc_spec') * YE(node_active, 'rc_spec', year)**rho(node_active)
++ (1-h(node_active, 'rc_therm')) * PRFCONST(node_active, 'rc_therm') * YE(node_active, 'rc_therm', year)**rho(node_active)
++ (1-h(node_active, 'transport')) * PRFCONST(node_active, 'transport') * YE(node_active, 'transport', year)**rho(node_active)
+)**(1/rho(node_active))
 ;
 
 ***
-* Equation NEW_ENERGY
+* Equations NEW ENERGY ACCOUNTING
 * ---------------------------------
-* Total energy production (across the six commerical energy demands :math:`s`) is the sum of production from all assets that were already existing
-* in the previous period :math:`y-1`, depreciated with the depreciation rate :math:`\text{depr}_{n}`, and the the new vintage of energy production from
-* period :math:`y`.
-*
-* .. math:: \text{PRODENE}_{n, s, y} = \text{PRODENE}_{n, s, y-1} \cdot { \left( 1 - \text{depr}_n \right) }^{\text{duration_period}_{y}} + \text{NEWENE}_{n, s, y} \qquad \forall{ n, s, y > 1}
+*New energy accounting equations. Need to be discussed and checked. See model documentation.
 *
 ***
 
-NEW_ENERGY(node_active, sector, year) $ (NOT macro_base_period(year))..
-PRODENE(node_active, sector, year) =E=
-SUM(year2$( seq_period(year2,year) ), PRODENE(node_active, sector, year2)) * (1 - depr(node_active))**duration_period(year) + NEWENE(node_active, sector, year)
+ENERGY_ACCOUNTING(node_active, sector, year) $ (NOT macro_base_period(year))..
+TE(node_active, sector, year) =G=
+YE(node_active, sector, year) + E(node_active, sector, year)
 ;
 
-***
-* Equation ENERGY_SUPPLY
-* ---------------------------------
-* The relationship below establishes the link between physical energy :math:`\text{PHYSENE}_{r, s, y}` as accounted in MESSAGE for the six commerical energy demands :math:`s` and
-* energy in terms of monetary value :math:`\text{PRODENE}_{n, s, y}` as specified in the production function of MACRO.
-*
-* .. math:: \text{PHYSENE}_{n, s, y} \geq \text{PRODENE}_{n, s, y} \cdot \text{aeei_factor}_{n, s, y} \qquad \forall{ n, s, y > 1}
-*
-* The cumulative effect of autonomous energy efficiency improvements (AEEI) is captured in
-* :math:`\text{aeei_factor}_{n,s,y} = \text{aeei_factor}_{n, s, y-1} \cdot (1 - \text{aeei}_{n,s,y})^{\text{duration_period}_{y}}`
-* with :math:`\text{aeei_factor}_{n,s,y=1} = 1`. Therefore, choosing the :math:`\text{aeei}_{n,s,y}` coefficients appropriately offers the possibility to calibrate MACRO to a certain energy demand trajectory
-* from MESSAGE.
-*
-***
+ENERGY_ACCOUNTING2(node_active, sector, year) $ (NOT macro_base_period(year))..
+E(node_active, sector, year) =G=
+TE(node_active, sector, year) * h(node_active, sector)
+;
+
+TE_EQUATION(node_active, sector, year) $ (NOT macro_base_period(year))..
+TE(node_active, sector, year) =E=
+
+( (labor(node_active, year) * EMIN(node_active) 
+ + (beta_rc_spec(node_active) / alpha(node_active)) * C(node_active, year) / (eneprice(node_active, 'rc_spec', year)/1000)
+) / h(node_active, 'rc_spec') ) $ (sameas(sector,'rc_spec') AND h(node_active, 'rc_spec') <> 0)
+
++ ( (labor(node_active, year) * EMIN(node_active)
+   + (beta_rc_therm(node_active) / alpha(node_active)) * C(node_active, year) / (eneprice(node_active, 'rc_therm', year)/1000)
+) / h(node_active, 'rc_therm') ) $ (sameas(sector,'rc_therm') AND h(node_active, 'rc_therm') <> 0)
+
++ ( (labor(node_active, year) * EMIN(node_active)
+   + (beta_transport(node_active) / alpha(node_active)) * C(node_active, year) / (eneprice(node_active, 'transport', year)/1000)
+) / h(node_active, 'transport') ) $ (sameas(sector,'transport') AND h(node_active, 'transport') <> 0)
+
++ 0 $ (sameas(sector,'i_spec') OR sameas(sector,'i_therm'))
+;
 
 ENERGY_SUPPLY(node_active, sector, year) $ (NOT macro_base_period(year))..
 PHYSENE(node_active, sector, year) =G=
-PRODENE(node_active, sector, year) * aeei_factor(node_active, sector, year)
+TE(node_active, sector, year) * aeei_factor(node_active, sector, year)
 ;
-
-***
-* Equation COST_ENERGY
-* ---------------------------------
-* Energy system costs are based on a previous MESSAGE model run. The approximation of energy system costs in vicinity of the MESSAGE solution are approximated by a Taylor expansion with the
-* first order term using shadow prices :math:`\text{eneprice}_{s, y, n}` of the MESSAGE model's solution and a quadratic second-order term.
-*
-* .. math:: \text{EC}_{n, y} =  & \text{total_cost}_{n, r} \\
-*                        + & \displaystyle \sum_{s} \text{eneprice}_{s, y, n} \cdot \left( \text{PHYSENE}_{n, s, y} - \text{enestart}_{s, y, n} \right) \\
-*                        + & \displaystyle \sum_{s} \frac{\text{eneprice}_{s, y, n}}{\text{enestart}_{s, y, n}} \cdot \left( \text{PHYSENE}_{n, s, y} - \text{enestart}_{s, y, n} \right)^2 \qquad \forall{ n, y > 1}
-*
-***
-
-COST_ENERGY(node_active, year) $ (NOT macro_base_period(year))..
-EC(node_active, year) =E=
-(total_cost(node_active, year)/1000
-+ SUM(sector, eneprice(node_active, sector, year) * 1E-3 * (PHYSENE(node_active, sector, year) - enestart(node_active, sector, year)))
-+ SUM(sector, eneprice(node_active, sector, year) * 1E-3 / enestart(node_active, sector, year) * (PHYSENE(node_active, sector, year) - enestart(node_active, sector, year)) * (PHYSENE(node_active, sector, year) - enestart(node_active, sector, year))))
-;
-
-***
-* Equation TERMINAL_CONDITION
-* ---------------------------------
-* Given the finite time horizon of MACRO, a terminal constraint needs to be applied to ensure that investments are chosen at an appropriate level, i.e. to replace depriciated capital and
-* provide net growth of capital stock beyond MACRO's time horizon :cite:`Manne-Richels-1992`. The goal is to avoid to the extend possible model artifacts resulting from this finite time horizon
-* cutoff.
-*
-* .. math:: \text{K}_{n, y} \cdot  \left( \text{grow}_{n, y} + \text{depr}_n \right) \leq \text{I}_{n, y} \qquad \forall{ n, y = \text{last year}}
-***
 
 TERMINAL_CONDITION(node_active, last_period)..
-I(node_active, last_period) =G= K(node_active, last_period) * (grow(node_active, last_period) + depr(node_active))
+C(node_active, last_period) / K(node_active, last_period) =E= 
+interestrate(last_period) + depr(node_active) - grow(node_active, last_period)
 ;
 
 * ------------------------------------------------------------------------------
@@ -305,15 +256,13 @@ I(node_active, last_period) =G= K(node_active, last_period) * (grow(node_active,
 * ------------------------------------------------------------------------------
 
 MODEL MESSAGE_MACRO /
-    UTILITY_FUNCTION
-    CAPITAL_CONSTRAINT
-    NEW_CAPITAL
-    NEW_PRODUCTION
-    TOTAL_CAPITAL
-    TOTAL_PRODUCTION
-    NEW_ENERGY
+    UTILITY_FUNCTION 
+    CAPITAL
+    PRODUCTION
+    ENERGY_ACCOUNTING
+    ENERGY_ACCOUNTING2
+    TE_EQUATION
     ENERGY_SUPPLY
-    COST_ENERGY
     TERMINAL_CONDITION
 / ;
 
