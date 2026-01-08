@@ -35,21 +35,27 @@
 * ================================== ================================================================================================================================
 * Parameter                          Description
 * ================================== ================================================================================================================================
-* :math:`\text{duration_period}_y`   Number of years in time period :math:`y` (forward diff)
-* :math:`\text{total_cost}_{n,y}`    Total system costs in region :math:`n` and period :math:`y` from MESSAGE model run
-* :math:`\text{enestart}_{n,s,y}`    Consumption level of (commercial) end-use services :math:`s` in region :math:`n` and period :math:`y` from MESSAGE model run
-* :math:`\text{eneprice}_{n,s,y}`    Shadow prices of (commercial) end-use services :math:`s` in region :math:`n` and period :math:`y` from MESSAGE model run
+* :math:`\text{period}_t`            Number of years in time period :math:`t` (forward diff)
+* :math:`\text{total_cost}_{n,t}`    Total system costs in region :math:`n` and period :math:`t` from MESSAGE model run
+* :math:`\text{enestart}_{n,s,t}`    Consumption level of (commercial) end-use services :math:`s` in region :math:`n` and period :math:`t` from MESSAGE model run
+* :math:`\text{p}_{n,s,t}`           Shadow prices of (commercial) end-use services :math:`s` in region :math:`n` and period :math:`t` from MESSAGE model run
+* :math:`\text{E}_{min,n,s,t}`       Subsistence level of direct energy consumption (end-use service) in region :math:`n`, sector :math:`s` and period :math:`t`
+* :math:`\text{h}_{n,s,t}`           Share of the direct energy consumption of the total energy production in region :math:`n`, sector :math:`s` and period :math:`t`
+
 * :math:`\epsilon_n`                 Elasticity of substitution between capital-labor and total energy in region :math:`n`
-* :math:`\rho_n`                     :math:`\epsilon - 1 / \epsilon` where :math:`\epsilon` is the elasticity of subsitution in region :math:`n`
-* :math:`\text{depr}_n`              Annual depreciation rate in region :math:`n`
+* :math:`\rho_n`                     :math:`\epsilon - 1 / \epsilon` where :math:`\epsilon` is the elasticity of substitution in region :math:`n`
+* :math:`\beta_n`                    Consumption value share parameter in region :math:`n`
+* :math:`\sigma_{n,s}`               Direct energy consumption value share parameter in region :math:`n` and of sector :math:`s`
+* :math:`\delta_n`                   Annual depreciation rate in region :math:`n`
 * :math:`\alpha_n`                   Capital value share parameter in region :math:`n`
 * :math:`a_n`                        Production function coefficient of capital and labor in region :math:`n`
-* :math:`b_{n,s}`                    Production function coefficients of the different end-use sectors in region :math:`n`, sector :math:`s` and period :math:`y`
-* :math:`\text{udf}_{n,y}`           Utility discount factor in period year in region :math:`n` and period :math:`y`
-* :math:`\text{newlab}_{n,y}`        New vintage of labor force in region :math:`n` and period :math:`y`
-* :math:`\text{grow}_{n,y}`          Annual growth rates of potential GDP in region :math:`n` and period :math:`y`
-* :math:`\text{aeei}_{n,s,y}`        Autonomous energy efficiency improvement (AEEI) in region :math:`n`, sector :math:`s` and period :math:`y`
-* :math:`\text{fin_time}_{n,y}`      finite time horizon correction factor in utility function in region :math:`n` and period :math:`y`
+* :math:`b_{n,s}`                    Production function coefficients of the different end-use sectors in region :math:`n`, sector :math:`s` and period :math:`t`
+* :math:`\text{udf}_{n,t}`           Utility discount factor in period year in region :math:`n` and period :math:`t`
+* :math:`\text{L}_{n,t}`             Labor force in region :math:`n` and period :math:`t`
+* :math:`\text{w}_{n,t}`             Wage rate in region :math:`n` and period :math:`t`
+* :math:`\text{grow}_{n,t}`          Annual growth rates of potential GDP in region :math:`n` and period :math:`t`
+* :math:`\text{aeei}_{n,s,t}`        Autonomous energy efficiency improvement (AEEI) in region :math:`n`, sector :math:`s` and period :math:`t`
+* :math:`\text{fin_time}_{n,t}`      Finite time horizon correction factor in utility function in region :math:`n` and period :math:`t`
 * ================================== ================================================================================================================================
 ***
 
@@ -65,15 +71,12 @@
 * Variable                        Definition                                                  Description
 * =============================== =========================================================== ==============================================================================================================
 * :math:`\text{K}_{n,y}`          :math:`\text{K}_{n, y}\geq 0 ~ \forall n, y`                Capital stock in region :math:`n` and period :math:`y`
-* :math:`\text{KN}_{n,y}`         :math:`\text{KN}_{n, y}\geq 0 ~ \forall n, y`               New Capital vintage in region :math:`n` and period :math:`y`
 * :math:`\text{Y}_{n,y}`          :math:`\text{Y}_{n, y}\geq 0 ~ \forall n, y`                Total production in region :math:`n` and period :math:`y`
-* :math:`\text{YN}_{n,y}`         :math:`\text{YN}_{n, y}\geq 0 ~ \forall n, y`               New production vintage in region :math:`n` and period :math:`y`
 * :math:`\text{C}_{n,y}`          :math:`\text{C}_{n, y}\geq 0 ~ \forall n, y`                Consumption in region :math:`n` and period :math:`y`
-* :math:`\text{I}_{n,y}`          :math:`\text{I}_{n, y}\geq 0 ~ \forall n, y`                Investment in region :math:`n` and period :math:`y`
 * :math:`\text{PHYSENE}_{n,s,y}`  :math:`\text{PHYSENE}_{n, s, y}\geq 0 ~ \forall n, s, y`    Physical end-use service use in region :math:`n`, sector :math:`s` and period :math:`y`
-* :math:`\text{PRODENE}_{n,s,y}`  :math:`\text{PRODENE}_{n, s, y}\geq 0 ~ \forall n, s, y`    Value of end-use service in the production function in region :math:`n`, sector :math:`s` and period :math:`y`
-* :math:`\text{NEWENE}_{n,s,y}`   :math:`\text{NEWENE}_{n, s, y}\geq 0 ~ \forall n, s, y`     New end-use service in the production function in region :math:`n`, sector :math:`s` and period :math:`y`
-* :math:`\text{EC}_{n,y}`         :math:`\text{EC} \in \left[-\infty..\infty\right]`          Approximation of system costs based on MESSAGE results
+* :math:`\text{TE}_{n,s,y}`       :math:`\text{TE}_{n, s, y}\geq 0 ~ \forall n, s, y`         Value of total end-use service in the production function and utility function in region :math:`n`, sector :math:`s` and period :math:`y`
+* :math:`\text{E}_{n,s,y}`        :math:`\text{E}_{n, s, y}\geq 0 ~ \forall n, s, y`          Value of direct energy consumption of end-use service of households in the utility function in region :math:`n`, sector :math:`s` and period :math:`y`
+* :math:`\text{YE}_{n,s,y}`       :math:`\text{YE}_{n, s, y}\geq 0 ~ \forall n, s, y`         Value of end-use service energy consumption in the production function in region :math:`n`, sector :math:`s` and period :math:`y`
 * :math:`\text{UTILITY}`          :math:`\text{UTILITY} \in \left[-\infty..\infty\right]`     Utility function (discounted log of consumption)
 * =============================== =========================================================== ==============================================================================================================
 *
