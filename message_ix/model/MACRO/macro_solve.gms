@@ -36,6 +36,8 @@ Y.LO(node_macro, macro_horizon)  = LOTOL(node_macro) * y0(node_macro) ;
 C.LO(node_macro, macro_horizon)  = LOTOL(node_macro) * c0(node_macro) ;
 
 TE.LO(node_macro, sector, macro_horizon) = LOTOL(node_macro) * enestart(node_macro, sector, macro_horizon) / aeei_factor(node_macro, sector, macro_horizon) ;
+YE.LO(node_macro, sector, macro_horizon) = (1-h(node_macro, sector)) * LOTOL(node_macro) * enestart(node_macro, sector, macro_horizon) / aeei_factor(node_macro, sector, macro_horizon) ;
+E.LO(node_macro, sector, macro_horizon) = h(node_macro, sector) * LOTOL(node_macro) * enestart(node_macro, sector, macro_horizon) / aeei_factor(node_macro, sector, macro_horizon) ;
 
 * ------------------------------------------------------------------------------
 * Base year values of variables are fixed to historical values
