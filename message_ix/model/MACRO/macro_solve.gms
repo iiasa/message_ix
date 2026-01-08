@@ -20,6 +20,10 @@ SVNEWE(node_macro, sector, year) = (
   )
 )$(NOT macro_base_period(year));
 
+TE.L(node_macro, sector, macro_horizon) = (
+  SVNEWE(node_macro, sector, macro_horizon)$(SVNEWE(node_macro, sector, macro_horizon) > 0) + epsilon
+);
+
 PHYSENE.L(node_macro, sector, year)  = enestart(node_macro, sector, year) ;
 KN.L(node_macro, macro_horizon)  = SVKN(node_macro, macro_horizon) $ (SVKN(node_macro, macro_horizon) > 0) + epsilon ;
 
