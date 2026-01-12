@@ -829,7 +829,7 @@ def interpolate_2d(  # noqa: C901
                 d_n = slice_df(df_yrs, idx, year_ref, [yr_nn], yr)
             d_n = d_n.loc[d_n.index.isin(d.index), :]
             d = d.loc[d.index.isin(d_n.index), :]
-            d[d.isnull() & d_n.notnull()] = d_n  # type: ignore [call-overload]
+            d[d.isnull() & d_n.notnull()] = d_n  # type: ignore [index]
             df2.loc[df2.index.isin(d.index), :] = d
 
         cond1 = df_dur.index <= yr_diff_new[0]
@@ -915,10 +915,10 @@ def interpolate_2d(  # noqa: C901
                 df_pre, df_pp.shift(+1, axis=1), year_pre, year_pp, yr
             )  # type: ignore
             df_yr.loc[pd.isna(df_yr[yr])] = df_to_fill_nans.shift(+1, axis=1)
-            df_yr[pd.isna(df_yr)] = df_pre  # type: ignore [call-overload]
+            df_yr[pd.isna(df_yr)] = df_pre  # type: ignore [index]
 
             if extrapol_neg:
-                df_yr[(df_yr < 0) & (df_pre >= 0)] = df_pre * extrapol_neg  # type: ignore [call-overload]
+                df_yr[(df_yr < 0) & (df_pre >= 0)] = df_pre * extrapol_neg  # type: ignore [index]
             df_yr.loc[:, df_yr.columns < str(yr)] = np.nan
 
         # c) Otherwise, do intrapolation
