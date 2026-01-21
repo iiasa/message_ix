@@ -140,24 +140,26 @@ $ONEMPTY
 ***
 
 Sets
-    node            world - regions - countries - grid cells
-    commodity       resources - electricity - water - land availability - etc.
-    level           levels of the reference energy system or supply chain ( primary - secondary - ... - useful )
-    sector          sectors (for integration with MACRO)
-    grade           grades of extraction of raw materials
-    tec             technologies
-    mode            modes of operation
-    emission        greenhouse gases - pollutants - etc.
-    land_scenario   scenarios of land use (for land-use model emulator)
-    land_type       types of land use
-    year_all        "All periods, including historical and future periods outside the horizon"
-    year (year_all) "Periods in model horizon, without historical and (for limited-foresight mode) future periods"
-    time            subannual time periods (seasons - days - hours)
-    shares          share constraint relations
-    relation        generic linear relations
-    lvl_spatial     hierarchical levels of spatial resolution
-    lvl_temporal    hierarchical levels of temporal resolution
-    rating          identifies the 'quality' of the renewable energy potential (bins acc. to Sullivan)
+    node                            world - regions - countries - grid cells
+    commodity                       resources - electricity - water - land availability - etc.
+    level                           levels of the reference energy system or supply chain ( primary - secondary - ... - useful )
+    sector                          sectors (for integration with MACRO)
+    grade                           grades of extraction of raw materials
+    tec                             technologies
+    mode                            modes of operation
+    emission                        greenhouse gases - pollutants - etc.
+    emission_annual (emission)      greenhouse gases - pollutants - etc. from annual inputs
+    emission_cumulative (emission)  greenhouse gases - pollutants - etc. from cumulative inputs 
+    land_scenario                   scenarios of land use (for land-use model emulator)
+    land_type                       types of land use
+    year_all                        years (over entire model horizon)
+    year (year_all)                 years included in a model instance (for myopic or rolling-horizon optimization)
+    time                            subannual time periods (seasons - days - hours)
+    shares                          share constraint relations
+    relation                        generic linear relations
+    lvl_spatial                     hierarchical levels of spatial resolution
+    lvl_temporal                    hierarchical levels of temporal resolution
+    rating                          identifies the 'quality' of the renewable energy potential (bins acc. to Sullivan)
 ;
 
 * Aliases for simple sets
@@ -302,11 +304,11 @@ Sets
     cat_emission(type_emission,emission)    mapping of emissions to respective categories
     type_tec_land(type_tec)                 dynamic set whether emissions from land use are included in type_tec
     balance_equality(commodity,level)       mapping of commodities-level where the supply-demand balance must be maintained with equality
-    time_relative(time)                     flag for treating unit of ACT in sub-annual time slices relative to parent 'time' (activating parameter 'duration_time_rel'),
+    time_relative(time)                     flag for treating unit of ACT in sub-annual time slices relative to parent 'time' (activating parameter 'duration_time_rel')
 
     # Derived in data_load.gms
-    type_tec_share(type_tec)                "Subset of type_tec appearing in map_shares_commodity_share",
-    type_tec_total(type_tec)                "Subset of type_tec appearing in map_shares_commodity_total"
+    type_tec_share(type_tec)                Subset of type_tec appearing in map_shares_commodity_share
+    type_tec_total(type_tec)                Subset of type_tec appearing in map_shares_commodity_total
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*

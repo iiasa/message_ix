@@ -17,6 +17,11 @@ $SETGLOBAL data "<your datafile name here>"
 * "linked": MESSAGEix-MACRO is run in iterative mode **
 $SETGLOBAL macromode "none"
 
+** Land-use model connection
+* "globiom": MESSAGEix is run with default GLOBIOM emulator
+* "magpie": MESSAGEix is run with MAgPIE emulator
+$SETGLOBAL landusemode "globiom"
+
 ** define the time horizon over which the model optimizes (perfect foresight, myopic or rolling horizon) **
 * perfect foresight - 0
 * myopic optimization (period-by-period, recursive-dynamic without any foresight) - 1
