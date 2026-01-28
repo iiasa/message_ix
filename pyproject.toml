@@ -65,7 +65,7 @@ tests = [
   "pint",
   "pooch",
   "pyam-iamc >= 0.6",
-  "pytest >= 5",
+  "pytest >= 9",
   "pytest-cov",
   "pytest-rerunfailures",
   "pytest-xdist",
@@ -103,12 +103,14 @@ module = [
 ]
 ignore_missing_imports = true
 
-[tool.pytest.ini_options]
+[tool.pytest]
 # Disable faulthandler plugin on Windows to prevent spurious console noise
-addopts = """
-  --cov=message_ix --cov-report=
-  -m "not nightly and not rmessageix"
-  -p no:faulthandler"""
+addopts = [
+  "--cov=message_ix",
+  "--cov-report=",
+  '-m "not nightly and not rmessageix"',
+  "-p no:faulthandler",
+]
 # Parallel to .util.ixmp4.configure_logging_and_warnings(), prevent warnings
 # from appearing in the test output
 filterwarnings = [
@@ -126,6 +128,9 @@ markers = [
   "rmessageix: test of the message_ix R interface.",
   "tutorial: Tests of the tutorial Jupyter notebooks",
 ]
+minversion = "9.0"
+strict_config = true
+strict_markers = true
 
 [tool.ruff]
 extend-include = ["*.ipynb"]
