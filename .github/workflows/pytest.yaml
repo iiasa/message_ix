@@ -66,6 +66,10 @@ jobs:
         - "3.12"
         - "3.13"
         - "3.14"  # Latest version supported by message_ix
+        extra-deps:
+        - "--help"
+        extra-name:
+        - ""
 
         # Below this comment are newly released or development versions of
         # Python. For these versions, binary wheels are not available for some
@@ -75,10 +79,16 @@ jobs:
 
         # - "3.15.0-alpha.1"  # Development version
 
+        include:
+        - os: ubuntu-latest
+          python-version: "3.14"
+          extra-deps: '"pandas >= 3"'
+          extra-name: "-pandas-3"
+
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-py${{ matrix.python-version }}
+    name: ${{ matrix.os }}-py${{ matrix.python-version }}${{ matrix.extra-name }}
 
     steps:
     - name: Check out message_ix
@@ -123,7 +133,9 @@ jobs:
         license: ${{ secrets.GAMS_LICENSE }}
 
     - name: Install the package and dependencies
-      run: uv pip install --upgrade ${{ env.upstream-versions }} .[tests]
+      run: |
+        uv pip install --upgrade ${{ env.upstream-versions }} .[tests]
+        uv pip install ${{ matrix.extra-deps }}
 
     - name: Run test suite using pytest
       env:
