@@ -16,6 +16,7 @@ from message_ix.testing import SCENARIO, make_westeros
 
 pytestmark = pytest.mark.ixmp4_209
 
+
 # NOTE These tests maybe don't need to be parametrized
 # Do the following depend on otherwise untested Scenario functions?
 # Scenario.add_macro()
@@ -47,7 +48,7 @@ def w_data(w_data_path: Path) -> Generator[dict[str, pd.DataFrame], Any, None]:
 
 @pytest.fixture(scope="module")
 def _ws(
-    test_mp: Platform, request: pytest.FixtureRequest
+        test_mp: Platform, request: pytest.FixtureRequest
 ) -> Generator[Scenario, Any, None]:
     """Module-scoped fixture with a solved instance of the Westeros model."""
     yield make_westeros(test_mp, solve=True, request=request)
@@ -55,7 +56,7 @@ def _ws(
 
 @pytest.fixture
 def westeros_solved(
-    request: pytest.FixtureRequest, _ws: Scenario
+        request: pytest.FixtureRequest, _ws: Scenario
 ) -> Generator[Scenario, Any, None]:
     """Fresh clone of the Westeros model."""
     yield _ws.clone(scenario=request.node.name)
@@ -63,7 +64,7 @@ def westeros_solved(
 
 @pytest.fixture
 def westeros_not_solved(
-    request: pytest.FixtureRequest, _ws: Scenario
+        request: pytest.FixtureRequest, _ws: Scenario
 ) -> Generator[Scenario, Any, None]:
     """Fresh clone of the Westeros model, without a solution."""
     yield _ws.clone(scenario=request.node.name, keep_solution=False)
@@ -87,14 +88,14 @@ def test_calc_invalid_data(westeros_solved: Scenario) -> None:
 
 
 def test_calc_valid_data_dict(
-    westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
+        westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
 ) -> None:
     c = prepare_computer(westeros_solved, data=w_data)
     c.get("check all")
 
 
 def test_calc_valid_years(
-    westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
+        westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
 ) -> None:
     """Select desirable years from a config file in Excel format."""
     data = w_data
@@ -143,7 +144,7 @@ def test_config(westeros_solved: Scenario, w_data_path: Path) -> None:
 
 
 def test_calc_data_missing_par(
-    westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
+        westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
 ) -> None:
     data = w_data
 
@@ -155,7 +156,7 @@ def test_calc_data_missing_par(
 
 
 def test_calc_data_missing_ref(
-    westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
+        westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
 ) -> None:
     """When "price_ref" is missing, the code computes it by extrapolation."""
     data = w_data
@@ -173,7 +174,7 @@ def test_calc_data_missing_ref(
 
 
 def test_calc_data_missing_column(
-    westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
+        westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
 ) -> None:
     data = w_data
 
@@ -186,7 +187,7 @@ def test_calc_data_missing_column(
 
 
 def test_calc_data_missing_datapoint(
-    westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
+        westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]
 ) -> None:
     data = w_data
 
@@ -207,29 +208,29 @@ def test_calc_data_missing_datapoint(
 @pytest.mark.parametrize(
     "key, test, expected",
     (
-        ("grow", "allclose", [0.02658363, 0.04137974, 0.04137974, 0.02918601]),
-        ("rho", "equal", [-4.0]),
-        ("historical_gdp", "equal", [500.0]),
-        ("k0", "equal", [1500.0]),
-        # These values updated to align with changes in
-        # https://github.com/iiasa/message_ix/pull/924
-        ("cost_MESSAGE", "allclose", [6.18242, 8.801164, 11.845227, 12.845227]),
-        (
-            "price_MESSAGE",
-            "allclose",
-            [211.0, 512.03088025, 162.65962971, 160.65616805],
-        ),
-        ("demand_MESSAGE", "allclose", [27, 55, 82, 104]),
-        ("prfconst", "allclose", [9.68838201e-08]),
-        ("lakl", "allclose", [26.027323]),
+            ("grow", "allclose", [0.02658363, 0.04137974, 0.04137974, 0.02918601]),
+            ("rho", "equal", [-4.0]),
+            ("historical_gdp", "equal", [500.0]),
+            ("k0", "equal", [1500.0]),
+            # These values updated to align with changes in
+            # https://github.com/iiasa/message_ix/pull/924
+            ("cost_MESSAGE", "allclose", [6.18242, 8.801164, 11.845227, 12.845227]),
+            (
+                    "price_MESSAGE",
+                    "allclose",
+                    [211.0, 512.03088025, 162.65962971, 160.65616805],
+            ),
+            ("demand_MESSAGE", "allclose", [27, 55, 82, 104]),
+            ("prfconst", "allclose", [9.68838201e-08]),
+            ("lakl", "allclose", [26.027323]),
     ),
 )
 def test_calc(
-    westeros_solved: Scenario,
-    w_data_path: Path,
-    key: str,
-    test: Literal["allclose", "equal"],
-    expected: list[float] | list[int],
+        westeros_solved: Scenario,
+        w_data_path: Path,
+        key: str,
+        test: Literal["allclose", "equal"],
+        expected: list[float] | list[int],
 ) -> None:
     """Test calculation of intermediate values on a solved Westeros scenario."""
     c = prepare_computer(westeros_solved, data=w_data_path)
@@ -319,17 +320,17 @@ def test_calibrate(westeros_solved: Scenario, w_data_path: Path) -> None:
 @pytest.mark.parametrize(
     "kwargs",
     (
-        {},  # Default concurrent=0
-        dict(concurrent=0),  # Explicit value, same as default
-        dict(concurrent=1),
-        pytest.param(
-            dict(concurrent=2),
-            marks=pytest.mark.xfail(raises=ValueError, reason="Invalid value"),
-        ),
+            {},  # Default concurrent=0
+            dict(concurrent=0),  # Explicit value, same as default
+            dict(concurrent=1),
+            pytest.param(
+                dict(concurrent=2),
+                marks=pytest.mark.xfail(raises=ValueError, reason="Invalid value"),
+            ),
     ),
 )
 def test_calibrate_roundtrip(
-    westeros_solved: Scenario, w_data_path: Path, kwargs
+        westeros_solved: Scenario, w_data_path: Path, kwargs
 ) -> None:
     """Ensure certain values occur after checking convergence.
 
@@ -351,7 +352,7 @@ def test_calibrate_roundtrip(
 
 @pytest.fixture
 def mr_scenario(
-    test_mp: Platform, request: pytest.FixtureRequest
+        test_mp: Platform, request: pytest.FixtureRequest
 ) -> Generator[Scenario, Any, None]:
     """Fixture with a multi-region, multi-sector scenario."""
     scenario = make_westeros(test_mp, request=request)
@@ -434,3 +435,65 @@ def test_sector_map(westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]) 
         w_data[table] = w_data[table].replace({"sector": {"light": "FOO"}})
 
     westeros_solved.add_macro(w_data, check_convergence=True)
+
+
+def test_price_ref(mr_scenario):
+    s = mr_scenario
+    data = pd.read_excel(mr_data_path("2"), sheet_name=None)
+    # remove price_ref to trigger extrapolation if calling c.get("price_ref")
+    data.pop("price_ref")
+    c = prepare_computer(s, data=data)
+
+    # Manipulate PRICE_COMMODITY data:
+    # 1) exclude electricity prices in years: [700, 710]
+    # This leads to this commodity having only 1 price data point,
+    #  which is insufficient for extrapolation
+    # 2) rename level 'final' to 'useful' to imitate having a second commodity
+    #   with level useful. However, only "light" is in the macro config.
+    ser = c.get("PRICE_COMMODITY")
+
+    from genno.core.attrseries import AttrSeries
+
+    ser = AttrSeries(pd.Series(ser[-4:]).rename({"final": "useful"}, axis="index"))
+    c.add(c.full_key("PRICE_COMMODITY"), ser, sums=True)
+
+    # check if cleaned PRICE_COMMODITY only contains commodities from macro config
+    prc_cleaned = c.get(c.full_key("PRICE_COMMODITY").add_tag("macro"))["commodity"].unique()
+    comms_macro = c.get("mapping_macro_sector").commodity.unique()
+    assert set(prc_cleaned) == set(comms_macro)
+
+    # fails with ComputationError
+    result = c.get("price_ref")
+    print()
+
+
+def test_extrapolate():
+    from message_ix.macro.calibrate import extrapolate
+
+    mms = pd.DataFrame(
+        {"commodity": ["comm1", "comm2"], "sector": ["comm1", "comm2"], "level": "lvl1"}
+    )
+    data = pd.DataFrame(
+        {
+            "node": ["node1", "node1", "node1", "node1"],
+            "level": ["lvl1", "lvl1", "lvl1", "lvl1"],
+            "commodity": ["comm1", "comm1", "comm1", "comm1"],
+            "value": [100, 100, 100, 100],
+            "level": ["lvl1", "lvl1", "lvl1", "lvl1"],
+            "year": [100, 101, 102, 103],
+        }
+    )
+    result = extrapolate(data, mms, 99)
+    assert (result == 100).all()
+    data2 = pd.DataFrame(
+        {
+            "node": ["node2"],
+            "level": ["lvl1"],
+            "commodity": ["comm1"],
+            "value": [100],
+            "level": ["lvl1"],
+            "year": [100],
+        }
+    )
+    extrapolate(data2, mms, 99)
+    return
