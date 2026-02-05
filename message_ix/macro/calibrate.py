@@ -120,6 +120,7 @@ class Structures:
     """MACRO structure information."""
 
     level: set[str]
+    commodity: set[str]
     node: set[str]
     sector: set[str]
     #: Model years for which MACRO is calibrated.
@@ -186,7 +187,13 @@ def clean_model_data(data: "Quantity", s: Structures) -> "DataFrame":
 
     # Construct selectors for only the values appearing in `s`
     selectors: MutableMapping[Hashable, Iterable[Hashable]] = {}
-    for dim, kind in ("l", "level"), ("n", "node"), ("sector", "sector"), ("y", "year"):
+    for dim, kind in (
+        ("l", "level"),
+        ("c", "commodity"),
+        ("n", "node"),
+        ("sector", "sector"),
+        ("y", "year"),
+    ):
         if dim in data.dims:
             selectors[dim] = sorted(getattr(s, kind))
             names[dim] = kind
@@ -708,6 +715,7 @@ def prepare_computer(
     # Structure information derived from `config`
     mms = c.add("mapping_macro_sector", mapping_macro_sector, "config::macro")
     c.add("level::macro", partial(unique_set, "level"), mms)
+    c.add("commodity::macro", partial(unique_set, "commodity"), mms)
     c.add("node::macro", partial(unique_set, "node"), "config::macro")
     c.add("sector::macro", partial(unique_set, "sector"), mms)
 
@@ -715,8 +723,11 @@ def prepare_computer(
     c.add("year::macro", macro_periods, "DEMAND:y", "config::macro")
 
     # Collect structure information in a class for easier reference
-    c.add("_s", Structures, *[f"{n}::macro" for n in "level node sector year".split()])
-
+    c.add(
+        "_s",
+        Structures,
+        *[f"{n}::macro" for n in "level commodity node sector year".split()],
+    )
     # Collection of keys to run to check input data formats
     checks = []
 
