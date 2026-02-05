@@ -3,10 +3,12 @@
 # The original tool (including VBA source code) can be downloaded here:
 # https://github.com/user-attachments/files/18109634/Fw_.VBA.Macros.to.Visualize.RES.diagram.zip
 
+import random
+
 import pandas as pd
 from graphviz import Digraph
+
 import message_ix
-import random
 
 
 def random_color_hex() -> str:
@@ -136,7 +138,7 @@ class GraphBuilder:
                 labelloc="t",
                 shape="rect",
                 style="filled",
-                height=f"{y*2}",
+                height=f"{y * 2}",
                 width="0.0001",
                 pos=f"{x},{y}!",
                 color=self.color_dict[label],
