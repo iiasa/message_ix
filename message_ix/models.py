@@ -738,7 +738,9 @@ equ(
     "",
     "Constraint for capacity maintenance over the technical lifetime",
 )
-# equ("COMMODITY_BALANCE_GT", "", "Commodity supply greater than or equal demand")
+equ(
+    "COMMODITY_BALANCE_GT", "n c l y h", "Commodity supply greater than or equal demand"
+)
 equ("COMMODITY_BALANCE_LT", "", "Commodity supply lower than or equal demand")
 equ(
     "COMMODITY_USE_LEVEL",
