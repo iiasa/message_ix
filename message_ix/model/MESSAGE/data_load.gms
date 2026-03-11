@@ -127,7 +127,7 @@ $ifthen.tag_magpie %landusemode% == "magpie"
 emission_cumulative(emission) = no;
 * add emission types where land-use emissions should use the cumulative accounting approach
 * TO DO: to avoid having to declarde these emissions in gams code, this section should be translated into a Python process
-emission_cumulative('TCE_CO2') = yes;
+* emission_cumulative('TCE_CO2') = yes;
 emission_cumulative('LU_CO2') = yes;
 emission_cumulative('TCE') = yes;
 * add all emission types to subset for annual land-use emission accounting,
@@ -140,7 +140,7 @@ emission_annual(emission_cumulative) = no;
 *----------------------------------------------------------------------------------------------------------------------*
 
 emission_cumulative(emission) = no;
-emission_cumulative('TCE_CO2') = yes;
+* emission_cumulative('TCE_CO2') = yes;
 emission_cumulative('LU_CO2') = yes;
 emission_cumulative('TCE') = yes;
 emission_annual(emission) = yes;
