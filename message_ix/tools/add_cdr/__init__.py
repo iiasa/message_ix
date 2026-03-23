@@ -642,7 +642,7 @@ def add_oae(scen, yamlpath=""):
 
     # Add OAE market penetration relation bounds
     ## create relation bounds
-    rel_eqs = ["OAE_mpen_c"]
+    rel_eqs = ["OAE_removal","OAE_mpen_c"]
     list_rel_eq = []
     for node in nodes:
         for rel in rel_eqs:
