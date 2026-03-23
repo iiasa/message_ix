@@ -26,7 +26,7 @@ All changes
 - Support for Python 3.9 is dropped (:pull:`985`), as it has reached end-of-life.
 - :mod:`message_ix` is tested and compatible with `Pandas 3.0.0 <https://pandas.pydata.org/pandas-docs/stable/whatsnew/v3.0.0.html>`_,
   released 2026-01-21 (:pull:`1001`).
-- Add representation of commodity flows associated with construction and retirement of technology capacity (:pull:`451`).
+- Add representation of commodity flows associated with construction and retirement of technology capacity (:pull:`451`, :pull:`1003`).
 
   - New parameters
     |input_cap|,
