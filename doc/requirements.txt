@@ -85,7 +85,7 @@ platformdirs==4.3.8
     #   pint
 pyarrow==21.0.0
     # via pandas
-pybtex==0.24.0
+pybtex==0.25.1
     # via
     #   pybtex-docutils
     #   sphinxcontrib-bibtex
@@ -110,7 +110,6 @@ roman-numerals-py==3.1.0
 six==1.16.0
     # via
     #   latexcodec
-    #   pybtex
     #   python-dateutil
 smmap==5.0.0
     # via gitdb
@@ -128,7 +127,7 @@ sphinx-rtd-theme==3.0.2
     # via -r requirements.in
 sphinxcontrib-applehelp==2.0.0
     # via sphinx
-sphinxcontrib-bibtex==2.6.3
+sphinxcontrib-bibtex==2.6.5
     # via -r requirements.in
 sphinxcontrib-devhelp==2.0.0
     # via sphinx
