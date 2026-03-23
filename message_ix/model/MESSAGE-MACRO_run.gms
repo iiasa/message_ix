@@ -155,17 +155,32 @@ demand_init(node_macro,sector,year) = SUM((commodity, level, time)$mapping_macro
 
 * useful energy/service demand prices from MESSAGE get mapped onto MACRO sector structure
 
-eneprice(node_macro,sector,year) $(NOT macro_base_period(year)) = SUM((commodity, level, time) $ mapping_macro_sector(sector, commodity, level),
-                                 PRICE_COMMODITY.L(node_macro,commodity,level,year,time) * duration_time(time) )
-;
+* Replace EPS values with 0
+PRICE_COMMODITY.L(node_macro,commodity,level,year,time)$(
+    mapVal(PRICE_COMMODITY.L(node_macro,commodity,level,year,time)) = 8
+) = 0;
 
-price_diff_abs(iteration,node_macro,sector,year)$( price_init(node_macro,sector,year) ) =
-    eneprice(node_macro,sector,year) - price_init(node_macro,sector,year) ;
-price_diff_rel(iteration,node_macro,sector,year)$( price_init(node_macro,sector,year) ) =
-    price_diff_abs(iteration,node_macro,sector,year) / price_init(node_macro,sector,year) ;
+eneprice(node_macro,sector,year)$(NOT macro_base_period(year)) = SUM(
+    (commodity,level,time)$mapping_macro_sector(sector,commodity,level),
+    PRICE_COMMODITY.L(node_macro,commodity,level,year,time) * duration_time(time)
+);
 
-price_init(node_macro,sector,year) = SUM((commodity, level, time) $ mapping_macro_sector(sector, commodity, level),
-                                        PRICE_COMMODITY.l(node_macro,commodity,level,year,time) ) ;
+* Absolute difference in prices
+price_diff_abs(iteration,node_macro,sector,year)$price_init(node_macro,sector,year) = (
+    eneprice(node_macro,sector,year)
+    - price_init(node_macro,sector,year)
+);
+
+* Relative difference in prices
+price_diff_rel(iteration,node_macro,sector,year)$price_init(node_macro,sector,year) = (
+    price_diff_abs(iteration,node_macro,sector,year)
+    / price_init(node_macro,sector,year)
+);
+
+price_init(node_macro,sector,year) = SUM(
+  (commodity,level,time)$mapping_macro_sector(sector,commodity,level),
+  PRICE_COMMODITY.L(node_macro,commodity,level,year,time)
+);
 
 DISPLAY enestart, eneprice, total_cost ;
 
