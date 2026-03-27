@@ -1,10 +1,14 @@
-# Input file for uv pip compile
 # Only specify the packages necessary for [docs]
 
 gitpython==3.1.44
 ixmp @ git+https://github.com/iiasa/ixmp.git@main
 numpydoc==1.8.0
 pandas==2.2.3
+
+# Per CVE-2026-25645; see
+# https://requests.rtfd.io/en/latest/community/updates/
+requests>=2.33.0
+
 sphinx==8.2.3
 sphinx-rtd-theme==3.0.2
 sphinxcontrib-bibtex==2.6.5
