@@ -149,7 +149,7 @@ jobs:
           --numprocesses=auto --dist=loadgroup
 
     - name: Upload test coverage to Codecov.io
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@v6
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -232,7 +232,7 @@ jobs:
           --numprocesses=auto --dist=loadgroup
 
     - name: Upload test coverage to Codecov.io
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@v6
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # required
 
