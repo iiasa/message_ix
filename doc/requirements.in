@@ -3,7 +3,10 @@
 gitpython==3.1.44
 ixmp @ git+https://github.com/iiasa/ixmp.git@main
 numpydoc==1.8.0
-pandas==2.2.3
+
+# Per CVE-2026-4539; see
+# https://github.com/pygments/pygments/issues/3058
+pygments>=2.20.0
 
 # Per CVE-2026-25645; see
 # https://requests.rtfd.io/en/latest/community/updates/
