@@ -162,11 +162,20 @@ SUM(node_active,
 ***
 * Equation CAPITAL_CONSTRAINT
 * ---------------------------------
-* The following equation specifies the allocation of total production among current consumption :math:`\text{C}_{n, y}`, investment into building up capital stock excluding
-* the sectors represented in MESSAGE :math:`\text{I}_{n, y}` and the MESSAGE system costs :math:`\text{EC}_{n, y}` which are derived from a previous MESSAGE model run. As described in :cite:`Manne-Richels-1992`, the first-order
-* optimality conditions lead to the Ramsey rule for the optimal allocation of savings, investment and consumption over time.
-*
-* .. math:: \text{Y}_{n, y} = \text{C}_{n, y} + \text{I}_{r, y} + \text{EC}_{n, y} \qquad \forall{n, y}
+* The capital constraint as in the first equation below specifies the allocation of total production among current consumption :math:`\text{C}_{n, y}`, investment :math:`\text{I}_{n, y}` into building up capital
+* stock and energy costs :math:`\text{EC}_{n, y}` approximated based on MESSAGE system costs :math:`\text{total_cost}_{n, r}`. The constraint assures that the net expenditures and savings cannot exceed the total income in a region. Investment excludes the sectors
+* represented in MESSAGE and the MESSAGE system costs are derived from a previous MESSAGE model run including all the energy systems costs, :math:`\text{COST_NODAL}_{n, y}`, for a certain
+* region considering the trade balance: :math:`\text{import_cost}_{n, y} - \text{export_cost}_{n, y}`. The production function in MACRO only accounts for non-energy producing part of the
+* economy and the energy system is modeled separately in MESSAGE. In addition, MACRO does not include the trade of normal goods. Therefore, the revenues from fuel or emission certificate
+* trade should be separately added to the total regional income. This is assured by including the trade balance in the :math:`\text{EC}_{n, y}`. As described in :cite:`Manne-Richels-1992`,
+* the first-order optimality conditions lead to the Ramsey rule for the optimal allocation of savings, investment, and consumption over time. 
+
+* The GDP is reported as the sum of investment, consumption, and energy costs without the trade balance. Positive contribution of energy costs :math:`\text{EC}_{n, y}` to GDP would be counter-balanced by the
+* decrease of consumption :math:`\text{C}_{n, y}` and investment :math:`\text{I}_{n, y}` in the certain year as well as by the reduction in capacity to invest and grow the economy for later years. 
+* 
+* .. math:: \text{Y}_{n, y} = \text{C}_{n, y} + \text{I}_{n, y} + \text{EC}_{n, y} \qquad \forall{n, y}
+* .. math:: \text{total_cost}_{n, r} = \text{COST_NODAL}_{n, y} + \text{import_cost}_{r, y} - \text{export_cost}_{n, y} \qquad \forall{n, y}
+* .. math:: \text{GDP}_{n, y} = \text{C}_{n, y} + \text{I}_{n, y} + \text{EC}_{n, y} - (\text{import_cost}_{r, y} - \text{export_cost}_{n, y}) \qquad \forall{n, y}
 *
 ***
 
