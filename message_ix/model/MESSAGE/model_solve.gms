@@ -141,7 +141,7 @@ else
 * reset the investment cost scaling parameter
         year(year_all2)$( ORD(year_all2) > ORD(year_all)
             AND duration_period_sum(year_all,year_all2) < %foresight% ) = yes ;
-        year4(year_all2)$((ord(year_all2) < ord(year_all))) = yes ;
+        year4(year_all2)$((ord(year_all2) < ord(year_all) + 1)) = yes ;
 
 * write a status update and time elapsed to the log file, solve the model
         put_utility 'log' /'+++ Solve the recursive-dynamic version of MESSAGEix - iteration ' year_all.tl:0 '  +++ ' ;
@@ -162,65 +162,54 @@ else
         ) ;
 
         IF(%learningmode% = 1,
-*       passing CAP_NEW values to update cap_new2 data for unit and size optimization,
-*       make bin parameters equal to 1 when technology is built, and 0 if otherwise,
-*       and passing log2_cap_new parameter to learning module
-*       NOTE: there is no log 0, thus binary parameter is added as helper to avoid error.
-*       multiplication with the binary parameter in learning module negates effect of this helper
+* passing CAP_NEW values to update cap_new2 data for unit and size optimization,
+* make bin parameters equal to 1 when technology is built, and 0 if otherwise,
+* and passing log2_cap_new parameter to learning module
+* NOTE: there is no log 0, thus binary parameter is added as helper to avoid error.
+* multiplication with the binary parameter in learning module negates effect of this helper
         cap_new2(newtec,year_all2) = sum(node, CAP_NEW.l(node,newtec,year_all2));
         bin_cap_new(newtec,year_all2) = sum(node, CAP_NEW.l(node,newtec,year_all2));
         bin_cap_new(newtec,year_all2)$(bin_cap_new(newtec,year_all2) > 1E-10) = 1 ;
         log2_cap_new2(newtec,year_all2) = log2(sum(node, CAP_NEW.l(node,newtec,year_all2)) + [1-bin_cap_new(newtec,year_all2)] ) ;
-        
+
         Solve learningeos using nlp minimizing OBJECT;
 
-*       update inv_cost values using indexed (normalized) cost IC
+* update inv_cost values using indexed (normalized) cost IC
         inv_cost(node,newtec,year_all2) = IC.l(newtec,year_all2) * inv_cost_ini(node,newtec);
 
-        display hist_length, bin_cap_new, IC.l, inv_cost, cap_new2, CAP_NEW.l,inv_cost_ini;
         );
 
 * fix all variables of the current iteration period 'year_all' to the optimal levels
         ext_fix(node,commodity,grade,year4) =  EXT.l(node,commodity,grade,year4) ;
-        cap_new_fix(node,newtec,year4) = CAP_NEW.l(node,newtec,year4) ;
-        cap_fix(node,newtec,year4,year4) = CAP.l(node,newtec,year4,year4) ;
-        act_fix(node,newtec,year4,year4,mode,time) = ACT.l(node,newtec,year4,year4,mode,time) ;
+        cap_new_fix(node,tec,year4) = CAP_NEW.l(node,tec,year4) ;
+        cap_fix(node,tec,year4,year4) = CAP.l(node,tec,year4,year4) ;
+        act_fix(node,tec,year4,year4,mode,time) = ACT.l(node,tec,year4,year4,mode,time) ;
+        cap_new_up_fix(node,tec,year4) = CAP_NEW_UP.l(node,tec,year4) ;
+        cap_new_lo_fix(node,tec,year4) = CAP_NEW_LO.l(node,tec,year4) ;
+        act_up_fix(node,tec,year4,time) = ACT_UP.l(node,tec,year4,time) ;
+        act_lo_fix(node,tec,year4,time) = ACT_LO.l(node,tec,year4,time) ;
 
         ext_fix(node,commodity,grade,year4)$(ext_fix(node,commodity,grade,year4) > 1E-10) =  1 ;
-        cap_new_fix(node,newtec,year4)$(cap_new_fix(node,newtec,year4) > 1E-10) = 1 ;
-        cap_fix(node,newtec,year4,year4)$(cap_fix(node,newtec,year4,year4) > 1E-10) = 1 ;
-        act_fix(node,newtec,year4,year4,mode,time)$(act_fix(node,newtec,year4,year4,mode,time) > 1E-10) = 1 ;
+        cap_new_fix(node,tec,year4)$(cap_new_fix(node,tec,year4) > 1E-10) = 1 ;
+        cap_fix(node,tec,year4,year4)$(cap_fix(node,tec,year4,year4) > 1E-10) = 1 ;
+        act_fix(node,tec,year4,year4,mode,time)$(act_fix(node,tec,year4,year4,mode,time) > 1E-10) = 1 ;
+        cap_new_up_fix(node,tec,year4)$(cap_new_up_fix(node,tec,year4) > 1E-10) = 1 ;
+        cap_new_lo_fix(node,tec,year4)$(cap_new_up_fix(node,tec,year4) > 1E-10) = 1 ;
+        act_up_fix(node,tec,year4,time)$(act_up_fix(node,tec,year4,time) > 1E-10) = 1 ;
+        act_lo_fix(node,tec,year4,time)$(act_lo_fix(node,tec,year4,time) > 1E-10) = 1 ;
 
-*        EXT.fx(node,commodity,grade,year4) =  EXT.l(node,commodity,grade,year4) ;
-        CAP_NEW.fx(node,newtec,year4)$(cap_new_fix(node,newtec,year4) = 1) = CAP_NEW.l(node,newtec,year4) ;
-*        CAP.fx(node,newtec,year4,year4) = CAP.l(node,newtec,year4,year4) ;
-        ACT.fx(node,newtec,year4,year4,mode,time)$(act_fix(node,newtec,year4,year4,mode,time) = 1) = ACT.l(node,newtec,year4,year4,mode,time) ;
-*        CAP_NEW_UP.fx(node,newtec,year4) = CAP_NEW_UP.l(node,newtec,year4) ;
-*        CAP_NEW_LO.fx(node,newtec,year4) = CAP_NEW_LO.l(node,newtec,year4) ;
-*        ACT_UP.fx(node,newtec,year4,time) = ACT_UP.l(node,newtec,year4,time) ;
-*        ACT_LO.fx(node,newtec,year4,time) = ACT_LO.l(node,newtec,year4,time) ;
-* relaxed "fix"
-*        EXT.up(node,commodity,grade,year4) = 1.000001*EXT.l(node,commodity,grade,year4) ;
-*        EXT.lo(node,commodity,grade,year4) = 0.999999*EXT.l(node,commodity,grade,year4) ;
-**        CAP_NEW.up(node,newtec,year4) = 1.000001*CAP_NEW.l(node,newtec,year4) ;
-**        CAP_NEW.lo(node,newtec,year4) = 0.999999*CAP_NEW.l(node,newtec,year4) ;
-*        CAP.up(node,newtec,year4,year4) = 1.000001*CAP.l(node,newtec,year4,year4) ;
-*        CAP.lo(node,newtec,year4,year4) = 0.999999*CAP.l(node,newtec,year4,year4) ;
-**        ACT.up(node,newtec,year4,year4,mode,time) = 1.000001*ACT.l(node,newtec,year4,year4,mode,time) ;
-**        ACT.lo(node,newtec,year4,year4,mode,time) = 0.999999*ACT.l(node,newtec,year4,year4,mode,time) ;
 
-$ontext
-        EXT.fx(node,commodity,grade,year_all) =  EXT.l(node,commodity,grade,year_all) ;
-        CAP_NEW.fx(node,tec,year_all) = CAP_NEW.l(node,tec,year_all) ;
-        CAP.fx(node,tec,year_all2,year_all)$( map_period(year_all2,year_all) ) = CAP.l(node,tec,year_all,year_all2) ;
-        ACT.fx(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all) )
-            = ACT.l(node,tec,year_all2,year_all,mode,time) ;
-        CAP_NEW_UP.fx(node,tec,year_all) = CAP_NEW_UP.l(node,tec,year_all) ;
-        CAP_NEW_LO.fx(node,tec,year_all) = CAP_NEW_LO.l(node,tec,year_all) ;
-        ACT_UP.fx(node,tec,year_all,time) = ACT_UP.l(node,tec,year_all,time) ;
-        ACT_LO.fx(node,tec,year_all,time) = ACT_LO.l(node,tec,year_all,time) ;
-$offtext
-        
+        EXT.fx(node,commodity,grade,year4)$(ext_fix(node,commodity,grade,year4) = 1) =  EXT.l(node,commodity,grade,year4) ;
+        CAP_NEW.fx(node,tec,year4)$(cap_new_fix(node,tec,year4) = 1) = CAP_NEW.l(node,tec,year4) ;
+        CAP.fx(node,tec,year4,year4)$(cap_fix(node,tec,year4,year4) = 1) = CAP.l(node,tec,year4,year4) ;
+        ACT.fx(node,tec,year4,year4,mode,time)$(act_fix(node,tec,year4,year4,mode,time) = 1) = ACT.l(node,tec,year4,year4,mode,time) ;
+        CAP_NEW_UP.fx(node,tec,year4)$(cap_new_up_fix(node,tec,year4) = 1) = CAP_NEW_UP.l(node,tec,year4) ;
+        CAP_NEW_LO.fx(node,tec,year4)$(cap_new_lo_fix(node,tec,year4) = 1) = CAP_NEW_LO.l(node,tec,year4) ;
+        ACT_UP.fx(node,tec,year4,time)$(act_up_fix(node,tec,year4,time) = 1) = ACT_UP.l(node,tec,year4,time) ;
+        ACT_LO.fx(node,tec,year4,time)$(act_lo_fix(node,tec,year4,time) = 1) = ACT_LO.l(node,tec,year4,time) ;
+
+
+
         Display year,year4,year_all,year_all2,model_horizon,inv_cost_ini ;
     ) ; # end of the recursive-dynamic loop
 
