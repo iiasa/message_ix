@@ -180,33 +180,33 @@ else
         );
 
 * fix all variables of the current iteration period 'year_all' to the optimal levels
-        ext_fix(node,commodity,grade,year4) =  EXT.l(node,commodity,grade,year4) ;
-        cap_new_fix(node,tec,year4) = CAP_NEW.l(node,tec,year4) ;
-        cap_fix(node,tec,year4,year4) = CAP.l(node,tec,year4,year4) ;
-        act_fix(node,tec,year4,year4,mode,time) = ACT.l(node,tec,year4,year4,mode,time) ;
-        cap_new_up_fix(node,tec,year4) = CAP_NEW_UP.l(node,tec,year4) ;
-        cap_new_lo_fix(node,tec,year4) = CAP_NEW_LO.l(node,tec,year4) ;
-        act_up_fix(node,tec,year4,time) = ACT_UP.l(node,tec,year4,time) ;
-        act_lo_fix(node,tec,year4,time) = ACT_LO.l(node,tec,year4,time) ;
+        ext_fix(node,commodity,grade,year4) =  0 ;
+        cap_new_fix(node,newtec,year4) = 0 ;
+        cap_fix(node,newtec,year4,year4) = 0 ;
+        act_fix(node,newtec,year4,year4,mode,time) = 0 ;
+        cap_new_up_fix(node,newtec,year4) = 0 ;
+        cap_new_lo_fix(node,newtec,year4) = 0 ;
+        act_up_fix(node,newtec,year4,time) = 0 ;
+        act_lo_fix(node,newtec,year4,time) = 0 ;
 
-        ext_fix(node,commodity,grade,year4)$(ext_fix(node,commodity,grade,year4) > 1E-10) =  1 ;
-        cap_new_fix(node,tec,year4)$(cap_new_fix(node,tec,year4) > 1E-10) = 1 ;
-        cap_fix(node,tec,year4,year4)$(cap_fix(node,tec,year4,year4) > 1E-10) = 1 ;
-        act_fix(node,tec,year4,year4,mode,time)$(act_fix(node,tec,year4,year4,mode,time) > 1E-10) = 1 ;
-        cap_new_up_fix(node,tec,year4)$(cap_new_up_fix(node,tec,year4) > 1E-10) = 1 ;
-        cap_new_lo_fix(node,tec,year4)$(cap_new_up_fix(node,tec,year4) > 1E-10) = 1 ;
-        act_up_fix(node,tec,year4,time)$(act_up_fix(node,tec,year4,time) > 1E-10) = 1 ;
-        act_lo_fix(node,tec,year4,time)$(act_lo_fix(node,tec,year4,time) > 1E-10) = 1 ;
+        ext_fix(node,commodity,grade,year4)$(EXT.l(node,commodity,grade,year4) < -1E-4 or EXT.l(node,commodity,grade,year4) > 1E-4) =  1 ;
+        cap_new_fix(node,newtec,year4)$(CAP_NEW.l(node,newtec,year4) < -1E-4 or CAP_NEW.l(node,newtec,year4) > 1E-4) = 1 ;
+        cap_fix(node,newtec,year4,year4)$(CAP.l(node,newtec,year4,year4) < -1E-4 or CAP.l(node,newtec,year4,year4) > 1E-4) = 1 ;
+        act_fix(node,newtec,year4,year4,mode,time)$(ACT.l(node,newtec,year4,year4,mode,time) < -1E-4 or ACT.l(node,newtec,year4,year4,mode,time) > 1E-4 ) = 1 ;
+        cap_new_up_fix(node,newtec,year4)$(CAP_NEW_UP.l(node,newtec,year4) < -1E-4 or CAP_NEW_UP.l(node,newtec,year4) > 1E-4) = 1 ;
+        cap_new_lo_fix(node,newtec,year4)$(CAP_NEW_LO.l(node,newtec,year4) < -1E-4 or CAP_NEW_LO.l(node,newtec,year4) > 1E-4) = 1 ;
+        act_up_fix(node,newtec,year4,time)$(ACT_UP.l(node,newtec,year4,time) < -1E-4 or ACT_UP.l(node,newtec,year4,time) > 1E-4) = 1 ;
+        act_lo_fix(node,newtec,year4,time)$(ACT_LO.l(node,newtec,year4,time) < -1E-4 or ACT_LO.l(node,newtec,year4,time) > 1E-4) = 1 ;
 
 
         EXT.fx(node,commodity,grade,year4)$(ext_fix(node,commodity,grade,year4) = 1) =  EXT.l(node,commodity,grade,year4) ;
-        CAP_NEW.fx(node,tec,year4)$(cap_new_fix(node,tec,year4) = 1) = CAP_NEW.l(node,tec,year4) ;
-        CAP.fx(node,tec,year4,year4)$(cap_fix(node,tec,year4,year4) = 1) = CAP.l(node,tec,year4,year4) ;
-        ACT.fx(node,tec,year4,year4,mode,time)$(act_fix(node,tec,year4,year4,mode,time) = 1) = ACT.l(node,tec,year4,year4,mode,time) ;
-        CAP_NEW_UP.fx(node,tec,year4)$(cap_new_up_fix(node,tec,year4) = 1) = CAP_NEW_UP.l(node,tec,year4) ;
-        CAP_NEW_LO.fx(node,tec,year4)$(cap_new_lo_fix(node,tec,year4) = 1) = CAP_NEW_LO.l(node,tec,year4) ;
-        ACT_UP.fx(node,tec,year4,time)$(act_up_fix(node,tec,year4,time) = 1) = ACT_UP.l(node,tec,year4,time) ;
-        ACT_LO.fx(node,tec,year4,time)$(act_lo_fix(node,tec,year4,time) = 1) = ACT_LO.l(node,tec,year4,time) ;
+        CAP_NEW.fx(node,newtec,year4)$(cap_new_fix(node,newtec,year4) = 1) = CAP_NEW.l(node,newtec,year4) ;
+        CAP.fx(node,newtec,year4,year4)$(cap_fix(node,newtec,year4,year4) = 1) = CAP.l(node,newtec,year4,year4) ;
+        ACT.fx(node,newtec,year4,year4,mode,time)$(act_fix(node,newtec,year4,year4,mode,time) = 1) = ACT.l(node,newtec,year4,year4,mode,time) ;
+        CAP_NEW_UP.fx(node,newtec,year4)$(cap_new_up_fix(node,newtec,year4) = 1) = CAP_NEW_UP.l(node,newtec,year4) ;
+        CAP_NEW_LO.fx(node,newtec,year4)$(cap_new_lo_fix(node,newtec,year4) = 1) = CAP_NEW_LO.l(node,newtec,year4) ;
+        ACT_UP.fx(node,newtec,year4,time)$(act_up_fix(node,newtec,year4,time) = 1) = ACT_UP.l(node,newtec,year4,time) ;
+        ACT_LO.fx(node,newtec,year4,time)$(act_lo_fix(node,newtec,year4,time) = 1) = ACT_LO.l(node,newtec,year4,time) ;
 
 
 

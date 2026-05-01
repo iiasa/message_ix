@@ -903,12 +903,12 @@ Parameters
 *----------------------------------------------------------------------------------------------------------------------*
 Parameters
   ext_fix(node,commodity,grade,year_all)            'fix parameter for EXT'
-  cap_new_fix(node,tec,year_all)                 'fix parameter for CAP_NEW'
-  cap_fix(node,tec,year_all,year_all)            'fix parameter for CAP'
-  act_fix(node,tec,year_all,year_all,mode,time)  'fix parameter for ACT'
-  cap_new_up_fix(node,tec,year_all)              'fix parameter for CAP_NEW_UP'
-  cap_new_lo_fix(node,tec,year_all)              'fix parameter for CAP_NEW_LO'
-  act_up_fix(node,tec,year_all,time)             'fix parameter for ACT_UP'
-  act_lo_fix(node,tec,year_all,time)             'fix parameter for ACT_LO'
+  cap_new_fix(node,newtec,year_all)                 'fix parameter for CAP_NEW'
+  cap_fix(node,newtec,year_all,year_all)            'fix parameter for CAP'
+  act_fix(node,newtec,year_all,year_all,mode,time)  'fix parameter for ACT'
+  cap_new_up_fix(node,newtec,year_all)              'fix parameter for CAP_NEW_UP'
+  cap_new_lo_fix(node,newtec,year_all)              'fix parameter for CAP_NEW_LO'
+  act_up_fix(node,newtec,year_all,time)             'fix parameter for ACT_UP'
+  act_lo_fix(node,newtec,year_all,time)             'fix parameter for ACT_LO'
 
 ;
