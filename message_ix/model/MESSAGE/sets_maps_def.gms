@@ -491,3 +491,10 @@ Sets
 ;
 
 Set ixmp_version(*,*) "Versions of Python packages used to generate this model";
+
+
+Set
+    last_fixed_period(year_all)      'period fixed by tha latest iteration'
+    future_period(year_all)          'future period in iteration'
+;
+
