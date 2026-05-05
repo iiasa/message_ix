@@ -213,7 +213,9 @@ else
         ACT_UP.fx(node,tec,year4,time)$(act_up_fix(node,tec,year4,time) = 1) = ACT_UP.l(node,tec,year4,time) ;
         ACT_LO.fx(node,tec,year4,time)$(act_lo_fix(node,tec,year4,time) = 1) = ACT_LO.l(node,tec,year4,time) ;
 
-        relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) = 0.5 * relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) ;
+*        IF(new_relation_coefficient > 0,
+*        relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) = new_relation_coefficient * relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) ;)
+*        relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) = 0.5 * relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) ;
 
 
 

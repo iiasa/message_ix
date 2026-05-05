@@ -510,6 +510,9 @@ par("knref_unit", "t")
 par("sizeref_unit", "t")
 par("sizeref_proj", "t")
 
+### learning related parameters
+# par("new_relation_coefficient", " ")
+
 # Variables
 var(
     "ACT_LO",

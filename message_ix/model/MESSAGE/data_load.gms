@@ -87,6 +87,10 @@ storage_initial, storage_self_discharge, time_order
 alpha, beta_unit, beta_proj, gamma_unit, gamma_proj
 *** initial condition
 inv_cost_refidx, knref_unit, sizeref_unit, sizeref_proj
+
+* - - - - - - - - - - - - - -
+* recursive dynamic Parameters to update coefficient
+*new_relation_coefficient
 ;
 
 
