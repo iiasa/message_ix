@@ -143,6 +143,12 @@ else
             AND duration_period_sum(year_all,year_all2) < %foresight% ) = yes ;
         year4(year_all2)$((ord(year_all2) < ord(year_all) + 1)) = yes ;
 
+* reset last_fixed_period
+        last_fixed_period(year_all2) = no ;
+        future_period(year_all) = no ;
+        last_fixed_period(year_all2)$((ord(year_all2) = card(year4))) = yes ;
+        future_period(year_all2)$((ord(year_all2) > card(year4))) = yes ;
+
 * write a status update and time elapsed to the log file, solve the model
         put_utility 'log' /'+++ Solve the recursive-dynamic version of MESSAGEix - iteration ' year_all.tl:0 '  +++ ' ;
         $$INCLUDE includes/aux_computation_time.gms
@@ -181,13 +187,13 @@ else
 
 * fix all variables of the current iteration period 'year_all' to the optimal levels
         ext_fix(node,commodity,grade,year4) =  0 ;
-        cap_new_fix(node,newtec,year4) = 0 ;
-        act_fix(node,newtec,year4,year4,mode,time) = 0 ;
-        cap_fix(node,newtec,year4,year4) = 0 ;
-        cap_new_up_fix(node,newtec,year4) = 0 ;
-        cap_new_lo_fix(node,newtec,year4) = 0 ;
-        act_up_fix(node,newtec,year4,time) = 0 ;
-        act_lo_fix(node,newtec,year4,time) = 0 ;
+        cap_new_fix(node,tec,year4) = 0 ;
+        act_fix(node,tec,year4,year4,mode,time) = 0 ;
+        cap_fix(node,tec,year4,year4) = 0 ;
+        cap_new_up_fix(node,tec,year4) = 0 ;
+        cap_new_lo_fix(node,tec,year4) = 0 ;
+        act_up_fix(node,tec,year4,time) = 0 ;
+        act_lo_fix(node,tec,year4,time) = 0 ;
 
         ext_fix(node,commodity,grade,year4)$(abs(EXT.l(node,commodity,grade,year4)) > 1E-6 ) =  1 ;
         cap_new_fix(node,tec,year4)$(abs(CAP_NEW.l(node,tec,year4)) > 1E-6 ) = 1 ;
@@ -207,9 +213,11 @@ else
         ACT_UP.fx(node,tec,year4,time)$(act_up_fix(node,tec,year4,time) = 1) = ACT_UP.l(node,tec,year4,time) ;
         ACT_LO.fx(node,tec,year4,time)$(act_lo_fix(node,tec,year4,time) = 1) = ACT_LO.l(node,tec,year4,time) ;
 
+        relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) = 0.5 * relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) ;
 
 
-        Display year,year4,year_all,year_all2,model_horizon,inv_cost_ini ;
+
+        Display year,year4,year_all,year_all2,model_horizon,last_fixed_period,future_period;
     ) ; # end of the recursive-dynamic loop
 
 ) ; # end of if statement for the selection betwen perfect-foresight or recursive-dynamic model
