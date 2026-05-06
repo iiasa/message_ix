@@ -11,12 +11,15 @@ Parameter
     prev_OBJ                             'previous objective value'
     delta_OBJ                            'difference between current and previous objective value'
     inv_cost_ini(node,newtec)            'initial investment cost assumption at first model year'
+    emiss_bin(type_year,year_all)            'binary to select active bound_emission in recursive dynamic mode'
+    bound_emission_container(node,type_emission,type_tec,type_year) 'bound emission container in recursive dynamic mode'
 ;
 
 count_iter = 1;
 prev_OBJ   = 0;
 delta_OBJ  = 1;
 inv_cost_ini(node,newtec) = sum(first_period, inv_cost(node,newtec,first_period));
+bound_emission_container(node,type_emission,type_tec,type_year) = bound_emission(node,type_emission,type_tec,type_year) ;
 
 if (%foresight% = 0,
 ***
@@ -149,6 +152,13 @@ else
         last_fixed_period(year_all2)$((ord(year_all2) = card(year4))) = yes ;
         future_period(year_all2)$((ord(year_all2) > card(year4))) = yes ;
 
+* reset bound_emission
+        emiss_bin(type_year,year) = 1 ;
+        emiss_bin('firstmodelyear',year) = 0 ;
+        emiss_bin('cumulative',year) = 0 ;
+        bound_emission(node,type_emission,type_tec,type_year) = sum(year$(cat_year(type_year,year)),
+                       emiss_bin(type_year,year) * bound_emission_container(node,type_emission,type_tec,type_year)) ;
+
 * write a status update and time elapsed to the log file, solve the model
         put_utility 'log' /'+++ Solve the recursive-dynamic version of MESSAGEix - iteration ' year_all.tl:0 '  +++ ' ;
         $$INCLUDE includes/aux_computation_time.gms
@@ -215,6 +225,9 @@ else
 
 *        IF(new_relation_coefficient > 0,
 *        relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) = new_relation_coefficient * relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) ;)
+* for ERW it is 0.5 because we reduce its efficiency but for biochar, it is 2 because we increase its decay rate
+* so need to introduce newtec specific parameter
+*        relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) = 0.5 * relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) ;
 *        relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) = 0.5 * relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) ;
 
 
