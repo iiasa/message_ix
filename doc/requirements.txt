@@ -14,7 +14,7 @@ click==8.2.1
     #   ixmp
 cloudpickle==3.1.1
     # via dask
-dask==2025.7.0
+dask[array]==2025.7.0
     # via genno
 docutils==0.20.1
     # via
@@ -34,7 +34,7 @@ genno==1.28.2
     # via ixmp
 gitdb==4.0.10
     # via gitpython
-gitpython==3.1.47
+gitpython==3.1.49
     # via -r requirements.in
 idna==3.7
     # via requests
@@ -67,7 +67,7 @@ packaging==25.0
     #   jpype1
     #   sphinx
     #   xarray
-pandas==2.2.3
+pandas[parquet]==2.2.3
     # via
     #   genno
     #   ixmp

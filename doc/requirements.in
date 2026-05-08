@@ -1,6 +1,6 @@
 # Only specify the packages necessary for [docs]
 
-gitpython==3.1.47
+gitpython==3.1.49
 ixmp @ git+https://github.com/iiasa/ixmp.git@main
 numpydoc==1.8.0
 
