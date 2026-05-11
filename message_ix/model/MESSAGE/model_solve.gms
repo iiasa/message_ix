@@ -13,6 +13,7 @@ Parameter
     inv_cost_ini(node,newtec)            'initial investment cost assumption at first model year'
     emiss_bin(type_year,year_all)            'binary to select active bound_emission in recursive dynamic mode'
     bound_emission_container(node,type_emission,type_tec,type_year) 'bound emission container in recursive dynamic mode'
+    tax_emission_container(node,type_emission,type_tec,type_year) 'bound emission container in recursive dynamic mode'
 ;
 
 count_iter = 1;
@@ -20,6 +21,7 @@ prev_OBJ   = 0;
 delta_OBJ  = 1;
 inv_cost_ini(node,newtec) = sum(first_period, inv_cost(node,newtec,first_period));
 bound_emission_container(node,type_emission,type_tec,type_year) = bound_emission(node,type_emission,type_tec,type_year) ;
+tax_emission_container(node,type_emission,type_tec,type_year) = tax_emission(node,type_emission,type_tec,type_year) ;
 
 if (%foresight% = 0,
 ***
@@ -158,6 +160,8 @@ else
         emiss_bin('cumulative',year) = 0 ;
         bound_emission(node,type_emission,type_tec,type_year) = sum(year$(cat_year(type_year,year)),
                        emiss_bin(type_year,year) * bound_emission_container(node,type_emission,type_tec,type_year)) ;
+        tax_emission(node,type_emission,type_tec,type_year) = sum(year$(cat_year(type_year,year)),
+                       emiss_bin(type_year,year) * tax_emission_container(node,type_emission,type_tec,type_year)) ;
 
 * write a status update and time elapsed to the log file, solve the model
         put_utility 'log' /'+++ Solve the recursive-dynamic version of MESSAGEix - iteration ' year_all.tl:0 '  +++ ' ;
@@ -214,21 +218,21 @@ else
         act_up_fix(node,tec,year4,time)$(abs(ACT_UP.l(node,tec,year4,time)) > 1E-6) = 1 ;
         act_lo_fix(node,tec,year4,time)$(abs(ACT_LO.l(node,tec,year4,time)) > 1E-6) = 1 ;
 
-        EXT.up(node,commodity,grade,year4)$(ext_fix(node,commodity,grade,year4) = 1) =  EXT.l(node,commodity,grade,year4) + 1E-4 ;
-        CAP_NEW.up(node,tec,year4)$(cap_new_fix(node,tec,year4) = 1) = CAP_NEW.l(node,tec,year4) + 1E-4 ;
-        ACT.up(node,tec,year4,year4,mode,time)$(act_fix(node,tec,year4,year4,mode,time) = 1) = ACT.l(node,tec,year4,year4,mode,time) + 1E-4 ;
+*        EXT.up(node,commodity,grade,year4)$(ext_fix(node,commodity,grade,year4) = 1) =  EXT.l(node,commodity,grade,year4) + 1E-4 ;
+*        CAP_NEW.up(node,tec,year4)$(cap_new_fix(node,tec,year4) = 1) = CAP_NEW.l(node,tec,year4) + 1E-4 ;
+*        ACT.up(node,tec,year4,year4,mode,time)$(act_fix(node,tec,year4,year4,mode,time) = 1) = ACT.l(node,tec,year4,year4,mode,time) + 1E-4 ;
         CAP.fx(node,tec,year4,year4)$(cap_fix(node,tec,year4,year4) = 1) = CAP.l(node,tec,year4,year4) ;
         CAP_NEW_UP.fx(node,tec,year4)$(cap_new_up_fix(node,tec,year4) = 1) = CAP_NEW_UP.l(node,tec,year4) ;
         CAP_NEW_LO.fx(node,tec,year4)$(cap_new_lo_fix(node,tec,year4) = 1) = CAP_NEW_LO.l(node,tec,year4) ;
         ACT_UP.fx(node,tec,year4,time)$(act_up_fix(node,tec,year4,time) = 1) = ACT_UP.l(node,tec,year4,time) ;
         ACT_LO.fx(node,tec,year4,time)$(act_lo_fix(node,tec,year4,time) = 1) = ACT_LO.l(node,tec,year4,time) ;
 
-*        IF(new_relation_coefficient > 0,
-*        relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) = new_relation_coefficient * relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) ;)
-* for ERW it is 0.5 because we reduce its efficiency but for biochar, it is 2 because we increase its decay rate
-* so need to introduce newtec specific parameter
-*        relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) = 0.5 * relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) ;
-*        relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) = 0.5 * relation_activity('CO2_Emission',node,future_period,node,newtec,last_fixed_period,mode) ;
+*        IF timing permanence uncertainty run
+* for ERW, the coefficient is 0.5 because we reduce its efficiency but
+* for biochar, the coefficient is 2 because we increase its decay rate
+* so need to introduce newtec specific parameter for future removal
+*        relation_activity('CO2_Emission',node,future_period,node,'biochar_apply',last_fixed_period,mode) = 2.0 * relation_activity('CO2_Emission',node,future_period,node,'biochar_apply',last_fixed_period,mode) ;
+*        relation_activity('ERW_removal',node,future_period,node,newtec,last_fixed_period,mode) = 0.5 * relation_activity('ERW_removal',node,future_period,node,newtec,last_fixed_period,mode) ;
 
 
 
