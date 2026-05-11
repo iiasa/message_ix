@@ -14,7 +14,7 @@ click==8.2.1
     #   ixmp
 cloudpickle==3.1.1
     # via dask
-dask==2025.7.0
+dask[array]==2025.7.0
     # via genno
 docutils==0.20.1
     # via
@@ -67,7 +67,7 @@ packaging==25.0
     #   jpype1
     #   sphinx
     #   xarray
-pandas==2.2.3
+pandas[parquet]==2.2.3
     # via
     #   genno
     #   ixmp
@@ -157,7 +157,7 @@ typing-extensions==4.14.1
     #   pint
 tzdata==2025.2
     # via pandas
-urllib3==2.6.3
+urllib3==2.7.0
     # via requests
 xarray==2025.7.1
     # via
