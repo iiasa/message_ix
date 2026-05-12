@@ -10,7 +10,7 @@ $ONGLOBAL
 *----------------------------------------------------------------------------------------------------------------------*
 
 ** scenario/case selection - this must match the name of the MsgData_<%%%>.gdx input data file **
-$SETGLOBAL data "<your datafile name here>"
+$SETGLOBAL data "sparccle_trade_SSP3_NPiREF"
 
 * MACRO mode. This can take 3 possible values, only 2 of which are usable with this file:
 *
@@ -23,7 +23,7 @@ $IF NOT SET macromode $SETGLOBAL macromode "none"
 * perfect foresight - 0
 * myopic optimization (period-by-period, recursive-dynamic without any foresight) - 1
 * rolling horizon (period-by-period, recursive-dynamic with limited foresight - 'number of years of foresight'
-$SETGLOBAL foresight "0"
+$SETGLOBAL foresight "1"
 
 ** add a comment and name extension for model report files (e.g. run-specific info, calibration notes) - optional **
 $SETGLOBAL comment ""
