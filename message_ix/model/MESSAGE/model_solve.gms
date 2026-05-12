@@ -107,8 +107,8 @@ else
 * write a status update and time elapsed to the log file, solve the model
         put_utility 'log' /'+++ Solve the recursive-dynamic version of MESSAGEix - iteration ' year_all.tl:0 '  +++ ' ;
         $$INCLUDE includes/aux_computation_time.gms
-* allow LP residuals (~1e-14) in fixed variables to produce exec errors without aborting
-        option aborterror = 100 ;
+* raise domain-violation limit so noise-level rhs exec errors do not abort the solve
+        option DomLim = 999999 ;
         Solve MESSAGE_LP using LP minimizing OBJ ;
 
 * write model status summary
@@ -125,9 +125,11 @@ else
         ) ;
 
 * fix all variables of the current iteration period 'year_all' to the optimal levels
-        EXT.fx(node,commodity,grade,year_all) =  EXT.l(node,commodity,grade,year_all) ;
-        CAP_NEW.fx(node,tec,year_all) = CAP_NEW.l(node,tec,year_all) ;
-        CAP.fx(node,tec,year_all2,year_all)$( map_period(year_all2,year_all) ) = CAP.l(node,tec,year_all2,year_all) ;
+* round to 8 decimal places before clamping to lb=0: eliminates sub-1e-8 LP residuals
+* that would otherwise make CAPACITY_CONSTRAINT / CAPACITY_MAINTENANCE_NEW exec-error
+        EXT.fx(node,commodity,grade,year_all) = max(0, round(EXT.l(node,commodity,grade,year_all), 8)) ;
+        CAP_NEW.fx(node,tec,year_all) = max(0, round(CAP_NEW.l(node,tec,year_all), 8)) ;
+        CAP.fx(node,tec,year_all2,year_all)$( map_period(year_all2,year_all) ) = max(0, round(CAP.l(node,tec,year_all2,year_all), 8)) ;
         ACT.fx(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all) )
             = ACT.l(node,tec,year_all2,year_all,mode,time) ;
         CAP_NEW_UP.fx(node,tec,year_all) = CAP_NEW_UP.l(node,tec,year_all) ;
