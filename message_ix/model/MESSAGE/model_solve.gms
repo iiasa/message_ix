@@ -107,6 +107,8 @@ else
 * write a status update and time elapsed to the log file, solve the model
         put_utility 'log' /'+++ Solve the recursive-dynamic version of MESSAGEix - iteration ' year_all.tl:0 '  +++ ' ;
         $$INCLUDE includes/aux_computation_time.gms
+* allow LP residuals (~1e-14) in fixed variables to produce exec errors without aborting
+        option aborterror = 100 ;
         Solve MESSAGE_LP using LP minimizing OBJ ;
 
 * write model status summary
@@ -125,7 +127,7 @@ else
 * fix all variables of the current iteration period 'year_all' to the optimal levels
         EXT.fx(node,commodity,grade,year_all) =  EXT.l(node,commodity,grade,year_all) ;
         CAP_NEW.fx(node,tec,year_all) = CAP_NEW.l(node,tec,year_all) ;
-        CAP.fx(node,tec,year_all2,year_all)$( map_period(year_all2,year_all) ) = MAX(0, CAP.l(node,tec,year_all2,year_all)) ;
+        CAP.fx(node,tec,year_all2,year_all)$( map_period(year_all2,year_all) ) = CAP.l(node,tec,year_all2,year_all) ;
         ACT.fx(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all) )
             = ACT.l(node,tec,year_all2,year_all,mode,time) ;
         CAP_NEW_UP.fx(node,tec,year_all) = CAP_NEW_UP.l(node,tec,year_all) ;
