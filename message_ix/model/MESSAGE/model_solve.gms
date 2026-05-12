@@ -125,7 +125,7 @@ else
 * fix all variables of the current iteration period 'year_all' to the optimal levels
         EXT.fx(node,commodity,grade,year_all) =  EXT.l(node,commodity,grade,year_all) ;
         CAP_NEW.fx(node,tec,year_all) = CAP_NEW.l(node,tec,year_all) ;
-        CAP.fx(node,tec,year_all2,year_all)$( map_period(year_all2,year_all) ) = CAP.l(node,tec,year_all2,year_all) ;
+        CAP.fx(node,tec,year_all2,year_all)$( map_period(year_all2,year_all) ) = MAX(0, CAP.l(node,tec,year_all2,year_all)) ;
         ACT.fx(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all) )
             = ACT.l(node,tec,year_all2,year_all,mode,time) ;
         CAP_NEW_UP.fx(node,tec,year_all) = CAP_NEW_UP.l(node,tec,year_all) ;
