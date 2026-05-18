@@ -138,7 +138,8 @@ else
 
     year(year_all) = no ;
 
-    LOOP(year_all$( model_horizon(year_all) ),
+    LOOP(year_all$( model_horizon(year_all)
+         AND remaining_years(year_all) gt %foresight%),
 
 * include all past periods and future periods including the period where the %foresight% is reached
         year(year_all) = yes ;
@@ -146,7 +147,7 @@ else
 * reset the investment cost scaling parameter
         year(year_all2)$( ORD(year_all2) > ORD(year_all)
             AND duration_period_sum(year_all,year_all2) < %foresight% ) = yes ;
-        year4(year_all2)$((ord(year_all2) < ord(year_all) + 1)) = yes ;
+        year4(year_all2)$((ORD(year_all2) < ORD(year_all) + 1)) = yes ;
 
 * reset last_fixed_period
         last_fixed_period(year_all2) = no ;
@@ -218,9 +219,9 @@ else
         act_up_fix(node,tec,year4,time)$(abs(ACT_UP.l(node,tec,year4,time)) > 1E-6) = 1 ;
         act_lo_fix(node,tec,year4,time)$(abs(ACT_LO.l(node,tec,year4,time)) > 1E-6) = 1 ;
 
-*        EXT.up(node,commodity,grade,year4)$(ext_fix(node,commodity,grade,year4) = 1) =  EXT.l(node,commodity,grade,year4) + 1E-4 ;
-*        CAP_NEW.up(node,tec,year4)$(cap_new_fix(node,tec,year4) = 1) = CAP_NEW.l(node,tec,year4) + 1E-4 ;
-*        ACT.up(node,tec,year4,year4,mode,time)$(act_fix(node,tec,year4,year4,mode,time) = 1) = ACT.l(node,tec,year4,year4,mode,time) + 1E-4 ;
+        EXT.up(node,commodity,grade,year4)$(ext_fix(node,commodity,grade,year4) = 1) =  EXT.l(node,commodity,grade,year4) + 1E-4 ;
+        CAP_NEW.up(node,tec,year4)$(cap_new_fix(node,tec,year4) = 1) = CAP_NEW.l(node,tec,year4) + 1E-4 ;
+        ACT.up(node,tec,year4,year4,mode,time)$(act_fix(node,tec,year4,year4,mode,time) = 1) = ACT.l(node,tec,year4,year4,mode,time) + 1E-4 ;
         CAP.fx(node,tec,year4,year4)$(cap_fix(node,tec,year4,year4) = 1) = CAP.l(node,tec,year4,year4) ;
         CAP_NEW_UP.fx(node,tec,year4)$(cap_new_up_fix(node,tec,year4) = 1) = CAP_NEW_UP.l(node,tec,year4) ;
         CAP_NEW_LO.fx(node,tec,year4)$(cap_new_lo_fix(node,tec,year4) = 1) = CAP_NEW_LO.l(node,tec,year4) ;
