@@ -1,6 +1,8 @@
 # Only specify the packages necessary for [docs]
 
-gitpython==3.1.50
+# Last updated per https://github.com/iiasa/message_ix/pull/1013
+gitpython>=3.1.50
+
 ixmp @ git+https://github.com/iiasa/ixmp.git@main
 numpydoc==1.8.0
 
@@ -15,3 +17,6 @@ requests>=2.33.0
 sphinx==8.2.3
 sphinx-rtd-theme==3.0.2
 sphinxcontrib-bibtex==2.6.5
+
+# Last updated per https://github.com/iiasa/message_ix/pull/1014
+urllib3>=2.7.0

@@ -157,8 +157,10 @@ typing-extensions==4.14.1
     #   pint
 tzdata==2025.2
     # via pandas
-urllib3==2.6.3
-    # via requests
+urllib3==2.7.0
+    # via
+    #   -r requirements.in
+    #   requests
 xarray==2025.7.1
     # via
     #   genno
