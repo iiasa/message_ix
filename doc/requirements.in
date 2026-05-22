@@ -1,8 +1,11 @@
-# Only specify the packages necessary for [docs]
+# Specific/minimum versions of documentation build dependencies
+#
+# Unless otherwise noted, these are set in response to dependabot
+# security alerts; view the line blame for details.
 
 # Last updated per https://github.com/iiasa/message_ix/pull/1013
 gitpython>=3.1.50
-
+idna>=3.15
 ixmp @ git+https://github.com/iiasa/ixmp.git@main
 numpydoc==1.8.0
 

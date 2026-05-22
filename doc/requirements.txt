@@ -36,8 +36,10 @@ gitdb==4.0.10
     # via gitpython
 gitpython==3.1.50
     # via -r requirements.in
-idna==3.7
-    # via requests
+idna==3.15
+    # via
+    #   -r requirements.in
+    #   requests
 imagesize==1.4.1
     # via sphinx
 ixmp @ git+https://github.com/iiasa/ixmp.git@main
