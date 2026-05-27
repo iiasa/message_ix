@@ -6,6 +6,9 @@
 * including the required accounting of investment costs beyond the model horizon.
 ***
 
+* Tolerance for the band used to lock prior-period variables in recursive-dynamic mode
+$setglobal rd_fix_tol 1E-6
+
 if (%foresight% = 0,
 ***
 * Perfect-foresight model
@@ -122,17 +125,30 @@ else
             ABORT "MESSAGEix did not solve to optimality!"
         ) ;
 
-* fix all variables of the current iteration period 'year_all' to the optimal levels
-        EXT.fx(node,commodity,grade,year_all) =  EXT.l(node,commodity,grade,year_all) ;
-        CAP_NEW.fx(node,tec,year_all) = CAP_NEW.l(node,tec,year_all) ;
-* NB CAP is indexed (year_vtg, year_act); both sides must use that order (cf. ACT below)
-        CAP.fx(node,tec,year_all2,year_all)$( map_period(year_all2,year_all) ) = CAP.l(node,tec,year_all2,year_all) ;
-        ACT.fx(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all) )
-            = ACT.l(node,tec,year_all2,year_all,mode,time) ;
-        CAP_NEW_UP.fx(node,tec,year_all) = CAP_NEW_UP.l(node,tec,year_all) ;
-        CAP_NEW_LO.fx(node,tec,year_all) = CAP_NEW_LO.l(node,tec,year_all) ;
-        ACT_UP.fx(node,tec,year_all,time) = ACT_UP.l(node,tec,year_all,time) ;
-        ACT_LO.fx(node,tec,year_all,time) = ACT_LO.l(node,tec,year_all,time) ;
+* Lock the current iteration period's variables for subsequent iterations. A narrow
+* tolerance band (.l +/- rd_fix_tol) is used instead of a hard .fx: pinning a variable
+* to the solver's bit-exact level can leave an equation violated by rounding (~1e-15),
+* which GAMS rejects as "infeasible due to rhs value" once every variable in it is
+* fixed. The band keeps a free variable in each equation while holding the decision
+* sunk to within rd_fix_tol.
+* NB CAP and ACT are indexed (year_vtg, year_act); the .l on the right must use the
+* same index order as the left.
+        EXT.up(node,commodity,grade,year_all) = EXT.l(node,commodity,grade,year_all) + %rd_fix_tol% ;
+        EXT.lo(node,commodity,grade,year_all) = max(0, EXT.l(node,commodity,grade,year_all) - %rd_fix_tol%) ;
+        CAP_NEW.up(node,tec,year_all) = CAP_NEW.l(node,tec,year_all) + %rd_fix_tol% ;
+        CAP_NEW.lo(node,tec,year_all) = max(0, CAP_NEW.l(node,tec,year_all) - %rd_fix_tol%) ;
+        CAP.up(node,tec,year_all2,year_all)$( map_period(year_all2,year_all) ) = CAP.l(node,tec,year_all2,year_all) + %rd_fix_tol% ;
+        CAP.lo(node,tec,year_all2,year_all)$( map_period(year_all2,year_all) ) = max(0, CAP.l(node,tec,year_all2,year_all) - %rd_fix_tol%) ;
+        ACT.up(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all) ) = ACT.l(node,tec,year_all2,year_all,mode,time) + %rd_fix_tol% ;
+        ACT.lo(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all) ) = max(0, ACT.l(node,tec,year_all2,year_all,mode,time) - %rd_fix_tol%) ;
+        CAP_NEW_UP.up(node,tec,year_all) = CAP_NEW_UP.l(node,tec,year_all) + %rd_fix_tol% ;
+        CAP_NEW_UP.lo(node,tec,year_all) = max(0, CAP_NEW_UP.l(node,tec,year_all) - %rd_fix_tol%) ;
+        CAP_NEW_LO.up(node,tec,year_all) = CAP_NEW_LO.l(node,tec,year_all) + %rd_fix_tol% ;
+        CAP_NEW_LO.lo(node,tec,year_all) = max(0, CAP_NEW_LO.l(node,tec,year_all) - %rd_fix_tol%) ;
+        ACT_UP.up(node,tec,year_all,time) = ACT_UP.l(node,tec,year_all,time) + %rd_fix_tol% ;
+        ACT_UP.lo(node,tec,year_all,time) = max(0, ACT_UP.l(node,tec,year_all,time) - %rd_fix_tol%) ;
+        ACT_LO.up(node,tec,year_all,time) = ACT_LO.l(node,tec,year_all,time) + %rd_fix_tol% ;
+        ACT_LO.lo(node,tec,year_all,time) = max(0, ACT_LO.l(node,tec,year_all,time) - %rd_fix_tol%) ;
 
     ) ; # end of the recursive-dynamic loop
 
