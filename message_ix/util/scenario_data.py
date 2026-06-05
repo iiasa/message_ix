@@ -1740,6 +1740,12 @@ HELPER_TABLES = [
     ),
     HelperTableInfo(name="is_relation_upper", sources={"relation_upper": None}),
     HelperTableInfo(name="is_relation_lower", sources={"relation_lower": None}),
+    HelperTableInfo(
+        name="is_relation_upper_time", sources={"relation_upper_time": None}
+    ),
+    HelperTableInfo(
+        name="is_relation_lower_time", sources={"relation_lower_time": None}
+    ),
     # auxiliary mapping sets for fixing decision variables
     # flags for fixed decision variable values (for 'slicing', i.e., fixing of decision
     # variables)

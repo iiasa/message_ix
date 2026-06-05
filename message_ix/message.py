@@ -86,7 +86,16 @@ class MESSAGE(GAMSModel):
         # handled in JDBCBackend. For the moment, this code does not backstop that
         # behaviour.
         # TODO Extend to handle all masks, e.g. for new backends.
-        for par_name in ("capacity_factor",):
+        #
+        # The JDBC backend composes ``is_relation_*`` for the annual parameters but
+        # not the subannual ``_time`` variants, so their flag sets are composed here.
+        # Composition is key-based, so a zero-valued bound (``relation_upper_time = 0``,
+        # i.e. "REL_TIME <= 0") is preserved.
+        for par_name in (
+            "capacity_factor",
+            "relation_lower_time",
+            "relation_upper_time",
+        ):
             # Name of the corresponding set
             set_name = f"is_{par_name}"
 
@@ -296,6 +305,8 @@ _set("cat_relation", "type_relation r")
 _set("cat_tec", "type_tec t")
 _set("cat_year", "type_year y")
 _set("is_capacity_factor", "nl t yv ya h")
+_set("is_relation_lower_time", "r nr yr h")
+_set("is_relation_upper_time", "r nr yr h")
 _set("level_renewable", "l")
 _set("level_resource", "l")
 _set("level_stocks", "l")
@@ -397,11 +408,14 @@ par("ref_extraction", "n c g y")
 par("ref_new_capacity", "nl t yv")
 par("ref_relation", "r nr yr")
 par("relation_activity", "r nr yr nl t ya m")
+par("relation_activity_time", "r nr yr nl t ya m h")
 par("relation_cost", "r nr yr")
 par("relation_lower", "r nr yr")
+par("relation_lower_time", "r nr yr h")
 par("relation_new_capacity", "r nr yr t")
 par("relation_total_capacity", "r nr yr t")
 par("relation_upper", "r nr yr")
+par("relation_upper_time", "r nr yr h")
 par("reliability_factor", "n t ya c l h q")
 par("renewable_capacity_factor", "n c g l y")
 par("renewable_potential", "n c g l y")
@@ -496,6 +510,11 @@ var(
     "REL",
     "r nr yr",
     "Auxiliary variable for left-hand side of user-defined relations",
+)
+var(
+    "REL_TIME",
+    "r nr yr h",
+    "Auxiliary variable for left-hand side of user-defined subannual relations",
 )
 var(
     "REN",
