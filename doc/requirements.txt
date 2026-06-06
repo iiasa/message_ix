@@ -84,7 +84,7 @@ platformdirs==4.3.8
     # via
     #   genno
     #   pint
-pyarrow==21.0.0
+pyarrow==23.0.1
     # via pandas
 pybtex==0.25.1
     # via
