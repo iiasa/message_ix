@@ -182,9 +182,18 @@ Variables
 %AUX_BOUNDS%    AND map_tec_act(node,tec,year_all2,mode,time) ) = %AUX_BOUND_VALUE% ;
 
 * to avoid "inter-vintage arbitrage" (across different vintages of technologies), all activities that
-* have positive lower bounds are assumed to be non-negative
+* have positive lower bounds are assumed to be non-negative; the test on bound_activity_lo is kept out
+* of the assignment condition because a relational test cannot drive sparse iteration
+Set is_bound_activity_lo_negative(node,tec,year_all,mode,time) "flag for explicitly negative lower bounds on activity";
+is_bound_activity_lo_negative(node,tec,year_all,mode,time)$( bound_activity_lo(node,tec,year_all,mode,time)
+    AND bound_activity_lo(node,tec,year_all,mode,time) < 0
+    AND map_tec_act(node,tec,year_all,mode,time) ) = yes ;
 ACT.lo(node,tec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,tec,year_all,year_all2)
-    AND map_tec_act(node,tec,year_all2,mode,time) AND bound_activity_lo(node,tec,year_all2,mode,time) >= 0 ) = 0 ;
+    AND map_tec_act(node,tec,year_all2,mode,time) ) = 0 ;
+ACT.lo(node,tec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,tec,year_all,year_all2)
+    AND is_bound_activity_lo_negative(node,tec,year_all2,mode,time) ) = -INF ;
+%AUX_BOUNDS% ACT.lo(node,tec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,tec,year_all,year_all2)
+%AUX_BOUNDS%    AND is_bound_activity_lo_negative(node,tec,year_all2,mode,time) ) = -%AUX_BOUND_VALUE% ;
 * previous implementation using upper bounds
 * ACT.lo(node,tec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,tec,year_all,year_all2)
 *    AND map_tec_act(node,tec,year_all2,mode,time)
