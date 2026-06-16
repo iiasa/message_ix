@@ -264,13 +264,44 @@ map_tec_lifetime_extended(node,tec,historical,year_all)$(
   AND duration_period_sum(historical,year_all) < technical_lifetime(node,tec,historical)
 ) = yes;
 
-* NB map_cap_ret_hist_* are populated after remaining_capacity_extended in scaling_investment_costs.gms
+* NB map_cap_ret_hist_flow_* are populated after remaining_capacity_extended in scaling_investment_costs.gms
 map_cap_ret(node,tec,vintage,y_prev,y_all)$(
   inv_tec(tec)
   AND map_tec_lifetime(node,tec,vintage,y_prev)
   AND NOT first_period(y_all)
   AND seq_period(y_prev,y_all)
 ) = yes;
+
+$IFTHEN %MESSAGE_CAP_COMM% == "1"
+
+* Sparse mappings for CAP-related commodity flows in COMMODITY_BALANCE_AUX.
+map_cap_flow(node,commodity,level,time,location,tec,vintage,year_all)$(
+  inv_tec(tec)
+  AND map_tec_lifetime(location,tec,vintage,year_all)
+  AND (
+    output_cap(location,tec,vintage,year_all,node,commodity,level,time)
+    OR input_cap(location,tec,vintage,year_all,node,commodity,level,time)
+  )
+) = yes;
+
+map_cap_new_flow(node,commodity,level,time,location,tec,year_all)$(
+  inv_tec(tec)
+  AND map_tec(location,tec,year_all)
+  AND (
+    output_cap_new(location,tec,year_all,node,commodity,level,time)
+    OR input_cap_new(location,tec,year_all,node,commodity,level,time)
+  )
+) = yes;
+
+map_cap_ret_flow(node,commodity,level,time,location,tec,vintage,y_prev,y_all)$(
+  map_cap_ret(location,tec,vintage,y_prev,y_all)
+  AND (
+    output_cap_ret(location,tec,vintage,node,commodity,level,time)
+    OR input_cap_ret(location,tec,vintage,node,commodity,level,time)
+  )
+) = yes;
+
+$ENDIF
 
 * mapping of renewable technologies to their input commodities
 map_ren_com(node,renewable_tec,commodity,year_all)$(

@@ -425,8 +425,11 @@ Sets
     map_relation(relation,node,year_all)             mapping of generic (user-defined) relations to nodes and years
 
     map_cap_ret(node,tec,vintage,y_prev,y_all)        'YES if CAP from vintage may be active in y_prev and retired in y_all'
-    map_cap_ret_hist_1(node,tec,vintage,y_prev,y_all) 'YES for pre-horizon CAP that reaches its technical_lifetime before y_all==first_period'
-    map_cap_ret_hist_2(node,tec,vintage,y_prev,y_all) 'YES for pre-horizon CAP that reaches its technical_lifetime in y_all==first_period'
+    map_cap_flow(node,commodity,level,time,location,tec,vintage,year_all) map of non-zero CAP operation commodity-flow coefficients
+    map_cap_new_flow(node,commodity,level,time,location,tec,year_all) map of non-zero CAP_NEW commodity-flow coefficients
+    map_cap_ret_flow(node,commodity,level,time,location,tec,vintage,y_prev,y_all) map of non-zero CAP retirement commodity-flow coefficients
+    map_cap_ret_hist_flow_1(node,commodity,level,time,location,tec,vintage,y_prev,y_all) map of non-zero pre-horizon CAP retirement commodity-flow coefficients (case 1)
+    map_cap_ret_hist_flow_2(node,commodity,level,time,location,tec,vintage,y_prev,y_all) map of non-zero pre-horizon CAP retirement commodity-flow coefficients (case 2)
 
 * Storage
     map_time_commodity_storage(node,tec,level,commodity,mode,year_all,time)  mapping of storage containers to their input commodity-level (not commodity-level of stored media)

@@ -187,21 +187,30 @@ remaining_capacity_extended(node,tec,vintage,year_all)$(
 ) = (technical_lifetime(node,tec,vintage) - duration_period_sum(vintage,year_all)) / duration_period(year_all);
 
 * Mapping sets used in COMMODITY_BALANCE_AUX that are conditional on remaining_capacity_extended
-map_cap_ret_hist_1(node,tec,vintage,y_prev,y_all)$(
+map_cap_ret_hist_flow_1(node,commodity,level,time,location,tec,vintage,y_prev,y_all)$(
   first_period(y_all)
   AND seq_period(y_prev,y_all)
   AND inv_tec(tec)
-  AND map_tec_lifetime_extended(node,tec,vintage,y_prev)
-  AND NOT map_tec_lifetime_extended(node,tec,vintage,y_all)
-  AND (remaining_capacity_extended(node,tec,vintage,y_all) = 0)
+  AND map_tec_lifetime_extended(location,tec,vintage,y_prev)
+  AND NOT map_tec_lifetime_extended(location,tec,vintage,y_all)
+  AND (remaining_capacity_extended(location,tec,vintage,y_all) = 0)
+  AND (
+    output_cap_ret(location,tec,vintage,node,commodity,level,time)
+    OR input_cap_ret(location,tec,vintage,node,commodity,level,time)
+  )
 ) = yes;
-map_cap_ret_hist_2(node,tec,vintage,y_prev,y_all)$(
+
+map_cap_ret_hist_flow_2(node,commodity,level,time,location,tec,vintage,y_prev,y_all)$(
   first_period(y_all)
   AND seq_period(y_prev,y_all)
   AND inv_tec(tec)
-  AND map_tec_lifetime_extended(node,tec,vintage,y_prev)
-  AND (remaining_capacity_extended(node,tec,vintage,y_all) < 1)
-  AND (remaining_capacity_extended(node,tec,vintage,y_all) > 0)
+  AND map_tec_lifetime_extended(location,tec,vintage,y_prev)
+  AND (remaining_capacity_extended(location,tec,vintage,y_all) < 1)
+  AND (remaining_capacity_extended(location,tec,vintage,y_all) > 0)
+  AND (
+    output_cap_ret(location,tec,vintage,node,commodity,level,time)
+    OR input_cap_ret(location,tec,vintage,node,commodity,level,time)
+  )
 ) = yes;
 
 

@@ -656,7 +656,7 @@ $IFTHEN %MESSAGE_CAP_COMM% == "1"
 
   # (1) CAP and {in,out}put_cap: flows due to operation of existing capacity
   + SUM(
-    (location,tec,vintage)$(inv_tec(tec) AND map_tec_lifetime(location,tec,vintage,year)),
+    (location,tec,vintage)$map_cap_flow(node,commodity,level,time,location,tec,vintage,year),
     (
       output_cap(location,tec,vintage,year,node,commodity,level,time)
       - input_cap(location,tec,vintage,year,node,commodity,level,time)
@@ -665,7 +665,7 @@ $IFTHEN %MESSAGE_CAP_COMM% == "1"
 
   # (2) CAP_NEW and {in,out}put_cap_new: flows due to construction of new capacity (during vintage period)
   + SUM(
-    (location,tec)$(inv_tec(tec) AND map_tec(location,tec,year)),
+    (location,tec)$map_cap_new_flow(node,commodity,level,time,location,tec,year),
     (
       output_cap_new(location,tec,year,node,commodity,level,time)
       - input_cap_new(location,tec,year,node,commodity,level,time)
@@ -674,7 +674,7 @@ $IFTHEN %MESSAGE_CAP_COMM% == "1"
 
   # (3) CAP and {in,out}put_cap_ret: flows due to retirement of CAP (any model period after the first)
   + SUM(
-    (location,tec,vintage,year2)$map_cap_ret(location,tec,vintage,year2,year),
+    (location,tec,vintage,year2)$map_cap_ret_flow(node,commodity,level,time,location,tec,vintage,year2,year),
     (
       output_cap_ret(location,tec,vintage,node,commodity,level,time)
       - input_cap_ret(location,tec,vintage,node,commodity,level,time)
@@ -689,7 +689,7 @@ $IFTHEN %MESSAGE_CAP_COMM% == "1"
   # Flows due to CAP(…,vintage,…) that reaches EOL in the final pre-horizon period, 'year_all2'.
   # These are counted in the first model period, 'year'.
   + SUM(
-    (location,tec,vintage,year_all2)$map_cap_ret_hist_1(location,tec,vintage,year_all2,year),
+    (location,tec,vintage,year_all2)$map_cap_ret_hist_flow_1(node,commodity,level,time,location,tec,vintage,year_all2,year),
     (
       output_cap_ret(location,tec,vintage,node,commodity,level,time)
       - input_cap_ret(location,tec,vintage,node,commodity,level,time)
@@ -701,7 +701,7 @@ $IFTHEN %MESSAGE_CAP_COMM% == "1"
   #
   # Flows due to CAP(…,vintage,…) that reaches EOL in the first model period, 'year'.
   + SUM(
-    (location,tec,vintage,year_all2)$map_cap_ret_hist_2(location,tec,vintage,year_all2,year),
+    (location,tec,vintage,year_all2)$map_cap_ret_hist_flow_2(node,commodity,level,time,location,tec,vintage,year_all2,year),
     (
       output_cap_ret(location,tec,vintage,node,commodity,level,time)
       - input_cap_ret(location,tec,vintage,node,commodity,level,time)
