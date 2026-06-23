@@ -92,7 +92,7 @@ jobs:
 
     steps:
     - name: Check out message_ix
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: ${{ env.depth }}
         ref: ${{ github.event_name != 'pull_request_target' && github.ref || github.event.pull_request.head.sha }}
@@ -119,7 +119,7 @@ jobs:
         java-version: '21'
 
     - name: Cache GAMS installer
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           gams
@@ -149,7 +149,7 @@ jobs:
           --numprocesses=auto --dist=loadgroup
 
     - name: Upload test coverage to Codecov.io
-      uses: codecov/codecov-action@v6
+      uses: codecov/codecov-action@v7
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -170,7 +170,7 @@ jobs:
 
     steps:
     - name: Check out message_ix
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: ${{ env.depth }}
         ref: ${{ github.event_name != 'pull_request_target' && github.ref || github.event.pull_request.head.sha }}
@@ -200,7 +200,7 @@ jobs:
         windows-path-include-rtools: false
 
     - name: Cache GAMS installer and R packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           gams
@@ -233,7 +233,7 @@ jobs:
           --numprocesses=auto --dist=loadgroup
 
     - name: Upload test coverage to Codecov.io
-      uses: codecov/codecov-action@v6
+      uses: codecov/codecov-action@v7
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # required
 
@@ -243,7 +243,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       with:
         ref: ${{ github.event_name != 'pull_request_target' && github.ref || github.event.pull_request.head.sha }}
     - uses: astral-sh/setup-uv@v7
