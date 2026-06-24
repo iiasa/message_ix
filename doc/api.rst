@@ -270,6 +270,13 @@ Model classes
      .. note:: For some models, this can significantly increase the linear program (LP) size
         and thus the solve time.
 
+   - **foresight** (:class:`int`):
+     Number of years of foresight for the solution algorithm.
+     :py:`0` (the default) selects perfect foresight, in which the entire model horizon is optimized simultaneously.
+     :py:`1` selects myopic (recursive-dynamic) optimization: each period is solved in turn with the decision variables of earlier periods held fixed.
+     A value :py:`> 1` selects a rolling horizon that looks ahead that many years in each step.
+     This corresponds to the GAMS compile-time variable ``foresight``.
+
    .. autoattribute:: items
       :no-value:
 

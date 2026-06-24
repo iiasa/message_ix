@@ -68,7 +68,10 @@ class MESSAGE(GAMSModel):
     #: All equations, parameters, sets, and variables in the MESSAGE formulation.
     items: MutableMapping[str, Item] = dict()
 
-    keyword_to_solve_arg = [("cap_comm", _boollike, "MESSAGE_CAP_COMM")]
+    keyword_to_solve_arg = [
+        ("cap_comm", _boollike, "MESSAGE_CAP_COMM"),
+        ("foresight", int, "foresight"),
+    ]
 
     @staticmethod
     def enforce(scenario: "ixmp.Scenario") -> None:
