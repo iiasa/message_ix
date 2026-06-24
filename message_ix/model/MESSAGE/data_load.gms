@@ -13,6 +13,7 @@ $LOAD level_resource, level_renewable
 $LOAD lvl_spatial, lvl_temporal, map_spatial_hierarchy, map_temporal_hierarchy
 $LOAD map_node, map_time, map_commodity, map_resource, map_stocks, map_tec, map_tec_time, map_tec_mode
 $LOAD is_capacity_factor
+$LOAD is_relation_upper_time, is_relation_lower_time
 $LOAD map_land, map_relation
 $LOAD type_tec, cat_tec, type_year, cat_year, type_emission, cat_emission, type_tec_land
 $LOAD inv_tec, renewable_tec
@@ -125,11 +126,14 @@ Execute_load '%in%',
   peak_load_factor,
   rating_bin,
   relation_activity,
+  relation_activity_time,
   relation_cost,
   relation_lower,
+  relation_lower_time,
   relation_new_capacity,
   relation_total_capacity,
   relation_upper,
+  relation_upper_time,
   reliability_factor,
   renewable_capacity_factor,
   renewable_potential,
