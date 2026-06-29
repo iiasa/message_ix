@@ -142,13 +142,15 @@ else
 *----------------------------------------------------------------------------------------------------------------------*
 
 * calculation of commodity import costs by node, commodity and year
+* Updated for bilateralized trade: imports arrive via export technologies at other nodes
+* that output cross-node to node2, rather than via same-node technologies with cross-node input
 import_cost(node2, commodity, year) =
-          SUM( (node,tec,vintage,mode,level,time,time2)$( (NOT sameas(node,node2)) AND map_tec_act(node2,tec,year,mode,time2)
-            AND map_tec_lifetime(node2,tec,vintage,year) AND map_commodity(node,commodity,level,year,time) ),
-* import into node2 from other nodes
-    input(node2,tec,vintage,year,mode,node,commodity,level,time2,time)
-    * duration_time_rel(time,time2) * ACT.L(node2,tec,vintage,year,mode,time2)
-    * PRICE_COMMODITY.l(node,commodity,level,year,time) )
+          SUM( (node,tec,vintage,mode,level,time,time2)$( (NOT sameas(node,node2)) AND map_tec_act(node,tec,year,mode,time2)
+            AND map_tec_lifetime(node,tec,vintage,year) AND map_commodity(node2,commodity,level,year,time) ),
+* import into node2: export technologies at node whose output lands at node2
+    output(node,tec,vintage,year,mode,node2,commodity,level,time2,time)
+    * duration_time_rel(time,time2) * ACT.L(node,tec,vintage,year,mode,time2)
+    * PRICE_COMMODITY.l(node2,commodity,level,year,time) )
 ;
 
 * calculation of commodity export costs by node, commodity and year
