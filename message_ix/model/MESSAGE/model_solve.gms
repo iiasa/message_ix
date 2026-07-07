@@ -121,13 +121,33 @@ else
             put_utility 'log' /'+++ MESSAGEix did not solve to optimality - run is aborted, no output produced! +++ ' ;
             ABORT "MESSAGEix did not solve to optimality!"
         ) ;
+        
+        execerror = 0;
 
 * fix all variables of the current iteration period 'year_all' to the optimal levels
-        EXT.fx(node,commodity,grade,year_all) =  EXT.l(node,commodity,grade,year_all) ;
-        CAP_NEW.fx(node,tec,year_all) = CAP_NEW.l(node,tec,year_all) ;
-        CAP.fx(node,tec,year_all2,year_all)$( map_period(year_all2,year_all) ) = CAP.l(node,tec,year_all,year_all2) ;
-        ACT.fx(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all) )
-            = ACT.l(node,tec,year_all2,year_all,mode,time) ;
+        EXT.up(node,commodity,grade,year_all)$( abs(EXT.l(node,commodity,grade,year_all)) > 1E-6 ) =
+            EXT.l(node,commodity,grade,year_all) + 1E-4 ;
+        EXT.lo(node,commodity,grade,year_all)$( abs(EXT.l(node,commodity,grade,year_all)) > 1E-6 ) =
+            max( 0, EXT.l(node,commodity,grade,year_all) - 1E-4 ) ;
+
+        CAP_NEW.up(node,tec,year_all)$( abs(CAP_NEW.l(node,tec,year_all)) > 1E-6 ) =
+            CAP_NEW.l(node,tec,year_all) + 1E-4 ;
+        CAP_NEW.lo(node,tec,year_all)$( abs(CAP_NEW.l(node,tec,year_all)) > 1E-6 ) =
+            max( 0, CAP_NEW.l(node,tec,year_all) - 1E-4 ) ;
+
+        CAP.up(node,tec,year_all2,year_all)$( map_period(year_all2,year_all)
+            AND abs(CAP.l(node,tec,year_all,year_all2)) > 1E-6 ) =
+            CAP.l(node,tec,year_all,year_all2) + 1E-4 ;
+        CAP.lo(node,tec,year_all2,year_all)$( map_period(year_all2,year_all)
+            AND abs(CAP.l(node,tec,year_all,year_all2)) > 1E-6 ) =
+            max( 0, CAP.l(node,tec,year_all,year_all2) - 1E-4 ) ;
+
+        ACT.up(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all)
+            AND abs(ACT.l(node,tec,year_all2,year_all,mode,time)) > 1E-6 ) =
+            ACT.l(node,tec,year_all2,year_all,mode,time) + 1E-4 ;
+        ACT.lo(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all)
+            AND abs(ACT.l(node,tec,year_all2,year_all,mode,time)) > 1E-6 ) =
+            max( 0, ACT.l(node,tec,year_all2,year_all,mode,time) - 1E-4 ) ;
         CAP_NEW_UP.fx(node,tec,year_all) = CAP_NEW_UP.l(node,tec,year_all) ;
         CAP_NEW_LO.fx(node,tec,year_all) = CAP_NEW_LO.l(node,tec,year_all) ;
         ACT_UP.fx(node,tec,year_all,time) = ACT_UP.l(node,tec,year_all,time) ;
