@@ -22,7 +22,7 @@ Adjust any imports like the following:
 All changes
 -----------
 
-- Correct MESSAGE-MACRO aggregation of subannual demand (:pull:`NNNN`).
+- Correct MESSAGE-MACRO aggregation of subannual demand (:pull:`1027`).
 
 - :mod:`message_ix` is tested and compatible with `Python 3.14 <https://www.python.org/downloads/release/python-3140/>`__ (:pull:`985`).
 - Support for Python 3.9 is dropped (:pull:`985`), as it has reached end-of-life.
