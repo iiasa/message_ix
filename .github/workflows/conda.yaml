@@ -12,7 +12,7 @@ on:
 
 env:
   # Oldest version that can reliably be downloaded
-  GAMS_VERSION: 48.6.1
+  GAMS_VERSION: 48.7.0
 
 jobs:
   conda:

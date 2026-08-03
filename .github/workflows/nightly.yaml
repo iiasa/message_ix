@@ -22,7 +22,7 @@ env:
   # Version used until 2024-11-20; disabled
   # gams-version: 29.1.0
   # Oldest version that can reliably be downloaded
-  gams-version: 48.6.1
+  gams-version: 48.7.0
   os: ubuntu-latest
   python-version: "3.14"
 
