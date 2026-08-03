@@ -1,5 +1,4 @@
 # Verify that installation from conda-forge works as intended
-
 name: Install from conda-forge
 
 on:
@@ -19,46 +18,24 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, macos-latest]
-        conda:
-        - {installer: anaconda, version: 2024.06-1}
-        - {installer: miniconda, version: py312_24.7.1-0}
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.conda.installer }}
+    name: ${{ matrix.os }}
+
+    # As suggested by conda-incubator/setup-miniconda
+    defaults:
+      run:
+        shell: bash -el {0}
 
     steps:
-    - name: Cache Anaconda installer, conda packages
-      uses: actions/cache@v6
-      with:
-        path: |
-          $CONDA/pkgs
-          ~/.conda/pkgs
-          ~/anaconda3/pkgs
-          ~/appdata/local/conda/conda/pkgs
-          ${{ github.workspace }}/Anaconda*.exe
-        key: ${{ matrix.os }}-${{ matrix.conda.installer }}
-
     - name: Setup Anaconda or miniconda
-      uses: iiasa/actions/setup-conda@main
+      uses: conda-incubator/setup-miniconda@v4
       with:
-        installer: ${{ matrix.conda.installer }}
-        version: ${{ matrix.conda.version }}
-
-    # TODO move the following 2 steps into the above action
-    - name: Determine shell on current OS
-      id: shell
-      run: |
-        import os
-        init, profile = {
-            "macos": ("bash", "source ~/.bash_profile"),
-            "windows": ("powershell", ""),
-        }.get("${{ matrix.os }}".split("-")[0])
-
-        with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-            f.write(f"init={init}\n")
-            f.write(f"profile={profile}\n")
-      shell: python
+        activate-environment: testenv
+        channel-priority: strict
+        channels: conda-forge
+        python-version: "3.14"
 
     - name: Cache GAMS installer
       uses: actions/cache@v6
@@ -74,39 +51,18 @@ jobs:
         version: ${{ env.GAMS_VERSION }}
         license: ${{ secrets.GAMS_LICENSE }}
 
-    - name: Initialize shell for "conda activate"
-      run: conda init ${{ steps.shell.outputs.init }}
-
-    - name: Configure conda channels, update, create environment, and install message-ix
+    - name: Install message-ix into 'testenv' conda environment
+      # Also install pytest and packages required for testing. pip and related
+      # tools support this via message_ix[testing], but conda does not.
       run: |
-        conda install -n base conda-libmamba-solver
-        conda config --set solver libmamba
-        conda config --prepend channels conda-forge
-        conda config --set channel_priority strict
-        conda update -n base -c defaults conda
-
-        # Also install pytest and packages required for testing. pip/PyPI
-        # supports this via message_ix[testing], but conda does not.
-        # Pin Python version to enable pyam versions relied on by the sankey tool;
-        # remove once pyam supports the latest Python
-        conda create --quiet --name testenv message-ix pytest asyncssh sphinx python=3.12
-        conda list --name testenv
-
-    - name: Check CLI commands and run test
-      run: |
-        # Source profile. On non-windows OSes, GHA invokes bash with
-        # "--noprofile", so the file written by "conda init bash" above is not
-        # read automatically
-        ${{ steps.shell.outputs.profile }}
-
-        # Activate the test environment
-        conda activate testenv
+        conda install message-ix pytest asyncssh sphinx
+        conda list
         conda info
 
-        # Check CLI tools
+    - name: Check message-ix and ixmp CLIs
+      run: |
         message-ix show-versions
         ixmp --platform default list || true
 
-        # Run a single test from the test suite to touch JDBCBackend Java code,
-        # via JPype
-        pytest --pyargs message_ix -p ixmp.testing -p message_ix.testing -p no:faulthandler -k "test_add_cat" --verbose -rA --color=yes
+    - name: Run a test from the test suite to touch JDBCBackend/Java via JPype
+      run: pytest --pyargs message_ix -p ixmp.testing -p message_ix.testing -p no:faulthandler -k "test_add_cat" --verbose -rA --color=yes
