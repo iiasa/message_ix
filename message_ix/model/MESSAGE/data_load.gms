@@ -135,16 +135,6 @@ emission_cumulative('TCE') = yes;
 emission_annual(emission) = yes;
 emission_annual(emission_cumulative) = no;
 
-*----------------------------------------------------------------------------------------------------------------------*
-* auxiliary mappings for split between cumulative and annualland-use emission calculations                             *
-*----------------------------------------------------------------------------------------------------------------------*
-
-emission_cumulative(emission) = no;
-* emission_cumulative('TCE_CO2') = yes;
-emission_cumulative('LU_CO2') = yes;
-emission_cumulative('TCE') = yes;
-emission_annual(emission) = yes;
-emission_annual(emission_cumulative) = no;
 $endif.tag_magpie
 
 *----------------------------------------------------------------------------------------------------------------------*
