@@ -867,6 +867,18 @@ Parameters
 *      - ``relation`` | ``node_rel`` | ``year_rel`` | ``tec``
 *    * - relation_activity
 *      - ``relation`` | ``node_rel`` | ``year_rel`` | ``node_loc`` | ``tec`` | ``year_act`` | ``mode``
+*    * - relation_upper_time
+*      - ``relation`` | ``node_rel`` | ``year_rel`` | ``time``
+*    * - relation_lower_time
+*      - ``relation`` | ``node_rel`` | ``year_rel`` | ``time``
+*    * - relation_activity_time
+*      - ``relation`` | ``node_rel`` | ``year_rel`` | ``node_loc`` | ``tec`` | ``year_act`` | ``mode`` | ``time``
+*
+* The ``_time`` variants extend the generic-relation mechanism to subannual time slices.
+* They are independent of the annual variants:
+* an annual ``relation_upper(r,n,y)`` constrains :math:`\text{REL}_{r,n,y}` summed over all time,
+* while ``relation_upper_time(r,n,y,h)`` constrains the per-slice :math:`\text{REL\_TIME}_{r,n,y,h}`.
+* Scenarios may use either or both.
 *
 ***
 
@@ -877,6 +889,9 @@ Parameters
     relation_new_capacity(relation,node,year_all,tec)   new capacity factor (multiplier) of generic relation
     relation_total_capacity(relation,node,year_all,tec) total capacity factor (multiplier) of generic relation
     relation_activity(relation,node,year_all,node,tec,year_all,mode) activity factor (multiplier) of generic relation
+    relation_upper_time(relation,node,year_all,time)    upper bound of generic relation at subannual time slice
+    relation_lower_time(relation,node,year_all,time)    lower bound of generic relation at subannual time slice
+    relation_activity_time(relation,node,year_all,node,tec,year_all,mode,time) activity factor (multiplier) of generic relation at subannual time slice
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*

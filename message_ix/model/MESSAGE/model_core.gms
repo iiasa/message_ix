@@ -130,6 +130,8 @@ Variables
     EMISS(node,emission,type_tec,year_all)       aggregate emissions by technology type and land-use model emulator
 * auxiliary variable for left-hand side of relations (linear constraints)
     REL(relation,node,year_all)                  auxiliary variable for left-hand side of user-defined relations
+* auxiliary variable for left-hand side of subannual relations (linear constraints at time-slice resolution)
+    REL_TIME(relation,node,year_all,time)        auxiliary variable for left-hand side of user-defined subannual relations
 * change in the content of storage device
     STORAGE_CHARGE(node,tec,mode,level,commodity,year_all,time)    charging of storage in each time slice (negative for discharge)
 ;
@@ -307,6 +309,9 @@ Equations
     RELATION_EQUIVALENCE            auxiliary equation to simplify the implementation of relations
     RELATION_CONSTRAINT_UP          upper bound of relations (linear constraints)
     RELATION_CONSTRAINT_LO          lower bound of relations (linear constraints)
+    RELATION_EQUIVALENCE_TIME       auxiliary equation to simplify the implementation of subannual relations
+    RELATION_CONSTRAINT_UP_TIME     upper bound of subannual relations (linear constraints at time-slice resolution)
+    RELATION_CONSTRAINT_LO_TIME     lower bound of subannual relations (linear constraints at time-slice resolution)
     STORAGE_CHANGE                  change in the state of charge of storage
     STORAGE_BALANCE                 balance of the state of charge of storage
     STORAGE_BALANCE_INIT            balance of the state of charge of storage at sub-annual time slices with initial storage content
@@ -2330,6 +2335,67 @@ RELATION_CONSTRAINT_LO(relation,node,year)$( is_relation_lower(relation,node,yea
     REL(relation,node,year)
 %SLACK_RELATION_BOUND_LO% + SLACK_RELATION_BOUND_LO(relation,node,year)
     =G= relation_lower(relation,node,year) ;
+
+***
+* Subannual generic relations
+* ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*
+* The subannual generic relations mirror :ref:`equation_relation_equivalence`, :ref:`equation_relation_constraint_up` and :ref:`equation_relation_constraint_lo` at subannual time-slice resolution.
+* They share the annual-relation convention:
+* generic linear constraints intended for development and testing, where specific features should use purpose-built equations.
+* The subannual variants are activated when scenarios populate ``relation_activity_time``, ``relation_upper_time`` or ``relation_lower_time``;
+* scenarios without these parameters are unaffected.
+*
+* .. _equation_relation_equivalence_time:
+*
+* Equation RELATION_EQUIVALENCE_TIME
+* """"""""""""""""""""""""""""""""""
+*   .. math::
+*      \text{REL\_TIME}_{r,n,y,h} = \sum_{t,n^L,y',m} \ \text{relation\_activity\_time}_{r,n,y,n^L,t,y',m,h} \\
+*          \cdot \Big( \sum_{y^V \leq y'} \text{ACT}_{n^L,t,y^V,y',m,h}
+*                    + \text{historical\_activity}_{n^L,t,y',m,h} \Big)
+*
+* ``REL_TIME`` is the subannual analogue of ``REL``.
+* The subannual relation carries only the activity term:
+* the capacity-side factors :math:`\text{relation\_new\_capacity}` and :math:`\text{relation\_total\_capacity}` stay annual,
+* because capacity itself has no subannual dimension in |MESSAGEix|.
+***
+
+RELATION_EQUIVALENCE_TIME(relation,node,year,time)..
+    REL_TIME(relation,node,year,time)
+        =E=
+    SUM(tec,
+        SUM((location,year_all2,mode)$( map_tec_act(location,tec,year_all2,mode,time) ),
+            relation_activity_time(relation,node,year,location,tec,year_all2,mode,time)
+            * ( SUM(vintage$( map_tec_lifetime(location,tec,vintage,year_all2) ),
+                  ACT(location,tec,vintage,year_all2,mode,time) )
+                  + historical_activity(location,tec,year_all2,mode,time) )
+          )
+      ) ;
+
+***
+* .. _equation_relation_constraint_up_time:
+*
+* Equation RELATION_CONSTRAINT_UP_TIME
+* """"""""""""""""""""""""""""""""""""
+*   .. math::
+*      \text{REL\_TIME}_{r,n,y,h} \leq \text{relation\_upper\_time}_{r,n,y,h}
+***
+RELATION_CONSTRAINT_UP_TIME(relation,node,year,time)$( is_relation_upper_time(relation,node,year,time) )..
+    REL_TIME(relation,node,year,time)
+    =L= relation_upper_time(relation,node,year,time) ;
+
+***
+* .. _equation_relation_constraint_lo_time:
+*
+* Equation RELATION_CONSTRAINT_LO_TIME
+* """"""""""""""""""""""""""""""""""""
+*   .. math::
+*      \text{REL\_TIME}_{r,n,y,h} \geq \text{relation\_lower\_time}_{r,n,y,h}
+***
+RELATION_CONSTRAINT_LO_TIME(relation,node,year,time)$( is_relation_lower_time(relation,node,year,time) )..
+    REL_TIME(relation,node,year,time)
+    =G= relation_lower_time(relation,node,year,time) ;
 
 *----------------------------------------------------------------------------------------------------------------------*
 ***
