@@ -15,6 +15,9 @@ $IF NOT EXIST '%in%' $ABORT "input GDX file '%in%' does not exist!"
 $IF NOT SET iter     $SETGLOBAL iter "output/MsgIterationReport"
 $IF NOT SET out      $SETGLOBAL out "output/MsgOutput.gdx"
 
+* default the land-use mode to GLOBIOM when none is passed on the command line
+$IF NOT SET landusemode $SETGLOBAL landusemode "globiom"
+
 ** define the time horizon over which the model optimizes (perfect foresight, myopic or rolling horizon) **
 * perfect foresight - 0 (assumed as default if not specified
 * myopic optimization (period-by-period, recursive-dynamic without any foresight) - 1
