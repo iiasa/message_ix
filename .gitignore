@@ -1,6 +1,7 @@
 # Python, R, etc.
 __pycache__
 *-checkpoint.ipynb
+.ipynb_checkpoints/
 *.bak
 *.dat
 *.egg-info
