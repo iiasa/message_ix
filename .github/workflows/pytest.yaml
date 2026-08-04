@@ -21,7 +21,7 @@ defaults:
     shell: bash
 
 env:
-  GAMS_VERSION: 48.6.1 # Oldest version of GAMS that can reliably be downloaded
+  GAMS_VERSION: 48.7.0 # Oldest version of GAMS that can reliably be downloaded
   depth: 100  # Must be large enough to include the most recent release
   label: "safe to test"  # Label that must be applied to run on PRs from forks
   python-version: "3.14"  # For non-matrixed jobs
@@ -79,11 +79,14 @@ jobs:
 
         # - "3.15.0-alpha.1"  # Development version
 
-        include:
-        - os: ubuntu-latest
-          python-version: "3.14"
-          extra-deps: '"pandas >= 3"'
-          extra-name: "-pandas-3"
+        # Additional matrix jobs for particular cases
+        # include:
+        # Force pandas >= 3 if upstream dependencies exclude it
+        # commented (2026-08-04): Not currently needed
+        # - os: ubuntu-latest
+        #   python-version: "3.14"
+        #   extra-deps: '"pandas >= 3"'
+        #   extra-name: "-pandas-3"
 
       fail-fast: false
 
