@@ -146,14 +146,16 @@ year(year_all)$( model_horizon(year_all) ) = yes ;
 year(year_all)$( macro_base_period(year_all) ) = yes ;
 
 * useful energy/service demand levels from MESSAGE get mapped onto MACRO sector structure
+* (DEMAND and demand_fixed are slice-cumulative quantities, so the annual total is a plain sum over `time`)
 enestart(node_macro,sector,year) = SUM((commodity, level, time) $ mapping_macro_sector(sector, commodity, level),
-                                 DEMAND.L(node_macro,commodity,level,year,time) * duration_time(time) ) / 1000
+                                 DEMAND.L(node_macro,commodity,level,year,time) ) / 1000
 ;
 
 demand_init(node_macro,sector,year) = SUM((commodity, level, time)$mapping_macro_sector(sector, commodity, level),
     demand_fixed(node_macro,commodity,level,year,time) ) ;
 
 * useful energy/service demand prices from MESSAGE get mapped onto MACRO sector structure
+* (PRICE_COMMODITY is a per-unit price, so the annual price is its duration_time-weighted mean over `time`)
 
 * Replace EPS values with 0
 PRICE_COMMODITY.L(node_macro,commodity,level,year,time)$(
@@ -202,10 +204,11 @@ demand_diff_rel(iteration,node_macro,sector,year) $(NOT macro_base_period(year))
     demand_diff_abs(iteration,node_macro,sector,year) / demand_init(node_macro,sector,year) ;
 
 * compute the relative difference between the previous demand and the updated demand from MACRO
+* (plain sum over `time`, following the slice-cumulative convention of demand_fixed)
 demand_scale(node_macro,sector,year)$(NOT macro_base_period(year)) =
     demand_new(node_macro,sector,year)
         / SUM((commodity, level, time) $ mapping_macro_sector(sector, commodity, level),
-            demand_fixed(node_macro,commodity,level,year,time) * duration_time(time) ) ;
+            demand_fixed(node_macro,commodity,level,year,time) ) ;
 
 * limit MACRO demand scaling to relative the maximum adjustment level (defined using SETGLOBAL from command line)
 demand_scale(node_macro,sector,year)$(NOT macro_base_period(year)) =
