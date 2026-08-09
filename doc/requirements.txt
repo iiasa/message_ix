@@ -34,7 +34,7 @@ genno==1.28.2
     # via ixmp
 gitdb==4.0.10
     # via gitpython
-gitpython==3.1.57
+gitpython==3.1.58
     # via -r requirements.in
 idna==3.15
     # via
