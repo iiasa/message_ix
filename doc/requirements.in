@@ -4,7 +4,7 @@
 # security alerts; view the line blame for details.
 
 # Last updated per https://github.com/iiasa/message_ix/pull/1029
-gitpython>=3.1.57
+gitpython>=3.1.58
 idna>=3.15
 ixmp @ git+https://github.com/iiasa/ixmp.git@main
 numpydoc==1.8.0
