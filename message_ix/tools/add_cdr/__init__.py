@@ -642,7 +642,7 @@ def add_oae(scen, yamlpath=""):
 
     # Add OAE market penetration relation bounds
     ## create relation bounds
-    rel_eqs = ["OAE_removal","OAE_mpen_c"]
+    rel_eqs = ["OAE_removal", "OAE_mpen_c"]
     list_rel_eq = []
     for node in nodes:
         for rel in rel_eqs:
@@ -927,8 +927,12 @@ def add_biochar(scen, yamlpath=""):
                 unit="???",
             )
 
+            df1 = df0.copy()
+            df1["relation"] = "CO2_cc"
+            df1["value"] = df1["value"].add(1)
+
             # relation for the following periods
-            df1 = make_df(
+            df2 = make_df(
                 "relation_activity",
                 relation="CO2_Emission",
                 node_rel=node,
@@ -943,8 +947,11 @@ def add_biochar(scen, yamlpath=""):
                 unit="???",
             )
 
+            df3 = df2.copy()
+            df3["relation"] = "CO2_cc"
+
             # collect all periods as a list
-            df_list += [df0, df1]
+            df_list += [df0, df1, df2, df3]
 
     df2add = pd.concat(df_list)
     df2add["year_rel"] = df2add["year_rel"].astype(int)
