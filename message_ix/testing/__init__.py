@@ -1041,12 +1041,6 @@ def tmp_scenario(
 
 
 @pytest.fixture(scope="session")
-def tutorial_path(request: pytest.FixtureRequest) -> Path:
-    """Path to the directory containing the tutorials."""
-    return Path(__file__).parents[2] / "tutorial"
-
-
-@pytest.fixture(scope="session")
 def ureg() -> Iterator["UnitRegistry"]:
     """Session-scoped :class:`pint.UnitRegistry` with units needed by tests."""
     import pint
