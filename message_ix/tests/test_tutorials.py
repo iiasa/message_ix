@@ -37,7 +37,7 @@ MARK = [
 pytestmark = [
     pytest.mark.tutorial,
     pytest.mark.flaky(
-        reruns=5,
+        reruns=2,
         rerun_delay=2,
         condition=GHA,
         reason="Flaky; fails occasionally on GitHub Actions runners",
