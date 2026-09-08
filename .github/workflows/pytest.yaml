@@ -227,7 +227,7 @@ jobs:
         IRkernel::installspec()
       shell: Rscript {0}
 
-    - name: Run test suite using pytest
+    - name: Run tutorial tests using pytest
       run: |
         pytest message_ix \
           -m "tutorial" \
