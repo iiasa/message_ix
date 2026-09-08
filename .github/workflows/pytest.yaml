@@ -218,6 +218,10 @@ jobs:
         version: ${{ env.GAMS_VERSION }}
         license: ${{ secrets.GAMS_LICENSE }}
 
+    - uses: ikalnytskyi/action-setup-postgres@v8
+      id: setup-postgres
+      with: { postgres-version: "16" }
+
     - name: Install the package and dependencies
       run: uv pip install --upgrade ${{ env.upstream-versions }} .[tests]
 
@@ -233,7 +237,8 @@ jobs:
           -m "tutorial" \
           --color=yes --durations=20 -rA --verbose \
           --cov-report=xml \
-          --numprocesses=auto --dist=loadgroup
+          --numprocesses=auto --dist=loadgroup \
+          --ixmp-postgres=${{ steps.setup-postgres.outputs.connection-uri }}
 
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v7
