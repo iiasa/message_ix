@@ -97,6 +97,8 @@ jobs:
     - name: Check out message_ix
       uses: actions/checkout@v7
       with:
+        # This step only runs if the 'check' job above succeeds
+        allow-unsafe-pr-checkout: true
         fetch-depth: ${{ env.depth }}
         ref: ${{ github.event_name != 'pull_request_target' && github.ref || github.event.pull_request.head.sha }}
 
@@ -175,6 +177,7 @@ jobs:
     - name: Check out message_ix
       uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: ${{ env.depth }}
         ref: ${{ github.event_name != 'pull_request_target' && github.ref || github.event.pull_request.head.sha }}
 
@@ -246,6 +249,8 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }} # required
 
   pre-commit:
+    needs: [ check ]
+
     name: Code quality
 
     runs-on: ubuntu-latest
@@ -253,6 +258,7 @@ jobs:
     steps:
     - uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         ref: ${{ github.event_name != 'pull_request_target' && github.ref || github.event.pull_request.head.sha }}
     - uses: astral-sh/setup-uv@v7
       with: { enable-cache: true, python-version: "${{ env.python-version }}" }
