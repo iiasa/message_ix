@@ -97,8 +97,9 @@ def model_periods(y: list[int], cat_year: pd.DataFrame) -> list[int]:
     """Return the elements of `y` beyond the firstmodelyear of `cat_year`."""
     return list(
         filter(
-            lambda year: cat_year.query("type_year == 'firstmodelyear'")["year"].item()
-            <= year,
+            lambda year: (
+                cat_year.query("type_year == 'firstmodelyear'")["year"].item() <= year
+            ),
             y,
         )
     )
