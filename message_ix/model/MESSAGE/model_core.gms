@@ -172,37 +172,42 @@ Variables
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*
-* auxiliary bounds on activity variables (debugging mode, avoid inter-vintage arbitrage, investment technology)                                                        *
+* Bounds on ACT
 *----------------------------------------------------------------------------------------------------------------------*
 
-* include upper and lower bounds (to avoid unbounded models)
-%AUX_BOUNDS% ACT.lo(node,tec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,tec,year_all,year_all2)
-%AUX_BOUNDS%    AND map_tec_act(node,tec,year_all2,mode,time) ) = -%AUX_BOUND_VALUE% ;
-%AUX_BOUNDS% ACT.up(node,tec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,tec,year_all,year_all2)
-%AUX_BOUNDS%    AND map_tec_act(node,tec,year_all2,mode,time) ) = %AUX_BOUND_VALUE% ;
+* Upper bounds
 
-* to avoid "inter-vintage arbitrage" (across different vintages of technologies), all activities that
-* have positive lower bounds are assumed to be non-negative; the test on bound_activity_lo is kept out
-* of the assignment condition because a relational test cannot drive sparse iteration
-Set is_bound_activity_lo_negative(node,tec,year_all,mode,time) "flag for explicitly negative lower bounds on activity";
-is_bound_activity_lo_negative(node,tec,year_all,mode,time)$( bound_activity_lo(node,tec,year_all,mode,time)
-    AND bound_activity_lo(node,tec,year_all,mode,time) < 0
-    AND map_tec_act(node,tec,year_all,mode,time) ) = yes ;
-ACT.lo(node,tec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,tec,year_all,year_all2)
-    AND map_tec_act(node,tec,year_all2,mode,time) ) = 0 ;
-ACT.lo(node,tec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,tec,year_all,year_all2)
-    AND is_bound_activity_lo_negative(node,tec,year_all2,mode,time) ) = -INF ;
-%AUX_BOUNDS% ACT.lo(node,tec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,tec,year_all,year_all2)
-%AUX_BOUNDS%    AND is_bound_activity_lo_negative(node,tec,year_all2,mode,time) ) = -%AUX_BOUND_VALUE% ;
-* previous implementation using upper bounds
-* ACT.lo(node,tec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,tec,year_all,year_all2)
-*    AND map_tec_act(node,tec,year_all2,mode,time)
-*    AND ( NOT bound_activity_up(node,tec,year_all2,mode,time)
-*        OR bound_activity_up(node,tec,year_all2,mode,time) >= 0 ) ) = 0 ;
+* (1) If AUX_BOUNDS is disabled ("*"), do nothing.
+*     If AUX_BOUNDS is enabled (""), limit ACT to avoid extremely high values.
+%AUX_BOUNDS% ACT.up(n,t,vintage,y_all,m,time)$(
+%AUX_BOUNDS%   map_tec_lifetime(n,t,vintage,y_all) AND map_tec_act(n,t,y_all,m,time)
+%AUX_BOUNDS% ) = %AUX_BOUND_VALUE% ;
 
-* assume that all "investment" technologies must have non-negative activity levels
-ACT.lo(node,inv_tec,year_all,year_all2,mode,time)$( map_tec_lifetime(node,inv_tec,year_all,year_all2)
-    AND map_tec_act(node,inv_tec,year_all2,mode,time) ) = 0 ;
+* Lower bounds
+
+* (2) All (t, vintage) that may be active in (n, y_all, m, time) must have non-negative ACT.
+*     This prevents "inter-vintage arbitrage", where the solver chooses ACT < 0 for certain (more costly) yV such that
+*     other (less costly) yV (at the same indices) may be higher.
+ACT.lo(n,t,vintage,y_all,m,time)$(
+  map_tec_lifetime(n,t,vintage,y_all) AND map_tec_act(n,t,y_all,m,time)
+) = 0 ;
+
+* (3) Where bound_activity_lo is explicitly set to a negative value, ACT may be negative.
+*     Values of bound_activity_lo are applied below in ACTIVITY_BOUND_LO, to the *sum* of ACT values across all
+*     `vintage`s active in `y_all`. Here we merely allow that individual ACT values are negative.
+ACT.lo(n,t,vintage,y_all,m,time)$(
+  map_tec_lifetime(n,t,vintage,y_all)
+  AND map_tec_act(n,t,y_all,m,time)
+  AND bound_activity_lo(n,t,y_all,m,time)
+  AND bound_activity_lo(n,t,y_all,m,time) < 0
+) = -INF;
+
+* (4) If AUX_BOUNDS is enabled, use the bound value instead of -INF.
+%AUX_BOUNDS% ACT.lo(n,t,vintage,y_all,m,time)$(
+%AUX_BOUNDS%   AND map_tec_act(n,t,y_all,m,time)
+%AUX_BOUNDS%   AND bound_activity_lo(n,t,y_all,m,time)
+%AUX_BOUNDS%   AND bound_activity_lo(n,t,y_all,m,time) < 0
+%AUX_BOUNDS% ) = -%AUX_BOUND_VALUE% ;
 
 *----------------------------------------------------------------------------------------------------------------------*
 * fixing variables to pre-specified values                                                                             *
