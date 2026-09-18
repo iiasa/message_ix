@@ -22,7 +22,6 @@ Adjust any imports like the following:
 All changes
 -----------
 
-- Reduce GAMS model generation time for scenarios with many nodes by assigning the non-negativity default on ``ACT`` through sparse set iteration (:pull:`1023`).
 - :mod:`message_ix` is tested and compatible with `Python 3.14 <https://www.python.org/downloads/release/python-3140/>`__ (:pull:`985`).
 - Support for Python 3.9 is dropped (:pull:`985`), as it has reached end-of-life.
 - :mod:`message_ix` is tested and compatible with `Pandas 3.0.0 <https://pandas.pydata.org/pandas-docs/stable/whatsnew/v3.0.0.html>`_,
@@ -55,11 +54,15 @@ All changes
   - Handle older scenarios—for instance, those without |input_cap|—in :meth:`.Reporter.from_scenario` (:issue:`988`).
   - Expand and test keys for multiple methods of calculating :ref:`reporter-historical` (:issue:`989`).
 
+- GAMS implementation of MESSAGE:
+
+  - Fix GDX output file compression on MacOS and Linux (:pull:`965`).
+  - Reduce model generation time for scenarios with many nodes (:pull:`1023`, :issue:`1022`).
+
 - Document the :ref:`minimum version of Java <install-java>` required for :class:`ixmp.JDBCBackend <ixmp.backend.jdbc.JDBCBackend>` (:pull:`962`).
 - Document :ref:`how to run a local PostgreSQL instance <install-postgres>`
   for local testing using :class:`ixmp.IXMP4Backend <ixmp.backend.ixmp4.IXMP4Backend>` (:pull:`981`).
 - Improve type hinting (:pull:`963`).
-- Fix capitalization in auxiliary_settings.gms to enable GDX output file compression on MacOS and Linux. (:pull:`965`) 
 
 All changes
 -----------
