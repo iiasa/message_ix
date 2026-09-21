@@ -18,6 +18,50 @@ from ixmp.util.ixmp4 import is_ixmp4backend
 
 log = logging.getLogger(__name__)
 
+#: Parameters that can be made modifiable in GamsModelInstance
+#: These are NOT used in conditional expressions ($) in GAMS code
+DEFAULT_MODIFIABLE_PARS = [
+    # Cost parameters
+    "inv_cost",
+    "fix_cost",
+    "var_cost",
+    "resource_cost",
+    # Technical coefficients
+    "input",
+    "output",
+    "technical_lifetime",
+    "construction_time",
+    # Bounds
+    "bound_activity_up",
+    "bound_activity_lo",
+    "bound_new_capacity_up",
+    "bound_new_capacity_lo",
+    "bound_total_capacity_up",
+    "bound_total_capacity_lo",
+    "initial_activity_up",
+    "initial_activity_lo",
+    "initial_new_capacity_up",
+    "initial_new_capacity_lo",
+    # Resource parameters
+    "resource_volume",
+    "resource_remaining",
+    # Demand and stocks
+    "demand",
+    "stock",
+    # Emissions
+    "emission_factor",
+    "emission_scaling",
+    # Storage
+    "storage_initial",
+    "storage_self_discharge",
+    # Relations
+    "relation_upper",
+    "relation_lower",
+    "relation_activity",
+    "relation_new_capacity",
+    "relation_total_capacity",
+]
+
 # Also print warnings to stderr
 _sh = logging.StreamHandler()
 _sh.setLevel(level=logging.WARNING)
@@ -760,6 +804,70 @@ class Scenario(ixmp.Scenario):
             :class:`.MESSAGE_MACRO`, and :class:`.GAMSModel`.
         """
         super().solve(model=model, solve_options=solve_options, **kwargs)
+
+    def create_model_instance(
+        self,
+        model="MESSAGE",
+        modifiable_pars=None,
+        fixable_vars=None,
+        use_defaults=True,
+        **model_options,
+    ):
+        """Create a persistent GAMS model instance for efficient resolving.
+
+        This is a thin wrapper around :meth:`ixmp.Scenario.create_model_instance`
+        that defaults to the MESSAGE model and provides default modifiable parameters.
+
+        Parameters
+        ----------
+        model : str, optional
+            Model to compile. Default is "MESSAGE".
+        modifiable_pars : list of str, optional
+            List of parameter names that can be modified between solves.
+            If None and use_defaults=True, uses DEFAULT_MODIFIABLE_PARS.
+        fixable_vars : list of str, optional
+            List of variable names that can be fixed between solves.
+        use_defaults : bool, optional
+            If True and modifiable_pars is None, uses DEFAULT_MODIFIABLE_PARS.
+            Set to False to create instance with no modifiable parameters.
+        model_options :
+            Additional keyword arguments passed to the model.
+
+        Returns
+        -------
+        tuple of (GamsModelInstance, GamsWorkspace)
+            The model instance and workspace that can be used for efficient resolving.
+
+        Examples
+        --------
+        >>> # Use default modifiable parameters
+        >>> mi, ws = scen.create_model_instance()
+        >>> # Modify inv_cost in sync_db
+        >>> inv_cost = mi.sync_db["inv_cost"]
+        >>> for rec in inv_cost:
+        ...     if rec.keys == ["node", "wind_ppl", "2020"]:
+        ...         rec.level = 1500
+        >>> mi.solve()
+
+        >>> # Custom modifiable parameters
+        >>> mi, ws = scen.create_model_instance(
+        ...     modifiable_pars=["demand", "bound_activity_up"]
+        ... )
+
+        See Also
+        --------
+        ixmp.Scenario.create_model_instance
+        DEFAULT_MODIFIABLE_PARS
+        """
+        if modifiable_pars is None and use_defaults:
+            modifiable_pars = DEFAULT_MODIFIABLE_PARS
+
+        return super().create_model_instance(
+            model=model,
+            modifiable_pars=modifiable_pars,
+            fixable_vars=fixable_vars,
+            **model_options,
+        )
 
     def add_macro(
         self,
