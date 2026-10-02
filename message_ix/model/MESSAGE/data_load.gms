@@ -213,6 +213,33 @@ rating_unrated(rating) = yes ;
 rating_unrated('unrated') = no ;
 
 *----------------------------------------------------------------------------------------------------------------------*
+* auxiliary mappings for split between cumulative and annualland-use emission calculations                             *
+*----------------------------------------------------------------------------------------------------------------------*
+
+* remove all emission types from subset for cumulative land-use emission accounting
+emission_cumulative(emission) = no;
+* add emission types where land-use emissions should use the cumulative accounting approach
+* TO DO: to avoid having to declarde these emissions in gams code, this section should be translated into a Python process
+emission_cumulative('TCE_CO2') = yes;
+emission_cumulative('LU_CO2') = yes;
+emission_cumulative('TCE') = yes;
+* add all emission types to subset for annual land-use emission accounting,
+* then remove the emission types that have been declared in the cumulative accounting set
+emission_annual(emission) = yes;
+emission_annual(emission_cumulative) = no;
+
+*----------------------------------------------------------------------------------------------------------------------*
+* auxiliary mappings for split between cumulative and annualland-use emission calculations                             *
+*----------------------------------------------------------------------------------------------------------------------*
+
+emission_cumulative(emission) = no;
+emission_cumulative('TCE_CO2') = yes;
+emission_cumulative('LU_CO2') = yes;
+emission_cumulative('TCE') = yes;
+emission_annual(emission) = yes;
+emission_annual(emission_cumulative) = no;
+
+*----------------------------------------------------------------------------------------------------------------------*
 * assignment and computation of MESSAGE-specific auxiliary parameters                                                  *
 *----------------------------------------------------------------------------------------------------------------------*
 
