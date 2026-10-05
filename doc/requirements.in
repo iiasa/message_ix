@@ -22,4 +22,4 @@ sphinx-rtd-theme==3.0.2
 sphinxcontrib-bibtex==2.6.5
 
 # Last updated per https://github.com/iiasa/message_ix/pull/1014
-urllib3>=2.7.0
+urllib3>=2.8.0
