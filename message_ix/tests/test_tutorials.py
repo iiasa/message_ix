@@ -1,5 +1,6 @@
 import logging
 import os
+import platform
 import sys
 from dataclasses import dataclass, field
 from importlib.resources import files
@@ -89,6 +90,8 @@ class Tutorial:
         result: dict[str, Any] = {}
         if self.path.name.startswith("R_"):
             result["kernel_name"] = "IR"  # Use a different kernel for R notebooks
+        if platform.system() == "Windows":
+            result["timeout"] = 20  # Use a longer timeout on Windows
         return result
 
 

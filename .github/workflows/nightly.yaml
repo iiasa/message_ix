@@ -62,8 +62,10 @@ jobs:
         license: ${{ secrets.GAMS_LICENSE }}
 
     - name: Install package and dependencies
+      # sqlalchemy: work around https://github.com/iiasa/ixmp4/issues/272
       run: |
         uv pip install --upgrade \
+          "sqlalchemy < 2.1" \
           "ixmp[tests] @ git+https://github.com/iiasa/ixmp.git@main" \
           .[tests]
 
