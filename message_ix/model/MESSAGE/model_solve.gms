@@ -95,6 +95,24 @@ else
 
     year(year_all) = no ;
 
+* keep fixed variables of prior periods as columns (lb = ub) instead of substituting them as constants; otherwise
+* equations of prior periods with only fixed variables are checked exactly by GAMS and LP noise (~1e-9) in the fixed
+* levels triggers 'Equation infeasible due to rhs value' exec errors that abort the solve
+    MESSAGE_LP.holdfixed = 0 ;
+
+* drop the lower dynamic activity constraint for resource extraction technologies (any technology with input from a
+* resource level); with limited foresight, extraction fixed in a prior period can otherwise force continued output from
+* a depleted resource grade and make later iterations infeasible
+    is_dynamic_activity_lo(node,tec,year_all,time)$( is_dynamic_activity_lo(node,tec,year_all,time)
+        AND SUM((vintage,mode,location,commodity,level_resource,time_od),
+            input(node,tec,vintage,year_all,mode,location,commodity,level_resource,time,time_od) ) ) = no ;
+
+* the soft relaxation term of ACTIVITY_CONSTRAINT_LO only relaxes the constraint for soft_activity_lo > 0; negative
+* values (as in some input data) make ACT_LO tighten the bound instead, so the costed relaxation never applies and
+* activity fixed in prior periods can make later iterations infeasible
+    soft_activity_lo(node,tec,year_all,time)$( soft_activity_lo(node,tec,year_all,time) < 0 )
+        = ABS(soft_activity_lo(node,tec,year_all,time)) ;
+
     LOOP(year_all$( model_horizon(year_all) ),
 
 * include all past periods and future periods including the period where the %foresight% is reached
@@ -107,8 +125,6 @@ else
 * write a status update and time elapsed to the log file, solve the model
         put_utility 'log' /'+++ Solve the recursive-dynamic version of MESSAGEix - iteration ' year_all.tl:0 '  +++ ' ;
         $$INCLUDE includes/aux_computation_time.gms
-* raise domain-violation limit so noise-level rhs exec errors do not abort the solve
-        option DomLim = 999999 ;
         Solve MESSAGE_LP using LP minimizing OBJ ;
 
 * write model status summary
@@ -124,18 +140,44 @@ else
             ABORT "MESSAGEix did not solve to optimality!"
         ) ;
 
-* fix all variables of the current iteration period 'year_all' to the optimal levels
-* round to 8 decimal places before clamping to lb=0: eliminates sub-1e-8 LP residuals
-* that would otherwise make CAPACITY_CONSTRAINT / CAPACITY_MAINTENANCE_NEW exec-error
-        EXT.fx(node,commodity,grade,year_all) = max(0, round(EXT.l(node,commodity,grade,year_all), 8)) ;
-        CAP_NEW.fx(node,tec,year_all) = max(0, round(CAP_NEW.l(node,tec,year_all), 8)) ;
-        CAP.fx(node,tec,year_all2,year_all)$( map_period(year_all2,year_all) ) = max(0, round(CAP.l(node,tec,year_all2,year_all), 8)) ;
-        ACT.fx(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all) )
-            = ACT.l(node,tec,year_all2,year_all,mode,time) ;
-        CAP_NEW_UP.fx(node,tec,year_all) = CAP_NEW_UP.l(node,tec,year_all) ;
-        CAP_NEW_LO.fx(node,tec,year_all) = CAP_NEW_LO.l(node,tec,year_all) ;
-        ACT_UP.fx(node,tec,year_all,time) = ACT_UP.l(node,tec,year_all,time) ;
-        ACT_LO.fx(node,tec,year_all,time) = ACT_LO.l(node,tec,year_all,time) ;
+* fix all variables of the current iteration period 'year_all' to the optimal levels, within a narrow band of
+* +/- (%myopic_fix_tol% + 1e-6 * |level|) clipped to the existing bounds; exact fixing locks in LP noise of each solve,
+* which accumulates across iterations and can make equations of fully fixed prior periods infeasible in later solves
+$IF NOT SET myopic_fix_tol $SETGLOBAL myopic_fix_tol "1e-5"
+        EXT.up(node,commodity,grade,year_all) = MIN( EXT.up(node,commodity,grade,year_all),
+            EXT.l(node,commodity,grade,year_all) + %myopic_fix_tol% + 1e-6 * ABS(EXT.l(node,commodity,grade,year_all)) ) ;
+        EXT.lo(node,commodity,grade,year_all) = MAX( EXT.lo(node,commodity,grade,year_all),
+            EXT.l(node,commodity,grade,year_all) - %myopic_fix_tol% - 1e-6 * ABS(EXT.l(node,commodity,grade,year_all)) ) ;
+        CAP_NEW.up(node,tec,year_all) = MIN( CAP_NEW.up(node,tec,year_all),
+            CAP_NEW.l(node,tec,year_all) + %myopic_fix_tol% + 1e-6 * ABS(CAP_NEW.l(node,tec,year_all)) ) ;
+        CAP_NEW.lo(node,tec,year_all) = MAX( CAP_NEW.lo(node,tec,year_all),
+            CAP_NEW.l(node,tec,year_all) - %myopic_fix_tol% - 1e-6 * ABS(CAP_NEW.l(node,tec,year_all)) ) ;
+        CAP.up(node,tec,year_all2,year_all)$( map_period(year_all2,year_all) ) = MIN( CAP.up(node,tec,year_all2,year_all),
+            CAP.l(node,tec,year_all2,year_all) + %myopic_fix_tol% + 1e-6 * ABS(CAP.l(node,tec,year_all2,year_all)) ) ;
+        CAP.lo(node,tec,year_all2,year_all)$( map_period(year_all2,year_all) ) = MAX( CAP.lo(node,tec,year_all2,year_all),
+            CAP.l(node,tec,year_all2,year_all) - %myopic_fix_tol% - 1e-6 * ABS(CAP.l(node,tec,year_all2,year_all)) ) ;
+        ACT.up(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all) )
+            = MIN( ACT.up(node,tec,year_all2,year_all,mode,time), ACT.l(node,tec,year_all2,year_all,mode,time)
+                + %myopic_fix_tol% + 1e-6 * ABS(ACT.l(node,tec,year_all2,year_all,mode,time)) ) ;
+        ACT.lo(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all) )
+            = MAX( ACT.lo(node,tec,year_all2,year_all,mode,time), ACT.l(node,tec,year_all2,year_all,mode,time)
+                - %myopic_fix_tol% - 1e-6 * ABS(ACT.l(node,tec,year_all2,year_all,mode,time)) ) ;
+        CAP_NEW_UP.up(node,tec,year_all) = MIN( CAP_NEW_UP.up(node,tec,year_all),
+            CAP_NEW_UP.l(node,tec,year_all) + %myopic_fix_tol% + 1e-6 * ABS(CAP_NEW_UP.l(node,tec,year_all)) ) ;
+        CAP_NEW_UP.lo(node,tec,year_all) = MAX( CAP_NEW_UP.lo(node,tec,year_all),
+            CAP_NEW_UP.l(node,tec,year_all) - %myopic_fix_tol% - 1e-6 * ABS(CAP_NEW_UP.l(node,tec,year_all)) ) ;
+        CAP_NEW_LO.up(node,tec,year_all) = MIN( CAP_NEW_LO.up(node,tec,year_all),
+            CAP_NEW_LO.l(node,tec,year_all) + %myopic_fix_tol% + 1e-6 * ABS(CAP_NEW_LO.l(node,tec,year_all)) ) ;
+        CAP_NEW_LO.lo(node,tec,year_all) = MAX( CAP_NEW_LO.lo(node,tec,year_all),
+            CAP_NEW_LO.l(node,tec,year_all) - %myopic_fix_tol% - 1e-6 * ABS(CAP_NEW_LO.l(node,tec,year_all)) ) ;
+        ACT_UP.up(node,tec,year_all,time) = MIN( ACT_UP.up(node,tec,year_all,time),
+            ACT_UP.l(node,tec,year_all,time) + %myopic_fix_tol% + 1e-6 * ABS(ACT_UP.l(node,tec,year_all,time)) ) ;
+        ACT_UP.lo(node,tec,year_all,time) = MAX( ACT_UP.lo(node,tec,year_all,time),
+            ACT_UP.l(node,tec,year_all,time) - %myopic_fix_tol% - 1e-6 * ABS(ACT_UP.l(node,tec,year_all,time)) ) ;
+        ACT_LO.up(node,tec,year_all,time) = MIN( ACT_LO.up(node,tec,year_all,time),
+            ACT_LO.l(node,tec,year_all,time) + %myopic_fix_tol% + 1e-6 * ABS(ACT_LO.l(node,tec,year_all,time)) ) ;
+        ACT_LO.lo(node,tec,year_all,time) = MAX( ACT_LO.lo(node,tec,year_all,time),
+            ACT_LO.l(node,tec,year_all,time) - %myopic_fix_tol% - 1e-6 * ABS(ACT_LO.l(node,tec,year_all,time)) ) ;
 
     ) ; # end of the recursive-dynamic loop
 
