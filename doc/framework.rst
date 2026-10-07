@@ -65,6 +65,11 @@ There are three ways to run a |MESSAGEix| model:
    :mod:`message_ix`, calling :meth:`message_ix.Scenario.solve`. (See the
    :doc:`tutorials`.)
 
+   The solution algorithm is selected with the :py:`foresight` keyword:
+   :py:`solve(foresight=0)` (the default) is perfect foresight, :py:`foresight=1` is
+   myopic, and :py:`foresight=N` for :py:`N > 1` is a rolling horizon with ``N`` years
+   of look-ahead. See :doc:`api` for details.
+
 2. Using the file ``MESSAGE_master.gms``, where the scenario name (i.e., the
    gdx input file), the optimization horizon (perfect foresight or myopic/
    rolling-horizon version), and other options can be defined explicitly.
