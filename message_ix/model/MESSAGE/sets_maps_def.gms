@@ -486,6 +486,8 @@ Sets
 
     is_relation_upper(relation,node,year_all)     flag whether upper bounds exists for generic relation
     is_relation_lower(relation,node,year_all)     flag whether lower bounds exists for generic relation
+    is_relation_upper_time(relation,node,year_all,time)     flag whether upper bound exists for generic relation at subannual time slice
+    is_relation_lower_time(relation,node,year_all,time)     flag whether lower bound exists for generic relation at subannual time slice
 ;
 
 *----------------------------------------------------------------------------------------------------------------------*

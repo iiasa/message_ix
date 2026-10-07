@@ -22,6 +22,10 @@ Adjust any imports like the following:
 All changes
 -----------
 
+- Add subannual generic relation constraints to MESSAGE (:pull:`NNNN`).
+  New parameters ``relation_upper_time``, ``relation_lower_time``, ``relation_activity_time``
+  bound ``REL_TIME(r, n, y, h)`` per time slice, complementing the annual ``relation_*`` parameters.
+
 - :mod:`message_ix` is tested and compatible with `Python 3.14 <https://www.python.org/downloads/release/python-3140/>`__ (:pull:`985`).
 - Support for Python 3.9 is dropped (:pull:`985`), as it has reached end-of-life.
 - :mod:`message_ix` is tested and compatible with `Pandas 3.0.0 <https://pandas.pydata.org/pandas-docs/stable/whatsnew/v3.0.0.html>`_,
