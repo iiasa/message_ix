@@ -1,0 +1,20 @@
+# config.yaml
+
+graph:
+  node:
+    shape: "rect"
+    style: "filled"
+    fontsize: "20"
+    height: "0.005"
+    width: "0.0001"
+  colors:
+    default: "lightblue"
+    level: "lightgrey"
+    phantom: "invisible"
+  levels:
+    primary: 0
+    secondary: 15
+    final: 35
+    useful: 60
+  technologies:
+    []
