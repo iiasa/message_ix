@@ -434,3 +434,81 @@ def test_sector_map(westeros_solved: Scenario, w_data: dict[str, pd.DataFrame]) 
         w_data[table] = w_data[table].replace({"sector": {"light": "FOO"}})
 
     westeros_solved.add_macro(w_data, check_convergence=True)
+
+
+@pytest.mark.parametrize("shares", [(0.5, 0.5), (0.3, 0.7)])
+def test_solve_subannual(
+    westeros_solved: Scenario, w_data_path: Path, shares: tuple[float, float]
+) -> None:
+    """MESSAGE-MACRO on a subannual scenario reproduces its annual equivalent.
+
+    The MESSAGE-MACRO iteration aggregates the ``time`` dimension of MESSAGE
+    quantities with two distinct conventions: ``DEMAND`` and ``demand_fixed``
+    are slice-cumulative, so their annual total is a plain sum over ``time``,
+    whereas ``PRICE_COMMODITY`` is a per-unit price, so its annual value is a
+    ``duration_time``-weighted mean. To check both, an annual scenario is
+    compared with a clone whose ``light`` demand is split into two time slices
+    such that the resulting LP is exactly equivalent to the annual one: GDP,
+    annually-summed demand, and annualized prices must match.
+    """
+    annual = westeros_solved.add_macro(w_data_path, check_convergence=False)
+    subannual = annual.clone(
+        scenario=f"{annual.scenario} subannual", keep_solution=False
+    )
+
+    with subannual.transact("Split light demand into two time slices"):
+        subannual.add_set("lvl_temporal", "season")
+
+        demand = subannual.par("demand", filters={"commodity": "light"})
+        subannual.remove_par("demand", demand)
+        output = subannual.par("output", filters={"technology": "bulb"})
+        subannual.remove_par("output", output)
+
+        # Each slice receives demand proportional to its duration, served
+        # through `output` of the (still annual) `bulb` activity scaled by the
+        # same share, so every slice constraint is the annual constraint
+        # rescaled and the subannual LP has the same solution as the annual
+        # one.
+        for time, share in zip(("h1", "h2"), shares):
+            subannual.add_set("time", time)
+            subannual.add_set("map_temporal_hierarchy", ["season", time, "year"])
+            subannual.add_par("duration_time", [time], share, "-")
+            subannual.add_par(
+                "demand", demand.assign(time=time, value=demand["value"] * share)
+            )
+            subannual.add_par(
+                "output",
+                output.assign(time_dest=time, value=output["value"] * share),
+            )
+
+    solve_args: dict[str, Any] = dict(model="MESSAGE-MACRO", quiet=True)
+    annual.solve(**solve_args)
+    subannual.solve(**solve_args)
+
+    npt.assert_allclose(
+        annual.var("GDP")["lvl"].values,
+        subannual.var("GDP")["lvl"].values,
+        rtol=1e-6,
+    )
+
+    def annual_light_demand(scenario: Scenario) -> np.ndarray:
+        demand = scenario.var("DEMAND", filters={"commodity": "light"})
+        return demand.groupby("year")["lvl"].sum().to_numpy()
+
+    npt.assert_allclose(
+        annual_light_demand(annual),
+        annual_light_demand(subannual),
+        rtol=1e-6,
+    )
+
+    def annual_light_price(scenario: Scenario) -> np.ndarray:
+        price = scenario.var("PRICE_COMMODITY", filters={"commodity": "light"})
+        duration = scenario.par("duration_time").set_index("time")["value"]
+        weighted = price["lvl"] * price["time"].map(duration)
+        return weighted.groupby(price["year"]).sum().to_numpy()
+
+    npt.assert_allclose(
+        annual_light_price(annual),
+        annual_light_price(subannual),
+        rtol=1e-6,
+    )
