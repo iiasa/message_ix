@@ -158,7 +158,8 @@ eneprice(node_macro,sector,year) $(NOT macro_base_period(year)) = SUM((commodity
 
 price_diff_abs(iteration,node_macro,sector,year)$( price_init(node_macro,sector,year) ) =
     eneprice(node_macro,sector,year) - price_init(node_macro,sector,year) ;
-price_diff_rel(iteration,node_macro,sector,year)$( price_init(node_macro,sector,year) ) =
+* skip a previous price of zero or EPS (a zero marginal): dividing by EPS aborts the run
+price_diff_rel(iteration,node_macro,sector,year)$( abs(price_init(node_macro,sector,year)) > 1e-9 ) =
     price_diff_abs(iteration,node_macro,sector,year) / price_init(node_macro,sector,year) ;
 
 price_init(node_macro,sector,year) = SUM((commodity, level, time) $ mapping_macro_sector(sector, commodity, level),
