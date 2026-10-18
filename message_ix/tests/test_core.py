@@ -153,8 +153,9 @@ class TestScenario:
 def test_backends_available() -> None:
     """Check that the expected set of backends are available within GHA workflows."""
     from ixmp.backend import available
+    from ixmp.util.ixmp4 import HAS_IXMP4
 
-    assert {"ixmp4", "jdbc"} <= set(available())
+    assert ({"ixmp4"} if HAS_IXMP4 else set()) & {"jdbc"} <= set(available())
 
 
 def test_year_int(test_mp: ixmp.Platform, request: pytest.FixtureRequest) -> None:
