@@ -155,6 +155,9 @@ def _compose_records(
     # Create a list to collect records
     records: list[pd.DataFrame] = []
 
+    # NB If the first item of `sources` includes columns = None, its original column
+    #    order determines the column order from pd.concat(), below. This was an
+    #    issue for map_commodity; see .util.scenario_data.
     for source_name, columns in sources.items():
         # Copy the scenario data to avoid modifying it
         df = scenario.par(name=source_name).copy()
