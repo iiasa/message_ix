@@ -24,7 +24,7 @@ env:
   # Oldest version that can reliably be downloaded
   gams-version: 48.7.0
   os: ubuntu-latest
-  python-version: "3.14"
+  python-version: "3.15"
 
 permissions: {contents: read}
 
