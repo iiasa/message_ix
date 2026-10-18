@@ -157,7 +157,7 @@ jobs:
           -m "not nightly and not tutorial" \
           --color=yes --durations=20 -rA --verbose \
           --cov-report=xml \
-          --numprocesses=auto --dist=loadgroup \
+          --numprocesses=auto --dist=loadscope \
           --ixmp-postgres=${{ steps.setup-postgres.outputs.connection-uri }}
 
     - name: Upload test coverage to Codecov.io
