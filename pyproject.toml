@@ -108,7 +108,7 @@ ignore_missing_imports = true
 addopts = [
   "--cov=message_ix",
   "--cov-report=",
-  '-m "not nightly and not rmessageix"',
+  '-m not nightly and not rmessageix',
   "-p no:faulthandler",
 ]
 # Parallel to .util.ixmp4.configure_logging_and_warnings(), prevent warnings
