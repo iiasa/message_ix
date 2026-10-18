@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from importlib.resources import files
 from pathlib import Path
 from shutil import copyfile
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import ixmp.backend
 import numpy.testing as npt
@@ -16,6 +16,9 @@ from nbclient.exceptions import CellExecutionError, CellTimeoutError
 
 from message_ix.testing import GHA
 from message_ix.tests.test_report import MISSING_IXMP4
+
+if TYPE_CHECKING:
+    from _pytest.mark.structures import ParameterSet
 
 log = logging.getLogger(__name__)
 
@@ -46,7 +49,7 @@ TUTORIAL_DIR = Path(files(__name__.partition(".")[0])).with_name("tutorial")  # 
 
 #: Parameters to :func:`test_tutorial`. This is populated using the shorthand functions
 #: below.
-TUTORIALS: list[tuple] = []
+TUTORIALS: list["ParameterSet"] = []
 
 
 @dataclass
@@ -70,7 +73,7 @@ class Tutorial:
     #:    :func:`numpy.testing.assert_allclose`.
     #: 2. Further positional arguments to :func:`numpy.testing.assert_allclose`:
     #:    `desired`, `rtol`, `atol`, etc.
-    check: list[tuple] = field(default_factory=list)
+    check: list[tuple[Any, ...]] = field(default_factory=list)
 
     #: Any :mod:`pytest` marks applicable to the test.
     marks: list[pytest.MarkDecorator] = field(default_factory=list)

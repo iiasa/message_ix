@@ -12,7 +12,7 @@
 
 # %% I) Importing required packages
 import logging
-from typing import Literal
+from typing import Any, Literal
 
 import numpy as np
 import pandas as pd
@@ -51,7 +51,7 @@ def slice_df(
     df: pd.DataFrame,
     idx: list[str],
     level: str,
-    locator: list,
+    locator: list[Any],
     value: int | str | None,
 ) -> pd.DataFrame:
     """Slice a MultiIndex DataFrame and set a value to a specific level.

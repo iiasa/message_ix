@@ -94,7 +94,7 @@ files = [
 # strict = true  # As of 2026-10-18, causes ~649 errors
 # The following are implied by strict in mypy 2.4.0
 # check_untyped_defs = true           #  49 errors
-# disallow_any_generics = true        #  31
+disallow_any_generics = true
 # disallow_incomplete_defs = true     #  47
 disallow_subclassing_any = true
 # disallow_untyped_calls = true       # 447
@@ -104,7 +104,7 @@ extra_checks = true
 no_implicit_reexport = true
 strict_equality = true
 warn_redundant_casts = true
-# warn_return_any = true              #  13
+warn_return_any = true
 warn_unused_ignores = true
 
 [[tool.mypy.overrides]]
@@ -112,7 +112,6 @@ warn_unused_ignores = true
 module = [
   "pooch",
   "pyam.*",
-  "scipy.*",
 ]
 ignore_missing_imports = true
 

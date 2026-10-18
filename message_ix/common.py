@@ -293,7 +293,7 @@ def _item_shorthand(cls, type, name, expr="", description=None, **kwargs):
     cls.items[name] = Item(name, type, expr, description=description, **kwargs)
 
 
-def _log_filter_pattern(cls: type[GAMSModel]) -> "re.Pattern":
+def _log_filter_pattern(cls: type[GAMSModel]) -> "re.Pattern[str]":
     """Return a compiled :class:`re.Pattern` for filtering log messages.
 
     Messages like the following are matched:

@@ -891,7 +891,7 @@ class LPdiag:
         else:
             attr = self.seq_col.get(seq_id)  # [col_name, lo_bnd, up_bnd]
             pass
-        s = []  # strings representing lo/up-bounds
+        s: list[str] = []  # strings representing lo/up-bounds
         for pos in [0, 1]:
             val = attr[pos + 1]  # 0-th element is the name
             if val == self.infty:  # used for both infinites (positive and negative)

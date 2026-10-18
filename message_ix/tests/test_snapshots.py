@@ -1,6 +1,7 @@
 """Tests of specific :data:`.SNAPSHOTS`."""
 
 from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 import numpy.testing as npt
 import pytest
@@ -10,12 +11,17 @@ import message_ix
 from message_ix.testing import SNAPSHOTS
 from message_ix.tools.migrate import v311
 
+if TYPE_CHECKING:
+    from message_ix import Scenario
+
+    ScenarioCallback = Callable[["Scenario"], None]
+
 #: Mapping from scenario URLs to tuples of:
 #:
 #: 1. Callable to prep the scenario.
 #: 2. Keyword arguments to Scenario.solve()
 #: 3. Callable that perform assertions on the solved :class:`.Scenario`.
-CHECK: dict[str, tuple[Callable, dict, Callable]] = {
+CHECK: dict[str, tuple["ScenarioCallback", dict[str, Any], "ScenarioCallback"]] = {
     "CD_Links_SSP2/baseline#1": (
         v311,
         dict(),

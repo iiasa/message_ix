@@ -62,9 +62,11 @@ def assert_dantzig_solution(s: Scenario, lp_method: int) -> None:
     assert_frame_equal(exp, s.var("ACT")[cols])
 
 
-def calculate_activity(scen: Scenario, tec="transport_from_seattle") -> pd.Series:
+def calculate_activity(
+    scen: Scenario, tec="transport_from_seattle"
+) -> "pd.Series[float]":  # TODO Unquote when dropping Python 3.13
     """Sum ``ACT`` levels for `technology` and `mode` groups; return sums for `tec`."""
-    return scen.var("ACT").groupby(["technology", "mode"])["lvl"].sum().loc[tec]
+    return scen.var("ACT").groupby(["technology", "mode"])["lvl"].sum().loc[tec]  # type: ignore [no-any-return]
 
 
 def test_b_a_u_1_mode(request: pytest.FixtureRequest, test_mp: Platform) -> None:
