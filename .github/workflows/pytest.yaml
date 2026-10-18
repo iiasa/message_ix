@@ -61,8 +61,7 @@ jobs:
         - ubuntu-latest
         - windows-latest
         python-version:
-        - "3.10"  # Earliest version supported by message_ix
-        - "3.11"
+        - "3.11"  # Earliest version supported by message_ix
         - "3.12"
         - "3.13"
         - "3.14"  # Latest version supported by message_ix
