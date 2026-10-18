@@ -101,11 +101,11 @@ disallow_subclassing_any = true
 disallow_untyped_decorators = true
 # disallow_untyped_defs = true        #  91
 extra_checks = true
-# no_implicit_reexport = true         #   1
-# strict_equality = true              #   2
+no_implicit_reexport = true
+strict_equality = true
 warn_redundant_casts = true
 # warn_return_any = true              #  13
-# warn_unused_ignores = true          #   6
+warn_unused_ignores = true
 
 [[tool.mypy.overrides]]
 # Packages/modules for which no type hints are available.

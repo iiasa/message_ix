@@ -285,7 +285,7 @@ def _maybe_add_list_to_indexset(
     # NOTE mypy recognizes missing as set[float | str]. If int indexsets mysteriously
     # turn to float indexsets, look here
     if missing := set(data) - set(indexset.data):
-        backend.optimization.indexsets.add_data(id=indexset.id, data=list(missing))  # type: ignore[arg-type]
+        backend.optimization.indexsets.add_data(id=indexset.id, data=list(missing))
 
 
 def _maybe_add_to_indexset(

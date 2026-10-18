@@ -309,7 +309,7 @@ class Scenario(ixmp.Scenario):
         # accepts int for "year"-like dimensions. Proxy the call to avoid type check
         # failures.
         # TODO Move this upstream, to ixmp
-        super().add_set(name, key, comment)  # type: ignore [arg-type]
+        super().add_set(name, key, comment)
 
     add_set.__doc__ = ixmp.Scenario.add_set.__doc__
 
@@ -616,7 +616,7 @@ class Scenario(ixmp.Scenario):
             if len(ya_args) == 3:
                 # Specific vintage for `years_active()`
                 values = map(
-                    lambda y: (int(ya_args[-1]), y),  # type: ignore
+                    lambda y: (int(ya_args[-1]), y),
                     self.years_active(*ya_args),
                 )
             else:

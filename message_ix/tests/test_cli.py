@@ -82,7 +82,7 @@ def test_dl(
     r = message_ix_cli("dl", *opts, str(tmp_path))
     assert r.exit_code == exit_code, (r.exception, r.output)
 
-    if opts == "":
+    if opts == [""]:
         # Guess what the latest release will be from GitHub, using __version__.
         # This string is provided by setuptools-scm based on the most recent
         # Git tag, e.g. if the tag is 'v3.0.0' it may be '3.0.1.devN+etc'.
