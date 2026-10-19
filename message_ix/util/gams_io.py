@@ -7,6 +7,8 @@ if TYPE_CHECKING:
 
 from ixmp.util.ixmp4 import ContainerData
 
+from message_ix.message import MESSAGE
+
 from .scenario_data import (
     HELPER_INDEXSETS,
     HELPER_TABLES,
@@ -155,12 +157,19 @@ def _compose_records(
     # Create a list to collect records
     records: list[pd.DataFrame] = []
 
+    # Target column order
+    column_order: list[str] = []
+
     # NB If the first item of `sources` includes columns = None, its original column
     #    order determines the column order from pd.concat(), below. This was an
     #    issue for map_commodity; see .util.scenario_data.
     for source_name, columns in sources.items():
         # Copy the scenario data to avoid modifying it
         df = scenario.par(name=source_name).copy()
+
+        # Retrieve a target column order from the source object in the MESSAGE schema
+        item = MESSAGE.items[source_name]
+        column_order = column_order = list(item.coords)
 
         # If `df` is empty, add an empty record with correctly named columns
         if df.empty:
@@ -192,7 +201,13 @@ def _compose_records(
 
     # NOTE ixmp_source only adds elements that were not already in records, but here we
     # add everything and drop_duplicates() afterwards
-    return pd.concat(records, ignore_index=True).drop_duplicates()
+    result = pd.concat(records, ignore_index=True).drop_duplicates()
+
+    if set(column_order) == set(result.columns):
+        # Reorder columns to match the target
+        result = result[column_order]
+
+    return result
 
 
 def _compose_map_tec_time(
