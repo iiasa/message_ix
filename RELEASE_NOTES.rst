@@ -22,10 +22,18 @@ Adjust any imports like the following:
 All changes
 -----------
 
-- :mod:`message_ix` is tested and compatible with `Python 3.14 <https://www.python.org/downloads/release/python-3140/>`__ (:pull:`985`).
-- Support for Python 3.9 is dropped (:pull:`985`), as it has reached end-of-life.
-- :mod:`message_ix` is tested and compatible with `Pandas 3.0.0 <https://pandas.pydata.org/pandas-docs/stable/whatsnew/v3.0.0.html>`_,
-  released 2026-01-21 (:pull:`1001`).
+- :mod:`message_ix` is tested and compatible with…
+
+  - `Python 3.15 <https://www.python.org/downloads/release/python-3150/>`__ (:pull:`1040`),
+    released 2026-10-09, and
+    `Python 3.14 <https://www.python.org/downloads/release/python-3140/>`__ (:pull:`985`),
+    released 2025-10-07.
+  - Support is dropped for Python 3.10 (:pull:`1040`)
+    and Python 3.9 (:pull:`985`),
+    as both have reached end-of-life.
+  - `Pandas 3.0.0 <https://pandas.pydata.org/pandas-docs/stable/whatsnew/v3.0.0.html>`_,
+    released 2026-01-21 (:pull:`1001`).
+
 - Add representation of commodity flows associated with construction and retirement of technology capacity (:pull:`451`, :pull:`1003`).
 
   - New parameters
