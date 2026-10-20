@@ -9,6 +9,8 @@ import message_ix
 import message_ix.tools.add_year.cli
 import message_ix.tools.lp_diag.cli
 
+__all__ = ["main"]
+
 log = logging.getLogger(__name__)
 
 # Override the docstring of the ixmp CLI so that it masquerades as the

@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Literal, overload
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 import genno
 import pandas as pd
@@ -23,8 +23,8 @@ __all__ = [
 def as_message_df(
     qty: "AnyQuantity",
     name: str,
-    dims: Mapping,
-    common: Mapping,
+    dims: Mapping[str, str],
+    common: Mapping[str, Any],
     wrap: Literal[True] = True,
 ) -> dict[str, pd.DataFrame]: ...
 
@@ -33,8 +33,8 @@ def as_message_df(
 def as_message_df(
     qty: "AnyQuantity",
     name: str,
-    dims: Mapping,
-    common: Mapping,
+    dims: Mapping[str, str],
+    common: Mapping[str, Any],
     wrap: Literal[False],
 ) -> pd.DataFrame: ...
 

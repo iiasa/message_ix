@@ -24,7 +24,7 @@ env:
   GAMS_VERSION: 48.7.0 # Oldest version of GAMS that can reliably be downloaded
   depth: 100  # Must be large enough to include the most recent release
   label: "safe to test"  # Label that must be applied to run on PRs from forks
-  python-version: "3.14"  # For non-matrixed jobs
+  python-version: "3.15"  # For non-matrixed jobs
   # Install:
   # - sqlalchemy: to work around https://github.com/iiasa/ixmp4/issues/272
   # - ixmp: from its `main` branch.
@@ -61,11 +61,11 @@ jobs:
         - ubuntu-latest
         - windows-latest
         python-version:
-        - "3.10"  # Earliest version supported by message_ix
-        - "3.11"
+        - "3.11"  # Earliest version supported by message_ix
         - "3.12"
         - "3.13"
-        - "3.14"  # Latest version supported by message_ix
+        - "3.14"
+        - "3.15"  # Latest version supported by message_ix
         extra-deps:
         - "--help"
         extra-name:
@@ -77,14 +77,14 @@ jobs:
         # these on the job runner requires a more elaborate build environment,
         # currently out of scope for the message_ix project.
 
-        # - "3.15.0-alpha.1"  # Development version
+        # - "3.16.0-alpha.1"  # Development version
 
         # Additional matrix jobs for particular cases
         # include:
         # Force pandas >= 3 if upstream dependencies exclude it
         # commented (2026-08-04): Not currently needed
         # - os: ubuntu-latest
-        #   python-version: "3.14"
+        #   python-version: "3.15"
         #   extra-deps: '"pandas >= 3"'
         #   extra-name: "-pandas-3"
 
@@ -137,6 +137,12 @@ jobs:
         version: ${{ env.GAMS_VERSION }}
         license: ${{ secrets.GAMS_LICENSE }}
 
+    - uses: ikalnytskyi/action-setup-postgres@v8
+      id: setup-postgres
+      with:
+        # NB Defaults include username=password=database="postgres", port=5432
+        postgres-version: "16"
+
     - name: Install the package and dependencies
       run: |
         uv pip install --upgrade ${{ env.upstream-versions }} .[tests]
@@ -151,7 +157,8 @@ jobs:
           -m "not nightly and not tutorial" \
           --color=yes --durations=20 -rA --verbose \
           --cov-report=xml \
-          --numprocesses=auto --dist=loadgroup
+          --numprocesses=auto --dist=loadscope \
+          --ixmp-postgres=${{ steps.setup-postgres.outputs.connection-uri }}
 
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v7
@@ -221,10 +228,6 @@ jobs:
         version: ${{ env.GAMS_VERSION }}
         license: ${{ secrets.GAMS_LICENSE }}
 
-    - uses: ikalnytskyi/action-setup-postgres@v8
-      id: setup-postgres
-      with: { postgres-version: "16" }
-
     - name: Install the package and dependencies
       run: uv pip install --upgrade ${{ env.upstream-versions }} .[tests]
 
@@ -240,8 +243,7 @@ jobs:
           -m "tutorial" \
           --color=yes --durations=20 -rA --verbose \
           --cov-report=xml \
-          --numprocesses=auto --dist=loadgroup \
-          --ixmp-postgres=${{ steps.setup-postgres.outputs.connection-uri }}
+          --numprocesses=auto --dist=loadgroup
 
     - name: Upload test coverage to Codecov.io
       uses: codecov/codecov-action@v7

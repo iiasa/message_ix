@@ -3,7 +3,7 @@ import os
 from collections.abc import Iterable, Mapping, Sequence
 from functools import lru_cache
 from itertools import chain, product, zip_longest
-from typing import TypeVar
+from typing import Any, TypeVar, cast
 from warnings import warn
 
 import ixmp
@@ -82,7 +82,7 @@ class Scenario(ixmp.Scenario):
             )
         )
 
-    data_type = TypeVar("data_type", pd.Series, pd.DataFrame, dict)
+    data_type = TypeVar("data_type", pd.Series, pd.DataFrame, dict[str, Any])
 
     # NOTE super().equ() etc hint that pd objects return, but they may also return dict
     def _year_as_int(self, name: str, data: data_type) -> data_type:
@@ -258,7 +258,7 @@ class Scenario(ixmp.Scenario):
         key_or_data: int
         | str
         | Sequence[int | str]
-        | dict
+        | dict[str, Any]
         | pd.DataFrame
         | None = None,
         value: float | Sequence[float] | None = None,
@@ -309,7 +309,7 @@ class Scenario(ixmp.Scenario):
         # accepts int for "year"-like dimensions. Proxy the call to avoid type check
         # failures.
         # TODO Move this upstream, to ixmp
-        super().add_set(name, key, comment)  # type: ignore [arg-type]
+        super().add_set(name, key, comment)
 
     add_set.__doc__ = ixmp.Scenario.add_set.__doc__
 
@@ -375,7 +375,7 @@ class Scenario(ixmp.Scenario):
         self,
         year: Iterable[int] = [],
         firstmodelyear: int | None = None,
-        data: dict | None = None,
+        data: dict[str, Any] | None = None,
     ) -> None:
         """Set the scenario time horizon via ``year`` and related categories.
 
@@ -597,7 +597,7 @@ class Scenario(ixmp.Scenario):
         if ya_args is None:
             # Product of all years
             years = self.set("year")
-            values: Iterable = product(years, years)
+            values: Iterable[tuple[int, int]] = product(years, years)
         elif len(ya_args) not in {2, 3}:
             raise ValueError(
                 f"ya_args must be a 2- or 3-tuple; got {ya_args} of length "
@@ -616,7 +616,7 @@ class Scenario(ixmp.Scenario):
             if len(ya_args) == 3:
                 # Specific vintage for `years_active()`
                 values = map(
-                    lambda y: (int(ya_args[-1]), y),  # type: ignore
+                    lambda y: (int(ya_args[-1]), y),
                     self.years_active(*ya_args),
                 )
             else:
@@ -692,12 +692,13 @@ class Scenario(ixmp.Scenario):
         # - the tec's age at the end of the *prior* period is less than or equal to its
         #   lifetime, and
         # - at or later than the vintage year.
-        return (
+        return cast(
+            list[int],
             data.where(data.age.shift(1, fill_value=0) < lt)
             .where(data.year >= yv)["year"]
             .dropna()
             .astype(np.int64)
-            .tolist()
+            .tolist(),
         )
 
     #: Alias for :meth:`years_active`.
@@ -763,7 +764,7 @@ class Scenario(ixmp.Scenario):
 
     def add_macro(
         self,
-        data: Mapping | os.PathLike,
+        data: Mapping[str, pd.DataFrame] | os.PathLike[str],
         scenario=None,
         check_convergence=True,
         **kwargs,

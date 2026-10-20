@@ -153,8 +153,9 @@ class TestScenario:
 def test_backends_available() -> None:
     """Check that the expected set of backends are available within GHA workflows."""
     from ixmp.backend import available
+    from ixmp.util.ixmp4 import HAS_IXMP4
 
-    assert {"ixmp4", "jdbc"} <= set(available())
+    assert ({"ixmp4"} if HAS_IXMP4 else set()) & {"jdbc"} <= set(available())
 
 
 def test_year_int(test_mp: ixmp.Platform, request: pytest.FixtureRequest) -> None:
@@ -217,13 +218,17 @@ def test_add_spatial_hierarchy(test_mp: ixmp.Platform) -> None:
     obs = scen.set("lvl_spatial")
     npt.assert_array_equal(obs, exp)
 
-    exp_map = [
-        ["state", "Vienna", "Austria"],
-        ["state", "Lower Austria", "Austria"],
-        ["country", "Austria", "World"],
-    ]
-    obs = scen.set("map_spatial_hierarchy")
-    npt.assert_array_equal(obs, exp_map)
+    columns = ["lvl_spatial", "node", "node_parent"]
+    exp_map = pd.DataFrame(
+        [
+            ["country", "Austria", "World"],
+            ["state", "Lower Austria", "Austria"],
+            ["state", "Vienna", "Austria"],
+        ],
+        columns=columns,
+    )
+    obs = scen.set("map_spatial_hierarchy").sort_values(columns, ignore_index=True)
+    pdt.assert_frame_equal(obs, exp_map)
 
 
 @pytest.mark.parametrize(
@@ -596,7 +601,7 @@ def test_new_timeseries_long_name64plus(message_test_mp: ixmp.Platform) -> None:
 
 
 def test_excel_read_write(
-    message_test_mp: ixmp.Platform, tmp_path: Path, request: pytest.FixtureRequest
+    request: pytest.FixtureRequest, message_test_mp: ixmp.Platform, tmp_path: Path
 ) -> None:
     # Path to temporary file
     fname = tmp_path / (request.node.name + "_excel_read_write.xlsx")

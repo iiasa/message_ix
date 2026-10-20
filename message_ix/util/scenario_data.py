@@ -1593,8 +1593,9 @@ HELPER_TABLES = [
     HelperTableInfo(
         name="map_commodity",
         sources={
-            "demand": None,
+            # NB The order matters here; see .gams_io._compose_records()
             "input": ["node_origin", "commodity", "level", "year_act", "time_origin"],
+            "demand": None,
             "output": ["node_dest", "commodity", "level", "year_act", "time_dest"],
         },
         renames={
@@ -1692,7 +1693,11 @@ HELPER_TABLES = [
     HelperTableInfo(
         name="is_bound_total_capacity_lo", sources={"bound_total_capacity_lo": None}
     ),
-    HelperTableInfo(name="is_bound_activity_up", sources={"bound_activity_up": None}),
+    HelperTableInfo(
+        name="is_bound_activity_up",
+        sources={"bound_activity_up": None},
+        renames={"node_loc": "node", "year_act": "year"},
+    ),
     # no need for a flag 'bound_activity_lo' because this defaults to 0 in MESSAGE
     # flag for dynamic constraints
     HelperTableInfo(

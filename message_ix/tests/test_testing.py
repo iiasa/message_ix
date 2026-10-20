@@ -43,6 +43,8 @@ def test_make_dantzig(
     """
     s = make_dantzig(test_mp, **kwargs, request=request)
     assert isinstance(s, Scenario)
+    assert s.has_solution()
+    assert 153.6 <= s.var("OBJ")["lvl"]
 
 
 @pytest.mark.parametrize(

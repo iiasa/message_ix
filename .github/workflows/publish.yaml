@@ -18,7 +18,7 @@ jobs:
     steps:
     - uses: actions/checkout@v7
     - uses: astral-sh/setup-uv@v7
-      with: { python-version: "3.14" }
+      with: { python-version: "3.15" }
     - run: uv build
     - run: uv publish --trusted-publishing=always
       if: >-

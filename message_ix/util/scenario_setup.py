@@ -153,7 +153,7 @@ def ensure_required_indexsets_have_data(scenario: "Scenario") -> None:
 
     # Raise an error if any of the checked IndexSets are empty
     for name in indexsets_to_check:
-        indexset = run.optimization.indexsets.get(name=name)
+        indexset = run.optimization.indexsets.get_by_name(name)
         # NOTE this is prone to failure should ixmp4 make indexset.data optional
         if indexset.data == []:
             raise ValueError(f"The required IndexSet {name} is empty!")
@@ -203,14 +203,14 @@ def compose_dimension_map(
 
     # Load Tables
     hierarchy_map = pd.DataFrame(
-        run.optimization.tables.get(name=f"map_{name_part}_hierarchy").data
+        run.optimization.tables.get_by_name(f"map_{name_part}_hierarchy").data
     )
     # TODO do we want to call this function when 'hierarchy_map' is empty? If not,
     # remove this:
     if hierarchy_map.empty:
         return
 
-    map_parameter = run.optimization.tables.get(name=f"map_{dimension}")
+    map_parameter = run.optimization.tables.get_by_name(f"map_{dimension}")
 
     # Create auxiliary variables
     dimension_items = set(hierarchy_map[f"{dimension}"].to_list()) | set(
@@ -285,7 +285,7 @@ def _maybe_add_list_to_indexset(
     # NOTE mypy recognizes missing as set[float | str]. If int indexsets mysteriously
     # turn to float indexsets, look here
     if missing := set(data) - set(indexset.data):
-        backend.optimization.indexsets.add_data(id=indexset.id, data=list(missing))  # type: ignore[arg-type]
+        backend.optimization.indexsets.add_data(id=indexset.id, data=list(missing))
 
 
 def _maybe_add_to_indexset(
@@ -363,10 +363,10 @@ def compose_period_map(scenario: "Scenario") -> None:
 
     # TODO Included here in ixmp_source; this should likely move to add_default_data
     # Add one default item to 'type_year'
-    type_year = run.optimization.indexsets.get(name="type_year")
+    type_year = run.optimization.indexsets.get_by_name("type_year")
     _maybe_add_to_indexset(indexset=type_year, data="cumulative", backend=ixmp4_backend)
 
-    cat_year = run.optimization.tables.get(name="cat_year")
+    cat_year = run.optimization.tables.get_by_name("cat_year")
     cat_year_df = pd.DataFrame(cat_year.data)
 
     # Get the first model year for determination of the model horizon below
@@ -377,14 +377,14 @@ def compose_period_map(scenario: "Scenario") -> None:
             "A MESSAGEix Scenario can't have multiple first years!"
         )
         first_model_year = (
-            int(first_model_year_df["year"][0])
-            if not first_model_year_df.empty
-            else None
+            None
+            if first_model_year_df.empty
+            else int(first_model_year_df["year"].item())
         )
 
     # Load 'year' data. NOTE that this is somehow converted to str going through ixmp,
     # but we need int for the calculations here, then str to add the data back.
-    year = run.optimization.indexsets.get(name="year")
+    year = run.optimization.indexsets.get_by_name("year")
     years = [int(_year) for _year in year.data]
 
     # TODO do we want to call this function when 'year' is empty? If not remove this:
@@ -411,7 +411,7 @@ def compose_period_map(scenario: "Scenario") -> None:
             )
 
     # Initialize duration_period with this data
-    duration_period = run.optimization.parameters.get(name="duration_period")
+    duration_period = run.optimization.parameters.get_by_name(name="duration_period")
     durations = [
         sorted_years[i] - sorted_years[i - 1] for i in range(len(sorted_years))
     ]

@@ -43,7 +43,7 @@ def _setup(
     mp: Platform,
     years: Sequence[int],
     firstmodelyear: int,
-    tl_years: filter | None = None,
+    tl_years: "filter[int] | None" = None,  # TODO Unquote when dropping Python 3.13
 ) -> tuple[Scenario, pd.DataFrame]:
     """Common setup for test of :meth:`.vintage_and_active_years`.
 

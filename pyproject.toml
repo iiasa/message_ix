@@ -20,16 +20,16 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
   "Programming Language :: R",
   "Topic :: Scientific/Engineering",
   "Topic :: Scientific/Engineering :: Information Analysis",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
   "click",
   "ixmp >= 3.11",
@@ -91,15 +91,27 @@ files = [
   "doc",
   "message_ix",
 ]
-# TODO Remove this once it has become default with mypy 2.0:
-local_partial_types = true
+# strict = true  # As of 2026-10-18, causes ~649 errors
+# The following are implied by strict in mypy 2.4.0
+# check_untyped_defs = true           #  49 errors
+disallow_any_generics = true
+# disallow_incomplete_defs = true     #  47
+disallow_subclassing_any = true
+# disallow_untyped_calls = true       # 447
+disallow_untyped_decorators = true
+# disallow_untyped_defs = true        #  91
+extra_checks = true
+no_implicit_reexport = true
+strict_equality = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unused_ignores = true
 
 [[tool.mypy.overrides]]
 # Packages/modules for which no type hints are available.
 module = [
   "pooch",
   "pyam.*",
-  "scipy.*",
 ]
 ignore_missing_imports = true
 
@@ -108,7 +120,7 @@ ignore_missing_imports = true
 addopts = [
   "--cov=message_ix",
   "--cov-report=",
-  '-m "not nightly and not rmessageix"',
+  '-m not nightly and not rmessageix',
   "-p no:faulthandler",
 ]
 # Parallel to .util.ixmp4.configure_logging_and_warnings(), prevent warnings

@@ -12,7 +12,7 @@
 
 # %% I) Importing required packages
 import logging
-from typing import Literal
+from typing import Any, Literal
 
 import numpy as np
 import pandas as pd
@@ -51,7 +51,7 @@ def slice_df(
     df: pd.DataFrame,
     idx: list[str],
     level: str,
-    locator: list,
+    locator: list[Any],
     value: int | str | None,
 ) -> pd.DataFrame:
     """Slice a MultiIndex DataFrame and set a value to a specific level.
@@ -178,7 +178,7 @@ def add_year(
 
     reg_list: list[str]
     if region in ("all", ["all"]):
-        nodes: pd.Series = sc_ref.set("node")  # type: ignore
+        nodes: pd.Series = sc_ref.set("node")
         reg_list = nodes.tolist()
     elif isinstance(region, list):
         reg_list = region
@@ -223,7 +223,7 @@ def add_year(
         int(min(cat_year_new["year"]))
         if firstmodelyear_new.empty
         else int(firstmodelyear_new["year"].item())
-    )  # type: ignore
+    )
     # assert isinstance(firstyear_new, int)
 
     cat_year_ref: pd.DataFrame = sc_new.set("cat_year")
@@ -799,7 +799,7 @@ def interpolate_2d(  # noqa: C901
             df_dur.loc[i, j] = int(j) - int(i)
 
     # Adding data for new transition year
-    if yr_diff_new and tec_list and year_diff not in yr_diff_new:
+    if yr_diff_new and tec_list and year_diff not in yr_diff_new:  # type: ignore [comparison-overlap]
         yrs = [x for x in horizon if x <= yr_diff_new[0]]
         year_next = min([x for x in df2_int_column_list if x > yr_diff_new[0]])
         df_yrs = slice_df(df2_tec, idx, year_ref, yrs, None)

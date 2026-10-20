@@ -538,7 +538,9 @@ def test_reporter_as_pyam(
     #   to compare with the expected data.
     expected = Path(__file__).parent / "data" / "report-pyam-write.csv"
     assert expected.read_text() == re.sub(
-        r"(test_reporter_as_pyam)\[(jdbc|ixmp4)\]", r"\1", path.read_text()
+        r"(test_reporter_as_pyam)\[(jdbc|ixmp4)_(hsqldb|postgresql)\]",
+        r"\1",
+        path.read_text(),
     )
 
     # Use a name map to replace variable names

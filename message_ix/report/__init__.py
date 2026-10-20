@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from functools import lru_cache, partial
 from itertools import product
 from operator import itemgetter
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from genno import ComputationError, Key, KeyExistsError, Keys, MissingKeyError
 from genno.operator import broadcast_map
@@ -54,7 +54,7 @@ configure(
 #:    contains the value 1 at every valid (type_addon, ta) location, and 0 elsewhere.
 #: 2. Simple products of 2 or mode quantities.
 #: 3. Other derived quantities.
-TASKS0: tuple[tuple, ...] = (
+TASKS0: tuple[tuple[Any, ...], ...] = (
     # Mapping sets
     ("map_addon", "map_as_qty", "cat_addon", "t"),
     ("map_emission", "map_as_qty", "cat_emission", "e"),
@@ -157,13 +157,13 @@ TASKS1 = (
 
 
 @lru_cache(1)
-def get_tasks() -> list[tuple[tuple, Mapping]]:
+def get_tasks() -> list[tuple[tuple[Any, ...], Mapping[str, Any]]]:
     """Return a list of tasks describing MESSAGE reporting calculations."""
     from message_ix.message import MESSAGE
 
     # Assemble queue of items to add. Each element is a 2-tuple of (positional, keyword)
     # arguments for Reporter.add()
-    to_add: list[tuple[tuple, Mapping]] = []
+    to_add: list[tuple[tuple[Any, ...], Mapping[str, Any]]] = []
 
     strict = dict(strict=True)
 

@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pandas as pd
@@ -77,7 +77,7 @@ NEEDS_CAP_COM = pytest.mark.xfail(
         dict(cap_comm=1),
     ),
 )
-def test_new_params_working(test_mp: "Platform", kwargs: dict) -> None:
+def test_new_params_working(test_mp: "Platform", kwargs: dict[str, Any]) -> None:
     """Check the model creation functions in message_ix.testing."""
 
     scen = make_westeros(test_mp, solve=False)

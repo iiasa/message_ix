@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from functools import partial
 from operator import itemgetter, mul
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, cast, overload
 
 import numpy as np
 import pandas as pd
@@ -64,12 +64,20 @@ INPUT_DATA = [
 # Utility methods
 
 
-def _notna(data, where=None):
+@overload
+def _notna(data: pd.Series, where: str = "") -> pd.Series: ...
+
+
+@overload
+def _notna(data: pd.DataFrame, where: str = "") -> pd.DataFrame: ...
+
+
+def _notna(data: pd.Series | pd.DataFrame, where: str = "") -> pd.Series | pd.DataFrame:
     """Raise :class:`RuntimeError` if `data` contains any missing values."""
-    if data.isna().any(axis=None):
+    if data.isna().any(axis=None):  # type: ignore [arg-type]
         raise RuntimeError(
             f"NaN values in {__name__}.{where}:\n"
-            + data[data.isna().any(axis=1)].to_string()
+            + data[data.isna().any(axis=1)].to_string()  # type: ignore [arg-type,index]
         )
     return data
 
@@ -191,12 +199,13 @@ def clean_model_data(data: "Quantity", s: Structures) -> "DataFrame":
             selectors[dim] = sorted(getattr(s, kind))
             names[dim] = kind
 
-    return (
-        select(data, selectors)  # type: ignore [attr-defined]
+    return cast(
+        pd.DataFrame,
+        select(data, selectors)
         .pipe(rename_dims, names)
         .to_series()
         .rename("value")
-        .reset_index()
+        .reset_index(),
     )
 
 
@@ -231,7 +240,8 @@ def demand(
     """
     # - Use reference data for the pre-model period
     # - Map `model_demand` from MESSAGE (commodity, level) to MACRO sector
-    return (
+    return cast(
+        pd.DataFrame,
         pd.concat(
             [
                 demand_ref.reset_index().assign(year=ym1),
@@ -240,7 +250,7 @@ def demand(
             sort=True,
         )
         .set_index(["node", "sector", "year"])["value"]
-        .pipe(_notna, "demand")
+        .pipe(_notna, "demand"),
     )
 
 
@@ -264,15 +274,16 @@ def extrapolate(
     """
     from scipy.optimize import curve_fit
 
-    def f(x, b, m):
+    def f(x: int, b: float, m: float, /) -> float:
         """Compound growth function to fit."""
         return b * m**x
 
-    def fitted_intercept(df: pd.DataFrame) -> float:
+    def fitted_intercept(df: "DataFrame") -> float:
         """Fit `f` to the data, with value → x and year → y."""
         # Shift years so that ym1 = 0
         (b, m), _ = curve_fit(f, df["year"] - ym1, df["value"])
-        return b  # The intercept at ym1 == b
+        # The intercept at ym1 == b
+        return b  # type: ignore [no-any-return]
 
     # Apply fitted_intercept to grouped data
     groupby_cols = set(model_data.columns) - {"year", "value"}
@@ -293,12 +304,12 @@ def extrapolate(
     return result.pipe(_notna, "extrapolate")
 
 
-def gdp0(gdp_calibrate, ym1: int) -> "Series":
+def gdp0(gdp_calibrate: "Series[float]", ym1: int) -> "Series[float]":
     """Select GDP reference values from "gdp_calibrate"."""
-    return gdp_calibrate.iloc[gdp_calibrate.index.isin([ym1], level="year")]
+    return gdp_calibrate.loc[gdp_calibrate.index.isin([ym1], level="year")]
 
 
-def growth(gdp_calibrate) -> "DataFrame":
+def growth(gdp_calibrate: "Series[float]") -> "Series[float]":
     """Calculate GDP growth rates between model periods (MACRO parameter ``grow``)."""
     diff = gdp_calibrate.groupby(level="node").diff()
     years = sorted(gdp_calibrate.index.get_level_values("year").unique())
@@ -335,7 +346,7 @@ def price(
     mapping_macro_sector: "DataFrame",
     s: Structures,
     ym1: int,
-) -> "DataFrame":
+) -> "Series[float]":
     """Prepare data for the ``price_MESSAGE`` MACRO parameter.
 
     Reads PRICE_COMMODITY from MESSAGEix, validates the data, and combines the data with
@@ -386,7 +397,9 @@ def rho(esub: "Series") -> "Series":
     return (esub - 1) / esub
 
 
-def total_cost(model_cost: "DataFrame", cost_ref: "DataFrame", ym1: int) -> "DataFrame":
+def total_cost(
+    model_cost: "DataFrame", cost_ref: "DataFrame", ym1: int
+) -> "Series[float]":
     """Combine `model_cost` and `cost_ref` (reference year) data.
 
     Raises
@@ -418,7 +431,7 @@ def total_cost(model_cost: "DataFrame", cost_ref: "DataFrame", ym1: int) -> "Dat
     )
 
 
-def unique_set(column: str, df: "DataFrame") -> set:
+def unique_set(column: str, df: "DataFrame") -> set[Any]:
     """A :class:`set` of the unique elements in `column` of `df`."""
     return set(df[column].dropna().unique())
 
@@ -460,7 +473,7 @@ def validate_transform(
     return df.set_index(idx)["value"]
 
 
-def _validate_data(name: str | None, df: "DataFrame", s: Structures) -> list:
+def _validate_data(name: str | None, df: "DataFrame", s: Structures) -> list[str]:
     """Validate input `df` against `s` for MACRO parameter `name` calibration .
 
     Parameters
@@ -535,7 +548,7 @@ def ym1(df: "Series", macro_periods: Collection[int]) -> int:
         much data is the minimum required to compute growth rates in the historical
         periods (MACRO's ``initializeyear``).
     """
-    data_years_before_model = sorted(
+    data_years_before_model: list[int] = sorted(
         filter(lambda y: y < min(macro_periods), set(df.index.get_level_values("year")))
     )
 
@@ -553,7 +566,9 @@ def ym1(df: "Series", macro_periods: Collection[int]) -> int:
 
 
 def add_model_data(
-    base: "Scenario", clone: "Scenario", data: Mapping | os.PathLike
+    base: "Scenario",
+    clone: "Scenario",
+    data: Mapping[str, pd.DataFrame] | os.PathLike[str],
 ) -> None:
     """Calculate and add MACRO structure and data to `clone`.
 
@@ -644,7 +659,7 @@ def calibrate(s, check_convergence: bool = True, **kwargs):
 def prepare_computer(
     base: "Scenario",
     target: "Scenario | None" = None,
-    data: Mapping | os.PathLike | None = None,
+    data: Mapping[str, pd.DataFrame] | os.PathLike[str] | None = None,
 ) -> "genno.Computer":
     """Prepare a :class:`.Reporter` to perform MACRO calibration calculations.
 

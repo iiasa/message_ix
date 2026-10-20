@@ -34,7 +34,7 @@ genno==1.28.2
     # via ixmp
 gitdb==4.0.10
     # via gitpython
-gitpython==3.1.58
+gitpython==3.1.62
     # via -r requirements.in
 idna==3.15
     # via
@@ -159,7 +159,7 @@ typing-extensions==4.14.1
     #   pint
 tzdata==2025.2
     # via pandas
-urllib3==2.7.0
+urllib3==2.8.0
     # via
     #   -r requirements.in
     #   requests
