@@ -28,7 +28,7 @@ flexcache==0.3
     # via pint
 flexparser==0.4
     # via pint
-fsspec==2025.7.0
+fsspec==2026.6.0
     # via dask
 genno==1.28.2
     # via ixmp
