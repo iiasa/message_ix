@@ -1,3 +1,5 @@
+import sys
+
 import pandas as pd
 import pytest
 from ixmp import Platform
@@ -60,7 +62,9 @@ def test_add_default_data_to_container_data_list(test_mp: Platform) -> None:
 
     for index, item in enumerate(data):
         assert isinstance(item.records, pd.DataFrame)
-        pd.testing.assert_frame_equal(item.records, expected[index])
+        pd.testing.assert_frame_equal(
+            item.records, expected[index], check_dtype=sys.version_info > (3, 12)
+        )
 
 
 @pytest.mark.ixmp4
