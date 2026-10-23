@@ -11,7 +11,6 @@ from message_ix.testing import make_westeros
 if TYPE_CHECKING:
     from ixmp import Platform
 
-pytestmark = pytest.mark.ixmp4_209
 
 COMMON: dict[str, int | str] = dict(
     commodity="coal",

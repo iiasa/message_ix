@@ -4,8 +4,6 @@ from ixmp import Platform
 
 from message_ix import Scenario, make_df
 
-pytestmark = pytest.mark.ixmp4_209
-
 MODEL = "test_emissions_price"
 
 solve_args = {"equ_list": ["EMISSION_EQUIVALENCE"]}

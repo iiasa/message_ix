@@ -4,8 +4,6 @@ from ixmp import Platform
 from message_ix import ModelError, Scenario
 from message_ix.testing import make_austria, make_dantzig, make_westeros
 
-pytestmark = pytest.mark.ixmp4_209
-
 
 @pytest.mark.parametrize(
     "kwargs",
@@ -26,7 +24,6 @@ def test_make_austria(
     assert isinstance(s, Scenario)
 
 
-@pytest.mark.ixmp4_209
 @pytest.mark.parametrize(
     "kwargs",
     (

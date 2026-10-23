@@ -26,8 +26,6 @@ from message_ix.message import MESSAGE
 from message_ix.report import ComputationError, Key, Reporter, configure
 from message_ix.testing import SCENARIO, assert_keys, make_dantzig, make_westeros
 
-pytestmark = pytest.mark.ixmp4_209
-
 # NOTE These tests maybe don't need to be parametrized.
 # Does `Reporter.from_scenario()` depend on otherwise untested Scenario functions?
 
