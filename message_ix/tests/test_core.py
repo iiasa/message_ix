@@ -16,8 +16,6 @@ import message_ix
 from message_ix import Scenario
 from message_ix.testing import GHA, SCENARIO, make_dantzig, make_westeros
 
-pytestmark = pytest.mark.ixmp4_209
-
 
 @pytest.fixture
 def dantzig_message_scenario(

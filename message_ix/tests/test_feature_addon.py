@@ -1,12 +1,9 @@
 import numpy as np
 import pandas as pd
-import pytest
 from ixmp import Platform
 
 from message_ix import Scenario
 from message_ix.testing import SCENARIO
-
-pytestmark = pytest.mark.ixmp4_209
 
 # First model year of the Dantzig scenario
 _year = 1963

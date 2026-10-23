@@ -11,8 +11,6 @@ if TYPE_CHECKING:
     import pytest
     from ixmp import Platform
 
-pytestmark = pytest.mark.ixmp4_209
-
 
 # NOTE This test likely doesn't need to be parametrized
 def test_prepare_plots(dantzig_reporter: Reporter) -> None:
