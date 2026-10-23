@@ -17,11 +17,13 @@ jobs:
   conda:
     strategy:
       matrix:
-        os: [windows-latest, macos-latest]
+        version:
+        - { os: macos-latest,   spec: '"message-ix > 3.11"' }
+        - { os: windows-latest, spec: "message-ix" }
       fail-fast: false
 
-    runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.version.os }}
+    name: ${{ matrix.version.os }}
 
     # As suggested by conda-incubator/setup-miniconda
     defaults:
@@ -42,9 +44,9 @@ jobs:
       with:
         path: |
           gams
-        key: ${{ matrix.os }}-gams${{ env.GAMS_VERSION }}
+        key: ${{ runner.os }}-gams${{ env.GAMS_VERSION }}
         restore-keys: |
-          ${{ matrix.os }}-
+          ${{ runner.os }}-
 
     - uses: iiasa/actions/setup-gams@main
       with:
@@ -55,7 +57,7 @@ jobs:
       # Also install pytest and packages required for testing. pip and related
       # tools support this via message_ix[testing], but conda does not.
       run: |
-        conda install message-ix pytest asyncssh sphinx
+        conda install ${{ matrix.version.spec }} pytest asyncssh sphinx
         conda list
         conda info
 
