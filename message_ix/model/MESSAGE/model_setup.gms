@@ -18,6 +18,9 @@ $IF NOT SET out      $SETGLOBAL out "output/MsgOutput.gdx"
 * default the land-use mode to GLOBIOM when none is passed on the command line
 $IF NOT SET landusemode $SETGLOBAL landusemode "globiom"
 
+* default the minimum-activity objective (capmin.gms) to off
+$IF NOT SET capmin $SETGLOBAL capmin "0"
+
 ** define the time horizon over which the model optimizes (perfect foresight, myopic or rolling horizon) **
 * perfect foresight - 0 (assumed as default if not specified
 * myopic optimization (period-by-period, recursive-dynamic without any foresight) - 1
@@ -88,3 +91,4 @@ $INCLUDE MESSAGE/scaling_investment_costs.gms
 
 $INCLUDE MESSAGE/model_core.gms
 $IF %landusemode% == "magpie" $INCLUDE MESSAGE/magpie_patch.gms
+$IF %capmin% == "1" $INCLUDE MESSAGE/capmin.gms

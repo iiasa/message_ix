@@ -24,6 +24,21 @@ if (%foresight% = 0,
 
 * write a status update to the log file, solve the model
     put_utility 'log' /'+++ Solve the perfect-foresight version of MESSAGEix +++ ' ;
+$ifthen %capmin% == "1"
+* minimum-activity objective (capmin.gms): solve MESSAGE_CAPMIN in place of MESSAGE_LP
+    Solve MESSAGE_CAPMIN using LP minimizing OBJ ;
+
+    status('perfect_foresight','modelstat') = MESSAGE_CAPMIN.modelstat ;
+    status('perfect_foresight','solvestat') = MESSAGE_CAPMIN.solvestat ;
+    status('perfect_foresight','resUsd')    = MESSAGE_CAPMIN.resUsd ;
+    status('perfect_foresight','objEst')    = MESSAGE_CAPMIN.objEst ;
+    status('perfect_foresight','objVal')    = MESSAGE_CAPMIN.objVal ;
+
+    IF( NOT ( MESSAGE_CAPMIN.modelstat = 1 OR MESSAGE_CAPMIN.modelstat = 8),
+        put_utility 'log' /'+++ MESSAGEix capmin did not solve to optimality, modelstat ' MESSAGE_CAPMIN.modelstat:0:0 ' +++ ' ;
+        ABORT "MESSAGEix capmin did not solve to optimality!"
+    ) ;
+$else
     Solve MESSAGE_LP using LP minimizing OBJ ;
     
 * write model status summary
@@ -38,6 +53,7 @@ if (%foresight% = 0,
         put_utility 'log' /'+++ MESSAGEix did not solve to optimality - run is aborted, no output produced! +++ ' ;
         ABORT "MESSAGEix did not solve to optimality!"
     ) ;
+$endif
 
 * rescale the dual of the emission constraint to account that the constraint is defined on the average year, not total
 EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
