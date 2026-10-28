@@ -9,6 +9,10 @@
 *
 * .. math::
 *    \min_x OBJ = \sum_{n,t \in T^{capmin},y^V,y,m,h} ACT_{n,t,y^V,y,m,h}
+*
+* Project branch ``project/justmip-magpie`` only, not upstream. JustMIP uses it to find the lowest
+* feasible cooperation cap in one LP: in message_data, ``projects/justmip/utils/coop_caps.py`` tags the
+* cap technology, ``utils/capmin_solve.py`` passes the flag, ``utils/coop_cap_search.py`` runs the search.
 ***
 
 $IF NOT "%foresight%" == "0" $ABORT "capmin requires the perfect-foresight model (foresight=0)"
