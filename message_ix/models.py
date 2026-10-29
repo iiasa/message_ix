@@ -214,8 +214,8 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         optfile.write_text("\n".join(lines))
         log.info(f"Use CPLEX options {self.cplex_opts}")
 
-        # Dual crossover, as doc/macro.rst describes: the loop switches to cplex.op2 after
-        # an LP ends optimal with unscaled infeasibilities (solvestat 4).
+        # Dual crossover, as doc/macro.rst describes: MESSAGE_run.gms and the end of
+        # MESSAGE-MACRO_run.gms re-solve an LP that ended with solvestat 4 with cplex.op2.
         self.cplex_opts.update({"barcrossalg": 2})
         optfile2 = Path(self.model_dir).joinpath("cplex.op2")
         lines2 = ("{} = {}".format(*kv) for kv in self.cplex_opts.items())
