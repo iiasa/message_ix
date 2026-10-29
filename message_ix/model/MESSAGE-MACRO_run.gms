@@ -200,6 +200,11 @@ demand_scale(node_macro,sector,year)$(NOT macro_base_period(year)) =
 demand_scale(node_macro,sector,year)$(NOT macro_base_period(year)) =
     max(demand_scale(node_macro,sector,year), 1 - %MAX_ADJUSTMENT% / scaling) ;
 
+* JustMIP (project/justmip-magpie): hold the demand of every year up to FREEZE_DEMAND_UNTIL (command
+* line --FREEZE_DEMAND_UNTIL=<year>) at the level MESSAGE started from, so a variant that starts from
+* its source's converged demand keeps that near-term demand
+$IF SET FREEZE_DEMAND_UNTIL demand_scale(node_macro,sector,year)$(year.val <= %FREEZE_DEMAND_UNTIL%) = 1 ;
+
 * reporting of net total costs (excluding emission taxes) and GDP as result of MESSAGE-MACRO iteration
 COST_NODAL_NET.L(node_macro,year) =
     COST_NODAL.L(node_macro,year) + trade_cost(node_macro,year)
