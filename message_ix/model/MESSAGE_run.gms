@@ -35,24 +35,6 @@ $INCLUDE MESSAGE/model_setup.gms
 
 $INCLUDE MESSAGE/model_solve.gms
 
-* JustMIP (project/justmip-magpie): an LP that ended optimal with unscaled infeasibilities (solvestat 4)
-* is solved once more with dual crossover (cplex.op2), as MESSAGE-MACRO_run.gms does for its final LP
-$ifthen %capmin% == "1"
-if( MESSAGE_CAPMIN.solvestat = 4,
-   put_utility 'log' /'+++ LP has unscaled infeasibilities: solving once more with dual crossover +++ ' ;
-   MESSAGE_CAPMIN.optFile = 2;
-$INCLUDE MESSAGE/model_solve.gms
-   put_utility 'log' /'+++ Final LP re-solved: solvestat ', MESSAGE_CAPMIN.solvestat:0:0, ' +++ ' ;
-) ;
-$else
-if( MESSAGE_LP.solvestat = 4,
-   put_utility 'log' /'+++ LP has unscaled infeasibilities: solving once more with dual crossover +++ ' ;
-   MESSAGE_LP.optFile = 2;
-$INCLUDE MESSAGE/model_solve.gms
-   put_utility 'log' /'+++ Final LP re-solved: solvestat ', MESSAGE_LP.solvestat:0:0, ' +++ ' ;
-) ;
-$endif
-
 *----------------------------------------------------------------------------------------------------------------------*
 * post-processing and export to gdx                                                                                    *
 *----------------------------------------------------------------------------------------------------------------------*
