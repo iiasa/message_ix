@@ -137,7 +137,7 @@ jobs:
         version: ${{ env.GAMS_VERSION }}
         license: ${{ secrets.GAMS_LICENSE }}
 
-    - uses: ikalnytskyi/action-setup-postgres@v8
+    - uses: ikalnytskyi/action-setup-postgres@v9
       id: setup-postgres
       with:
         # NB Defaults include username=password=database="postgres", port=5432
