@@ -5,21 +5,21 @@
 
 # Last updated per https://github.com/iiasa/message_ix/pull/1029
 gitpython>=3.2.1
-idna>=3.15
+idna>=3.20
 ixmp @ git+https://github.com/iiasa/ixmp.git@main
-numpydoc==1.8.0
+numpydoc==1.11.0
 
 # Per CVE-2026-4539; see
 # https://github.com/pygments/pygments/issues/3058
-pygments>=2.20.0
+pygments>=2.21.0
 
 # Per CVE-2026-25645; see
 # https://requests.rtfd.io/en/latest/community/updates/
-requests>=2.33.0
+requests>=2.34.2
 
 sphinx==8.2.3
-sphinx-rtd-theme==3.0.2
-sphinxcontrib-bibtex==2.6.5
+sphinx-rtd-theme==3.1.0
+sphinxcontrib-bibtex==2.7.0
 
 # Last updated per https://github.com/iiasa/message_ix/pull/1014
 urllib3>=2.8.0
