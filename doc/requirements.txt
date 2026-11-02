@@ -110,7 +110,7 @@ requests==2.34.2
     # via
     #   -r doc/requirements.in
     #   sphinx
-roman-numerals-py==3.1.0
+roman-numerals==4.1.0
     # via sphinx
 six==1.16.0
     # via
@@ -120,7 +120,7 @@ smmap==5.0.0
     # via gitdb
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==8.2.3
+sphinx==9.0.4
     # via
     #   -r doc/requirements.in
     #   numpydoc
