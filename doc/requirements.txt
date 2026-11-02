@@ -4,7 +4,7 @@ alabaster==0.7.16
     # via sphinx
 babel==2.16.0
     # via sphinx
-certifi==2024.7.4
+certifi==2026.10.19
     # via requests
 charset-normalizer==3.2.0
     # via requests
@@ -30,20 +30,22 @@ flexparser==0.4
     # via pint
 fsspec==2026.6.0
     # via dask
-genno==1.28.2
+genno==1.31.0
     # via ixmp
 gitdb==4.0.10
     # via gitpython
-gitpython==3.1.62
-    # via -r requirements.in
-idna==3.15
+gitpython==3.2.1
+    # via -r doc/requirements.in
+idna==3.20
     # via
-    #   -r requirements.in
+    #   -r doc/requirements.in
     #   requests
 imagesize==1.4.1
     # via sphinx
+importlib-metadata==10.1.0
+    # via dask
 ixmp @ git+https://github.com/iiasa/ixmp.git@main
-    # via -r requirements.in
+    # via -r doc/requirements.in
 jinja2==3.1.6
     # via sphinx
 jpype1==1.6.0
@@ -59,8 +61,8 @@ numpy==2.3.0
     #   dask
     #   pandas
     #   xarray
-numpydoc==1.8.0
-    # via -r requirements.in
+numpydoc==1.11.0
+    # via -r doc/requirements.in
 openpyxl==3.1.5
     # via ixmp
 packaging==25.0
@@ -69,7 +71,7 @@ packaging==25.0
     #   jpype1
     #   sphinx
     #   xarray
-pandas[parquet]==2.2.3
+pandas[parquet]==3.1.0
     # via
     #   genno
     #   ixmp
@@ -92,13 +94,11 @@ pybtex==0.25.1
     #   sphinxcontrib-bibtex
 pybtex-docutils==1.0.2
     # via sphinxcontrib-bibtex
-pygments==2.20.0
+pygments==2.21.0
     # via
-    #   -r requirements.in
+    #   -r doc/requirements.in
     #   sphinx
 python-dateutil==2.9.0.post0
-    # via pandas
-pytz==2025.2
     # via pandas
 pyyaml==6.0.1
     # via
@@ -106,9 +106,9 @@ pyyaml==6.0.1
     #   genno
     #   ixmp
     #   pybtex
-requests==2.33.0
+requests==2.34.2
     # via
-    #   -r requirements.in
+    #   -r doc/requirements.in
     #   sphinx
 roman-numerals-py==3.1.0
     # via sphinx
@@ -122,18 +122,18 @@ snowballstemmer==2.2.0
     # via sphinx
 sphinx==8.2.3
     # via
-    #   -r requirements.in
+    #   -r doc/requirements.in
     #   numpydoc
     #   sphinx-rtd-theme
     #   sphinxcontrib-bibtex
     #   sphinxcontrib-jquery
     #   sphinxcontrib-serializinghtml
-sphinx-rtd-theme==3.0.2
-    # via -r requirements.in
+sphinx-rtd-theme==3.1.0
+    # via -r doc/requirements.in
 sphinxcontrib-applehelp==2.0.0
     # via sphinx
-sphinxcontrib-bibtex==2.6.5
-    # via -r requirements.in
+sphinxcontrib-bibtex==2.7.0
+    # via -r doc/requirements.in
 sphinxcontrib-devhelp==2.0.0
     # via sphinx
 sphinxcontrib-htmlhelp==2.1.0
@@ -146,8 +146,6 @@ sphinxcontrib-qthelp==2.0.0
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.9
     # via sphinx
-tabulate==0.9.0
-    # via numpydoc
 toolz==1.0.0
     # via
     #   dask
@@ -157,13 +155,13 @@ typing-extensions==4.14.1
     #   flexcache
     #   flexparser
     #   pint
-tzdata==2025.2
-    # via pandas
 urllib3==2.8.0
     # via
-    #   -r requirements.in
+    #   -r doc/requirements.in
     #   requests
 xarray==2025.7.1
     # via
     #   genno
     #   ixmp
+zipp==4.1.2
+    # via importlib-metadata
