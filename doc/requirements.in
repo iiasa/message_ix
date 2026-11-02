@@ -17,7 +17,7 @@ pygments>=2.21.0
 # https://requests.rtfd.io/en/latest/community/updates/
 requests>=2.34.2
 
-sphinx==8.2.3
+sphinx==9.0.4
 sphinx-rtd-theme==3.1.0
 sphinxcontrib-bibtex==2.7.0
 
