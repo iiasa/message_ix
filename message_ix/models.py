@@ -214,8 +214,6 @@ class GAMSModel(ixmp.model.gams.GAMSModel):
         optfile.write_text("\n".join(lines))
         log.info(f"Use CPLEX options {self.cplex_opts}")
 
-        # Dual crossover, as doc/macro.rst describes: the loop switches to cplex.op2 after
-        # an LP ends optimal with unscaled infeasibilities (solvestat 4).
         self.cplex_opts.update({"barcrossalg": 2})
         optfile2 = Path(self.model_dir).joinpath("cplex.op2")
         lines2 = ("{} = {}".format(*kv) for kv in self.cplex_opts.items())
@@ -563,11 +561,6 @@ var(
     "PRICE_EMISSION",
     "n type_emission type_tec y",
     "Emission price (derived from marginals of EMISSION_EQUIVALENCE constraint)",
-)
-var(
-    "PRICE_EMISSION_NEW",
-    "n type_emission type_tec y",
-    "TEMPORARY test for Emission price fix",
 )
 var(
     "REL",

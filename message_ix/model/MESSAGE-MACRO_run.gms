@@ -285,10 +285,9 @@ if ( ORD(Iteration) > 1,
 * solving further with unscaled infeasibilities.
 * When encountering unscaled infeasibilities, modelstat = 1 and solvestat = 4.
 
-* JustMIP (project/justmip-magpie): iterations keep cplex.opt. Dual crossover took 25-45 min per
-* LP in the EC LM runs (29 Oct); the converged iteration's LP gets it once, after the loop.
 if( MESSAGE_LP.solvestat = 4,
-   put_utility 'log' /'+++ LP solved with unscaled infeasibilities; dual crossover is kept for the final LP +++ ' ;
+   put_utility 'log' /'+++ Detected issues solving with unscaled infeasibilities. Enforcing Dual crossover +++ ' ;
+   MESSAGE_LP.optFile = 2;
    report_iteration(iteration, 'unscaled infeasibilities') = 1 ;
 ) ;
 
@@ -315,16 +314,6 @@ $INCLUDE includes/aux_computation_time.gms
 N_ITER.L = ctr ;
 MAX_ITER.L = max_it ;
 
-
-* JustMIP (project/justmip-magpie): when the converged iteration's LP ended optimal with unscaled
-* infeasibilities, solve it once more at the same demand with dual crossover (cplex.op2), so the
-* stored solution is not a status-4 one
-if( convergence_status = 1 AND MESSAGE_LP.solvestat = 4,
-   put_utility 'log' /'+++ Final LP has unscaled infeasibilities: solving once more with dual crossover +++ ' ;
-   MESSAGE_LP.optFile = 2;
-$INCLUDE MESSAGE/model_solve.gms
-   put_utility 'log' /'+++ Final LP re-solved: solvestat ', MESSAGE_LP.solvestat:0:0, ' +++ ' ;
-) ;
 
 $INCLUDE MESSAGE/reporting.gms
 
