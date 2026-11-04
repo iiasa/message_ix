@@ -733,7 +733,9 @@ class Scenario(ixmp.Scenario):
         check_convergence : bool, optional
             Confirm that the calibrated scenario solves in one iteration.
         kwargs
-            Solve options when solving the calibrated scenario.
+            Solve options when solving the calibrated scenario. The file location
+            options (`model_dir`, `case`, `in_file`, `out_file`) also apply to the
+            standalone MACRO calibration solve.
 
         Returns
         -------

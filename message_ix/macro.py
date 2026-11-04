@@ -36,6 +36,10 @@ You are using *experimental*, incomplete features from
 ======================================================
 """
 
+#: Keyword arguments to :meth:`.Scenario.solve` that set where GAMS reads and writes
+#: files; :func:`calibrate` also passes these to the standalone MACRO solve.
+SOLVE_LOCATION_KEYS = ("model_dir", "case", "in_file", "out_file")
+
 # Pairing MACRO calibration parameters with input data for consistency of units
 UNITS = dict(
     cost_MESSAGE="cost_ref",
@@ -587,7 +591,8 @@ def calibrate(s, check_convergence: bool = True, **kwargs):
     check_convergence : bool, optional
         Test is MACRO-calibrated scenario converges in one iteration.
     **kwargs :
-        Keyword arguments passed to meth:`message_ix.Scenario.solve`.
+        Keyword arguments passed to meth:`message_ix.Scenario.solve`. Those in
+        :data:`SOLVE_LOCATION_KEYS` also apply to the standalone MACRO solve.
 
     Raises
     ------
@@ -602,10 +607,12 @@ def calibrate(s, check_convergence: bool = True, **kwargs):
     """
     # Solve MACRO standalone
     gams_args = ["LogOption=2"]  # pass everything to log file
+    location = {k: kwargs[k] for k in SOLVE_LOCATION_KEYS if k in kwargs}
     s.solve(
         model="MACRO",
         var_list=["N_ITER", "MAX_ITER", "aeei_calibrate", "grow_calibrate"],
         gams_args=gams_args,
+        **location,
     )
 
     n_iter = s.var("N_ITER")["lvl"]

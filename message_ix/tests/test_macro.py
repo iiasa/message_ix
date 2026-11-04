@@ -279,6 +279,29 @@ def test_calibrate(westeros_solved, w_data_path) -> None:
     assert not end_grow.isnull().any()
 
 
+def test_calibrate_solve_location() -> None:
+    """File location options reach the standalone MACRO solve; others do not."""
+    from unittest.mock import MagicMock
+
+    s = MagicMock(scenario="s")
+    s.clone.return_value = s
+    calib = pd.DataFrame(dict(node=["R"], year=[2020], mrg=[0.0], lvl=[1.0]))
+    s.var.side_effect = lambda name: calib if "calibrate" in name else {"lvl": 1}
+    s.par.return_value = pd.DataFrame(dict(unit=["-"]))
+
+    macro.calibrate(s, check_convergence=True, model_dir="/job/model", max_iteration=9)
+
+    (_, macro_kw), (_, mm_kw) = s.solve.call_args_list
+    assert macro_kw["model"] == "MACRO" and macro_kw["model_dir"] == "/job/model"
+    assert "max_iteration" not in macro_kw
+    assert mm_kw["model_dir"] == "/job/model" and mm_kw["max_iteration"] == 9
+
+    # Without options the MACRO solve call is unchanged
+    s.solve.reset_mock()
+    macro.calibrate(s, check_convergence=False)
+    assert set(s.solve.call_args.kwargs) == {"model", "var_list", "gams_args"}
+
+
 def test_calibrate_roundtrip(westeros_solved, w_data_path) -> None:
     """Ensure certain values occur after checking convergence.
 
