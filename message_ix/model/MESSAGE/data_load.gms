@@ -129,7 +129,7 @@ emission_cumulative(emission) = no;
 * TO DO: to avoid having to declarde these emissions in gams code, this section should be translated into a Python process
 * emission_cumulative('TCE_CO2') = yes;
 emission_cumulative('LU_CO2') = yes;
-* Land debt applies to land-use-change CO2 only (LULUCF, IPCC 2006 GL Vol. 4); debt term: magpie_patch.gms:242-258.
+* Land debt applies to land-use-change CO2 only (LULUCF, IPCC 2006 GL Vol. 4, Eggleston et al. eds, IGES 2006); debt term: magpie_patch.gms:242-258.
 emission_cumulative('TCE_land_CO2') = yes;
 * add all emission types to subset for annual land-use emission accounting,
 * then remove the emission types that have been declared in the cumulative accounting set

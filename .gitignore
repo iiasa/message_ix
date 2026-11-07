@@ -1,6 +1,7 @@
 # Python, R, etc.
 __pycache__
 *-checkpoint.ipynb
+# notebook checkpoints and GAMS solve output stay local
 .ipynb_checkpoints/
 *.bak
 *.dat

@@ -38,6 +38,7 @@ You are using *experimental*, incomplete features from
 
 #: Keyword arguments to :meth:`.Scenario.solve` that set where GAMS reads and writes
 #: files; :func:`calibrate` also passes these to the standalone MACRO solve.
+# Concurrent jobs each solve in their own model_dir; without it the MACRO solve read the shared tree's cplex.opt.
 SOLVE_LOCATION_KEYS = ("model_dir", "case", "in_file", "out_file")
 
 # Pairing MACRO calibration parameters with input data for consistency of units
