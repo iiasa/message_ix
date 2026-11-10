@@ -152,14 +152,21 @@ $IF NOT SET myopic_fix_tol $SETGLOBAL myopic_fix_tol "1e-5"
             CAP_NEW.l(node,tec,year_all) + %myopic_fix_tol% + 1e-6 * ABS(CAP_NEW.l(node,tec,year_all)) ) ;
         CAP_NEW.lo(node,tec,year_all) = MAX( CAP_NEW.lo(node,tec,year_all),
             CAP_NEW.l(node,tec,year_all) - %myopic_fix_tol% - 1e-6 * ABS(CAP_NEW.l(node,tec,year_all)) ) ;
-        CAP.up(node,tec,year_all2,year_all)$( map_period(year_all2,year_all) ) = MIN( CAP.up(node,tec,year_all2,year_all),
-            CAP.l(node,tec,year_all2,year_all) + %myopic_fix_tol% + 1e-6 * ABS(CAP.l(node,tec,year_all2,year_all)) ) ;
-        CAP.lo(node,tec,year_all2,year_all)$( map_period(year_all2,year_all) ) = MAX( CAP.lo(node,tec,year_all2,year_all),
-            CAP.l(node,tec,year_all2,year_all) - %myopic_fix_tol% - 1e-6 * ABS(CAP.l(node,tec,year_all2,year_all)) ) ;
-        ACT.up(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all) )
+* CAP and ACT are restricted to the combinations generated in model_core (map_tec_lifetime, map_tec_act); a bound
+* set on any other node-tec-vintage-year(-mode-time) has no effect on the LP but is a non-default value, so GAMS keeps
+* (and writes to the output GDX) a record for each one: hundreds of millions of ACT records for large models
+        CAP.up(node,inv_tec,year_all2,year_all)$( map_period(year_all2,year_all)
+            AND map_tec_lifetime(node,inv_tec,year_all2,year_all) ) = MIN( CAP.up(node,inv_tec,year_all2,year_all),
+            CAP.l(node,inv_tec,year_all2,year_all) + %myopic_fix_tol% + 1e-6 * ABS(CAP.l(node,inv_tec,year_all2,year_all)) ) ;
+        CAP.lo(node,inv_tec,year_all2,year_all)$( map_period(year_all2,year_all)
+            AND map_tec_lifetime(node,inv_tec,year_all2,year_all) ) = MAX( CAP.lo(node,inv_tec,year_all2,year_all),
+            CAP.l(node,inv_tec,year_all2,year_all) - %myopic_fix_tol% - 1e-6 * ABS(CAP.l(node,inv_tec,year_all2,year_all)) ) ;
+        ACT.up(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all)
+            AND map_tec_lifetime(node,tec,year_all2,year_all) AND map_tec_act(node,tec,year_all,mode,time) )
             = MIN( ACT.up(node,tec,year_all2,year_all,mode,time), ACT.l(node,tec,year_all2,year_all,mode,time)
                 + %myopic_fix_tol% + 1e-6 * ABS(ACT.l(node,tec,year_all2,year_all,mode,time)) ) ;
-        ACT.lo(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all) )
+        ACT.lo(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all)
+            AND map_tec_lifetime(node,tec,year_all2,year_all) AND map_tec_act(node,tec,year_all,mode,time) )
             = MAX( ACT.lo(node,tec,year_all2,year_all,mode,time), ACT.l(node,tec,year_all2,year_all,mode,time)
                 - %myopic_fix_tol% - 1e-6 * ABS(ACT.l(node,tec,year_all2,year_all,mode,time)) ) ;
         CAP_NEW_UP.up(node,tec,year_all) = MIN( CAP_NEW_UP.up(node,tec,year_all),
