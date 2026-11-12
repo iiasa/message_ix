@@ -82,6 +82,9 @@ $INCLUDE MESSAGE/parameter_def.gms
 ** load data from gdx, run processing scripts of auxiliary parameters
 $INCLUDE MESSAGE/data_load.gms
 
+** optionally zero out numerically negligible input values (enable with --clean_tol=<threshold>)
+$INCLUDE MESSAGE/data_cleanup.gms
+
 ** compute auxiliary parameters for capacity and investment cost accounting
 $INCLUDE MESSAGE/scaling_investment_costs.gms
 

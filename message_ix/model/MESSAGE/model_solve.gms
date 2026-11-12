@@ -144,6 +144,27 @@ else
 * +/- (%myopic_fix_tol% + 1e-6 * |level|) clipped to the existing bounds; exact fixing locks in LP noise of each solve,
 * which accumulates across iterations and can make equations of fully fixed prior periods infeasible in later solves
 $IF NOT SET myopic_fix_tol $SETGLOBAL myopic_fix_tol "1e-5"
+* project the levels onto the existing bounds first: a barrier solution without crossover (solutiontype=2) can violate
+* bounds by more than %myopic_fix_tol%, and then MAX(lo, l - tol) > MIN(up, l + tol) gives a bound-infeasible column
+        EXT.l(node,commodity,grade,year_all) = MIN( EXT.up(node,commodity,grade,year_all),
+            MAX( EXT.lo(node,commodity,grade,year_all), EXT.l(node,commodity,grade,year_all) ) ) ;
+        CAP_NEW.l(node,tec,year_all) = MIN( CAP_NEW.up(node,tec,year_all),
+            MAX( CAP_NEW.lo(node,tec,year_all), CAP_NEW.l(node,tec,year_all) ) ) ;
+        CAP.l(node,inv_tec,year_all2,year_all)$( map_period(year_all2,year_all)
+            AND map_tec_lifetime(node,inv_tec,year_all2,year_all) ) = MIN( CAP.up(node,inv_tec,year_all2,year_all),
+            MAX( CAP.lo(node,inv_tec,year_all2,year_all), CAP.l(node,inv_tec,year_all2,year_all) ) ) ;
+        ACT.l(node,tec,year_all2,year_all,mode,time)$( map_period(year_all2,year_all)
+            AND map_tec_lifetime(node,tec,year_all2,year_all) AND map_tec_act(node,tec,year_all,mode,time) )
+            = MIN( ACT.up(node,tec,year_all2,year_all,mode,time),
+                MAX( ACT.lo(node,tec,year_all2,year_all,mode,time), ACT.l(node,tec,year_all2,year_all,mode,time) ) ) ;
+        CAP_NEW_UP.l(node,tec,year_all) = MIN( CAP_NEW_UP.up(node,tec,year_all),
+            MAX( CAP_NEW_UP.lo(node,tec,year_all), CAP_NEW_UP.l(node,tec,year_all) ) ) ;
+        CAP_NEW_LO.l(node,tec,year_all) = MIN( CAP_NEW_LO.up(node,tec,year_all),
+            MAX( CAP_NEW_LO.lo(node,tec,year_all), CAP_NEW_LO.l(node,tec,year_all) ) ) ;
+        ACT_UP.l(node,tec,year_all,time) = MIN( ACT_UP.up(node,tec,year_all,time),
+            MAX( ACT_UP.lo(node,tec,year_all,time), ACT_UP.l(node,tec,year_all,time) ) ) ;
+        ACT_LO.l(node,tec,year_all,time) = MIN( ACT_LO.up(node,tec,year_all,time),
+            MAX( ACT_LO.lo(node,tec,year_all,time), ACT_LO.l(node,tec,year_all,time) ) ) ;
         EXT.up(node,commodity,grade,year_all) = MIN( EXT.up(node,commodity,grade,year_all),
             EXT.l(node,commodity,grade,year_all) + %myopic_fix_tol% + 1e-6 * ABS(EXT.l(node,commodity,grade,year_all)) ) ;
         EXT.lo(node,commodity,grade,year_all) = MAX( EXT.lo(node,commodity,grade,year_all),
