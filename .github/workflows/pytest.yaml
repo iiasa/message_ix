@@ -27,12 +27,14 @@ env:
   python-version: "3.15"  # For non-matrixed jobs
   # Install:
   # - ixmp: from its `main` branch.
+  # - pytest: to work around https://github.com/pytest-dev/pytest-xdist/issues/1407
   # - all other dependencies from PyPI.
   #
   # To test against other code, such as other branches for open PRs, temporarily
   # add lines as appropriate. These lines SHOULD NOT be merged to `main`.
   upstream-versions: |
     "ixmp @ git+https://github.com/iiasa/ixmp.git@main" \
+    "pytest < 9.2" \
 
 jobs:
   check:
