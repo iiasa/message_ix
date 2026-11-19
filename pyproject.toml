@@ -52,7 +52,7 @@ docs = [
   "GitPython",
   "message_ix[ixmp4,report]",
   "numpydoc",
-  "sphinx >= 4.0",
+  "sphinx >= 9",
   "sphinx_rtd_theme",
   "sphinxcontrib-bibtex",
 ]
