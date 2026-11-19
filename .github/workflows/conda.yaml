@@ -11,7 +11,12 @@ on:
 
 env:
   # Oldest version that can reliably be downloaded
-  GAMS_VERSION: 48.7.0
+  gams-version: "48.7.0"
+  # The latest version of pyam on conda-forge, v3.2.0,
+  # includes the constraint python <3.14. Use a compatible version.
+  python-version: "3.13"
+  # Conda/libmamba sporadically chooses to install v0.7.0, which causes errors
+  upstream-versions: '"pyam >= 1.6"'
 
 jobs:
   conda:
@@ -37,27 +42,27 @@ jobs:
         activate-environment: testenv
         channel-priority: strict
         channels: conda-forge
-        python-version: "3.14"
+        python-version: ${{ env.python-version }}
 
     - name: Cache GAMS installer
       uses: actions/cache@v6
       with:
         path: |
           gams
-        key: ${{ runner.os }}-gams${{ env.GAMS_VERSION }}
+        key: ${{ runner.os }}-gams${{ env.gams-version }}
         restore-keys: |
           ${{ runner.os }}-
 
     - uses: iiasa/actions/setup-gams@main
       with:
-        version: ${{ env.GAMS_VERSION }}
+        version: ${{ env.gams-version }}
         license: ${{ secrets.GAMS_LICENSE }}
 
     - name: Install message-ix into 'testenv' conda environment
       # Also install pytest and packages required for testing. pip and related
       # tools support this via message_ix[testing], but conda does not.
       run: |
-        conda install ${{ matrix.version.spec }} pytest asyncssh sphinx
+        conda install ${{ matrix.version.spec }} ${{ env.upstream-versions }} pytest asyncssh sphinx
         conda list
         conda info
 
