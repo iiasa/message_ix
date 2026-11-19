@@ -382,47 +382,50 @@ Operators
 
    Other operators are provided by :mod:`ixmp.report`:
 
+   .. currentmodule:: ixmp.report.operator
+
    .. autosummary::
-      ~ixmp.report.operator.data_for_quantity
-      ~ixmp.report.operator.from_url
-      ~ixmp.report.operator.get_ts
-      ~ixmp.report.operator.map_as_qty
-      ~ixmp.report.operator.remove_ts
-      ~ixmp.report.operator.store_ts
-      ~ixmp.report.operator.update_scenario
+      data_for_quantity
+      from_url
+      get_ts
+      map_as_qty
+      remove_ts
+      store_ts
+      update_scenario
 
    …and by :mod:`genno.operator` and its compatibility modules.
    See the package documentation for details.
 
+   .. currentmodule:: genno
    .. autosummary::
-      ~genno.compat.plotnine.Plot
-      ~genno.operator.add
-      ~genno.operator.aggregate
-      ~genno.operator.apply_units
-      ~genno.compat.pyam.operator.as_pyam
-      ~genno.operator.broadcast_map
-      ~genno.operator.combine
-      ~genno.operator.concat
-      ~genno.operator.div
-      ~genno.operator.drop_vars
-      ~genno.operator.group_sum
-      ~genno.operator.index_to
-      ~genno.operator.interpolate
-      ~genno.operator.load_file
-      ~genno.operator.mul
-      ~genno.operator.pow
-      ~genno.operator.relabel
-      ~genno.operator.rename_dims
-      ~genno.operator.round
-      ~genno.operator.select
-      ~genno.operator.sub
-      ~genno.operator.sum
-      ~genno.operator.write_report
-
+      ~compat.plotnine.Plot
+      ~operator.add
+      ~operator.aggregate
+      ~operator.apply_units
+      ~compat.pyam.operator.as_pyam
+      ~operator.broadcast_map
+      ~operator.combine
+      ~operator.concat
+      ~operator.div
+      ~operator.drop_vars
+      ~operator.group_sum
+      ~operator.index_to
+      ~operator.interpolate
+      ~operator.load_file
+      ~operator.mul
+      ~operator.pow
+      ~operator.relabel
+      ~operator.rename_dims
+      ~operator.round
+      ~operator.select
+      ~operator.sub
+      ~operator.sum
+      ~operator.write_report
+   
    .. autosummary::
-      ~genno.operator.disaggregate_shares
-      ~genno.operator.product
-      ~genno.operator.ratio
+      ~operator.disaggregate_shares
+      ~operator.product
+      ~operator.ratio
 
 Utilities
 ---------

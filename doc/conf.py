@@ -145,6 +145,8 @@ latex_engine = "lualatex"
 # Sphinx will not properly resolve relative references within docstrings of methods of
 # the former. Some of these aliases are to allow Sphinx to locate the correct targets.
 reference_aliases = {
+    # pandas
+    "(pandas.core.(frame|series).|)(DataFrame|Series)": r"pandas.\3",
     # genno
     "AnyQuantity": ":data:`genno.core.quantity.AnyQuantity`",
     "Computer": "genno.Computer",
@@ -156,9 +158,9 @@ reference_aliases = {
     r"(genno\.|)Key(?=Seq|[^\w]|$)": "genno.core.key.Key",
     r"(genno\.|)Quantity": "genno.core.attrseries.AttrSeries",
     # ixmp
+    "(Filters|ModelItemType|ParData|ScalarParData)": r":any:`ixmp.types.\1`",
     "ItemType": "ixmp.backend.ItemType",
-    "Platform": "ixmp.Platform",
-    "TimeSeries": "ixmp.TimeSeries",
+    "(Platform|TimeSeries)": r"ixmp.\1",
     #
     # Many projects (including Sphinx itself!) do not have a py:module target in for the
     # top-level module in objects.inv. Resolve these using :doc:`index` or similar for
