@@ -71,6 +71,11 @@ EMISSION_CONSTRAINT.m(node,type_emission,type_tec,type_year)$(
             / df_period(year) ;
 
 * calculate PRICE_EMISSION based on the marginals of EMISSION_EQUIVALENCE
+* Reset first. The assignments below write only where a marginal is nonzero, and MESSAGE-MACRO
+* runs this file once per iteration, so without the reset a price whose constraint is slack in
+* the last LP keeps its value from an earlier iteration (JustMIP, CHN_sm_M1_A1_hl, Nov 2026:
+* 953 USD/tC reported in 2100 where the last LP's dual is zero).
+    PRICE_EMISSION.l(node,type_emission,type_tec,year) = 0 ;
 $ifthen %landusemode% == "magpie"
     PRICE_EMISSION.l(node,type_emission,type_tec,year)$( SUM(emission$( cat_emission(type_emission,emission) ),
          EMISSION_EQUIVALENCE_MAgPIE.m(node,emission,type_tec,year) ) ) =
